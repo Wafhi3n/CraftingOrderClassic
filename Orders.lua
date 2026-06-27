@@ -56,11 +56,15 @@ local function genId()
     return me() .. "-" .. COC.db.orderSeq
 end
 
-function Orders:Post(itemID, qty, price)
+-- opts (optionnel) : { spellID, profession, provided = { itemID,... } } depuis l'UI Poster.
+function Orders:Post(itemID, qty, price, opts)
     if not (itemID and COC.db) then return nil end
+    opts = opts or {}
     local o = {
         id = genId(), buyer = me(), kind = "item", itemID = itemID,
-        qty = qty or 1, price = price, profession = self:ProfForItem(itemID),
+        qty = qty or 1, price = price,
+        profession = opts.profession or self:ProfForItem(itemID),
+        spellID = opts.spellID, provided = opts.provided,   -- réactifs fournis (local v1)
         status = "open", ts = time(),
     }
     COC.db.orders[o.id] = o

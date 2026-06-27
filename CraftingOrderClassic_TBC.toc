@@ -14,5 +14,6 @@ Libs\CraftLink-1.0\Data\TBC.xml
 CraftingOrderClassic.lua
 CraftingOrderClassic_UI_Skin.lua
 CraftingOrderClassic_UI.lua
+CraftingOrderClassic_UI_Post.lua
 Directory.lua
 Orders.lua

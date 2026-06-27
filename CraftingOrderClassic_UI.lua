@@ -38,13 +38,14 @@ function UI:Build()
     self:BuildTabs(f)
     self:BuildOrdersTab(f)
     self:BuildArtisansTab(f)
+    if self.BuildPostTab then self:BuildPostTab(f) end
     self:ShowTab("orders")
     return f
 end
 
 function UI:BuildTabs(f)
     self.tabs = {}
-    local defs = { { id = "orders", label = "Carnet" }, { id = "artisans", label = "Artisans" } }
+    local defs = { { id = "orders", label = "Carnet" }, { id = "post", label = "Poster" }, { id = "artisans", label = "Artisans" } }
     for i, d in ipairs(defs) do
         local b = Skin.MakeGoldButton(f, 90, 22, d.label)
         b:SetPoint("TOPLEFT", 16 + (i - 1) * 94, -48)
@@ -58,6 +59,7 @@ function UI:ShowTab(id)
     for tid, b in pairs(self.tabs) do b:SetSelected(tid == id) end
     self.ordersPanel:SetShown(id == "orders")
     self.artisansPanel:SetShown(id == "artisans")
+    if self.postPanel then self.postPanel:SetShown(id == "post") end
     self:Refresh()
 end
 
@@ -209,7 +211,9 @@ end
 -- ------------------------------------------------------------------
 function UI:Refresh()
     if not self.frame or not self.frame:IsShown() then return end
-    if self.activeTab == "artisans" then self:RefreshArtisans() else self:RefreshOrders() end
+    if self.activeTab == "artisans" then self:RefreshArtisans()
+    elseif self.activeTab == "post" and self.RefreshPost then self:RefreshPost()
+    else self:RefreshOrders() end
     local CraftLink = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
     local D = COC.Directory
     self.status:SetText(string.format("|c%sréseau|r %s  ·  %d en ligne  ·  %d artisan(s)",
