@@ -1,0 +1,18 @@
+## Interface: 30403
+## Title: Crafting Order - Classic
+## Notes: Réseau global et social de commandes de craft (autonome — sans guilde). /co pour le statut.
+## Author:
+## Version: 0.1.0
+## SavedVariables: CraftingOrderClassicDB
+
+# Variante WRATH (chargée par le client WotLK Classic). Charge le dataset WotLK (recettes
+# complètes + Inscription + Joaillerie). Cf. CraftingOrderClassic.toc (Era) / _TBC.toc (BCC).
+Libs\LibStub\LibStub.lua
+Libs\CraftLink-1.0\lib.xml
+Libs\CraftLink-1.0\Data\Wrath.xml
+
+CraftingOrderClassic.lua
+CraftingOrderClassic_UI_Skin.lua
+CraftingOrderClassic_UI.lua
+Directory.lua
+Orders.lua
