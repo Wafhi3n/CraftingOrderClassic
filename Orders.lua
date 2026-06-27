@@ -72,6 +72,31 @@ function Orders:Post(itemID, qty, price, opts)
     return o
 end
 
+-- Poste depuis une entrée de catalogue : objet (itemID) OU service/enchant (spellID seul).
+function Orders:PostEntry(entry, qty, price, opts)
+    if not (entry and COC.db) then return nil end
+    opts = opts or {}
+    local o = {
+        id = genId(), buyer = me(),
+        kind = entry.itemID and "item" or "enchant",
+        itemID = entry.itemID, spellID = entry.spellID,
+        qty = qty or 1, price = price,
+        profession = opts.profession or (entry.itemID and self:ProfForItem(entry.itemID)),
+        provided = opts.provided, status = "open", ts = time(),
+    }
+    COC.db.orders[o.id] = o
+    self:Broadcast("NEW", o)
+    return o
+end
+
+-- Nom affichable d'un ordre : objet (GetItemInfo) ou enchant (GetSpellInfo). Multilingue.
+function Orders:OrderName(o)
+    local c = CraftLink
+    if o.itemID then return c and c:ItemName(o.itemID) or ("item:" .. o.itemID) end
+    if o.spellID then return c and c:RecipeName(o.spellID) or ("spell:" .. o.spellID) end
+    return "?"
+end
+
 function Orders:Cancel(id)
     local o = id and COC.db.orders[id]
     if not o then pmsg("commande introuvable : " .. tostring(id)); return end
@@ -108,7 +133,7 @@ function Orders:OnNetwork(sender, message)
         if not id or id == "" then return end
         local o = COC.db.orders[id] or {}
         o.id, o.buyer, o.kind = id, buyer, (kind ~= "" and kind) or "item"
-        o.itemID     = tonumber(oid)
+        if o.kind == "enchant" then o.spellID = tonumber(oid) else o.itemID = tonumber(oid) end
         o.qty        = tonumber(qty) or 1
         o.profession = (prof ~= "" and prof) or nil
         o.price      = (price ~= "" and price) or nil
@@ -158,7 +183,7 @@ function Orders:PrintList()
         if o.status ~= "cancelled" then
             shown = shown + 1
             print(string.format("  |cFFFFFFFF%s|r  %s x%d  [%s]  |cFFFFCC00%s|r%s",
-                o.id, itemName(o.itemID), o.qty or 1, o.profession or "?",
+                o.id, self:OrderName(o), o.qty or 1, o.profession or "?",
                 o.status, o.acceptedBy and (" par " .. o.acceptedBy) or ""))
         end
     end

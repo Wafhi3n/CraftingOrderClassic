@@ -10,6 +10,20 @@ local RH   = 16
 local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true) end
 local function itemName(id) local c=CL(); return c and c:ItemName(id) or ("item:"..tostring(id)) end
 
+-- Nom d'une entrée de catalogue : objet (GetItemInfo) ou service/enchant (GetSpellInfo).
+local function entryName(e)
+    local c = CL(); if not c then return "?" end
+    if e.itemID then return c:ItemName(e.itemID) end
+    return c:RecipeName(e.spellID)
+end
+
+-- Objet lié-quand-ramassé (non échangeable) → à masquer. nil si pas encore en cache (on montre).
+local function isSoulbound(itemID)
+    if not (itemID and GetItemInfo) then return false end
+    local bind = select(14, GetItemInfo(itemID))   -- 1 = Bind on Pickup
+    return bind == 1
+end
+
 -- ------------------------------------------------------------------
 -- Construction
 -- ------------------------------------------------------------------
@@ -49,6 +63,11 @@ function UI:BuildPostTab(f)
     self.postReagContent = rcontent; self.postReagRows = {}
 
     self:_BuildPostBottom(panel)
+
+    -- Noms d'objets chargés en différé par Blizzard → on rafraîchit le catalogue quand ils arrivent.
+    local ev = CreateFrame("Frame")
+    ev:RegisterEvent("GET_ITEM_INFO_RECEIVED")
+    ev:SetScript("OnEvent", function() UI:_PostNameDirty() end)
 end
 
 function UI:_BuildPostBottom(panel)
@@ -109,9 +128,11 @@ function UI:RefreshPostCatalogue()
     local s = self.postSearch
     local out = {}
     for _, e in ipairs(list) do
-        local nm = c:ItemName(e.itemID)
-        if not s or s == "" or nm:lower():find(s, 1, true) or tostring(e.itemID):find(s, 1, true) then
-            out[#out + 1] = { e = e, name = nm }
+        if not (e.itemID and isSoulbound(e.itemID)) then   -- masque les objets liés (non échangeables)
+            local nm = entryName(e)
+            if not s or s == "" or nm:lower():find(s, 1, true) or (e.itemID and tostring(e.itemID):find(s, 1, true)) then
+                out[#out + 1] = { e = e, name = nm }
+            end
         end
     end
     table.sort(out, function(a, b) return a.name < b.name end)
@@ -119,11 +140,15 @@ function UI:RefreshPostCatalogue()
     for i = 1, 8 do
         local row = self:_PostCatRow(i); local item = out[off + i]
         if item then
-            row.entry = item.e
-            local tag = item.e.spellID and "" or " |cFF66CC66(récolte)|r"
-            row.fs:SetText(item.name .. tag)
-            row.fs:SetTextColor(item.e == self.postEntry and 1 or 0.91, item.e == self.postEntry and 0.85 or 0.86, item.e == self.postEntry and 0.27 or 0.78)
-            row:SetScript("OnClick", function() UI:SelectPostItem(item.e) end)
+            local e = item.e
+            row.entry = e
+            local tag = e.service and " |cFFCC88FF(ench.)|r"
+                or ((e.itemID and not e.spellID) and " |cFF66CC66(matière)|r" or "")
+            -- placeholder tant que le nom d'objet n'est pas résolu (cache async Blizzard)
+            local disp = item.name:match("^item:") and "|cFF777777Chargement…|r" or item.name
+            row.fs:SetText(disp .. tag)
+            row.fs:SetTextColor(e == self.postEntry and 1 or 0.91, e == self.postEntry and 0.85 or 0.86, e == self.postEntry and 0.27 or 0.78)
+            row:SetScript("OnClick", function() UI:SelectPostItem(e) end)
             row:Show()
         else row:Hide() end
     end
@@ -131,9 +156,19 @@ function UI:RefreshPostCatalogue()
     self.postCatList = out
 end
 
+-- Rafraîchissement throttlé quand Blizzard renvoie un nom d'objet (GET_ITEM_INFO_RECEIVED).
+function UI:_PostNameDirty()
+    if self._postNameTimer or not C_Timer then return end
+    self._postNameTimer = true
+    C_Timer.After(0.3, function()
+        UI._postNameTimer = nil
+        if UI.postPanel and UI.postPanel:IsShown() then UI:RefreshPostCatalogue() end
+    end)
+end
+
 function UI:SelectPostItem(entry)
     self.postEntry = entry; self.postProvide = {}
-    self.postSelLbl:SetText("Sélection : |cFFFFFFFF" .. itemName(entry.itemID) .. "|r")
+    self.postSelLbl:SetText("Sélection : |cFFFFFFFF" .. entryName(entry) .. "|r")
     self:RefreshPostCatalogue(); self:RefreshPostReagents()
 end
 
@@ -174,7 +209,7 @@ function UI:DoPostOrder()
     local price = self.postPrice:GetText(); if price == "" then price = nil end
     local provided = {}
     for iid, v in pairs(self.postProvide) do if v then provided[#provided + 1] = iid end end
-    COC.Orders:Post(e.itemID, qty, price, { spellID = e.spellID, profession = self.postProf, provided = provided })
+    COC.Orders:PostEntry(e, qty, price, { profession = self.postProf, provided = provided })
     self.postPrice:SetText(""); self.postEntry = nil; self.postProvide = {}
     self:ShowTab("orders")   -- retour au carnet pour voir la commande
 end

@@ -135,7 +135,7 @@ function UI:RefreshOrders()
         if o.status ~= "cancelled" then
             n = n + 1
             local row = self:_OrderRow(n)
-            local nm = (o.itemID and GetItemInfo and (GetItemInfo(o.itemID))) or (o.itemID and ("item:" .. o.itemID)) or "?"
+            local nm = COC.Orders and COC.Orders:OrderName(o) or "?"
             local col = (o.status == "open") and Skin.hex.green or Skin.hex.gold
             row.fs:SetText(string.format("|c%s%s|r x%d  |c%s%s|r  |cFF888888%s%s|r",
                 Skin.hex.gold, nm, o.qty or 1, Skin.hex.muted, o.profession or "?",
