@@ -43,6 +43,13 @@ function COC:Status()
     else
         p("aucune recette captée — ouvre une fenêtre de métier une fois pour l'amorcer.")
     end
+
+    local d = COC.Directory
+    if d then
+        p(string.format("réseau global : %s — |cFFFFFFFF%d|r en ligne, |cFFFFFFFF%d|r crafteur(s) connus",
+            CraftLink:IsNetworkReady() and "|cFF33DD33canal rejoint|r" or "|cFFFFCC00connexion…|r",
+            d:CountOnline(), d:CountKnownCrafters()))
+    end
 end
 
 local f = CreateFrame("Frame")
@@ -60,10 +67,19 @@ f:SetScript("OnEvent", function(_, event, arg1)
         COC.db.knownRecipes = COC.db.knownRecipes or {}
     elseif event == "PLAYER_LOGIN" then
         if CraftLink and COC.db then CraftLink:LoadMyRecipes(COC.db.knownRecipes) end
+        if COC.Directory then COC.Directory:Start() end   -- transport + annuaire global
         SLASH_CRAFTINGORDER1 = "/co"
         SLASH_CRAFTINGORDER2 = "/craftorder"
-        SlashCmdList["CRAFTINGORDER"] = function() COC:Status() end
-        p("loaded — |cFFFFFFFF/co|r pour le statut. (Réseau global de commandes de craft — autonome, embarque CraftLink.)")
+        SlashCmdList["CRAFTINGORDER"] = function(msg)
+            local arg = (msg or ""):lower():gsub("%s+", "")
+            if (arg == "refresh" or arg == "scan") and COC.Directory then
+                COC.Directory:Refresh()
+                p("réseau : sollicitation envoyée (HI global + PING proximité).")
+            else
+                COC:Status()
+            end
+        end
+        p("loaded — |cFFFFFFFF/co|r statut, |cFFFFFFFF/co refresh|r sollicite l'annuaire. (Réseau global — autonome.)")
     else
         -- TRADE_SKILL_* / CRAFT_* : la fenêtre est lisible → on capte.
         pcall(function() COC:Scan() end)
