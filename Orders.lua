@@ -121,6 +121,7 @@ function Orders:OnNetwork(sender, message)
         local id, crafter = message:match("^ORD|DONE|([^|]*)|(.*)$"); local o = id and COC.db.orders[id]
         if o then o.status = "done"; o.acceptedBy = (crafter ~= "" and crafter) or o.acceptedBy end
     end
+    if COC.UI and COC.UI.Refresh then COC.UI:Refresh() end   -- maj live de la fenêtre si ouverte
 end
 
 -- Resync sur HI : je ré-annonce MES commandes ouvertes/acceptées (jitté, anti-burst).

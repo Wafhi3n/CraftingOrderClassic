@@ -87,7 +87,10 @@ f:SetScript("OnEvent", function(_, event, arg1)
             local cmd, rest = (msg or ""):match("^%s*(%S*)%s*(.-)%s*$")
             cmd = (cmd or ""):lower()
             local O, D = COC.Orders, COC.Directory
-            if cmd == "refresh" or cmd == "scan" then
+            if cmd == "" then
+                if COC.UI then COC.UI:Toggle() end
+            elseif cmd == "status" then COC:Status()
+            elseif cmd == "refresh" or cmd == "scan" then
                 if D then D:Refresh(); p("réseau : sollicitation envoyée (HI global + PING proximité).") end
             elseif cmd == "orders" or cmd == "list" then if O then O:PrintList() end
             elseif cmd == "post"   then if O then O:PostFromInput(rest) end
