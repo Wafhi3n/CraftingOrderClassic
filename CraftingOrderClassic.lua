@@ -29,8 +29,10 @@ function COC:Status()
         p("CraftLink introuvable — l'infra partagée n'est pas chargée.")
         return
     end
+    -- On compte les métiers ENREGISTRÉS (table peuplée au load) — pas CraftLink.catalog, qui est
+    -- construit paresseusement et serait encore vide à ce point (affichait 0 à tort).
     local profs = 0
-    for _ in pairs(CraftLink.catalog or {}) do profs = profs + 1 end
+    for _ in pairs(CraftLink.professions or {}) do profs = profs + 1 end
     p(string.format("infra CraftLink — dataVersion=|cFFE8B84B%d|r, protocole=v%d, catalogue=%d métier(s) %s",
         CraftLink:DataVersion(), CraftLink:ProtocolVersion(), profs,
         CraftLink:HasCatalog() and "|cFF33DD33prêt|r" or "|cFFFF4444vide|r"))

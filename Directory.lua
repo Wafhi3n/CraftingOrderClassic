@@ -122,6 +122,13 @@ function Dir:Start()
 
     CraftLink:StartTransport()
 
-    -- Première annonce quand le canal est prêt (le join est async).
-    if C_Timer then C_Timer.After(3, function() Dir:Announce() end) end
+    -- Au démarrage, une fois le canal prêt (join async) : je publie mes recettes (Announce) ET
+    -- je sollicite les présents (HI) — sinon je n'apprends que ceux qui arrivent APRÈS moi (les
+    -- events JOIN ne listent pas les déjà-présents). Les réponses RK sont jittées (anti-burst).
+    if C_Timer then
+        C_Timer.After(3, function()
+            Dir:Announce()
+            if CraftLink:IsNetworkReady() then CraftLink:Send("HI", "global") end
+        end)
+    end
 end
