@@ -10,5 +10,6 @@
 # synchronisée par sync-libs.ps1. Rend cet addon AUTONOME (n'a pas besoin de Guild Economy).
 Libs\LibStub\LibStub.lua
 Libs\CraftLink-1.0\lib.xml
+Libs\CraftLink-1.0\Data\Vanilla.xml
 
 CraftingOrderClassic.lua
