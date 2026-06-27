@@ -15,7 +15,7 @@ local function me() return (UnitName and UnitName("player")) or "?" end
 function UI:Build()
     if self.frame then return self.frame end
     local f = CreateFrame("Frame", "CraftingOrderClassicWindow", UIParent, "BackdropTemplate")
-    f:SetSize(520, 430)
+    f:SetSize(868, 600)
     f:SetPoint("CENTER")
     f:SetMovable(true); f:EnableMouse(true); f:RegisterForDrag("LeftButton")
     f:SetScript("OnDragStart", f.StartMoving); f:SetScript("OnDragStop", f.StopMovingOrSizing)
@@ -24,9 +24,20 @@ function UI:Build()
     f:Hide()
     self.frame = f
 
+    -- Fond tavern peint + voile assombrissant (lisibilité), à l'intérieur du cadre or.
+    local bg = f:CreateTexture(nil, "BACKGROUND", nil, 1)
+    bg:SetPoint("TOPLEFT", 12, -12); bg:SetPoint("BOTTOMRIGHT", -12, 12)
+    bg:SetTexture("Interface\\AddOns\\CraftingOrderClassic\\Textures\\tavern-bg.tga")
+    local veil = f:CreateTexture(nil, "BACKGROUND", nil, 2)
+    veil:SetPoint("TOPLEFT", bg); veil:SetPoint("BOTTOMRIGHT", bg)
+    veil:SetColorTexture(0.04, 0.03, 0.02, 0.66)
+
     local title = f:CreateFontString(nil, "OVERLAY")
     title:SetFontObject(Skin.WordmarkFont())
-    title:SetPoint("TOP", 0, -16); title:SetText("Crafting Order")
+    title:SetPoint("TOP", 0, -14); title:SetText("Crafting Order")
+    local sub = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    sub:SetPoint("TOP", title, "BOTTOM", 0, -1); sub:SetText("Classic · canal global")
+    sub:SetTextColor(0.6, 1.0, 0.6); Skin.ApplyShadow(sub)
 
     local close = CreateFrame("Button", nil, f, "UIPanelCloseButton")
     close:SetPoint("TOPRIGHT", -8, -8)
@@ -45,10 +56,10 @@ end
 
 function UI:BuildTabs(f)
     self.tabs = {}
-    local defs = { { id = "orders", label = "Carnet" }, { id = "post", label = "Poster" }, { id = "artisans", label = "Artisans" } }
+    local defs = { { id = "orders", label = "Carnet" }, { id = "post", label = "Commande" }, { id = "artisans", label = "Artisans" } }
     for i, d in ipairs(defs) do
-        local b = Skin.MakeGoldButton(f, 90, 22, d.label)
-        b:SetPoint("TOPLEFT", 16 + (i - 1) * 94, -48)
+        local b = Skin.MakeGoldButton(f, 124, 24, d.label)
+        b:SetPoint("TOPLEFT", 12 + (i - 1) * 128, -54)
         b:SetScript("OnClick", function() UI:ShowTab(d.id) end)
         self.tabs[d.id] = b
     end
