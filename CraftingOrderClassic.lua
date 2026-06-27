@@ -54,6 +54,15 @@ function COC:Status()
     end
 end
 
+function COC:Help()
+    p("commandes :")
+    print("  |cFFFFFFFF/co|r — statut (infra, mes recettes, réseau)")
+    print("  |cFFFFFFFF/co orders|r — carnet d'ordres")
+    print("  |cFFFFFFFF/co post [shift-clic objet] [xN] [prix]|r — poster une commande")
+    print("  |cFFFFFFFF/co accept <id>|r / |cFFFFFFFF/co done <id>|r / |cFFFFFFFF/co cancel <id>|r")
+    print("  |cFFFFFFFF/co refresh|r — solliciter l'annuaire (présence + proximité)")
+end
+
 local f = CreateFrame("Frame")
 f:RegisterEvent("ADDON_LOADED")
 f:RegisterEvent("PLAYER_LOGIN")
@@ -70,18 +79,25 @@ f:SetScript("OnEvent", function(_, event, arg1)
     elseif event == "PLAYER_LOGIN" then
         if CraftLink and COC.db then CraftLink:LoadMyRecipes(COC.db.knownRecipes) end
         if COC.Directory then COC.Directory:Start() end   -- transport + annuaire global
+        if COC.Orders then COC.Orders:Start() end          -- carnet d'ordres global
         SLASH_CRAFTINGORDER1 = "/co"
         SLASH_CRAFTINGORDER2 = "/craftorder"
         SlashCmdList["CRAFTINGORDER"] = function(msg)
-            local arg = (msg or ""):lower():gsub("%s+", "")
-            if (arg == "refresh" or arg == "scan") and COC.Directory then
-                COC.Directory:Refresh()
-                p("réseau : sollicitation envoyée (HI global + PING proximité).")
-            else
-                COC:Status()
-            end
+            -- 1er mot = sous-commande ; le reste garde sa casse (liens d'objet à pipes).
+            local cmd, rest = (msg or ""):match("^%s*(%S*)%s*(.-)%s*$")
+            cmd = (cmd or ""):lower()
+            local O, D = COC.Orders, COC.Directory
+            if cmd == "refresh" or cmd == "scan" then
+                if D then D:Refresh(); p("réseau : sollicitation envoyée (HI global + PING proximité).") end
+            elseif cmd == "orders" or cmd == "list" then if O then O:PrintList() end
+            elseif cmd == "post"   then if O then O:PostFromInput(rest) end
+            elseif cmd == "cancel" then if O then O:Cancel(rest) end
+            elseif cmd == "accept" then if O then O:Accept(rest) end
+            elseif cmd == "done"   then if O then O:Deliver(rest) end
+            elseif cmd == "help"   then COC:Help()
+            else COC:Status() end
         end
-        p("loaded — |cFFFFFFFF/co|r statut, |cFFFFFFFF/co refresh|r sollicite l'annuaire. (Réseau global — autonome.)")
+        p("loaded — |cFFFFFFFF/co help|r pour les commandes. (Réseau global de craft — autonome.)")
     else
         -- TRADE_SKILL_* / CRAFT_* : la fenêtre est lisible → on capte.
         pcall(function() COC:Scan() end)

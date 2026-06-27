@@ -14,3 +14,4 @@ Libs\CraftLink-1.0\Data\Vanilla.xml
 
 CraftingOrderClassic.lua
 Directory.lua
+Orders.lua
