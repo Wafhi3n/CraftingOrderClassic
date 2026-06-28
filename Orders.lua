@@ -38,9 +38,10 @@ function Orders:Broadcast(action, o)
     if not CraftLink then return end
     local payload
     if action == "NEW" then
-        payload = string.format("ORD|NEW|%s|%s|%s|%d|%d|%s|%s",
+        payload = string.format("ORD|NEW|%s|%s|%s|%d|%d|%s|%s|%s|%d",
             o.id, o.buyer, o.kind, o.itemID or o.spellID or 0, o.qty or 1,
-            o.profession or "", (o.price or ""):gsub("|", ""))
+            o.profession or "", (o.price or ""):gsub("|", ""),
+            (o.recipient or "Tous"):gsub("|", ""), o.byStack and 1 or 0)
     elseif action == "CANCEL" then payload = "ORD|CANCEL|" .. o.id
     elseif action == "ACK"    then payload = string.format("ORD|ACK|%s|%s", o.id, o.acceptedBy or "")
     elseif action == "DONE"   then payload = string.format("ORD|DONE|%s|%s", o.id, o.acceptedBy or "")
@@ -82,7 +83,8 @@ function Orders:PostEntry(entry, qty, price, opts)
         itemID = entry.itemID, spellID = entry.spellID,
         qty = qty or 1, price = price,
         profession = opts.profession or (entry.itemID and self:ProfForItem(entry.itemID)),
-        provided = opts.provided, status = "open", ts = time(),
+        provided = opts.provided, recipient = opts.recipient, byStack = opts.byStack,
+        status = "open", ts = time(),
     }
     COC.db.orders[o.id] = o
     self:Broadcast("NEW", o)
@@ -110,7 +112,20 @@ function Orders:Accept(id)
     if not o or o.status ~= "open" then pmsg("commande non disponible : " .. tostring(id)); return end
     if o.buyer == me() then pmsg("c'est ta propre commande."); return end
     o.status = "accepted"; o.acceptedBy = me(); self:Broadcast("ACK", o)
+    self:WhisperPub(o)
     pmsg(string.format("commande acceptée : %s (%s)", id, itemName(o.itemID)))
+end
+
+-- Pub : si l'auteur N'A PAS l'addon (commande captée dans /trade ou /g, pas reçue par le réseau),
+-- on le prévient par whisper → l'acceptation lui parvient ET ça fait connaître l'addon.
+-- Les commandes reçues via le canal addon portent o.viaAddon=true → pas de whisper (ACK suffit).
+function Orders:WhisperPub(o)
+    if not (SendChatMessage and o.buyer and o.buyer ~= me()) then return end
+    if o.viaAddon or o.fake then return end
+    local what = self:OrderName(o)
+    local msg = "I accept your order of " .. what
+        .. (o.price and (" costing " .. o.price) or "") .. " — via Crafting Order Classic"
+    SendChatMessage(msg, "WHISPER", nil, o.buyer)
 end
 
 function Orders:Deliver(id)
@@ -128,18 +143,26 @@ end
 function Orders:OnNetwork(sender, message)
     local action = message:match("^ORD|([A-Z]+)|")
     if action == "NEW" then
-        local id, buyer, kind, oid, qty, prof, price =
-            message:match("^ORD|NEW|([^|]*)|([^|]*)|([^|]*)|([^|]*)|([^|]*)|([^|]*)|(.*)$")
+        local id, buyer, kind, oid, qty, prof, price, recipient, byStack =
+            message:match("^ORD|NEW|([^|]*)|([^|]*)|([^|]*)|([^|]*)|([^|]*)|([^|]*)|([^|]*)|([^|]*)|(%d*)$")
         if not id or id == "" then return end
+        local existed = COC.db.orders[id] ~= nil   -- déjà connue ? (anti-spam sur re-broadcast)
         local o = COC.db.orders[id] or {}
         o.id, o.buyer, o.kind = id, buyer, (kind ~= "" and kind) or "item"
         if o.kind == "enchant" then o.spellID = tonumber(oid) else o.itemID = tonumber(oid) end
         o.qty        = tonumber(qty) or 1
         o.profession = (prof ~= "" and prof) or nil
         o.price      = (price ~= "" and price) or nil
+        o.recipient  = (recipient and recipient ~= "" and recipient) or "Tous"
+        o.byStack    = byStack == "1"
+        o.viaAddon   = true   -- reçue par le canal addon → l'auteur a l'addon (pas de whisper de pub)
         o.status     = o.status or "open"
         o.ts         = o.ts or time()
         COC.db.orders[id] = o
+        -- Ciblage : une commande qui me nomme explicitement → alerte forte (1re réception seulement).
+        if not existed and o.buyer ~= me() and o.recipient == me() and o.status == "open" then
+            self:AlertTargeted(o)
+        end
     elseif action == "CANCEL" then
         local id = message:match("^ORD|CANCEL|(.+)$"); local o = id and COC.db.orders[id]
         if o then o.status = "cancelled" end
@@ -151,6 +174,16 @@ function Orders:OnNetwork(sender, message)
         if o then o.status = "done"; o.acceptedBy = (crafter ~= "" and crafter) or o.acceptedBy end
     end
     if COC.UI and COC.UI.Refresh then COC.UI:Refresh() end   -- maj live de la fenêtre si ouverte
+end
+
+-- Alerte « commande pour TOI » : un joueur t'a ciblé nommément (recipient == ton nom).
+function Orders:AlertTargeted(o)
+    local nm = self:OrderName(o)
+    pmsg(string.format("|cFFFFCC00◆ commande pour TOI|r de |cFFFFFFFF%s|r : %s%s%s",
+        o.buyer, nm, (o.qty and o.qty > 1) and (" ×" .. o.qty) or "",
+        o.price and (" — |cFFFFDD00" .. o.price .. "|r") or ""))
+    pcall(function() PlaySound(SOUNDKIT and SOUNDKIT.TELL_MESSAGE or 3081, "Master") end)
+    if COC.UI and COC.UI.Refresh then COC.UI:Refresh() end
 end
 
 -- Resync sur HI : je ré-annonce MES commandes ouvertes/acceptées (jitté, anti-burst).

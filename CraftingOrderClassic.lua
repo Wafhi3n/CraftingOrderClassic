@@ -20,7 +20,10 @@ local function p(msg) print("|cFF33DD88Crafting Order|r " .. msg) end
 function COC:Scan()
     if not (CraftLink and self.db) then return end
     local _, changed = CraftLink:ScanOpenKnown()
-    if changed then CraftLink:SaveMyRecipes(self.db.knownRecipes) end
+    if changed then
+        CraftLink:SaveMyRecipes(self.db.knownRecipes)        -- persiste à chaque plan appris
+        if self.Directory then self.Directory:AnnounceThrottled() end   -- + rediffuse aux autres
+    end
 end
 
 -- /co : statut. Infra CraftLink (catalogue + versions) + MES recettes captées (autonome).
@@ -61,6 +64,8 @@ function COC:Help()
     print("  |cFFFFFFFF/co post [shift-clic objet] [xN] [prix]|r — poster une commande")
     print("  |cFFFFFFFF/co accept <id>|r / |cFFFFFFFF/co done <id>|r / |cFFFFFFFF/co cancel <id>|r")
     print("  |cFFFFFFFF/co refresh|r — solliciter l'annuaire (présence + proximité)")
+    print("  |cFFFFFFFF/co prof|r — réafficher l'overlay « commandes du métier » sur la fenêtre métier")
+    print("  |cFFFFFFFF/co debug|r — |cFFFF8800mode solo|r : injecte/retire un réseau fictif (artisans + commandes)")
 end
 
 local f = CreateFrame("Frame")
@@ -71,6 +76,7 @@ f:RegisterEvent("TRADE_SKILL_SHOW")
 f:RegisterEvent("TRADE_SKILL_UPDATE")
 f:RegisterEvent("CRAFT_SHOW")
 f:RegisterEvent("CRAFT_UPDATE")
+f:RegisterEvent("SKILL_LINES_CHANGED")   -- gain de skill → recapture + rediffusion (Étape D)
 f:SetScript("OnEvent", function(_, event, arg1)
     if event == "ADDON_LOADED" and arg1 == ADDON then
         CraftingOrderClassicDB = CraftingOrderClassicDB or {}
@@ -79,7 +85,12 @@ f:SetScript("OnEvent", function(_, event, arg1)
     elseif event == "PLAYER_LOGIN" then
         if CraftLink and COC.db then CraftLink:LoadMyRecipes(COC.db.knownRecipes) end
         if COC.Directory then COC.Directory:Start() end   -- transport + annuaire global
-        if COC.Orders then COC.Orders:Start() end          -- carnet d'ordres global
+        if COC.Orders   then COC.Orders:Start()   end      -- carnet d'ordres global
+        if COC.Social   then COC.Social:Start()   end      -- tooltip social + clic-droit (Étape D)
+        if COC.Inbound  then COC.Inbound:Start()  end      -- capture /commerce + /guilde (non-addon)
+        if COC.ProfOrders then COC.ProfOrders:Start() end  -- overlay « commandes du métier » sur la fenêtre métier
+        if COC.UI and COC.UI.BuildMinimapButton then COC.UI:BuildMinimapButton() end
+        if COC.Debug and C_Timer then C_Timer.After(1, function() COC.Debug:Reapply() end) end
         SLASH_CRAFTINGORDER1 = "/co"
         SLASH_CRAFTINGORDER2 = "/craftorder"
         SlashCmdList["CRAFTINGORDER"] = function(msg)
@@ -97,10 +108,21 @@ f:SetScript("OnEvent", function(_, event, arg1)
             elseif cmd == "cancel" then if O then O:Cancel(rest) end
             elseif cmd == "accept" then if O then O:Accept(rest) end
             elseif cmd == "done"   then if O then O:Deliver(rest) end
+            elseif cmd == "prof"   then if COC.ProfOrders then COC.ProfOrders:Reenable() end
+            elseif cmd == "debug"  then if COC.Debug then COC.Debug:Toggle() end
             elseif cmd == "help"   then COC:Help()
             else COC:Status() end
         end
         p("loaded — |cFFFFFFFF/co help|r pour les commandes. (Réseau global de craft — autonome.)")
+    elseif event == "SKILL_LINES_CHANGED" then
+        -- Gain de point / apprentissage : recapture mes niveaux et les rediffuse (throttlé).
+        if COC.Directory and not COC._skillTimer and C_Timer then
+            COC._skillTimer = true
+            C_Timer.After(2, function()
+                COC._skillTimer = nil
+                COC.Directory:CaptureSkills(); COC.Directory:AnnounceSkills()
+            end)
+        end
     else
         -- TRADE_SKILL_* / CRAFT_* : la fenêtre est lisible → on capte.
         pcall(function() COC:Scan() end)

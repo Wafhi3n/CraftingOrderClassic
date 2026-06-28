@@ -31,6 +31,160 @@ Skin.hex = { gold="FFE8B84B", goldHi="FFF0C674", price="FFFFDD00", muted="FF8C8C
 local function unpackc(c) return c[1], c[2], c[3], c[4] or 1 end
 Skin.unpack = unpackc
 
+-- Localisation des métiers (clé interne EN du catalogue → libellé FR). Fallback = la clé.
+-- TODO multilingue : dériver du nom de ligne de compétence localisé selon le client.
+Skin.profFR = {
+    Alchemy="Alchimie", Blacksmithing="Forge", Cooking="Cuisine", Enchanting="Enchantement",
+    Engineering="Ingénierie", ["First Aid"]="Secourisme", Fishing="Pêche", Herbalism="Herboristerie",
+    Leatherworking="Travail du cuir", Mining="Minage", Poisons="Poisons", Skinning="Dépeçage",
+    Tailoring="Couture", Jewelcrafting="Joaillerie", Inscription="Calligraphie",
+    Elemental="Élémentaire",
+}
+function Skin.ProfLabel(p) return p and (Skin.profFR[p] or p) or "—" end
+
+-- Spell IDs d'apprenti pour récupérer l'icône de métier via GetSpellTexture (cache client stable).
+Skin.profSpellID = {
+    Alchemy        = 2259,  Blacksmithing  = 2018,  Enchanting    = 7411,
+    Engineering    = 4036,  Herbalism      = 2383,  Jewelcrafting = 25229,
+    Leatherworking = 2108,  Mining         = 2575,  Skinning      = 8613,
+    Tailoring      = 3908,  Cooking        = 2550,  ["First Aid"] = 3273,
+    Fishing        = 7620,  Inscription    = 45357,
+}
+function Skin.ProfIcon(key)
+    if not key then return nil end
+    local sid = Skin.profSpellID[key]
+    if sid and GetSpellTexture then local t = GetSpellTexture(sid); if t then return t end end
+    if key == "Elemental" then return "Interface\\Icons\\Spell_Fire_FlameBolt" end
+    return nil
+end
+
+-- Statut d'ordre → libellé FR + couleur hex.
+Skin.statusFR = {
+    open      = { "En attente", "FFFFCC00" },
+    accepted  = { "Acceptée",   "FF33CCFF" },
+    done      = { "Livrée",     "FF33DD33" },
+    cancelled = { "Annulée",    "FF888888" },
+}
+function Skin.StatusInfo(s) local t = Skin.statusFR[s or "open"] or Skin.statusFR.open; return t[1], t[2] end
+
+-- Couleur de rareté d'un objet {r,g,b} (or par défaut : services/enchants, ou nom non encore en cache).
+function Skin.RarityColor(itemID)
+    if itemID and GetItemInfo then
+        local q = select(3, GetItemInfo(itemID))
+        if q and ITEM_QUALITY_COLORS and ITEM_QUALITY_COLORS[q] then
+            local c = ITEM_QUALITY_COLORS[q]; return c.r, c.g, c.b
+        end
+    end
+    return unpackc(Skin.color.gold)
+end
+
+-- Premier caractère (UTF-8) en capitale — pour le badge de rareté.
+function Skin.FirstChar(s)
+    if not s or s == "" then return "?" end
+    local b = s:byte(1)
+    local len = (b < 0x80 and 1) or (b < 0xE0 and 2) or (b < 0xF0 and 3) or 4
+    return s:sub(1, len):upper()
+end
+
+-- L'objet existe-t-il dans la base du CLIENT courant ? GetItemInfoInstant lit la DB statique et
+-- renvoie nil pour un objet d'une autre extension (ex. minerai TBC sur un client Era) → filtrage
+-- propre par version, sans re-générer les données (sur un client TBC, l'objet apparaîtra).
+function Skin.ItemExists(itemID)
+    if not itemID then return true end
+    if GetItemInfoInstant then return GetItemInfoInstant(itemID) ~= nil end
+    return true   -- API absente : on ne filtre pas
+end
+
+-- Icône native d'un objet/sort (texture du client — aucun asset à fournir). nil si introuvable.
+function Skin.Icon(itemID, spellID)
+    if itemID and GetItemIcon then local t = GetItemIcon(itemID); if t then return t end end
+    if itemID and GetItemInfo then local t = select(10, GetItemInfo(itemID)); if t then return t end end
+    if spellID and GetSpellTexture then local t = GetSpellTexture(spellID); if t then return t end end
+    return nil
+end
+
+-- Badge carré : icône native de l'objet (bordure colorée par rareté), avec repli sur une lettre.
+-- Paint(r, g, b, char, tex) — tex = texture d'icône (Skin.Icon), ou nil → lettre.
+function Skin.MakeBadge(parent, size)
+    size = size or 18
+    local b = CreateFrame("Frame", nil, parent, "BackdropTemplate")
+    b:SetSize(size, size)
+    b:SetBackdrop({ bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
+        edgeFile = "Interface\\Buttons\\WHITE8X8", edgeSize = 1,
+        insets = { left = 1, right = 1, top = 1, bottom = 1 } })
+    local icon = b:CreateTexture(nil, "ARTWORK")
+    icon:SetPoint("TOPLEFT", 1, -1); icon:SetPoint("BOTTOMRIGHT", -1, 1)
+    icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)   -- rogne la bordure native de l'icône
+    icon:Hide(); b.icon = icon
+    local fs = b:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    fs:SetPoint("CENTER"); Skin.ApplyShadow(fs); b.letter = fs
+    b.Paint = function(self, r, g, bl, ch, tex)
+        self:SetBackdropBorderColor(r, g, bl, 1)
+        if tex then
+            self.icon:SetTexture(tex); self.icon:Show()
+            self.letter:SetText(""); self:SetBackdropColor(0, 0, 0, 1)
+        else
+            self.icon:Hide()
+            self:SetBackdropColor(r * 0.30, g * 0.30, bl * 0.30, 1)
+            self.letter:SetTextColor(r, g, bl); self.letter:SetText(ch)
+        end
+        self:Show()
+    end
+    return b
+end
+
+-- =========================================================================
+-- Icônes natives Blizzard (chemins in-game — AUCUN asset à livrer, le client les a déjà).
+-- =========================================================================
+Skin.tex = {
+    gold    = "Interface\\MoneyFrame\\UI-GoldIcon",
+    silver  = "Interface\\MoneyFrame\\UI-SilverIcon",
+    copper  = "Interface\\MoneyFrame\\UI-CopperIcon",
+    online  = "Interface\\FriendsFrame\\StatusIcon-Online",
+    offline = "Interface\\FriendsFrame\\StatusIcon-Offline",
+    away    = "Interface\\FriendsFrame\\StatusIcon-Away",
+    dnd     = "Interface\\FriendsFrame\\StatusIcon-DnD",
+    broadcast = "Interface\\FriendsFrame\\BroadcastIcon",
+    workorder = "Interface\\GossipFrame\\WorkOrderGossipIcon",
+    crate     = "Interface\\Icons\\INV_Crate_03",   -- récolte « par stack »
+}
+
+-- Pastille de présence : texture statut du jeu, avec méthode SetOnline(bool/nil). nil = masquée.
+function Skin.MakeStatusIcon(parent, size)
+    size = size or 14
+    local t = parent:CreateTexture(nil, "OVERLAY")
+    t:SetSize(size, size)
+    t.SetOnline = function(self, state)
+        if state == nil then self:Hide(); return end
+        self:SetTexture(state and Skin.tex.online or Skin.tex.offline)
+        self:Show()
+    end
+    return t
+end
+
+-- Icône de monnaie (kind = "gold"/"silver"/"copper"), placée à droite d'un champ de saisie.
+function Skin.MoneyIcon(parent, kind, anchorTo)
+    local t = parent:CreateTexture(nil, "OVERLAY")
+    t:SetSize(13, 13); t:SetTexture(Skin.tex[kind])
+    if anchorTo then t:SetPoint("LEFT", anchorTo, "RIGHT", 2, 0) end
+    return t
+end
+
+-- Masque la scrollbar (et ses boutons haut/bas) d'un UIPanelScrollFrameTemplate quand le contenu
+-- tient sans défilement → évite les « carrés » flottants qui débordaient sur la bordure dorée.
+function Skin.AutoHideScroll(scrollName, content)
+    local scroll, sb = _G[scrollName], _G[scrollName .. "ScrollBar"]
+    if not (scroll and content) then return end
+    local show = (content:GetHeight() or 0) > (scroll:GetHeight() or 0) + 1
+    if sb then sb:SetShown(show) end
+    -- Certains templates WoW placent les boutons haut/bas en dehors du ScrollBar (frères, pas enfants).
+    for _, sfx in ipairs({ "ScrollBarScrollUpButton", "ScrollBarScrollDownButton",
+                            "ScrollUpButton",          "ScrollDownButton" }) do
+        local btn = _G[scrollName .. sfx]
+        if btn then btn:SetShown(show) end
+    end
+end
+
 function Skin.ApplyShadow(fs)
     if fs and fs.SetShadowColor then fs:SetShadowColor(0, 0, 0, 0.95); fs:SetShadowOffset(1, -1) end
     return fs

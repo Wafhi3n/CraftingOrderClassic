@@ -8,6 +8,17 @@ local Skin = UI.Skin
 local ROW_H = 22
 
 local function me() return (UnitName and UnitName("player")) or "?" end
+local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true) end
+
+-- Une commande passe-t-elle le filtre relationnel du Carnet ? « all » = tout ; sinon on regarde
+-- la source du demandeur dans l'annuaire (guild/friend/recent). Mes propres commandes : partout.
+local function orderMatchesFilter(o, filter)
+    if filter == "all" then return true end
+    if o.buyer == me() then return true end
+    local D = COC.Directory
+    local r = D and D.roster and D.roster[o.buyer]
+    return (r and (r.source or "recent") or "recent") == filter
+end
 
 -- ------------------------------------------------------------------
 -- Construction du cadre
@@ -49,28 +60,57 @@ function UI:Build()
     self:BuildTabs(f)
     self:BuildOrdersTab(f)
     self:BuildArtisansTab(f)
-    if self.BuildPostTab then self:BuildPostTab(f) end
+    if self.BuildPostTab   then self:BuildPostTab(f)   end
+    if self.BuildGatherTab then self:BuildGatherTab(f) end
     self:ShowTab("orders")
+
+    -- Résolution asynchrone des noms : Blizzard renvoie les infos d'objet en différé. Un seul
+    -- handler central rafraîchit l'onglet actif (Carnet, réactifs, listes…) dès qu'un nom arrive.
+    local nameEv = CreateFrame("Frame")
+    nameEv:RegisterEvent("GET_ITEM_INFO_RECEIVED")
+    nameEv:SetScript("OnEvent", function() UI:_NamesDirty() end)
+
     return f
+end
+
+function UI:_NamesDirty()
+    if self._nameTimer or not C_Timer then return end
+    self._nameTimer = true
+    C_Timer.After(0.3, function()
+        UI._nameTimer = nil
+        if UI.frame and UI.frame:IsShown() then UI:Refresh() end
+    end)
 end
 
 function UI:BuildTabs(f)
     self.tabs = {}
-    local defs = { { id = "orders", label = "Carnet" }, { id = "post", label = "Commande" }, { id = "artisans", label = "Artisans" } }
+    local defs = {
+        { id = "orders",  label = "Carnet"   },
+        { id = "post",    label = "Commande" },
+        { id = "gather",  label = "Récolte"  },
+        { id = "artisans",label = "Artisans" },
+    }
     for i, d in ipairs(defs) do
-        local b = Skin.MakeGoldButton(f, 124, 24, d.label)
-        b:SetPoint("TOPLEFT", 12 + (i - 1) * 128, -54)
+        local b = Skin.MakeGoldButton(f, 118, 24, d.label)
+        b:SetPoint("TOPLEFT", 12 + (i - 1) * 122, -54)
         b:SetScript("OnClick", function() UI:ShowTab(d.id) end)
         self.tabs[d.id] = b
     end
 end
 
 function UI:ShowTab(id)
+    -- Changement d'onglet → on réinitialise les sélections (évite les faux clics / sélections
+    -- fantômes d'un onglet à l'autre, ex. « Sélection : Écaille » qui traînait sous Élémentaire).
+    if id ~= self.activeTab then
+        self.postEntry = nil; self.postProvide = {}
+        self.gatherEntry = nil
+    end
     self.activeTab = id
     for tid, b in pairs(self.tabs) do b:SetSelected(tid == id) end
     self.ordersPanel:SetShown(id == "orders")
+    if self.postPanel   then self.postPanel:SetShown(id == "post")    end
+    if self.gatherPanel then self.gatherPanel:SetShown(id == "gather") end
     self.artisansPanel:SetShown(id == "artisans")
-    if self.postPanel then self.postPanel:SetShown(id == "post") end
     self:Refresh()
 end
 
@@ -86,32 +126,10 @@ local function makeScroll(parent, name)
 end
 
 -- ------------------------------------------------------------------
--- Onglet Carnet d'ordres
+-- Onglet Carnet d'ordres — table (Commande · Qté · Prix · Métier · Destinataire · Statut)
 -- ------------------------------------------------------------------
-function UI:BuildOrdersTab(f)
-    local panel = CreateFrame("Frame", nil, f); panel:SetAllPoints(f); self.ordersPanel = panel
-    local scroll, content = makeScroll(panel, "CraftingOrderOrdersScroll")
-    self.ordersContent = content; self.orderRows = {}
-
-    -- Barre de post : editbox (shift-clic objet) + bouton.
-    local eb = CreateFrame("EditBox", nil, panel, "InputBoxTemplate")
-    eb:SetSize(330, 20); eb:SetPoint("BOTTOMLEFT", 18, 38); eb:SetAutoFocus(false)
-    eb:SetScript("OnEnterPressed", function(self) UI:DoPost(self) end)
-    local hint = panel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    hint:SetPoint("BOTTOMLEFT", eb, "TOPLEFT", 2, 2)
-    hint:SetText("Shift-clic un objet ici, puis « Poster »  (ex: [Objet] x5 50g)")
-    self.postBox = eb
-    local post = Skin.MakeGoldButton(panel, 70, 22, "Poster")
-    post:SetPoint("LEFT", eb, "RIGHT", 8, 0)
-    post:SetScript("OnClick", function() UI:DoPost(eb) end)
-end
-
-function UI:DoPost(eb)
-    local txt = eb:GetText()
-    if txt and txt:match("item:%d+") then
-        COC.Orders:PostFromInput(txt); eb:SetText(""); eb:ClearFocus(); self:Refresh()
-    end
-end
+local ROW_T = 30
+local COL = { name = 8, qty = 320, price = 372, prof = 500, dest = 612, status = 716 }
 
 local function orderActionFor(o)
     local m = me()
@@ -119,112 +137,192 @@ local function orderActionFor(o)
     if o.buyer == m and o.status ~= "done" and o.status ~= "cancelled" then
         return "Annuler", function() COC.Orders:Cancel(o.id) end
     end
-    if o.acceptedBy == m and o.status == "accepted" then return "Livré", function() COC.Orders:Deliver(o.id) end end
+    if o.acceptedBy == m and o.status == "accepted" then return "Livrer", function() COC.Orders:Deliver(o.id) end end
     return nil
+end
+
+-- Marge intérieure commune : décale TOUT le contenu d'un panneau vers l'intérieur d'un coup
+-- (jeu sous les onglets + respiration contre la bordure dorée), sans retoucher chaque coordonnée.
+local PAD_X, PAD_TOP, PAD_BOT = 8, 12, 8
+local function insetPanel(panel, f)
+    panel:ClearAllPoints()
+    panel:SetPoint("TOPLEFT", f, "TOPLEFT", PAD_X, -PAD_TOP)
+    panel:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -PAD_X, PAD_BOT)
+end
+UI.insetPanel = insetPanel
+
+function UI:BuildOrdersTab(f)
+    local panel = CreateFrame("Frame", nil, f); insetPanel(panel, f); self.ordersPanel = panel
+
+    -- Rangée de filtres : relationnel (Tous/Guilde/Amis/Croisés) + file Entrantes (chat capté).
+    self.orderFilter = "all"; self.orderFilterBtns = {}
+    local fdefs = { {id="all",label="Tous"}, {id="guild",label="Guilde"}, {id="friend",label="Amis"},
+                    {id="recent",label="Croisés"}, {id="inbound",label="Entrantes"} }
+    local fx = 12
+    for _, d in ipairs(fdefs) do
+        local w = (d.id == "inbound") and 104 or 78
+        local b = Skin.MakeGoldButton(panel, w, 20, d.label); b:SetPoint("TOPLEFT", fx, -74)
+        b:SetScript("OnClick", function() UI.orderFilter = d.id; UI:_RefreshOrderFilterTabs(); UI:RefreshOrders() end)
+        self.orderFilterBtns[d.id] = b; fx = fx + w + 6
+    end
+    self:_RefreshOrderFilterTabs()
+
+    -- En-tête de colonnes (libellés gris, alignés sur les colonnes des lignes)
+    local function hdr(text, x)
+        local h = panel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+        h:SetPoint("TOPLEFT", 12 + x, -104); h:SetText(text)
+        h:SetTextColor(Skin.unpack(Skin.color.textMuted)); Skin.ApplyShadow(h)
+        return h
+    end
+    hdr("COMMANDE", COL.name + 24); hdr("QTÉ", COL.qty); hdr("PRIX PROPOSÉ", COL.price)
+    hdr("MÉTIER", COL.prof); self.hdrDest = hdr("DESTINATAIRE", COL.dest); hdr("STATUT", COL.status)
+    Skin.MakeSeparator(panel, -118)
+
+    local scroll = CreateFrame("ScrollFrame", "CraftingOrderOrdersScroll", panel, "UIPanelScrollFrameTemplate")
+    scroll:SetPoint("TOPLEFT", 12, -124); scroll:SetPoint("BOTTOMRIGHT", -42, 22)
+    local content = CreateFrame("Frame", nil, scroll); content:SetSize(800, 10); scroll:SetScrollChild(content)
+    self.ordersContent = content; self.orderRows = {}
+end
+
+function UI:_RefreshOrderFilterTabs()
+    for id, b in pairs(self.orderFilterBtns or {}) do b:SetSelected(id == self.orderFilter) end
+    local ib = self.orderFilterBtns and self.orderFilterBtns.inbound
+    if ib and COC.Inbound then
+        local n = COC.Inbound:Count()
+        ib:SetText(n > 0 and ("|cFFFF8800Entrantes (" .. n .. ")|r") or "Entrantes")
+    end
 end
 
 function UI:_OrderRow(i)
     local row = self.orderRows[i]
     if row then return row end
-    row = CreateFrame("Frame", nil, self.ordersContent); row:SetSize(436, ROW_H)
-    row:SetPoint("TOPLEFT", 0, -(i - 1) * ROW_H)
-    local hi = row:CreateTexture(nil, "BACKGROUND"); hi:SetAllPoints()
-    hi:SetColorTexture(Skin.unpack(Skin.color.rowHover)); hi:Hide(); row.hi = hi
-    row.fs = row:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    row.fs:SetPoint("LEFT", 4, 0); row.fs:SetWidth(300); row.fs:SetJustifyH("LEFT"); Skin.ApplyShadow(row.fs)
-    row.btn = Skin.MakeGoldButton(row, 66, 16); row.btn:SetPoint("RIGHT", -2, 0)
-    row:SetScript("OnEnter", function(r) r.hi:Show() end)
-    row:SetScript("OnLeave", function(r) r.hi:Hide() end)
+    row = CreateFrame("Button", nil, self.ordersContent); row:SetSize(800, ROW_T)
+    row:SetPoint("TOPLEFT", 0, -(i - 1) * ROW_T)
+    row:RegisterForClicks("LeftButtonUp", "RightButtonUp")
+    local hi = row:CreateTexture(nil, "HIGHLIGHT"); hi:SetAllPoints()
+    hi:SetColorTexture(Skin.unpack(Skin.color.rowHover))
+    row.badge = Skin.MakeBadge(row, 18); row.badge:SetPoint("LEFT", COL.name, 0)
+    local function col(x, w)
+        local fs = row:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+        fs:SetPoint("LEFT", x, 0); fs:SetWidth(w); fs:SetJustifyH("LEFT"); Skin.ApplyShadow(fs); return fs
+    end
+    row.name   = col(COL.name + 24, 284)
+    row.qty    = col(COL.qty, 44)
+    row.price  = col(COL.price, 120)
+    row.prof   = col(COL.prof, 104)
+    row.dest   = col(COL.dest, 96)
+    row.status = col(COL.status, 80)
+    row:SetScript("OnLeave", function() GameTooltip:Hide() end)
     self.orderRows[i] = row
     return row
 end
 
 function UI:RefreshOrders()
+    if self.orderFilter == "inbound" then return self:_RefreshInbound() end
+    if self.hdrDest then self.hdrDest:SetText("DESTINATAIRE") end
     local all = COC.Orders and COC.Orders:All() or {}
     local n = 0
     for _, o in ipairs(all) do
-        if o.status ~= "cancelled" then
+        if o.status ~= "cancelled" and orderMatchesFilter(o, self.orderFilter) then
             n = n + 1
             local row = self:_OrderRow(n)
-            local nm = COC.Orders and COC.Orders:OrderName(o) or "?"
-            local col = (o.status == "open") and Skin.hex.green or Skin.hex.gold
-            row.fs:SetText(string.format("|c%s%s|r x%d  |c%s%s|r  |cFF888888%s%s|r",
-                Skin.hex.gold, nm, o.qty or 1, Skin.hex.muted, o.profession or "?",
-                o.status, o.acceptedBy and (" · " .. o.acceptedBy) or ""))
+            local nm = COC.Orders:OrderName(o)
+            local r, g, b = Skin.RarityColor(o.itemID)
+            row.badge:Paint(r, g, b, Skin.FirstChar(nm), Skin.Icon(o.itemID, o.spellID))
+            row.name:SetText(nm); row.name:SetTextColor(r, g, b)
+            row.qty:SetText("|cFFCCCCCC" .. (o.byStack and ((o.qty or 1) .. " st") or ("×" .. (o.qty or 1))) .. "|r")
+            row.price:SetText(o.price and ("|c" .. Skin.hex.price .. o.price .. "|r") or "|cFF666666—|r")
+            row.prof:SetText("|c" .. Skin.hex.gold .. Skin.ProfLabel(o.profession) .. "|r")
+            row.dest:SetText("|cFFCCBB88" .. (o.recipient or "Tous") .. "|r")
+            local slabel, scol = Skin.StatusInfo(o.status)
+            row.status:SetText("|c" .. scol .. slabel .. "|r")
             local label, fn = orderActionFor(o)
-            if label then row.btn:SetText(label); row.btn:SetScript("OnClick", function() fn(); UI:Refresh() end); row.btn:Show()
-            else row.btn:Hide() end
+            row:SetScript("OnClick", label and function() fn(); UI:Refresh() end or nil)
+            row:SetScript("OnEnter", label and function(rr)
+                GameTooltip:SetOwner(rr, "ANCHOR_RIGHT"); GameTooltip:AddLine("Clic : " .. label, 1, 1, 1); GameTooltip:Show()
+            end or nil)
             row:Show()
         end
     end
     for i = n + 1, #self.orderRows do self.orderRows[i]:Hide() end
-    self.ordersContent:SetHeight(math.max(n * ROW_H, 10))
+    self.ordersContent:SetHeight(math.max(n * ROW_T, 10))
+    Skin.AutoHideScroll("CraftingOrderOrdersScroll", self.ordersContent)
     if n == 0 and self.orderRows[1] then
-        local row = self:_OrderRow(1); row.btn:Hide()
-        row.fs:SetText("|cFF888888Aucune commande. Poste-en une ci-dessous.|r"); row:Show()
+        local row = self:_OrderRow(1); row.badge:Hide()
+        row.name:SetText("|cFF888888Aucune commande. Onglet « Commande » pour en poster une.|r")
+        row.name:SetTextColor(0.6, 0.6, 0.6)
+        row.qty:SetText(""); row.price:SetText(""); row.prof:SetText(""); row.dest:SetText(""); row.status:SetText("")
+        row:SetScript("OnClick", nil); row:SetScript("OnEnter", nil); row:Show()
     end
 end
 
--- ------------------------------------------------------------------
--- Onglet Artisans (annuaire global)
--- ------------------------------------------------------------------
-function UI:BuildArtisansTab(f)
-    local panel = CreateFrame("Frame", nil, f); panel:SetAllPoints(f); panel:Hide()
-    self.artisansPanel = panel
-    local scroll, content = makeScroll(panel, "CraftingOrderArtisansScroll")
-    self.artisansContent = content; self.artisanRows = {}
-    local refresh = Skin.MakeGoldButton(panel, 110, 22, "Solliciter")
-    refresh:SetPoint("BOTTOMLEFT", 18, 38)
-    refresh:SetScript("OnClick", function() if COC.Directory then COC.Directory:Refresh() end; UI:Refresh() end)
-end
-
-function UI:_ArtisanRow(i)
-    local row = self.artisanRows[i]
-    if row then return row end
-    row = CreateFrame("Frame", nil, self.artisansContent); row:SetSize(436, ROW_H)
-    row:SetPoint("TOPLEFT", 0, -(i - 1) * ROW_H)
-    row.fs = row:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    row.fs:SetPoint("LEFT", 4, 0); row.fs:SetWidth(420); row.fs:SetJustifyH("LEFT"); Skin.ApplyShadow(row.fs)
-    self.artisanRows[i] = row
-    return row
-end
-
-function UI:RefreshArtisans()
-    local D = COC.Directory
-    local list = {}
-    if D then for p in pairs(D.roster or {}) do list[#list + 1] = p end end
-    table.sort(list, function(a, b)
-        local oa, ob = D and D.online[a], D and D.online[b]
-        if (oa and true) ~= (ob and true) then return oa end
-        return a < b
-    end)
+-- Vue « Entrantes » : demandes captées dans /commerce et /guilde (joueurs SANS l'addon).
+-- Clic gauche = accepter (whisper de pub au demandeur) ; clic droit = ignorer.
+function UI:_RefreshInbound()
+    if self.hdrDest then self.hdrDest:SetText("DEMANDEUR") end
+    local c = CL()
+    local all = COC.Inbound and COC.Inbound:All() or {}
     local n = 0
-    for _, p in ipairs(list) do
-        n = n + 1
-        local row = self:_ArtisanRow(n)
-        local on = D.online[p] and ("|cFF33DD33●|r") or ("|cFF555555○|r")
-        local profs = {}
-        for prof, hex in pairs(D.roster[p].recipes or {}) do profs[#profs + 1] = prof end
-        row.fs:SetText(string.format("%s |cFFFFFFFF%s|r  |cFF888888%s|r", on, p, table.concat(profs, ", ")))
+    for _, e in ipairs(all) do
+        n = n + 1; local row = self:_OrderRow(n)
+        local nm = (c and c:ItemName(e.itemID)) or ("item:" .. e.itemID)
+        local r, g, b = Skin.RarityColor(e.itemID)
+        row.badge:Paint(r, g, b, Skin.FirstChar(nm), Skin.Icon(e.itemID)); row.badge:Show()
+        local warn = (not e.canCraft) and "  |cFFFF6666(hors skill)|r" or ""
+        row.name:SetText((nm:match("^item:") and "|cFF777777Chargement…|r" or nm) .. warn)
+        row.name:SetTextColor(r, g, b)
+        row.qty:SetText("|cFFCCCCCC×" .. (e.qty or 1) .. "|r")
+        row.price:SetText(e.price and ("|c" .. Skin.hex.price .. e.price .. "|r") or "|cFF666666—|r")
+        row.prof:SetText("|c" .. Skin.hex.gold .. Skin.ProfLabel(e.profession) .. "|r")
+        row.dest:SetText("|cFFFFFFFF" .. e.buyer .. "|r")
+        local srcLbl = (e.source == "guild") and "guilde" or "commerce"
+        row.status:SetText((e.status == "accepted") and "|cFF33DD33acceptée|r"
+            or ("|cFFFF8800◆ " .. srcLbl .. "|r"))
+        row:SetScript("OnClick", function(_, button)
+            if button == "RightButton" then COC.Inbound:Dismiss(e.id) else COC.Inbound:Accept(e.id) end
+            UI:Refresh()
+        end)
+        row:SetScript("OnEnter", function(rr)
+            GameTooltip:SetOwner(rr, "ANCHOR_RIGHT")
+            GameTooltip:AddLine("Demande captée dans /" .. srcLbl, 1, 1, 1)
+            GameTooltip:AddLine("Clic gauche : accepter (whisper au demandeur)", 0.6, 1, 0.6)
+            GameTooltip:AddLine("Clic droit : ignorer", 1, 0.6, 0.6)
+            GameTooltip:Show()
+        end)
         row:Show()
     end
-    for i = n + 1, #self.artisanRows do self.artisanRows[i]:Hide() end
-    self.artisansContent:SetHeight(math.max(n * ROW_H, 10))
-    if n == 0 and self.artisanRows[1] then
-        local row = self:_ArtisanRow(1)
-        row.fs:SetText("|cFF888888Aucun artisan connu. Clique « Solliciter » près d'autres porteurs.|r")
-        row:Show()
+    for i = n + 1, #self.orderRows do self.orderRows[i]:Hide() end
+    self.ordersContent:SetHeight(math.max(n * ROW_T, 10))
+    Skin.AutoHideScroll("CraftingOrderOrdersScroll", self.ordersContent)
+    if n == 0 and self.orderRows[1] then
+        local row = self:_OrderRow(1); row.badge:Hide()
+        row.name:SetText("|cFF888888Aucune commande entrante. (Capture /commerce et /guilde des joueurs sans l'addon.)|r")
+        row.name:SetTextColor(0.6, 0.6, 0.6)
+        row.qty:SetText(""); row.price:SetText(""); row.prof:SetText(""); row.dest:SetText(""); row.status:SetText("")
+        row:SetScript("OnClick", nil); row:SetScript("OnEnter", nil); row:Show()
     end
 end
+
+-- ------------------------------------------------------------------
+-- Onglet Artisans (annuaire social) → CraftingOrderClassic_UI_Artisans.lua
+-- (BuildArtisansTab / RefreshArtisans y sont définis ; chargé après ce fichier).
+-- ------------------------------------------------------------------
 
 -- ------------------------------------------------------------------
 -- Refresh global + statut + toggle
 -- ------------------------------------------------------------------
 function UI:Refresh()
     if not self.frame or not self.frame:IsShown() then return end
-    if self.activeTab == "artisans" then self:RefreshArtisans()
-    elseif self.activeTab == "post" and self.RefreshPost then self:RefreshPost()
+    if     self.activeTab == "artisans"                          then self:RefreshArtisans()
+    elseif self.activeTab == "post"   and self.RefreshPost       then self:RefreshPost()
+    elseif self.activeTab == "gather" and self.RefreshGather     then self:RefreshGather()
     else self:RefreshOrders() end
+    -- Compteur d'ordres actifs sur l'onglet Carnet (live, quel que soit l'onglet courant).
+    if self.tabs and self.tabs.orders and COC.db then
+        local c = 0; for _, o in pairs(COC.db.orders or {}) do if o.status ~= "cancelled" then c = c + 1 end end
+        self.tabs.orders:SetText("Carnet (" .. c .. ")")
+    end
+    if self.orderFilterBtns then self:_RefreshOrderFilterTabs() end
     local CraftLink = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
     local D = COC.Directory
     self.status:SetText(string.format("|c%sréseau|r %s  ·  %d en ligne  ·  %d artisan(s)",

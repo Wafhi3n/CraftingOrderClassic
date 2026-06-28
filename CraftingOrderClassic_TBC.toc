@@ -12,8 +12,16 @@ Libs\CraftLink-1.0\lib.xml
 Libs\CraftLink-1.0\Data\TBC.xml
 
 CraftingOrderClassic.lua
+CraftingOrderClassic_Elemental.lua
 CraftingOrderClassic_UI_Skin.lua
 CraftingOrderClassic_UI.lua
 CraftingOrderClassic_UI_Post.lua
+CraftingOrderClassic_UI_Gather.lua
+CraftingOrderClassic_UI_Artisans.lua
+CraftingOrderClassic_Social.lua
+CraftingOrderClassic_Minimap.lua
+CraftingOrderClassic_ProfOrders.lua
 Directory.lua
 Orders.lua
+CraftingOrderClassic_Inbound.lua
+Debug.lua

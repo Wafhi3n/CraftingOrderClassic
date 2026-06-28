@@ -1,220 +1,466 @@
--- CraftingOrderClassic_UI_Post.lua — onglet « Poster » : recherche d'objet à fabriquer/récolter
--- par métier → réactifs (cases « je fournis ») → poster une commande. Remplace le shift-clic.
--- Lit CraftLink (ProfessionCatalogue / RecipeReagents / ItemName). Chargé après _UI.lua.
+-- CraftingOrderClassic_UI_Post.lua — onglet « Commande » : sélection de plan (gauche) +
+-- réactifs « je fournis » / commission g-s-c / ciblage artisan (droite). Chargé après _UI.lua.
 
 local COC  = CraftingOrderClassic
 local UI   = COC.UI
 local Skin = UI.Skin
-local RH   = 16
+
+local PLH = 20    -- hauteur ligne plan
+local RRH = 21    -- hauteur ligne réactif
+local ARH = 26    -- hauteur ligne artisan
+
+local SEP  = 308   -- x séparateur gauche/droite
+local LW   = SEP - 14          -- largeur panneau gauche (zone visible)
+local LSW  = LW - 22           -- largeur scroll gauche (laisse la place à la scrollbar avant le séparateur)
+local RX   = SEP + 8           -- x départ panneau droit
+local REDGE = 846              -- bord droit utile (sous la bordure dorée)
+local RW   = 818 - RX          -- largeur scroll droit (scrollbar finit avant REDGE)
 
 local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true) end
-local function itemName(id) local c=CL(); return c and c:ItemName(id) or ("item:"..tostring(id)) end
-
--- Nom d'une entrée de catalogue : objet (GetItemInfo) ou service/enchant (GetSpellInfo).
+local function isSoulbound(id) return id and GetItemInfo and select(14, GetItemInfo(id)) == 1 end
 local function entryName(e)
     local c = CL(); if not c then return "?" end
-    if e.itemID then return c:ItemName(e.itemID) end
-    return c:RecipeName(e.spellID)
+    return e.itemID and c:ItemName(e.itemID) or c:RecipeName(e.spellID)
+end
+local function sep1px(parent, x1, x2, y)
+    local s = parent:CreateTexture(nil, "ARTWORK"); s:SetHeight(1)
+    s:SetColorTexture(Skin.color.separator[1], Skin.color.separator[2], Skin.color.separator[3], 0.5)
+    s:SetSize(x2 - x1, 1); s:SetPoint("TOPLEFT", x1, y); return s
 end
 
--- Objet lié-quand-ramassé (non échangeable) → à masquer. nil si pas encore en cache (on montre).
-local function isSoulbound(itemID)
-    if not (itemID and GetItemInfo) then return false end
-    local bind = select(14, GetItemInfo(itemID))   -- 1 = Bind on Pickup
-    return bind == 1
-end
-
--- ------------------------------------------------------------------
--- Construction
--- ------------------------------------------------------------------
+-- =========================================================================
+-- Construction principale
+-- =========================================================================
 function UI:BuildPostTab(f)
-    local panel = CreateFrame("Frame", nil, f); panel:SetAllPoints(f); panel:Hide()
-    self.postPanel = panel
+    local panel = CreateFrame("Frame", nil, f); self.insetPanel(panel, f); panel:Hide()
+    self.postPanel   = panel
     self.postProvide = {}
+    self.postTarget  = "all"
+    self.postSource  = "guild"
 
-    -- Colonne gauche : métiers
-    local profHdr = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    profHdr:SetPoint("TOPLEFT", 14, -76); profHdr:SetText("|cFFE8B84BMétier|r")
-    local pscroll = CreateFrame("ScrollFrame", "COCPostProfScroll", panel, "UIPanelScrollFrameTemplate")
-    pscroll:SetPoint("TOPLEFT", 12, -92); pscroll:SetPoint("BOTTOMLEFT", 12, 92); pscroll:SetWidth(120)
-    local pcontent = CreateFrame("Frame", nil, pscroll); pcontent:SetSize(110, 10); pscroll:SetScrollChild(pcontent)
-    self.postProfContent = pcontent; self.postProfRows = {}
+    sep1px(panel, SEP, SEP + 1, -82):SetSize(1, 494)    -- ligne verticale gauche/droite
 
-    -- Recherche + catalogue (droite)
-    local search = CreateFrame("EditBox", nil, panel, "InputBoxTemplate")
-    search:SetSize(220, 18); search:SetPoint("TOPLEFT", 150, -78); search:SetAutoFocus(false)
-    search:SetScript("OnTextChanged", function(b) UI.postSearch = b:GetText():lower(); UI:RefreshPostCatalogue() end)
-    search:SetScript("OnEscapePressed", function(b) b:ClearFocus() end)
-    local sLbl = panel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    sLbl:SetPoint("BOTTOMLEFT", search, "TOPLEFT", 2, 1); sLbl:SetText("Rechercher un objet")
+    self:_BuildPostLeft(panel)
+    self:_BuildPostRight(panel)
+    -- (résolution des noms async : handler central dans _UI.lua)
+end
 
-    local cscroll = CreateFrame("ScrollFrame", "COCPostCatScroll", panel, "UIPanelScrollFrameTemplate")
-    cscroll:SetPoint("TOPLEFT", 150, -100); cscroll:SetPoint("TOPRIGHT", -30, -100); cscroll:SetHeight(8 * RH)
-    local ccontent = CreateFrame("Frame", nil, cscroll); ccontent:SetSize(330, 10); cscroll:SetScrollChild(ccontent)
-    self.postCatScroll = cscroll; self.postCatContent = ccontent; self.postCatRows = {}
+-- Professions de récolte pure (aucune recette) → exclues de l'onglet Commande, elles vivent
+-- dans l'onglet Récolte. Mining reste ici (fonte = recettes) ET dans Récolte (minerais).
+local GATHER_ONLY = { Fishing = true, Herbalism = true, Skinning = true }
 
-    -- Réactifs « je fournis »
-    local rHdr = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    rHdr:SetPoint("TOPLEFT", 150, -100 - 8 * RH - 8); rHdr:SetText("|cFFE8B84BRéactifs|r |cFF888888(cocher = je fournis)|r")
-    self.postReagHdr = rHdr
+-- =========================================================================
+-- Panneau gauche : dropdown métier + liste des plans
+-- =========================================================================
+function UI:_BuildPostLeft(panel)
+    local hdrLbl = panel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+    hdrLbl:SetPoint("TOPLEFT", 14, -80); hdrLbl:SetText("MÉTIER")
+    hdrLbl:SetTextColor(Skin.unpack(Skin.color.textMuted))
+
+    local pBtn = Skin.MakeGoldButton(panel, LW, 22, "—"); pBtn:SetPoint("TOPLEFT", 12, -98)
+    -- L'icône du métier est DANS le dropdown, collée au nom du métier sélectionné.
+    self.postProfBadge = Skin.MakeBadge(pBtn, 16); self.postProfBadge:SetPoint("LEFT", 5, 0)
+    pBtn.text:SetJustifyH("LEFT"); pBtn.text:ClearAllPoints(); pBtn.text:SetPoint("LEFT", 26, 0)
+    local arrow = pBtn:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    arrow:SetPoint("RIGHT", -6, 0); arrow:SetText("▾"); arrow:SetTextColor(Skin.unpack(Skin.color.gold))
+    self.postProfBtn = pBtn
+    pBtn:SetScript("OnClick", function() UI:_ToggleProfFlyout() end)
+
+    -- Flyout (hors hiérarchie du panel pour passer au-dessus)
+    local fly = CreateFrame("Frame", "COCProfFlyout", UIParent, "BackdropTemplate")
+    fly:SetSize(LW, 10); fly:SetFrameStrata("DIALOG"); fly:Hide(); Skin.SkinWell(fly)
+    self.postProfFlyout = fly; self.postProfFlyRows = {}
+
+    -- Fermer flyout sur clic ailleurs
+    local closer = CreateFrame("Button", nil, UIParent)
+    closer:SetAllPoints(); closer:SetFrameStrata("DIALOG"); closer:Hide()
+    fly:SetFrameLevel(closer:GetFrameLevel() + 1)
+    closer:SetScript("OnClick", function() fly:Hide(); closer:Hide() end)
+    fly:SetScript("OnShow",     function() closer:Show() end)
+    fly:SetScript("OnHide",     function() closer:Hide() end)
+
+    -- Filtre qualité (pill) + recherche
+    local qBtn = Skin.MakeGoldButton(panel, 100, 18, "Qualité : Toutes")
+    qBtn:SetPoint("TOPLEFT", 12, -128)
+    qBtn:SetScript("OnClick", function() end)
+
+    local srch = CreateFrame("EditBox", nil, panel, "InputBoxTemplate")
+    srch:SetSize(LW - 110, 16); srch:SetPoint("TOPLEFT", 116, -129); srch:SetAutoFocus(false)
+    local hint = panel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+    hint:SetPoint("LEFT", srch, "LEFT", 4, 0); hint:SetText("○ Rechercher un plan")
+    srch:SetScript("OnTextChanged", function(b)
+        hint:SetShown(b:GetText() == "")
+        UI.postSearch = b:GetText():lower(); UI:RefreshPostPlans()
+    end)
+    srch:SetScript("OnEscapePressed", function(b) b:ClearFocus() end)
+
+    sep1px(panel, 12, SEP - 2, -150)
+
+    local lhdr = panel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+    lhdr:SetPoint("TOPLEFT", 14, -156); lhdr:SetText("LISTE DES PLANS")
+    lhdr:SetTextColor(Skin.unpack(Skin.color.textMuted))
+
+    local pscroll = CreateFrame("ScrollFrame", "COCPostPlanScroll", panel, "UIPanelScrollFrameTemplate")
+    pscroll:SetPoint("TOPLEFT", 12, -170); pscroll:SetPoint("BOTTOMLEFT", 12, 22); pscroll:SetWidth(LSW)
+    local pc = CreateFrame("Frame", nil, pscroll); pc:SetSize(LW - 22, 10); pscroll:SetScrollChild(pc)
+    self.postPlanContent = pc; self.postPlanRows = {}
+end
+
+function UI:_ToggleProfFlyout()
+    local fly = self.postProfFlyout; if not fly then return end
+    if fly:IsShown() then fly:Hide(); return end
+    fly:ClearAllPoints(); fly:SetPoint("TOPLEFT", self.postProfBtn, "BOTTOMLEFT", 0, -2); fly:Show()
+end
+
+-- =========================================================================
+-- Panneau droit : titre plan + réactifs + commission + ciblage artisan
+-- =========================================================================
+function UI:_BuildPostRight(panel)
+    -- Titre du plan
+    self.postPlanBadge = Skin.MakeBadge(panel, 20); self.postPlanBadge:SetPoint("TOPLEFT", RX, -83)
+    self.postPlanName  = panel:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    self.postPlanName:SetPoint("LEFT", self.postPlanBadge, "RIGHT", 6, 0)
+    self.postPlanName:SetWidth(RW - 100); self.postPlanName:SetJustifyH("LEFT"); Skin.ApplyShadow(self.postPlanName)
+    local jeLabel = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    jeLabel:SetPoint("TOPRIGHT", -22, -85); jeLabel:SetText("JE FOURNIS")
+    jeLabel:SetTextColor(Skin.unpack(Skin.color.gold)); Skin.ApplyShadow(jeLabel)
+
+    sep1px(panel, RX, REDGE, -106)
+
+    local rhdr = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    rhdr:SetPoint("TOPLEFT", RX, -112)
+    rhdr:SetText("|cFFE8B84BRéactifs|r |cFF888888(cocher = je fournis)|r"); Skin.ApplyShadow(rhdr)
+    self.postReagHdr = rhdr
+
+    -- Compteur « je fournis » à droite de l'en-tête réactifs.
+    self.postBQCount = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    self.postBQCount:SetPoint("TOPRIGHT", -22, -112); self.postBQCount:SetTextColor(Skin.unpack(Skin.color.textMuted))
+    Skin.ApplyShadow(self.postBQCount)
+
     local rscroll = CreateFrame("ScrollFrame", "COCPostReagScroll", panel, "UIPanelScrollFrameTemplate")
-    rscroll:SetPoint("TOPLEFT", 150, -100 - 8 * RH - 24); rscroll:SetPoint("BOTTOMRIGHT", -30, 64)
-    local rcontent = CreateFrame("Frame", nil, rscroll); rcontent:SetSize(330, 10); rscroll:SetScrollChild(rcontent)
-    self.postReagContent = rcontent; self.postReagRows = {}
+    rscroll:SetPoint("TOPLEFT", RX, -127); rscroll:SetSize(RW, 8 * RRH)
+    local rc = CreateFrame("Frame", nil, rscroll); rc:SetSize(RW - 22, 10); rscroll:SetScrollChild(rc)
+    self.postReagContent = rc; self.postReagRows = {}
 
-    self:_BuildPostBottom(panel)
+    sep1px(panel, RX, REDGE, -300)
 
-    -- Noms d'objets chargés en différé par Blizzard → on rafraîchit le catalogue quand ils arrivent.
-    local ev = CreateFrame("Frame")
-    ev:RegisterEvent("GET_ITEM_INFO_RECEIVED")
-    ev:SetScript("OnEvent", function() UI:_PostNameDirty() end)
+    -- Commission g/s/c + Qté
+    local comLbl = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    comLbl:SetPoint("TOPLEFT", RX, -308); comLbl:SetText("|cFFE8B84BCommission|r"); Skin.ApplyShadow(comLbl)
+    self.postGold, self.postSilver, self.postCopper = self:_MakeGSC(panel, RX + 92, -306)
+    local qLbl = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    qLbl:SetPoint("TOPLEFT", RX + 330, -308); qLbl:SetText("Qté"); Skin.ApplyShadow(qLbl)
+    self.postQty = CreateFrame("EditBox", nil, panel, "InputBoxTemplate")
+    self.postQty:SetSize(40, 16); self.postQty:SetPoint("TOPLEFT", RX + 352, -306)
+    self.postQty:SetAutoFocus(false); self.postQty:SetNumeric(true); self.postQty:SetText("1")
+    self.postQty:SetScript("OnEscapePressed", function(b) b:ClearFocus() end)
+
+    sep1px(panel, RX, REDGE, -328)
+
+    self:_BuildPostArtisanSection(panel)
 end
 
-function UI:_BuildPostBottom(panel)
-    local sel = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    sel:SetPoint("BOTTOMLEFT", 14, 40); sel:SetWidth(300); sel:SetJustifyH("LEFT"); Skin.ApplyShadow(sel)
-    sel:SetText("|cFF888888Choisis un métier puis un objet.|r"); self.postSelLbl = sel
-
-    local btn = Skin.MakeGoldButton(panel, 70, 22, "Poster")
-    btn:SetPoint("BOTTOMRIGHT", -14, 36)
-    btn:SetScript("OnClick", function() UI:DoPostOrder() end)
-    local price = CreateFrame("EditBox", nil, panel, "InputBoxTemplate")
-    price:SetSize(64, 18); price:SetPoint("RIGHT", btn, "LEFT", -10, 0); price:SetAutoFocus(false)
-    price:SetScript("OnEscapePressed", function(b) b:ClearFocus() end); self.postPrice = price
-    local pl = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall"); pl:SetPoint("RIGHT", price, "LEFT", -3, 0); pl:SetText("Prix")
-    local qty = CreateFrame("EditBox", nil, panel, "InputBoxTemplate")
-    qty:SetSize(36, 18); qty:SetPoint("RIGHT", pl, "LEFT", -8, 0); qty:SetAutoFocus(false); qty:SetNumeric(true); qty:SetText("1")
-    qty:SetScript("OnEscapePressed", function(b) b:ClearFocus() end); self.postQty = qty
-    local ql = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall"); ql:SetPoint("RIGHT", qty, "LEFT", -3, 0); ql:SetText("Qté")
-end
-
--- ------------------------------------------------------------------
--- Métiers (gauche)
--- ------------------------------------------------------------------
-function UI:_PostProfRow(i)
-    local r = self.postProfRows[i]; if r then return r end
-    r = Skin.MakeGoldButton(self.postProfContent, 106, RH)
-    r:SetPoint("TOPLEFT", 0, -(i - 1) * RH); r.text:SetJustifyH("LEFT"); r.text:ClearAllPoints(); r.text:SetPoint("LEFT", 4, 0)
-    self.postProfRows[i] = r; return r
-end
-
-function UI:RefreshPostProfs()
-    local c = CL(); local profs = c and c:Professions() or {}
-    if not self.postProf and profs[1] then self.postProf = profs[1] end
-    for i, prof in ipairs(profs) do
-        local r = self:_PostProfRow(i)
-        r:SetText(prof); r:SetSelected(prof == self.postProf)
-        r:SetScript("OnClick", function() UI.postProf = prof; UI.postEntry = nil; UI:RefreshPost() end)
-        r:Show()
+function UI:_MakeGSC(parent, x, y)
+    local cfg = { {40, "gold"}, {34, "silver"}, {34, "copper"} }
+    local fields, cx = {}, x
+    for i, c in ipairs(cfg) do
+        local eb = CreateFrame("EditBox", nil, parent, "InputBoxTemplate")
+        eb:SetSize(c[1], 16); eb:SetPoint("TOPLEFT", cx, y)
+        eb:SetAutoFocus(false); eb:SetNumeric(true); eb:SetText("0")
+        eb:SetScript("OnEscapePressed", function(b) b:ClearFocus() end)
+        Skin.MoneyIcon(parent, c[2], eb)               -- vraie icône or/argent/cuivre du jeu
+        fields[i] = eb; cx = cx + c[1] + 20
     end
-    for i = #profs + 1, #self.postProfRows do self.postProfRows[i]:Hide() end
-    self.postProfContent:SetHeight(math.max(#profs * RH, 10))
+    return fields[1], fields[2], fields[3]
 end
 
--- ------------------------------------------------------------------
--- Catalogue (droite)
--- ------------------------------------------------------------------
-function UI:_PostCatRow(i)
-    local r = self.postCatRows[i]; if r then return r end
-    r = CreateFrame("Button", nil, self.postCatContent); r:SetSize(326, RH); r:SetPoint("TOPLEFT", 0, -(i - 1) * RH)
-    local hi = r:CreateTexture(nil, "HIGHLIGHT"); hi:SetAllPoints(); hi:SetColorTexture(Skin.unpack(Skin.color.rowHover))
-    r.fs = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall"); r.fs:SetPoint("LEFT", 4, 0); r.fs:SetJustifyH("LEFT"); Skin.ApplyShadow(r.fs)
-    self.postCatRows[i] = r; return r
+function UI:_BuildPostArtisanSection(panel)
+    local srcDefs = { {id="guild", label="Guilde"}, {id="friend", label="Amis"}, {id="added", label="Ajoutés"}, {id="recent", label="Croisés"} }
+    self.postSrcBtns = {}
+    for i, d in ipairs(srcDefs) do
+        local b = Skin.MakeGoldButton(panel, 58, 20, d.label); b:SetPoint("TOPLEFT", RX + (i-1)*62, -337)
+        b:SetScript("OnClick", function()
+            UI.postSource = d.id; UI.postTarget = d.id   -- cibler TOUTE cette liste
+            UI:_RefreshPostSrcTabs(); UI:RefreshPostArtisans()
+        end)
+        self.postSrcBtns[d.id] = b
+    end
+    self.postSource = "guild"; self.postTarget = "all"; self:_RefreshPostSrcTabs()
+
+    local diffBtn = Skin.MakeGoldButton(panel, 124, 20, "Diffuser à tous"); diffBtn:SetPoint("TOPRIGHT", -22, -337)
+    local diffIc = diffBtn:CreateTexture(nil, "OVERLAY"); diffIc:SetSize(14, 14)
+    diffIc:SetPoint("LEFT", 5, 0); diffIc:SetTexture(Skin.tex.broadcast)
+    diffBtn.text:ClearAllPoints(); diffBtn.text:SetPoint("LEFT", 22, 0)
+    diffBtn:SetScript("OnClick", function()
+        UI.postTarget = "all"; UI:RefreshPostArtisans()
+    end)
+
+    local ascroll = CreateFrame("ScrollFrame", "COCPostArtScroll", panel, "UIPanelScrollFrameTemplate")
+    ascroll:SetPoint("TOPLEFT", RX, -362); ascroll:SetSize(RW, 5 * ARH)
+    local ac = CreateFrame("Frame", nil, ascroll); ac:SetSize(RW - 22, 10); ascroll:SetScrollChild(ac)
+    self.postArtContent = ac; self.postArtRows = {}
+
+    local artLbl = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    artLbl:SetPoint("TOPLEFT", RX, -495); artLbl:SetText("|cFFE8B84BDestinataire :|r"); Skin.ApplyShadow(artLbl)
+    self.postArtisanName = panel:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    self.postArtisanName:SetPoint("LEFT", artLbl, "RIGHT", 6, 0); Skin.ApplyShadow(self.postArtisanName)
+    self:_UpdateArtisanLabel()
+
+    local posterBtn = Skin.MakeGoldButton(panel, 82, 24, "Poster"); posterBtn:SetPoint("BOTTOMRIGHT", -22, 36)
+    posterBtn:SetScript("OnClick", function() UI:DoPostOrder() end)
+
+    self.postSelLbl = panel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+    self.postSelLbl:SetPoint("BOTTOMLEFT", RX, 40); self.postSelLbl:SetWidth(RW - 100); self.postSelLbl:SetJustifyH("LEFT")
+    self.postSelLbl:SetText("|cFF888888Choisis un métier puis un plan.|r")
 end
 
-function UI:RefreshPostCatalogue()
-    local c = CL(); if not (c and self.postCatScroll) then return end
+function UI:_RefreshPostSrcTabs()
+    for id, b in pairs(self.postSrcBtns or {}) do b:SetSelected(id == self.postSource) end
+end
+
+-- =========================================================================
+-- Refresh
+-- =========================================================================
+function UI:RefreshPost()
+    self:_RefreshProfDropdown()
+    self:RefreshPostPlans()
+    self:RefreshPostPlanDetail()
+    self:RefreshPostArtisans()
+end
+
+function UI:_RefreshProfDropdown()
+    local c = CL(); local all = c and c:Professions() or {}
+    local profs = {}
+    for _, p in ipairs(all) do if not GATHER_ONLY[p] then profs[#profs + 1] = p end end
+    if (not self.postProf or GATHER_ONLY[self.postProf]) and profs[1] then self.postProf = profs[1] end
+    local p = self.postProf or "—"; local lbl = Skin.ProfLabel(p)
+    self.postProfBtn:SetText(lbl)
+    self.postProfBadge:Paint(Skin.color.gold[1], Skin.color.gold[2], Skin.color.gold[3], Skin.FirstChar(lbl), Skin.ProfIcon(p))
+    -- Peuplement du flyout
+    local fly, frows = self.postProfFlyout, self.postProfFlyRows
+    local h = 0
+    for i, prof in ipairs(profs) do
+        local r = frows[i]
+        if not r then
+            r = Skin.MakeGoldButton(fly, LW - 4, 20, ""); r:SetPoint("TOPLEFT", 2, -2 - (i-1)*20)
+            r.text:SetJustifyH("LEFT"); r.text:ClearAllPoints(); r.text:SetPoint("LEFT", 6, 0)
+            frows[i] = r
+        end
+        r:SetText(Skin.ProfLabel(prof)); r:SetSelected(prof == self.postProf)
+        r:SetScript("OnClick", function()
+            UI.postProf = prof; UI.postEntry = nil; UI:_RefreshProfDropdown()
+            UI:RefreshPostPlans(); UI:RefreshPostPlanDetail(); UI:RefreshPostArtisans()
+            fly:Hide()
+        end)
+        r:Show(); h = h + 20
+    end
+    for i = #profs + 1, #frows do frows[i]:Hide() end
+    fly:SetHeight(h + 4)
+end
+
+function UI:RefreshPostPlans()
+    local c = CL(); if not (c and self.postPlanContent) then return end
     local list = self.postProf and c:ProfessionCatalogue(self.postProf) or {}
     local s = self.postSearch
     local out = {}
     for _, e in ipairs(list) do
-        if not (e.itemID and isSoulbound(e.itemID)) then   -- masque les objets liés (non échangeables)
+        -- Commande = objets CRAFTABLES uniquement (recette/sort) ; les récoltes pures (sans spellID)
+        -- vivent dans l'onglet Récolte. On masque les objets liés (non échangeables) et ceux absents
+        -- du client (autre extension).
+        if e.spellID and Skin.ItemExists(e.itemID) and not (e.itemID and isSoulbound(e.itemID)) then
             local nm = entryName(e)
-            if not s or s == "" or nm:lower():find(s, 1, true) or (e.itemID and tostring(e.itemID):find(s, 1, true)) then
-                out[#out + 1] = { e = e, name = nm }
+            if not s or s == "" or nm:lower():find(s, 1, true) then
+                out[#out + 1] = {e = e, name = nm}
             end
         end
     end
     table.sort(out, function(a, b) return a.name < b.name end)
-    local off = math.floor(self.postCatScroll:GetVerticalScroll() / RH)
-    for i = 1, 8 do
-        local row = self:_PostCatRow(i); local item = out[off + i]
-        if item then
-            local e = item.e
-            row.entry = e
-            local tag = e.service and " |cFFCC88FF(ench.)|r"
-                or ((e.itemID and not e.spellID) and " |cFF66CC66(matière)|r" or "")
-            -- placeholder tant que le nom d'objet n'est pas résolu (cache async Blizzard)
-            local disp = item.name:match("^item:") and "|cFF777777Chargement…|r" or item.name
-            row.fs:SetText(disp .. tag)
-            row.fs:SetTextColor(e == self.postEntry and 1 or 0.91, e == self.postEntry and 0.85 or 0.86, e == self.postEntry and 0.27 or 0.78)
-            row:SetScript("OnClick", function() UI:SelectPostItem(e) end)
-            row:Show()
-        else row:Hide() end
+    self.postPlanList = out
+    for i, item in ipairs(out) do
+        local row = self:_PostPlanRow(i); local e = item.e
+        local r, g, b = Skin.RarityColor(e.itemID)
+        row.badge:Paint(r, g, b, Skin.FirstChar(item.name), Skin.Icon(e.itemID, e.spellID))
+        local disp = item.name:match("^item:") and "|cFF777777Chargement…|r" or item.name
+        row.name:SetText(disp); row.name:SetTextColor(r, g, b)
+        row.name:SetTextColor(e == self.postEntry and 1 or r, e == self.postEntry and 0.85 or g, e == self.postEntry and 0.27 or b)
+        row.entry = e; row:SetScript("OnClick", function() UI:SelectPostPlan(e) end); row:Show()
     end
-    self.postCatContent:SetHeight(math.max(#out * RH, 8 * RH))
-    self.postCatList = out
+    for i = #out + 1, #self.postPlanRows do self.postPlanRows[i]:Hide() end
+    self.postPlanContent:SetHeight(math.max(#out * PLH, 10))
+    Skin.AutoHideScroll("COCPostPlanScroll", self.postPlanContent)
 end
 
--- Rafraîchissement throttlé quand Blizzard renvoie un nom d'objet (GET_ITEM_INFO_RECEIVED).
-function UI:_PostNameDirty()
-    if self._postNameTimer or not C_Timer then return end
-    self._postNameTimer = true
-    C_Timer.After(0.3, function()
-        UI._postNameTimer = nil
-        if UI.postPanel and UI.postPanel:IsShown() then UI:RefreshPostCatalogue() end
-    end)
+function UI:_PostPlanRow(i)
+    local r = self.postPlanRows[i]; if r then return r end
+    r = CreateFrame("Button", nil, self.postPlanContent); r:SetSize(LW - 22, PLH); r:SetPoint("TOPLEFT", 0, -(i-1)*PLH)
+    local hi = r:CreateTexture(nil, "HIGHLIGHT"); hi:SetAllPoints(); hi:SetColorTexture(Skin.unpack(Skin.color.rowHover))
+    r.badge = Skin.MakeBadge(r, 14); r.badge:SetPoint("LEFT", 2, 0)
+    r.name  = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    r.name:SetPoint("LEFT", 20, 0); r.name:SetJustifyH("LEFT"); r.name:SetWidth(LW - 46); Skin.ApplyShadow(r.name)
+    self.postPlanRows[i] = r; return r
 end
 
-function UI:SelectPostItem(entry)
-    self.postEntry = entry; self.postProvide = {}
-    self.postSelLbl:SetText("Sélection : |cFFFFFFFF" .. entryName(entry) .. "|r")
-    self:RefreshPostCatalogue(); self:RefreshPostReagents()
-end
-
--- ------------------------------------------------------------------
--- Réactifs (cases « je fournis »)
--- ------------------------------------------------------------------
-function UI:_PostReagRow(i)
-    local r = self.postReagRows[i]; if r then return r end
-    r = CreateFrame("Button", nil, self.postReagContent); r:SetSize(326, RH); r:SetPoint("TOPLEFT", 0, -(i - 1) * RH)
-    r.fs = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall"); r.fs:SetPoint("LEFT", 4, 0); r.fs:SetJustifyH("LEFT"); Skin.ApplyShadow(r.fs)
-    self.postReagRows[i] = r; return r
+function UI:RefreshPostPlanDetail()
+    local e = self.postEntry
+    if not e then
+        self.postPlanBadge:Hide(); self.postPlanName:SetText("|cFF888888Aucun plan sélectionné.|r")
+        self.postReagHdr:SetShown(false); self.postBQCount:SetText("")
+        for i = 1, #self.postReagRows do self.postReagRows[i]:Hide() end
+        self.postReagContent:SetHeight(10)
+        if self.postSelLbl then self.postSelLbl:SetText("|cFF888888Choisis un métier puis un plan.|r") end
+        return
+    end
+    local nm = entryName(e); local r, g, b = Skin.RarityColor(e.itemID)
+    self.postPlanBadge:Paint(r, g, b, Skin.FirstChar(nm), Skin.Icon(e.itemID, e.spellID)); self.postPlanBadge:Show()
+    self.postPlanName:SetText(nm); self.postPlanName:SetTextColor(r, g, b)
+    self:RefreshPostReagents()
 end
 
 function UI:RefreshPostReagents()
     local c = CL()
-    local reag = (c and self.postEntry and self.postEntry.spellID) and c:RecipeReagents(self.postProf, self.postEntry.spellID) or {}
+    local reag = (c and self.postEntry and self.postEntry.spellID)
+        and c:RecipeReagents(self.postProf, self.postEntry.spellID) or {}
+    self.postCurrentReag = reag
     for i = 1, #self.postReagRows do self.postReagRows[i]:Hide() end
     for i, rg in ipairs(reag) do
         local row = self:_PostReagRow(i); local iid, qty = rg[1], rg[2]
-        local function paint()
-            local box = UI.postProvide[iid] and "|cFF33DD33[x]|r" or "|cFF888888[ ]|r"
-            row.fs:SetText(string.format("%s %s |cFFFFCC00x%d|r", box, itemName(iid), qty))
-        end
-        row:SetScript("OnClick", function() UI.postProvide[iid] = not UI.postProvide[iid]; paint() end)
-        paint(); row:Show()
+        local cr, cg, cb = Skin.RarityColor(iid)
+        local nm2 = c and c:ItemName(iid) or ("item:"..iid)
+        local disp = nm2:match("^item:") and "|cFF777777Chargement…|r" or nm2
+        row.badge:Paint(cr, cg, cb, Skin.FirstChar(nm2), Skin.Icon(iid))
+        row.name:SetText(disp); row.name:SetTextColor(cr, cg, cb)
+        row.qty:SetText("|cFFFFCC00×"..qty.."|r")
+        row.check:SetText(UI.postProvide[iid] and "|cFF33DD33✓|r" or "|cFF888888□|r")
+        row:SetScript("OnClick", function()
+            UI.postProvide[iid] = not UI.postProvide[iid]
+            row.check:SetText(UI.postProvide[iid] and "|cFF33DD33✓|r" or "|cFF888888□|r")
+            UI:_UpdateProvidedCount()
+        end)
+        row:Show()
     end
-    self.postReagContent:SetHeight(math.max(#reag * RH, 10))
+    self.postReagContent:SetHeight(math.max(#reag * RRH, 10))
+    Skin.AutoHideScroll("COCPostReagScroll", self.postReagContent)
     self.postReagHdr:SetShown(self.postEntry ~= nil)
+    self:_UpdateProvidedCount()
 end
 
--- ------------------------------------------------------------------
+function UI:_PostReagRow(i)
+    local r = self.postReagRows[i]; if r then return r end
+    r = CreateFrame("Button", nil, self.postReagContent); r:SetSize(RW - 22, RRH); r:SetPoint("TOPLEFT", 0, -(i-1)*RRH)
+    local hi = r:CreateTexture(nil, "HIGHLIGHT"); hi:SetAllPoints(); hi:SetColorTexture(Skin.unpack(Skin.color.rowHover))
+    r.badge = Skin.MakeBadge(r, 14); r.badge:SetPoint("LEFT", 2, 0)
+    r.name  = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    r.name:SetPoint("LEFT", 20, 0); r.name:SetWidth(RW - 110); r.name:SetJustifyH("LEFT"); Skin.ApplyShadow(r.name)
+    r.qty   = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall"); r.qty:SetPoint("RIGHT", -22, 0); Skin.ApplyShadow(r.qty)
+    r.check = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall"); r.check:SetPoint("RIGHT", -4, 0); Skin.ApplyShadow(r.check)
+    self.postReagRows[i] = r; return r
+end
+
+function UI:_UpdateProvidedCount()
+    local reag = self.postCurrentReag or {}; local n = 0
+    for _, rg in ipairs(reag) do if UI.postProvide[rg[1]] then n = n + 1 end end
+    if self.postBQCount then self.postBQCount:SetText(n.." / "..#reag.." fournis") end
+end
+
+function UI:RefreshPostArtisans()
+    local D = COC.Directory; if not (D and self.postArtContent) then return end
+    local src, prof = self.postSource or "guild", self.postProf
+    local list = {}
+    for name, r in pairs(D.roster or {}) do
+        local artSrc = r.source or "recent"
+        if artSrc == src and (not prof or (r.recipes and r.recipes[prof])) then
+            list[#list+1] = {name=name, r=r, online=D.online[name]}
+        end
+    end
+    table.sort(list, function(a, b)
+        if (a.online and true) ~= (b.online and true) then return a.online end
+        return a.name < b.name
+    end)
+    local n = 0
+    for _, a in ipairs(list) do
+        n = n + 1; local row = self:_PostArtRow(n)
+        local sk = a.r.skill and prof and a.r.skill[prof]
+        local skTxt = sk and ("|cFF888888"..sk[1].."/"..sk[2].."|r  ") or ""
+        local profs2 = {}
+        for p2 in pairs(a.r.recipes or {}) do profs2[#profs2+1] = Skin.ProfLabel(p2) end
+        row.dot:SetOnline(a.online and true or false)
+        row.name:SetText("|cFFFFFFFF"..a.name.."|r  "..skTxt.."|cFF888888"..table.concat(profs2, " · ").."|r")
+        row.src:SetText("|cFF888888"..(a.r.source or "recent"):upper().."|r")
+        row.artEntry = a
+        row.selTex:SetShown(UI.postTarget == "@" .. a.name)
+        row:SetScript("OnClick", function()
+            UI.postTarget = "@" .. a.name; UI:RefreshPostArtisans()
+        end)
+        row:Show()
+    end
+    for i = n+1, #self.postArtRows do self.postArtRows[i]:Hide() end
+    self.postArtContent:SetHeight(math.max(n * ARH, 10))
+    Skin.AutoHideScroll("COCPostArtScroll", self.postArtContent)
+    self:_UpdateArtisanLabel()
+end
+
+function UI:_PostArtRow(i)
+    local r = self.postArtRows[i]; if r then return r end
+    r = CreateFrame("Button", nil, self.postArtContent); r:SetSize(RW - 22, ARH); r:SetPoint("TOPLEFT", 0, -(i-1)*ARH)
+    local hi = r:CreateTexture(nil, "HIGHLIGHT"); hi:SetAllPoints(); hi:SetColorTexture(Skin.unpack(Skin.color.rowHover))
+    local st = r:CreateTexture(nil, "BACKGROUND"); st:SetAllPoints()
+    st:SetColorTexture(Skin.color.tabActive[1], Skin.color.tabActive[2], Skin.color.tabActive[3], 0.30)
+    st:Hide(); r.selTex = st
+    r.dot  = Skin.MakeStatusIcon(r, 14); r.dot:SetPoint("LEFT", 4, 0)
+    r.name = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    r.name:SetPoint("LEFT", 18, 0); r.name:SetWidth(RW - 100); r.name:SetJustifyH("LEFT"); Skin.ApplyShadow(r.name)
+    r.src  = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall"); r.src:SetPoint("RIGHT", -4, 0); Skin.ApplyShadow(r.src)
+    self.postArtRows[i] = r; return r
+end
+
+local POST_TARGET_FR = { guild = "Guilde", friend = "Amis", added = "Ajoutés", recent = "Croisés" }
+function UI:_PostTargetLabel()
+    local t = self.postTarget or "all"
+    if t == "all" then return "Tous" end
+    if t:sub(1, 1) == "@" then return t:sub(2) end
+    return POST_TARGET_FR[t] or "Tous"
+end
+
+function UI:_UpdateArtisanLabel()
+    if self.postArtisanName then
+        local t = self.postTarget or "all"
+        local col = (t == "all") and "FFAAAAAA" or "FFFFFFFF"
+        self.postArtisanName:SetText("|c" .. col .. self:_PostTargetLabel() .. "|r")
+    end
+end
+
+function UI:SelectPostPlan(entry)
+    self.postEntry = entry; self.postProvide = {}
+    self.postSelLbl:SetText("Sélection : |cFFFFFFFF"..entryName(entry).."|r")
+    self:RefreshPostPlans(); self:RefreshPostPlanDetail(); self:RefreshPostArtisans()
+end
+
+-- =========================================================================
 -- Poster
--- ------------------------------------------------------------------
+-- =========================================================================
 function UI:DoPostOrder()
     local e = self.postEntry
-    if not e then self.postSelLbl:SetText("|cFFFF4444Choisis d'abord un objet.|r"); return end
+    if not e then self.postSelLbl:SetText("|cFFFF4444Choisis d'abord un plan.|r"); return end
     local qty = tonumber(self.postQty:GetText()) or 1
-    local price = self.postPrice:GetText(); if price == "" then price = nil end
+    local g   = tonumber(self.postGold:GetText()) or 0
+    local s   = tonumber(self.postSilver:GetText()) or 0
+    local cu  = tonumber(self.postCopper:GetText()) or 0
+    local price = nil
+    if g > 0 or s > 0 or cu > 0 then
+        local parts = {}
+        if g  > 0 then parts[#parts+1] = g.."po"  end
+        if s  > 0 then parts[#parts+1] = s.."pa"  end
+        if cu > 0 then parts[#parts+1] = cu.."pc" end
+        price = table.concat(parts, " ")
+    end
     local provided = {}
-    for iid, v in pairs(self.postProvide) do if v then provided[#provided + 1] = iid end end
-    COC.Orders:PostEntry(e, qty, price, { profession = self.postProf, provided = provided })
-    self.postPrice:SetText(""); self.postEntry = nil; self.postProvide = {}
-    self:ShowTab("orders")   -- retour au carnet pour voir la commande
-end
-
--- Refresh global de l'onglet
-function UI:RefreshPost()
-    self:RefreshPostProfs(); self:RefreshPostCatalogue(); self:RefreshPostReagents()
+    for iid, v in pairs(self.postProvide) do if v then provided[#provided+1] = iid end end
+    COC.Orders:PostEntry(e, qty, price, {
+        profession = self.postProf, provided = provided,
+        recipient  = self:_PostTargetLabel(),
+    })
+    self.postGold:SetText("0"); self.postSilver:SetText("0"); self.postCopper:SetText("0")
+    self.postQty:SetText("1"); self.postEntry = nil; self.postProvide = {}
+    self.postSelLbl:SetText("|cFF33DD33Commande postée !|r")
+    self:ShowTab("orders")
 end
