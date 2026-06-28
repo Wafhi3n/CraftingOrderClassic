@@ -65,6 +65,7 @@ function COC:Help()
     print("  |cFFFFFFFF/co accept <id>|r / |cFFFFFFFF/co done <id>|r / |cFFFFFFFF/co cancel <id>|r")
     print("  |cFFFFFFFF/co refresh|r — solliciter l'annuaire (présence + proximité)")
     print("  |cFFFFFFFF/co prof|r — réafficher l'overlay « commandes du métier » sur la fenêtre métier")
+    print("  |cFFFFFFFF/co profwindow|r — |cFFFF8800expérimental|r : fenêtre métier custom 3 colonnes (remplace Blizzard)")
     print("  |cFFFFFFFF/co debug|r — |cFFFF8800mode solo|r : injecte/retire un réseau fictif (artisans + commandes)")
 end
 
@@ -109,6 +110,8 @@ f:SetScript("OnEvent", function(_, event, arg1)
             elseif cmd == "accept" then if O then O:Accept(rest) end
             elseif cmd == "done"   then if O then O:Deliver(rest) end
             elseif cmd == "prof"   then if COC.ProfOrders then COC.ProfOrders:Reenable() end
+            elseif cmd == "profwindow" or cmd == "pw" then
+                if COC.ProfWindow then COC.ProfWindow:SetEnabled(not COC.ProfWindow:IsEnabled()) end
             elseif cmd == "debug"  then if COC.Debug then COC.Debug:Toggle() end
             elseif cmd == "help"   then COC:Help()
             else COC:Status() end

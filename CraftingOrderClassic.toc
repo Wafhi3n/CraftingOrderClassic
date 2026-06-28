@@ -22,6 +22,10 @@ CraftingOrderClassic_UI_Artisans.lua
 CraftingOrderClassic_Social.lua
 CraftingOrderClassic_Minimap.lua
 CraftingOrderClassic_ProfOrders.lua
+CraftingOrderClassic_Craft.lua
+CraftingOrderClassic_ProfWindow.lua
+CraftingOrderClassic_ProfWindow_Recipes.lua
+CraftingOrderClassic_ProfWindow_Detail.lua
 Directory.lua
 Orders.lua
 CraftingOrderClassic_Inbound.lua

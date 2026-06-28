@@ -145,17 +145,25 @@ function ProfOrders:Reenable()
     self:OnProfShow()
 end
 
+-- Coordinateur unique des events fenêtre métier : route vers la fenêtre CUSTOM (si activée via
+-- `/co profwindow`) ou vers l'overlay « commandes du métier » sinon.
 function ProfOrders:Start()
     if not COC.db then return end
     if COC.db.profCompanion == nil then COC.db.profCompanion = true end
     local f = CreateFrame("Frame")
-    f:RegisterEvent("TRADE_SKILL_SHOW"); f:RegisterEvent("TRADE_SKILL_CLOSE")
-    f:RegisterEvent("CRAFT_SHOW");       f:RegisterEvent("CRAFT_CLOSE")
+    for _, ev in ipairs({ "TRADE_SKILL_SHOW", "TRADE_SKILL_UPDATE", "TRADE_SKILL_CLOSE",
+                          "CRAFT_SHOW", "CRAFT_UPDATE", "CRAFT_CLOSE" }) do f:RegisterEvent(ev) end
     f:SetScript("OnEvent", function(_, event)
-        if event == "TRADE_SKILL_SHOW" or event == "CRAFT_SHOW" then
-            if C_Timer then C_Timer.After(0.2, function() ProfOrders:OnProfShow() end)
-            else ProfOrders:OnProfShow() end
-        else
+        local PW = COC.ProfWindow
+        local windowOn = PW and PW:IsEnabled()
+        if event:find("SHOW$") then
+            local fn = windowOn and function() PW:OnProfessionShow() end or function() ProfOrders:OnProfShow() end
+            if C_Timer then C_Timer.After(0.2, fn) else fn() end
+        elseif event:find("UPDATE$") then
+            if windowOn and PW.frame and PW.frame:IsShown() then PW:Refresh()
+            elseif ProfOrders.panel and ProfOrders.panel:IsShown() then ProfOrders:Refresh() end
+        else   -- *_CLOSE
+            if PW then PW:OnProfessionClose() end
             ProfOrders:OnProfHide()
         end
     end)

@@ -174,6 +174,8 @@ function Orders:OnNetwork(sender, message)
         if o then o.status = "done"; o.acceptedBy = (crafter ~= "" and crafter) or o.acceptedBy end
     end
     if COC.UI and COC.UI.Refresh then COC.UI:Refresh() end   -- maj live de la fenêtre si ouverte
+    local PW = COC.ProfWindow
+    if PW and PW.RefreshOrders and PW.frame and PW.frame:IsShown() then PW:RefreshOrders() end
 end
 
 -- Alerte « commande pour TOI » : un joueur t'a ciblé nommément (recipient == ton nom).
