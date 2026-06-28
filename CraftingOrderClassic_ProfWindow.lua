@@ -220,13 +220,24 @@ function PW:SetEnabled(on)
     end
 end
 
+local function silenceGE()
+    if _G.TradeScannerDB then TradeScannerDB.replaceProfWindow = false end
+    if _G.TradeScanner and TradeScanner.ProfWindow and TradeScanner.ProfWindow.Hide then
+        TradeScanner.ProfWindow:Hide()
+    end
+end
+
 function PW:OnProfessionShow()
     if not self:IsEnabled() then return end
     local craft = COC.Craft
     if not (craft and craft:GetOpenProfessionInfo()) then return end
+    silenceGE()                         -- coexistence : pas de double panneau si GE est chargé
     self:Build(); self:NeutralizeNative()
     if not self.frame:IsShown() then self.frame:Show() end
     self:Refresh()
+    -- L'ordre de dispatch des events entre addons n'est pas garanti : si GE traite SHOW APRÈS nous
+    -- (et restaure la frame native / réaffiche sa fenêtre), on re-museler juste après.
+    if C_Timer then C_Timer.After(0.05, function() silenceGE(); PW:NeutralizeNative() end) end
 end
 
 function PW:OnProfessionClose()

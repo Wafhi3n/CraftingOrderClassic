@@ -137,8 +137,11 @@ function UI:_BuildGatherRight(panel)
     crateTex:SetPoint("CENTER"); crateTex:SetSize(16, 16)
     crateTex:SetTexture(Skin.tex.crate); crateTex:SetTexCoord(0.08, 0.92, 0.08, 0.92); crateTex:Hide()
     stChk.crate = crateTex
+    -- Coché = caisse (commande par pile) ; décoché = icône de l'objet voulu (commande à l'unité).
     stChk.Update = function()
-        if UI.gatherByStack then crateTex:Show(); stChk:SetText("")
+        local tex = UI.gatherByStack and Skin.tex.crate
+                 or (UI.gatherEntry and Skin.Icon(UI.gatherEntry.itemID))
+        if tex then crateTex:SetTexture(tex); crateTex:Show(); stChk:SetText("")
         else crateTex:Hide(); stChk:SetText("□") end
     end
     stChk:SetScript("OnClick", function()
@@ -351,6 +354,7 @@ end
 
 function UI:_RefreshGatherDetail()
     local e = self.gatherEntry; local c = CL()
+    if self.gatherStackChk then self.gatherStackChk.Update() end   -- icône case = objet / caisse
     if not e then
         self.gatherResBadge:Hide(); self.gatherResName:SetText("|cFF888888Aucune ressource sélectionnée.|r")
         self.gatherResInfo:SetText(""); self.gatherInfoTxt:SetText("")

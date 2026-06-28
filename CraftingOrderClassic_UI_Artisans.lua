@@ -71,7 +71,8 @@ function UI:BuildArtisansTab(f)
 
     local ascroll = CreateFrame("ScrollFrame", "COCArtScroll", panel, "UIPanelScrollFrameTemplate")
     ascroll:SetPoint("TOPLEFT", ARX, -150); ascroll:SetPoint("BOTTOMRIGHT", -42, 22)
-    local ac = CreateFrame("Frame", nil, ascroll); ac:SetSize(ARW - 24, 10); ascroll:SetScrollChild(ac)
+    -- Largeur < zone visible du scroll (sinon les lignes passent SOUS la scrollbar → boutons masqués).
+    local ac = CreateFrame("Frame", nil, ascroll); ac:SetSize(ARW - 54, 10); ascroll:SetScrollChild(ac)
     self.artScroll = ascroll; self.artListContent = ac; self.artListRows = {}
 end
 
@@ -189,7 +190,7 @@ end
 
 function UI:_ArtRow(i)
     local r = self.artListRows[i]; if r then return r end
-    r = CreateFrame("Button", nil, self.artListContent); r:SetSize(ARW - 24, ARH); r:SetPoint("TOPLEFT", 0, -(i - 1) * ARH)
+    r = CreateFrame("Button", nil, self.artListContent); r:SetSize(ARW - 54, ARH); r:SetPoint("TOPLEFT", 0, -(i - 1) * ARH)
     local hi = r:CreateTexture(nil, "HIGHLIGHT"); hi:SetAllPoints(); hi:SetColorTexture(Skin.unpack(Skin.color.rowHover))
     r.dot   = Skin.MakeStatusIcon(r, 14); r.dot:SetPoint("LEFT", 6, 0)
     r.name  = r:CreateFontString(nil, "OVERLAY", "GameFontNormal")
