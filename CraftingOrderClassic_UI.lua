@@ -5,6 +5,7 @@
 local COC  = CraftingOrderClassic
 local UI   = COC.UI
 local Skin = UI.Skin
+local L    = COC.L
 local ROW_H = 22
 
 local function me() return (UnitName and UnitName("player")) or "?" end
@@ -47,7 +48,7 @@ function UI:Build()
     title:SetFontObject(Skin.WordmarkFont())
     title:SetPoint("TOP", 0, -14); title:SetText("Crafting Order")
     local sub = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    sub:SetPoint("TOP", title, "BOTTOM", 0, -1); sub:SetText("Classic · canal global")
+    sub:SetPoint("TOP", title, "BOTTOM", 0, -1); sub:SetText(L["Classic · canal global"])
     sub:SetTextColor(0.6, 1.0, 0.6); Skin.ApplyShadow(sub)
 
     local close = CreateFrame("Button", nil, f, "UIPanelCloseButton")
@@ -85,10 +86,10 @@ end
 function UI:BuildTabs(f)
     self.tabs = {}
     local defs = {
-        { id = "orders",  label = "Carnet"   },
-        { id = "post",    label = "Commande" },
-        { id = "gather",  label = "Récolte"  },
-        { id = "artisans",label = "Artisans" },
+        { id = "orders",  label = L["Carnet"]   },
+        { id = "post",    label = L["Commande"] },
+        { id = "gather",  label = L["Récolte"]  },
+        { id = "artisans",label = L["Artisans"] },
     }
     for i, d in ipairs(defs) do
         local b = Skin.MakeGoldButton(f, 118, 24, d.label)
@@ -133,11 +134,11 @@ local COL = { name = 8, qty = 320, price = 372, prof = 500, dest = 612, status =
 
 local function orderActionFor(o)
     local m = me()
-    if o.status == "open" and o.buyer ~= m then return "Accepter", function() COC.Orders:Accept(o.id) end end
+    if o.status == "open" and o.buyer ~= m then return L["Accepter"], function() COC.Orders:Accept(o.id) end end
     if o.buyer == m and o.status ~= "done" and o.status ~= "cancelled" then
-        return "Annuler", function() COC.Orders:Cancel(o.id) end
+        return L["Annuler"], function() COC.Orders:Cancel(o.id) end
     end
-    if o.acceptedBy == m and o.status == "accepted" then return "Livrer", function() COC.Orders:Deliver(o.id) end end
+    if o.acceptedBy == m and o.status == "accepted" then return L["Livrer"], function() COC.Orders:Deliver(o.id) end end
     return nil
 end
 
@@ -156,8 +157,8 @@ function UI:BuildOrdersTab(f)
 
     -- Rangée de filtres : relationnel (Tous/Guilde/Amis/Croisés) + file Entrantes (chat capté).
     self.orderFilter = "all"; self.orderFilterBtns = {}
-    local fdefs = { {id="all",label="Tous"}, {id="guild",label="Guilde"}, {id="friend",label="Amis"},
-                    {id="recent",label="Croisés"}, {id="inbound",label="Entrantes"} }
+    local fdefs = { {id="all",label=L["Tous"]}, {id="guild",label=L["Guilde"]}, {id="friend",label=L["Amis"]},
+                    {id="recent",label=L["Croisés"]}, {id="inbound",label=L["Entrantes"]} }
     local fx = 12
     for _, d in ipairs(fdefs) do
         local w = (d.id == "inbound") and 104 or 78
@@ -174,8 +175,8 @@ function UI:BuildOrdersTab(f)
         h:SetTextColor(Skin.unpack(Skin.color.textMuted)); Skin.ApplyShadow(h)
         return h
     end
-    hdr("COMMANDE", COL.name + 24); hdr("QTÉ", COL.qty); hdr("PRIX PROPOSÉ", COL.price)
-    hdr("MÉTIER", COL.prof); self.hdrDest = hdr("DESTINATAIRE", COL.dest); hdr("STATUT", COL.status)
+    hdr(L["COMMANDE"], COL.name + 24); hdr(L["QTÉ"], COL.qty); hdr(L["PRIX PROPOSÉ"], COL.price)
+    hdr(L["MÉTIER"], COL.prof); self.hdrDest = hdr(L["DESTINATAIRE"], COL.dest); hdr(L["STATUT"], COL.status)
     Skin.MakeSeparator(panel, -118)
 
     local scroll = CreateFrame("ScrollFrame", "CraftingOrderOrdersScroll", panel, "UIPanelScrollFrameTemplate")
@@ -189,7 +190,7 @@ function UI:_RefreshOrderFilterTabs()
     local ib = self.orderFilterBtns and self.orderFilterBtns.inbound
     if ib and COC.Inbound then
         local n = COC.Inbound:Count()
-        ib:SetText(n > 0 and ("|cFFFF8800Entrantes (" .. n .. ")|r") or "Entrantes")
+        ib:SetText(n > 0 and ("|cFFFF8800" .. L["Entrantes"] .. " (" .. n .. ")|r") or L["Entrantes"])
     end
 end
 
@@ -219,7 +220,7 @@ end
 
 function UI:RefreshOrders()
     if self.orderFilter == "inbound" then return self:_RefreshInbound() end
-    if self.hdrDest then self.hdrDest:SetText("DESTINATAIRE") end
+    if self.hdrDest then self.hdrDest:SetText(L["DESTINATAIRE"]) end
     local all = COC.Orders and COC.Orders:All() or {}
     local n = 0
     for _, o in ipairs(all) do
@@ -239,7 +240,7 @@ function UI:RefreshOrders()
             local label, fn = orderActionFor(o)
             row:SetScript("OnClick", label and function() fn(); UI:Refresh() end or nil)
             row:SetScript("OnEnter", label and function(rr)
-                GameTooltip:SetOwner(rr, "ANCHOR_RIGHT"); GameTooltip:AddLine("Clic : " .. label, 1, 1, 1); GameTooltip:Show()
+                GameTooltip:SetOwner(rr, "ANCHOR_RIGHT"); GameTooltip:AddLine(L["Clic : "] .. label, 1, 1, 1); GameTooltip:Show()
             end or nil)
             row:Show()
         end
@@ -249,7 +250,7 @@ function UI:RefreshOrders()
     Skin.AutoHideScroll("CraftingOrderOrdersScroll", self.ordersContent)
     if n == 0 and self.orderRows[1] then
         local row = self:_OrderRow(1); row.badge:Hide()
-        row.name:SetText("|cFF888888Aucune commande. Onglet « Commande » pour en poster une.|r")
+        row.name:SetText("|cFF888888" .. L["Aucune commande. Onglet « Commande » pour en poster une."] .. "|r")
         row.name:SetTextColor(0.6, 0.6, 0.6)
         row.qty:SetText(""); row.price:SetText(""); row.prof:SetText(""); row.dest:SetText(""); row.status:SetText("")
         row:SetScript("OnClick", nil); row:SetScript("OnEnter", nil); row:Show()
@@ -259,7 +260,7 @@ end
 -- Vue « Entrantes » : demandes captées dans /commerce et /guilde (joueurs SANS l'addon).
 -- Clic gauche = accepter (whisper de pub au demandeur) ; clic droit = ignorer.
 function UI:_RefreshInbound()
-    if self.hdrDest then self.hdrDest:SetText("DEMANDEUR") end
+    if self.hdrDest then self.hdrDest:SetText(L["DEMANDEUR"]) end
     local c = CL()
     local all = COC.Inbound and COC.Inbound:All() or {}
     local n = 0
@@ -275,8 +276,8 @@ function UI:_RefreshInbound()
         row.price:SetText(e.price and ("|c" .. Skin.hex.price .. e.price .. "|r") or "|cFF666666—|r")
         row.prof:SetText("|c" .. Skin.hex.gold .. Skin.ProfLabel(e.profession) .. "|r")
         row.dest:SetText("|cFFFFFFFF" .. e.buyer .. "|r")
-        local srcLbl = (e.source == "guild") and "guilde" or "commerce"
-        row.status:SetText((e.status == "accepted") and "|cFF33DD33acceptée|r"
+        local srcLbl = (e.source == "guild") and L["guilde"] or L["commerce"]
+        row.status:SetText((e.status == "accepted") and ("|cFF33DD33" .. L["acceptée"] .. "|r")
             or ("|cFFFF8800◆ " .. srcLbl .. "|r"))
         row:SetScript("OnClick", function(_, button)
             if button == "RightButton" then COC.Inbound:Dismiss(e.id) else COC.Inbound:Accept(e.id) end
@@ -284,9 +285,9 @@ function UI:_RefreshInbound()
         end)
         row:SetScript("OnEnter", function(rr)
             GameTooltip:SetOwner(rr, "ANCHOR_RIGHT")
-            GameTooltip:AddLine("Demande captée dans /" .. srcLbl, 1, 1, 1)
-            GameTooltip:AddLine("Clic gauche : accepter (whisper au demandeur)", 0.6, 1, 0.6)
-            GameTooltip:AddLine("Clic droit : ignorer", 1, 0.6, 0.6)
+            GameTooltip:AddLine(L["Demande captée dans /"] .. srcLbl, 1, 1, 1)
+            GameTooltip:AddLine(L["Clic gauche : accepter (whisper au demandeur)"], 0.6, 1, 0.6)
+            GameTooltip:AddLine(L["Clic droit : ignorer"], 1, 0.6, 0.6)
             GameTooltip:Show()
         end)
         row:Show()
@@ -296,7 +297,7 @@ function UI:_RefreshInbound()
     Skin.AutoHideScroll("CraftingOrderOrdersScroll", self.ordersContent)
     if n == 0 and self.orderRows[1] then
         local row = self:_OrderRow(1); row.badge:Hide()
-        row.name:SetText("|cFF888888Aucune commande entrante. (Capture /commerce et /guilde des joueurs sans l'addon.)|r")
+        row.name:SetText("|cFF888888" .. L["Aucune commande entrante. (Capture /commerce et /guilde des joueurs sans l'addon.)"] .. "|r")
         row.name:SetTextColor(0.6, 0.6, 0.6)
         row.qty:SetText(""); row.price:SetText(""); row.prof:SetText(""); row.dest:SetText(""); row.status:SetText("")
         row:SetScript("OnClick", nil); row:SetScript("OnEnter", nil); row:Show()
@@ -320,14 +321,14 @@ function UI:Refresh()
     -- Compteur d'ordres actifs sur l'onglet Carnet (live, quel que soit l'onglet courant).
     if self.tabs and self.tabs.orders and COC.db then
         local c = 0; for _, o in pairs(COC.db.orders or {}) do if o.status ~= "cancelled" then c = c + 1 end end
-        self.tabs.orders:SetText("Carnet (" .. c .. ")")
+        self.tabs.orders:SetText(L["Carnet"] .. " (" .. c .. ")")
     end
     if self.orderFilterBtns then self:_RefreshOrderFilterTabs() end
     local CraftLink = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
     local D = COC.Directory
-    self.status:SetText(string.format("|c%sréseau|r %s  ·  %d en ligne  ·  %d artisan(s)",
+    self.status:SetText(string.format("|c%s" .. L["réseau"] .. "|r %s  ·  %d " .. L["en ligne"] .. "  ·  %d " .. L["artisan(s)"],
         Skin.hex.muted,
-        (CraftLink and CraftLink:IsNetworkReady()) and "|cFF33DD33canal rejoint|r" or "|cFFFFCC00…|r",
+        (CraftLink and CraftLink:IsNetworkReady()) and ("|cFF33DD33" .. L["canal rejoint"] .. "|r") or "|cFFFFCC00…|r",
         D and D:CountOnline() or 0, D and D:CountKnownCrafters() or 0))
 end
 

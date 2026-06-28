@@ -6,6 +6,7 @@
 CraftingOrderClassic.UI = CraftingOrderClassic.UI or {}
 local Skin = {}
 CraftingOrderClassic.UI.Skin = Skin
+local L = CraftingOrderClassic.L
 
 Skin.color = {
     panel     = { 0.082, 0.063, 0.043 },        -- #15100b fond fenêtre
@@ -40,7 +41,7 @@ Skin.profFR = {
     Tailoring="Couture", Jewelcrafting="Joaillerie", Inscription="Calligraphie",
     Elemental="Élémentaire",
 }
-function Skin.ProfLabel(p) return p and (Skin.profFR[p] or p) or "—" end
+function Skin.ProfLabel(p) return p and L[Skin.profFR[p] or p] or "—" end
 
 -- Spell IDs d'apprenti pour récupérer l'icône de métier via GetSpellTexture (cache client stable).
 Skin.profSpellID = {
@@ -65,7 +66,7 @@ Skin.statusFR = {
     done      = { "Livrée",     "FF33DD33" },
     cancelled = { "Annulée",    "FF888888" },
 }
-function Skin.StatusInfo(s) local t = Skin.statusFR[s or "open"] or Skin.statusFR.open; return t[1], t[2] end
+function Skin.StatusInfo(s) local t = Skin.statusFR[s or "open"] or Skin.statusFR.open; return L[t[1]], t[2] end
 
 -- Couleur de rareté d'un objet {r,g,b} (or par défaut : services/enchants, ou nom non encore en cache).
 function Skin.RarityColor(itemID)
