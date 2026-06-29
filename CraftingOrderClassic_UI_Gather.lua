@@ -54,8 +54,8 @@ function UI:_BuildGatherLeft(panel)
     local gBtn = Skin.MakeGoldButton(panel, LW, 22, "—"); gBtn:SetPoint("TOPLEFT", 12, -98)
     self.gatherProfBadge = Skin.MakeBadge(gBtn, 16); self.gatherProfBadge:SetPoint("LEFT", 5, 0)
     gBtn.text:SetJustifyH("LEFT"); gBtn.text:ClearAllPoints(); gBtn.text:SetPoint("LEFT", 26, 0)
-    local arrow = gBtn:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    arrow:SetPoint("RIGHT", -6, 0); arrow:SetText("▾"); arrow:SetTextColor(Skin.unpack(Skin.color.gold))
+    local arrow = gBtn:CreateTexture(nil, "OVERLAY")
+    arrow:SetSize(16, 16); arrow:SetPoint("RIGHT", -3, 0); arrow:SetTexture(Skin.tex.arrowDown)
     self.gatherProfBtn = gBtn
     gBtn:SetScript("OnClick", function() UI:_ToggleGatherFlyout() end)
 
@@ -71,8 +71,7 @@ function UI:_BuildGatherLeft(panel)
 
     local srch = CreateFrame("EditBox", nil, panel, "InputBoxTemplate")
     srch:SetSize(LW, 16); srch:SetPoint("TOPLEFT", 12, -129); srch:SetAutoFocus(false)
-    local hint = panel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    hint:SetPoint("LEFT", srch, "LEFT", 4, 0); hint:SetText("○ " .. L["Rechercher une ressource"])
+    local hint = Skin.SearchHint(panel, srch, L["Rechercher une ressource"])
     srch:SetScript("OnTextChanged", function(b)
         hint:SetShown(b:GetText() == "")
         UI.gatherSearch = b:GetText():lower(); UI:RefreshGatherList()
@@ -126,13 +125,13 @@ function UI:_BuildGatherRight(panel)
 
     -- Demande quantité
     local qhdr = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    qhdr:SetPoint("TOPLEFT", RX, -128); qhdr:SetText("|cFFE8B84B" .. L["Demande de récolte — quantité voulue"] .. "|r"); Skin.ApplyShadow(qhdr)
+    qhdr:SetPoint("TOPLEFT", RX, -128); qhdr:SetText("|cFFE8B84B" .. L["Demande de récolte — quantité voulue"] .. "|r"); Skin.ApplyShadow(qhdr); self.gatherQHdr = qhdr
 
     -- Case « stacks » : si cochée, la quantité est un nombre de PILES, pas d'unités.
     self.gatherByStack = false
     local stLbl = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    stLbl:SetPoint("TOPRIGHT", -22, -128); stLbl:SetText(L["stacks"]); Skin.ApplyShadow(stLbl)
-    local stChk = Skin.MakeGoldButton(panel, 20, 20, "□"); stChk:SetPoint("RIGHT", stLbl, "LEFT", -4, 0)
+    stLbl:SetPoint("TOPRIGHT", -22, -128); stLbl:SetText(L["stacks"]); Skin.ApplyShadow(stLbl); self.gatherStLbl = stLbl
+    local stChk = Skin.MakeGoldButton(panel, 20, 20, ""); stChk:SetPoint("RIGHT", stLbl, "LEFT", -4, 0)
     -- Icône caisse affichée SUR la case quand « stacks » est coché (sinon □).
     local crateTex = stChk:CreateTexture(nil, "ARTWORK")
     crateTex:SetPoint("CENTER"); crateTex:SetSize(16, 16)
@@ -140,10 +139,12 @@ function UI:_BuildGatherRight(panel)
     stChk.crate = crateTex
     -- Coché = caisse (commande par pile) ; décoché = icône de l'objet voulu (commande à l'unité).
     stChk.Update = function()
-        local tex = UI.gatherByStack and Skin.tex.crate
+        -- Toujours une TEXTURE (le glyphe « □ » s'affichait en tofu) : caisse si « par pile »,
+        -- sinon l'icône de l'objet voulu, sinon une case à cocher vide native.
+        local tex = (UI.gatherByStack and Skin.tex.crate)
                  or (UI.gatherEntry and Skin.Icon(UI.gatherEntry.itemID))
-        if tex then crateTex:SetTexture(tex); crateTex:Show(); stChk:SetText("")
-        else crateTex:Hide(); stChk:SetText("□") end
+                 or Skin.tex.checkBox
+        crateTex:SetTexture(tex); crateTex:Show(); stChk:SetText("")
     end
     stChk:SetScript("OnClick", function()
         UI.gatherByStack = not UI.gatherByStack
@@ -329,7 +330,7 @@ function UI:RefreshGatherList()
         row.name:SetText(disp); row.name:SetTextColor(r, g, b)
         if e == self.gatherEntry then row.name:SetTextColor(1, 0.85, 0.27) end
         row.stack:SetText("")
-        row.entry = e; row:SetScript("OnClick", function() UI:SelectGatherItem(e) end); row:Show()
+        row.entry = e; row.tipItemID = e.itemID; row:SetScript("OnClick", function() UI:SelectGatherItem(e) end); row:Show()
     end
     for i = #out + 1, #self.gatherListRows do self.gatherListRows[i]:Hide() end
     self.gatherListContent:SetHeight(math.max(#out * GLH, 10))
@@ -345,7 +346,7 @@ function UI:_GatherListRow(i)
     r.name:SetPoint("LEFT", 20, 0); r.name:SetJustifyH("LEFT"); r.name:SetWidth(LW - 80); Skin.ApplyShadow(r.name)
     r.stack = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     r.stack:SetPoint("RIGHT", -4, 0); Skin.ApplyShadow(r.stack)
-    self.gatherListRows[i] = r; return r
+    self.gatherListRows[i] = r; Skin.WireItemTooltip(r); return r
 end
 
 function UI:SelectGatherItem(entry)
@@ -357,14 +358,16 @@ function UI:_RefreshGatherDetail()
     local e = self.gatherEntry; local c = CL()
     if self.gatherStackChk then self.gatherStackChk.Update() end   -- icône case = objet / caisse
     if not e then
-        -- Rien de sélectionné → icône par défaut (point d'interrogation) plutôt qu'un trou.
-        local mr, mg, mb = Skin.unpack(Skin.color.textMuted)
-        self.gatherResBadge:Paint(mr, mg, mb, "?", Skin.tex.unknown)
+        -- Rien de sélectionné → on MASQUE le badge + la ligne quantité/stacks (contrôles orphelins) ;
+        -- on ne garde que le libellé d'invite.
+        self.gatherResBadge:Hide()
+        for _, w in ipairs({ self.gatherQHdr, self.gatherStLbl, self.gatherStackChk, self.gatherQty }) do if w then w:Hide() end end
         self.gatherResName:SetText("|cFF888888" .. L["Aucune ressource sélectionnée."] .. "|r")
         self.gatherResInfo:SetText(""); self.gatherInfoTxt:SetText("")
         if self.gatherSelLbl then self.gatherSelLbl:SetText("|cFF888888" .. L["Choisis un métier de récolte puis une ressource."] .. "|r") end
         return
     end
+    for _, w in ipairs({ self.gatherQHdr, self.gatherStLbl, self.gatherStackChk, self.gatherQty }) do if w then w:Show() end end
     local nm = c and c:ItemName(e.itemID) or ("item:"..e.itemID)
     local r, g, b = Skin.RarityColor(e.itemID)
     -- « stacks » coché → icône caisse ; sinon l'icône de l'objet à récolter.

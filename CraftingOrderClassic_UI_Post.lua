@@ -24,6 +24,13 @@ local RW   = 818 - RX          -- largeur scroll droit (scrollbar finit avant RE
 
 local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true) end
 local function isSoulbound(id) return id and GetItemInfo and select(14, GetItemInfo(id)) == 1 end
+
+-- knowsProf : métier connu via SK (sans fenêtre) OU RK. inSource : liste source (Amis/Guilde via
+-- drapeaux de relation → un ajouté aussi ami compte dans Amis), sinon catégorie d'affichage.
+local function knowsProf(r, p) return (r.skill and r.skill[p]) or (r.recipes and r.recipes[p]) or false end
+local function inSource(r, src)
+    return (src == "friend" and r.isFriend) or (src == "guild" and r.isGuild) or (r.source or "recent") == src
+end
 local function entryName(e)
     local c = CL(); if not c then return "?" end
     return e.itemID and c:ItemName(e.itemID) or c:RecipeName(e.spellID)
@@ -67,8 +74,8 @@ function UI:_BuildPostLeft(panel)
     -- L'icône du métier est DANS le dropdown, collée au nom du métier sélectionné.
     self.postProfBadge = Skin.MakeBadge(pBtn, 16); self.postProfBadge:SetPoint("LEFT", 5, 0)
     pBtn.text:SetJustifyH("LEFT"); pBtn.text:ClearAllPoints(); pBtn.text:SetPoint("LEFT", 26, 0)
-    local arrow = pBtn:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    arrow:SetPoint("RIGHT", -6, 0); arrow:SetText("▾"); arrow:SetTextColor(Skin.unpack(Skin.color.gold))
+    local arrow = pBtn:CreateTexture(nil, "OVERLAY")
+    arrow:SetSize(16, 16); arrow:SetPoint("RIGHT", -3, 0); arrow:SetTexture(Skin.tex.arrowDown)
     self.postProfBtn = pBtn
     pBtn:SetScript("OnClick", function() UI:_ToggleProfFlyout() end)
 
@@ -97,8 +104,7 @@ function UI:_BuildPostLeft(panel)
 
     local srch = CreateFrame("EditBox", nil, panel, "InputBoxTemplate")
     srch:SetSize(LW - 110, 16); srch:SetPoint("TOPLEFT", 116, -129); srch:SetAutoFocus(false)
-    local hint = panel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    hint:SetPoint("LEFT", srch, "LEFT", 4, 0); hint:SetText("○ " .. L["Rechercher un plan"])
+    local hint = Skin.SearchHint(panel, srch, L["Rechercher un plan"])
     srch:SetScript("OnTextChanged", function(b)
         hint:SetShown(b:GetText() == "")
         UI.postSearch = b:GetText():lower(); UI:RefreshPostPlans()
@@ -169,7 +175,7 @@ function UI:_BuildPostRight(panel)
     local qLbl = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     qLbl:SetPoint("TOPLEFT", RX + 330, -308); qLbl:SetText(L["Qté"]); Skin.ApplyShadow(qLbl)
     self.postQty = CreateFrame("EditBox", nil, panel, "InputBoxTemplate")
-    self.postQty:SetSize(40, 16); self.postQty:SetPoint("TOPLEFT", RX + 352, -306)
+    self.postQty:SetSize(40, 16); self.postQty:SetPoint("TOPLEFT", RX + 366, -306)
     self.postQty:SetAutoFocus(false); self.postQty:SetNumeric(true); self.postQty:SetText("1")
     self.postQty:SetScript("OnEscapePressed", function(b) b:ClearFocus() end)
 
@@ -209,8 +215,9 @@ function UI:_BuildPostArtisanSection(panel)
     local diffIc = diffBtn:CreateTexture(nil, "OVERLAY"); diffIc:SetSize(14, 14)
     diffIc:SetPoint("LEFT", 5, 0); diffIc:SetTexture(Skin.tex.broadcast)
     diffBtn.text:ClearAllPoints(); diffBtn.text:SetPoint("LEFT", 22, 0)
+    -- Raccourci : cible Tous ET poste directement (sinon le bouton « ne faisait rien »).
     diffBtn:SetScript("OnClick", function()
-        UI.postTarget = "all"; UI:RefreshPostArtisans()
+        UI.postTarget = "all"; UI:RefreshPostArtisans(); UI:DoPostOrder()
     end)
 
     local ascroll = CreateFrame("ScrollFrame", "COCPostArtScroll", panel, "UIPanelScrollFrameTemplate")
@@ -304,7 +311,7 @@ function UI:RefreshPostPlans()
         local disp = item.name:match("^item:") and "|cFF777777" .. L["Chargement…"] .. "|r" or item.name
         row.name:SetText(disp); row.name:SetTextColor(r, g, b)
         row.name:SetTextColor(e == self.postEntry and 1 or r, e == self.postEntry and 0.85 or g, e == self.postEntry and 0.27 or b)
-        row.entry = e; row:SetScript("OnClick", function() UI:SelectPostPlan(e) end); row:Show()
+        row.entry = e; row.tipItemID, row.tipSpellID = e.itemID, e.spellID; row:SetScript("OnClick", function() UI:SelectPostPlan(e) end); row:Show()
     end
     for i = #out + 1, #self.postPlanRows do self.postPlanRows[i]:Hide() end
     self.postPlanContent:SetHeight(math.max(#out * PLH, 10))
@@ -318,7 +325,7 @@ function UI:_PostPlanRow(i)
     r.badge = Skin.MakeBadge(r, 14); r.badge:SetPoint("LEFT", 2, 0)
     r.name  = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     r.name:SetPoint("LEFT", 20, 0); r.name:SetJustifyH("LEFT"); r.name:SetWidth(LW - 46); Skin.ApplyShadow(r.name)
-    self.postPlanRows[i] = r; return r
+    self.postPlanRows[i] = r; Skin.WireItemTooltip(r); return r
 end
 
 function UI:RefreshPostPlanDetail()
@@ -344,17 +351,17 @@ function UI:RefreshPostReagents()
     self.postCurrentReag = reag
     for i = 1, #self.postReagRows do self.postReagRows[i]:Hide() end
     for i, rg in ipairs(reag) do
-        local row = self:_PostReagRow(i); local iid, qty = rg[1], rg[2]
+        local row = self:_PostReagRow(i); local iid, qty = rg[1], rg[2]; row.tipItemID = iid
         local cr, cg, cb = Skin.RarityColor(iid)
         local nm2 = c and c:ItemName(iid) or ("item:"..iid)
         local disp = nm2:match("^item:") and "|cFF777777" .. L["Chargement…"] .. "|r" or nm2
         row.badge:Paint(cr, cg, cb, Skin.FirstChar(nm2), Skin.Icon(iid))
         row.name:SetText(disp); row.name:SetTextColor(cr, cg, cb)
         row.qty:SetText("|cFFFFCC00×"..qty.."|r")
-        row.check:SetText(UI.postProvide[iid] and "|cFF33DD33✓|r" or "|cFF888888□|r")
+        row.check:SetChecked(UI.postProvide[iid])
         row:SetScript("OnClick", function()
             UI.postProvide[iid] = not UI.postProvide[iid]
-            row.check:SetText(UI.postProvide[iid] and "|cFF33DD33✓|r" or "|cFF888888□|r")
+            row.check:SetChecked(UI.postProvide[iid])
             UI:_UpdateProvidedCount()
         end)
         row:Show()
@@ -373,8 +380,8 @@ function UI:_PostReagRow(i)
     r.name  = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     r.name:SetPoint("LEFT", 20, 0); r.name:SetWidth(RW - 110); r.name:SetJustifyH("LEFT"); Skin.ApplyShadow(r.name)
     r.qty   = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall"); r.qty:SetPoint("RIGHT", -22, 0); Skin.ApplyShadow(r.qty)
-    r.check = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall"); r.check:SetPoint("RIGHT", -4, 0); Skin.ApplyShadow(r.check)
-    self.postReagRows[i] = r; return r
+    r.check = Skin.MakeCheck(r, 18); r.check:SetPoint("RIGHT", -4, 0)
+    self.postReagRows[i] = r; Skin.WireItemTooltip(r); return r
 end
 
 function UI:_UpdateProvidedCount()
@@ -388,8 +395,7 @@ function UI:RefreshPostArtisans()
     local src, prof = self.postSource or "guild", self.postProf
     local list = {}
     for name, r in pairs(D.roster or {}) do
-        local artSrc = r.source or "recent"
-        if artSrc == src and (not prof or (r.recipes and r.recipes[prof])) then
+        if inSource(r, src) and (not prof or knowsProf(r, prof)) then
             list[#list+1] = {name=name, r=r, online=D.online[name]}
         end
     end

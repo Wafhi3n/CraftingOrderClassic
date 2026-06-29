@@ -149,7 +149,55 @@ Skin.tex = {
     workorder = "Interface\\GossipFrame\\WorkOrderGossipIcon",
     crate     = "Interface\\Icons\\INV_Crate_03",   -- récolte « par stack »
     unknown   = "Interface\\Icons\\INV_Misc_QuestionMark",   -- repli « rien de sélectionné »
+    checkBox  = "Interface\\Buttons\\UI-CheckBox-Up",        -- case vide (texture native, pas de glyphe tofu)
+    checkMark = "Interface\\Buttons\\UI-CheckBox-Check",     -- coche verte
+    arrowDown = "Interface\\Buttons\\Arrow-Down-Up",         -- flèche dropdown (le « ▾ » s'affichait en tofu)
+    search    = "Interface\\Common\\UI-Searchbox-Icon",      -- loupe (le « ○ » s'affichait en tofu)
+    ok        = "Interface\\Scenarios\\ScenarioIcon-Check",  -- ✓ « je sais faire » (inline |T|t)
+    fail      = "Interface\\Scenarios\\ScenarioIcon-Fail",   -- ✗ « hors de ma portée »
+    gear      = "Interface\\Scenarios\\ScenarioIcon-Interact", -- engrenage (config, futur)
+    dotYellow = "Interface\\COMMON\\Indicator-Yellow",       -- pastille (« ◆ » entrante)
+    dotRed    = "Interface\\COMMON\\Indicator-Red",
+    dotGreen  = "Interface\\COMMON\\Indicator-Green",
+    dotGray   = "Interface\\COMMON\\Indicator-Gray",
 }
+
+-- Icône loupe + texte d'invite (placeholder) pour un champ de recherche. Renvoie le FontString
+-- placeholder (à masquer quand le champ est rempli, via :SetShown(text=="")). Plus de glyphe « ○ ».
+function Skin.SearchHint(parent, editbox, text)
+    local ic = parent:CreateTexture(nil, "OVERLAY")
+    ic:SetSize(12, 12); ic:SetPoint("LEFT", editbox, "LEFT", 2, 0); ic:SetTexture(Skin.tex.search)
+    local hint = parent:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+    hint:SetPoint("LEFT", ic, "RIGHT", 3, 0); hint:SetText(text)
+    return hint
+end
+
+-- Case à cocher carrée en TEXTURE native (les glyphes ✓/□ s'affichent en tofu dans la police WoW).
+-- Renvoie la texture « boîte » avec :SetChecked(bool) qui montre/masque la coche superposée.
+function Skin.MakeCheck(parent, size)
+    size = size or 16
+    local box = parent:CreateTexture(nil, "ARTWORK")
+    box:SetSize(size, size); box:SetTexture(Skin.tex.checkBox)
+    local mark = parent:CreateTexture(nil, "OVERLAY")
+    mark:SetPoint("CENTER", box, "CENTER"); mark:SetSize(size, size)
+    mark:SetTexture(Skin.tex.checkMark); mark:Hide()
+    box.mark = mark
+    box.SetChecked = function(self, on) self.mark:SetShown(on and true or false) end
+    return box
+end
+
+-- Câble le tooltip d'objet/sort au survol d'une ligne (à appeler UNE fois dans le constructeur de
+-- ligne). Lit `row.tipItemID` / `row.tipSpellID` posés au refresh → priorité à l'objet (le produit).
+function Skin.WireItemTooltip(row)
+    row:SetScript("OnEnter", function(self)
+        local link = (self.tipItemID and ("item:" .. self.tipItemID))
+                  or (self.tipSpellID and ("spell:" .. self.tipSpellID))
+        if not link then return end
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        if pcall(GameTooltip.SetHyperlink, GameTooltip, link) then GameTooltip:Show() else GameTooltip:Hide() end
+    end)
+    row:SetScript("OnLeave", GameTooltip_Hide)
+end
 
 -- Pastille de présence : texture statut du jeu, avec méthode SetOnline(bool/nil). nil = masquée.
 function Skin.MakeStatusIcon(parent, size)

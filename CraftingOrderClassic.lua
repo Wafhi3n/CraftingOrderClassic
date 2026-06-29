@@ -64,9 +64,38 @@ function COC:Help()
     print("  |cFFFFFFFF/co post [shift-clic objet] [xN] [prix]|r — poster une commande")
     print("  |cFFFFFFFF/co accept <id>|r / |cFFFFFFFF/co done <id>|r / |cFFFFFFFF/co cancel <id>|r")
     print("  |cFFFFFFFF/co refresh|r — solliciter l'annuaire (présence + proximité)")
-    print("  |cFFFFFFFF/co prof|r — réafficher l'overlay « commandes du métier » sur la fenêtre métier")
-    print("  |cFFFFFFFF/co profwindow|r — |cFFFF8800expérimental|r : fenêtre métier custom 3 colonnes (remplace Blizzard)")
+    print("  |cFFFFFFFF/co métier [nom]|r — vue commandes d'un métier (ou menu des métiers si vide)")
+    print("  |cFFFFFFFF/co profwindow|r — basculer fenêtre métier custom / vue Blizzard")
     print("  |cFFFFFFFF/co debug|r — |cFFFF8800mode solo|r : injecte/retire un réseau fictif (artisans + commandes)")
+    print("  |cFFFFFFFF/co trace|r — |cFFFF8800diag|r : journalise le réseau dans la SavedVariable (off | clear | dump)")
+end
+
+-- Dispatch des sous-commandes /co (extrait de OnEvent pour rester sous le seuil anti-monolithe).
+function COC:Slash(msg)
+    local cmd, rest = (msg or ""):match("^%s*(%S*)%s*(.-)%s*$")
+    cmd = (cmd or ""):lower()
+    local O, D = COC.Orders, COC.Directory
+    if cmd == "" then
+        if COC.UI then COC.UI:Toggle() end
+    elseif cmd == "status" then COC:Status()
+    elseif cmd == "refresh" or cmd == "scan" then
+        if D then D:Refresh(); p("réseau : sollicitation envoyée (HI global + PING proximité).") end
+    elseif cmd == "orders" or cmd == "list" then if O then O:PrintList() end
+    elseif cmd == "post"   then if O then O:PostFromInput(rest) end
+    elseif cmd == "cancel" then if O then O:Cancel(rest) end
+    elseif cmd == "accept" then if O then O:Accept(rest) end
+    elseif cmd == "done"   then if O then O:Deliver(rest) end
+    elseif cmd == "prof" or cmd == "métier" or cmd == "metier" then
+        if rest and rest ~= "" and COC.ProfWindow and CraftLink then
+            local key = CraftLink:ResolveProfession(rest)
+            if key then COC.ProfWindow:OpenFor(key) else p("métier inconnu : " .. rest) end
+        elseif COC.UI and COC.UI.ToggleProfMenu then COC.UI:ToggleProfMenu() end
+    elseif cmd == "profwindow" or cmd == "pw" then
+        if COC.ProfWindow then COC.ProfWindow:SetEnabled(not COC.ProfWindow:IsEnabled()) end
+    elseif cmd == "debug"  then if COC.Debug then COC.Debug:Toggle() end
+    elseif cmd == "trace"  then if COC.Trace then COC.Trace:Cmd(rest) end
+    elseif cmd == "help"   then COC:Help()
+    else COC:Status() end
 end
 
 local f = CreateFrame("Frame")
@@ -85,6 +114,11 @@ f:SetScript("OnEvent", function(_, event, arg1)
         COC.db.knownRecipes = COC.db.knownRecipes or {}
     elseif event == "PLAYER_LOGIN" then
         if CraftLink and COC.db then CraftLink:LoadMyRecipes(COC.db.knownRecipes) end
+        -- Trace réseau persistée (diagnostic 2 comptes) : on branche le tracer de la lib sur COC.Trace.
+        if CraftLink and CraftLink.SetTracer then
+            CraftLink:SetTracer(function(c, m) if COC.Trace then COC.Trace:Log(c, m) end end)
+        end
+        if COC.Trace then COC.Trace:AutoEnablePTR() end   -- PTR/test → logs auto (sans /co trace)
         if COC.Directory then COC.Directory:Start() end   -- transport + annuaire global
         if COC.Orders   then COC.Orders:Start()   end      -- carnet d'ordres global
         if COC.Social   then COC.Social:Start()   end      -- tooltip social + clic-droit (Étape D)
@@ -94,28 +128,7 @@ f:SetScript("OnEvent", function(_, event, arg1)
         if COC.Debug and C_Timer then C_Timer.After(1, function() COC.Debug:Reapply() end) end
         SLASH_CRAFTINGORDER1 = "/co"
         SLASH_CRAFTINGORDER2 = "/craftorder"
-        SlashCmdList["CRAFTINGORDER"] = function(msg)
-            -- 1er mot = sous-commande ; le reste garde sa casse (liens d'objet à pipes).
-            local cmd, rest = (msg or ""):match("^%s*(%S*)%s*(.-)%s*$")
-            cmd = (cmd or ""):lower()
-            local O, D = COC.Orders, COC.Directory
-            if cmd == "" then
-                if COC.UI then COC.UI:Toggle() end
-            elseif cmd == "status" then COC:Status()
-            elseif cmd == "refresh" or cmd == "scan" then
-                if D then D:Refresh(); p("réseau : sollicitation envoyée (HI global + PING proximité).") end
-            elseif cmd == "orders" or cmd == "list" then if O then O:PrintList() end
-            elseif cmd == "post"   then if O then O:PostFromInput(rest) end
-            elseif cmd == "cancel" then if O then O:Cancel(rest) end
-            elseif cmd == "accept" then if O then O:Accept(rest) end
-            elseif cmd == "done"   then if O then O:Deliver(rest) end
-            elseif cmd == "prof"   then if COC.ProfOrders then COC.ProfOrders:Reenable() end
-            elseif cmd == "profwindow" or cmd == "pw" then
-                if COC.ProfWindow then COC.ProfWindow:SetEnabled(not COC.ProfWindow:IsEnabled()) end
-            elseif cmd == "debug"  then if COC.Debug then COC.Debug:Toggle() end
-            elseif cmd == "help"   then COC:Help()
-            else COC:Status() end
-        end
+        SlashCmdList["CRAFTINGORDER"] = function(msg) COC:Slash(msg) end
         p("loaded — |cFFFFFFFF/co help|r pour les commandes. (Réseau global de craft — autonome.)")
     elseif event == "SKILL_LINES_CHANGED" then
         -- Gain de point / apprentissage : recapture mes niveaux et les rediffuse (throttlé).

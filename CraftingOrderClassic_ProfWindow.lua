@@ -120,73 +120,28 @@ function PW:Build()
 
     if self._BuildRecipes then self:_BuildRecipes(recCol) end
     if self._BuildDetail  then self:_BuildDetail(detCol)  end
-    self:_BuildOrders(ordCol)
+    if self._BuildOrders then self:_BuildOrders(ordCol) else self:_OrdersModuleMissing(ordCol) end
 end
 
 -- ------------------------------------------------------------------
--- Colonne DROITE : commandes liées au métier ouvert (carnet + entrantes)
+-- Colonne DROITE : commandes du métier (cartes par demandeur + actions).
+-- PW:_BuildOrders / _OrdCard / _FillCard / _CardActions / RefreshOrders sont définis dans
+-- CraftingOrderClassic_ProfWindow_Orders.lua (chargé APRÈS ce fichier).
 -- ------------------------------------------------------------------
-local ORD_H = 30
-function PW:_BuildOrders(col)
-    local hdr = col:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    hdr:SetPoint("TOPLEFT", 8, -6); hdr:SetText("|cFFE8B84B" .. L["Commandes"] .. "|r"); self.ordHdr = hdr
 
-    local scroll = CreateFrame("ScrollFrame", "CraftingOrderProfWinOrdScroll", col, "UIPanelScrollFrameTemplate")
-    scroll:SetPoint("TOPLEFT", 6, -28); scroll:SetPoint("BOTTOMRIGHT", -24, 6)
-    local content = CreateFrame("Frame", nil, scroll); content:SetSize(210, 10); scroll:SetScrollChild(content)
-    self.ordContent = content; self.ordRows = {}
-end
-
-function PW:_OrdRow(i)
-    local r = self.ordRows[i]; if r then return r end
-    r = CreateFrame("Frame", nil, self.ordContent); r:SetSize(210, ORD_H); r:SetPoint("TOPLEFT", 0, -(i - 1) * ORD_H)
-    r.badge = Skin.MakeBadge(r, 16); r.badge:SetPoint("TOPLEFT", 2, -1)
-    r.name = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    r.name:SetPoint("TOPLEFT", 22, -2); r.name:SetWidth(180); r.name:SetJustifyH("LEFT"); Skin.ApplyShadow(r.name)
-    r.sub = r:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    r.sub:SetPoint("TOPLEFT", 22, -16); r.sub:SetWidth(184); r.sub:SetJustifyH("LEFT"); Skin.ApplyShadow(r.sub)
-    r:EnableMouse(true)
-    r:SetScript("OnEnter", function(self)
-        if not self.tipItemID then return end
-        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-        if pcall(GameTooltip.SetHyperlink, GameTooltip, "item:" .. self.tipItemID) then GameTooltip:Show() else GameTooltip:Hide() end
-    end)
-    r:SetScript("OnLeave", GameTooltip_Hide)
-    self.ordRows[i] = r; return r
-end
-
-function PW:RefreshOrders()
-    if not self.ordContent then return end
-    local prof = self.profKey; local c = CL()
-    local list = {}
-    for _, o in pairs((COC.db and COC.db.orders) or {}) do
-        if o.profession == prof and o.status ~= "cancelled" and o.status ~= "done" then
-            list[#list + 1] = { o = o, kind = "order" }
-        end
+-- Garde-fou : si ce fichier compagnon n'est pas chargé (cas typique = .lua ajouté au .toc et pas encore
+-- pris en compte — WoW ne charge un fichier nouvellement listé qu'au prochain DÉMARRAGE COMPLET, pas sur
+-- un simple /reload), on affiche un message dans la colonne et on prévient une fois, sans planter.
+function PW:_OrdersModuleMissing(col)
+    local fs = col:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    fs:SetPoint("TOPLEFT", 12, -12); fs:SetPoint("TOPRIGHT", -12, -12); fs:SetJustifyH("LEFT")
+    fs:SetText("|cFFE8B84B" .. L["Commandes"] .. "|r\n\n|cFFFF7777"
+        .. L["Module Commandes non chargé — redémarre complètement WoW (quitter/relancer), pas un simple /reload."] .. "|r")
+    if not COC._ordersWarned then
+        COC._ordersWarned = true
+        print("|cFF33DD88Crafting Order|r |cFFFF7777"
+            .. L["Module Commandes non chargé — redémarre complètement WoW (quitter/relancer), pas un simple /reload."] .. "|r")
     end
-    for _, e in pairs((COC.db and COC.db.inbound) or {}) do
-        if e.profession == prof and e.status ~= "dismissed" then list[#list + 1] = { o = e, kind = "inbound" } end
-    end
-    table.sort(list, function(a, b) return (a.o.ts or 0) > (b.o.ts or 0) end)
-    local n = 0
-    for _, it in ipairs(list) do
-        n = n + 1; local row = self:_OrdRow(n); local o = it.o
-        local nm = (c and c:ItemName(o.itemID)) or (o.spellID and c and c:RecipeName(o.spellID)) or ("item:" .. (o.itemID or 0))
-        local r, g, b = Skin.RarityColor(o.itemID)
-        row.tipItemID = o.itemID
-        row.badge:Paint(r, g, b, Skin.FirstChar(nm), Skin.Icon(o.itemID, o.spellID) or Skin.tex.unknown)
-        local able = PW.CanFulfill(o)
-        local tag = (able == true) and "|cFF33DD33✓|r " or (able == false) and "|cFFFF5555✗|r " or ""
-        row.name:SetText(tag .. ((nm:match("^item:") and L["Chargement…"]) or nm)); row.name:SetTextColor(r, g, b)
-        local who = (it.kind == "inbound") and (L["entrante · "] .. o.buyer) or (o.buyer or "?")
-        local qty = o.byStack and ((o.qty or 1) .. " st") or ("×" .. (o.qty or 1))
-        row.sub:SetText("|cFF999999" .. qty .. " · " .. who .. "|r" .. (o.price and ("  |cFFFFDD00" .. o.price .. "|r") or ""))
-        row:Show()
-    end
-    for i = n + 1, #self.ordRows do self.ordRows[i]:Hide() end
-    self.ordContent:SetHeight(math.max(n * ORD_H, 10))
-    Skin.AutoHideScroll("CraftingOrderProfWinOrdScroll", self.ordContent)
-    self.ordHdr:SetText("|cFFE8B84B" .. L["Commandes"] .. "|r |cFF888888(" .. n .. ")|r")
 end
 
 -- ------------------------------------------------------------------
@@ -197,16 +152,58 @@ function PW:Hide() if self.frame then self.frame:Hide() end end
 function PW:_DoRefresh()
     self._pending = false
     if not self.frame or not self.frame:IsShown() then return end
-    local craft = COC.Craft; if not craft then return end
-    local name = craft:GetOpenProfessionInfo(); if not name then return end
-    self.profKey = craft:OpenProfessionKey()
-    self.titleFS:SetText(name)
-    local rank, maxRank = craft:OpenRank()
-    self.rankFS:SetText((rank and maxRank) and string.format("|cFFE8B84B%d|r / %d", rank, maxRank) or "")
-    self.recipes = craft:ReadRecipes() or {}
-    if self.RefreshRecipes then self:RefreshRecipes() end
-    if self.RefreshDetail  then self:RefreshDetail()  end
-    self:RefreshOrders()
+    local craft = COC.Craft
+    local name = craft and craft:GetOpenProfessionInfo()
+    if name then                                   -- mode PLEIN : fenêtre métier native ouverte
+        self.profKey = craft:OpenProfessionKey()
+        self.titleFS:SetText(name)
+        local rank, maxRank = craft:OpenRank()
+        self.rankFS:SetText((rank and maxRank) and string.format("|cFFE8B84B%d|r / %d", rank, maxRank) or "")
+        self.recipes = craft:ReadRecipes() or {}
+        self:_ApplyMode(false)
+        if self.RefreshRecipes then self:RefreshRecipes() end
+        if self.RefreshDetail  then self:RefreshDetail()  end
+    elseif self.standaloneKey then                 -- mode COMPACT : ouvert par clé (récolte / menu minimap)
+        self.profKey = self.standaloneKey
+        self.titleFS:SetText(Skin.ProfLabel(self.profKey))
+        local D = COC.Directory; local sk = D and D.mySkills and D.mySkills[self.profKey]
+        self.rankFS:SetText(sk and string.format("|cFFE8B84B%d|r / %d", sk[1], sk[2]) or "")
+        self:_ApplyMode(true)
+    else
+        return
+    end
+    if self.RefreshOrders then self:RefreshOrders() end
+end
+
+-- Bascule PLEIN (3 colonnes, fenêtre native) ↔ COMPACT (colonne Commandes seule, ouvert par clé).
+function PW:_ApplyMode(compact)
+    if self._compact == compact then return end
+    self._compact = compact
+    if self.recCol then self.recCol:SetShown(not compact) end
+    if self.detCol then self.detCol:SetShown(not compact) end
+    self.ordCol:ClearAllPoints()
+    if compact then
+        self.frame:SetWidth(300)
+        self.ordCol:SetPoint("TOPLEFT", self.frame, "TOPLEFT", self.PAD, -self.HEADER_H)
+        self.ordCol:SetPoint("BOTTOM", self.frame, "BOTTOM", 0, self.PAD)
+        self.ordCol:SetWidth(300 - 2 * self.PAD)
+    else
+        -- Réplique EXACTEMENT l'ancrage d'origine de _BuildColumn (offset -HEADER_H) → zéro régression
+        -- du layout 3 colonnes dans le cas courant (fenêtre native).
+        self.frame:SetWidth(self.FRAME_W)
+        self.ordCol:SetPoint("TOPLEFT", self.detCol, "TOPRIGHT", self.GAP, -self.HEADER_H)
+        self.ordCol:SetPoint("BOTTOM", self.frame, "BOTTOM", 0, self.PAD)
+        self.ordCol:SetWidth(self.COL_W[3])
+    end
+end
+
+-- Ouvre la vue métier pour une CLÉ de métier (récolte sans établi, ou menu minimap) → mode compact.
+function PW:OpenFor(profKey)
+    if not profKey then return end
+    self.standaloneKey = profKey
+    self:Build()
+    if not self.frame:IsShown() then self.frame:Show() end
+    self:Refresh()
 end
 
 function PW:Refresh()
@@ -219,7 +216,8 @@ end
 -- ------------------------------------------------------------------
 -- Entrées (depuis le coordinateur d'événements ProfOrders) + bascule
 -- ------------------------------------------------------------------
-function PW:IsEnabled() return COC.db and COC.db.profWindow == true end
+-- Custom = vue métier par DÉFAUT (la maquette designer). « Vue Blizzard » pose profWindow=false.
+function PW:IsEnabled() return not (COC.db and COC.db.profWindow == false) end
 
 -- Active/désactive la fenêtre custom. ON → coupe le takeover de Guild Economy (anti-conflit).
 function PW:SetEnabled(on)
@@ -231,8 +229,6 @@ function PW:SetEnabled(on)
     else
         self:Hide(); self:RestoreNative()
         print("|cFF33DD88Crafting Order|r " .. L["fenêtre métier custom |cFFFFCC00désactivée|r (vue Blizzard)."])
-        -- L'overlay « commandes du métier » reprend la main si une fenêtre est ouverte.
-        if COC.ProfOrders and COC.ProfOrders.OnProfShow then COC.ProfOrders:OnProfShow() end
     end
 end
 
@@ -248,6 +244,7 @@ function PW:OnProfessionShow()
     local craft = COC.Craft
     if not (craft and craft:GetOpenProfessionInfo()) then return end
     silenceGE()                         -- coexistence : pas de double panneau si GE est chargé
+    self.standaloneKey = nil            -- la fenêtre native prend le dessus sur une ouverture par clé
     self:Build(); self:NeutralizeNative()
     if not self.frame:IsShown() then self.frame:Show() end
     self:Refresh()

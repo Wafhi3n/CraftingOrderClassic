@@ -82,9 +82,16 @@ function Dir:ClassifySource(name)
     return nil
 end
 
--- Applique la source à une entrée roster (sans écraser un ajout manuel « added »).
+-- Applique la source à une entrée roster. On stampe TOUJOURS les drapeaux de relation
+-- (isGuild/isFriend) — même sur un ajout manuel « added » — pour que le routage « Amis »/« Guilde »
+-- (Orders:_ScopeMatch) reconnaisse un artisan ajouté qui est AUSSI ami/guildmate en jeu. Le `source`
+-- d'affichage, lui, reste figé sur « added » pour un ajout manuel (catégorie de la sidebar).
 function Dir:_ApplySource(name, r)
-    if not r or r.manual then return end
+    if not r then return end
+    local sn = shortName(name)
+    r.isGuild  = (self._guildSet  and self._guildSet[sn])  == true
+    r.isFriend = (self._friendSet and self._friendSet[sn]) == true
+    if r.manual then return end
     r.source = self:ClassifySource(name) or r.source or "recent"
 end
 
@@ -128,16 +135,51 @@ function Dir:OnRK(sender, message)
     self:_NoteLinked(sender, r)
 end
 
--- HI reçu (un client sollicite l'annuaire) → je réponds mes recettes, jitté (anti-burst).
-function Dir:OnHello(sender)
-    if not (CraftLink and C_Timer) then return end
-    C_Timer.After(math.random() * 3, function() Dir:Announce() end)
+-- Garantit une entrée roster pour un joueur QUI A RÉPONDU (a donc l'addon) : classe la source
+-- (guilde/ami/ajouté sinon « recent » = Croisé/Met), marque en ligne, horodate. Idempotent.
+function Dir:_Touch(name)
+    if not name then return end
+    local r = self.roster and self.roster[name]
+    if not r then r = {}; self.roster = self.roster or {}; self.roster[name] = r end
+    self:_ApplySource(name, r)
+    r.lastSeen = time()
+    local wasOnline = self.online[name]
+    self.online[name] = true
+    self:_NoteLinked(name, r)
+    -- Transition hors-ligne → en ligne : pousse-lui mes commandes ouvertes qui le concernent (whisper).
+    if not wasOnline and COC.Orders and COC.Orders.OnArtisanOnline then COC.Orders:OnArtisanOnline(name) end
+    return r
 end
 
--- PING de proximité (YELL) → je réponds PONG en YELL (découverte des porteurs autour de moi).
-function Dir:OnPing(sender)
-    if CraftLink then CraftLink:Send("PONG", "yell") end
-    if sender then self.online[sender] = true end
+-- HI reçu (un client sollicite l'annuaire). DIRIGÉ (whisper) → je réponds DIRECTEMENT à l'émetteur
+-- (fiable sans canal). GLOBAL → réponse jittée en broadcast (anti-burst).
+function Dir:OnHello(sender, _, distribution)
+    if not CraftLink then return end
+    self:_Touch(sender)
+    if distribution == "WHISPER" then
+        self:AnnounceTo(sender)
+    elseif C_Timer then
+        C_Timer.After(math.random() * 3, function() Dir:Announce() end)
+    end
+end
+
+-- PING reçu → PONG sur la MÊME portée (whisper si dirigé, sinon yell). Dirigé → j'envoie aussi mes
+-- métiers à l'émetteur (le « croiseur » voit mes métiers tout de suite, sans attendre un scan).
+function Dir:OnPing(sender, _, distribution)
+    if not CraftLink then return end
+    self:_Touch(sender)
+    if distribution == "WHISPER" and sender then
+        CraftLink:Send("PONG", "whisper", sender)
+        self:AnnounceTo(sender)
+    else
+        CraftLink:Send("PONG", "yell")
+    end
+end
+
+-- PONG reçu (l'autre A l'addon) → on le connaît : entrée roster (Croisé) + en ligne.
+function Dir:OnPong(sender)
+    self:_Touch(sender)
+    if COC.UI and COC.UI.Refresh then COC.UI:Refresh() end
 end
 
 -- ------------------------------------------------------------------
@@ -151,6 +193,33 @@ function Dir:Announce()
         if msg then CraftLink:Send(msg, "global") end
     end
     self:AnnounceSkills()
+end
+
+-- Publie MON profil DIRECTEMENT à un joueur (whisper) — fiable hors canal/guilde. Sert aux réponses
+-- de découverte dirigée (HI/PING whisper) : l'autre reçoit mes métiers + niveaux immédiatement.
+function Dir:AnnounceTo(target)
+    if not (CraftLink and target) then return end
+    for _, prof in ipairs(CraftLink:MyProfessions()) do
+        local msg = CraftLink:BuildRK(prof)
+        if msg then CraftLink:Send(msg, "whisper", target) end
+    end
+    local sk = self:_SkillPayload()
+    if sk then CraftLink:Send(sk, "whisper", target) end
+end
+
+-- Découverte DIRIGÉE d'un joueur (croisement / ajout manuel) : on lui chuchote PING + HI. S'il a
+-- l'addon, il répond (PONG + son profil) → il atterrit dans Croisés/Met avec ses métiers. S'il ne
+-- l'a pas, rien (les addon-messages whisper sont invisibles pour lui). Throttlé par nom (anti-spam).
+function Dir:DiscoverPlayer(name)
+    name = shortName(name)
+    if not (CraftLink and name and name ~= "") then return end
+    if name == shortName(UnitName and UnitName("player") or "") then return end
+    self._lastPing = self._lastPing or {}
+    local t = now()
+    if (self._lastPing[name] or 0) + 60 > t then return end   -- 1 ping / 60 s / joueur
+    self._lastPing[name] = t
+    CraftLink:Send("PING", "whisper", name)
+    CraftLink:Send("HI",   "whisper", name)
 end
 
 -- Re-publication throttlée (3 s) — appelée quand mes recettes changent (plan appris) ou skill gagné,
@@ -180,35 +249,82 @@ function Dir:CaptureSkills()
     if COC.db then COC.db.mySkills = self.mySkills end
 end
 
-function Dir:AnnounceSkills()
-    if not (CraftLink and CraftLink:IsNetworkReady()) then return end
+-- Construit le fil SK : "SK|lvl=<niveau>|key,cur,max;..." (niveau perso inclus pour l'annuaire).
+function Dir:_SkillPayload()
     local parts = {}
     for key, sk in pairs(self.mySkills or {}) do parts[#parts + 1] = key .. "," .. sk[1] .. "," .. sk[2] end
-    if #parts > 0 then CraftLink:Send("SK|" .. table.concat(parts, ";"), "global") end
+    if #parts == 0 then return nil end
+    local lvl = (UnitLevel and UnitLevel("player")) or 0
+    return "SK|lvl=" .. lvl .. "|" .. table.concat(parts, ";")
 end
 
--- SK reçu (niveaux d'un autre) → cache roster.
+function Dir:AnnounceSkills()
+    if not (CraftLink and CraftLink:IsNetworkReady()) then return end
+    local sk = self:_SkillPayload()
+    if sk then CraftLink:Send(sk, "global") end
+end
+
+-- SK reçu (niveaux d'un autre) → cache roster. Formats : "SK|lvl=N|..." (avec niveau) ou ancien "SK|...".
 function Dir:OnSkill(sender, message)
     if not sender then return end
-    local body = message:match("^SK|(.+)$"); if not body then return end
-    local r = self.roster[sender]; if not r then r = {}; self.roster[sender] = r end
+    local lvl, body = message:match("^SK|lvl=(%d+)|(.+)$")
+    if not body then body = message:match("^SK|(.+)$") end
+    if not body then return end
+    local r = self:_Touch(sender)
     r.skill = r.skill or {}
+    if lvl then r.level = tonumber(lvl) end
     for chunk in body:gmatch("[^;]+") do
         local key, cur, max = chunk:match("^([^,]+),(%d+),(%d+)$")
         if key then r.skill[key] = { tonumber(cur), tonumber(max) } end
     end
-    self:_ApplySource(sender, r)
-    r.lastSeen = time()
-    self.online[sender] = true
-    self:_NoteLinked(sender, r)
     if COC.UI and COC.UI.Refresh then COC.UI:Refresh() end
 end
 
--- Sollicite l'annuaire (sur action utilisateur) : HI global + un PING de proximité.
+-- Sollicite l'annuaire (sur action utilisateur) : HI global + PING proximité + re-ping des connus.
 function Dir:Refresh()
     if not CraftLink then return end
     CraftLink:Send("HI", "global")
     CraftLink:Send("PING", "yell")
+    self:RediscoverKnown(true)   -- refresh manuel : re-ping aussi les croisés récents
+end
+
+-- Re-ping (whisper dirigé) mes artisans connus → ils se rallument tout seuls quand ils sont en ligne,
+-- SANS dépendre du canal caché (peu fiable). DiscoverPlayer s'auto-throttle (60 s/nom) ; les erreurs
+-- « joueur hors-ligne » sont filtrées (cf. _InstallWhisperErrorFilter).
+--   * Ajoutés/manuels : toujours (petite liste de favoris → maintien de présence périodique).
+--   * Croisés (recent) : seulement si `includeRecent` (au login / refresh), plafonné aux plus récents
+--     pour ne pas spammer le réseau — sinon ils ne se rallument qu'en re-survolant après un relog.
+function Dir:RediscoverKnown(includeRecent)
+    local recents = {}
+    for name, r in pairs(self.roster or {}) do
+        if r.manual or r.source == "added" then self:DiscoverPlayer(name)
+        elseif includeRecent and (r.source or "recent") == "recent" then
+            recents[#recents + 1] = { name = name, t = r.lastSeen or 0 }
+        end
+    end
+    if #recents > 0 then
+        table.sort(recents, function(a, b) return a.t > b.t end)
+        for i = 1, math.min(30, #recents) do self:DiscoverPlayer(recents[i].name) end
+    end
+end
+
+-- Supprime le message système « No player named "X" is currently online. » quand X est un nom qu'on
+-- vient de ping (découverte whisper) → pas de spam rouge en sondant des artisans hors-ligne.
+function Dir:_InstallWhisperErrorFilter()
+    if self._errFilter or not ChatFrame_AddMessageEventFilter then return end
+    self._errFilter = true
+    local raw = ERR_CHAT_PLAYER_NOT_FOUND_S or "No player named \"%s\" is currently online."
+    local pat = "^" .. raw:gsub("[%-%.%+%[%]%(%)%$%^%%%?%*]", "%%%0"):gsub("%%%%s", "(.-)") .. "$"
+    ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", function(_, _, msg)
+        local who = msg and msg:match(pat)
+        if who then
+            who = shortName(who)
+            if Dir._lastPing and Dir._lastPing[who] and (now() - Dir._lastPing[who]) < 15 then
+                return true   -- avale l'erreur : c'était notre sondage de découverte
+            end
+        end
+        return false
+    end)
 end
 
 -- ------------------------------------------------------------------
@@ -253,15 +369,28 @@ function Dir:Start()
 
     CraftLink:RegisterHandler("RK",   function(s, m)    Dir:OnRK(s, m) end)
     CraftLink:RegisterHandler("SK",   function(s, m)    Dir:OnSkill(s, m) end)
-    CraftLink:RegisterHandler("HI",   function(s)       Dir:OnHello(s) end)
-    CraftLink:RegisterHandler("PING", function(s, m, d) Dir:OnPing(s) end)
-    CraftLink:RegisterHandler("PONG", function(s)       if s then Dir.online[s] = true end end)
+    CraftLink:RegisterHandler("HI",   function(s, m, d) Dir:OnHello(s, m, d) end)
+    CraftLink:RegisterHandler("PING", function(s, m, d) Dir:OnPing(s, m, d) end)
+    CraftLink:RegisterHandler("PONG", function(s)       Dir:OnPong(s) end)
     CraftLink:OnPresence(function(kind, who) Dir:OnPresence(kind, who) end)
 
     CraftLink:StartTransport()
+    self:_WireEvents()
+    self:_WireBringup()
+    self:_InstallWhisperErrorFilter()
 
-    -- Classement guilde/amis : à chaque maj du roster de guilde / liste d'amis → reclasse les
-    -- porteurs découverts. On sollicite les deux rosters maintenant pour amorcer.
+    -- Capture mes niveaux + relations dès que possible (n'a pas besoin du canal).
+    if C_Timer then
+        C_Timer.After(2, function() Dir:CaptureSkills(); Dir:ScanRelations() end)
+        -- Au login : re-ping ajoutés ET croisés récents (capé) → ils se rallument sans re-survoler.
+        C_Timer.After(4, function() Dir:RediscoverKnown(true) end)
+        -- Maintien périodique : seulement les favoris ajoutés (petite liste, pas de spam réseau).
+        if C_Timer.NewTicker then C_Timer.NewTicker(45, function() Dir:RediscoverKnown() end) end
+    end
+end
+
+-- Events de classement (guilde/amis) + gain de compétence (re-capture/ré-annonce). Amorce les rosters.
+function Dir:_WireEvents()
     local rel = CreateFrame("Frame")
     rel:RegisterEvent("GUILD_ROSTER_UPDATE")
     rel:RegisterEvent("FRIENDLIST_UPDATE")
@@ -275,8 +404,6 @@ function Dir:Start()
     elseif GuildRoster then GuildRoster() end
     if C_FriendList and C_FriendList.ShowFriends then C_FriendList.ShowFriends() end
 
-    -- Gain de compétence (point gagné / plan appris) → re-capture MES niveaux, ré-annonce (throttlé),
-    -- rafraîchit la fenêtre métier (rang en en-tête) et l'UI. Lisible sans ouvrir la fenêtre.
     local sk = CreateFrame("Frame")
     sk:RegisterEvent("CHAT_MSG_SKILL")
     sk:SetScript("OnEvent", function()
@@ -285,16 +412,20 @@ function Dir:Start()
         if PW and PW.frame and PW.frame:IsShown() and PW.Refresh then PW:Refresh() end
         if COC.UI and COC.UI.Refresh then COC.UI:Refresh() end
     end)
+end
 
-    -- Au démarrage, une fois le canal prêt (join async) : je publie mes recettes (Announce) ET
-    -- je sollicite les présents (HI) — sinon je n'apprends que ceux qui arrivent APRÈS moi (les
-    -- events JOIN ne listent pas les déjà-présents). Les réponses RK sont jittées (anti-burst).
-    if C_Timer then
-        C_Timer.After(3, function()
-            Dir:CaptureSkills()
-            Dir:ScanRelations()
-            Dir:Announce()
-            if CraftLink:IsNetworkReady() then CraftLink:Send("HI", "global") end
-        end)
-    end
+-- Bring-up FIABLE : au lieu d'un « After(3s) » qui abandonne si le canal n'est pas prêt, on s'abonne
+-- à OnNetworkReady → à CHAQUE (re)acquisition du canal, je (re)publie mon profil ET sollicite les
+-- présents (HI global) — les events JOIN ne listent pas les déjà-présents. Jitté (anti-burst).
+function Dir:_WireBringup()
+    CraftLink:OnNetworkReady(function()
+        Dir:CaptureSkills()
+        if C_Timer then
+            C_Timer.After(math.random() * 2, function()
+                Dir:Announce(); CraftLink:Send("HI", "global")
+            end)
+        else
+            Dir:Announce(); CraftLink:Send("HI", "global")
+        end
+    end)
 end

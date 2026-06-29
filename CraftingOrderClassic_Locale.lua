@@ -21,8 +21,10 @@ if loc == "enUS" or loc == "enGB" then
         -- En-têtes de colonnes (Carnet)
         ["COMMANDE"] = "ORDER", ["QTÉ"] = "QTY", ["PRIX PROPOSÉ"] = "PRICE OFFERED",
         ["MÉTIER"] = "PROFESSION", ["DESTINATAIRE"] = "RECIPIENT", ["STATUT"] = "STATUS", ["DEMANDEUR"] = "REQUESTER",
+        ["ARTISAN"] = "CRAFTER",
         -- Filtres Carnet
         ["Tous"] = "All", ["Guilde"] = "Guild", ["Amis"] = "Friends", ["Croisés"] = "Met", ["Entrantes"] = "Incoming",
+        ["Archivées"] = "Archived", ["En cours"] = "Active", ["libre"] = "open",
         ["Aucune commande. Onglet « Commande » pour en poster une."] = "No orders. Use the « Order » tab to post one.",
         ["Aucune commande entrante. (Capture /commerce et /guilde des joueurs sans l'addon.)"] =
             "No incoming orders. (Captured from /trade and /guild of players without the addon.)",
@@ -82,8 +84,13 @@ if loc == "enUS" or loc == "enGB" then
         ["» Vue Crafting Order"] = "» Crafting Order view", ["Masquer"] = "Hide",
         ["overlay métier masqué — |cFFFFFFFF/co prof|r pour le réafficher."] =
             "profession overlay hidden — |cFFFFFFFF/co prof|r to show it again.",
-        -- Minimap
+        ["Module Commandes non chargé — redémarre complètement WoW (quitter/relancer), pas un simple /reload."] =
+            "Orders module not loaded — fully restart WoW (quit/relaunch), not just /reload.",
+        -- Minimap + menu métiers
         ["Clic : ouvrir le carnet d'ordres"] = "Click: open the order ledger",
+        ["Clic droit : mes métiers"] = "Right click: my professions",
+        ["Mes métiers"] = "My professions", ["Aucun métier connu."] = "No known profession.",
+        ["Don / gratuit"] = "Free / gift",
         -- Entrantes (alertes chat)
         ["|cFFFF8800◆ entrante|r |cFFFFFFFF%s|r (%s) : %s%s%s"] = "|cFFFF8800◆ incoming|r |cFFFFFFFF%s|r (%s): %s%s%s",
         ["   |cFF33DD33→ tu sais la crafter|r — Carnet › Entrantes"] = "   |cFF33DD33→ you can craft it|r — Ledger › Incoming",

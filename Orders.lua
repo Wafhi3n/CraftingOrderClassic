@@ -38,23 +38,66 @@ end
 -- ------------------------------------------------------------------
 -- Émission (protocole)
 -- ------------------------------------------------------------------
+local KEYWORD_RCPT = { Tous = true, Guilde = true, Amis = true }
+
+-- Sérialise un ORD|NEW (partagé par Broadcast et le push à la connexion).
+function Orders:_NewPayload(o)
+    return string.format("ORD|NEW|%s|%s|%s|%d|%d|%s|%s|%s|%d",
+        o.id, o.buyer, o.kind, o.itemID or o.spellID or 0, o.qty or 1,
+        o.profession or "", (o.price or ""):gsub("|", ""),
+        (o.recipient or "Tous"):gsub("|", ""), o.byStack and 1 or 0)
+end
+
+-- Un joueur (de mon annuaire) entre-t-il dans la portée d'un ordre ? Tous / guilde-amis / nommé.
+-- Guilde/Amis = drapeaux de relation (isGuild/isFriend) → marche aussi pour un artisan AJOUTÉ qui est
+-- ami/guildmate en jeu (sinon « added » l'exclurait à tort).
+function Orders:_ScopeMatch(o, name, r)
+    local rcpt = o.recipient or "Tous"
+    if rcpt == "Tous"   then return true end
+    if rcpt == "Guilde" then return r ~= nil and (r.isGuild  or r.source == "guild")  == true end
+    if rcpt == "Amis"   then return r ~= nil and (r.isFriend or r.source == "friend") == true end
+    return name == rcpt                                       -- ordre nommé sur un joueur précis
+end
+
+-- Artisans connus EN LIGNE concernés par un ordre → fanout whisper (le canal caché est peu fiable
+-- sur PTR : on DOUBLE chaque NEW vers eux → livraison garantie sans dépendre du canal).
+function Orders:_FanoutTargets(o)
+    local D = COC.Directory
+    if not (D and D.roster and D.online) then return {} end
+    local m, out = me(), {}
+    for name, r in pairs(D.roster) do
+        if name ~= m and D.online[name] and self:_ScopeMatch(o, name, r) then out[name] = true end
+    end
+    return out
+end
+
+-- Cibles dirigées (whisper) pour les transitions de cycle : ACK/DONE → l'acheteur ;
+-- CANCEL → l'artisan qui avait accepté + le destinataire nommé. Fiable même canal HS.
+function Orders:_CycleTargets(action, o)
+    local t, m = {}, me()
+    local function add(n) if n and n ~= "" and n ~= m and not KEYWORD_RCPT[n] then t[n] = true end end
+    if action == "ACK" or action == "DONE" then add(o.buyer)
+    elseif action == "CANCEL" then add(o.acceptedBy); add(o.recipient) end
+    return t
+end
+
 function Orders:Broadcast(action, o)
     if not CraftLink then return end
     local payload
     if action == "NEW" then
-        payload = string.format("ORD|NEW|%s|%s|%s|%d|%d|%s|%s|%s|%d",
-            o.id, o.buyer, o.kind, o.itemID or o.spellID or 0, o.qty or 1,
-            o.profession or "", (o.price or ""):gsub("|", ""),
-            (o.recipient or "Tous"):gsub("|", ""), o.byStack and 1 or 0)
+        payload = self:_NewPayload(o)
     elseif action == "CANCEL" then payload = "ORD|CANCEL|" .. o.id
     elseif action == "ACK"    then payload = string.format("ORD|ACK|%s|%s", o.id, o.acceptedBy or "")
     elseif action == "DONE"   then payload = string.format("ORD|DONE|%s|%s", o.id, o.acceptedBy or "")
     end
-    if payload then
-        CraftLink:Send(payload, "global")
-        -- Portée guilde : on double l'envoi sur le transport GUILD pour toucher les membres qui ne
-        -- sont pas sur le canal caché (Amis/@Nom restent un filtre de réception, pas de transport dédié).
-        if action == "NEW" and o.recipient == "Guilde" then CraftLink:Send(payload, "guild") end
+    if not payload then return end
+    CraftLink:Send(payload, "global")
+    if action == "NEW" then
+        if o.recipient == "Guilde" then CraftLink:Send(payload, "guild") end
+        -- Fanout whisper vers les artisans connus EN LIGNE concernés (contourne le canal caché HS).
+        for name in pairs(self:_FanoutTargets(o)) do CraftLink:Send(payload, "whisper", name) end
+    else
+        for name in pairs(self:_CycleTargets(action, o)) do CraftLink:Send(payload, "whisper", name) end
     end
 end
 
@@ -163,6 +206,20 @@ function Orders:Deliver(id)
     pmsg(string.format("livrée ! crafts livrés au total : %d", COC.db.delivered))
 end
 
+-- Action d'une ligne de commande dans la VUE MÉTIER (fenêtre de craft) : c'est LÀ qu'un artisan
+-- accepte/livre — le Carnet ne fait que LISTER mes propres commandes. Renvoie (label, fn) ou nil.
+function Orders:ProfRowAction(o)
+    if not o then return nil end
+    local m = me()
+    if o.status == "open" and o.buyer ~= m and self:VisibleTo(o) then
+        return L["Accepter"], function() Orders:Accept(o.id) end
+    end
+    if o.acceptedBy == m and o.status == "accepted" then
+        return L["Livrer"], function() Orders:Deliver(o.id) end
+    end
+    return nil
+end
+
 -- ------------------------------------------------------------------
 -- Réception (protocole) — met à jour le cache
 -- ------------------------------------------------------------------
@@ -253,13 +310,30 @@ function Orders:PruneExpired()
     end
 end
 
--- Un artisan se connecte (présence JOIN) : si j'ai une commande OUVERTE qui le cible nommément, je la
--- lui (re)pousse — il était peut-être hors-ligne au moment du post. Jitté (anti-burst).
+-- Faut-il RELAYER cette commande à un pair `who` qu'on vient de découvrir ? On propage en MESH :
+-- toute commande OUVERTE non expirée, MÊME d'un autre joueur, MÊME si je ne sais pas la crafter (le
+-- but est qu'elle atteigne le bon artisan via les croisements). On ne relaie pas une commande à son
+-- propre auteur, ni une commande NOMMÉE sur quelqu'un d'autre (ciblée → livraison directe seulement).
+-- Chaque récepteur filtre l'AFFICHAGE via VisibleTo ; il peut quand même la re-relayer (cache complet).
+function Orders:_RelayMatch(o, who)
+    if o.status ~= "open" then return false end
+    if (time() - (o.ts or 0)) > ORDER_TTL then return false end
+    if o.buyer == who then return false end
+    local rcpt = o.recipient or "Tous"
+    if rcpt == "Tous" or rcpt == "Guilde" or rcpt == "Amis" then return true end
+    return rcpt == who                                   -- nommé : seulement vers la cible
+end
+
+-- Un artisan apparaît EN LIGNE (présence JOIN ou découverte whisper) : je lui RELAIE en direct
+-- (whisper) les commandes ouvertes en cache qui le concernent → propagation P2P fiable même si le
+-- canal caché est muet. Plafonné (anti-burst) ; la dédup par id côté récepteur évite les boucles.
 function Orders:OnArtisanOnline(who)
-    if not (who and CraftLink and C_Timer) then return end
+    if not (who and CraftLink) then return end
+    local sent = 0
     for _, o in pairs(COC.db.orders or {}) do
-        if o.buyer == me() and o.status == "open" and o.recipient == who then
-            C_Timer.After(math.random() * 2, function() Orders:Broadcast("NEW", o) end)
+        if sent < 25 and self:_RelayMatch(o, who) then
+            CraftLink:Send(self:_NewPayload(o), "whisper", who)
+            sent = sent + 1
         end
     end
 end

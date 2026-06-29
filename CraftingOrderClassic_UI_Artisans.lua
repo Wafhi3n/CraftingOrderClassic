@@ -18,6 +18,27 @@ local SRC_TAG = { guild = L["GUILDE"], friend = L["AMIS"], added = L["AJOUTÉ"],
 local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true) end
 local function trim(s) return s and s:gsub("^%s+", ""):gsub("%s+$", "") or "" end
 
+-- Connaît-on un métier de cet artisan ? UNION des niveaux SK (r.skill) ET des recettes RK (r.recipes) :
+-- un artisan croisé sans avoir ouvert sa fenêtre métier n'a que des SK → il DOIT quand même s'afficher.
+local function knowsProf(r, pf)
+    return (r.skill and r.skill[pf]) or (r.recipes and r.recipes[pf]) or false
+end
+
+-- Libellé des métiers d'un artisan : « Forge 300/300 » si le niveau (SK) est connu, sinon le simple
+-- nom (RK seul). Union des deux sources, trié. Vide si on ne sait encore rien de ses métiers.
+local function profsText(r)
+    local seen, parts = {}, {}
+    for key, sv in pairs(r.skill or {}) do
+        seen[key] = true
+        parts[#parts + 1] = Skin.ProfLabel(key) .. " " .. (sv[1] or "?") .. "/" .. (sv[2] or "?")
+    end
+    for key in pairs(r.recipes or {}) do
+        if not seen[key] then seen[key] = true; parts[#parts + 1] = Skin.ProfLabel(key) end
+    end
+    table.sort(parts)
+    return table.concat(parts, " · ")
+end
+
 -- =========================================================================
 -- Construction
 -- =========================================================================
@@ -127,6 +148,7 @@ function UI:_AddArtisan(name)
     local r = D.roster[name] or {}
     r.source = "added"; r.recipes = r.recipes or {}; r.manual = true; r.lastSeen = time()
     D.roster[name] = r
+    if D.DiscoverPlayer then D:DiscoverPlayer(name) end   -- ping immédiat : métiers + en ligne s'il a l'addon
     UI.artSource = "added"; UI:_RefreshArtSrcTabs(); UI:RefreshArtisans()
     print("|cFF33DD88Crafting Order|r " .. L["artisan ajouté : "] .. "|cFFFFFFFF" .. name ..
         "|r |cFF888888" .. L["(lié quand il sera en ligne avec l'addon)"] .. "|r")
@@ -151,7 +173,7 @@ function UI:RefreshArtisans()
     local src, pf = self.artSource or "all", self.artProfFilter
     local list = {}
     for name, r in pairs(D and D.roster or {}) do
-        if (src == "all" or (r.source or "recent") == src) and (not pf or (r.recipes and r.recipes[pf])) then
+        if (src == "all" or (r.source or "recent") == src) and (not pf or knowsProf(r, pf)) then
             list[#list + 1] = { name = name, r = r, online = D.online[name] }
         end
     end
@@ -167,10 +189,7 @@ function UI:RefreshArtisans()
         row.name:SetText("|cFFFFFFFF" .. a.name .. "|r")
         local lvl = a.r.level and (L["niv "] .. a.r.level) or L["niv ?"]
         row.sub:SetText("|cFF888888" .. (a.online and L["En ligne"] or L["Hors ligne"]) .. " · " .. lvl .. "|r")
-        local profs = {}
-        for p in pairs(a.r.recipes or {}) do profs[#profs + 1] = Skin.ProfLabel(p) end
-        table.sort(profs)
-        row.profs:SetText("|c" .. Skin.hex.gold .. (table.concat(profs, " · ")) .. "|r")
+        row.profs:SetText("|c" .. Skin.hex.gold .. profsText(a.r) .. "|r")
         row.src:SetText("|cFF888888" .. (SRC_TAG[a.r.source or "recent"] or "") .. "|r")
         row.whisper:SetScript("OnClick", function()
             if ChatFrame_SendTell then ChatFrame_SendTell(a.name) end

@@ -20,22 +20,27 @@ local function OnTooltipUnit(tooltip)
     if not r then return end
 
     local sk = GetSkin()
-    local parts = {}
-
-    -- Priorité : niveaux SK reçus (plus précis — « Forge 250/300 »).
-    for key, sv in pairs(r.skill or {}) do
-        parts[#parts + 1] = (sk and sk.ProfLabel(key) or key) .. " " .. sv[1] .. "/" .. sv[2]
+    -- Icône de métier INLINE (|T…|t) plutôt que le nom long → ligne compacte. Repli sur le libellé
+    -- si le client n'a pas l'icône en cache.
+    local function profMark(key)
+        local t = sk and sk.ProfIcon(key)
+        return t and ("|T" .. t .. ":14:14:0:0|t") or (sk and sk.ProfLabel(key) or key)
     end
-    -- Fallback : métiers connus via bitfield RK, sans niveau.
+    local parts = {}
+    -- Priorité : niveaux SK reçus (plus précis — icône + « 250/300 »).
+    for key, sv in pairs(r.skill or {}) do
+        parts[#parts + 1] = profMark(key) .. " " .. sv[1] .. "/" .. sv[2]
+    end
+    -- Fallback : métiers connus via bitfield RK, sans niveau → icône seule.
     if #parts == 0 then
-        for key in pairs(r.recipes or {}) do
-            parts[#parts + 1] = sk and sk.ProfLabel(key) or key
-        end
+        for key in pairs(r.recipes or {}) do parts[#parts + 1] = profMark(key) end
     end
 
     if #parts == 0 then return end
     table.sort(parts)
-    tooltip:AddLine("|cFF33DD88CO-Classic ✓|r  " .. table.concat(parts, " · "), 1, 1, 1)
+    -- Marque addon = icône WorkOrder (le glyphe « ✓ » s'affichait en tofu dans la police WoW).
+    local mark = sk and ("  |T" .. sk.tex.workorder .. ":14:14:0:0|t") or ""
+    tooltip:AddLine("|cFF33DD88CO-Classic|r" .. mark .. "  " .. table.concat(parts, "   "), 1, 1, 1)
     tooltip:Show()
 end
 
@@ -82,6 +87,35 @@ local function InjectContextMenu()
 end
 
 -- =========================================================================
+-- Découverte au CROISEMENT : survoler / cibler / grouper un joueur → on lui chuchote un PING+HI
+-- (Dir:DiscoverPlayer, throttlé 60 s/nom). S'il a l'addon, il répond → il entre dans Croisés/Met
+-- avec ses métiers. S'il ne l'a pas, rien (addon-messages whisper invisibles côté receveur).
+-- =========================================================================
+local function discover(unit)
+    if not (unit and COC.Directory and UnitIsPlayer and UnitIsPlayer(unit)) then return end
+    if UnitIsUnit and UnitIsUnit(unit, "player") then return end
+    -- Whisper addon-message ne traverse pas la faction adverse → on ne ping que les alliés potentiels.
+    if UnitCanCooperate and not UnitCanCooperate("player", unit) then return end
+    local name = UnitName(unit)
+    if name and name ~= "" then COC.Directory:DiscoverPlayer(name) end
+end
+
+function Social:_WireDiscovery()
+    local f = CreateFrame("Frame")
+    f:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
+    f:RegisterEvent("PLAYER_TARGET_CHANGED")
+    f:RegisterEvent("GROUP_ROSTER_UPDATE")
+    f:SetScript("OnEvent", function(_, event)
+        if event == "UPDATE_MOUSEOVER_UNIT" then discover("mouseover")
+        elseif event == "PLAYER_TARGET_CHANGED" then discover("target")
+        else
+            local prefix = IsInRaid and IsInRaid() and "raid" or "party"
+            for i = 1, (GetNumGroupMembers and GetNumGroupMembers() or 0) do discover(prefix .. i) end
+        end
+    end)
+end
+
+-- =========================================================================
 -- Activation (appelé depuis PLAYER_LOGIN dans CraftingOrderClassic.lua)
 -- =========================================================================
 function Social:Start()
@@ -89,4 +123,5 @@ function Social:Start()
         GameTooltip:HookScript("OnTooltipSetUnit", OnTooltipUnit)
     end
     InjectContextMenu()
+    self:_WireDiscovery()
 end

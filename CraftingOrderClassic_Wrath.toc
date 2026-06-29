@@ -14,6 +14,7 @@ Libs\CraftLink-1.0\lib.xml
 Libs\CraftLink-1.0\Data\Wrath.xml
 
 CraftingOrderClassic.lua
+CraftingOrderClassic_Trace.lua
 CraftingOrderClassic_Locale.lua
 CraftingOrderClassic_Elemental.lua
 CraftingOrderClassic_UI_Skin.lua
@@ -28,6 +29,7 @@ CraftingOrderClassic_Craft.lua
 CraftingOrderClassic_ProfWindow.lua
 CraftingOrderClassic_ProfWindow_Recipes.lua
 CraftingOrderClassic_ProfWindow_Detail.lua
+CraftingOrderClassic_ProfWindow_Orders.lua
 Directory.lua
 Orders.lua
 CraftingOrderClassic_Inbound.lua
