@@ -4,10 +4,16 @@
 local COC  = CraftingOrderClassic
 local UI   = COC.UI
 local Skin = UI.Skin
+local L    = COC.L   -- localisation du chrome (clé = FR ; overlay enUS). NB : les VALEURS canoniques
+                     -- de destinataire restent en FR (clé) pour rester identiques sur le réseau.
 
 local PLH = 20    -- hauteur ligne plan
 local RRH = 21    -- hauteur ligne réactif
 local ARH = 26    -- hauteur ligne artisan
+
+-- Filtre qualité MINIMALE (cycle) : false = Toutes, sinon seuil WoW (2=Inhabituel, 3=Rare, 4=Épique).
+-- Les NOMS de qualité sont localisés par le client via _G["ITEM_QUALITY<n>_DESC"] (zéro clé à baker).
+local QUALITY_STEPS = { false, 2, 3, 4 }
 
 local SEP  = 308   -- x séparateur gauche/droite
 local LW   = SEP - 14          -- largeur panneau gauche (zone visible)
@@ -54,7 +60,7 @@ local GATHER_ONLY = { Fishing = true, Herbalism = true, Skinning = true }
 -- =========================================================================
 function UI:_BuildPostLeft(panel)
     local hdrLbl = panel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    hdrLbl:SetPoint("TOPLEFT", 14, -80); hdrLbl:SetText("MÉTIER")
+    hdrLbl:SetPoint("TOPLEFT", 14, -80); hdrLbl:SetText(L["MÉTIER"])
     hdrLbl:SetTextColor(Skin.unpack(Skin.color.textMuted))
 
     local pBtn = Skin.MakeGoldButton(panel, LW, 22, "—"); pBtn:SetPoint("TOPLEFT", 12, -98)
@@ -80,14 +86,19 @@ function UI:_BuildPostLeft(panel)
     fly:SetScript("OnHide",     function() closer:Hide() end)
 
     -- Filtre qualité (pill) + recherche
-    local qBtn = Skin.MakeGoldButton(panel, 100, 18, "Qualité : Toutes")
-    qBtn:SetPoint("TOPLEFT", 12, -128)
-    qBtn:SetScript("OnClick", function() end)
+    self.postQualityIdx = 1
+    local qBtn = Skin.MakeGoldButton(panel, 104, 18, "")
+    qBtn:SetPoint("TOPLEFT", 12, -128); self.postQualityBtn = qBtn
+    qBtn:SetScript("OnClick", function()
+        UI.postQualityIdx = (UI.postQualityIdx % #QUALITY_STEPS) + 1
+        UI:_RefreshQualityBtn(); UI:RefreshPostPlans()
+    end)
+    self:_RefreshQualityBtn()
 
     local srch = CreateFrame("EditBox", nil, panel, "InputBoxTemplate")
     srch:SetSize(LW - 110, 16); srch:SetPoint("TOPLEFT", 116, -129); srch:SetAutoFocus(false)
     local hint = panel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    hint:SetPoint("LEFT", srch, "LEFT", 4, 0); hint:SetText("○ Rechercher un plan")
+    hint:SetPoint("LEFT", srch, "LEFT", 4, 0); hint:SetText("○ " .. L["Rechercher un plan"])
     srch:SetScript("OnTextChanged", function(b)
         hint:SetShown(b:GetText() == "")
         UI.postSearch = b:GetText():lower(); UI:RefreshPostPlans()
@@ -97,7 +108,7 @@ function UI:_BuildPostLeft(panel)
     sep1px(panel, 12, SEP - 2, -150)
 
     local lhdr = panel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    lhdr:SetPoint("TOPLEFT", 14, -156); lhdr:SetText("LISTE DES PLANS")
+    lhdr:SetPoint("TOPLEFT", 14, -156); lhdr:SetText(L["LISTE DES PLANS"])
     lhdr:SetTextColor(Skin.unpack(Skin.color.textMuted))
 
     local pscroll = CreateFrame("ScrollFrame", "COCPostPlanScroll", panel, "UIPanelScrollFrameTemplate")
@@ -112,6 +123,13 @@ function UI:_ToggleProfFlyout()
     fly:ClearAllPoints(); fly:SetPoint("TOPLEFT", self.postProfBtn, "BOTTOMLEFT", 0, -2); fly:Show()
 end
 
+function UI:_RefreshQualityBtn()
+    if not self.postQualityBtn then return end
+    local q = QUALITY_STEPS[self.postQualityIdx or 1]
+    local name = q and ((_G["ITEM_QUALITY" .. q .. "_DESC"] or "?") .. "+") or L["Toutes"]
+    self.postQualityBtn:SetText(L["Qualité : "] .. name)
+end
+
 -- =========================================================================
 -- Panneau droit : titre plan + réactifs + commission + ciblage artisan
 -- =========================================================================
@@ -122,14 +140,14 @@ function UI:_BuildPostRight(panel)
     self.postPlanName:SetPoint("LEFT", self.postPlanBadge, "RIGHT", 6, 0)
     self.postPlanName:SetWidth(RW - 100); self.postPlanName:SetJustifyH("LEFT"); Skin.ApplyShadow(self.postPlanName)
     local jeLabel = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    jeLabel:SetPoint("TOPRIGHT", -22, -85); jeLabel:SetText("JE FOURNIS")
+    jeLabel:SetPoint("TOPRIGHT", -22, -85); jeLabel:SetText(L["JE FOURNIS"])
     jeLabel:SetTextColor(Skin.unpack(Skin.color.gold)); Skin.ApplyShadow(jeLabel)
 
     sep1px(panel, RX, REDGE, -106)
 
     local rhdr = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     rhdr:SetPoint("TOPLEFT", RX, -112)
-    rhdr:SetText("|cFFE8B84BRéactifs|r |cFF888888(cocher = je fournis)|r"); Skin.ApplyShadow(rhdr)
+    rhdr:SetText("|cFFE8B84B" .. L["Réactifs"] .. "|r |cFF888888" .. L["(cocher = je fournis)"] .. "|r"); Skin.ApplyShadow(rhdr)
     self.postReagHdr = rhdr
 
     -- Compteur « je fournis » à droite de l'en-tête réactifs.
@@ -146,10 +164,10 @@ function UI:_BuildPostRight(panel)
 
     -- Commission g/s/c + Qté
     local comLbl = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    comLbl:SetPoint("TOPLEFT", RX, -308); comLbl:SetText("|cFFE8B84BCommission|r"); Skin.ApplyShadow(comLbl)
+    comLbl:SetPoint("TOPLEFT", RX, -308); comLbl:SetText("|cFFE8B84B" .. L["Commission"] .. "|r"); Skin.ApplyShadow(comLbl)
     self.postGold, self.postSilver, self.postCopper = self:_MakeGSC(panel, RX + 92, -306)
     local qLbl = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    qLbl:SetPoint("TOPLEFT", RX + 330, -308); qLbl:SetText("Qté"); Skin.ApplyShadow(qLbl)
+    qLbl:SetPoint("TOPLEFT", RX + 330, -308); qLbl:SetText(L["Qté"]); Skin.ApplyShadow(qLbl)
     self.postQty = CreateFrame("EditBox", nil, panel, "InputBoxTemplate")
     self.postQty:SetSize(40, 16); self.postQty:SetPoint("TOPLEFT", RX + 352, -306)
     self.postQty:SetAutoFocus(false); self.postQty:SetNumeric(true); self.postQty:SetText("1")
@@ -175,7 +193,7 @@ function UI:_MakeGSC(parent, x, y)
 end
 
 function UI:_BuildPostArtisanSection(panel)
-    local srcDefs = { {id="guild", label="Guilde"}, {id="friend", label="Amis"}, {id="added", label="Ajoutés"}, {id="recent", label="Croisés"} }
+    local srcDefs = { {id="guild", label=L["Guilde"]}, {id="friend", label=L["Amis"]}, {id="added", label=L["Ajoutés"]}, {id="recent", label=L["Croisés"]} }
     self.postSrcBtns = {}
     for i, d in ipairs(srcDefs) do
         local b = Skin.MakeGoldButton(panel, 58, 20, d.label); b:SetPoint("TOPLEFT", RX + (i-1)*62, -337)
@@ -187,7 +205,7 @@ function UI:_BuildPostArtisanSection(panel)
     end
     self.postSource = "guild"; self.postTarget = "all"; self:_RefreshPostSrcTabs()
 
-    local diffBtn = Skin.MakeGoldButton(panel, 124, 20, "Diffuser à tous"); diffBtn:SetPoint("TOPRIGHT", -22, -337)
+    local diffBtn = Skin.MakeGoldButton(panel, 124, 20, L["Diffuser à tous"]); diffBtn:SetPoint("TOPRIGHT", -22, -337)
     local diffIc = diffBtn:CreateTexture(nil, "OVERLAY"); diffIc:SetSize(14, 14)
     diffIc:SetPoint("LEFT", 5, 0); diffIc:SetTexture(Skin.tex.broadcast)
     diffBtn.text:ClearAllPoints(); diffBtn.text:SetPoint("LEFT", 22, 0)
@@ -201,7 +219,7 @@ function UI:_BuildPostArtisanSection(panel)
     self.postArtContent = ac; self.postArtRows = {}
 
     local artLbl = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    artLbl:SetPoint("TOPLEFT", RX, -495); artLbl:SetText("|cFFE8B84BDestinataire :|r"); Skin.ApplyShadow(artLbl)
+    artLbl:SetPoint("TOPLEFT", RX, -495); artLbl:SetText("|cFFE8B84B" .. L["Destinataire :"] .. "|r"); Skin.ApplyShadow(artLbl)
     self.postArtisanName = panel:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     self.postArtisanName:SetPoint("LEFT", artLbl, "RIGHT", 6, 0); Skin.ApplyShadow(self.postArtisanName)
     self:_UpdateArtisanLabel()
@@ -211,7 +229,7 @@ function UI:_BuildPostArtisanSection(panel)
 
     self.postSelLbl = panel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
     self.postSelLbl:SetPoint("BOTTOMLEFT", RX, 40); self.postSelLbl:SetWidth(RW - 100); self.postSelLbl:SetJustifyH("LEFT")
-    self.postSelLbl:SetText("|cFF888888Choisis un métier puis un plan.|r")
+    self.postSelLbl:SetText("|cFF888888" .. L["Choisis un métier puis un plan."] .. "|r")
 end
 
 function UI:_RefreshPostSrcTabs()
@@ -262,14 +280,17 @@ function UI:RefreshPostPlans()
     local c = CL(); if not (c and self.postPlanContent) then return end
     local list = self.postProf and c:ProfessionCatalogue(self.postProf) or {}
     local s = self.postSearch
+    local qmin = QUALITY_STEPS[self.postQualityIdx or 1]   -- seuil qualité minimal (ou false = Toutes)
     local out = {}
     for _, e in ipairs(list) do
         -- Commande = objets CRAFTABLES uniquement (recette/sort) ; les récoltes pures (sans spellID)
         -- vivent dans l'onglet Récolte. On masque les objets liés (non échangeables) et ceux absents
         -- du client (autre extension).
         if e.spellID and Skin.ItemExists(e.itemID) and not (e.itemID and isSoulbound(e.itemID)) then
+            local okq = true
+            if qmin and e.itemID then local q = select(3, GetItemInfo(e.itemID)); okq = q ~= nil and q >= qmin end
             local nm = entryName(e)
-            if not s or s == "" or nm:lower():find(s, 1, true) then
+            if okq and (not s or s == "" or nm:lower():find(s, 1, true)) then
                 out[#out + 1] = {e = e, name = nm}
             end
         end
@@ -280,7 +301,7 @@ function UI:RefreshPostPlans()
         local row = self:_PostPlanRow(i); local e = item.e
         local r, g, b = Skin.RarityColor(e.itemID)
         row.badge:Paint(r, g, b, Skin.FirstChar(item.name), Skin.Icon(e.itemID, e.spellID))
-        local disp = item.name:match("^item:") and "|cFF777777Chargement…|r" or item.name
+        local disp = item.name:match("^item:") and "|cFF777777" .. L["Chargement…"] .. "|r" or item.name
         row.name:SetText(disp); row.name:SetTextColor(r, g, b)
         row.name:SetTextColor(e == self.postEntry and 1 or r, e == self.postEntry and 0.85 or g, e == self.postEntry and 0.27 or b)
         row.entry = e; row:SetScript("OnClick", function() UI:SelectPostPlan(e) end); row:Show()
@@ -303,11 +324,11 @@ end
 function UI:RefreshPostPlanDetail()
     local e = self.postEntry
     if not e then
-        self.postPlanBadge:Hide(); self.postPlanName:SetText("|cFF888888Aucun plan sélectionné.|r")
+        self.postPlanBadge:Hide(); self.postPlanName:SetText("|cFF888888" .. L["Aucun plan sélectionné."] .. "|r")
         self.postReagHdr:SetShown(false); self.postBQCount:SetText("")
         for i = 1, #self.postReagRows do self.postReagRows[i]:Hide() end
         self.postReagContent:SetHeight(10)
-        if self.postSelLbl then self.postSelLbl:SetText("|cFF888888Choisis un métier puis un plan.|r") end
+        if self.postSelLbl then self.postSelLbl:SetText("|cFF888888" .. L["Choisis un métier puis un plan."] .. "|r") end
         return
     end
     local nm = entryName(e); local r, g, b = Skin.RarityColor(e.itemID)
@@ -326,7 +347,7 @@ function UI:RefreshPostReagents()
         local row = self:_PostReagRow(i); local iid, qty = rg[1], rg[2]
         local cr, cg, cb = Skin.RarityColor(iid)
         local nm2 = c and c:ItemName(iid) or ("item:"..iid)
-        local disp = nm2:match("^item:") and "|cFF777777Chargement…|r" or nm2
+        local disp = nm2:match("^item:") and "|cFF777777" .. L["Chargement…"] .. "|r" or nm2
         row.badge:Paint(cr, cg, cb, Skin.FirstChar(nm2), Skin.Icon(iid))
         row.name:SetText(disp); row.name:SetTextColor(cr, cg, cb)
         row.qty:SetText("|cFFFFCC00×"..qty.."|r")
@@ -359,7 +380,7 @@ end
 function UI:_UpdateProvidedCount()
     local reag = self.postCurrentReag or {}; local n = 0
     for _, rg in ipairs(reag) do if UI.postProvide[rg[1]] then n = n + 1 end end
-    if self.postBQCount then self.postBQCount:SetText(n.." / "..#reag.." fournis") end
+    if self.postBQCount then self.postBQCount:SetText(n.." / "..#reag.." "..L["fournis"]) end
 end
 
 function UI:RefreshPostArtisans()
@@ -413,25 +434,30 @@ function UI:_PostArtRow(i)
     self.postArtRows[i] = r; return r
 end
 
-local POST_TARGET_FR = { guild = "Guilde", friend = "Amis", added = "Ajoutés", recent = "Croisés" }
+-- Valeur CANONIQUE du destinataire (FR, identique sur le réseau ; cf. Orders:VisibleTo). Seuls
+-- « Guilde » / « Amis » / @Nom sont routables ; « Ajoutés »/« Croisés » (listes perso, non évaluables
+-- par un récepteur) retombent sur « Tous » (diffusion globale).
 function UI:_PostTargetLabel()
     local t = self.postTarget or "all"
-    if t == "all" then return "Tous" end
+    if t == "all"        then return "Tous" end
     if t:sub(1, 1) == "@" then return t:sub(2) end
-    return POST_TARGET_FR[t] or "Tous"
+    if t == "guild"      then return "Guilde" end
+    if t == "friend"     then return "Amis" end
+    return "Tous"
 end
 
 function UI:_UpdateArtisanLabel()
     if self.postArtisanName then
         local t = self.postTarget or "all"
         local col = (t == "all") and "FFAAAAAA" or "FFFFFFFF"
-        self.postArtisanName:SetText("|c" .. col .. self:_PostTargetLabel() .. "|r")
+        -- Affichage localisé ; la VALEUR canonique (FR) sert au réseau (cf. _PostTargetLabel / DoPostOrder).
+        self.postArtisanName:SetText("|c" .. col .. L[self:_PostTargetLabel()] .. "|r")
     end
 end
 
 function UI:SelectPostPlan(entry)
     self.postEntry = entry; self.postProvide = {}
-    self.postSelLbl:SetText("Sélection : |cFFFFFFFF"..entryName(entry).."|r")
+    self.postSelLbl:SetText(L["Sélection : "].."|cFFFFFFFF"..entryName(entry).."|r")
     self:RefreshPostPlans(); self:RefreshPostPlanDetail(); self:RefreshPostArtisans()
 end
 
@@ -440,7 +466,7 @@ end
 -- =========================================================================
 function UI:DoPostOrder()
     local e = self.postEntry
-    if not e then self.postSelLbl:SetText("|cFFFF4444Choisis d'abord un plan.|r"); return end
+    if not e then self.postSelLbl:SetText("|cFFFF4444" .. L["Choisis d'abord un plan."] .. "|r"); return end
     local qty = tonumber(self.postQty:GetText()) or 1
     local g   = tonumber(self.postGold:GetText()) or 0
     local s   = tonumber(self.postSilver:GetText()) or 0
@@ -461,6 +487,6 @@ function UI:DoPostOrder()
     })
     self.postGold:SetText("0"); self.postSilver:SetText("0"); self.postCopper:SetText("0")
     self.postQty:SetText("1"); self.postEntry = nil; self.postProvide = {}
-    self.postSelLbl:SetText("|cFF33DD33Commande postée !|r")
+    self.postSelLbl:SetText("|cFF33DD33" .. L["Commande postée !"] .. "|r")
     self:ShowTab("orders")
 end

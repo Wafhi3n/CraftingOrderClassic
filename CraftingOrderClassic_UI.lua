@@ -218,6 +218,33 @@ function UI:_OrderRow(i)
     return row
 end
 
+-- Toast : notification éphémère skinnée (haut-centre), fade ≤160 ms + son. Réutilisable (ordre ciblé
+-- reçu, entrante captée, artisan favori en ligne). Remplace/complète les print de chat.
+function UI:Toast(text, icon)
+    local t = self._toast
+    if not t then
+        t = CreateFrame("Frame", "CraftingOrderToast", UIParent, "BackdropTemplate")
+        t:SetSize(330, 44); t:SetPoint("TOP", UIParent, "TOP", 0, -130)
+        t:SetFrameStrata("FULLSCREEN_DIALOG"); Skin.SkinFrameBackdrop(t)
+        t.icon = t:CreateTexture(nil, "ARTWORK"); t.icon:SetSize(28, 28); t.icon:SetPoint("LEFT", 10, 0)
+        t.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
+        t.fs = t:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+        t.fs:SetPoint("LEFT", t.icon, "RIGHT", 8, 0); t.fs:SetPoint("RIGHT", -10, 0)
+        t.fs:SetJustifyH("LEFT"); Skin.ApplyShadow(t.fs)
+        t:Hide(); self._toast = t
+    end
+    t.icon:SetTexture(icon or Skin.tex.workorder); t.fs:SetText(text)
+    t:SetAlpha(0); t:Show()
+    if UIFrameFadeIn then UIFrameFadeIn(t, 0.16, 0, 1) else t:SetAlpha(1) end
+    if t._hideTimer then t._hideTimer:Cancel() end
+    if C_Timer then
+        t._hideTimer = C_Timer.NewTimer(4, function()
+            if UIFrameFadeOut then UIFrameFadeOut(t, 0.3, t:GetAlpha(), 0) end
+            C_Timer.After(0.3, function() t:Hide() end)
+        end)
+    end
+end
+
 function UI:RefreshOrders()
     if self.orderFilter == "inbound" then return self:_RefreshInbound() end
     if self.hdrDest then self.hdrDest:SetText(L["DESTINATAIRE"]) end
@@ -234,7 +261,7 @@ function UI:RefreshOrders()
             row.qty:SetText("|cFFCCCCCC" .. (o.byStack and ((o.qty or 1) .. " st") or ("×" .. (o.qty or 1))) .. "|r")
             row.price:SetText(o.price and ("|c" .. Skin.hex.price .. o.price .. "|r") or "|cFF666666—|r")
             row.prof:SetText("|c" .. Skin.hex.gold .. Skin.ProfLabel(o.profession) .. "|r")
-            row.dest:SetText("|cFFCCBB88" .. (o.recipient or "Tous") .. "|r")
+            row.dest:SetText("|cFFCCBB88" .. L[o.recipient or "Tous"] .. "|r")
             local slabel, scol = Skin.StatusInfo(o.status)
             row.status:SetText("|c" .. scol .. slabel .. "|r")
             local label, fn = orderActionFor(o)

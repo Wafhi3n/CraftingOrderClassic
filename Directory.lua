@@ -12,6 +12,7 @@
 local COC = CraftingOrderClassic
 local Dir = {}
 COC.Directory = Dir
+local L = COC.L
 
 local CraftLink = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
 
@@ -28,8 +29,11 @@ function Dir:OnPresence(kind, who)
         self.online[who] = true
         local r = self.roster and self.roster[who]
         if r and r.source == "added" then
-            print("|cFF33DD88Crafting Order|r ton artisan |cFFFFFFFF" .. who .. "|r est en ligne.")
+            local msg = string.format(L["ton artisan |cFFFFFFFF%s|r est en ligne."], who)
+            print("|cFF33DD88Crafting Order|r " .. msg)
+            if COC.UI and COC.UI.Toast then COC.UI:Toast(msg) end
         end
+        if COC.Orders and COC.Orders.OnArtisanOnline then COC.Orders:OnArtisanOnline(who) end  -- push commande ciblée
         self:Announce()                 -- un nouveau arrive → je (re)publie mes recettes
     else
         self.online[who] = nil
@@ -270,6 +274,17 @@ function Dir:Start()
     if C_GuildInfo and C_GuildInfo.GuildRoster then C_GuildInfo.GuildRoster()
     elseif GuildRoster then GuildRoster() end
     if C_FriendList and C_FriendList.ShowFriends then C_FriendList.ShowFriends() end
+
+    -- Gain de compétence (point gagné / plan appris) → re-capture MES niveaux, ré-annonce (throttlé),
+    -- rafraîchit la fenêtre métier (rang en en-tête) et l'UI. Lisible sans ouvrir la fenêtre.
+    local sk = CreateFrame("Frame")
+    sk:RegisterEvent("CHAT_MSG_SKILL")
+    sk:SetScript("OnEvent", function()
+        Dir:CaptureSkills(); Dir:AnnounceThrottled()
+        local PW = COC.ProfWindow
+        if PW and PW.frame and PW.frame:IsShown() and PW.Refresh then PW:Refresh() end
+        if COC.UI and COC.UI.Refresh then COC.UI:Refresh() end
+    end)
 
     -- Au démarrage, une fois le canal prêt (join async) : je publie mes recettes (Announce) ET
     -- je sollicite les présents (HI) — sinon je n'apprends que ceux qui arrivent APRÈS moi (les

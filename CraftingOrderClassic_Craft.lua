@@ -72,7 +72,12 @@ local CRAFT_API = {
     getNumReag  = function(i) return (GetCraftNumReagents and GetCraftNumReagents(i)) or 0 end,
     getReagInfo = function(i, j) return GetCraftReagentInfo(i, j) end,
     getReagLink = function(i, j) return GetCraftReagentItemLink and GetCraftReagentItemLink(i, j) end,
-    craft       = function(i) if DoCraft then DoCraft(i) end end,
+    craft       = function(_)
+        -- DoCraft est une fonction PROTÉGÉE en Classic Era : un addon ne peut PAS l'appeler (même
+        -- depuis un clic) après avoir neutralisé l'UI native. Le craft d'enchantement passe donc par
+        -- un bouton SÉCURISÉ qui redirige le clic vers le bouton natif Blizzard (cf.
+        -- ProfWindow_Detail : detCreateBtn → CraftCreateButton). Ici : no-op volontaire.
+    end,
 }
 
 -- Table d'API du métier ACTUELLEMENT ouvert (ou nil), + isCraft.
@@ -101,12 +106,18 @@ function Craft:DifficultyColor(difficulty)
     return 0.9, 0.9, 0.9
 end
 
--- Rang du métier ouvert (skill, max) ; nil côté Craft (pas de rang exposé).
+-- Rang du métier ouvert (skill, max). Côté TradeSkill : GetTradeSkillLine. Côté Craft (Enchantement)
+-- l'API n'expose pas le rang → on le lit via l'annuaire (Directory tient mySkills à jour via l'API
+-- skill, lisible sans ouvrir la fenêtre).
 function Craft:OpenRank()
-    if self:IsCraftOpen() then return nil end
-    if GetTradeSkillLine then
+    if not self:IsCraftOpen() and GetTradeSkillLine then
         local _, rank, maxRank = GetTradeSkillLine()
-        return rank, maxRank
+        if rank and rank > 0 then return rank, maxRank end
+    end
+    local key = self:OpenProfessionKey()
+    local D = COC.Directory
+    if key and D and D.mySkills and D.mySkills[key] then
+        return D.mySkills[key][1], D.mySkills[key][2]
     end
     return nil
 end

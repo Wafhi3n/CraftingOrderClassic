@@ -5,6 +5,7 @@
 local COC  = CraftingOrderClassic
 local UI   = COC.UI
 local Skin = UI.Skin
+local L    = COC.L
 
 local ARH    = 40              -- hauteur ligne artisan
 local ASEP   = 212             -- x séparateur sidebar/liste
@@ -12,7 +13,7 @@ local ARX    = 220             -- x zone droite
 local AREDGE = 846
 local ARW    = AREDGE - ARX
 
-local SRC_TAG = { guild = "GUILDE", friend = "AMIS", added = "AJOUTÉ", recent = "CROISÉ" }
+local SRC_TAG = { guild = L["GUILDE"], friend = L["AMIS"], added = L["AJOUTÉ"], recent = L["CROISÉ"] }
 
 local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true) end
 local function trim(s) return s and s:gsub("^%s+", ""):gsub("%s+$", "") or "" end
@@ -33,10 +34,10 @@ function UI:BuildArtisansTab(f)
 
     -- Sidebar : SOURCE
     local srcHdr = panel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    srcHdr:SetPoint("TOPLEFT", 14, -80); srcHdr:SetText("SOURCE")
+    srcHdr:SetPoint("TOPLEFT", 14, -80); srcHdr:SetText(L["SOURCE"])
     srcHdr:SetTextColor(Skin.unpack(Skin.color.textMuted))
 
-    local srcDefs = { {id="all",label="Tous"}, {id="guild",label="Guilde"}, {id="friend",label="Amis"}, {id="added",label="Ajoutés"}, {id="recent",label="Croisés"} }
+    local srcDefs = { {id="all",label=L["Tous"]}, {id="guild",label=L["Guilde"]}, {id="friend",label=L["Amis"]}, {id="added",label=L["Ajoutés"]}, {id="recent",label=L["Croisés"]} }
     self.artSrcBtns = {}
     for i, d in ipairs(srcDefs) do
         local b = Skin.MakeGoldButton(panel, 190, 28, d.label)
@@ -51,14 +52,14 @@ function UI:BuildArtisansTab(f)
 
     -- Sidebar : ajout manuel d'un joueur
     local addHdr = panel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    addHdr:SetPoint("BOTTOMLEFT", 14, 86); addHdr:SetText("AJOUTER UN JOUEUR")
+    addHdr:SetPoint("BOTTOMLEFT", 14, 86); addHdr:SetText(L["AJOUTER UN JOUEUR"])
     addHdr:SetTextColor(Skin.unpack(Skin.color.textMuted))
     local addBox = CreateFrame("EditBox", nil, panel, "InputBoxTemplate")
     addBox:SetSize(150, 20); addBox:SetPoint("BOTTOMLEFT", 16, 60); addBox:SetAutoFocus(false)
     addBox:SetScript("OnEscapePressed", function(b) b:ClearFocus() end)
     addBox:SetScript("OnEnterPressed", function(b) UI:_AddArtisan(b:GetText()); b:SetText(""); b:ClearFocus() end)
     local ghost = panel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    ghost:SetPoint("LEFT", addBox, "LEFT", 4, 0); ghost:SetText("Nom du personnage")
+    ghost:SetPoint("LEFT", addBox, "LEFT", 4, 0); ghost:SetText(L["Nom du personnage"])
     addBox:SetScript("OnTextChanged", function(b) ghost:SetShown(b:GetText() == "") end)
     local addBtn = Skin.MakeGoldButton(panel, 26, 20, "+")
     addBtn:SetPoint("LEFT", addBox, "RIGHT", 6, 0)
@@ -66,7 +67,7 @@ function UI:BuildArtisansTab(f)
 
     -- Zone droite : libellé Métier + pills (construits paresseusement), puis liste
     self.artPillHdr = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    self.artPillHdr:SetPoint("TOPLEFT", ARX, -98); self.artPillHdr:SetText("|cFF888888Métier :|r"); Skin.ApplyShadow(self.artPillHdr)
+    self.artPillHdr:SetPoint("TOPLEFT", ARX, -98); self.artPillHdr:SetText("|cFF888888" .. L["Métier :"] .. "|r"); Skin.ApplyShadow(self.artPillHdr)
     self.artPills = {}
 
     local ascroll = CreateFrame("ScrollFrame", "COCArtScroll", panel, "UIPanelScrollFrameTemplate")
@@ -88,7 +89,7 @@ function UI:_BuildArtPills(panel)
     local x, y, rowH = 50, 0, 24      -- x départ = 50 pour dégager « Métier : »
     local maxW = ARW - 4
     for _, key in ipairs(defs) do
-        local label = (key == "Tous") and "Tous" or Skin.ProfLabel(key)
+        local label = (key == "Tous") and L["Tous"] or Skin.ProfLabel(key)   -- "Tous" = sentinelle (pas localisée)
         local b = Skin.MakeGoldButton(panel, 10, 18, label)
         local w = b.text:GetStringWidth() + 16
         b:SetWidth(w)
@@ -127,8 +128,8 @@ function UI:_AddArtisan(name)
     r.source = "added"; r.recipes = r.recipes or {}; r.manual = true; r.lastSeen = time()
     D.roster[name] = r
     UI.artSource = "added"; UI:_RefreshArtSrcTabs(); UI:RefreshArtisans()
-    print("|cFF33DD88Crafting Order|r artisan ajouté : |cFFFFFFFF" .. name ..
-        "|r |cFF888888(lié quand il sera en ligne avec l'addon)|r")
+    print("|cFF33DD88Crafting Order|r " .. L["artisan ajouté : "] .. "|cFFFFFFFF" .. name ..
+        "|r |cFF888888" .. L["(lié quand il sera en ligne avec l'addon)"] .. "|r")
 end
 
 -- =========================================================================
@@ -164,8 +165,8 @@ function UI:RefreshArtisans()
         n = n + 1; local row = self:_ArtRow(n)
         row.dot:SetOnline(a.online and true or false)
         row.name:SetText("|cFFFFFFFF" .. a.name .. "|r")
-        local lvl = a.r.level and ("niv " .. a.r.level) or "niv ?"
-        row.sub:SetText("|cFF888888" .. (a.online and "En ligne" or "Hors ligne") .. " · " .. lvl .. "|r")
+        local lvl = a.r.level and (L["niv "] .. a.r.level) or L["niv ?"]
+        row.sub:SetText("|cFF888888" .. (a.online and L["En ligne"] or L["Hors ligne"]) .. " · " .. lvl .. "|r")
         local profs = {}
         for p in pairs(a.r.recipes or {}) do profs[#profs + 1] = Skin.ProfLabel(p) end
         table.sort(profs)
@@ -182,7 +183,7 @@ function UI:RefreshArtisans()
     Skin.AutoHideScroll("COCArtScroll", self.artListContent)
     if n == 0 and self.artListRows[1] then
         local row = self:_ArtRow(1)
-        row.dot:SetOnline(nil); row.name:SetText("|cFF888888Aucun artisan dans cette source.|r")
+        row.dot:SetOnline(nil); row.name:SetText("|cFF888888" .. L["Aucun artisan dans cette source."] .. "|r")
         row.sub:SetText(""); row.profs:SetText(""); row.src:SetText(""); row.whisper:Hide()
         row:Show()
     end
@@ -200,6 +201,6 @@ function UI:_ArtRow(i)
     r.profs = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     r.profs:SetPoint("LEFT", 180, 0); r.profs:SetWidth(ARW - 320); r.profs:SetJustifyH("LEFT"); Skin.ApplyShadow(r.profs)
     r.src   = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall"); r.src:SetPoint("RIGHT", -94, 0); Skin.ApplyShadow(r.src)
-    r.whisper = Skin.MakeGoldButton(r, 78, 22, "Chuchoter"); r.whisper:SetPoint("RIGHT", -6, 0)
+    r.whisper = Skin.MakeGoldButton(r, 78, 22, L["Chuchoter"]); r.whisper:SetPoint("RIGHT", -6, 0)
     self.artListRows[i] = r; return r
 end

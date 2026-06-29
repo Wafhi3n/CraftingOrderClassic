@@ -4,6 +4,7 @@
 
 local COC = CraftingOrderClassic
 local PW  = COC.ProfWindow
+local L   = COC.L
 
 local ROW_H, VISIBLE = 16, 23
 
@@ -28,7 +29,7 @@ end
 
 function PW:_BuildRecipes(col)
     local hdr = col:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    hdr:SetPoint("TOPLEFT", 8, -6); hdr:SetText("|cFFE8B84BRecettes|r")
+    hdr:SetPoint("TOPLEFT", 8, -6); hdr:SetText("|cFFE8B84B" .. L["Recettes"] .. "|r")
 
     local search = CreateFrame("EditBox", nil, col, "InputBoxTemplate")
     search:SetSize(116, 16); search:SetPoint("TOPRIGHT", -10, -6); search:SetAutoFocus(false)

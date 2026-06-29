@@ -4,6 +4,7 @@
 local COC  = CraftingOrderClassic
 local UI   = COC.UI
 local Skin = UI.Skin
+local L    = COC.L
 
 local RADIUS = 80
 
@@ -40,7 +41,7 @@ function UI:BuildMinimapButton()
     b:SetScript("OnEnter", function(self)
         GameTooltip:SetOwner(self, "ANCHOR_LEFT")
         GameTooltip:AddLine("|cFF33DD88Crafting Order|r — Classic")
-        GameTooltip:AddLine("Clic : ouvrir le carnet d'ordres", 1, 1, 1)
+        GameTooltip:AddLine(L["Clic : ouvrir le carnet d'ordres"], 1, 1, 1)
         GameTooltip:Show()
     end)
     b:SetScript("OnLeave", function() GameTooltip:Hide() end)

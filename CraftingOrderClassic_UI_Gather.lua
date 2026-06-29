@@ -5,6 +5,7 @@
 local COC  = CraftingOrderClassic
 local UI   = COC.UI
 local Skin = UI.Skin
+local L    = COC.L   -- localisation du chrome (valeurs recipient canoniques en FR — cf. _GatherTargetLabel)
 
 local GLH = 20    -- hauteur ligne ressource
 local ARH = 26    -- hauteur ligne artisan
@@ -47,7 +48,7 @@ end
 -- =========================================================================
 function UI:_BuildGatherLeft(panel)
     local hdr = panel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    hdr:SetPoint("TOPLEFT", 14, -80); hdr:SetText("MÉTIER DE RÉCOLTE")
+    hdr:SetPoint("TOPLEFT", 14, -80); hdr:SetText(L["MÉTIER DE RÉCOLTE"])
     hdr:SetTextColor(Skin.unpack(Skin.color.textMuted))
 
     local gBtn = Skin.MakeGoldButton(panel, LW, 22, "—"); gBtn:SetPoint("TOPLEFT", 12, -98)
@@ -71,7 +72,7 @@ function UI:_BuildGatherLeft(panel)
     local srch = CreateFrame("EditBox", nil, panel, "InputBoxTemplate")
     srch:SetSize(LW, 16); srch:SetPoint("TOPLEFT", 12, -129); srch:SetAutoFocus(false)
     local hint = panel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    hint:SetPoint("LEFT", srch, "LEFT", 4, 0); hint:SetText("○ Rechercher une ressource")
+    hint:SetPoint("LEFT", srch, "LEFT", 4, 0); hint:SetText("○ " .. L["Rechercher une ressource"])
     srch:SetScript("OnTextChanged", function(b)
         hint:SetShown(b:GetText() == "")
         UI.gatherSearch = b:GetText():lower(); UI:RefreshGatherList()
@@ -81,7 +82,7 @@ function UI:_BuildGatherLeft(panel)
     -- Sélecteur d'extension (affiché seulement pour le pseudo-métier « Élémentaire »).
     self.gatherExp = 0   -- 0 = Toutes, 1 = Classic, 2 = TBC, 3 = WotLK
     self.gatherVerPills = {}
-    local verDefs = { {0,"Toutes"}, {1,"Classic"}, {2,"TBC"}, {3,"WotLK"} }
+    local verDefs = { {0,L["Toutes"]}, {1,"Classic"}, {2,"TBC"}, {3,"WotLK"} }
     local vx = 12
     for _, d in ipairs(verDefs) do
         local b = Skin.MakeGoldButton(panel, 10, 16, d[2])
@@ -95,7 +96,7 @@ function UI:_BuildGatherLeft(panel)
     sep1px(panel, 12, SEP - 2, -172)
 
     local lhdr = panel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    lhdr:SetPoint("TOPLEFT", 14, -178); lhdr:SetText("LISTE DES RESSOURCES")
+    lhdr:SetPoint("TOPLEFT", 14, -178); lhdr:SetText(L["LISTE DES RESSOURCES"])
     lhdr:SetTextColor(Skin.unpack(Skin.color.textMuted))
 
     local gscroll = CreateFrame("ScrollFrame", "COCGatherListScroll", panel, "UIPanelScrollFrameTemplate")
@@ -125,12 +126,12 @@ function UI:_BuildGatherRight(panel)
 
     -- Demande quantité
     local qhdr = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    qhdr:SetPoint("TOPLEFT", RX, -128); qhdr:SetText("|cFFE8B84BDemande de récolte — quantité voulue|r"); Skin.ApplyShadow(qhdr)
+    qhdr:SetPoint("TOPLEFT", RX, -128); qhdr:SetText("|cFFE8B84B" .. L["Demande de récolte — quantité voulue"] .. "|r"); Skin.ApplyShadow(qhdr)
 
     -- Case « stacks » : si cochée, la quantité est un nombre de PILES, pas d'unités.
     self.gatherByStack = false
     local stLbl = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    stLbl:SetPoint("TOPRIGHT", -22, -128); stLbl:SetText("stacks"); Skin.ApplyShadow(stLbl)
+    stLbl:SetPoint("TOPRIGHT", -22, -128); stLbl:SetText(L["stacks"]); Skin.ApplyShadow(stLbl)
     local stChk = Skin.MakeGoldButton(panel, 20, 20, "□"); stChk:SetPoint("RIGHT", stLbl, "LEFT", -4, 0)
     -- Icône caisse affichée SUR la case quand « stacks » est coché (sinon □).
     local crateTex = stChk:CreateTexture(nil, "ARTWORK")
@@ -162,7 +163,7 @@ function UI:_BuildGatherRight(panel)
 
     -- Prix par pile
     local pLbl = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    pLbl:SetPoint("TOPLEFT", RX, -288); pLbl:SetText("|cFFE8B84BPrix proposé|r"); Skin.ApplyShadow(pLbl)
+    pLbl:SetPoint("TOPLEFT", RX, -288); pLbl:SetText("|cFFE8B84B" .. L["Prix proposé"] .. "|r"); Skin.ApplyShadow(pLbl)
     self.gatherGold, self.gatherSilver, self.gatherCopper = self:_MakeGSCGather(panel, RX + 96, -286)
 
     sep1px(panel, RX, REDGE, -308)
@@ -185,7 +186,7 @@ function UI:_MakeGSCGather(parent, x, y)
 end
 
 function UI:_BuildGatherArtisanSection(panel)
-    local srcDefs = { {id="guild",label="Guilde"}, {id="friend",label="Amis"}, {id="added",label="Ajoutés"}, {id="recent",label="Croisés"} }
+    local srcDefs = { {id="guild",label=L["Guilde"]}, {id="friend",label=L["Amis"]}, {id="added",label=L["Ajoutés"]}, {id="recent",label=L["Croisés"]} }
     self.gatherSrcBtns = {}
     for i, d in ipairs(srcDefs) do
         local b = Skin.MakeGoldButton(panel, 58, 20, d.label); b:SetPoint("TOPLEFT", RX + (i-1)*62, -317)
@@ -197,7 +198,7 @@ function UI:_BuildGatherArtisanSection(panel)
     end
     self.gatherSrc = "guild"; self.gatherTarget = "all"; self:_RefreshGatherSrcTabs()
 
-    local diffBtn = Skin.MakeGoldButton(panel, 124, 20, "Diffuser à tous"); diffBtn:SetPoint("TOPRIGHT", -22, -317)
+    local diffBtn = Skin.MakeGoldButton(panel, 124, 20, L["Diffuser à tous"]); diffBtn:SetPoint("TOPRIGHT", -22, -317)
     local diffIc = diffBtn:CreateTexture(nil, "OVERLAY"); diffIc:SetSize(14, 14)
     diffIc:SetPoint("LEFT", 5, 0); diffIc:SetTexture(Skin.tex.broadcast)
     diffBtn.text:ClearAllPoints(); diffBtn.text:SetPoint("LEFT", 22, 0)
@@ -211,17 +212,17 @@ function UI:_BuildGatherArtisanSection(panel)
     self.gatherArtContent = ac; self.gatherArtRows = {}
 
     local artLbl = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    artLbl:SetPoint("TOPLEFT", RX, -475); artLbl:SetText("|cFFE8B84BRécolteur :|r"); Skin.ApplyShadow(artLbl)
+    artLbl:SetPoint("TOPLEFT", RX, -475); artLbl:SetText("|cFFE8B84B" .. L["Récolteur :"] .. "|r"); Skin.ApplyShadow(artLbl)
     self.gatherArtisanName = panel:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     self.gatherArtisanName:SetPoint("LEFT", artLbl, "RIGHT", 6, 0); Skin.ApplyShadow(self.gatherArtisanName)
     self:_UpdateGatherArtisanLabel()
 
-    local posterBtn = Skin.MakeGoldButton(panel, 82, 24, "Poster"); posterBtn:SetPoint("BOTTOMRIGHT", -22, 36)
+    local posterBtn = Skin.MakeGoldButton(panel, 82, 24, L["Poster"]); posterBtn:SetPoint("BOTTOMRIGHT", -22, 36)
     posterBtn:SetScript("OnClick", function() UI:DoGatherOrder() end)
 
     self.gatherSelLbl = panel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
     self.gatherSelLbl:SetPoint("BOTTOMLEFT", RX, 40); self.gatherSelLbl:SetWidth(RW - 100); self.gatherSelLbl:SetJustifyH("LEFT")
-    self.gatherSelLbl:SetText("|cFF888888Choisis un métier de récolte puis une ressource.|r")
+    self.gatherSelLbl:SetText("|cFF888888" .. L["Choisis un métier de récolte puis une ressource."] .. "|r")
 end
 
 function UI:_RefreshGatherSrcTabs()
@@ -324,7 +325,7 @@ function UI:RefreshGatherList()
         local row = self:_GatherListRow(i); local e = item.e
         local r, g, b = Skin.RarityColor(e.itemID)
         row.badge:Paint(r, g, b, Skin.FirstChar(item.name), Skin.Icon(e.itemID))
-        local disp = item.name:match("^item:") and "|cFF777777Chargement…|r" or item.name
+        local disp = item.name:match("^item:") and ("|cFF777777" .. L["Chargement…"] .. "|r") or item.name
         row.name:SetText(disp); row.name:SetTextColor(r, g, b)
         if e == self.gatherEntry then row.name:SetTextColor(1, 0.85, 0.27) end
         row.stack:SetText("")
@@ -356,9 +357,12 @@ function UI:_RefreshGatherDetail()
     local e = self.gatherEntry; local c = CL()
     if self.gatherStackChk then self.gatherStackChk.Update() end   -- icône case = objet / caisse
     if not e then
-        self.gatherResBadge:Hide(); self.gatherResName:SetText("|cFF888888Aucune ressource sélectionnée.|r")
+        -- Rien de sélectionné → icône par défaut (point d'interrogation) plutôt qu'un trou.
+        local mr, mg, mb = Skin.unpack(Skin.color.textMuted)
+        self.gatherResBadge:Paint(mr, mg, mb, "?", Skin.tex.unknown)
+        self.gatherResName:SetText("|cFF888888" .. L["Aucune ressource sélectionnée."] .. "|r")
         self.gatherResInfo:SetText(""); self.gatherInfoTxt:SetText("")
-        if self.gatherSelLbl then self.gatherSelLbl:SetText("|cFF888888Choisis un métier de récolte puis une ressource.|r") end
+        if self.gatherSelLbl then self.gatherSelLbl:SetText("|cFF888888" .. L["Choisis un métier de récolte puis une ressource."] .. "|r") end
         return
     end
     local nm = c and c:ItemName(e.itemID) or ("item:"..e.itemID)
@@ -369,13 +373,13 @@ function UI:_RefreshGatherDetail()
     self.gatherResName:SetText(nm); self.gatherResName:SetTextColor(r, g, b)
     local profLbl = Skin.ProfLabel(self.gatherProf or "")
     self.gatherResInfo:SetText("|cFF888888" .. profLbl .. "|r")
-    local unit = self.gatherByStack and "par stack" or "à l'unité"
+    local unit = self.gatherByStack and L["par stack"] or L["à l'unité"]
     if self.gatherProf == "Elemental" then
-        self.gatherInfoTxt:SetText("Objet |cFFE8B84Bélémentaire|r (farmé sur les mobs, pas de métier). Diffusé à tous. Quantité et prix |cFFE8B84B" .. unit .. ".|r")
+        self.gatherInfoTxt:SetText(string.format(L["Objet |cFFE8B84Bélémentaire|r (farmé sur les mobs, pas de métier). Diffusé à tous. Quantité et prix |cFFE8B84B%s.|r"], unit))
     else
-        self.gatherInfoTxt:SetText("Diffusée aux récolteurs ayant |cFFE8B84B" .. profLbl .. ".|r Quantité et prix proposé |cFFE8B84B" .. unit .. ".|r")
+        self.gatherInfoTxt:SetText(string.format(L["Diffusée aux récolteurs ayant |cFFE8B84B%s.|r Quantité et prix proposé |cFFE8B84B%s.|r"], profLbl, unit))
     end
-    self.gatherSelLbl:SetText("Sélection : |cFFFFFFFF"..nm.."|r")
+    self.gatherSelLbl:SetText(L["Sélection : "].."|cFFFFFFFF"..nm.."|r")
 end
 
 function UI:_RefreshGatherArtisans()
@@ -428,19 +432,21 @@ function UI:_GatherArtRow(i)
     self.gatherArtRows[i] = r; return r
 end
 
-local GATHER_TARGET_FR = { guild = "Guilde", friend = "Amis", added = "Ajoutés", recent = "Croisés" }
+-- Valeur CANONIQUE du destinataire (cf. _PostTargetLabel / Orders:VisibleTo).
 function UI:_GatherTargetLabel()
     local t = self.gatherTarget or "all"
-    if t == "all" then return "Tous" end
+    if t == "all"        then return "Tous" end
     if t:sub(1, 1) == "@" then return t:sub(2) end
-    return GATHER_TARGET_FR[t] or "Tous"
+    if t == "guild"      then return "Guilde" end
+    if t == "friend"     then return "Amis" end
+    return "Tous"
 end
 
 function UI:_UpdateGatherArtisanLabel()
     if self.gatherArtisanName then
         local t = self.gatherTarget or "all"
         local col = (t == "all") and "FFAAAAAA" or "FFFFFFFF"
-        self.gatherArtisanName:SetText("|c" .. col .. self:_GatherTargetLabel() .. "|r")
+        self.gatherArtisanName:SetText("|c" .. col .. L[self:_GatherTargetLabel()] .. "|r")
     end
 end
 
@@ -449,7 +455,7 @@ end
 -- =========================================================================
 function UI:DoGatherOrder()
     local e = self.gatherEntry
-    if not e then self.gatherSelLbl:SetText("|cFFFF4444Choisis d'abord une ressource.|r"); return end
+    if not e then self.gatherSelLbl:SetText("|cFFFF4444" .. L["Choisis d'abord une ressource."] .. "|r"); return end
     local qty  = tonumber(self.gatherQty:GetText()) or 1
     local g    = tonumber(self.gatherGold:GetText()) or 0
     local s    = tonumber(self.gatherSilver:GetText()) or 0
@@ -468,6 +474,6 @@ function UI:DoGatherOrder()
     self.gatherGold:SetText("0"); self.gatherSilver:SetText("0"); self.gatherCopper:SetText("0")
     self.gatherQty:SetText("1"); self.gatherEntry = nil
     self.gatherByStack = false; if self.gatherStackChk then self.gatherStackChk.Update() end
-    self.gatherSelLbl:SetText("|cFF33DD33Commande de récolte postée !|r")
+    self.gatherSelLbl:SetText("|cFF33DD33" .. L["Commande de récolte postée !"] .. "|r")
     self:ShowTab("orders")
 end

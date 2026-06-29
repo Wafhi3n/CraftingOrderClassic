@@ -9,6 +9,7 @@
 local COC  = CraftingOrderClassic
 local UI   = COC.UI
 local Skin = UI.Skin
+local L    = COC.L
 local ProfOrders = {}
 COC.ProfOrders = ProfOrders
 
@@ -47,21 +48,26 @@ function ProfOrders:Build()
 
     local title = p:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     title:SetPoint("TOPLEFT", 16, -14); Skin.ApplyShadow(title)
-    title:SetText("|cFFE8B84BCommandes|r"); self.title = title
+    title:SetText("|cFFE8B84B" .. L["Commandes"] .. "|r"); self.title = title
 
     local sub = p:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
     sub:SetPoint("TOPLEFT", 16, -32); self.sub = sub
 
     -- Bascule : masque l'overlay (laisse la fenêtre métier vanilla seule). Persistant.
-    local toggle = Skin.MakeGoldButton(p, 78, 18, "Masquer")
+    local toggle = Skin.MakeGoldButton(p, 78, 18, L["Masquer"])
     toggle:SetPoint("TOPRIGHT", -12, -12)
     toggle:SetScript("OnClick", function()
         COC.db.profCompanion = false; p:Hide()
-        print("|cFF33DD88Crafting Order|r overlay métier masqué — |cFFFFFFFF/co prof|r pour le réafficher.")
+        print("|cFF33DD88Crafting Order|r " .. L["overlay métier masqué — |cFFFFFFFF/co prof|r pour le réafficher."])
     end)
 
+    -- Passe à la fenêtre CUSTOM complète (3 colonnes) — l'inverse du bouton « Vue Blizzard ».
+    local toCustom = Skin.MakeGoldButton(p, 168, 18, L["» Vue Crafting Order"])
+    toCustom:SetPoint("TOPLEFT", 14, -50)
+    toCustom:SetScript("OnClick", function() if COC.ProfWindow then COC.ProfWindow:SetEnabled(true) end end)
+
     local scroll = CreateFrame("ScrollFrame", "CraftingOrderProfOrdersScroll", p, "UIPanelScrollFrameTemplate")
-    scroll:SetPoint("TOPLEFT", 12, -52); scroll:SetPoint("BOTTOMRIGHT", -30, 12)
+    scroll:SetPoint("TOPLEFT", 12, -74); scroll:SetPoint("BOTTOMRIGHT", -30, 12)
     local content = CreateFrame("Frame", nil, scroll); content:SetSize(200, 10); scroll:SetScrollChild(content)
     self.content = content; self.rows = {}
     return p
@@ -75,6 +81,13 @@ function ProfOrders:_Row(i)
     r.name:SetPoint("TOPLEFT", 22, -2); r.name:SetWidth(150); r.name:SetJustifyH("LEFT"); Skin.ApplyShadow(r.name)
     r.sub = r:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
     r.sub:SetPoint("TOPLEFT", 22, -16); r.sub:SetWidth(184); r.sub:SetJustifyH("LEFT"); Skin.ApplyShadow(r.sub)
+    r:EnableMouse(true)
+    r:SetScript("OnEnter", function(self)
+        if not self.tipItemID then return end
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        if pcall(GameTooltip.SetHyperlink, GameTooltip, "item:" .. self.tipItemID) then GameTooltip:Show() else GameTooltip:Hide() end
+    end)
+    r:SetScript("OnLeave", GameTooltip_Hide)
     self.rows[i] = r; return r
 end
 
@@ -105,12 +118,13 @@ function ProfOrders:Refresh()
         n = n + 1; local row = self:_Row(n); local o = it.o
         local nm = (c and c:ItemName(o.itemID)) or (o.spellID and c and c:RecipeName(o.spellID)) or ("item:" .. (o.itemID or 0))
         local r, g, b = Skin.RarityColor(o.itemID)
-        row.badge:Paint(r, g, b, Skin.FirstChar(nm), Skin.Icon(o.itemID, o.spellID))
+        row.tipItemID = o.itemID
+        row.badge:Paint(r, g, b, Skin.FirstChar(nm), Skin.Icon(o.itemID, o.spellID) or Skin.tex.unknown)
         local able = canFulfill(o)
         -- Marqueur devant le nom : ✓ je sais faire, ✗ hors de ma portée, rien si indéterminé.
         local tag = (able == true) and "|cFF33DD33✓|r " or (able == false) and "|cFFFF5555✗|r " or ""
-        row.name:SetText(tag .. ((nm:match("^item:") and "Chargement…") or nm)); row.name:SetTextColor(r, g, b)
-        local who = (it.kind == "inbound") and ("entrante · " .. o.buyer) or (o.buyer or "?")
+        row.name:SetText(tag .. ((nm:match("^item:") and L["Chargement…"]) or nm)); row.name:SetTextColor(r, g, b)
+        local who = (it.kind == "inbound") and (L["entrante · "] .. o.buyer) or (o.buyer or "?")
         local qty = o.byStack and ((o.qty or 1) .. " st") or ("×" .. (o.qty or 1))
         local pr  = o.price and ("  |cFFFFDD00" .. o.price .. "|r") or ""
         row.sub:SetText("|cFF999999" .. qty .. " · " .. who .. "|r" .. pr)
@@ -119,7 +133,7 @@ function ProfOrders:Refresh()
     for i = n + 1, #self.rows do self.rows[i]:Hide() end
     self.content:SetHeight(math.max(n * RH, 10))
     Skin.AutoHideScroll("CraftingOrderProfOrdersScroll", self.content)
-    self.title:SetText("|cFFE8B84BCommandes|r |cFF888888(" .. n .. ")|r")
+    self.title:SetText("|cFFE8B84B" .. L["Commandes"] .. "|r |cFF888888(" .. n .. ")|r")
 end
 
 function ProfOrders:OnProfShow()
@@ -145,6 +159,33 @@ function ProfOrders:Reenable()
     self:OnProfShow()
 end
 
+-- Mutex métier : on a détaché les frames natives de UIPanelWindows (pour les neutraliser sans Hide),
+-- ce qui débraye la fermeture mutuelle native. On la refait à la main → un seul métier à la fois.
+-- Renvoie true si on a effectivement fermé l'AUTRE métier (cas bascule Enchantement↔Couture).
+local function closeOtherProfession(event)
+    if event:find("^CRAFT") then
+        if _G.TradeSkillFrame and TradeSkillFrame:IsShown() and CloseTradeSkill then CloseTradeSkill(); return true end
+    elseif _G.CraftFrame and CraftFrame:IsShown() and CloseCraft then CloseCraft(); return true end
+    return false
+end
+
+-- SHOW d'un métier : neutralise INSTANTANÉMENT le natif (zéro flash Blizzard avant notre fenêtre),
+-- ferme l'autre métier éventuellement ouvert, puis affiche notre fenêtre custom (ou l'overlay).
+function ProfOrders:_OnShow(PW, windowOn, event)
+    if not windowOn then
+        local fn = function() ProfOrders:OnProfShow() end
+        if C_Timer then C_Timer.After(0.2, fn) else fn() end
+        return
+    end
+    local switched = closeOtherProfession(event)
+    PW:NeutralizeNative()                          -- instantané → le natif ne clignote jamais
+    if switched and C_Timer then
+        C_Timer.After(0.1, function() PW:OnProfessionShow() end)   -- laisse le *_CLOSE de l'autre passer
+    else
+        PW:OnProfessionShow()
+    end
+end
+
 -- Coordinateur unique des events fenêtre métier : route vers la fenêtre CUSTOM (si activée via
 -- `/co profwindow`) ou vers l'overlay « commandes du métier » sinon.
 function ProfOrders:Start()
@@ -157,14 +198,21 @@ function ProfOrders:Start()
         local PW = COC.ProfWindow
         local windowOn = PW and PW:IsEnabled()
         if event:find("SHOW$") then
-            local fn = windowOn and function() PW:OnProfessionShow() end or function() ProfOrders:OnProfShow() end
-            if C_Timer then C_Timer.After(0.2, fn) else fn() end
+            ProfOrders:_OnShow(PW, windowOn, event)
         elseif event:find("UPDATE$") then
-            if windowOn and PW.frame and PW.frame:IsShown() then PW:Refresh()
+            -- Skill-up / plan appris pendant la session : re-capture mon niveau (rang à jour en en-tête)
+            -- et ré-annonce throttlé (les autres voient mon nouveau skill). [[craftingorder-social-vision]]
+            if COC.Directory then COC.Directory:CaptureSkills(); COC.Directory:AnnounceThrottled() end
+            if windowOn then
+                if PW.frame and PW.frame:IsShown() then PW:Refresh() else PW:OnProfessionShow() end
             elseif ProfOrders.panel and ProfOrders.panel:IsShown() then ProfOrders:Refresh() end
         else   -- *_CLOSE
-            if PW then PW:OnProfessionClose() end
-            ProfOrders:OnProfHide()
+            if windowOn and COC.Craft and COC.Craft:GetOpenProfessionInfo() then
+                PW:OnProfessionShow()          -- bascule : un autre métier reste encore ouvert
+            else
+                if PW then PW:OnProfessionClose() end
+                ProfOrders:OnProfHide()
+            end
         end
     end)
 end

@@ -14,8 +14,12 @@
 local COC = CraftingOrderClassic
 local Orders = {}
 COC.Orders = Orders
+local L = COC.L
 
 local CraftLink = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
+
+local ORDER_TTL  = 6 * 3600   -- 6 h : au-delà, une commande OUVERTE est tenue pour expirée (cachée/élaguée)
+local REBROADCAST = 2 * 3600  -- 2 h : ré-émission périodique de MES commandes ouvertes (anti-oubli réseau)
 
 local function me()  return (UnitName and UnitName("player")) or "?" end
 local function pmsg(m) print("|cFF33DD88Crafting Order|r " .. m) end
@@ -46,7 +50,28 @@ function Orders:Broadcast(action, o)
     elseif action == "ACK"    then payload = string.format("ORD|ACK|%s|%s", o.id, o.acceptedBy or "")
     elseif action == "DONE"   then payload = string.format("ORD|DONE|%s|%s", o.id, o.acceptedBy or "")
     end
-    if payload then CraftLink:Send(payload, "global") end
+    if payload then
+        CraftLink:Send(payload, "global")
+        -- Portée guilde : on double l'envoi sur le transport GUILD pour toucher les membres qui ne
+        -- sont pas sur le canal caché (Amis/@Nom restent un filtre de réception, pas de transport dédié).
+        if action == "NEW" and o.recipient == "Guilde" then CraftLink:Send(payload, "guild") end
+    end
+end
+
+-- Routage par destinataire. Le canal étant global, tout le monde REÇOIT tout : ce filtre décide ce
+-- qui m'est destiné (affichage Carnet + acceptation). Valeurs canoniques (FR) côté réseau : "Tous",
+-- "Guilde", "Amis", ou un nom de joueur. NB : "Guilde"/"Amis" s'évaluent via MES relations (buyer ∈
+-- ma guilde / mes amis) — best-effort v1 (on ne connaît pas les relations du posteur).
+function Orders:VisibleTo(o, who)
+    who = who or me()
+    local rcpt = o.recipient
+    if not rcpt or rcpt == "" or rcpt == "Tous" then return true end
+    if o.buyer == who then return true end          -- ma propre commande : toujours visible
+    if rcpt == who then return true end             -- ciblée nommément sur moi (@Nom)
+    local D = COC.Directory
+    if rcpt == "Guilde" then return (D and D._guildSet  and D._guildSet[o.buyer]) == true end
+    if rcpt == "Amis"   then return (D and D._friendSet and D._friendSet[o.buyer]) == true end
+    return false                                    -- ciblée sur un AUTRE joueur → pas pour moi
 end
 
 -- ------------------------------------------------------------------
@@ -111,6 +136,7 @@ function Orders:Accept(id)
     local o = id and COC.db.orders[id]
     if not o or o.status ~= "open" then pmsg("commande non disponible : " .. tostring(id)); return end
     if o.buyer == me() then pmsg("c'est ta propre commande."); return end
+    if not self:VisibleTo(o) then pmsg("cette commande ne t'est pas destinée."); return end
     o.status = "accepted"; o.acceptedBy = me(); self:Broadcast("ACK", o)
     self:WhisperPub(o)
     pmsg(string.format("commande acceptée : %s (%s)", id, itemName(o.itemID)))
@@ -180,10 +206,12 @@ end
 
 -- Alerte « commande pour TOI » : un joueur t'a ciblé nommément (recipient == ton nom).
 function Orders:AlertTargeted(o)
-    local nm = self:OrderName(o)
-    pmsg(string.format("|cFFFFCC00◆ commande pour TOI|r de |cFFFFFFFF%s|r : %s%s%s",
-        o.buyer, nm, (o.qty and o.qty > 1) and (" ×" .. o.qty) or "",
-        o.price and (" — |cFFFFDD00" .. o.price .. "|r") or ""))
+    local nm  = self:OrderName(o)
+    local qty = (o.qty and o.qty > 1) and (" ×" .. o.qty) or ""
+    local pr  = o.price and (" — |cFFFFDD00" .. o.price .. "|r") or ""
+    local msg = string.format(L["|cFFFFCC00◆ commande pour TOI|r de |cFFFFFFFF%s|r : %s%s%s"], o.buyer, nm, qty, pr)
+    pmsg(msg)
+    if COC.UI and COC.UI.Toast then COC.UI:Toast(msg) end
     pcall(function() PlaySound(SOUNDKIT and SOUNDKIT.TELL_MESSAGE or 3081, "Master") end)
     if COC.UI and COC.UI.Refresh then COC.UI:Refresh() end
 end
@@ -204,10 +232,36 @@ end
 -- Lecture (cache) + commandes texte (avant l'UI)
 -- ------------------------------------------------------------------
 function Orders:All()
-    local out = {}
-    for _, o in pairs(COC.db.orders or {}) do out[#out + 1] = o end
+    local out, who, now = {}, me(), time()
+    for _, o in pairs(COC.db.orders or {}) do
+        -- Masque les commandes OUVERTES expirées (TTL) et celles qui ne me sont pas destinées (routage).
+        local expired = o.status == "open" and (now - (o.ts or now)) > ORDER_TTL
+        if not expired and self:VisibleTo(o, who) then out[#out + 1] = o end
+    end
     table.sort(out, function(a, b) return (a.ts or 0) > (b.ts or 0) end)
     return out
+end
+
+-- Élague du cache les commandes ouvertes trop vieilles (sauf les miennes, gardées pour réémission).
+function Orders:PruneExpired()
+    if not COC.db then return end
+    local now = time()
+    for id, o in pairs(COC.db.orders or {}) do
+        if o.status == "open" and o.buyer ~= me() and (now - (o.ts or now)) > ORDER_TTL then
+            COC.db.orders[id] = nil
+        end
+    end
+end
+
+-- Un artisan se connecte (présence JOIN) : si j'ai une commande OUVERTE qui le cible nommément, je la
+-- lui (re)pousse — il était peut-être hors-ligne au moment du post. Jitté (anti-burst).
+function Orders:OnArtisanOnline(who)
+    if not (who and CraftLink and C_Timer) then return end
+    for _, o in pairs(COC.db.orders or {}) do
+        if o.buyer == me() and o.status == "open" and o.recipient == who then
+            C_Timer.After(math.random() * 2, function() Orders:Broadcast("NEW", o) end)
+        end
+    end
 end
 
 function Orders:PrintList()
@@ -246,6 +300,18 @@ end
 function Orders:Start()
     if not (COC.db and CraftLink) then return end
     COC.db.orders = COC.db.orders or {}
+    self:PruneExpired()                                  -- entretien au démarrage
     CraftLink:RegisterHandler("ORD", function(s, m) Orders:OnNetwork(s, m) end)
     CraftLink:RegisterHandler("HI",  function() Orders:OnHello() end)
+    -- Ré-émission périodique de MES commandes ouvertes/acceptées : un porteur qui rejoint le canal
+    -- sans envoyer de HI finit par les recevoir (sinon il ne voit que ce qui est posté après lui).
+    if C_Timer and C_Timer.NewTicker then
+        C_Timer.NewTicker(REBROADCAST, function()
+            for _, o in pairs(COC.db.orders or {}) do
+                if o.buyer == me() and (o.status == "open" or o.status == "accepted") then
+                    Orders:Broadcast("NEW", o)
+                end
+            end
+        end)
+    end
 end

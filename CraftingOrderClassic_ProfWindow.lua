@@ -9,6 +9,7 @@
 local COC  = CraftingOrderClassic
 local UI   = COC.UI
 local Skin = UI.Skin
+local L    = COC.L
 local PW   = {}
 COC.ProfWindow = PW
 
@@ -72,7 +73,7 @@ function PW:_BuildHeader(f)
     rank:SetPoint("TOP", title, "BOTTOM", 0, -2); rank:SetTextColor(Skin.unpack(Skin.color.text))
     Skin.ApplyShadow(rank); self.rankFS = rank
 
-    local vanilla = Skin.MakeGoldButton(f, 96, 20, "Vue Blizzard")
+    local vanilla = Skin.MakeGoldButton(f, 96, 20, L["Vue Blizzard"])
     vanilla:SetPoint("TOPRIGHT", -36, -12)
     vanilla:SetScript("OnClick", function() PW:SetEnabled(false) end)
 
@@ -98,9 +99,16 @@ end
 function PW:Build()
     if self.frame then return end
     local f = CreateFrame("Frame", "CraftingOrderProfWindow", UIParent, "BackdropTemplate")
-    f:SetSize(self.FRAME_W, self.FRAME_H); f:SetPoint("CENTER")
+    f:SetSize(self.FRAME_W, self.FRAME_H)
+    local pos = COC.db and COC.db.profWinPos               -- position persistée (drag) ou centre par défaut
+    if pos then f:SetPoint(pos[1], UIParent, pos[2], pos[3], pos[4]) else f:SetPoint("CENTER") end
     f:SetMovable(true); f:EnableMouse(true); f:RegisterForDrag("LeftButton")
-    f:SetScript("OnDragStart", f.StartMoving); f:SetScript("OnDragStop", f.StopMovingOrSizing)
+    f:SetScript("OnDragStart", f.StartMoving)
+    f:SetScript("OnDragStop", function(fr)
+        fr:StopMovingOrSizing()
+        local p, _, rp, x, y = fr:GetPoint()
+        if COC.db then COC.db.profWinPos = { p, rp, x, y } end
+    end)
     f:SetClampedToScreen(true); f:SetFrameStrata("HIGH"); Skin.SkinFrameBackdrop(f); f:Hide()
     self.frame = f
     self:_BuildHeader(f)
@@ -121,7 +129,7 @@ end
 local ORD_H = 30
 function PW:_BuildOrders(col)
     local hdr = col:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    hdr:SetPoint("TOPLEFT", 8, -6); hdr:SetText("|cFFE8B84BCommandes|r"); self.ordHdr = hdr
+    hdr:SetPoint("TOPLEFT", 8, -6); hdr:SetText("|cFFE8B84B" .. L["Commandes"] .. "|r"); self.ordHdr = hdr
 
     local scroll = CreateFrame("ScrollFrame", "CraftingOrderProfWinOrdScroll", col, "UIPanelScrollFrameTemplate")
     scroll:SetPoint("TOPLEFT", 6, -28); scroll:SetPoint("BOTTOMRIGHT", -24, 6)
@@ -137,6 +145,13 @@ function PW:_OrdRow(i)
     r.name:SetPoint("TOPLEFT", 22, -2); r.name:SetWidth(180); r.name:SetJustifyH("LEFT"); Skin.ApplyShadow(r.name)
     r.sub = r:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
     r.sub:SetPoint("TOPLEFT", 22, -16); r.sub:SetWidth(184); r.sub:SetJustifyH("LEFT"); Skin.ApplyShadow(r.sub)
+    r:EnableMouse(true)
+    r:SetScript("OnEnter", function(self)
+        if not self.tipItemID then return end
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        if pcall(GameTooltip.SetHyperlink, GameTooltip, "item:" .. self.tipItemID) then GameTooltip:Show() else GameTooltip:Hide() end
+    end)
+    r:SetScript("OnLeave", GameTooltip_Hide)
     self.ordRows[i] = r; return r
 end
 
@@ -158,11 +173,12 @@ function PW:RefreshOrders()
         n = n + 1; local row = self:_OrdRow(n); local o = it.o
         local nm = (c and c:ItemName(o.itemID)) or (o.spellID and c and c:RecipeName(o.spellID)) or ("item:" .. (o.itemID or 0))
         local r, g, b = Skin.RarityColor(o.itemID)
-        row.badge:Paint(r, g, b, Skin.FirstChar(nm), Skin.Icon(o.itemID, o.spellID))
+        row.tipItemID = o.itemID
+        row.badge:Paint(r, g, b, Skin.FirstChar(nm), Skin.Icon(o.itemID, o.spellID) or Skin.tex.unknown)
         local able = PW.CanFulfill(o)
         local tag = (able == true) and "|cFF33DD33✓|r " or (able == false) and "|cFFFF5555✗|r " or ""
-        row.name:SetText(tag .. ((nm:match("^item:") and "Chargement…") or nm)); row.name:SetTextColor(r, g, b)
-        local who = (it.kind == "inbound") and ("entrante · " .. o.buyer) or (o.buyer or "?")
+        row.name:SetText(tag .. ((nm:match("^item:") and L["Chargement…"]) or nm)); row.name:SetTextColor(r, g, b)
+        local who = (it.kind == "inbound") and (L["entrante · "] .. o.buyer) or (o.buyer or "?")
         local qty = o.byStack and ((o.qty or 1) .. " st") or ("×" .. (o.qty or 1))
         row.sub:SetText("|cFF999999" .. qty .. " · " .. who .. "|r" .. (o.price and ("  |cFFFFDD00" .. o.price .. "|r") or ""))
         row:Show()
@@ -170,7 +186,7 @@ function PW:RefreshOrders()
     for i = n + 1, #self.ordRows do self.ordRows[i]:Hide() end
     self.ordContent:SetHeight(math.max(n * ORD_H, 10))
     Skin.AutoHideScroll("CraftingOrderProfWinOrdScroll", self.ordContent)
-    self.ordHdr:SetText("|cFFE8B84BCommandes|r |cFF888888(" .. n .. ")|r")
+    self.ordHdr:SetText("|cFFE8B84B" .. L["Commandes"] .. "|r |cFF888888(" .. n .. ")|r")
 end
 
 -- ------------------------------------------------------------------
@@ -210,11 +226,11 @@ function PW:SetEnabled(on)
     if COC.db then COC.db.profWindow = on and true or false end
     if on then
         if _G.TradeScannerDB then TradeScannerDB.replaceProfWindow = false end   -- GE laisse la main
-        print("|cFF33DD88Crafting Order|r fenêtre métier custom |cFF33DD33activée|r — ouvre un métier. (Guild Economy laisse la main.)")
+        print("|cFF33DD88Crafting Order|r " .. L["fenêtre métier custom |cFF33DD33activée|r — ouvre un métier. (Guild Economy laisse la main.)"])
         self:OnProfessionShow()
     else
         self:Hide(); self:RestoreNative()
-        print("|cFF33DD88Crafting Order|r fenêtre métier custom |cFFFFCC00désactivée|r (vue Blizzard).")
+        print("|cFF33DD88Crafting Order|r " .. L["fenêtre métier custom |cFFFFCC00désactivée|r (vue Blizzard)."])
         -- L'overlay « commandes du métier » reprend la main si une fenêtre est ouverte.
         if COC.ProfOrders and COC.ProfOrders.OnProfShow then COC.ProfOrders:OnProfShow() end
     end

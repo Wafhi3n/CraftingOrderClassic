@@ -7,17 +7,22 @@
 local COC     = CraftingOrderClassic
 local Inbound = {}
 COC.Inbound   = Inbound
+local L       = COC.L
 
 local CraftLink = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
 
 local EXPIRY   = 1800   -- 30 min
 local MAX_IN   = 60
 
--- Mots-clés « demande » (FR + EN). Un message doit en contenir un + un lien d'objet CRAFTABLE.
-local KW_REQUEST = {
-    "WTB", "ACH", "ACHAT", "BUY", "B>", "CHERCHE", "RECHERCHE", "ISO", "LF ", "LFW",
-    "NEED", "BESOIN", "CRAFT", "ENCHANT", "RECETTE", "FABRIQU",
-}
+-- Mots-clés « demande d'achat / de craft » (FR + EN). STEM = sous-chaîne (conjugaisons : achat,
+-- achète, cherchent, crafting…) ; TOKEN = mot ENTIER requis pour les sigles courts ambigus
+-- (sinon « ACH » ⊂ « eACH », « LF » ⊂ « woLF », « ISO » ⊂ « comparISOn »).
+local KW_REQ_STEM  = { "ACHAT", "ACHET", "CHERCHE", "RECHERCHE", "BESOIN", "FABRIQU", "RECETTE", "ENCHANT", "CRAFT", "BUY", "NEED" }
+local KW_REQ_TOKEN = { "WTB", "WTC", "ISO", "LF", "B>" }
+-- Mots-clés « OFFRE » (vente OU service d'artisan) : si présents → ce n'est PAS une demande, on
+-- ignore. WTS = vendre ; LFW = « looking for work » (un ARTISAN qui propose ses services, pas un
+-- client) ; « your mats » = il craft avec TES réactifs. NB : « LF » (looking for) reste une demande.
+local KW_OFFER     = { "WTS", "VDS", "S>", "VEND", "SELL", "LFW", "YOUR MATS", "VOS MATS" }
 
 local function me() return (UnitName and UnitName("player")) or "?" end
 local function pmsg(m) print("|cFF33DD88Crafting Order|r " .. m) end
@@ -27,9 +32,30 @@ local function StripMarkup(msg)
     return msg
 end
 
+-- Le mot-clé est-il un MOT ENTIER (non collé à une lettre/chiffre) ? Évite ACH⊂EACH, LF⊂WOLF.
+local function findToken(up, kw)
+    local s = up:find(kw, 1, true)
+    while s do
+        local b, a = up:sub(s - 1, s - 1), up:sub(s + #kw, s + #kw)
+        if not b:match("%w") and not a:match("%w") then return true end
+        s = up:find(kw, s + 1, true)
+    end
+    return false
+end
+
 local function HasRequestKW(msg)
     local up = " " .. msg:upper() .. " "
-    for _, kw in ipairs(KW_REQUEST) do if up:find(kw, 1, true) then return true end end
+    for _, kw in ipairs(KW_REQ_STEM)  do if up:find(kw, 1, true) then return true end end
+    for _, kw in ipairs(KW_REQ_TOKEN) do if findToken(up, kw)    then return true end end
+    return false
+end
+
+-- Offre (vente WTS, ou service d'artisan LFW / « your mats ») ? → jamais une commande entrante.
+local function IsOffer(msg)
+    local up = " " .. msg:upper() .. " "
+    for _, kw in ipairs(KW_OFFER) do
+        if (#kw <= 3 and findToken(up, kw)) or (#kw > 3 and up:find(kw, 1, true)) then return true end
+    end
     return false
 end
 
@@ -64,6 +90,7 @@ end
 -- ------------------------------------------------------------------
 function Inbound:OnChat(msg, player, source)
     if not (msg and player) or player == me() then return end
+    if IsOffer(msg) then return end              -- WTS (vente) ou LFW (artisan offrant) = pas une demande
     if not HasRequestKW(msg) then return end
     local ids = ExtractItemIDs(msg)
     if #ids == 0 then return end
@@ -101,12 +128,13 @@ end
 function Inbound:Alert(e)
     local c = CraftLink
     local nm = (c and c:ItemName(e.itemID)) or ("item:" .. e.itemID)
-    local src = (e.source == "guild") and "guilde" or "commerce"
+    local src = (e.source == "guild") and L["guilde"] or L["commerce"]
     local qty = (e.qty and e.qty > 1) and (" ×" .. e.qty) or ""
     local pr  = e.price and (" — |cFFFFDD00" .. e.price .. "|r") or ""
-    pmsg(string.format("|cFFFF8800◆ entrante|r |cFFFFFFFF%s|r (%s) : %s%s%s",
-        e.buyer, src, nm, qty, pr))
-    if e.canCraft then print("   |cFF33DD33→ tu sais la crafter|r — Carnet › Entrantes") end
+    local msg = string.format(L["|cFFFF8800◆ entrante|r |cFFFFFFFF%s|r (%s) : %s%s%s"], e.buyer, src, nm, qty, pr)
+    pmsg(msg)
+    if COC.UI and COC.UI.Toast then COC.UI:Toast(msg) end
+    if e.canCraft then print(L["   |cFF33DD33→ tu sais la crafter|r — Carnet › Entrantes"]) end
     pcall(function() PlaySound(SOUNDKIT and SOUNDKIT.TELL_MESSAGE or 3081, "Master") end)
 end
 

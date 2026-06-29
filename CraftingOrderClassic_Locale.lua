@@ -47,7 +47,7 @@ if loc == "enUS" or loc == "enGB" then
         ["(cocher = je fournis)"] = "(check = I provide)", ["Commission"] = "Commission", ["Qté"] = "Qty",
         ["Destinataire :"] = "Recipient:", ["Diffuser à tous"] = "Broadcast to all", ["Poster"] = "Post",
         ["Choisis un métier puis un plan."] = "Pick a profession then a recipe.",
-        ["Rechercher un plan"] = "Search a recipe", ["Qualité : Toutes"] = "Quality: All",
+        ["Rechercher un plan"] = "Search a recipe", ["Qualité : Toutes"] = "Quality: All", ["Qualité : "] = "Quality: ",
         ["Sélection : "] = "Selection: ", ["Commande postée !"] = "Order posted!",
         ["Choisis d'abord un plan."] = "Pick a recipe first.", ["Aucun plan sélectionné."] = "No recipe selected.",
         ["Ajoutés"] = "Added", ["fournis"] = "provided", ["Chargement…"] = "Loading…",
@@ -59,18 +59,36 @@ if loc == "enUS" or loc == "enGB" then
         ["Aucune ressource sélectionnée."] = "No resource selected.", ["par stack"] = "per stack", ["à l'unité"] = "per unit",
         ["Commande de récolte postée !"] = "Gather order posted!", ["Choisis d'abord une ressource."] = "Pick a resource first.",
         ["Toutes"] = "All",
+        ["Objet |cFFE8B84Bélémentaire|r (farmé sur les mobs, pas de métier). Diffusé à tous. Quantité et prix |cFFE8B84B%s.|r"] =
+            "|cFFE8B84BElemental|r item (farmed off mobs, no profession). Broadcast to all. Quantity and price |cFFE8B84B%s.|r",
+        ["Diffusée aux récolteurs ayant |cFFE8B84B%s.|r Quantité et prix proposé |cFFE8B84B%s.|r"] =
+            "Broadcast to gatherers with |cFFE8B84B%s.|r Quantity and offered price |cFFE8B84B%s.|r",
         -- Artisans
         ["SOURCE"] = "SOURCE", ["AJOUTER UN JOUEUR"] = "ADD A PLAYER", ["Nom du personnage"] = "Character name",
         ["Métier :"] = "Profession:", ["Chuchoter"] = "Whisper", ["Aucun artisan dans cette source."] = "No crafter in this source.",
         ["En ligne"] = "Online", ["Hors ligne"] = "Offline", ["niv "] = "lvl ", ["niv ?"] = "lvl ?",
         ["GUILDE"] = "GUILD", ["AMIS"] = "FRIEND", ["AJOUTÉ"] = "ADDED", ["CROISÉ"] = "MET",
+        ["artisan ajouté : "] = "crafter added: ",
+        ["(lié quand il sera en ligne avec l'addon)"] = "(linked when seen online with the addon)",
         -- Fenêtre métier (ProfWindow)
         ["Recettes"] = "Recipes", ["Commandes"] = "Orders", ["Réactifs :"] = "Reagents:",
         ["Créer"] = "Create", ["Créer tout"] = "Create All", ["Vue Blizzard"] = "Blizzard view",
         ["Sélectionne une recette."] = "Select a recipe.", ["Produit "] = "Makes ",
         ["entrante · "] = "incoming · ", ["réactifs insuffisants."] = "not enough reagents.",
+        ["fenêtre métier custom |cFF33DD33activée|r — ouvre un métier. (Guild Economy laisse la main.)"] =
+            "custom profession window |cFF33DD33enabled|r — open a profession. (Guild Economy stands down.)",
+        ["fenêtre métier custom |cFFFFCC00désactivée|r (vue Blizzard)."] =
+            "custom profession window |cFFFFCC00disabled|r (Blizzard view).",
+        ["» Vue Crafting Order"] = "» Crafting Order view", ["Masquer"] = "Hide",
+        ["overlay métier masqué — |cFFFFFFFF/co prof|r pour le réafficher."] =
+            "profession overlay hidden — |cFFFFFFFF/co prof|r to show it again.",
         -- Minimap
         ["Clic : ouvrir le carnet d'ordres"] = "Click: open the order ledger",
+        -- Entrantes (alertes chat)
+        ["|cFFFF8800◆ entrante|r |cFFFFFFFF%s|r (%s) : %s%s%s"] = "|cFFFF8800◆ incoming|r |cFFFFFFFF%s|r (%s): %s%s%s",
+        ["   |cFF33DD33→ tu sais la crafter|r — Carnet › Entrantes"] = "   |cFF33DD33→ you can craft it|r — Ledger › Incoming",
+        ["|cFFFFCC00◆ commande pour TOI|r de |cFFFFFFFF%s|r : %s%s%s"] = "|cFFFFCC00◆ order for YOU|r from |cFFFFFFFF%s|r: %s%s%s",
+        ["ton artisan |cFFFFFFFF%s|r est en ligne."] = "your crafter |cFFFFFFFF%s|r is online.",
     }
     for k, v in pairs(en) do L[k] = v end
 end

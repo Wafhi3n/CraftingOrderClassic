@@ -148,6 +148,7 @@ Skin.tex = {
     broadcast = "Interface\\FriendsFrame\\BroadcastIcon",
     workorder = "Interface\\GossipFrame\\WorkOrderGossipIcon",
     crate     = "Interface\\Icons\\INV_Crate_03",   -- récolte « par stack »
+    unknown   = "Interface\\Icons\\INV_Misc_QuestionMark",   -- repli « rien de sélectionné »
 }
 
 -- Pastille de présence : texture statut du jeu, avec méthode SetOnline(bool/nil). nil = masquée.
@@ -236,9 +237,11 @@ function Skin.MakeSeparator(parent, offsetY)
 end
 
 -- Bouton or « maison » (échappe aux re-skins externes rouges). Expose SetText/SetSelected.
-function Skin.MakeGoldButton(parent, w, h, text)
+function Skin.MakeGoldButton(parent, w, h, text, template)
     local small = (h <= 16)
-    local b = CreateFrame("Button", nil, parent, "BackdropTemplate")
+    -- `template` optionnel : permet un bouton sécurisé ("SecureActionButtonTemplate") pour rediriger
+    -- un clic vers une fonction protégée de Blizzard (ex. DoCraft des enchantements).
+    local b = CreateFrame("Button", nil, parent, template and (template .. ", BackdropTemplate") or "BackdropTemplate")
     b:SetSize(w, h)
     b:SetBackdrop({
         bgFile = "Interface\\ChatFrame\\ChatFrameBackground",

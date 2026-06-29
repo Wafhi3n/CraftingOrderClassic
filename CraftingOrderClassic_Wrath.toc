@@ -1,8 +1,10 @@
 ## Interface: 30403
 ## Title: Crafting Order - Classic
 ## Notes: Réseau global et social de commandes de craft (autonome — sans guilde). /co pour le statut.
-## Author:
+## Author: Wafhi3n
 ## Version: 0.1.0
+## X-Category: Auction & Economy
+## X-Website: https://github.com/Wafhi3n/CraftingOrderClassic
 ## SavedVariables: CraftingOrderClassicDB
 
 # Variante WRATH (chargée par le client WotLK Classic). Charge le dataset WotLK (recettes
