@@ -1,27 +1,34 @@
-# Crafting Order — Classic — CurseForge description
+# Crafting & Gathering Order — Classic — CurseForge description
 
 > Source of truth for the CurseForge page description. Copy-paste into the addon page on each notable
 > update. (Not packaged — see `.pkgmeta` ignore.)
 
 ---
 
-**Crafting Order — Classic** brings a real craft-order board to WoW Classic — without needing a
-shared guild or the Auction House. Post what you want crafted or gathered once, and every addon user
-on your realm can see and answer it.
+**Crafting & Gathering Order — Classic** brings a real work-order board to WoW Classic — for **both
+crafting and gathering** — without needing a shared guild or the Auction House. Post what you want
+crafted or gathered once, and every addon user on your realm can see and answer it.
 
 **Post once, reach the realm**
 
 A clean, tavern-styled window lets you post **craft orders** (pick a profession and recipe, tick the
 reagents you'll provide, set a commission) and **gather orders** (ore, herbs, leather, fish — by the
-stack or by the unit). Orders broadcast over a hidden realm-wide channel — there's no central server
-and no shared guild required.
+unit or by the stack, always shown with the real total, e.g. *3 stacks (60)*). Orders broadcast over a
+hidden realm-wide channel — there's no central server and no shared guild required.
 
 **Send it to the right people**
 
 Broadcast to **everyone**, or scope an order to your **Guild**, your **Friends**, or one **specific
-crafter**. Targeted orders only reach eligible recipients, and are pushed to that crafter the moment
-they log in. Open orders re-broadcast periodically and expire on their own, so the board never fills
-with stale requests.
+player**. Targeted orders only reach eligible recipients, and are pushed to them the moment they log
+in. Open orders re-broadcast periodically and expire on their own, so the board never fills with stale
+requests.
+
+**Never miss an order meant for you**
+
+When an order lands for you — broadcast to all, sent to your guild or friends, or addressed to you by
+name — you get a toast, a chat line, and a sound. Dial it in with **/co notify**: notify on
+*everything*, only *directed* orders (named + guild + friends), only orders that *name* you, or turn
+it *off* entirely.
 
 **Find the crafter you need**
 
@@ -33,8 +40,9 @@ crafter comes online. Hover any player to see their professions in the tooltip.
 **Catches requests from non-users too**
 
 Requests posted in **/trade** and **/guild** by players who don't run the addon are captured into an
-**Incoming** queue — accept one and it whispers them your offer automatically. Selling posts (WTS)
-and crafters advertising their services (LFW) are filtered out, so only real requests show up.
+**Incoming** queue — accept one and it whispers them your offer automatically. Selling posts (WTS) and
+crafters advertising their services (LFW) are filtered out, so only real requests show up. Toggle the
+scanner anytime with **/co scan**.
 
 **A profession window that does the work** *(optional)*
 
@@ -52,7 +60,8 @@ addon is completely standalone (it embeds the shared **CraftLink** library) and 
 **Commands**
 
 Use **/co help** for the full list. Popular: **/co** (open the board), **/co profwindow** (custom
-profession window), **/co refresh** (re-poll the directory).
+profession window), **/co notify** (notification scope), **/co scan** (toggle the /trade + /guild
+scanner), **/co refresh** (re-poll the directory).
 
 **Perfect for**
 

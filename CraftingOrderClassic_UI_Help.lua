@@ -119,15 +119,6 @@ local function content()
     return out
 end
 
-function UI:BuildHelpTab(f)
-    local panel = CreateFrame("Frame", nil, f); self.insetPanel(panel, f); self.helpPanel = panel
-
-    local scroll = CreateFrame("ScrollFrame", "CraftingOrderHelpScroll", panel, "UIPanelScrollFrameTemplate")
-    scroll:SetPoint("TOPLEFT", 12, -74); scroll:SetPoint("BOTTOMRIGHT", -32, 22)
-    local body = CreateFrame("Frame", nil, scroll); body:SetSize(BODY_W, 10); scroll:SetScrollChild(body)
-    self.helpBody = body
-end
-
 -- Une section : icône + titre en tête, puis une ligne par item (bullet broadcast + texte wrap).
 local function paintSection(body, sec, y)
     local ic = body:CreateTexture(nil, "OVERLAY")
@@ -150,13 +141,21 @@ local function paintSection(body, sec, y)
     return y - 10
 end
 
-function UI:RefreshHelp()
-    local body = self.helpBody
-    for _, child in ipairs({ body:GetChildren() }) do child:Hide(); child:SetParent(nil) end
-    for _, tex in ipairs({ body:GetRegions() }) do tex:Hide() end
+-- Contenu figé (aucune dépendance à l'état de jeu) : peint UNE fois à la construction, pas de
+-- pool de lignes ni de re-render à chaque Refresh() comme les autres onglets (données vivantes).
+function UI:BuildHelpTab(f)
+    local panel = CreateFrame("Frame", nil, f); self.insetPanel(panel, f); self.helpPanel = panel
+
+    local scroll = CreateFrame("ScrollFrame", "CraftingOrderHelpScroll", panel, "UIPanelScrollFrameTemplate")
+    scroll:SetPoint("TOPLEFT", 12, -74); scroll:SetPoint("BOTTOMRIGHT", -32, 22)
+    local body = CreateFrame("Frame", nil, scroll); body:SetSize(BODY_W, 10); scroll:SetScrollChild(body)
+    self.helpBody = body
 
     local y = -2
     for _, sec in ipairs(content()) do y = paintSection(body, sec, y) end
     body:SetHeight(math.max(-y, 10))
-    Skin.AutoHideScroll("CraftingOrderHelpScroll", body)
+end
+
+function UI:RefreshHelp()
+    Skin.AutoHideScroll("CraftingOrderHelpScroll", self.helpBody)
 end

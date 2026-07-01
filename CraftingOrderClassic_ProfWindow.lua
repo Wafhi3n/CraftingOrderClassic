@@ -149,6 +149,20 @@ function PW:_OrdersModuleMissing(col)
 end
 
 -- ------------------------------------------------------------------
+-- Bouton de retour sur la fenêtre NATIVE (vue Blizzard) : pose un petit bouton doré sur
+-- TradeSkillFrame / CraftFrame pour rebasculer vers la vue custom sans passer par /co profwindow.
+-- ------------------------------------------------------------------
+function PW:EnsureNativeToggle(frame, key)
+    if not frame then return end
+    self._nativeToggle = self._nativeToggle or {}
+    if self._nativeToggle[key] then return end
+    local btn = Skin.MakeGoldButton(frame, 150, 20, L["» Vue Crafting Order"])
+    btn:SetPoint("TOPRIGHT", -66, -8)
+    btn:SetScript("OnClick", function() PW:SetEnabled(true) end)
+    self._nativeToggle[key] = btn
+end
+
+-- ------------------------------------------------------------------
 -- Refresh global (coalescé)
 -- ------------------------------------------------------------------
 function PW:Hide() if self.frame then self.frame:Hide() end end

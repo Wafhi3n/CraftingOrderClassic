@@ -39,7 +39,11 @@ function ProfOrders:Start()
             if windowOn and PW.frame and PW.frame:IsShown() then PW:Refresh()
             elseif windowOn then PW:OnProfessionShow() end
         elseif not windowOn then
-            return                                  -- « Vue Blizzard » : on laisse la fenêtre native
+            if PW and event:find("SHOW$") then       -- « Vue Blizzard » : pose le bouton de retour
+                if event:find("^CRAFT") then PW:EnsureNativeToggle(_G.CraftFrame, "craft")
+                else PW:EnsureNativeToggle(_G.TradeSkillFrame, "trade") end
+            end
+            return                                  -- on laisse la fenêtre native pour le reste
         elseif event:find("SHOW$") then
             ProfOrders:_OnShow(PW, event)
         else                                        -- *_CLOSE

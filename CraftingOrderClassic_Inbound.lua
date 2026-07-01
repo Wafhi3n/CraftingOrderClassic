@@ -22,7 +22,9 @@ local KW_REQ_TOKEN = { "WTB", "WTC", "ISO", "LF", "B>" }
 -- Mots-clés « OFFRE » (vente OU service d'artisan) : si présents → ce n'est PAS une demande, on
 -- ignore. WTS = vendre ; LFW = « looking for work » (un ARTISAN qui propose ses services, pas un
 -- client) ; « your mats » = il craft avec TES réactifs. NB : « LF » (looking for) reste une demande.
-local KW_OFFER     = { "WTS", "VDS", "S>", "VEND", "SELL", "LFW", "YOUR MATS", "VOS MATS" }
+-- OFFER/PROPOSE : un artisan qui annonce « Crafting [X], also offer... » matche le stem CRAFT
+-- (demande) sans jamais contenir WTS/VEND ; OFFER/PROPOSE lève l'ambiguïté (bug 2026-07-01).
+local KW_OFFER     = { "WTS", "VDS", "S>", "VEND", "SELL", "LFW", "YOUR MATS", "VOS MATS", "OFFER", "PROPOSE" }
 
 local function me() return (UnitName and UnitName("player")) or "?" end
 local function pmsg(m) print("|cFF33DD88Crafting Order|r " .. m) end
@@ -129,6 +131,10 @@ function Inbound:Add(e)
 end
 
 function Inbound:Alert(e)
+    -- Même discipline que les toasts P2P (Orders:_ShouldAlert) : « /co notify off » et les joueurs
+    -- mutés ne déclenchent AUCUNE notif (chat/toast/son). L'entrée reste dans le Carnet › Entrantes.
+    if COC.db and (COC.db.notifyScope == "off"
+        or (COC.db.mutedPlayers and COC.db.mutedPlayers[e.buyer])) then return end
     local c = CraftLink
     local nm = (c and c:ItemName(e.itemID)) or ("item:" .. e.itemID)
     local src = (e.source == "guild") and L["guilde"] or L["commerce"]

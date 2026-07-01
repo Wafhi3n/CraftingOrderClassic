@@ -39,7 +39,7 @@ function UI:Build()
 
     local title = f:CreateFontString(nil, "OVERLAY")
     title:SetFontObject(Skin.WordmarkFont())
-    title:SetPoint("TOP", 0, -14); title:SetText("Crafting Order")
+    title:SetPoint("TOP", 0, -14); title:SetText("Crafting & Gathering Order")
     local sub = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     sub:SetPoint("TOP", title, "BOTTOM", 0, -1); sub:SetText(L["Classic · canal global"])
     sub:SetTextColor(0.6, 1.0, 0.6); Skin.ApplyShadow(sub)

@@ -113,6 +113,19 @@ function COC:NotifyCmd(arg)
     p(string.format(L["notifications : |cFFFFFFFF%s|r — /co notify [all|directed|named|off]"], cur))
 end
 
+-- /co scan [on|off] : (dés)active le scanner du canal Commerce / de la guilde qui repère les demandes
+-- de craft postées en clair (« WTB [objet] ») et les remonte en Entrantes + notif. Persistant via
+-- COC.db.scanInbound (défaut ON). OFF = plus aucune détection depuis le chat public.
+function COC:ScanCmd(arg)
+    local L = COC.L
+    arg = (arg or ""):lower()
+    if arg == "on"  then COC.db.scanInbound = true
+    elseif arg == "off" then COC.db.scanInbound = false end
+    local on = COC.db and COC.db.scanInbound ~= false
+    p(string.format(L["scan chat commerce/guilde : |cFFFFFFFF%s|r — /co scan [on|off]"],
+        on and L["actif"] or L["coupé"]))
+end
+
 -- Avertit UNE FOIS que l'addon rejoint son canal réseau dédié (transparence : le joueur le verra
 -- dans sa liste de canaux). Déclenché à la première acquisition du canal. Dialogue défini
 -- paresseusement (Locale chargé au runtime).
@@ -173,6 +186,7 @@ function COC:Help()
     print("  |cFFFFFFFF/co profwindow|r — " .. L["basculer fenêtre métier custom / vue Blizzard"])
     print("  |cFFFFFFFF/co channel [on|off]|r — " .. L["(dés)activer le canal réseau global"])
     print("  |cFFFFFFFF/co notify [all|directed|named|off]|r — " .. L["portée des notifications de commande"])
+    print("  |cFFFFFFFF/co scan [on|off]|r — " .. L["détecter les demandes de craft postées en chat (commerce/guilde)"])
     print("  |cFFFFFFFF/co debug|r — |cFFFF8800" .. L["mode solo"] .. "|r : " .. L["injecte/retire un réseau fictif (artisans + commandes)"])
     print("  |cFFFFFFFF/co trace|r — |cFFFF8800" .. L["diag"] .. "|r : " .. L["journalise le réseau dans la SavedVariable (off | clear | dump)"])
 end
@@ -185,7 +199,7 @@ function COC:Slash(msg)
     if cmd == "" then
         if COC.UI then COC.UI:Toggle() end
     elseif cmd == "status" then COC:Status()
-    elseif cmd == "refresh" or cmd == "scan" then
+    elseif cmd == "refresh" then
         if D then D:Refresh(); p(COC.L["réseau : sollicitation envoyée (HI global + PING proximité)."]) end
     elseif cmd == "orders" or cmd == "list" then if O then O:PrintList() end
     elseif cmd == "post"   then if O then O:PostFromInput(rest) end
@@ -202,6 +216,7 @@ function COC:Slash(msg)
         if COC.ProfWindow then COC.ProfWindow:SetEnabled(not COC.ProfWindow:IsEnabled()) end
     elseif cmd == "channel" or cmd == "canal" then COC:ChannelCmd(rest)
     elseif cmd == "notify" or cmd == "notif" then COC:NotifyCmd(rest)
+    elseif cmd == "scan" then COC:ScanCmd(rest)
     elseif cmd == "beacon" then COC:BeaconDiag()
     elseif cmd == "wipe"   then COC:WipeRoster()
     elseif cmd == "debug"  then if COC.Debug then COC.Debug:Toggle() end

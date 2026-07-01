@@ -6,7 +6,13 @@ local COC = CraftingOrderClassic
 local PW  = COC.ProfWindow
 local L   = COC.L
 
-local ROW_H, VISIBLE = 16, 23
+-- ROW_H = hauteur d'une ligne ; VISIBLE = taille du POOL de lignes physiques réutilisées.
+-- INVARIANT : VISIBLE doit être ≥ au nb de lignes que le viewport peut afficher, sinon les
+-- derniers items sont INatteignables (le scroll max = n - viewportRows ; le plus grand index
+-- rendu = maxOff + VISIBLE ; s'il est < n, la queue de liste ne s'affiche jamais).
+-- Viewport recettes ≈ 398 px (col 430 - 26 haut - 6 bas) / 16 ≈ 25 lignes → 26 avec marge.
+-- (bug 2026-07-01 : à 23, Bolt of Woolen/Linen Cloth manquaient en bas de la Couture.)
+local ROW_H, VISIBLE = 16, 26
 
 function PW:_BuildRecipeRow(parent, i)
     local row = CreateFrame("Button", nil, parent)

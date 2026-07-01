@@ -68,6 +68,11 @@ if loc == "enUS" or loc == "enGB" then
         ["portée des notifications de commande"] = "order notification scope",
         ["notifications : |cFFFFFFFF%s|r — /co notify [all|directed|named|off]"] =
             "notifications: |cFFFFFFFF%s|r — /co notify [all|directed|named|off]",
+        ["détecter les demandes de craft postées en chat (commerce/guilde)"] =
+            "detect craft requests posted in chat (trade/guild)",
+        ["scan chat commerce/guilde : |cFFFFFFFF%s|r — /co scan [on|off]"] =
+            "trade/guild chat scan: |cFFFFFFFF%s|r — /co scan [on|off]",
+        ["actif"] = "on", ["coupé"] = "off",
         ["mode solo"] = "solo mode",
         ["injecte/retire un réseau fictif (artisans + commandes)"] = "inject/remove a fake network (crafters + orders)",
         ["journalise le réseau dans la SavedVariable (off | clear | dump)"] =

@@ -1,17 +1,30 @@
-# Changelog — Crafting Order — Classic
+# Changelog — Crafting & Gathering Order — Classic
 
-## v0.1.0 — first public build
+## v1.0.0 — first stable release
+
+_Since the `0.0.1` beta:_ renamed to **Crafting & Gathering Order — Classic** (full gathering-order
+support); inbound scanner treats **OFFER / PROPOSE** as crafter ads so they're no longer misfiled as
+requests; inbound alerts now honor the `/co notify` scope and per-player mutes; a **"» Crafting Order
+view"** button on the native profession/craft window returns you to the custom view; and the recipe
+list pool was widened (23 → 26 rows) so the bottom of long lists is reachable again (e.g. *Bolt of
+Woolen / Linen Cloth* in Tailoring).
 
 The standalone, global, social craft-order network. Highlights of this first release:
 
 **Order ledger & posting.** Post craft and gather requests from a tavern-skinned window (Ledger /
 Order / Gather / Artisans tabs) or from chat (`/co post`). Browse, accept, deliver and cancel.
-Reagent "I provide" ticks when posting a craft. Order **quality filter** (minimum rarity).
+Reagent "I provide" ticks when posting a craft. Order **quality filter** (minimum rarity). Gather
+requests can be sized **by the unit or by the stack**, and always render with the real total so
+there's no guessing — *3 stacks (60)* rather than a cryptic *3 st*.
 
 **Recipient routing.** Target an order to **Everyone**, your **Guild**, your **Friends**, or a
 **specific player**. Scoped orders are only shown to / acceptable by eligible recipients; guild
 orders also relay over the guild channel. Recipient values are language-neutral on the wire so FR
 and EN clients agree.
+
+**Order notifications.** When an order meant for you arrives — broadcast, guild, friends, or you by
+name — you get a toast, a chat line and a sound. Tune it with `/co notify`: *all* (default),
+*directed* (named + guild + friends), *named* (only orders that name you), or *off*.
 
 **Persistence & retry.** Open orders re-broadcast every ~2 h, are pushed to a targeted crafter the
 instant they come online, and expire after 6 h.
@@ -30,7 +43,7 @@ reopens for others and the buyer is notified (a name-targeted order shows as *De
 
 **Chat capture.** `/trade` and `/guild` requests from players without the addon land in an *Incoming*
 queue. WTS (selling) and LFW (crafters advertising) are excluded; word-boundary keyword matching
-avoids false positives (e.g. "each" no longer matches "ACH").
+avoids false positives (e.g. "each" no longer matches "ACH"). Toggle the scanner with `/co scan`.
 
 **Custom profession window** (`/co profwindow`, experimental). 3-column browser (recipes · reagents
 with Create / Create All · related orders) replacing the Blizzard window, with a round-trip to
