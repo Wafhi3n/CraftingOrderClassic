@@ -22,6 +22,7 @@ CraftingOrderClassic_UI.lua
 CraftingOrderClassic_UI_Post.lua
 CraftingOrderClassic_UI_Gather.lua
 CraftingOrderClassic_UI_Artisans.lua
+CraftingOrderClassic_UI_Help.lua
 CraftingOrderClassic_Social.lua
 CraftingOrderClassic_Minimap.lua
 CraftingOrderClassic_ProfOrders.lua
@@ -33,4 +34,5 @@ CraftingOrderClassic_ProfWindow_Orders.lua
 Directory.lua
 Orders.lua
 CraftingOrderClassic_Inbound.lua
+CraftingOrderClassic_Handoff.lua
 Debug.lua

@@ -22,6 +22,13 @@ local RW    = 818 - RX
 local GATHER_PROFS = { "Mining", "Herbalism", "Skinning", "Fishing" }
 
 local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true) end
+-- Même logique que _UI_Post.lua : un métier est « connu » via son niveau de skill (SK) OU une recette
+-- captée (RK). Crucial en récolte : Skinning/Herbalism/Fishing n'émettent AUCUN RK → seul r.skill les
+-- porte. inSource respecte les drapeaux de relation (un ajouté aussi ami compte dans « Amis »).
+local function knowsProf(r, p) return (r.skill and r.skill[p]) or (r.recipes and r.recipes[p]) or false end
+local function inSource(r, src)
+    return (src == "friend" and r.isFriend) or (src == "guild" and r.isGuild) or (r.source or "recent") == src
+end
 local function sep1px(parent, x1, x2, y)
     local s = parent:CreateTexture(nil, "ARTWORK"); s:SetHeight(1)
     s:SetColorTexture(Skin.color.separator[1], Skin.color.separator[2], Skin.color.separator[3], 0.5)
@@ -202,15 +209,14 @@ function UI:_BuildGatherArtisanSection(panel)
     local diffBtn = Skin.MakeGoldButton(panel, 124, 20, L["Diffuser à tous"]); diffBtn:SetPoint("TOPRIGHT", -22, -317)
     local diffIc = diffBtn:CreateTexture(nil, "OVERLAY"); diffIc:SetSize(14, 14)
     diffIc:SetPoint("LEFT", 5, 0); diffIc:SetTexture(Skin.tex.broadcast)
-    diffBtn.text:ClearAllPoints(); diffBtn.text:SetPoint("LEFT", 22, 0)
+    diffBtn.text:ClearAllPoints(); diffBtn.text:SetPoint("LEFT", 22, 0); self.gatherDiffBtn = diffBtn
+    -- Sélectionne la cible « Tous » (diffusion globale) ; on poste ensuite via « Poster » (iso Commande).
     diffBtn:SetScript("OnClick", function()
         UI.gatherTarget = "all"; UI:_RefreshGatherArtisans()
     end)
 
-    local ascroll = CreateFrame("ScrollFrame", "COCGatherArtScroll", panel, "UIPanelScrollFrameTemplate")
-    ascroll:SetPoint("TOPLEFT", RX, -342); ascroll:SetSize(RW, 5 * ARH)
-    local ac = CreateFrame("Frame", nil, ascroll); ac:SetSize(RW - 22, 10); ascroll:SetScrollChild(ac)
-    self.gatherArtContent = ac; self.gatherArtRows = {}
+    -- Ligne « Toute la guilde / Tous les amis » épinglée en tête + liste (cf. UI:_BuildAllRowAndScroll).
+    self:_BuildAllRowAndScroll(panel, "COCGatherArtScroll", "gather", -340)
 
     local artLbl = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     artLbl:SetPoint("TOPLEFT", RX, -475); artLbl:SetText("|cFFE8B84B" .. L["Récolteur :"] .. "|r"); Skin.ApplyShadow(artLbl)
@@ -392,8 +398,7 @@ function UI:_RefreshGatherArtisans()
     local prof = (self.gatherProf == "Elemental") and nil or self.gatherProf
     local list = {}
     for name, rd in pairs(D.roster or {}) do
-        local artSrc = rd.source or "guild"
-        if artSrc == src and (not prof or (rd.recipes and rd.recipes[prof])) then
+        if inSource(rd, src) and (not prof or knowsProf(rd, prof)) then
             list[#list+1] = {name=name, r=rd, online=D.online[name]}
         end
     end
@@ -405,9 +410,17 @@ function UI:_RefreshGatherArtisans()
     for _, a in ipairs(list) do
         n = n + 1; local row = self:_GatherArtRow(n)
         row.dot:SetOnline(a.online and true or false)
+        -- Métiers affichés = skill ∪ recipes (les récoltes ne vivent que dans skill).
+        local profset = {}
+        for p2 in pairs(a.r.recipes or {}) do profset[p2] = true end
+        for p2 in pairs(a.r.skill   or {}) do profset[p2] = true end
         local profs2 = {}
-        for p2 in pairs(a.r.recipes or {}) do profs2[#profs2+1] = Skin.ProfLabel(p2) end
-        row.name:SetText("|cFFFFFFFF"..a.name.."|r  |cFF888888"..table.concat(profs2, " · ").."|r")
+        for p2 in pairs(profset) do profs2[#profs2+1] = Skin.ProfLabel(p2) end
+        table.sort(profs2)
+        -- Niveau du métier de récolte ciblé (ex. « Skinning 320/375 »), lisible sans ouvrir la fenêtre.
+        local sk = a.r.skill and prof and a.r.skill[prof]
+        local skTxt = sk and ("|cFF888888"..sk[1].."/"..sk[2].."|r  ") or ""
+        row.name:SetText("|cFFFFFFFF"..a.name.."|r  "..skTxt.."|cFF888888"..table.concat(profs2, " · ").."|r")
         row.src:SetText("|cFF888888"..(a.r.source or ""):upper().."|r")
         row.artEntry = a; row.selTex:SetShown(UI.gatherTarget == "@" .. a.name)
         row:SetScript("OnClick", function()
@@ -418,7 +431,7 @@ function UI:_RefreshGatherArtisans()
     for i = n+1, #self.gatherArtRows do self.gatherArtRows[i]:Hide() end
     self.gatherArtContent:SetHeight(math.max(n * ARH, 10))
     Skin.AutoHideScroll("COCGatherArtScroll", self.gatherArtContent)
-    self:_UpdateGatherArtisanLabel()
+    self:_RefreshAllRow("gather"); self:_UpdateGatherArtisanLabel()
 end
 
 function UI:_GatherArtRow(i)

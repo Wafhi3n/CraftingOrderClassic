@@ -214,16 +214,14 @@ function UI:_BuildPostArtisanSection(panel)
     local diffBtn = Skin.MakeGoldButton(panel, 124, 20, L["Diffuser à tous"]); diffBtn:SetPoint("TOPRIGHT", -22, -337)
     local diffIc = diffBtn:CreateTexture(nil, "OVERLAY"); diffIc:SetSize(14, 14)
     diffIc:SetPoint("LEFT", 5, 0); diffIc:SetTexture(Skin.tex.broadcast)
-    diffBtn.text:ClearAllPoints(); diffBtn.text:SetPoint("LEFT", 22, 0)
-    -- Raccourci : cible Tous ET poste directement (sinon le bouton « ne faisait rien »).
+    diffBtn.text:ClearAllPoints(); diffBtn.text:SetPoint("LEFT", 22, 0); self.postDiffBtn = diffBtn
+    -- Sélectionne la cible « Tous » (diffusion globale) ; on poste ensuite via « Poster » (iso Récolte).
     diffBtn:SetScript("OnClick", function()
-        UI.postTarget = "all"; UI:RefreshPostArtisans(); UI:DoPostOrder()
+        UI.postTarget = "all"; UI:RefreshPostArtisans()
     end)
 
-    local ascroll = CreateFrame("ScrollFrame", "COCPostArtScroll", panel, "UIPanelScrollFrameTemplate")
-    ascroll:SetPoint("TOPLEFT", RX, -362); ascroll:SetSize(RW, 5 * ARH)
-    local ac = CreateFrame("Frame", nil, ascroll); ac:SetSize(RW - 22, 10); ascroll:SetScrollChild(ac)
-    self.postArtContent = ac; self.postArtRows = {}
+    -- Ligne « Toute la guilde / Tous les amis » épinglée en tête + liste (cf. UI:_BuildAllRowAndScroll).
+    self:_BuildAllRowAndScroll(panel, "COCPostArtScroll", "post", -360)
 
     local artLbl = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     artLbl:SetPoint("TOPLEFT", RX, -495); artLbl:SetText("|cFFE8B84B" .. L["Destinataire :"] .. "|r"); Skin.ApplyShadow(artLbl)
@@ -231,7 +229,7 @@ function UI:_BuildPostArtisanSection(panel)
     self.postArtisanName:SetPoint("LEFT", artLbl, "RIGHT", 6, 0); Skin.ApplyShadow(self.postArtisanName)
     self:_UpdateArtisanLabel()
 
-    local posterBtn = Skin.MakeGoldButton(panel, 82, 24, "Poster"); posterBtn:SetPoint("BOTTOMRIGHT", -22, 36)
+    local posterBtn = Skin.MakeGoldButton(panel, 82, 24, L["Poster"]); posterBtn:SetPoint("BOTTOMRIGHT", -22, 36)
     posterBtn:SetScript("OnClick", function() UI:DoPostOrder() end)
 
     self.postSelLbl = panel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
@@ -423,7 +421,7 @@ function UI:RefreshPostArtisans()
     for i = n+1, #self.postArtRows do self.postArtRows[i]:Hide() end
     self.postArtContent:SetHeight(math.max(n * ARH, 10))
     Skin.AutoHideScroll("COCPostArtScroll", self.postArtContent)
-    self:_UpdateArtisanLabel()
+    self:_RefreshAllRow("post"); self:_UpdateArtisanLabel()
 end
 
 function UI:_PostArtRow(i)
@@ -491,6 +489,7 @@ function UI:DoPostOrder()
         profession = self.postProf, provided = provided,
         recipient  = self:_PostTargetLabel(),
     })
+    if COC.Beacon then COC:Beacon() end   -- balise TEXTE de découverte (clic = hardware event)
     self.postGold:SetText("0"); self.postSilver:SetText("0"); self.postCopper:SetText("0")
     self.postQty:SetText("1"); self.postEntry = nil; self.postProvide = {}
     self.postSelLbl:SetText("|cFF33DD33" .. L["Commande postée !"] .. "|r")

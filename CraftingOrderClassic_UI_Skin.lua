@@ -34,9 +34,11 @@ Skin.unpack = unpackc
 
 -- Localisation des métiers (clé interne EN du catalogue → libellé FR). Fallback = la clé.
 -- TODO multilingue : dériver du nom de ligne de compétence localisé selon le client.
+-- NB : le catalogue enregistre le Secourisme sous "First Aid" (Vanilla) OU "FirstAid" (TBC/Wrath,
+-- incohérence entre saveurs) — les deux clés doivent être mappées ici.
 Skin.profFR = {
     Alchemy="Alchimie", Blacksmithing="Forge", Cooking="Cuisine", Enchanting="Enchantement",
-    Engineering="Ingénierie", ["First Aid"]="Secourisme", Fishing="Pêche", Herbalism="Herboristerie",
+    Engineering="Ingénierie", ["First Aid"]="Secourisme", FirstAid="Secourisme", Fishing="Pêche", Herbalism="Herboristerie",
     Leatherworking="Travail du cuir", Mining="Minage", Poisons="Poisons", Skinning="Dépeçage",
     Tailoring="Couture", Jewelcrafting="Joaillerie", Inscription="Calligraphie",
     Elemental="Élémentaire",
@@ -48,7 +50,7 @@ Skin.profSpellID = {
     Alchemy        = 2259,  Blacksmithing  = 2018,  Enchanting    = 7411,
     Engineering    = 4036,  Herbalism      = 2383,  Jewelcrafting = 25229,
     Leatherworking = 2108,  Mining         = 2575,  Skinning      = 8613,
-    Tailoring      = 3908,  Cooking        = 2550,  ["First Aid"] = 3273,
+    Tailoring      = 3908,  Cooking        = 2550,  ["First Aid"] = 3273,  FirstAid = 3273,
     Fishing        = 7620,  Inscription    = 45357,
 }
 function Skin.ProfIcon(key)
@@ -65,6 +67,7 @@ Skin.statusFR = {
     accepted  = { "Acceptée",   "FF33CCFF" },
     done      = { "Livrée",     "FF33DD33" },
     cancelled = { "Annulée",    "FF888888" },
+    declined  = { "Refusée",    "FFFF4444" },
 }
 function Skin.StatusInfo(s) local t = Skin.statusFR[s or "open"] or Skin.statusFR.open; return L[t[1]], t[2] end
 
@@ -77,6 +80,29 @@ function Skin.RarityColor(itemID)
         end
     end
     return unpackc(Skin.color.gold)
+end
+
+-- Libellé de quantité UNIQUE et cohérent d'un ordre (Carnet, carte vue métier, Confiées, toasts).
+-- Deux modes selon o.byStack :
+--   • à l'unité → « ×N »
+--   • par pile  → « N piles (total) » où total = N × taille de pile (8ᵉ retour de GetItemInfo ;
+--     20 pour Heavy Hide) → on donne le nombre concret d'objets voulus. Taille inconnue (objet pas
+--     encore en cache / enchant sans itemID) → repli « N piles » sans le total.
+-- Accepte toute table portant {qty, byStack, itemID} (ordre OU ligne Handoff:_Row).
+function Skin.QtyText(o)
+    local n = o.qty or 1
+    if not o.byStack then return "×" .. n end
+    local word = (n > 1) and L["piles"] or L["pile"]
+    local stackSize = o.itemID and GetItemInfo and select(8, GetItemInfo(o.itemID))
+    if stackSize and stackSize > 1 then return n .. " " .. word .. " (" .. (n * stackSize) .. ")" end
+    return n .. " " .. word
+end
+
+-- Variante pour les alertes chat/toast : préfixe un espace et masque le « ×1 » trivial (mais garde
+-- « 1 pile (20) », qui porte une info réelle). Renvoie "" quand il n'y a rien d'utile à afficher.
+function Skin.QtySuffix(o)
+    if not o.byStack and (o.qty or 1) <= 1 then return "" end
+    return " " .. Skin.QtyText(o)
 end
 
 -- Premier caractère (UTF-8) en capitale — pour le badge de rareté.

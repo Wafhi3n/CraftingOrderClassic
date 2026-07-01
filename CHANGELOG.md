@@ -16,6 +16,14 @@ and EN clients agree.
 **Persistence & retry.** Open orders re-broadcast every ~2 h, are pushed to a targeted crafter the
 instant they come online, and expire after 6 h.
 
+**Keep it for a capable friend.** Orders (and captured `/trade`·`/guild` requests) are cross-matched
+against the professions of the artisans you know (friends / guild / added). When one who can craft it
+comes online, they get a "you can make this" nudge — no shared channel required, all over whisper.
+The receiver re-checks their *real* recipe knowledge before alerting, so no false pings.
+
+**Decline & release.** A crafter can **refuse** an order or **release** one they had accepted: it
+reopens for others and the buyer is notified (a name-targeted order shows as *Declined*).
+
 **Artisan directory & social.** Live presence over the hidden realm channel, skill levels, sources
 (Guild / Friends / Added / Met), add-by-name and right-click "add crafter", social tooltip, and a
 **toast** when a favourite crafter logs in.

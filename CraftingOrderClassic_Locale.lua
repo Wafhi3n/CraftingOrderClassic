@@ -32,7 +32,71 @@ if loc == "enUS" or loc == "enGB" then
         ["Clic gauche : accepter (whisper au demandeur)"] = "Left click: accept (whisper the requester)",
         ["Clic droit : ignorer"] = "Right click: dismiss",
         ["Clic : "] = "Click: ", ["Accepter"] = "Accept", ["Annuler"] = "Cancel", ["Livrer"] = "Deliver",
+        ["Refuser"] = "Decline", ["%s a refusé ta commande : %s"] = "%s declined your order: %s",
         ["guilde"] = "guild", ["commerce"] = "trade", ["acceptée"] = "accepted",
+        -- Vue métier (cabine) : pied de colonne Commandes + action carte
+        ["Inviter en groupe"] = "Invite to group", ["en attente"] = "pending", ["acceptées"] = "accepted", ["en sourdine"] = "muted",
+        ["diag"] = "diag", ["Sourdine"] = "Muted", ["Réafficher"] = "Unmute",
+        -- Panneau « composants » des cartes de commande
+        ["COMPOSANTS FOURNIS"] = "PROVIDED COMPONENTS", ["À FOURNIR"] = "TO PROVIDE", ["complet"] = "complete",
+        -- Ligne de chargement + /co status + /co help (sorties chat des commandes slash)
+        ["chargé — |cFFFFFFFF/co help|r pour les commandes. (Réseau global de craft — autonome.)"] =
+            "loaded — |cFFFFFFFF/co help|r for commands. (Global craft network — standalone.)",
+        ["CraftLink introuvable — l'infra partagée n'est pas chargée."] =
+            "CraftLink not found — the shared infrastructure isn't loaded.",
+        ["infra CraftLink — dataVersion=|cFFE8B84B%d|r, protocole=v%d, catalogue=%d métier(s) %s"] =
+            "CraftLink infra — dataVersion=|cFFE8B84B%d|r, protocol=v%d, catalogue=%d profession(s) %s",
+        ["prêt"] = "ready", ["vide"] = "empty",
+        ["mes recettes captées : "] = "my captured recipes: ",
+        ["aucune recette captée — ouvre une fenêtre de métier une fois pour l'amorcer."] =
+            "no recipes captured — open a profession window once to seed them.",
+        ["réseau global : %s — |cFFFFFFFF%d|r en ligne, |cFFFFFFFF%d|r crafteur(s) connus"] =
+            "global network: %s — |cFFFFFFFF%d|r online, |cFFFFFFFF%d|r known crafter(s)",
+        ["connexion…"] = "connecting…",
+        ["réseau : sollicitation envoyée (HI global + PING proximité)."] =
+            "network: poll sent (global HI + proximity PING).",
+        ["métier inconnu : "] = "unknown profession: ",
+        ["commandes :"] = "commands:",
+        ["statut (infra, mes recettes, réseau)"] = "status (infra, my recipes, network)",
+        ["carnet d'ordres"] = "order ledger", ["poster une commande"] = "post an order",
+        ["solliciter l'annuaire (présence + proximité)"] = "poll the directory (presence + proximity)",
+        ["teste l'aller-retour réseau (PING global → PONG des autres porteurs)"] =
+            "test the network round-trip (global PING → PONG from other holders)",
+        ["vue commandes d'un métier (ou menu des métiers si vide)"] =
+            "a profession's orders view (or profession menu if empty)",
+        ["basculer fenêtre métier custom / vue Blizzard"] = "toggle custom profession window / Blizzard view",
+        ["portée des notifications de commande"] = "order notification scope",
+        ["notifications : |cFFFFFFFF%s|r — /co notify [all|directed|named|off]"] =
+            "notifications: |cFFFFFFFF%s|r — /co notify [all|directed|named|off]",
+        ["mode solo"] = "solo mode",
+        ["injecte/retire un réseau fictif (artisans + commandes)"] = "inject/remove a fake network (crafters + orders)",
+        ["journalise le réseau dans la SavedVariable (off | clear | dump)"] =
+            "log the network to the SavedVariable (off | clear | dump)",
+        -- Résultats des commandes texte (/co post|accept|done|cancel|orders|ping)
+        ["commande introuvable : "] = "order not found: ", ["ce n'est pas ta commande."] = "this isn't your order.",
+        ["commande annulée : "] = "order cancelled: ", ["commande non disponible : "] = "order not available: ",
+        ["c'est ta propre commande."] = "this is your own order.",
+        ["cette commande ne t'est pas destinée."] = "this order isn't meant for you.",
+        ["commande acceptée : %s (%s)"] = "order accepted: %s (%s)",
+        ["tu n'as pas accepté cette commande."] = "you didn't accept this order.",
+        ["livrée ! crafts livrés au total : %d"] = "delivered! total crafts delivered: %d",
+        ["commande relâchée : "] = "order released: ", ["carnet d'ordres :"] = "order ledger:",
+        [" par "] = " by ", ["  (aucune commande active)"] = "  (no active order)",
+        ["usage : /co post [shift-clic objet] [xN] [prix]"] = "usage: /co post [shift-click item] [xN] [price]",
+        ["commande postée |cFFFFFFFF%s|r : %s x%d %s[%s]"] = "order posted |cFFFFFFFF%s|r: %s x%d %s[%s]",
+        ["CraftLink absent — l'infra réseau n'est pas chargée."] = "CraftLink missing — the network infrastructure isn't loaded.",
+        ["PING envoyé (canal %s%s). En attente des PONG…"] = "PING sent (channel %s%s). Waiting for PONGs…",
+        ["rejoint"] = "joined", ["PAS rejoint"] = "NOT joined",
+        [", +|cFFFFFFFF%d|r whisper(s)"] = ", +|cFFFFFFFF%d|r whisper(s)",
+        ["entrante acceptée — réponse envoyée à |cFFFFFFFF%s|r"] = "incoming accepted — reply sent to |cFFFFFFFF%s|r",
+        -- /co debug (mode solo) + /co trace (diag)
+        ["infra non prête."] = "infrastructure not ready.",
+        ["activé — %d artisans + %d commandes + %d entrantes injectés."] =
+            "enabled — %d crafters + %d orders + %d incoming injected.",
+        ["désactivé — faux artisans et commandes purgés."] = "disabled — fake crafters and orders purged.",
+        ["vidée."] = "cleared.", ["%d lignes (30 dernières) :"] = "%d lines (last 30):",
+        ["ON. Fais tes tests, puis |cFFFFFFFF/reload|r, puis lis SavedVariables\\CraftingOrderClassic.lua (clé trace)."] =
+            "ON. Run your tests, then |cFFFFFFFF/reload|r, then read SavedVariables\\CraftingOrderClassic.lua (trace key).",
         -- Statut bar
         ["réseau"] = "network", ["canal rejoint"] = "channel joined",
         ["en ligne"] = "online", ["artisan(s)"] = "crafter(s)",
@@ -43,7 +107,7 @@ if loc == "enUS" or loc == "enGB" then
         ["Minage"] = "Mining", ["Dépeçage"] = "Skinning", ["Couture"] = "Tailoring",
         ["Joaillerie"] = "Jewelcrafting", ["Calligraphie"] = "Inscription", ["Élémentaire"] = "Elemental",
         -- Statuts d'ordre
-        ["En attente"] = "Pending", ["Acceptée"] = "Accepted", ["Livrée"] = "Delivered", ["Annulée"] = "Cancelled",
+        ["En attente"] = "Pending", ["Acceptée"] = "Accepted", ["Livrée"] = "Delivered", ["Annulée"] = "Cancelled", ["Refusée"] = "Declined",
         -- Commande (Post)
         ["LISTE DES PLANS"] = "RECIPE LIST", ["JE FOURNIS"] = "I PROVIDE", ["Réactifs"] = "Reagents",
         ["(cocher = je fournis)"] = "(check = I provide)", ["Commission"] = "Commission", ["Qté"] = "Qty",
@@ -53,10 +117,14 @@ if loc == "enUS" or loc == "enGB" then
         ["Sélection : "] = "Selection: ", ["Commande postée !"] = "Order posted!",
         ["Choisis d'abord un plan."] = "Pick a recipe first.", ["Aucun plan sélectionné."] = "No recipe selected.",
         ["Ajoutés"] = "Added", ["fournis"] = "provided", ["Chargement…"] = "Loading…",
+        -- Ligne « toute la liste » épinglée (destinataire groupé) — Commande + Récolte
+        ["Toute la guilde"] = "Whole guild", ["Tous les amis"] = "All friends",
+        ["Tous les ajoutés"] = "All added", ["Tous les croisés"] = "All met",
         -- Récolte (Gather)
         ["MÉTIER DE RÉCOLTE"] = "GATHERING PROFESSION", ["Rechercher une ressource"] = "Search a resource",
         ["LISTE DES RESSOURCES"] = "RESOURCE LIST", ["Demande de récolte — quantité voulue"] = "Gather request — wanted quantity",
-        ["stacks"] = "stacks", ["Récolteur :"] = "Gatherer:", ["Prix proposé"] = "Price offered",
+        ["stacks"] = "stacks", ["pile"] = "stack", ["piles"] = "stacks",
+        ["Récolteur :"] = "Gatherer:", ["Prix proposé"] = "Price offered",
         ["Choisis un métier de récolte puis une ressource."] = "Pick a gathering profession then a resource.",
         ["Aucune ressource sélectionnée."] = "No resource selected.", ["par stack"] = "per stack", ["à l'unité"] = "per unit",
         ["Commande de récolte postée !"] = "Gather order posted!", ["Choisis d'abord une ressource."] = "Pick a resource first.",
@@ -92,10 +160,108 @@ if loc == "enUS" or loc == "enGB" then
         ["Mes métiers"] = "My professions", ["Aucun métier connu."] = "No known profession.",
         ["Don / gratuit"] = "Free / gift",
         -- Entrantes (alertes chat)
-        ["|cFFFF8800◆ entrante|r |cFFFFFFFF%s|r (%s) : %s%s%s"] = "|cFFFF8800◆ incoming|r |cFFFFFFFF%s|r (%s): %s%s%s",
+        ["|cFFFF8800entrante|r |cFFFFFFFF%s|r (%s) : %s%s%s"] = "|cFFFF8800incoming|r |cFFFFFFFF%s|r (%s): %s%s%s",
         ["   |cFF33DD33→ tu sais la crafter|r — Carnet › Entrantes"] = "   |cFF33DD33→ you can craft it|r — Ledger › Incoming",
-        ["|cFFFFCC00◆ commande pour TOI|r de |cFFFFFFFF%s|r : %s%s%s"] = "|cFFFFCC00◆ order for YOU|r from |cFFFFFFFF%s|r: %s%s%s",
+        ["|cFFFFCC00commande pour TOI|r de |cFFFFFFFF%s|r : %s%s%s"] = "|cFFFFCC00order for YOU|r from |cFFFFFFFF%s|r: %s%s%s",
         ["ton artisan |cFFFFFFFF%s|r est en ligne."] = "your crafter |cFFFFFFFF%s|r is online.",
+        -- Garder pour un ami capable (Handoff) : nudge crafteur + info posteur + file « Confiées »
+        ["|cFF66CCFFtu sais le faire|r — demandé par |cFFFFFFFF%s|r : %s%s%s"] =
+            "|cFF66CCFFyou can craft this|r — requested by |cFFFFFFFF%s|r: %s%s%s",
+        ["%s peut faire une commande captée — gardée pour son passage : %s"] =
+            "%s can craft a captured order — kept for their next login: %s",
+        ["Confiées"] = "Entrusted", ["Remis"] = "Sent",
+        ["Aucune commande confiée pour l'instant."] = "No entrusted orders yet.",
+        -- Canal global (custom CraftLinkNet) : statut, /co channel, popup d'info
+        ["canal : |cFFFFFFFF%s|r"] = "channel: |cFFFFFFFF%s|r",
+        ["canal : non rejoint — |cFFFFFFFF/co channel on|r pour réessayer"] =
+            "channel: not joined — |cFFFFFFFF/co channel on|r to retry",
+        ["auto-join du canal réseau désactivé — le carnet global ne fonctionnera plus (whisper/guilde restent actifs)."] =
+            "network channel auto-join disabled — the global ledger will stop working (whisper/guild stay active).",
+        ["canal réseau (re)rejoint."] = "network channel (re)joined.",
+        ["canal global actuel : |cFFFFFFFF%s|r. |cFFFFFFFF/co channel off|r pour le quitter, |cFFFFFFFF/co channel on|r pour le rejoindre."] =
+            "current global channel: |cFFFFFFFF%s|r. |cFFFFFFFF/co channel off|r to leave it, |cFFFFFFFF/co channel on|r to rejoin.",
+        ["(dés)activer le canal réseau global"] = "(de)activate the global network channel",
+        ["balise TEXTE émise=%s (canal idx=%s) — lance |cFFFFFFFF/co trace dump|r sur l'AUTRE perso et cherche |cFFFFFFFF[recv] beacon|r."] =
+            "TEXT beacon sent=%s (channel idx=%s) — run |cFFFFFFFF/co trace dump|r on the OTHER char and look for |cFFFFFFFF[recv] beacon|r.",
+        ["annuaire local vidé (diag) — exécute aussi |cFFFFFFFF/co wipe|r sur l'autre compte pour un test de découverte propre."] =
+            "local directory wiped (diag) — also run |cFFFFFFFF/co wipe|r on the other account for a clean discovery test.",
+        ["Crafting Order rejoint un canal dédié (|cFFFFD100%s|r) pour faire circuler le carnet de commandes entre joueurs de l'addon. Tu le verras dans ta liste de canaux ; aucun message lisible n'y est envoyé. Tu peux le quitter à tout moment — |cFFFFFFFF/co channel off|r."] =
+            "Crafting Order joins a dedicated channel (|cFFFFD100%s|r) to relay the order ledger between addon users. You'll see it in your channel list; no readable text is ever sent there. You can leave it anytime — |cFFFFFFFF/co channel off|r.",
+        -- Onglet Aide
+        ["Aide"] = "Help",
+        ["C'est quoi Crafting Order ?"] = "What is Crafting Order?",
+        ["Réseau GLOBAL et SOCIAL de commandes de craft — fonctionne sans guilde, entre tous les joueurs de l'addon."] =
+            "GLOBAL and SOCIAL crafting order network — works without a guild, across all addon users.",
+        ["Poste ce dont tu as besoin, ou consulte les commandes que tu peux honorer avec tes métiers."] =
+            "Post what you need, or check the orders you can fulfill with your professions.",
+        ["Ouvrir la fenêtre et commandes utiles"] = "Opening the window and useful commands",
+        ["Clic gauche sur l'icône minimap (ou |cFFFFFFFF/co|r) : ouvre cette fenêtre."] =
+            "Left click the minimap icon (or |cFFFFFFFF/co|r): opens this window.",
+        ["Clic droit sur l'icône minimap (ou |cFFFFFFFF/co métier|r) : ouvre la Vue Métier d'un de tes métiers."] =
+            "Right click the minimap icon (or |cFFFFFFFF/co métier|r): opens the Profession View for one of your professions.",
+        ["|cFFFFFFFF/co help|r dans le chat : liste complète des commandes slash."] =
+            "|cFFFFFFFF/co help|r in chat: full list of slash commands.",
+        ["|cFFFFFFFF/co channel off|r / |cFFFFFFFF/co channel on|r : quitter/rejoindre le canal réseau."] =
+            "|cFFFFFFFF/co channel off|r / |cFFFFFFFF/co channel on|r: leave/rejoin the network channel.",
+        ["Les 4 onglets de cette fenêtre"] = "The 4 tabs of this window",
+        ["|cFFE8B84BCarnet|r : tes commandes à toi (postées), en cours ou archivées."] =
+            "|cFFE8B84BLedger|r: your own posted orders, active or archived.",
+        ["|cFFE8B84BCommande|r : poster une demande de craft à faire réaliser par un artisan."] =
+            "|cFFE8B84BOrder|r: post a crafting request for a crafter to fulfill.",
+        ["|cFFE8B84BRécolte|r : poster une demande de matières à un récolteur (mine, herbe, peau, pêche)."] =
+            "|cFFE8B84BGather|r: post a materials request to a gatherer (mining, herbalism, skinning, fishing).",
+        ["|cFFE8B84BArtisans|r : l'annuaire — qui sait crafter quoi, en ligne ou non."] =
+            "|cFFE8B84BArtisans|r: the directory — who can craft what, online or not.",
+        ["Poster une commande de craft"] = "Posting a crafting order",
+        ["Onglet |cFFE8B84BCommande|r → choisis un métier puis un plan dans la liste."] =
+            "|cFFE8B84BOrder|r tab → pick a profession then a recipe from the list.",
+        ["Shift-clic un objet dans un sac ou un lien de chat pour le présélectionner s'il correspond à un plan."] =
+            "Shift-click an item in a bag or a chat link to preselect it if it matches a recipe.",
+        ["Coche les réactifs que TU fournis toi-même (le reste reste à la charge de l'artisan)."] =
+            "Check the reagents YOU provide yourself (the rest stays the crafter's responsibility).",
+        ["Choisis la quantité, la commission proposée, puis le destinataire (guilde, amis, un artisan précis, ou diffuser à tous)."] =
+            "Pick the quantity, the offered commission, then the recipient (guild, friends, a specific crafter, or broadcast to all).",
+        ["Clique |cFFE8B84BPoster|r : la commande apparaît dans ton Carnet et chez les artisans concernés."] =
+            "Click |cFFE8B84BPost|r: the order appears in your Ledger and for the relevant crafters.",
+        ["Poster une commande de récolte"] = "Posting a gathering order",
+        ["Onglet |cFFE8B84BRécolte|r → choisis un métier de récolte puis une ressource."] =
+            "|cFFE8B84BGather|r tab → pick a gathering profession then a resource.",
+        ["Choisis à l'unité ou par pile, la quantité voulue et le prix proposé, puis le destinataire."] =
+            "Pick per unit or per stack, the wanted quantity and the offered price, then the recipient.",
+        ["Fonctionne comme une commande de craft, mais ciblée sur les joueurs qui ont le métier de récolte, pas de recette à connaître."] =
+            "Works like a crafting order, but targets players with the gathering profession — no recipe required.",
+        ["Accepter / livrer une commande — la Vue Métier"] = "Accepting / delivering an order — the Profession View",
+        ["L'acceptation et la livraison ne se font PAS dans le Carnet : ouvre la |cFFE8B84BVue Métier|r du métier concerné (clic droit minimap, ou |cFFFFFFFF/co métier <nom>|r)."] =
+            "Accepting and delivering do NOT happen in the Ledger: open the |cFFE8B84BProfession View|r for the relevant profession (right click minimap, or |cFFFFFFFF/co métier <name>|r).",
+        ["La 3ᵉ colonne de la Vue Métier liste toutes les commandes de ce métier : accepte, crafte, puis livre."] =
+            "The 3rd column of the Profession View lists all orders for that profession: accept, craft, then deliver.",
+        ["Les demandes captées dans |cFFE8B84B/commerce|r et |cFFE8B84B/guilde|r de joueurs sans l'addon apparaissent aussi ici, marquées « entrante »."] =
+            "Requests captured from |cFFE8B84B/trade|r and |cFFE8B84B/guild|r chat of players without the addon also appear here, marked \"incoming\".",
+        ["Un artisan connu qui sait honorer une commande captée est notifié à sa prochaine connexion (voir « Confiées » dans le Carnet)."] =
+            "A known crafter able to fulfill a captured order is notified next time they log in (see \"Entrusted\" in the Ledger).",
+        ["Le Carnet en détail"] = "The Ledger in detail",
+        ["|cFFE8B84BEn cours|r : tes commandes ouvertes ou acceptées par un artisan."] =
+            "|cFFE8B84BActive|r: your orders that are open or accepted by a crafter.",
+        ["|cFFE8B84BArchivées|r : tes commandes livrées ou annulées."] =
+            "|cFFE8B84BArchived|r: your orders that are delivered or cancelled.",
+        ["|cFFE8B84BConfiées|r : commandes gardées pour un artisan connu capable de les honorer, en attendant qu'il se reconnecte."] =
+            "|cFFE8B84BEntrusted|r: orders kept for a known crafter able to fulfill them, waiting for them to log back in.",
+        ["Depuis le Carnet, tu peux annuler une commande tant qu'elle n'est pas livrée."] =
+            "From the Ledger, you can cancel an order as long as it isn't delivered.",
+        ["Annuaire & social"] = "Directory & social",
+        ["L'onglet Artisans liste les joueurs connus par source : guilde, amis, ajoutés manuellement, croisés récemment."] =
+            "The Artisans tab lists known players by source: guild, friends, manually added, recently met.",
+        ["Survole un joueur (tooltip) pour voir ses métiers et son niveau de compétence."] =
+            "Hover a player (tooltip) to see their professions and skill level.",
+        ["Clic droit sur un joueur (chat, groupe...) pour l'ajouter à ton annuaire — utile pour le retrouver même hors ligne."] =
+            "Right click a player (chat, party...) to add them to your directory — useful to find them again even offline.",
+        ["La pastille verte/grise indique s'il est en ligne."] = "The green/gray dot shows whether they're online.",
+        ["Réseau, confidentialité & statuts"] = "Network, privacy & statuses",
+        ["L'addon rejoint un canal dédié pour faire circuler le carnet entre joueurs de l'addon — aucun message lisible n'y est envoyé."] =
+            "The addon joins a dedicated channel to relay the ledger between addon users — no readable text is ever sent there.",
+        ["|cFFFFFFFF/co channel off|r le quitte à tout moment (whisper et guilde restent actifs) ; |cFFFFFFFF/co channel on|r le rejoint."] =
+            "|cFFFFFFFF/co channel off|r leaves it anytime (whisper and guild stay active); |cFFFFFFFF/co channel on|r rejoins it.",
+        ["Statuts d'une commande : "] = "Order statuses: ",
     }
     for k, v in pairs(en) do L[k] = v end
 end

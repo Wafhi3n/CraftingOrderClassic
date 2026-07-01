@@ -122,6 +122,9 @@ function Inbound:Add(e)
         if (time() - (v.ts or 0)) > EXPIRY then COC.db.inbound[k] = nil else n = n + 1 end
     end
     if e.status == "new" then self:Alert(e) end
+    -- « Garder pour un ami capable » : si un artisan connu sait la faire, on me le signale et on la
+    -- lui pousse (maintenant s'il est en ligne, sinon à sa connexion via Handoff:OnArtisanOnline).
+    if e.status == "new" and COC.Handoff then COC.Handoff:NoteInbound(e) end
     if COC.UI and COC.UI.Refresh then COC.UI:Refresh() end
 end
 
@@ -129,10 +132,11 @@ function Inbound:Alert(e)
     local c = CraftLink
     local nm = (c and c:ItemName(e.itemID)) or ("item:" .. e.itemID)
     local src = (e.source == "guild") and L["guilde"] or L["commerce"]
-    local qty = (e.qty and e.qty > 1) and (" ×" .. e.qty) or ""
+    local Skin = COC.UI and COC.UI.Skin
+    local qty = (Skin and Skin.QtySuffix(e)) or ""
     local pr  = e.price and (" — |cFFFFDD00" .. e.price .. "|r") or ""
-    local msg = string.format(L["|cFFFF8800◆ entrante|r |cFFFFFFFF%s|r (%s) : %s%s%s"], e.buyer, src, nm, qty, pr)
-    pmsg(msg)
+    local msg = string.format(L["|cFFFF8800entrante|r |cFFFFFFFF%s|r (%s) : %s%s%s"], e.buyer, src, nm, qty, pr)
+    pmsg((Skin and ("|T" .. Skin.tex.workorder .. ":0|t ") or "") .. msg)
     if COC.UI and COC.UI.Toast then COC.UI:Toast(msg) end
     if e.canCraft then print(L["   |cFF33DD33→ tu sais la crafter|r — Carnet › Entrantes"]) end
     pcall(function() PlaySound(SOUNDKIT and SOUNDKIT.TELL_MESSAGE or 3081, "Master") end)
@@ -161,7 +165,7 @@ function Inbound:Accept(id)
     e.status = "accepted"
     -- Whisper de pub : l'auteur n'a pas l'addon, on le prévient (et on fait connaître l'addon).
     if COC.Orders then COC.Orders:WhisperPub({ buyer = e.buyer, itemID = e.itemID, price = e.price }) end
-    pmsg("entrante acceptée — réponse envoyée à |cFFFFFFFF" .. e.buyer .. "|r")
+    pmsg(string.format(L["entrante acceptée — réponse envoyée à |cFFFFFFFF%s|r"], e.buyer))
     if COC.UI and COC.UI.Refresh then COC.UI:Refresh() end
 end
 

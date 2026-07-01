@@ -90,7 +90,11 @@ end
 function PW:_BuildColumn(f, width, leftAnchor)
     local col = CreateFrame("Frame", nil, f)
     col:SetWidth(width)
-    col:SetPoint("TOPLEFT", leftAnchor.frame, leftAnchor.point, leftAnchor.x, -self.HEADER_H)
+    -- y = -HEADER_H UNIQUEMENT pour la 1re colonne (ancrée à la frame, sous l'en-tête). Les colonnes
+    -- suivantes s'ancrent au bord droit de la précédente (déjà sous l'en-tête) avec y = 0 : sinon
+    -- chaque colonne descend d'un cran (effet « escalier » → la colonne Commandes finissait 2×HEADER_H
+    -- trop bas, d'où l'impression de tailles différentes).
+    col:SetPoint("TOPLEFT", leftAnchor.frame, leftAnchor.point, leftAnchor.x, leftAnchor.y or 0)
     col:SetPoint("BOTTOM", f, "BOTTOM", 0, self.PAD)
     if Skin.SkinWell then Skin.SkinWell(col) end
     return col
@@ -113,7 +117,7 @@ function PW:Build()
     self.frame = f
     self:_BuildHeader(f)
 
-    local recCol = self:_BuildColumn(f, self.COL_W[1], { frame = f, point = "TOPLEFT", x = self.PAD })
+    local recCol = self:_BuildColumn(f, self.COL_W[1], { frame = f,      point = "TOPLEFT",  x = self.PAD, y = -self.HEADER_H })
     local detCol = self:_BuildColumn(f, self.COL_W[2], { frame = recCol, point = "TOPRIGHT", x = self.GAP })
     local ordCol = self:_BuildColumn(f, self.COL_W[3], { frame = detCol, point = "TOPRIGHT", x = self.GAP })
     self.recCol, self.detCol, self.ordCol = recCol, detCol, ordCol
@@ -188,22 +192,62 @@ function PW:_ApplyMode(compact)
         self.ordCol:SetPoint("BOTTOM", self.frame, "BOTTOM", 0, self.PAD)
         self.ordCol:SetWidth(300 - 2 * self.PAD)
     else
-        -- Réplique EXACTEMENT l'ancrage d'origine de _BuildColumn (offset -HEADER_H) → zéro régression
-        -- du layout 3 colonnes dans le cas courant (fenêtre native).
+        -- Même ancrage que _BuildColumn pour la colonne Commandes : sous l'en-tête, au bord droit de
+        -- la colonne Détail (y = 0, PAS de double offset d'en-tête → fini l'escalier).
         self.frame:SetWidth(self.FRAME_W)
-        self.ordCol:SetPoint("TOPLEFT", self.detCol, "TOPRIGHT", self.GAP, -self.HEADER_H)
+        self.ordCol:SetPoint("TOPLEFT", self.detCol, "TOPRIGHT", self.GAP, 0)
         self.ordCol:SetPoint("BOTTOM", self.frame, "BOTTOM", 0, self.PAD)
         self.ordCol:SetWidth(self.COL_W[3])
     end
 end
 
--- Ouvre la vue métier pour une CLÉ de métier (récolte sans établi, ou menu minimap) → mode compact.
+-- Ouvre la vue métier pour une CLÉ de métier (menu minimap / récolte / /co métier).
+--  * Métier CRAFTABLE (a une vraie fenêtre en jeu) → on OUVRE la fenêtre native (cast du sort de
+--    métier) : la vue PLEINE 3 colonnes se monte via OnProfessionShow, recettes lues en live. Repli
+--    compact si la fenêtre ne s'ouvre pas (Secourisme, combat…).
+--  * Métier de RÉCOLTE (pas de fenêtre) → vue COMPACTE autonome (colonne Commandes seule).
 function PW:OpenFor(profKey)
     if not profKey then return end
+    if not GATHER[profKey] then
+        local craft = COC.Craft
+        if craft and craft:GetOpenProfessionInfo() and craft:OpenProfessionKey() == profKey then
+            self:OnProfessionShow(); return          -- déjà ouvert nativement → (ré)affiche la vue pleine
+        end
+        local spell = Skin.ProfLabel(profKey)
+        if spell and spell ~= "" and spell ~= "—" and CastSpellByName then
+            self.standaloneKey = nil
+            CastSpellByName(spell)                    -- ouvre la fenêtre native → OnProfessionShow
+            if C_Timer and C_Timer.After then
+                C_Timer.After(0.4, function()
+                    local c = COC.Craft
+                    if not (c and c:GetOpenProfessionInfo()) then PW:_OpenCompact(profKey) end
+                end)
+            end
+            return
+        end
+    end
+    self:_OpenCompact(profKey)
+end
+
+-- Vue compacte autonome (colonne Commandes seule) : récolte, ou repli si la fenêtre native n'a pas pu
+-- s'ouvrir pour un métier craftable. Si une AUTRE fenêtre native est déjà ouverte (ex. : Travail du
+-- cuir ouvert pendant qu'on demande Dépeçage), on la ferme d'abord : TRADE_SKILL_CLOSE déclenche
+-- OnProfessionClose, qui voit standaloneKey posé et RESTE VISIBLE en mode compact (au lieu de masquer).
+function PW:_OpenCompact(profKey)
     self.standaloneKey = profKey
     self:Build()
-    if not self.frame:IsShown() then self.frame:Show() end
-    self:Refresh()
+    local craft = COC.Craft
+    if craft and craft:GetOpenProfessionInfo() then
+        if craft.IsCraftOpen and craft:IsCraftOpen() then
+            if CloseCraft then CloseCraft() end
+        else
+            if CloseTradeSkill then CloseTradeSkill() end
+        end
+        -- OnProfessionClose prend le relais (voit standaloneKey → reste en compact)
+    else
+        if not self.frame:IsShown() then self.frame:Show() end
+        self:Refresh()
+    end
 end
 
 function PW:Refresh()
@@ -255,5 +299,13 @@ end
 
 function PW:OnProfessionClose()
     self.selectedIndex = nil
-    self:Hide(); self:RestoreNative()
+    if self.standaloneKey then
+        -- Une vue compacte a été demandée (ex. : Dépeçage pendant que la Forge était ouverte).
+        -- On restaure la native fermée mais on RESTE VISIBLE en mode compact pour le bon métier.
+        self:RestoreNative()
+        if not self.frame:IsShown() then self.frame:Show() end
+        self:Refresh()
+    else
+        self:Hide(); self:RestoreNative()
+    end
 end

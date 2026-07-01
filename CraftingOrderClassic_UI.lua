@@ -56,6 +56,7 @@ function UI:Build()
     self:BuildArtisansTab(f)
     if self.BuildPostTab   then self:BuildPostTab(f)   end
     if self.BuildGatherTab then self:BuildGatherTab(f) end
+    if self.BuildHelpTab   then self:BuildHelpTab(f)   end
     self:ShowTab("orders")
 
     -- Résolution asynchrone des noms : Blizzard renvoie les infos d'objet en différé. Un seul
@@ -83,6 +84,7 @@ function UI:BuildTabs(f)
         { id = "post",    label = L["Commande"] },
         { id = "gather",  label = L["Récolte"]  },
         { id = "artisans",label = L["Artisans"] },
+        { id = "help",    label = L["Aide"]     },
     }
     for i, d in ipairs(defs) do
         local b = Skin.MakeGoldButton(f, 118, 24, d.label)
@@ -105,6 +107,7 @@ function UI:ShowTab(id)
     if self.postPanel   then self.postPanel:SetShown(id == "post")    end
     if self.gatherPanel then self.gatherPanel:SetShown(id == "gather") end
     self.artisansPanel:SetShown(id == "artisans")
+    if self.helpPanel   then self.helpPanel:SetShown(id == "help")    end
     self:Refresh()
 end
 
@@ -117,6 +120,54 @@ local function makeScroll(parent, name)
     local content = CreateFrame("Frame", nil, scroll); content:SetSize(440, 10)
     scroll:SetScrollChild(content)
     return scroll, content
+end
+
+-- ------------------------------------------------------------------
+-- Ligne « toute la liste » (Commande/Récolte) : bouton épinglé EN TÊTE de la liste d'artisans qui
+-- cible explicitement TOUTE la source courante (toute la guilde / tous les amis). Le routage existe
+-- déjà côté réseau (recipient "Guilde"/"Amis" ; cf. Orders:_ScopeMatch/VisibleTo) : ici on rend ce
+-- choix VISIBLE et re-sélectionnable (sinon il n'existait qu'en effet de bord du clic sur l'onglet
+-- source). Sélection seule → on poste ensuite via « Poster ». Partagé par _UI_Post + _UI_Gather.
+-- ALL_RX/RW/ARH = mêmes valeurs que les locaux RX/RW/ARH de ces deux fichiers (layout identique).
+local ALL_RX, ALL_RW, ALL_ARH = 316, 502, 26
+local ALL_SRC_LABEL = {
+    guild  = "Toute la guilde",  friend = "Tous les amis",
+    added  = "Tous les ajoutés", recent = "Tous les croisés",
+}
+
+-- kind = "post" | "gather" ; top = Y de la ligne épinglée. Construit la ligne + le ScrollFrame (4
+-- lignes visibles) juste en dessous, et renseigne self.<kind>AllRow / <kind>ArtContent / <kind>ArtRows.
+function UI:_BuildAllRowAndScroll(panel, scrollName, kind, top)
+    local row = CreateFrame("Button", nil, panel)
+    row:SetSize(ALL_RW - 22, ALL_ARH); row:SetPoint("TOPLEFT", ALL_RX, top)
+    local hi = row:CreateTexture(nil, "HIGHLIGHT"); hi:SetAllPoints(); hi:SetColorTexture(Skin.unpack(Skin.color.rowHover))
+    local st = row:CreateTexture(nil, "BACKGROUND"); st:SetAllPoints()
+    st:SetColorTexture(Skin.color.tabActive[1], Skin.color.tabActive[2], Skin.color.tabActive[3], 0.30); st:Hide()
+    row.selTex = st
+    local ic = row:CreateTexture(nil, "OVERLAY"); ic:SetSize(14, 14); ic:SetPoint("LEFT", 5, 0); ic:SetTexture(Skin.tex.broadcast)
+    row.label = row:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    row.label:SetPoint("LEFT", 24, 0); row.label:SetJustifyH("LEFT"); row.label:SetWidth(ALL_RW - 60)
+    row.label:SetTextColor(Skin.unpack(Skin.color.gold)); Skin.ApplyShadow(row.label)
+    row:SetScript("OnClick", function()
+        if kind == "post" then UI.postTarget = UI.postSource; UI:RefreshPostArtisans()
+        else UI.gatherTarget = UI.gatherSrc; UI:_RefreshGatherArtisans() end
+    end)
+    self[kind .. "AllRow"] = row
+
+    local scroll = CreateFrame("ScrollFrame", scrollName, panel, "UIPanelScrollFrameTemplate")
+    scroll:SetPoint("TOPLEFT", ALL_RX, top - ALL_ARH - 2); scroll:SetSize(ALL_RW, 4 * ALL_ARH)
+    local content = CreateFrame("Frame", nil, scroll); content:SetSize(ALL_RW - 22, 10); scroll:SetScrollChild(content)
+    self[kind .. "ArtContent"] = content; self[kind .. "ArtRows"] = {}
+end
+
+-- Rafraîchit le libellé + l'état sélectionné de la ligne « toute la liste » selon la source courante.
+function UI:_RefreshAllRow(kind)
+    local row = self[kind .. "AllRow"]; if not row then return end
+    local src = (kind == "post") and (self.postSource or "guild") or (self.gatherSrc or "guild")
+    local tgt = (kind == "post") and self.postTarget or self.gatherTarget
+    row.label:SetText(L[ALL_SRC_LABEL[src] or "Tous les croisés"])
+    row.selTex:SetShown(tgt == src)
+    local diff = self[kind .. "DiffBtn"]; if diff then diff:SetSelected(tgt == "all") end
 end
 
 -- ------------------------------------------------------------------
@@ -151,7 +202,7 @@ function UI:BuildOrdersTab(f)
     -- la file Entrantes (demandes captées dans /commerce et /guilde de joueurs sans l'addon).
     self.orderFilter = "active"; self.orderFilterBtns = {}
     -- Entrantes (/commerce, /guilde) sont désormais dans la VUE MÉTIER, plus dans le Carnet.
-    local fdefs = { {id="active",label=L["En cours"]}, {id="archived",label=L["Archivées"]} }
+    local fdefs = { {id="active",label=L["En cours"]}, {id="archived",label=L["Archivées"]}, {id="handoff",label=L["Confiées"]} }
     local fx = 12
     for _, d in ipairs(fdefs) do
         local w = 78
@@ -238,6 +289,7 @@ local function isPastOrder(o) return o.status == "done" or o.status == "cancelle
 
 function UI:RefreshOrders()
     if self.hdrDest then self.hdrDest:SetText(L["ARTISAN"]) end
+    if self.orderFilter == "handoff" then return self:RefreshHandoff() end
     local archived, m = (self.orderFilter == "archived"), me()
     local mine = {}
     for _, o in pairs((COC.db and COC.db.orders) or {}) do if o.buyer == m then mine[#mine + 1] = o end end
@@ -251,7 +303,7 @@ function UI:RefreshOrders()
             local r, g, b = Skin.RarityColor(o.itemID)
             row.badge:Paint(r, g, b, Skin.FirstChar(nm), Skin.Icon(o.itemID, o.spellID))
             row.name:SetText(nm); row.name:SetTextColor(r, g, b)
-            row.qty:SetText("|cFFCCCCCC" .. (o.byStack and ((o.qty or 1) .. " st") or ("×" .. (o.qty or 1))) .. "|r")
+            row.qty:SetText("|cFFCCCCCC" .. Skin.QtyText(o) .. "|r")
             row.price:SetText(o.price and ("|c" .. Skin.hex.price .. o.price .. "|r") or "|cFF666666—|r")
             row.prof:SetText("|c" .. Skin.hex.gold .. Skin.ProfLabel(o.profession) .. "|r")
             row.dest:SetText(o.acceptedBy and ("|cFF33DD33" .. o.acceptedBy .. "|r")
@@ -278,6 +330,36 @@ function UI:RefreshOrders()
     end
 end
 
+-- Filtre « Confiées » : commandes (miennes + entrantes captées) qu'un artisan CONNU sait faire,
+-- gardées pour lui. Une ligne par (commande, artisan) ; statut = Remis (poussé cette session) vs
+-- En attente (il n'est pas encore repassé). Réutilise le pool de lignes du Carnet (colonnes détournées).
+function UI:RefreshHandoff()
+    local rows = (COC.Handoff and COC.Handoff:Pending()) or {}
+    local n = 0
+    for _, it in ipairs(rows) do
+        n = n + 1
+        local row = self:_OrderRow(n)
+        local r, g, b = Skin.RarityColor(it.itemID)
+        row.badge:Paint(r, g, b, Skin.FirstChar(it.name or "?"), Skin.Icon(it.itemID, it.spellID)); row.badge:Show()
+        row.name:SetText(it.name or "?"); row.name:SetTextColor(r, g, b)
+        row.qty:SetText("|cFFCCCCCC" .. Skin.QtyText(it) .. "|r")
+        row.price:SetText(it.price and ("|c" .. Skin.hex.price .. it.price .. "|r") or "|cFF666666—|r")
+        row.prof:SetText("|c" .. Skin.hex.gold .. Skin.ProfLabel(it.profession) .. "|r")
+        row.dest:SetText((it.online and "|cFF33DD33" or "|cFF888888") .. it.target .. "|r")
+        row.status:SetText(it.delivered and ("|cFF33DD33" .. L["Remis"] .. "|r") or ("|cFFFFCC00" .. L["En attente"] .. "|r"))
+        row:SetScript("OnClick", nil); row:SetScript("OnEnter", nil); row:Show()
+    end
+    for i = n + 1, #self.orderRows do self.orderRows[i]:Hide() end
+    self.ordersContent:SetHeight(math.max(n * ROW_T, 10))
+    Skin.AutoHideScroll("CraftingOrderOrdersScroll", self.ordersContent)
+    if n == 0 and self.orderRows[1] then
+        local row = self:_OrderRow(1); row.badge:Hide()
+        row.name:SetText("|cFF888888" .. L["Aucune commande confiée pour l'instant."] .. "|r"); row.name:SetTextColor(0.6, 0.6, 0.6)
+        row.qty:SetText(""); row.price:SetText(""); row.prof:SetText(""); row.dest:SetText(""); row.status:SetText("")
+        row:SetScript("OnClick", nil); row:SetScript("OnEnter", nil); row:Show()
+    end
+end
+
 -- (Les demandes « Entrantes » captées dans /commerce et /guilde sont désormais affichées dans la
 -- VUE MÉTIER — colonne Commandes de _ProfWindow_Orders.lua — et non plus dans le Carnet.)
 
@@ -294,6 +376,7 @@ function UI:Refresh()
     if     self.activeTab == "artisans"                          then self:RefreshArtisans()
     elseif self.activeTab == "post"   and self.RefreshPost       then self:RefreshPost()
     elseif self.activeTab == "gather" and self.RefreshGather     then self:RefreshGather()
+    elseif self.activeTab == "help"   and self.RefreshHelp       then self:RefreshHelp()
     else self:RefreshOrders() end
     -- Compteur d'ordres du Carnet = ce qui est RÉELLEMENT visible (All() applique TTL + routage
     -- VisibleTo), pas le cache brut → plus d'écart « Carnet (5) mais liste vide ».

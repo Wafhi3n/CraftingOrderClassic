@@ -17,7 +17,7 @@
 -- partagent le mapping position <-> spellID, condition pour que les bitfields échangés
 -- (cf. CraftLink_Registry) soient interprétables.
 
-local MAJOR, MINOR = "CraftLink-1.0", 1
+local MAJOR, MINOR = "CraftLink-1.0", 5   -- v5 : balise TEXTE de découverte SOUS hardware event seulement (auto=ADDON_ACTION_BLOCKED) + fix filtre ; données en whisper
 local lib = LibStub:NewLibrary(MAJOR, MINOR)
 if not lib then return end  -- déjà chargé par un autre addon avec une version >= : on garde l'existante
 

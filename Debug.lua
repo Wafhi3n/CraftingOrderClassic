@@ -11,6 +11,7 @@ local COC   = CraftingOrderClassic
 local Debug = {}
 COC.Debug = Debug
 
+local L = COC.L
 local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true) end
 local function me() return (UnitName and UnitName("player")) or "?" end
 
@@ -68,7 +69,7 @@ local function pmsg(m) print("|cFF33DD88Crafting Order|r |cFFFF8800[debug]|r " .
 
 function Debug:Enable()
     local c, D = CL(), COC.Directory
-    if not (c and D and COC.db) then pmsg("infra non prête."); return end
+    if not (c and D and COC.db) then pmsg(L["infra non prête."]); return end
     D.roster = D.roster or {}
     local myDV = c:DataVersion()
     for _, a in ipairs(self.fakeArtisans) do
@@ -94,7 +95,7 @@ function Debug:Enable()
         COC.db.inbound[e.id] = e
     end
     COC.db.debug = true
-    pmsg(string.format("activé — %d artisans + %d commandes + %d entrantes injectés.", #self.fakeArtisans, 3, 3))
+    pmsg(string.format(L["activé — %d artisans + %d commandes + %d entrantes injectés."], #self.fakeArtisans, 3, 3))
     if COC.UI then COC.UI:Refresh() end
 end
 
@@ -112,7 +113,7 @@ function Debug:Disable()
         if e.fake then COC.db.inbound[id] = nil end
     end
     if COC.db then COC.db.debug = nil end
-    pmsg("désactivé — faux artisans et commandes purgés.")
+    pmsg(L["désactivé — faux artisans et commandes purgés."])
     if COC.UI then COC.UI:Refresh() end
 end
 

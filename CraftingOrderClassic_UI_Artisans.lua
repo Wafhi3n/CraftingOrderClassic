@@ -24,19 +24,19 @@ local function knowsProf(r, pf)
     return (r.skill and r.skill[pf]) or (r.recipes and r.recipes[pf]) or false
 end
 
--- Libellé des métiers d'un artisan : « Forge 300/300 » si le niveau (SK) est connu, sinon le simple
--- nom (RK seul). Union des deux sources, trié. Vide si on ne sait encore rien de ses métiers.
-local function profsText(r)
+-- Métiers connus d'un artisan, en liste { key, sv } : niveau (SK) si connu, sinon recette seule (RK).
+-- Union des deux sources, triée par libellé localisé — même ordre visuel que l'ancien texte concaténé.
+local function profsList(r)
     local seen, parts = {}, {}
     for key, sv in pairs(r.skill or {}) do
         seen[key] = true
-        parts[#parts + 1] = Skin.ProfLabel(key) .. " " .. (sv[1] or "?") .. "/" .. (sv[2] or "?")
+        parts[#parts + 1] = { key = key, sv = sv }
     end
     for key in pairs(r.recipes or {}) do
-        if not seen[key] then seen[key] = true; parts[#parts + 1] = Skin.ProfLabel(key) end
+        if not seen[key] then seen[key] = true; parts[#parts + 1] = { key = key } end
     end
-    table.sort(parts)
-    return table.concat(parts, " · ")
+    table.sort(parts, function(a, b) return Skin.ProfLabel(a.key) < Skin.ProfLabel(b.key) end)
+    return parts
 end
 
 -- =========================================================================
@@ -189,7 +189,7 @@ function UI:RefreshArtisans()
         row.name:SetText("|cFFFFFFFF" .. a.name .. "|r")
         local lvl = a.r.level and (L["niv "] .. a.r.level) or L["niv ?"]
         row.sub:SetText("|cFF888888" .. (a.online and L["En ligne"] or L["Hors ligne"]) .. " · " .. lvl .. "|r")
-        row.profs:SetText("|c" .. Skin.hex.gold .. profsText(a.r) .. "|r")
+        UI:_SetArtProfIcons(row, profsList(a.r))
         row.src:SetText("|cFF888888" .. (SRC_TAG[a.r.source or "recent"] or "") .. "|r")
         row.whisper:SetScript("OnClick", function()
             if ChatFrame_SendTell then ChatFrame_SendTell(a.name) end
@@ -203,7 +203,7 @@ function UI:RefreshArtisans()
     if n == 0 and self.artListRows[1] then
         local row = self:_ArtRow(1)
         row.dot:SetOnline(nil); row.name:SetText("|cFF888888" .. L["Aucun artisan dans cette source."] .. "|r")
-        row.sub:SetText(""); row.profs:SetText(""); row.src:SetText(""); row.whisper:Hide()
+        row.sub:SetText(""); UI:_SetArtProfIcons(row, {}); row.src:SetText(""); row.whisper:Hide()
         row:Show()
     end
 end
@@ -217,9 +217,38 @@ function UI:_ArtRow(i)
     r.name:SetPoint("TOPLEFT", 22, -5); r.name:SetWidth(150); r.name:SetJustifyH("LEFT"); Skin.ApplyShadow(r.name)
     r.sub   = r:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
     r.sub:SetPoint("TOPLEFT", 22, -22); r.sub:SetWidth(150); r.sub:SetJustifyH("LEFT"); Skin.ApplyShadow(r.sub)
-    r.profs = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    r.profs:SetPoint("LEFT", 180, 0); r.profs:SetWidth(ARW - 320); r.profs:SetJustifyH("LEFT"); Skin.ApplyShadow(r.profs)
+    r.profsFrame = CreateFrame("Frame", nil, r)
+    r.profsFrame:SetPoint("LEFT", 180, 0); r.profsFrame:SetSize(ARW - 320, ARH)
+    r.profIconPool = {}
     r.src   = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall"); r.src:SetPoint("RIGHT", -94, 0); Skin.ApplyShadow(r.src)
     r.whisper = Skin.MakeGoldButton(r, 78, 22, L["Chuchoter"]); r.whisper:SetPoint("RIGHT", -6, 0)
     self.artListRows[i] = r; return r
+end
+
+-- Icônes de métier (survol = tooltip nom + niveau) à la place du texte concaténé — moins encombrant.
+local ARI = 22   -- pas horizontal entre icônes
+function UI:_SetArtProfIcons(row, list)
+    local pool = row.profIconPool
+    for i, item in ipairs(list) do
+        local ic = pool[i]
+        if not ic then
+            ic = CreateFrame("Frame", nil, row.profsFrame); ic:SetSize(18, 18)
+            local tex = ic:CreateTexture(nil, "ARTWORK"); tex:SetAllPoints()
+            tex:SetTexCoord(0.08, 0.92, 0.08, 0.92); ic.tex = tex
+            ic:SetScript("OnEnter", function(self)
+                GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+                GameTooltip:SetText(self.tipLabel or "", 1, 1, 1)
+                if self.tipSub then GameTooltip:AddLine(self.tipSub, 0.910, 0.722, 0.294) end
+                GameTooltip:Show()
+            end)
+            ic:SetScript("OnLeave", GameTooltip_Hide)
+            pool[i] = ic
+        end
+        ic:ClearAllPoints(); ic:SetPoint("LEFT", (i - 1) * ARI, 0)
+        ic.tex:SetTexture(Skin.ProfIcon(item.key) or Skin.tex.unknown)
+        ic.tipLabel = Skin.ProfLabel(item.key)
+        ic.tipSub = item.sv and ((item.sv[1] or "?") .. "/" .. (item.sv[2] or "?")) or nil
+        ic:Show()
+    end
+    for i = #list + 1, #pool do pool[i]:Hide() end
 end

@@ -25,6 +25,9 @@ local function now() return (GetTime and GetTime()) or 0 end
 -- ------------------------------------------------------------------
 function Dir:OnPresence(kind, who)
     if not who then return end
+    -- Canal CUSTOM dédié (CraftLinkNet) : tout joiner EST un porteur (pas de bruit de joueurs lambda),
+    -- donc on réagit à tous les JOIN/LEAVE, connus ou pas — un nouveau porteur s'annonce aussi via HI
+    -- au bringup, mais réagir ici accélère sa découverte sans risque de spam.
     if kind == "join" then
         self.online[who] = true
         local r = self.roster and self.roster[who]
@@ -57,6 +60,16 @@ end
 -- ------------------------------------------------------------------
 local function shortName(n) return n and (n:match("^([^%-]+)") or n) or n end
 
+-- Amis Battle.net (BattleTag) en plus des amis « classiques » : sans ça, un ami ajouté uniquement
+-- via BattleTag n'entre jamais dans l'onglet Amis même croisé et en ligne. `fn` reçoit chaque perso.
+local function forEachBNetWoWFriend(fn)
+    if not (BNGetNumFriends and BNGetFriendInfo) then return end
+    for i = 1, (BNGetNumFriends() or 0) do
+        local _, _, _, _, characterName, _, client, isOnline = BNGetFriendInfo(i)
+        if isOnline and characterName and client == (BNET_CLIENT_WOW or "WoW") then fn(characterName) end
+    end
+end
+
 function Dir:ScanRelations()
     self._guildSet, self._friendSet = {}, {}
     if IsInGuild and IsInGuild() and GetNumGuildMembers then
@@ -71,6 +84,7 @@ function Dir:ScanRelations()
             if info and info.name then self._friendSet[shortName(info.name)] = true end
         end
     end
+    forEachBNetWoWFriend(function(n) self._friendSet[shortName(n)] = true end)
     self:ReclassifyAll()
 end
 
@@ -222,6 +236,14 @@ function Dir:DiscoverPlayer(name)
     CraftLink:Send("HI",   "whisper", name)
 end
 
+-- Balise TEXTE reçue sur le canal : un porteur (peut-être INCONNU) annonce sa présence. C'est le SEUL
+-- rôle du canal — la distribution CHANNEL des AddonMessages est muette entre comptes d'un même
+-- Battle.net (testé) → on bascule aussitôt en découverte dirigée whisper (auto-throttlée 60 s/nom),
+-- après quoi tout le trafic de données passe en whisper (fiable). Voir CraftLink_Transport:SendBeacon.
+function Dir:OnBeacon(who)
+    self:DiscoverPlayer(who)
+end
+
 -- Re-publication throttlée (3 s) — appelée quand mes recettes changent (plan appris) ou skill gagné,
 -- pour que les autres reçoivent mes RK/SK à jour sans spammer le réseau.
 function Dir:AnnounceThrottled()
@@ -280,11 +302,43 @@ function Dir:OnSkill(sender, message)
     if COC.UI and COC.UI.Refresh then COC.UI:Refresh() end
 end
 
+-- Découverte des amis + guildmates EN LIGNE par whisper (PING+HI) — fiable hors canal global et sans
+-- ciblage mutuel. Au login (1er appel → prev vide) on ping TOUS les en-ligne ; ensuite, sur chaque
+-- FRIENDLIST/GUILD_ROSTER_UPDATE, on ne ping QUE les nouveaux connectés (transition hors-ligne→en-ligne)
+-- pour ne pas re-sonder en boucle les déjà-présents ni les non-porteurs. DiscoverPlayer reste throttlé
+-- 60 s/nom en filet de sécurité. `_wasOnlineRel` = statut en-ligne (API jeu) du sweep précédent.
+function Dir:DiscoverFriendsAndGuild()
+    local prev, cur = self._wasOnlineRel or {}, {}
+    local function consider(name, online)
+        name = shortName(name)
+        if not (name and online) then return end
+        cur[name] = true
+        if not prev[name] then self:DiscoverPlayer(name) end   -- vient de se connecter
+    end
+    if C_FriendList and C_FriendList.GetNumFriends then
+        for i = 1, (C_FriendList.GetNumFriends() or 0) do
+            local info = C_FriendList.GetFriendInfoByIndex(i)
+            if info then consider(info.name, info.connected) end
+        end
+    end
+    if IsInGuild and IsInGuild() and GetNumGuildMembers then
+        for i = 1, (GetNumGuildMembers() or 0) do
+            local name, _, _, _, _, _, _, _, online = GetGuildRosterInfo(i)
+            consider(name, online)
+        end
+    end
+    forEachBNetWoWFriend(function(n) consider(n, true) end)
+    self._wasOnlineRel = cur
+end
+
 -- Sollicite l'annuaire (sur action utilisateur) : HI global + PING proximité + re-ping des connus.
 function Dir:Refresh()
     if not CraftLink then return end
     CraftLink:Send("HI", "global")
     CraftLink:Send("PING", "yell")
+    -- /co refresh = action JOUEUR (hardware event) → on peut émettre la balise TEXTE de découverte
+    -- (annonce ma présence aux INCONNUS du canal ; eux me découvriront ensuite en whisper).
+    if CraftLink.SendBeacon then CraftLink:SendBeacon() end
     self:RediscoverKnown(true)   -- refresh manuel : re-ping aussi les croisés récents
 end
 
@@ -373,6 +427,7 @@ function Dir:Start()
     CraftLink:RegisterHandler("PING", function(s, m, d) Dir:OnPing(s, m, d) end)
     CraftLink:RegisterHandler("PONG", function(s)       Dir:OnPong(s) end)
     CraftLink:OnPresence(function(kind, who) Dir:OnPresence(kind, who) end)
+    if CraftLink.OnBeacon then CraftLink:OnBeacon(function(who) Dir:OnBeacon(who) end) end
 
     CraftLink:StartTransport()
     self:_WireEvents()
@@ -384,8 +439,12 @@ function Dir:Start()
         C_Timer.After(2, function() Dir:CaptureSkills(); Dir:ScanRelations() end)
         -- Au login : re-ping ajoutés ET croisés récents (capé) → ils se rallument sans re-survoler.
         C_Timer.After(4, function() Dir:RediscoverKnown(true) end)
+        -- Au login : ping whisper des AMIS et GUILDMATES en ligne → présence immédiate sans ciblage.
+        C_Timer.After(6, function() Dir:DiscoverFriendsAndGuild() end)
         -- Maintien périodique : seulement les favoris ajoutés (petite liste, pas de spam réseau).
         if C_Timer.NewTicker then C_Timer.NewTicker(45, function() Dir:RediscoverKnown() end) end
+        -- NB : pas de balise sur timer (ADDON_ACTION_BLOCKED hors action joueur). La découverte
+        -- d'INCONNUS passe par la balise émise au clic Poster / /co refresh (cf Dir:Refresh, DoPostOrder).
     end
 end
 
@@ -398,7 +457,10 @@ function Dir:_WireEvents()
         if not C_Timer then Dir:ScanRelations(); return end
         if Dir._relTimer then return end
         Dir._relTimer = true
-        C_Timer.After(2, function() Dir._relTimer = nil; Dir:ScanRelations() end)
+        -- Debounce 2 s : (re)classer guilde/amis PUIS découvrir les NOUVEAUX connectés. Un ami/guildmate
+        -- qui se connecte déclenche FRIENDLIST/GUILD_ROSTER_UPDATE → on le ping en whisper sous 2 s
+        -- (présence quasi immédiate, sans ciblage ni dépendre du canal global ni d'un re-survol).
+        C_Timer.After(2, function() Dir._relTimer = nil; Dir:ScanRelations(); Dir:DiscoverFriendsAndGuild() end)
     end)
     if C_GuildInfo and C_GuildInfo.GuildRoster then C_GuildInfo.GuildRoster()
     elseif GuildRoster then GuildRoster() end
@@ -420,12 +482,14 @@ end
 function Dir:_WireBringup()
     CraftLink:OnNetworkReady(function()
         Dir:CaptureSkills()
-        if C_Timer then
-            C_Timer.After(math.random() * 2, function()
-                Dir:Announce(); CraftLink:Send("HI", "global")
-            end)
-        else
+        local function bringup()
             Dir:Announce(); CraftLink:Send("HI", "global")
+            -- NB : PAS de balise texte ici — SendChatMessage hors action joueur = ADDON_ACTION_BLOCKED
+            -- (testé). La balise n'est émise que sous hardware event (clic Poster, /co refresh, /co beacon).
+            -- D : à chaque (re)acquisition du canal, repousser MES commandes ouvertes/acceptées (resync
+            -- léger) → un pair qui vient de (re)joindre les reçoit sans attendre le ticker de 2 h.
+            if COC.Orders and COC.Orders.RebroadcastMine then COC.Orders:RebroadcastMine() end
         end
+        if C_Timer then C_Timer.After(math.random() * 2, bringup) else bringup() end
     end)
 end

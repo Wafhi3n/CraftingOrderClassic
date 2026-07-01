@@ -60,14 +60,14 @@ function Trace:Cmd(rest)
         if COC.db then COC.db.traceOn = false end
         p("OFF.")
     elseif arg == "clear" then
-        self:Clear(); p("vidée.")
+        self:Clear(); p(COC.L["vidée."])
     elseif arg == "dump" then
         local b = buf()
-        p(#b .. " lignes (30 dernières) :")
+        p(string.format(COC.L["%d lignes (30 dernières) :"], #b))
         for i = math.max(1, #b - 29), #b do print(b[i]) end
     else
         if COC.db then COC.db.traceOn = true end
         self:Log("meta", "=== trace ON par " .. ((UnitName and UnitName("player")) or "?") .. " ===")
-        p("ON. Fais tes tests, puis |cFFFFFFFF/reload|r, puis lis SavedVariables\\CraftingOrderClassic.lua (clé trace).")
+        p(COC.L["ON. Fais tes tests, puis |cFFFFFFFF/reload|r, puis lis SavedVariables\\CraftingOrderClassic.lua (clé trace)."])
     end
 end
