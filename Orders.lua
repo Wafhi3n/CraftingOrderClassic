@@ -39,70 +39,9 @@ end
 -- ------------------------------------------------------------------
 -- Émission (protocole)
 -- ------------------------------------------------------------------
-local KEYWORD_RCPT = { Tous = true, Guilde = true, Amis = true }
-
--- Sérialise un ORD|NEW (partagé par Broadcast et le push à la connexion). Dernier champ = liste CSV
--- des itemID que l'ACHETEUR fournit (vide si aucun) → l'artisan voit « À FOURNIR » vs déjà fournis.
-function Orders:_NewPayload(o)
-    return string.format("ORD|NEW|%s|%s|%s|%d|%d|%s|%s|%s|%d|%s",
-        o.id, o.buyer, o.kind, o.itemID or o.spellID or 0, o.qty or 1,
-        o.profession or "", (o.price or ""):gsub("|", ""),
-        (o.recipient or "Tous"):gsub("|", ""), o.byStack and 1 or 0,
-        table.concat(o.provided or {}, ","))
-end
-
--- Un joueur (de mon annuaire) entre-t-il dans la portée d'un ordre ? Tous / guilde-amis / nommé.
--- Guilde/Amis = drapeaux de relation (isGuild/isFriend) → marche aussi pour un artisan AJOUTÉ qui est
--- ami/guildmate en jeu (sinon « added » l'exclurait à tort).
-function Orders:_ScopeMatch(o, name, r)
-    local rcpt = o.recipient or "Tous"
-    if rcpt == "Tous"   then return true end
-    if rcpt == "Guilde" then return r ~= nil and (r.isGuild  or r.source == "guild")  == true end
-    if rcpt == "Amis"   then return r ~= nil and (r.isFriend or r.source == "friend") == true end
-    return name == rcpt                                       -- ordre nommé sur un joueur précis
-end
-
--- Artisans connus EN LIGNE concernés par un ordre → fanout whisper (le canal caché est peu fiable
--- sur PTR : on DOUBLE chaque NEW vers eux → livraison garantie sans dépendre du canal).
-function Orders:_FanoutTargets(o)
-    local D = COC.Directory
-    if not (D and D.roster and D.online) then return {} end
-    local m, out = me(), {}
-    for name, r in pairs(D.roster) do
-        if name ~= m and D.online[name] and self:_ScopeMatch(o, name, r) then out[name] = true end
-    end
-    return out
-end
-
--- Cibles dirigées (whisper) pour les transitions de cycle : ACK/DONE → l'acheteur ;
--- CANCEL → l'artisan qui avait accepté + le destinataire nommé. Fiable même canal HS.
-function Orders:_CycleTargets(action, o)
-    local t, m = {}, me()
-    local function add(n) if n and n ~= "" and n ~= m and not KEYWORD_RCPT[n] then t[n] = true end end
-    if action == "ACK" or action == "DONE" then add(o.buyer)
-    elseif action == "CANCEL" then add(o.acceptedBy); add(o.recipient) end
-    return t
-end
-
-function Orders:Broadcast(action, o)
-    if not CraftLink then return end
-    local payload
-    if action == "NEW" then
-        payload = self:_NewPayload(o)
-    elseif action == "CANCEL" then payload = "ORD|CANCEL|" .. o.id
-    elseif action == "ACK"    then payload = string.format("ORD|ACK|%s|%s", o.id, o.acceptedBy or "")
-    elseif action == "DONE"   then payload = string.format("ORD|DONE|%s|%s", o.id, o.acceptedBy or "")
-    end
-    if not payload then return end
-    CraftLink:Send(payload, "global")
-    if action == "NEW" then
-        if o.recipient == "Guilde" then CraftLink:Send(payload, "guild") end
-        -- Fanout whisper vers les artisans connus EN LIGNE concernés (contourne le canal caché HS).
-        for name in pairs(self:_FanoutTargets(o)) do CraftLink:Send(payload, "whisper", name) end
-    else
-        for name in pairs(self:_CycleTargets(action, o)) do CraftLink:Send(payload, "whisper", name) end
-    end
-end
+-- Encodage ORD| + routage par portée (KEYWORD_RCPT, _NewPayload, _ScopeMatch, _FanoutTargets,
+-- _CycleTargets, Broadcast) → déplacés dans Orders_Net.lua (couche « fil réseau », anti-monolithe).
+-- Ces méthodes restent sur la table COC.Orders → appelées via self: depuis le cycle local ci-dessous.
 
 -- Routage par destinataire. Le canal étant global, tout le monde REÇOIT tout : ce filtre décide ce
 -- qui m'est destiné (affichage Carnet + acceptation). Valeurs canoniques (FR) côté réseau : "Tous",
@@ -206,6 +145,7 @@ function Orders:Deliver(id)
     if o.acceptedBy ~= me() then pmsg(L["tu n'as pas accepté cette commande."]); return end
     o.status = "done"; self:Broadcast("DONE", o)
     COC.db.delivered = (COC.db.delivered or 0) + 1   -- réputation v1 : compteur de crafts livrés
+    if COC.Directory then COC.Directory:AnnounceSkills() end   -- rediffuse la réputation à jour (SK)
     pmsg(string.format(L["livrée ! crafts livrés au total : %d"], COC.db.delivered))
 end
 
@@ -249,86 +189,16 @@ function Orders:ProfRowAction(o)
     return nil
 end
 
--- ------------------------------------------------------------------
--- Réception (protocole) — met à jour le cache
--- ------------------------------------------------------------------
-function Orders:OnNetwork(sender, message)
-    local action = message:match("^ORD|([A-Z]+)|")
-    if action == "NEW" then
-        local id, buyer, kind, oid, qty, prof, price, recipient, byStack, prov =
-            message:match("^ORD|NEW|([^|]*)|([^|]*)|([^|]*)|([^|]*)|([^|]*)|([^|]*)|([^|]*)|([^|]*)|(%d*)|?([%d,]*)$")
-        if not id or id == "" then return end
-        local existed = COC.db.orders[id] ~= nil   -- déjà connue ? (anti-spam sur re-broadcast)
-        local o = COC.db.orders[id] or {}
-        o.id, o.buyer, o.kind = id, buyer, (kind ~= "" and kind) or "item"
-        if o.kind == "enchant" then o.spellID = tonumber(oid) else o.itemID = tonumber(oid) end
-        o.qty        = tonumber(qty) or 1
-        o.profession = (prof ~= "" and prof) or nil
-        o.price      = (price ~= "" and price) or nil
-        o.recipient  = (recipient and recipient ~= "" and recipient) or "Tous"
-        o.byStack    = byStack == "1"
-        if prov and prov ~= "" then                       -- réactifs fournis par l'acheteur (CSV itemID)
-            local t = {}; for d in prov:gmatch("%d+") do t[#t + 1] = tonumber(d) end
-            o.provided = t
-        end
-        o.viaAddon   = true   -- reçue par le canal addon → l'auteur a l'addon (pas de whisper de pub)
-        o.status     = o.status or "open"
-        o.ts         = o.ts or time()
-        COC.db.orders[id] = o
-        if not existed and o.buyer ~= me() and o.status == "open" and self:_ShouldAlert(o) then
-            self:AlertTargeted(o)   -- toast à la 1re réception (portée réglée par COC.db.notifyScope)
-        end
-    elseif action == "CANCEL" then
-        local id = message:match("^ORD|CANCEL|(.+)$"); local o = id and COC.db.orders[id]
-        if o then o.status = "cancelled" end
-    elseif action == "ACK" then
-        local id, crafter = message:match("^ORD|ACK|([^|]*)|(.*)$"); local o = id and COC.db.orders[id]
-        if o then o.status = "accepted"; o.acceptedBy = (crafter ~= "" and crafter) or nil end
-    elseif action == "DONE" then
-        local id, crafter = message:match("^ORD|DONE|([^|]*)|(.*)$"); local o = id and COC.db.orders[id]
-        if o then o.status = "done"; o.acceptedBy = (crafter ~= "" and crafter) or o.acceptedBy end
-    elseif action == "NACK" then
-        local id, who = message:match("^ORD|NACK|([^|]*)|(.*)$"); local o = id and COC.db.orders[id]
-        if o and who ~= "" then
-            if o.acceptedBy == who then
-                o.status = "open"; o.acceptedBy = nil               -- l'artisan se désiste → réouverte
-            elseif o.buyer == me() and o.recipient == who then
-                o.status = "declined"; o.declinedBy = who           -- commande nommée refusée → refusée
-            end
-            if o.buyer == me() then
-                local txt = string.format(L["%s a refusé ta commande : %s"], who, self:OrderName(o))
-                pmsg(txt)
-                if o.status == "declined" and COC.UI and COC.UI.Toast then
-                    local Skin = COC.UI.Skin; COC.UI:Toast(txt, Skin and Skin.tex.fail)
-                end
-            end
-        end
-    elseif action == "SUGG" then self:_OnSuggest(message)
-    end
-    if COC.UI and COC.UI.Refresh then COC.UI:Refresh() end   -- maj live de la fenêtre si ouverte
-    local PW = COC.ProfWindow
-    if PW and PW.RefreshOrders and PW.frame and PW.frame:IsShown() then PW:RefreshOrders() end
-end
-
--- Nudge « garde pour toi » (ORD|SUGG|id[|1]) : un pair me signale une commande de son cache que JE
--- saurais faire. « |1 » = captée /commerce·/guilde → viaAddon=false + captured. Alerte ssi H:ICanCraft.
-function Orders:_OnSuggest(message)
-    local id, cap = message:match("^ORD|SUGG|([^|]*)|?(%d*)$")
-    local o = id and COC.db.orders[id]
-    if not o then return end
-    if cap == "1" then o.viaAddon = false; o.captured = true end
-    local H = COC.Handoff
-    if H and o.status == "open" and o.buyer ~= me() and o.recipient ~= me() and H:ICanCraft(o) then
-        H:AlertCapable(o)
-    end
-end
+-- Réception protocole (OnNetwork : NEW/CANCEL/ACK/DONE/NACK/SUGG, + _OnSuggest) → déplacée dans
+-- Orders_Net.lua (couche « fil réseau »). _ShouldAlert / AlertTargeted (alerting) restent ci-dessous
+-- car appelés par OnNetwork via self: sur la table partagée COC.Orders.
 
 -- Notifier (toast) à la 1re réception ? Selon COC.db.notifyScope : all(défaut)/directed/named/off ; cf. /co notify.
 function Orders:_ShouldAlert(o)
     local m = (COC.db and COC.db.notifyScope) or "all"
     if m == "off" or (COC.db and COC.db.mutedPlayers and COC.db.mutedPlayers[o.buyer]) then return false end
-    if o.recipient == me() then return true end                     -- nommée : toujours
-    if m == "named" or not self:VisibleTo(o) then return false end   -- mode restreint / hors portée
+    if o.recipient == me() then return true end                     -- nommée : toujours (même petit perso)
+    if m == "named" or not self:VisibleTo(o) or (COC.Moderation and COC.Moderation:BelowThreshold(o.buyer)) then return false end  -- restreint / hors portée / bas niveau (anti-bot)
     return (o.recipient and o.recipient ~= "" and o.recipient ~= "Tous") or m == "all"  -- Guilde/Amis vs large
 end
 
@@ -348,6 +218,13 @@ function Orders:AlertTargeted(o, tries)
     pmsg((Skin and ("|T" .. Skin.tex.workorder .. ":0|t ") or "") .. msg)
     if COC.UI and COC.UI.Toast then COC.UI:Toast(msg) end
     pcall(function() PlaySound(SOUNDKIT and SOUNDKIT.TELL_MESSAGE or 3081, "Master") end)
+    -- Reroll : commande nommée que mon perso COURANT ne sait pas faire, mais un alt du compte oui.
+    -- Passe par Handoff:AlertReroll (chemin unique, dédupliqué par o._rerollAlertDone) pour éviter
+    -- une double alerte si le même ordre arrive aussi via ORD|SUGG (_OnSuggest, Orders_Net.lua).
+    if o.recipient == me() and COC.Handoff and not COC.Handoff:ICanCraft(o) then
+        local alt = COC.Handoff:MyRerollCanCraft(o)
+        if alt then COC.Handoff:AlertReroll(o, alt) end
+    end
     if COC.UI and COC.UI.Refresh then COC.UI:Refresh() end
 end
 

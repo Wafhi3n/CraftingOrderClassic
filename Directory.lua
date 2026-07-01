@@ -254,53 +254,9 @@ function Dir:AnnounceThrottled()
 end
 
 -- ------------------------------------------------------------------
--- Niveaux de compétence (Étape D) — profil « Forge 250/300 », lisible SANS ouvrir la fenêtre.
+-- Niveaux de compétence (SK) + réputation → déplacés dans Directory_Skills.lua (couche « profil »,
+-- anti-monolithe). CaptureSkills / _SkillPayload / AnnounceSkills / OnSkill restent sur COC.Directory.
 -- ------------------------------------------------------------------
--- Capture MES niveaux de métier via l'API skill. Le nom de ligne est localisé → ResolveProfession
--- le ramène à la clé interne EN (les aliases de CraftLink contiennent les noms FR/DE/ES).
-function Dir:CaptureSkills()
-    if not (CraftLink and GetNumSkillLines) then return end
-    self.mySkills = {}
-    for i = 1, GetNumSkillLines() do
-        local name, isHeader, _, rank, _, _, maxRank = GetSkillLineInfo(i)
-        if name and not isHeader and rank and rank > 0 then
-            local key = CraftLink:ResolveProfession(name)
-            if key and CraftLink.professions[key] then self.mySkills[key] = { rank, maxRank } end
-        end
-    end
-    if COC.db then COC.db.mySkills = self.mySkills end
-end
-
--- Construit le fil SK : "SK|lvl=<niveau>|key,cur,max;..." (niveau perso inclus pour l'annuaire).
-function Dir:_SkillPayload()
-    local parts = {}
-    for key, sk in pairs(self.mySkills or {}) do parts[#parts + 1] = key .. "," .. sk[1] .. "," .. sk[2] end
-    if #parts == 0 then return nil end
-    local lvl = (UnitLevel and UnitLevel("player")) or 0
-    return "SK|lvl=" .. lvl .. "|" .. table.concat(parts, ";")
-end
-
-function Dir:AnnounceSkills()
-    if not (CraftLink and CraftLink:IsNetworkReady()) then return end
-    local sk = self:_SkillPayload()
-    if sk then CraftLink:Send(sk, "global") end
-end
-
--- SK reçu (niveaux d'un autre) → cache roster. Formats : "SK|lvl=N|..." (avec niveau) ou ancien "SK|...".
-function Dir:OnSkill(sender, message)
-    if not sender then return end
-    local lvl, body = message:match("^SK|lvl=(%d+)|(.+)$")
-    if not body then body = message:match("^SK|(.+)$") end
-    if not body then return end
-    local r = self:_Touch(sender)
-    r.skill = r.skill or {}
-    if lvl then r.level = tonumber(lvl) end
-    for chunk in body:gmatch("[^;]+") do
-        local key, cur, max = chunk:match("^([^,]+),(%d+),(%d+)$")
-        if key then r.skill[key] = { tonumber(cur), tonumber(max) } end
-    end
-    if COC.UI and COC.UI.Refresh then COC.UI:Refresh() end
-end
 
 -- Découverte des amis + guildmates EN LIGNE par whisper (PING+HI) — fiable hors canal global et sans
 -- ciblage mutuel. Au login (1er appel → prev vide) on ping TOUS les en-ligne ; ensuite, sur chaque

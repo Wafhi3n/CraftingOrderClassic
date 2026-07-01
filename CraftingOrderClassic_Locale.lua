@@ -37,6 +37,22 @@ if loc == "enUS" or loc == "enGB" then
         -- Vue métier (cabine) : pied de colonne Commandes + action carte
         ["Inviter en groupe"] = "Invite to group", ["en attente"] = "pending", ["acceptées"] = "accepted", ["en sourdine"] = "muted",
         ["diag"] = "diag", ["Sourdine"] = "Muted", ["Réafficher"] = "Unmute",
+        -- Modération / anti-spam (/co mute|unmute|lowlevel, popup spam, menu contextuel joueur)
+        ["Muter"] = "Mute", ["Ajouter aux artisans"] = "Add to artisans",
+        ["%s est mis en sourdine — plus aucune notification de sa part."] = "%s is now muted — no more notifications from them.",
+        ["%s n'est plus en sourdine."] = "%s is no longer muted.",
+        ["usage : /co unmute <nom>"] = "usage: /co unmute <name>",
+        ["aucun joueur en sourdine. /co mute <nom> pour en ajouter un."] = "no muted players. /co mute <name> to add one.",
+        ["en sourdine (%d) : %s"] = "muted (%d): %s",
+        ["mute auto bas niveau : |cFFFFFFFFdésactivé|r — /co lowlevel <niveau>"] = "low-level auto-mute: |cFFFFFFFFoff|r — /co lowlevel <level>",
+        ["mute auto bas niveau : sous le niveau |cFFFFFFFF%d|r — /co lowlevel [N|off]"] = "low-level auto-mute: below level |cFFFFFFFF%d|r — /co lowlevel [N|off]",
+        ["%s a posté %d fois en peu de temps. Le mettre en sourdine ?"] = "%s posted %d times in a short while. Mute them?",
+        ["muter/démuter un joueur (aucune notif de sa part)"] = "mute/unmute a player (no notifications from them)",
+        ["seuil de mute auto des persos bas niveau (défaut 5)"] = "auto-mute threshold for low-level characters (default 5)",
+        -- Réputation sociale (crafts livrés, diffusée via SK)
+        ["%d livrés"] = "%d delivered",
+        -- Rerolls / alts du compte
+        ["ton reroll |cFFFFFFFF%s|r sait le faire : %s"] = "your alt |cFFFFFFFF%s|r can make this: %s",
         -- Panneau « composants » des cartes de commande
         ["COMPOSANTS FOURNIS"] = "PROVIDED COMPONENTS", ["À FOURNIR"] = "TO PROVIDE", ["complet"] = "complete",
         -- Ligne de chargement + /co status + /co help (sorties chat des commandes slash)
@@ -68,11 +84,10 @@ if loc == "enUS" or loc == "enGB" then
         ["portée des notifications de commande"] = "order notification scope",
         ["notifications : |cFFFFFFFF%s|r — /co notify [all|directed|named|off]"] =
             "notifications: |cFFFFFFFF%s|r — /co notify [all|directed|named|off]",
-        ["détecter les demandes de craft postées en chat (commerce/guilde)"] =
-            "detect craft requests posted in chat (trade/guild)",
-        ["scan chat commerce/guilde : |cFFFFFFFF%s|r — /co scan [on|off]"] =
-            "trade/guild chat scan: |cFFFFFFFF%s|r — /co scan [on|off]",
-        ["actif"] = "on", ["coupé"] = "off",
+        ["portée du scan des demandes de craft en chat (défaut : mes métiers)"] =
+            "scope of the in-chat craft-request scan (default: my professions)",
+        ["scan chat commerce/guilde : |cFFFFFFFF%s|r — /co scan [mine|all|off]"] =
+            "trade/guild chat scan: |cFFFFFFFF%s|r — /co scan [mine|all|off]",
         ["mode solo"] = "solo mode",
         ["injecte/retire un réseau fictif (artisans + commandes)"] = "inject/remove a fake network (crafters + orders)",
         ["journalise le réseau dans la SavedVariable (off | clear | dump)"] =

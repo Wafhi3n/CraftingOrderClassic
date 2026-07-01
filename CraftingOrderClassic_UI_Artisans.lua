@@ -179,6 +179,8 @@ function UI:RefreshArtisans()
     end
     table.sort(list, function(a, b)
         if (a.online and true) ~= (b.online and true) then return a.online end
+        local ra, rb = a.r.rep or 0, b.r.rep or 0
+        if ra ~= rb then return ra > rb end       -- réputation (crafts livrés) décroissante
         return a.name < b.name
     end)
 
@@ -188,7 +190,8 @@ function UI:RefreshArtisans()
         row.dot:SetOnline(a.online and true or false)
         row.name:SetText("|cFFFFFFFF" .. a.name .. "|r")
         local lvl = a.r.level and (L["niv "] .. a.r.level) or L["niv ?"]
-        row.sub:SetText("|cFF888888" .. (a.online and L["En ligne"] or L["Hors ligne"]) .. " · " .. lvl .. "|r")
+        local rep = (a.r.rep and a.r.rep > 0) and (" · " .. string.format(L["%d livrés"], a.r.rep)) or ""
+        row.sub:SetText("|cFF888888" .. (a.online and L["En ligne"] or L["Hors ligne"]) .. " · " .. lvl .. rep .. "|r")
         UI:_SetArtProfIcons(row, profsList(a.r))
         row.src:SetText("|cFF888888" .. (SRC_TAG[a.r.source or "recent"] or "") .. "|r")
         row.whisper:SetScript("OnClick", function()

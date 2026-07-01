@@ -3,8 +3,9 @@
 -- (neutralisée, jamais Hide() pour garder la session lisible). Colonnes dans _Recipes / _Detail ;
 -- la colonne Commandes vit ici (réutilise le carnet/entrantes du métier ouvert).
 --
--- EXPÉRIMENTAL : activé via `/co profwindow` (COC.db.profWindow). Quand ON, désactive le takeover
--- de Guild Economy (TradeScannerDB.replaceProfWindow=false) → jamais deux fenêtres à la fois.
+-- Vue métier par DÉFAUT (maquette designer) : PW:IsEnabled() vrai sauf COC.db.profWindow == false.
+-- `/co profwindow` bascule custom ↔ « Vue Blizzard » (opt-out). Quand la vue custom est active, désactive
+-- le takeover de Guild Economy (TradeScannerDB.replaceProfWindow=false) → jamais deux fenêtres à la fois.
 
 local COC  = CraftingOrderClassic
 local UI   = COC.UI

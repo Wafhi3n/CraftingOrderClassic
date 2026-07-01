@@ -113,17 +113,17 @@ function COC:NotifyCmd(arg)
     p(string.format(L["notifications : |cFFFFFFFF%s|r — /co notify [all|directed|named|off]"], cur))
 end
 
--- /co scan [on|off] : (dés)active le scanner du canal Commerce / de la guilde qui repère les demandes
+-- /co scan [mine|all|off] : portée du scanner du canal Commerce / de la guilde qui repère les demandes
 -- de craft postées en clair (« WTB [objet] ») et les remonte en Entrantes + notif. Persistant via
--- COC.db.scanInbound (défaut ON). OFF = plus aucune détection depuis le chat public.
+-- COC.db.inboundScope. Défaut **mine** = SEULEMENT les métiers que j'ai (pas de spam pour un métier
+-- qu'on n'a pas) ; all = tout objet fabricable ; off = plus aucune détection depuis le chat public.
+local SCAN_MODES = { mine = true, all = true, off = true }
 function COC:ScanCmd(arg)
     local L = COC.L
     arg = (arg or ""):lower()
-    if arg == "on"  then COC.db.scanInbound = true
-    elseif arg == "off" then COC.db.scanInbound = false end
-    local on = COC.db and COC.db.scanInbound ~= false
-    p(string.format(L["scan chat commerce/guilde : |cFFFFFFFF%s|r — /co scan [on|off]"],
-        on and L["actif"] or L["coupé"]))
+    if SCAN_MODES[arg] then COC.db.inboundScope = arg end
+    local cur = (COC.db and COC.db.inboundScope) or "mine"
+    p(string.format(L["scan chat commerce/guilde : |cFFFFFFFF%s|r — /co scan [mine|all|off]"], cur))
 end
 
 -- Avertit UNE FOIS que l'addon rejoint son canal réseau dédié (transparence : le joueur le verra
@@ -186,7 +186,9 @@ function COC:Help()
     print("  |cFFFFFFFF/co profwindow|r — " .. L["basculer fenêtre métier custom / vue Blizzard"])
     print("  |cFFFFFFFF/co channel [on|off]|r — " .. L["(dés)activer le canal réseau global"])
     print("  |cFFFFFFFF/co notify [all|directed|named|off]|r — " .. L["portée des notifications de commande"])
-    print("  |cFFFFFFFF/co scan [on|off]|r — " .. L["détecter les demandes de craft postées en chat (commerce/guilde)"])
+    print("  |cFFFFFFFF/co scan [mine|all|off]|r — " .. L["portée du scan des demandes de craft en chat (défaut : mes métiers)"])
+    print("  |cFFFFFFFF/co mute <nom>|r / |cFFFFFFFF/co unmute <nom>|r — " .. L["muter/démuter un joueur (aucune notif de sa part)"])
+    print("  |cFFFFFFFF/co lowlevel [N|off]|r — " .. L["seuil de mute auto des persos bas niveau (défaut 5)"])
     print("  |cFFFFFFFF/co debug|r — |cFFFF8800" .. L["mode solo"] .. "|r : " .. L["injecte/retire un réseau fictif (artisans + commandes)"])
     print("  |cFFFFFFFF/co trace|r — |cFFFF8800" .. L["diag"] .. "|r : " .. L["journalise le réseau dans la SavedVariable (off | clear | dump)"])
 end
@@ -217,6 +219,9 @@ function COC:Slash(msg)
     elseif cmd == "channel" or cmd == "canal" then COC:ChannelCmd(rest)
     elseif cmd == "notify" or cmd == "notif" then COC:NotifyCmd(rest)
     elseif cmd == "scan" then COC:ScanCmd(rest)
+    elseif cmd == "mute"   then if COC.Moderation then COC.Moderation:MuteCmd(rest) end
+    elseif cmd == "unmute" then if COC.Moderation then COC.Moderation:UnmuteCmd(rest) end
+    elseif cmd == "lowlevel" or cmd == "lowlvl" then if COC.Moderation then COC.Moderation:LowLevelCmd(rest) end
     elseif cmd == "beacon" then COC:BeaconDiag()
     elseif cmd == "wipe"   then COC:WipeRoster()
     elseif cmd == "debug"  then if COC.Debug then COC.Debug:Toggle() end

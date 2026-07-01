@@ -186,6 +186,47 @@ function Handoff:AlertCapable(o, tries)
 end
 
 -- ------------------------------------------------------------------
+-- Rerolls / alts (même compte) : « ton reroll X sait le faire »
+-- ------------------------------------------------------------------
+-- Un de MES rerolls sait-il crafter `o` ? Lit les partitions persistées COC.db.knownRecipes[nom-royaume]
+-- (set spellID par métier, cf. COC:_MyKnownStore) SANS que l'alt soit connecté. Renvoie le nom (court)
+-- du 1er reroll capable, ou nil. Surface « ton reroll » quand le perso COURANT, lui, ne sait pas faire.
+function Handoff:MyRerollCanCraft(o)
+    local c = CraftLink
+    if not (c and COC.db and COC.db.knownRecipes) then return nil end
+    local prof = o.profession or (o.itemID and COC.Orders and COC.Orders:ProfForItem(o.itemID))
+    if not prof then return nil end
+    local spellID = o.spellID
+    if not spellID and o.itemID then local i2s = c:ItemToSpell(prof); spellID = i2s and i2s[o.itemID] end
+    if not spellID then return nil end
+    local meKey = ((UnitName and UnitName("player")) or "?") .. "-" .. ((GetRealmName and GetRealmName()) or "")
+    for who, partition in pairs(COC.db.knownRecipes) do
+        local set = who ~= meKey and partition[prof]
+        if set and set[spellID] then return who:match("^([^%-]+)") or who end
+    end
+    return nil
+end
+
+-- Alerte « ton reroll sait le faire » (chat + toast). Nom d'objet async → retente ~3 s (cf. AlertCapable).
+-- Chemin unique pour cette alerte (appelé depuis AlertTargeted ordre nommé ET _OnSuggest) : o._rerollAlertDone
+-- dédup côté ordre pour ne jamais l'afficher deux fois si les deux chemins se déclenchent pour le même id.
+function Handoff:AlertReroll(o, alt, tries)
+    if o._rerollAlertDone then return end
+    local O = COC.Orders; if not O then return end
+    local nm = O:OrderName(o)
+    if (nm:match("^item:") or nm:match("^spell:")) and (tries or 0) < 10 then
+        if o.itemID and GetItemInfo then GetItemInfo(o.itemID) end
+        if C_Timer then C_Timer.After(0.3, function() Handoff:AlertReroll(o, alt, (tries or 0) + 1) end); return end
+    end
+    o._rerollAlertDone = true
+    local Skin = COC.UI and COC.UI.Skin
+    local what = nm .. ((Skin and Skin.QtySuffix(o)) or "")
+    local msg  = string.format(L["ton reroll |cFFFFFFFF%s|r sait le faire : %s"], alt, what)
+    pmsg((Skin and ("|T" .. Skin.tex.workorder .. ":0|t ") or "") .. msg)
+    if COC.UI and COC.UI.Toast then COC.UI:Toast(msg, Skin and Skin.tex.workorder) end
+end
+
+-- ------------------------------------------------------------------
 -- Lecture (Palier 3) — file « Confiées » pour l'UI
 -- ------------------------------------------------------------------
 function Handoff:_Row(o, a, id)

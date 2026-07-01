@@ -33,7 +33,10 @@ CraftingOrderClassic_ProfWindow_Recipes.lua
 CraftingOrderClassic_ProfWindow_Detail.lua
 CraftingOrderClassic_ProfWindow_Orders.lua
 Directory.lua
+Directory_Skills.lua
 Orders.lua
+Orders_Net.lua
 CraftingOrderClassic_Inbound.lua
 CraftingOrderClassic_Handoff.lua
+CraftingOrderClassic_Moderation.lua
 Debug.lua

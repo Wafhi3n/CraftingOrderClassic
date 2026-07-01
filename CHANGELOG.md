@@ -1,5 +1,28 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## Unreleased
+
+**Moderation & anti-spam.** Mute a spammer with `/co mute <name>` / `/co unmute <name>`, shift-right-click
+on an order card, or the right-click player menu — a muted player triggers no toast, chat line or sound
+(P2P orders **and** chat-captured requests). Low-level posters are auto-muted below a threshold
+(`/co lowlevel [N|off]`, default 5) when their level is known, to cut bot/mule noise. A burst of orders
+from one author raises a one-click **"mute them?"** prompt.
+
+**Social reputation.** Your delivered-craft count now rides on the profile broadcast and shows in the
+social tooltip and the Artisans list (*· N delivered*), which sorts crafters by it. Reputation is
+self-reported (same trust model as skill levels) and backward-compatible on the wire — older clients
+simply ignore it.
+
+**Reroll awareness.** When an order your current character can't craft is routed to you (a capable-friend
+nudge, or an order named to you), the addon tells you which of your **other characters on the account**
+can make it — so you know which alt to log.
+
+**Custom profession window is now the default.** The 3-column browser (recipes · reagents · related
+orders) is the standard view; *Blizzard view* is the opt-out (`/co profwindow`).
+
+_Under the hood: the orders and directory modules were split along their network / domain seams
+(`Orders_Net.lua`, `Directory_Skills.lua`) to keep each file focused._
+
 ## v1.0.0 — first stable release
 
 _Since the `0.0.1` beta:_ renamed to **Crafting & Gathering Order — Classic** (full gathering-order

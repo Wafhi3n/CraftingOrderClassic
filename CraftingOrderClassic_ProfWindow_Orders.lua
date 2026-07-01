@@ -191,7 +191,9 @@ function PW:_CardActions(card, it)
     card.invite:SetScript("OnClick", function() if InviteUnit and o.buyer then InviteUnit(o.buyer) end end)
     card:SetScript("OnMouseUp", function(_, btn)
         if btn ~= "RightButton" then return end
-        if kind == "inbound" then COC.Inbound:Dismiss(o.id)
+        if IsShiftKeyDown and IsShiftKeyDown() and o.buyer and COC.Moderation then
+            COC.Moderation:Mute(o.buyer)   -- shift-clic-droit = muter l'auteur (clic-droit simple = masquer l'ordre)
+        elseif kind == "inbound" then COC.Inbound:Dismiss(o.id)
         else COC.db.muted = COC.db.muted or {}; COC.db.muted[o.id] = true end
         PW:RefreshOrders()
     end)

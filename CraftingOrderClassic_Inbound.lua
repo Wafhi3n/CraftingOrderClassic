@@ -90,8 +90,19 @@ end
 -- ------------------------------------------------------------------
 -- Parsing
 -- ------------------------------------------------------------------
+-- Portée du scanner chat (COC.db.inboundScope, cf /co scan) :
+--   mine (défaut) = SEULEMENT un métier que j'ai (mySkills) → aucun bruit pour un métier qu'on n'a pas ;
+--   all = tout objet fabricable ; off = rien (court-circuité en amont).
+local function scanScope() return (COC.db and COC.db.inboundScope) or "mine" end
+function Inbound:_WantProf(prof)
+    if scanScope() == "all" then return true end
+    local D = COC.Directory
+    return (D and D.mySkills and D.mySkills[prof]) ~= nil
+end
+
 function Inbound:OnChat(msg, player, source)
     if not (msg and player) or player == me() then return end
+    if scanScope() == "off" then return end
     if IsOffer(msg) then return end              -- WTS (vente) ou LFW (artisan offrant) = pas une demande
     if not HasRequestKW(msg) then return end
     local ids = ExtractItemIDs(msg)
@@ -99,7 +110,7 @@ function Inbound:OnChat(msg, player, source)
     local Orders = COC.Orders
     for _, itemID in ipairs(ids) do
         local prof = Orders and Orders:ProfForItem(itemID)
-        if prof then   -- objet réellement fabricable → c'est une demande de craft
+        if prof and self:_WantProf(prof) then   -- objet fabricable dans un métier que je surveille
             local canCraft = CraftLink and CraftLink:IKnowRecipeForItem(prof, itemID) or false
             self:Add({
                 buyer = player, itemID = itemID, qty = ExtractQty(msg),
@@ -124,6 +135,7 @@ function Inbound:Add(e)
         if (time() - (v.ts or 0)) > EXPIRY then COC.db.inbound[k] = nil else n = n + 1 end
     end
     if e.status == "new" then self:Alert(e) end
+    if e.status == "new" and COC.Moderation then COC.Moderation:NotePost(e.buyer) end   -- anti-spam
     -- « Garder pour un ami capable » : si un artisan connu sait la faire, on me le signale et on la
     -- lui pousse (maintenant s'il est en ligne, sinon à sa connexion via Handoff:OnArtisanOnline).
     if e.status == "new" and COC.Handoff then COC.Handoff:NoteInbound(e) end
@@ -135,6 +147,7 @@ function Inbound:Alert(e)
     -- mutés ne déclenchent AUCUNE notif (chat/toast/son). L'entrée reste dans le Carnet › Entrantes.
     if COC.db and (COC.db.notifyScope == "off"
         or (COC.db.mutedPlayers and COC.db.mutedPlayers[e.buyer])) then return end
+    if COC.Moderation and COC.Moderation:BelowThreshold(e.buyer) then return end   -- petit perso (si connu)
     local c = CraftLink
     local nm = (c and c:ItemName(e.itemID)) or ("item:" .. e.itemID)
     local src = (e.source == "guild") and L["guilde"] or L["commerce"]
@@ -186,13 +199,12 @@ end
 -- ------------------------------------------------------------------
 function Inbound:Start()
     if not COC.db then return end
-    if COC.db.scanInbound == nil then COC.db.scanInbound = true end
     COC.db.inbound = COC.db.inbound or {}
     local f = CreateFrame("Frame")
     f:RegisterEvent("CHAT_MSG_CHANNEL")
     f:RegisterEvent("CHAT_MSG_GUILD")
     f:SetScript("OnEvent", function(_, event, msg, player, _, channelName)
-        if not COC.db.scanInbound then return end
+        if scanScope() == "off" then return end
         local who = player and (player:match("^([^%-]+)") or player)
         if event == "CHAT_MSG_CHANNEL" then
             local cn = (channelName or ""):lower()

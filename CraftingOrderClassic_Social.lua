@@ -40,7 +40,8 @@ local function OnTooltipUnit(tooltip)
     table.sort(parts)
     -- Marque addon = icône WorkOrder (le glyphe « ✓ » s'affichait en tofu dans la police WoW).
     local mark = sk and ("  |T" .. sk.tex.workorder .. ":14:14:0:0|t") or ""
-    tooltip:AddLine("|cFF33DD88CO-Classic|r" .. mark .. "  " .. table.concat(parts, "   "), 1, 1, 1)
+    local rep = (r.rep and r.rep > 0) and ("  |cFFE8B84B" .. string.format(COC.L["%d livrés"], r.rep) .. "|r") or ""
+    tooltip:AddLine("|cFF33DD88CO-Classic|r" .. mark .. "  " .. table.concat(parts, "   ") .. rep, 1, 1, 1)
     tooltip:Show()
 end
 
@@ -48,40 +49,52 @@ end
 -- Clic-droit : « Ajouter aux artisans »
 -- =========================================================================
 local COC_MENU_KEY = "COC_ADD_TO_CRAFTERS"
+local COC_MUTE_KEY = "COC_MUTE_PLAYER"
+
+-- Nom du joueur ciblé par le menu contextuel ouvert (convention variable selon la version Classic).
+local function menuTargetName()
+    local name
+    local menu = UIDROPDOWNMENU_OPEN_MENU
+    if menu then
+        name = menu.name
+        if not name and menu.unit then name = UnitName(menu.unit) end
+    end
+    if not (name and name ~= "") then name = UnitName("mouseover") end   -- dernier recours : sous la souris
+    return name
+end
 
 local function InjectContextMenu()
     if not (UnitPopupMenus and UnitPopupButtons) then return end
+    local L = COC.L
     local targets = { "PLAYER", "PARTY", "RAID_PLAYER", "FRIEND", "GUILD" }
     for _, t in ipairs(targets) do
         local menu = UnitPopupMenus[t]
         if menu then
-            local already = false
-            for _, k in ipairs(menu) do if k == COC_MENU_KEY then already = true; break end end
-            if not already then
-                -- Insère avant « CANCEL » (dernier item) pour respecter l'ordre visuel.
-                local n = #menu
-                if menu[n] == "CANCEL" then table.insert(menu, n, COC_MENU_KEY)
-                else menu[#menu + 1] = COC_MENU_KEY end
+            for _, key in ipairs({ COC_MENU_KEY, COC_MUTE_KEY }) do
+                local already = false
+                for _, k in ipairs(menu) do if k == key then already = true; break end end
+                if not already then
+                    -- Insère avant « CANCEL » (dernier item) pour respecter l'ordre visuel.
+                    local n = #menu
+                    if menu[n] == "CANCEL" then table.insert(menu, n, key)
+                    else menu[#menu + 1] = key end
+                end
             end
         end
     end
 
     UnitPopupButtons[COC_MENU_KEY] = {
-        text = "Ajouter aux artisans",
-        dist = 0,
+        text = L["Ajouter aux artisans"], dist = 0,
         func = function()
-            -- Récupère le nom depuis le menu ouvert (convention variable selon la version Classic).
-            local name
-            local menu = UIDROPDOWNMENU_OPEN_MENU
-            if menu then
-                name = menu.name
-                if not name and menu.unit then name = UnitName(menu.unit) end
-            end
-            -- Dernier recours : unité sous la souris.
-            if not (name and name ~= "") then name = UnitName("mouseover") end
-            if name and name ~= "" and COC.UI and COC.UI._AddArtisan then
-                COC.UI:_AddArtisan(name)
-            end
+            local name = menuTargetName()
+            if name and name ~= "" and COC.UI and COC.UI._AddArtisan then COC.UI:_AddArtisan(name) end
+        end,
+    }
+    UnitPopupButtons[COC_MUTE_KEY] = {
+        text = L["Muter"], dist = 0,
+        func = function()
+            local name = menuTargetName()
+            if name and name ~= "" and COC.Moderation then COC.Moderation:Mute(name) end
         end,
     }
 end
