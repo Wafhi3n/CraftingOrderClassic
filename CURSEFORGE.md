@@ -37,6 +37,30 @@ The **Artisans** directory shows who can make what, who's **online right now**, 
 channel). Add anyone by name or right-click their portrait, and get a notification when a favourite
 crafter comes online. Hover any player to see their professions in the tooltip.
 
+**Order from the crafter who can make it**
+
+Pick a crafter in the Order tab and the recipe list narrows to what *they* can actually craft — from
+their known-recipe registry, or a skill-level estimate when that's all that's shared yet. No more
+sending someone a request they can't fill. Their registry is pulled fresh the moment you select them.
+
+**Craft what your bags allow**
+
+Filter the recipe list to the plans you can make **right now** with the reagents already in your bags —
+it updates live as your inventory changes, so you always know what you can start immediately.
+
+**Partners, loot alerts & recipe gifts**
+
+Loot a recipe, formula, schematic or pattern and the addon tells you what it teaches, whether you
+already know it, and which of your **partners** don't. Mark anyone a partner with a right-click, then
+offer them a spare plan with **/co gift** — a friendly whisper, never automatic.
+
+**Delivery you can trust**
+
+An order isn't *done* the instant a crafter clicks Deliver — it becomes **Delivered**, and the buyer
+confirms receipt (automatically when the item reaches their bags, or with a one-click **Received**
+button). Crafter reputation is credited only on that confirmation, so delivered-counts reflect real
+hand-offs.
+
 **Catches requests from non-users too**
 
 Requests posted in **/trade** and **/guild** by players who don't run the addon are captured into an
@@ -61,7 +85,8 @@ addon is completely standalone (it embeds the shared **CraftLink** library) and 
 
 Use **/co help** for the full list. Popular: **/co** (open the board), **/co profwindow** (custom
 profession window), **/co notify** (notification scope), **/co scan** (toggle the /trade + /guild
-scanner), **/co refresh** (re-poll the directory).
+scanner), **/co gift** (offer a looted plan to a partner), **/co lootalert** (toggle recipe-loot
+alerts), **/co refresh** (re-poll the directory).
 
 **Perfect for**
 
