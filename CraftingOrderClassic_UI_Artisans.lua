@@ -154,6 +154,28 @@ function UI:_AddArtisan(name)
         "|r |cFF888888" .. L["(lié quand il sera en ligne avec l'addon)"] .. "|r")
 end
 
+-- Bascule le flag PARTENAIRE (drapeau explicite, distinct du isFriend automatique du client WoW —
+-- cf. request/FEATURE_friend.md) : priorisé dans l'alerte de plan looté (CraftingOrderClassic_LootAlert.lua)
+-- pour proposer un don en premier. Ajoute l'artisan à l'annuaire s'il n'y est pas encore (comme _AddArtisan).
+function UI:_TogglePartner(name)
+    name = trim(name)
+    if name == "" then return end
+    name = name:sub(1, 1):upper() .. name:sub(2)
+    local D = COC.Directory; if not D then return end
+    D.roster = D.roster or {}
+    local r = D.roster[name]
+    if not r then
+        r = { source = "added", recipes = {}, manual = true, lastSeen = time() }
+        D.roster[name] = r
+        if D.DiscoverPlayer then D:DiscoverPlayer(name) end
+    end
+    r.isPartner = not r.isPartner
+    UI:RefreshArtisans()
+    print("|cFF33DD88Crafting Order|r " .. (r.isPartner
+        and string.format(L["|cFFFFFFFF%s|r marqué comme partenaire — priorité sur les alertes de don."], name)
+        or string.format(L["|cFFFFFFFF%s|r n'est plus marqué comme partenaire."], name)))
+end
+
 -- =========================================================================
 -- Refresh
 -- =========================================================================
@@ -178,6 +200,7 @@ function UI:RefreshArtisans()
         end
     end
     table.sort(list, function(a, b)
+        if (a.r.isPartner and true) ~= (b.r.isPartner and true) then return a.r.isPartner end   -- partenaires en tête
         if (a.online and true) ~= (b.online and true) then return a.online end
         local ra, rb = a.r.rep or 0, b.r.rep or 0
         if ra ~= rb then return ra > rb end       -- réputation (crafts livrés) décroissante
@@ -188,7 +211,9 @@ function UI:RefreshArtisans()
     for _, a in ipairs(list) do
         n = n + 1; local row = self:_ArtRow(n)
         row.dot:SetOnline(a.online and true or false)
-        row.name:SetText("|cFFFFFFFF" .. a.name .. "|r")
+        -- Étiquette « Partenaire » (texte, pas de glyphe — cf. wow-ui-tofu-textures) : tag doré devant le nom.
+        local pTag = a.r.isPartner and ("|cFFFFD100" .. L["[Partenaire]"] .. "|r ") or ""
+        row.name:SetText(pTag .. "|cFFFFFFFF" .. a.name .. "|r")
         local lvl = a.r.level and (L["niv "] .. a.r.level) or L["niv ?"]
         local rep = (a.r.rep and a.r.rep > 0) and (" · " .. string.format(L["%d livrés"], a.r.rep)) or ""
         row.sub:SetText("|cFF888888" .. (a.online and L["En ligne"] or L["Hors ligne"]) .. " · " .. lvl .. rep .. "|r")

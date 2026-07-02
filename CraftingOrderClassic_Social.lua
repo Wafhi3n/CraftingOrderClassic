@@ -48,8 +48,9 @@ end
 -- =========================================================================
 -- Clic-droit : « Ajouter aux artisans »
 -- =========================================================================
-local COC_MENU_KEY = "COC_ADD_TO_CRAFTERS"
-local COC_MUTE_KEY = "COC_MUTE_PLAYER"
+local COC_MENU_KEY    = "COC_ADD_TO_CRAFTERS"
+local COC_MUTE_KEY    = "COC_MUTE_PLAYER"
+local COC_PARTNER_KEY = "COC_TOGGLE_PARTNER"
 
 -- Nom du joueur ciblé par le menu contextuel ouvert (convention variable selon la version Classic).
 local function menuTargetName()
@@ -70,7 +71,7 @@ local function InjectContextMenu()
     for _, t in ipairs(targets) do
         local menu = UnitPopupMenus[t]
         if menu then
-            for _, key in ipairs({ COC_MENU_KEY, COC_MUTE_KEY }) do
+            for _, key in ipairs({ COC_MENU_KEY, COC_PARTNER_KEY, COC_MUTE_KEY }) do
                 local already = false
                 for _, k in ipairs(menu) do if k == key then already = true; break end end
                 if not already then
@@ -88,6 +89,13 @@ local function InjectContextMenu()
         func = function()
             local name = menuTargetName()
             if name and name ~= "" and COC.UI and COC.UI._AddArtisan then COC.UI:_AddArtisan(name) end
+        end,
+    }
+    UnitPopupButtons[COC_PARTNER_KEY] = {
+        text = L["Partenaire (basculer)"], dist = 0,
+        func = function()
+            local name = menuTargetName()
+            if name and name ~= "" and COC.UI and COC.UI._TogglePartner then COC.UI:_TogglePartner(name) end
         end,
     }
     UnitPopupButtons[COC_MUTE_KEY] = {

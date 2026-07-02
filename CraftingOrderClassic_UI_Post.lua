@@ -9,7 +9,6 @@ local L    = COC.L   -- localisation du chrome (clé = FR ; overlay enUS). NB : 
 
 local PLH = 20    -- hauteur ligne plan
 local RRH = 21    -- hauteur ligne réactif
-local ARH = 26    -- hauteur ligne artisan
 
 -- Filtre qualité MINIMALE (cycle) : false = Toutes, sinon seuil WoW (2=Inhabituel, 3=Rare, 4=Épique).
 -- Les NOMS de qualité sont localisés par le client via _G["ITEM_QUALITY<n>_DESC"] (zéro clé à baker).
@@ -25,15 +24,21 @@ local RW   = 818 - RX          -- largeur scroll droit (scrollbar finit avant RE
 local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true) end
 local function isSoulbound(id) return id and GetItemInfo and select(14, GetItemInfo(id)) == 1 end
 
--- knowsProf : métier connu via SK (sans fenêtre) OU RK. inSource : liste source (Amis/Guilde via
--- drapeaux de relation → un ajouté aussi ami compte dans Amis), sinon catégorie d'affichage.
-local function knowsProf(r, p) return (r.skill and r.skill[p]) or (r.recipes and r.recipes[p]) or false end
-local function inSource(r, src)
-    return (src == "friend" and r.isFriend) or (src == "guild" and r.isGuild) or (r.source or "recent") == src
-end
 local function entryName(e)
     local c = CL(); if not c then return "?" end
     return e.itemID and c:ItemName(e.itemID) or c:RecipeName(e.spellID)
+end
+
+-- P2 : ai-je déjà TOUS les réactifs de cette recette dans mes sacs (GetItemCount, sacs seuls) ?
+-- false si la recette n'a pas de données `reagents` (CraftLink v6, cf. tools/gen_metadata.lua) —
+-- on ne peut alors ni confirmer ni infirmer, donc on ne la propose pas comme « prête ».
+local function hasReagentsInBags(c, prof, spellID)
+    local reag = spellID and c:RecipeReagents(prof, spellID)
+    if not reag or #reag == 0 then return false end
+    for _, rg in ipairs(reag) do
+        if (GetItemCount(rg[1], false) or 0) < rg[2] then return false end
+    end
+    return true
 end
 local function sep1px(parent, x1, x2, y)
     local s = parent:CreateTexture(nil, "ARTWORK"); s:SetHeight(1)
@@ -92,7 +97,24 @@ function UI:_BuildPostLeft(panel)
     fly:SetScript("OnShow",     function() closer:Show() end)
     fly:SetScript("OnHide",     function() closer:Hide() end)
 
-    -- Filtre qualité (pill) + recherche
+    self:_BuildPostPlanFilters(panel)
+
+    sep1px(panel, 12, SEP - 2, -172)
+
+    local lhdr = panel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+    lhdr:SetPoint("TOPLEFT", 14, -178); lhdr:SetText(L["LISTE DES PLANS"])
+    lhdr:SetTextColor(Skin.unpack(Skin.color.textMuted))
+    self.postPlanHdr = lhdr   -- annoté dynamiquement quand un artisan filtre la liste (cf. RefreshPostPlans)
+
+    local pscroll = CreateFrame("ScrollFrame", "COCPostPlanScroll", panel, "UIPanelScrollFrameTemplate")
+    pscroll:SetPoint("TOPLEFT", 12, -192); pscroll:SetPoint("BOTTOMLEFT", 12, 22); pscroll:SetWidth(LSW)
+    local pc = CreateFrame("Frame", nil, pscroll); pc:SetSize(LW - 22, 10); pscroll:SetScrollChild(pc)
+    self.postPlanContent = pc; self.postPlanRows = {}
+end
+
+-- Filtre qualité (pill) + recherche + filtre « réactifs en poche » (P2). Extrait de _BuildPostLeft
+-- pour rester sous le seuil anti-monolithe.
+function UI:_BuildPostPlanFilters(panel)
     self.postQualityIdx = 1
     local qBtn = Skin.MakeGoldButton(panel, 104, 18, "")
     qBtn:SetPoint("TOPLEFT", 12, -128); self.postQualityBtn = qBtn
@@ -111,16 +133,17 @@ function UI:_BuildPostLeft(panel)
     end)
     srch:SetScript("OnEscapePressed", function(b) b:ClearFocus() end)
 
-    sep1px(panel, 12, SEP - 2, -150)
-
-    local lhdr = panel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    lhdr:SetPoint("TOPLEFT", 14, -156); lhdr:SetText(L["LISTE DES PLANS"])
-    lhdr:SetTextColor(Skin.unpack(Skin.color.textMuted))
-
-    local pscroll = CreateFrame("ScrollFrame", "COCPostPlanScroll", panel, "UIPanelScrollFrameTemplate")
-    pscroll:SetPoint("TOPLEFT", 12, -170); pscroll:SetPoint("BOTTOMLEFT", 12, 22); pscroll:SetWidth(LSW)
-    local pc = CreateFrame("Frame", nil, pscroll); pc:SetSize(LW - 22, 10); pscroll:SetScrollChild(pc)
-    self.postPlanContent = pc; self.postPlanRows = {}
+    -- Filtre RÉACTIFS EN POCHE (P2) : ne montrer que les plans dont je porte déjà tous les
+    -- composants (cf. _HasReagentsInBags). Les plans prêts remontent toujours en tête de liste,
+    -- que le filtre soit actif ou non (cf. RefreshPostPlans).
+    self.postReagFilter = false
+    local rBtn = Skin.MakeGoldButton(panel, LW, 18, "")
+    rBtn:SetPoint("TOPLEFT", 12, -150); self.postReagFilterBtn = rBtn
+    rBtn:SetScript("OnClick", function()
+        UI.postReagFilter = not UI.postReagFilter
+        UI:_RefreshReagFilterBtn(); UI:RefreshPostPlans()
+    end)
+    self:_RefreshReagFilterBtn()
 end
 
 function UI:_ToggleProfFlyout()
@@ -134,6 +157,13 @@ function UI:_RefreshQualityBtn()
     local q = QUALITY_STEPS[self.postQualityIdx or 1]
     local name = q and ((_G["ITEM_QUALITY" .. q .. "_DESC"] or "?") .. "+") or L["Toutes"]
     self.postQualityBtn:SetText(L["Qualité : "] .. name)
+end
+
+function UI:_RefreshReagFilterBtn()
+    if not self.postReagFilterBtn then return end
+    self.postReagFilterBtn:SetText(self.postReagFilter
+        and ("|cFF33DD33" .. L["Réactifs : j'ai tout"] .. "|r")
+        or  (L["Réactifs : "] .. L["Toutes"]))
 end
 
 -- =========================================================================
@@ -198,48 +228,7 @@ function UI:_MakeGSC(parent, x, y)
     return fields[1], fields[2], fields[3]
 end
 
-function UI:_BuildPostArtisanSection(panel)
-    local srcDefs = { {id="guild", label=L["Guilde"]}, {id="friend", label=L["Amis"]}, {id="added", label=L["Ajoutés"]}, {id="recent", label=L["Croisés"]} }
-    self.postSrcBtns = {}
-    for i, d in ipairs(srcDefs) do
-        local b = Skin.MakeGoldButton(panel, 58, 20, d.label); b:SetPoint("TOPLEFT", RX + (i-1)*62, -337)
-        b:SetScript("OnClick", function()
-            UI.postSource = d.id; UI.postTarget = d.id   -- cibler TOUTE cette liste
-            UI:_RefreshPostSrcTabs(); UI:RefreshPostArtisans()
-        end)
-        self.postSrcBtns[d.id] = b
-    end
-    self.postSource = "guild"; self.postTarget = "all"; self:_RefreshPostSrcTabs()
-
-    local diffBtn = Skin.MakeGoldButton(panel, 124, 20, L["Diffuser à tous"]); diffBtn:SetPoint("TOPRIGHT", -22, -337)
-    local diffIc = diffBtn:CreateTexture(nil, "OVERLAY"); diffIc:SetSize(14, 14)
-    diffIc:SetPoint("LEFT", 5, 0); diffIc:SetTexture(Skin.tex.broadcast)
-    diffBtn.text:ClearAllPoints(); diffBtn.text:SetPoint("LEFT", 22, 0); self.postDiffBtn = diffBtn
-    -- Sélectionne la cible « Tous » (diffusion globale) ; on poste ensuite via « Poster » (iso Récolte).
-    diffBtn:SetScript("OnClick", function()
-        UI.postTarget = "all"; UI:RefreshPostArtisans()
-    end)
-
-    -- Ligne « Toute la guilde / Tous les amis » épinglée en tête + liste (cf. UI:_BuildAllRowAndScroll).
-    self:_BuildAllRowAndScroll(panel, "COCPostArtScroll", "post", -360)
-
-    local artLbl = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    artLbl:SetPoint("TOPLEFT", RX, -495); artLbl:SetText("|cFFE8B84B" .. L["Destinataire :"] .. "|r"); Skin.ApplyShadow(artLbl)
-    self.postArtisanName = panel:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    self.postArtisanName:SetPoint("LEFT", artLbl, "RIGHT", 6, 0); Skin.ApplyShadow(self.postArtisanName)
-    self:_UpdateArtisanLabel()
-
-    local posterBtn = Skin.MakeGoldButton(panel, 82, 24, L["Poster"]); posterBtn:SetPoint("BOTTOMRIGHT", -22, 36)
-    posterBtn:SetScript("OnClick", function() UI:DoPostOrder() end)
-
-    self.postSelLbl = panel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    self.postSelLbl:SetPoint("BOTTOMLEFT", RX, 40); self.postSelLbl:SetWidth(RW - 100); self.postSelLbl:SetJustifyH("LEFT")
-    self.postSelLbl:SetText("|cFF888888" .. L["Choisis un métier puis un plan."] .. "|r")
-end
-
-function UI:_RefreshPostSrcTabs()
-    for id, b in pairs(self.postSrcBtns or {}) do b:SetSelected(id == self.postSource) end
-end
+-- (Section artisan/destinataire/Poster : voir CraftingOrderClassic_UI_Post_Artisans.lua)
 
 -- =========================================================================
 -- Refresh
@@ -286,27 +275,47 @@ function UI:RefreshPostPlans()
     local list = self.postProf and c:ProfessionCatalogue(self.postProf) or {}
     local s = self.postSearch
     local qmin = QUALITY_STEPS[self.postQualityIdx or 1]   -- seuil qualité minimal (ou false = Toutes)
+    -- Filtre artisan ciblé (P5) : si postTarget = "@Nom", ne montrer que ce que CET artisan peut
+    -- fabriquer (recettes connues via RK, ou à défaut plans à sa portée via son niveau + learnedAt ;
+    -- cf. _TargetArtisanFilter). L'inverse du flux plan→artisans. artMode = libellé du mode (en-tête).
+    local artFilter, artMode = nil, nil
+    if self.postProf then artFilter, artMode = self:_TargetArtisanFilter(self.postProf) end
     local out = {}
     for _, e in ipairs(list) do
         -- Commande = objets CRAFTABLES uniquement (recette/sort) ; les récoltes pures (sans spellID)
         -- vivent dans l'onglet Récolte. On masque les objets liés (non échangeables) et ceux absents
         -- du client (autre extension).
-        if e.spellID and Skin.ItemExists(e.itemID) and not (e.itemID and isSoulbound(e.itemID)) then
+        if e.spellID and Skin.ItemExists(e.itemID) and not (e.itemID and isSoulbound(e.itemID))
+            and (not artFilter or artFilter(e.spellID)) then
             local okq = true
             if qmin and e.itemID then local q = select(3, GetItemInfo(e.itemID)); okq = q ~= nil and q >= qmin end
             local nm = entryName(e)
             if okq and (not s or s == "" or nm:lower():find(s, 1, true)) then
-                out[#out + 1] = {e = e, name = nm}
+                local ready = hasReagentsInBags(c, self.postProf, e.spellID)
+                if not self.postReagFilter or ready then
+                    out[#out + 1] = {e = e, name = nm, ready = ready}
+                end
             end
         end
     end
-    table.sort(out, function(a, b) return a.name < b.name end)
+    -- Réactifs en poche (P2) : les plans immédiatement fabricables remontent en tête, même quand
+    -- le filtre est désactivé (visibilité gratuite, aucune perte d'info).
+    table.sort(out, function(a, b)
+        if a.ready ~= b.ready then return a.ready end
+        return a.name < b.name
+    end)
     self.postPlanList = out
+    if self.postPlanHdr then
+        self.postPlanHdr:SetText(artFilter
+            and L["LISTE DES PLANS"] .. " |cFF33DD33(" .. self:_PostTargetLabel() .. " · " .. (artMode or "") .. ")|r"
+            or L["LISTE DES PLANS"])
+    end
     for i, item in ipairs(out) do
         local row = self:_PostPlanRow(i); local e = item.e
         local r, g, b = Skin.RarityColor(e.itemID)
         row.badge:Paint(r, g, b, Skin.FirstChar(item.name), Skin.Icon(e.itemID, e.spellID))
         local disp = item.name:match("^item:") and "|cFF777777" .. L["Chargement…"] .. "|r" or item.name
+        if item.ready then disp = "|cFF33DD33" .. L["[Prêt]"] .. "|r " .. disp end
         row.name:SetText(disp); row.name:SetTextColor(r, g, b)
         row.name:SetTextColor(e == self.postEntry and 1 or r, e == self.postEntry and 0.85 or g, e == self.postEntry and 0.27 or b)
         row.entry = e; row.tipItemID, row.tipSpellID = e.itemID, e.spellID; row:SetScript("OnClick", function() UI:SelectPostPlan(e) end); row:Show()
@@ -388,77 +397,6 @@ function UI:_UpdateProvidedCount()
     if self.postBQCount then self.postBQCount:SetText(n.." / "..#reag.." "..L["fournis"]) end
 end
 
-function UI:RefreshPostArtisans()
-    local D = COC.Directory; if not (D and self.postArtContent) then return end
-    local src, prof = self.postSource or "guild", self.postProf
-    local list = {}
-    for name, r in pairs(D.roster or {}) do
-        if inSource(r, src) and (not prof or knowsProf(r, prof)) then
-            list[#list+1] = {name=name, r=r, online=D.online[name]}
-        end
-    end
-    table.sort(list, function(a, b)
-        if (a.online and true) ~= (b.online and true) then return a.online end
-        return a.name < b.name
-    end)
-    local n = 0
-    for _, a in ipairs(list) do
-        n = n + 1; local row = self:_PostArtRow(n)
-        local sk = a.r.skill and prof and a.r.skill[prof]
-        local skTxt = sk and ("|cFF888888"..sk[1].."/"..sk[2].."|r  ") or ""
-        local profs2 = {}
-        for p2 in pairs(a.r.recipes or {}) do profs2[#profs2+1] = Skin.ProfLabel(p2) end
-        row.dot:SetOnline(a.online and true or false)
-        row.name:SetText("|cFFFFFFFF"..a.name.."|r  "..skTxt.."|cFF888888"..table.concat(profs2, " · ").."|r")
-        row.src:SetText("|cFF888888"..(a.r.source or "recent"):upper().."|r")
-        row.artEntry = a
-        row.selTex:SetShown(UI.postTarget == "@" .. a.name)
-        row:SetScript("OnClick", function()
-            UI.postTarget = "@" .. a.name; UI:RefreshPostArtisans()
-        end)
-        row:Show()
-    end
-    for i = n+1, #self.postArtRows do self.postArtRows[i]:Hide() end
-    self.postArtContent:SetHeight(math.max(n * ARH, 10))
-    Skin.AutoHideScroll("COCPostArtScroll", self.postArtContent)
-    self:_RefreshAllRow("post"); self:_UpdateArtisanLabel()
-end
-
-function UI:_PostArtRow(i)
-    local r = self.postArtRows[i]; if r then return r end
-    r = CreateFrame("Button", nil, self.postArtContent); r:SetSize(RW - 22, ARH); r:SetPoint("TOPLEFT", 0, -(i-1)*ARH)
-    local hi = r:CreateTexture(nil, "HIGHLIGHT"); hi:SetAllPoints(); hi:SetColorTexture(Skin.unpack(Skin.color.rowHover))
-    local st = r:CreateTexture(nil, "BACKGROUND"); st:SetAllPoints()
-    st:SetColorTexture(Skin.color.tabActive[1], Skin.color.tabActive[2], Skin.color.tabActive[3], 0.30)
-    st:Hide(); r.selTex = st
-    r.dot  = Skin.MakeStatusIcon(r, 14); r.dot:SetPoint("LEFT", 4, 0)
-    r.name = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    r.name:SetPoint("LEFT", 18, 0); r.name:SetWidth(RW - 100); r.name:SetJustifyH("LEFT"); Skin.ApplyShadow(r.name)
-    r.src  = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall"); r.src:SetPoint("RIGHT", -4, 0); Skin.ApplyShadow(r.src)
-    self.postArtRows[i] = r; return r
-end
-
--- Valeur CANONIQUE du destinataire (FR, identique sur le réseau ; cf. Orders:VisibleTo). Seuls
--- « Guilde » / « Amis » / @Nom sont routables ; « Ajoutés »/« Croisés » (listes perso, non évaluables
--- par un récepteur) retombent sur « Tous » (diffusion globale).
-function UI:_PostTargetLabel()
-    local t = self.postTarget or "all"
-    if t == "all"        then return "Tous" end
-    if t:sub(1, 1) == "@" then return t:sub(2) end
-    if t == "guild"      then return "Guilde" end
-    if t == "friend"     then return "Amis" end
-    return "Tous"
-end
-
-function UI:_UpdateArtisanLabel()
-    if self.postArtisanName then
-        local t = self.postTarget or "all"
-        local col = (t == "all") and "FFAAAAAA" or "FFFFFFFF"
-        -- Affichage localisé ; la VALEUR canonique (FR) sert au réseau (cf. _PostTargetLabel / DoPostOrder).
-        self.postArtisanName:SetText("|c" .. col .. L[self:_PostTargetLabel()] .. "|r")
-    end
-end
-
 function UI:SelectPostPlan(entry)
     self.postEntry = entry; self.postProvide = {}
     self.postSelLbl:SetText(L["Sélection : "].."|cFFFFFFFF"..entryName(entry).."|r")
@@ -495,3 +433,12 @@ function UI:DoPostOrder()
     self.postSelLbl:SetText("|cFF33DD33" .. L["Commande postée !"] .. "|r")
     self:ShowTab("orders")
 end
+
+-- Réactifs en poche (P2) : les sacs changent (loot, craft, échange...) → la liste de plans « prêts »
+-- doit suivre. Rafraîchi UNIQUEMENT si l'onglet Commande est visible (coût nul le reste du temps).
+-- BAG_UPDATE_DELAYED regroupe les BAG_UPDATE d'un même lot en un seul événement (pas de spam).
+local bagWatcher = CreateFrame("Frame")
+bagWatcher:RegisterEvent("BAG_UPDATE_DELAYED")
+bagWatcher:SetScript("OnEvent", function()
+    if UI.postPanel and UI.postPanel:IsShown() then UI:RefreshPostPlans() end
+end)

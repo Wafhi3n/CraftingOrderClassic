@@ -147,6 +147,9 @@ function Dir:OnRK(sender, message)
     r.lastSeen = time()
     self.online[sender] = true          -- présence passive : un message prouve la présence
     self:_NoteLinked(sender, r)
+    -- Un RK frais peut changer le filtre « plans de cet artisan » (onglet Commande) ou l'annuaire :
+    -- on rafraîchit la vue courante (no-op si la fenêtre est fermée). Idem OnSkill.
+    if COC.UI and COC.UI.Refresh then COC.UI:Refresh() end
 end
 
 -- Garantit une entrée roster pour un joueur QUI A RÉPONDU (a donc l'addon) : classe la source

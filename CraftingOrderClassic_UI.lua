@@ -149,7 +149,7 @@ function UI:_BuildAllRowAndScroll(panel, scrollName, kind, top)
     row.label:SetPoint("LEFT", 24, 0); row.label:SetJustifyH("LEFT"); row.label:SetWidth(ALL_RW - 60)
     row.label:SetTextColor(Skin.unpack(Skin.color.gold)); Skin.ApplyShadow(row.label)
     row:SetScript("OnClick", function()
-        if kind == "post" then UI.postTarget = UI.postSource; UI:RefreshPostArtisans()
+        if kind == "post" then UI.postTarget = UI.postSource; UI:RefreshPostArtisans(); UI:RefreshPostPlans()
         else UI.gatherTarget = UI.gatherSrc; UI:_RefreshGatherArtisans() end
     end)
     self[kind .. "AllRow"] = row
@@ -176,9 +176,13 @@ end
 local ROW_T = 30
 local COL = { name = 8, qty = 320, price = 372, prof = 500, dest = 612, status = 716 }
 
--- Carnet = MES commandes : seule action ici = annuler (tant qu'ouverte/acceptée). Accepter/livrer
--- une commande d'autrui se fait dans la vue métier (Orders:ProfRowAction).
+-- Carnet = MES commandes. Commande REMISE par le crafteur → bouton « J'ai reçu » (confirme la
+-- réception → terminée + crédite le crafteur). Sinon, tant qu'ouverte/acceptée → annuler. Accepter/
+-- livrer une commande d'AUTRUI se fait dans la vue métier (Orders:ProfRowAction).
 local function orderActionFor(o)
+    if o.buyer == me() and o.status == "delivered" then
+        return L["J'ai reçu"], function() COC.Orders:Confirm(o.id) end
+    end
     if o.buyer == me() and o.status ~= "done" and o.status ~= "cancelled" then
         return L["Annuler"], function() COC.Orders:Cancel(o.id) end
     end

@@ -2,6 +2,33 @@
 
 ## Unreleased
 
+**Buyer-confirmed completion.** An order no longer flips to *done* the instant the crafter clicks
+**Deliver** — it now becomes **Delivered** (awaiting confirmation). The buyer confirms receipt, either
+automatically when the crafted item lands in their bags or via a **Received** button in their Ledger,
+and only then is the order *done* and the crafter's delivered-count (reputation) credited. This ties
+reputation to the buyer actually getting the goods. (Auto-detection currently covers looted items; the
+same hook is wired for a future trade/mail step.)
+
+**Recipe filtering by crafter.** In the Order tab, clicking a specific crafter now filters the recipe
+list down to what *they* actually know (via their broadcast recipe registry), instead of only setting
+the recipient — the reverse of the old recipe-then-crafter flow.
+
+**Loot alert for recipe items.** Looting a recognized recipe/formula/pattern now surfaces a toast/chat
+line naming the profession and teachable recipe, flags whether you already know it, and — if you've
+tagged a **partner** who doesn't — lists them (`/co lootalert [on|off]` to toggle).
+
+**Partners & gifting.** Right-click a player to mark them as a **partner** (separate from your WoW
+friends list) — they're pinned to the top of the Artisans tab. `/co gift [name]` whispers a partner
+who's missing your last looted recipe, offering it to them.
+
+**"Reagents on hand" filter.** The Order tab can now filter (or just sort to the top) recipes you can
+craft *right now* with what's in your bags, refreshed live as your bags change.
+
+_Under the hood: CraftLink bumped to v6 — recipe data now carries `learnedAt` (skill level required)
+and `taughtBy` (recipe-item → spell mapping) for Vanilla/TBC/Wrath, regenerated from Wowhead via a new
+`tools/gen_metadata.lua` (idempotent) with a `tools/check_dataversion.lua` guard protecting the frozen
+Vanilla dataVersion. Fixed an inconsistent "First Aid"/"FirstAid" profession key between flavors._
+
 **Moderation & anti-spam.** Mute a spammer with `/co mute <name>` / `/co unmute <name>`, shift-right-click
 on an order card, or the right-click player menu — a muted player triggers no toast, chat line or sound
 (P2P orders **and** chat-captured requests). Low-level posters are auto-muted below a threshold

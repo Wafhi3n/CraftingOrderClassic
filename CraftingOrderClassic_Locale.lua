@@ -32,6 +32,12 @@ if loc == "enUS" or loc == "enGB" then
         ["Clic gauche : accepter (whisper au demandeur)"] = "Left click: accept (whisper the requester)",
         ["Clic droit : ignorer"] = "Right click: dismiss",
         ["Clic : "] = "Click: ", ["Accepter"] = "Accept", ["Annuler"] = "Cancel", ["Livrer"] = "Deliver",
+        ["J'ai reçu"] = "Received", ["Remise"] = "Delivered",
+        ["remise — en attente de confirmation de %s : %s"] = "delivered — awaiting %s's confirmation: %s",
+        ["réception confirmée : %s"] = "receipt confirmed: %s",
+        ["réception confirmée par %s ! crafts livrés au total : %d"] = "receipt confirmed by %s! total crafts delivered: %d",
+        ["%s a remis ta commande : %s — clique « J'ai reçu » pour confirmer"] =
+            "%s delivered your order: %s — click \"Received\" to confirm",
         ["Refuser"] = "Decline", ["%s a refusé ta commande : %s"] = "%s declined your order: %s",
         ["guilde"] = "guild", ["commerce"] = "trade", ["acceptée"] = "accepted",
         -- Vue métier (cabine) : pied de colonne Commandes + action carte
@@ -99,7 +105,6 @@ if loc == "enUS" or loc == "enGB" then
         ["cette commande ne t'est pas destinée."] = "this order isn't meant for you.",
         ["commande acceptée : %s (%s)"] = "order accepted: %s (%s)",
         ["tu n'as pas accepté cette commande."] = "you didn't accept this order.",
-        ["livrée ! crafts livrés au total : %d"] = "delivered! total crafts delivered: %d",
         ["commande relâchée : "] = "order released: ", ["carnet d'ordres :"] = "order ledger:",
         [" par "] = " by ", ["  (aucune commande active)"] = "  (no active order)",
         ["usage : /co post [shift-clic objet] [xN] [prix]"] = "usage: /co post [shift-click item] [xN] [price]",
@@ -135,6 +140,11 @@ if loc == "enUS" or loc == "enGB" then
         ["Choisis un métier puis un plan."] = "Pick a profession then a recipe.",
         ["Rechercher un plan"] = "Search a recipe", ["Qualité : Toutes"] = "Quality: All", ["Qualité : "] = "Quality: ",
         ["Sélection : "] = "Selection: ", ["Commande postée !"] = "Order posted!",
+        -- Filtre réactifs en poche (P2)
+        ["Réactifs : j'ai tout"] = "Reagents: I have it all", ["Réactifs : "] = "Reagents: ",
+        ["[Prêt]"] = "[Ready]",
+        -- Filtre artisan ciblé (P5) : mode d'en-tête de la liste des plans
+        ["connus"] = "known", ["niv. %d"] = "lvl %d",
         ["Choisis d'abord un plan."] = "Pick a recipe first.", ["Aucun plan sélectionné."] = "No recipe selected.",
         ["Ajoutés"] = "Added", ["fournis"] = "provided", ["Chargement…"] = "Loading…",
         -- Ligne « toute la liste » épinglée (destinataire groupé) — Commande + Récolte
@@ -184,6 +194,33 @@ if loc == "enUS" or loc == "enGB" then
         ["   |cFF33DD33→ tu sais la crafter|r — Carnet › Entrantes"] = "   |cFF33DD33→ you can craft it|r — Ledger › Incoming",
         ["|cFFFFCC00commande pour TOI|r de |cFFFFFFFF%s|r : %s%s%s"] = "|cFFFFCC00order for YOU|r from |cFFFFFFFF%s|r: %s%s%s",
         ["ton artisan |cFFFFFFFF%s|r est en ligne."] = "your crafter |cFFFFFFFF%s|r is online.",
+        -- Alerte plan looté (CHAT_MSG_LOOT → CraftLink:RecipeFromPlanItem)
+        ["plan looté : |cFFFFFFFF%s|r — enseigne |cFFFFFFFF%s|r (%s) %s"] =
+            "recipe looted: |cFFFFFFFF%s|r — teaches |cFFFFFFFF%s|r (%s) %s",
+        ["|cFF888888(tu la connais déjà)|r"] = "|cFF888888(you already know it)|r",
+        ["|cFF33DD33(tu ne la connais pas encore !)|r"] = "|cFF33DD33(you don't know it yet!)|r",
+        ["alerte plan looté : |cFFFFFFFF%s|r — /co lootalert [on|off]"] =
+            "loot alert: |cFFFFFFFF%s|r — /co lootalert [on|off]",
+        ["alerte quand tu loots un plan connu de CraftLink (défaut : on)"] =
+            "alert when you loot a recipe known to CraftLink (default: on)",
+        -- Partenaires (P1) + proposer un don (/co gift)
+        ["Partenaire (basculer)"] = "Partner (toggle)",
+        ["[Partenaire]"] = "[Partner]",
+        ["|cFFFFFFFF%s|r marqué comme partenaire — priorité sur les alertes de don."] =
+            "|cFFFFFFFF%s|r marked as partner — prioritized in gift alerts.",
+        ["|cFFFFFFFF%s|r n'est plus marqué comme partenaire."] = "|cFFFFFFFF%s|r is no longer marked as partner.",
+        ["|cFF66CCFFpartenaires intéressés :|r %s (|cFFFFFFFF/co gift <nom>|r)"] =
+            "|cFF66CCFFinterested partners:|r %s (|cFFFFFFFF/co gift <name>|r)",
+        ["proposer (chuchoter) le dernier plan looté à un partenaire qui ne le connaît pas"] =
+            "propose (whisper) the last looted recipe to a partner who doesn't know it",
+        ["aucun plan looté en attente de don pour l'instant."] = "no looted recipe pending a gift right now.",
+        ["don en attente pour |cFFFFFFFF%s|r — partenaires : %s (|cFFFFFFFF/co gift <nom>|r)"] =
+            "gift pending for |cFFFFFFFF%s|r — partners: %s (|cFFFFFFFF/co gift <name>|r)",
+        ["|cFFFFFFFF%s|r n'est pas dans la liste des partenaires en attente pour ce plan."] =
+            "|cFFFFFFFF%s|r isn't in the list of partners waiting for this recipe.",
+        ["Salut ! J'ai looté %s (%s) — tu ne le connais pas encore, ça t'intéresse ?"] =
+            "Hey! I looted %s (%s) — you don't know it yet, are you interested?",
+        ["don proposé à |cFFFFFFFF%s|r pour %s."] = "gift proposed to |cFFFFFFFF%s|r for %s.",
         -- Garder pour un ami capable (Handoff) : nudge crafteur + info posteur + file « Confiées »
         ["|cFF66CCFFtu sais le faire|r — demandé par |cFFFFFFFF%s|r : %s%s%s"] =
             "|cFF66CCFFyou can craft this|r — requested by |cFFFFFFFF%s|r: %s%s%s",

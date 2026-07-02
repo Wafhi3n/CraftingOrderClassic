@@ -187,6 +187,8 @@ function COC:Help()
     print("  |cFFFFFFFF/co channel [on|off]|r — " .. L["(dés)activer le canal réseau global"])
     print("  |cFFFFFFFF/co notify [all|directed|named|off]|r — " .. L["portée des notifications de commande"])
     print("  |cFFFFFFFF/co scan [mine|all|off]|r — " .. L["portée du scan des demandes de craft en chat (défaut : mes métiers)"])
+    print("  |cFFFFFFFF/co lootalert [on|off]|r — " .. L["alerte quand tu loots un plan connu de CraftLink (défaut : on)"])
+    print("  |cFFFFFFFF/co gift [nom]|r — " .. L["proposer (chuchoter) le dernier plan looté à un partenaire qui ne le connaît pas"])
     print("  |cFFFFFFFF/co mute <nom>|r / |cFFFFFFFF/co unmute <nom>|r — " .. L["muter/démuter un joueur (aucune notif de sa part)"])
     print("  |cFFFFFFFF/co lowlevel [N|off]|r — " .. L["seuil de mute auto des persos bas niveau (défaut 5)"])
     print("  |cFFFFFFFF/co debug|r — |cFFFF8800" .. L["mode solo"] .. "|r : " .. L["injecte/retire un réseau fictif (artisans + commandes)"])
@@ -219,6 +221,8 @@ function COC:Slash(msg)
     elseif cmd == "channel" or cmd == "canal" then COC:ChannelCmd(rest)
     elseif cmd == "notify" or cmd == "notif" then COC:NotifyCmd(rest)
     elseif cmd == "scan" then COC:ScanCmd(rest)
+    elseif cmd == "lootalert" then if COC.LootAlert then COC.LootAlert:Cmd(rest) end
+    elseif cmd == "gift" then if COC.LootAlert then COC.LootAlert:GiftCmd(rest) end
     elseif cmd == "mute"   then if COC.Moderation then COC.Moderation:MuteCmd(rest) end
     elseif cmd == "unmute" then if COC.Moderation then COC.Moderation:UnmuteCmd(rest) end
     elseif cmd == "lowlevel" or cmd == "lowlvl" then if COC.Moderation then COC.Moderation:LowLevelCmd(rest) end

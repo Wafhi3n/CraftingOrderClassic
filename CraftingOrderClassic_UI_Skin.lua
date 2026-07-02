@@ -34,8 +34,9 @@ Skin.unpack = unpackc
 
 -- Localisation des métiers (clé interne EN du catalogue → libellé FR). Fallback = la clé.
 -- TODO multilingue : dériver du nom de ligne de compétence localisé selon le client.
--- NB : le catalogue enregistre le Secourisme sous "First Aid" (Vanilla) OU "FirstAid" (TBC/Wrath,
--- incohérence entre saveurs) — les deux clés doivent être mappées ici.
+-- NB : clé canonique du Secourisme = "First Aid" (avec espace) sur TOUTES les saveurs depuis le
+-- 2026-07-02 (TBC/Wrath enregistraient "FirstAid") ; on garde le double mapping par sécurité
+-- (copie de lib pas encore resynchronisée).
 Skin.profFR = {
     Alchemy="Alchimie", Blacksmithing="Forge", Cooking="Cuisine", Enchanting="Enchantement",
     Engineering="Ingénierie", ["First Aid"]="Secourisme", FirstAid="Secourisme", Fishing="Pêche", Herbalism="Herboristerie",
@@ -65,6 +66,7 @@ end
 Skin.statusFR = {
     open      = { "En attente", "FFFFCC00" },
     accepted  = { "Acceptée",   "FF33CCFF" },
+    delivered = { "Remise",     "FF88CCFF" },   -- remise par le crafteur, en attente de confirmation acheteur
     done      = { "Livrée",     "FF33DD33" },
     cancelled = { "Annulée",    "FF888888" },
     declined  = { "Refusée",    "FFFF4444" },

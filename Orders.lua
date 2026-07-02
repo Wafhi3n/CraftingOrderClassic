@@ -139,14 +139,56 @@ function Orders:WhisperPub(o)
     SendChatMessage(msg, "WHISPER", nil, o.buyer)
 end
 
+-- Le crafteur REMET l'objet (bouton « Livrer » de la vue métier) : la commande passe « remise »
+-- (delivered) et NON directement « terminée ». C'est désormais l'ACHETEUR qui finalise (confirmation
+-- de réception : auto au loot / bouton « J'ai reçu »), moment où la réputation du crafteur est créditée
+-- (cf. OnNetwork DONE). Évite qu'un crafteur se crédite un craft sans que l'acheteur ait rien reçu.
 function Orders:Deliver(id)
     local o = id and COC.db.orders[id]
     if not o then pmsg(L["commande introuvable : "] .. tostring(id)); return end
     if o.acceptedBy ~= me() then pmsg(L["tu n'as pas accepté cette commande."]); return end
+    o.status = "delivered"; self:Broadcast("DLV", o)
+    pmsg(string.format(L["remise — en attente de confirmation de %s : %s"], o.buyer or "?", self:OrderName(o)))
+end
+
+-- L'ACHETEUR confirme avoir REÇU l'objet → la commande passe « terminée » et le crafteur est crédité
+-- (ORD|DONE). Déclenché par le bouton « J'ai reçu » (Carnet) OU l'auto-détection de réception
+-- (TryAutoComplete). `auto` = silencieux si rien à confirmer (évite le spam sur chaque loot).
+function Orders:Confirm(id, auto)
+    local o = id and COC.db.orders[id]
+    if not o then if not auto then pmsg(L["commande introuvable : "] .. tostring(id)) end; return end
+    if o.buyer ~= me() then if not auto then pmsg(L["ce n'est pas ta commande."]) end; return end
+    if o.status == "done" then return end
     o.status = "done"; self:Broadcast("DONE", o)
-    COC.db.delivered = (COC.db.delivered or 0) + 1   -- réputation v1 : compteur de crafts livrés
-    if COC.Directory then COC.Directory:AnnounceSkills() end   -- rediffuse la réputation à jour (SK)
-    pmsg(string.format(L["livrée ! crafts livrés au total : %d"], COC.db.delivered))
+    pmsg(string.format(L["réception confirmée : %s"], self:OrderName(o)))
+    if COC.UI and COC.UI.Refresh then COC.UI:Refresh() end
+end
+
+-- Auto-complétion à la RÉCEPTION d'un objet. `source` = "loot" aujourd'hui ; point d'entrée UNIQUE
+-- pour brancher plus tard l'échange et le courrier (il suffira d'appeler ceci depuis ces détecteurs).
+-- Confirme la 1re commande À MOI, « remise », dont l'objet correspond (dédup par le statut done).
+function Orders:TryAutoComplete(itemID, source)
+    if not (itemID and COC.db and COC.db.orders) then return false end
+    for id, o in pairs(COC.db.orders) do
+        if o.buyer == me() and o.status == "delivered" and o.itemID == itemID then
+            self:Confirm(id, true)
+            return true
+        end
+    end
+    return false
+end
+
+-- Toast côté ACHETEUR quand le crafteur vient de remettre l'objet (reçu ORD|DLV) : l'invite à
+-- confirmer la réception. La confirmation auto au loot peut arriver juste après (double sécurité).
+function Orders:AlertDelivered(o)
+    if not o then return end
+    local txt = string.format(L["%s a remis ta commande : %s — clique « J'ai reçu » pour confirmer"],
+        o.acceptedBy or "?", self:OrderName(o))
+    pmsg(txt)
+    if COC.UI and COC.UI.Toast then
+        local Skin = COC.UI and COC.UI.Skin
+        COC.UI:Toast(txt, Skin and Skin.tex.workorder)
+    end
 end
 
 -- Refuser/relâcher une commande (bouton « Refuser » de la vue métier ; le clic droit ne fait que
