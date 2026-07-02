@@ -37,11 +37,16 @@ The **Artisans** directory shows who can make what, who's **online right now**, 
 channel). Add anyone by name or right-click their portrait, and get a notification when a favourite
 crafter comes online. Hover any player to see their professions in the tooltip.
 
+Running a cross-guild confederation with **GreenWall**? The Artisans directory adds a **Confederation**
+section listing addon users from your sister guilds, spotted passively from the guild-chat bridge — no
+extra network traffic. Diagnose with **/co gwroster**.
+
 **Order from the crafter who can make it**
 
-Pick a crafter in the Order tab and the recipe list narrows to what *they* can actually craft — from
-their known-recipe registry, or a skill-level estimate when that's all that's shared yet. No more
-sending someone a request they can't fill. Their registry is pulled fresh the moment you select them.
+Pick a crafter in the Order tab and the recipe list — now grouped by section for easier browsing —
+narrows to what *they* can actually craft — from their known-recipe registry, or a skill-level estimate
+when that's all that's shared yet. No more sending someone a request they can't fill. Their registry is
+pulled fresh the moment you select them.
 
 **Craft what your bags allow**
 
@@ -64,9 +69,9 @@ hand-offs.
 **Catches requests from non-users too**
 
 Requests posted in **/trade** and **/guild** by players who don't run the addon are captured into an
-**Incoming** queue — accept one and it whispers them your offer automatically. Selling posts (WTS) and
-crafters advertising their services (LFW) are filtered out, so only real requests show up. Toggle the
-scanner anytime with **/co scan**.
+**Incoming** queue so you never miss one — accept it, then reply to them yourself in chat. Selling posts
+(WTS) and crafters advertising their services (LFW) are filtered out, so only real requests show up.
+Toggle the scanner anytime with **/co scan**.
 
 **A profession window that does the work** *(optional)*
 

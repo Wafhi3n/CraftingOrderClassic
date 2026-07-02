@@ -29,7 +29,6 @@ if loc == "enUS" or loc == "enGB" then
         ["Aucune commande entrante. (Capture /commerce et /guilde des joueurs sans l'addon.)"] =
             "No incoming orders. (Captured from /trade and /guild of players without the addon.)",
         ["Demande captée dans /"] = "Request captured in /",
-        ["Clic gauche : accepter (whisper au demandeur)"] = "Left click: accept (whisper the requester)",
         ["Clic droit : ignorer"] = "Right click: dismiss",
         ["Clic : "] = "Click: ", ["Accepter"] = "Accept", ["Annuler"] = "Cancel", ["Livrer"] = "Deliver",
         ["J'ai reçu"] = "Received", ["Remise"] = "Delivered",
@@ -113,7 +112,7 @@ if loc == "enUS" or loc == "enGB" then
         ["PING envoyé (canal %s%s). En attente des PONG…"] = "PING sent (channel %s%s). Waiting for PONGs…",
         ["rejoint"] = "joined", ["PAS rejoint"] = "NOT joined",
         [", +|cFFFFFFFF%d|r whisper(s)"] = ", +|cFFFFFFFF%d|r whisper(s)",
-        ["entrante acceptée — réponse envoyée à |cFFFFFFFF%s|r"] = "incoming accepted — reply sent to |cFFFFFFFF%s|r",
+        ["entrante acceptée : |cFFFFFFFF%s|r"] = "incoming accepted: |cFFFFFFFF%s|r",
         -- /co debug (mode solo) + /co trace (diag)
         ["infra non prête."] = "infrastructure not ready.",
         ["activé — %d artisans + %d commandes + %d entrantes injectés."] =

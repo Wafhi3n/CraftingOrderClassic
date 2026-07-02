@@ -1,5 +1,24 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.2.0 — confederation directory, sectioned recipe lists & quieter incoming requests
+
+**Confederation directory (GreenWall).** If you run [GreenWall](https://legacy.curseforge.com/wow/addons/greenwall)
+for a cross-guild confederation, the Artisans tab now surfaces a **Confederation** section listing
+crafters from your sister guilds who also run this addon — spotted passively from the guild-chat
+bridge, display-only (no extra network traffic). Diagnose with **/co gwroster**. Confederation is
+below Guild/Friends in priority, so it never bumps someone already classified there. Works on SoD live
+only (no confederation on PTR).
+
+**Recipe & plan lists grouped by section.** The Order tab's recipe list and the profession window's
+plan list are now grouped under section headers (e.g. weapons, armor, consumables) instead of one long
+alphabetical list — easier to scan a large profession. Hovering the produced item in the profession
+window's detail pane now shows its full tooltip.
+
+**Quieter incoming requests.** Accepting a request captured from **/trade** or **/guild** (posted by a
+player without the addon) no longer sends them an automatic whisper announcing the acceptance — it was
+unsolicited and read as spam. The request is still marked accepted in your Incoming queue; reply to the
+player yourself in chat if you want them to know.
+
 ## v1.1.0 — artisan matching, loot alerts, partners & buyer-confirmed delivery
 
 **Buyer-confirmed completion.** An order no longer flips to *done* the instant the crafter clicks

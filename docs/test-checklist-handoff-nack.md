@@ -44,8 +44,9 @@ SavedVariable, lisible après `/reload` ou `/co trace dump`). Un fichier `.lua` 
    - [ ] #4 reçoit en whisper l'ordre de synthèse `CAP-<id>` (`_NewPayload`) PUIS le nudge
      `ORD|SUGG|<id>|1`.
    - [ ] Chez #4, la commande apparaît avec `viaAddon=false`, `captured=true` (visible via `/co trace`).
-   - [ ] #4 accepte la commande captée → le demandeur original (`o.buyer`, un joueur SANS l'addon) est
-     prévenu via **WhisperPub** (pas juste en interne), car `viaAddon=false`.
+   - [ ] #4 accepte la commande captée → statut interne `accepted` chez #4 (`/co trace`). **Plus de
+     whisper automatique** au demandeur original (WhisperPub retiré, v1.2.0) : c'est à #4 de répondre
+     manuellement dans le chat s'il veut prévenir un joueur SANS l'addon.
 
 ## 4. Chaînage d'une commande captée (régression du fix B1)
 

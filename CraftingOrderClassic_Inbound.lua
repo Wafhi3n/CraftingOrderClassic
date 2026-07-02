@@ -1,8 +1,8 @@
 -- CraftingOrderClassic_Inbound.lua — couche réseau « passive » : capte les demandes de craft
 -- postées dans /commerce (Trade) et /guilde par des joueurs SANS l'addon, alerte le joueur, et
 -- les range dans une file « Entrantes » (acceptable / ignorable). Calqué sur le scanner de Guild
--- Economy (TradeScanner). Ces commandes portent viaAddon=false → l'acceptation déclenche un
--- whisper de pub (cf. Orders:WhisperPub).
+-- Economy (TradeScanner). Ces commandes portent viaAddon=false ; l'acceptation ne prévient plus
+-- automatiquement le demandeur (WhisperPub retiré, v1.2.0) — à faire manuellement dans le chat.
 
 local COC     = CraftingOrderClassic
 local Inbound = {}
@@ -182,9 +182,7 @@ end
 function Inbound:Accept(id)
     local e = id and COC.db.inbound and COC.db.inbound[id]; if not e then return end
     e.status = "accepted"
-    -- Whisper de pub : l'auteur n'a pas l'addon, on le prévient (et on fait connaître l'addon).
-    if COC.Orders then COC.Orders:WhisperPub({ buyer = e.buyer, itemID = e.itemID, price = e.price }) end
-    pmsg(string.format(L["entrante acceptée — réponse envoyée à |cFFFFFFFF%s|r"], e.buyer))
+    pmsg(string.format(L["entrante acceptée : |cFFFFFFFF%s|r"], e.buyer))
     if COC.UI and COC.UI.Refresh then COC.UI:Refresh() end
 end
 

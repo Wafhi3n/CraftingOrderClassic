@@ -123,20 +123,7 @@ function Orders:Accept(id)
     if o.buyer == me() then pmsg(L["c'est ta propre commande."]); return end
     if not self:VisibleTo(o) then pmsg(L["cette commande ne t'est pas destinée."]); return end
     o.status = "accepted"; o.acceptedBy = me(); self:Broadcast("ACK", o)
-    self:WhisperPub(o)
     pmsg(string.format(L["commande acceptée : %s (%s)"], id, itemName(o.itemID)))
-end
-
--- Pub : si l'auteur N'A PAS l'addon (commande captée dans /trade ou /g, pas reçue par le réseau),
--- on le prévient par whisper → l'acceptation lui parvient ET ça fait connaître l'addon.
--- Les commandes reçues via le canal addon portent o.viaAddon=true → pas de whisper (ACK suffit).
-function Orders:WhisperPub(o)
-    if not (SendChatMessage and o.buyer and o.buyer ~= me()) then return end
-    if o.viaAddon or o.fake then return end
-    local what = self:OrderName(o)
-    local msg = "I accept your order of " .. what
-        .. (o.price and (" costing " .. o.price) or "") .. " — via Crafting Order Classic"
-    SendChatMessage(msg, "WHISPER", nil, o.buyer)
 end
 
 -- Le crafteur REMET l'objet (bouton « Livrer » de la vue métier) : la commande passe « remise »
