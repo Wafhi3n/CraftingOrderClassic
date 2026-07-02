@@ -13,7 +13,7 @@ local ARX    = 220             -- x zone droite
 local AREDGE = 846
 local ARW    = AREDGE - ARX
 
-local SRC_TAG = { guild = L["GUILDE"], friend = L["AMIS"], added = L["AJOUTÉ"], recent = L["CROISÉ"] }
+local SRC_TAG = { guild = L["GUILDE"], friend = L["AMIS"], added = L["AJOUTÉ"], recent = L["CROISÉ"], confed = L["CONFÉDÉRÉ"] }
 
 local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true) end
 local function trim(s) return s and s:gsub("^%s+", ""):gsub("%s+$", "") or "" end
@@ -58,7 +58,9 @@ function UI:BuildArtisansTab(f)
     srcHdr:SetPoint("TOPLEFT", 14, -80); srcHdr:SetText(L["SOURCE"])
     srcHdr:SetTextColor(Skin.unpack(Skin.color.textMuted))
 
-    local srcDefs = { {id="all",label=L["Tous"]}, {id="guild",label=L["Guilde"]}, {id="friend",label=L["Amis"]}, {id="added",label=L["Ajoutés"]}, {id="recent",label=L["Croisés"]} }
+    -- « Confédération » (confed) : bucket EN PLUS, masqué si GreenWall absent (cf. RefreshArtisans). Placé
+    -- en dernier → le masquer ne laisse aucun trou dans la sidebar.
+    local srcDefs = { {id="all",label=L["Tous"]}, {id="guild",label=L["Guilde"]}, {id="friend",label=L["Amis"]}, {id="added",label=L["Ajoutés"]}, {id="recent",label=L["Croisés"]}, {id="confed",label=L["Confédération"]} }
     self.artSrcBtns = {}
     for i, d in ipairs(srcDefs) do
         local b = Skin.MakeGoldButton(panel, 190, 28, d.label)
@@ -100,6 +102,16 @@ end
 
 function UI:_RefreshArtSrcTabs()
     for id, b in pairs(self.artSrcBtns or {}) do b:SetSelected(id == self.artSource) end
+end
+
+-- Le bucket « Confédération » n'existe que si GreenWall est actif (display-only) : on le montre/masque et,
+-- s'il était sélectionné alors que GreenWall a disparu, on retombe sur « Tous ».
+function UI:_SyncConfedTab()
+    local D = COC.Directory
+    -- Visible si GreenWall actif — OU en mode solo (/co debug) pour tester l'UI sans SoD live.
+    local gwOn = (D and D._GreenWallActive and D:_GreenWallActive()) or (COC.db and COC.db.debug)
+    if self.artSrcBtns and self.artSrcBtns.confed then self.artSrcBtns.confed:SetShown(gwOn and true or false) end
+    if not gwOn and self.artSource == "confed" then self.artSource = "all"; self:_RefreshArtSrcTabs() end
 end
 
 -- Pills de filtre métier (Tous + chaque métier), avec retour à la ligne.
@@ -183,9 +195,10 @@ function UI:RefreshArtisans()
     local panel = self.artisansPanel; if not panel then return end
     if not self.artPillsBuilt then self:_BuildArtPills(panel); self.artPillsBuilt = true end
     local D = COC.Directory
+    self:_SyncConfedTab()   -- montre/masque le bucket « Confédération » selon GreenWall (display-only)
 
     -- Compteurs par source (+ « all » = total)
-    local counts = { all = 0, guild = 0, friend = 0, added = 0, recent = 0 }
+    local counts = { all = 0, guild = 0, friend = 0, added = 0, recent = 0, confed = 0 }
     for _, r in pairs(D and D.roster or {}) do
         local s = r.source or "recent"; counts[s] = (counts[s] or 0) + 1; counts.all = counts.all + 1
     end

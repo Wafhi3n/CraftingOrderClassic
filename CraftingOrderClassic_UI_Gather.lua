@@ -27,7 +27,9 @@ local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
 -- porte. inSource respecte les drapeaux de relation (un ajouté aussi ami compte dans « Amis »).
 local function knowsProf(r, p) return (r.skill and r.skill[p]) or (r.recipes and r.recipes[p]) or false end
 local function inSource(r, src)
-    return (src == "friend" and r.isFriend) or (src == "guild" and r.isGuild) or (r.source or "recent") == src
+    -- « confed » (display-only) traité comme « recent » ici : un confédéré reste sélectionnable sous « Croisés ».
+    return (src == "friend" and r.isFriend) or (src == "guild" and r.isGuild)
+        or (r.source == "confed" and "recent" or r.source or "recent") == src
 end
 local function sep1px(parent, x1, x2, y)
     local s = parent:CreateTexture(nil, "ARTWORK"); s:SetHeight(1)

@@ -167,9 +167,17 @@ if loc == "enUS" or loc == "enGB" then
         ["SOURCE"] = "SOURCE", ["AJOUTER UN JOUEUR"] = "ADD A PLAYER", ["Nom du personnage"] = "Character name",
         ["Métier :"] = "Profession:", ["Chuchoter"] = "Whisper", ["Aucun artisan dans cette source."] = "No crafter in this source.",
         ["En ligne"] = "Online", ["Hors ligne"] = "Offline", ["niv "] = "lvl ", ["niv ?"] = "lvl ?",
-        ["GUILDE"] = "GUILD", ["AMIS"] = "FRIEND", ["AJOUTÉ"] = "ADDED", ["CROISÉ"] = "MET",
+        ["GUILDE"] = "GUILD", ["AMIS"] = "FRIEND", ["AJOUTÉ"] = "ADDED", ["CROISÉ"] = "MET", ["CONFÉDÉRÉ"] = "CONFED",
+        ["Confédération"] = "Confederation",
         ["artisan ajouté : "] = "crafter added: ",
         ["(lié quand il sera en ligne avec l'addon)"] = "(linked when seen online with the addon)",
+        -- Confédération GreenWall (display-only, /co gwroster)
+        ["GreenWall non détecté — section « Confédération » masquée."] = "GreenWall not detected — « Confederation » section hidden.",
+        ["GreenWall actif, aucun confédéré repéré (il faut qu'ils parlent en /g)."] = "GreenWall active, no confederate seen yet (they must talk in /g).",
+        ["confédérés repérés (%d) :"] = "confederates seen (%d):",
+        ["en ligne · annuaire"] = "online · directory", ["annuaire"] = "directory",
+        ["pas encore dans l'annuaire (sans COC ?)"] = "not in directory yet (no COC?)",
+        ["confédérés GreenWall repérés (SoD live only)"] = "GreenWall confederates seen (SoD live only)",
         -- Fenêtre métier (ProfWindow)
         ["Recettes"] = "Recipes", ["Commandes"] = "Orders", ["Réactifs :"] = "Reagents:",
         ["Créer"] = "Create", ["Créer tout"] = "Create All", ["Vue Blizzard"] = "Blizzard view",

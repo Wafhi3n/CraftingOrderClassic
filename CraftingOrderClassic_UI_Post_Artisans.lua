@@ -19,7 +19,10 @@ local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
 -- drapeaux de relation → un ajouté aussi ami compte dans Amis), sinon catégorie d'affichage.
 local function knowsProf(r, p) return (r.skill and r.skill[p]) or (r.recipes and r.recipes[p]) or false end
 local function inSource(r, src)
-    return (src == "friend" and r.isFriend) or (src == "guild" and r.isGuild) or (r.source or "recent") == src
+    -- « confed » (display-only, onglet Artisans) n'est pas une portée de post → on le traite comme « recent »
+    -- ici pour que les confédérés restent sélectionnables sous « Croisés ».
+    return (src == "friend" and r.isFriend) or (src == "guild" and r.isGuild)
+        or (r.source == "confed" and "recent" or r.source or "recent") == src
 end
 
 -- Prédicat de filtrage des plans par l'artisan ciblé (postTarget = "@Nom") pour ce métier, ou nil

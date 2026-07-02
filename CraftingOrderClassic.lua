@@ -173,6 +173,29 @@ function COC:WipeRoster()
     p(L["annuaire local vidé (diag) — exécute aussi |cFFFFFFFF/co wipe|r sur l'autre compte pour un test de découverte propre."])
 end
 
+-- /co gwroster : diag confédération GreenWall (display-only). Liste les confédérés repérés via le pont
+-- /g et indique lesquels sont déjà dans l'annuaire CraftLink (= affichés dans Artisans › Confédération).
+-- Testable UNIQUEMENT sur SoD live (pas de guilde/confédération sur PTR).
+function COC:GreenWallDiag()
+    local L, D = COC.L, COC.Directory
+    if not (D and D._GreenWallActive and D:_GreenWallActive()) then
+        p(L["GreenWall non détecté — section « Confédération » masquée."]); return
+    end
+    local names = {}
+    for n in pairs(D._confedSet or {}) do names[#names + 1] = n end
+    table.sort(names)
+    if #names == 0 then
+        p(L["GreenWall actif, aucun confédéré repéré (il faut qu'ils parlent en /g)."]); return
+    end
+    p(string.format(L["confédérés repérés (%d) :"], #names))
+    for _, n in ipairs(names) do
+        local r = D.roster and D.roster[n]
+        local tag = r and (D.online and D.online[n] and L["en ligne · annuaire"] or L["annuaire"])
+            or L["pas encore dans l'annuaire (sans COC ?)"]
+        p("  |cFFFFFFFF" .. n .. "|r — |cFF888888" .. tag .. "|r")
+    end
+end
+
 function COC:Help()
     local L = COC.L
     p(L["commandes :"])
@@ -193,6 +216,7 @@ function COC:Help()
     print("  |cFFFFFFFF/co lowlevel [N|off]|r — " .. L["seuil de mute auto des persos bas niveau (défaut 5)"])
     print("  |cFFFFFFFF/co debug|r — |cFFFF8800" .. L["mode solo"] .. "|r : " .. L["injecte/retire un réseau fictif (artisans + commandes)"])
     print("  |cFFFFFFFF/co trace|r — |cFFFF8800" .. L["diag"] .. "|r : " .. L["journalise le réseau dans la SavedVariable (off | clear | dump)"])
+    print("  |cFFFFFFFF/co gwroster|r — |cFFFF8800" .. L["diag"] .. "|r : " .. L["confédérés GreenWall repérés (SoD live only)"])
 end
 
 -- Dispatch des sous-commandes /co (extrait de OnEvent pour rester sous le seuil anti-monolithe).
@@ -227,6 +251,7 @@ function COC:Slash(msg)
     elseif cmd == "unmute" then if COC.Moderation then COC.Moderation:UnmuteCmd(rest) end
     elseif cmd == "lowlevel" or cmd == "lowlvl" then if COC.Moderation then COC.Moderation:LowLevelCmd(rest) end
     elseif cmd == "beacon" then COC:BeaconDiag()
+    elseif cmd == "gwroster" or cmd == "confed" then COC:GreenWallDiag()
     elseif cmd == "wipe"   then COC:WipeRoster()
     elseif cmd == "debug"  then if COC.Debug then COC.Debug:Toggle() end
     elseif cmd == "trace"  then if COC.Trace then COC.Trace:Cmd(rest) end

@@ -16,7 +16,7 @@ local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
 local function me() return (UnitName and UnitName("player")) or "?" end
 
 -- Faux artisans (mock proche du template Claude Design). Clés métier = clés internes EN du catalogue.
--- 10 artisans, 7 en ligne → footer "7 en ligne · 10 artisan(s)". source = guild|friend|added.
+-- source = guild|friend|added|recent|confed (confed = co-guildes GreenWall, visibles en debug/SoD live).
 Debug.fakeArtisans = {
     { name = "Grizzlyy", level = 60, online = true,  source = "guild",  skill = { Blacksmithing = {250,300}, Mining = {250,300} } },
     { name = "Koraud",   level = 60, online = true,  source = "guild",  skill = { Alchemy = {300,300}, Herbalism = {300,300} } },
@@ -31,6 +31,9 @@ Debug.fakeArtisans = {
     -- « Croisés » : rencontrés via la présence, pas encore ajoutés.
     { name = "Tova",     level = 44, online = true,  source = "recent", skill = { Tailoring = {210,225} } },
     { name = "Borgrim",  level = 60, online = false, source = "recent", skill = { Mining = {300,300}, Blacksmithing = {290,300} } },
+    -- « Confédération » : co-guildes GreenWall (onglet visible seulement si GreenWall actif / en debug).
+    { name = "Faelin",   level = 60, online = true,  source = "confed", skill = { Enchanting = {300,300} } },
+    { name = "Ordwin",   level = 58, online = false, source = "confed", skill = { Engineering = {290,300}, Mining = {300,300} } },
 }
 
 -- Fausses commandes (mock du template). itemID réels → noms localisés par GetItemInfo.
