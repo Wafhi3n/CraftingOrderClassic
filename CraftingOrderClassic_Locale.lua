@@ -143,6 +143,9 @@ if loc == "enUS" or loc == "enGB" then
         -- Filtre réactifs en poche (P2)
         ["Réactifs : j'ai tout"] = "Reagents: I have it all", ["Réactifs : "] = "Reagents: ",
         ["[Prêt]"] = "[Ready]",
+        -- Sections de la liste des plans (en-têtes) : les noms d'emplacement/type/catégorie viennent
+        -- des globales client (déjà localisées) ; seule cette catégorie de repli a besoin d'une clé.
+        ["Autres"] = "Other",
         -- Filtre artisan ciblé (P5) : mode d'en-tête de la liste des plans
         ["connus"] = "known", ["niv. %d"] = "lvl %d",
         ["Choisis d'abord un plan."] = "Pick a recipe first.", ["Aucun plan sélectionné."] = "No recipe selected.",

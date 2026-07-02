@@ -78,14 +78,34 @@ function PW:_ComputeWantedMap()
     return map
 end
 
+-- Découpage en sections IDENTIQUE à l'onglet Commande (COC.SectionOf) : on IGNORE les en-têtes
+-- natifs (grossiers : « Cloth » = tout l'habillement) et on regroupe finement par emplacement+type
+-- (« Head · Cloth », « Chest · Cloth »…). Les vraies recettes gardent leur `index` (SetTradeSkillItem).
+local function sectionOf(itemID)
+    if COC.SectionOf then return COC.SectionOf(itemID) end
+    return L["Autres"], 900   -- repli si le module de catégories n'est pas chargé (ne devrait pas arriver)
+end
+
 function PW:_RecipeDisplayList()
     local raw, search = self.recipes or {}, self.recipeSearch
-    if not search or search == "" then return raw end
-    local list = {}
+    local items = {}
     for _, r in ipairs(raw) do
-        if not r.isHeader and r.name and r.name:lower():find(search, 1, true) then list[#list + 1] = r end
+        if not r.isHeader and (not search or search == "" or (r.name and r.name:lower():find(search, 1, true))) then
+            r._sec, r._secOrder = sectionOf(r.itemID)
+            items[#items + 1] = r
+        end
     end
-    return list
+    table.sort(items, function(a, b)
+        if a._secOrder ~= b._secOrder then return a._secOrder < b._secOrder end
+        if a._sec     ~= b._sec     then return a._sec     < b._sec     end
+        return (a.name or "") < (b.name or "")
+    end)
+    local out, lastSec = {}, nil
+    for _, r in ipairs(items) do
+        if r._sec ~= lastSec then out[#out + 1] = { isHeader = true, name = r._sec }; lastSec = r._sec end
+        out[#out + 1] = r
+    end
+    return out
 end
 
 function PW:RefreshRecipes()

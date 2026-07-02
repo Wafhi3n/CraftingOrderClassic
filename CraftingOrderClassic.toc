@@ -22,6 +22,7 @@ CraftingOrderClassic_UI_Skin.lua
 CraftingOrderClassic_UI.lua
 CraftingOrderClassic_UI_Post.lua
 CraftingOrderClassic_UI_Post_Artisans.lua
+CraftingOrderClassic_UI_Post_Categories.lua
 CraftingOrderClassic_UI_Gather.lua
 CraftingOrderClassic_UI_Artisans.lua
 CraftingOrderClassic_UI_Help.lua

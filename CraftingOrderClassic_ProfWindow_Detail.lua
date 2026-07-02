@@ -33,6 +33,11 @@ function PW:_BuildDetail(col)
     local iconBig = col:CreateTexture(nil, "ARTWORK")
     iconBig:SetSize(34, 34); iconBig:SetPoint("TOPLEFT", 12, -10); iconBig:SetTexCoord(0.07, 0.93, 0.07, 0.93); iconBig:Hide()
     self.detIcon = iconBig
+    -- Une Texture ne reçoit pas la souris : bouton invisible par-dessus pour le tooltip de l'objet produit.
+    local iconBtn = CreateFrame("Button", nil, col); iconBtn:SetAllPoints(iconBig)
+    iconBtn:SetScript("OnEnter", function(r) PW:_ProductTooltip(r) end)
+    iconBtn:SetScript("OnLeave", GameTooltip_Hide)
+    self.detIconBtn = iconBtn
 
     local nameFS = col:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     nameFS:SetPoint("TOPLEFT", iconBig, "TOPRIGHT", 8, -2); nameFS:SetPoint("RIGHT", -10, 0)
@@ -78,6 +83,19 @@ function PW:_BuildDetail(col)
 
     local qtyLbl = col:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     qtyLbl:SetPoint("RIGHT", qtyBox, "LEFT", -4, 0); qtyLbl:SetText(L["Qté"]); self.detQtyLbl = qtyLbl
+end
+
+-- Tooltip de l'objet PRODUIT (grosse icône du détail). Même logique que la ligne de recette :
+-- hyperlien si connu, sinon SetCraftSpell (enchant) / SetTradeSkillItem (métier normal) par index.
+function PW:_ProductTooltip(anchor)
+    local e = self:GetSelectedRecipe(); if not e then return end
+    GameTooltip:SetOwner(anchor, "ANCHOR_RIGHT"); GameTooltip:ClearLines()
+    local ok = false
+    if e.link then ok = pcall(GameTooltip.SetHyperlink, GameTooltip, e.link)
+    elseif COC.Craft:IsCraftOpen() then ok = pcall(GameTooltip.SetCraftSpell, GameTooltip, e.index)
+    else ok = pcall(GameTooltip.SetTradeSkillItem, GameTooltip, e.index) end
+    if not ok then GameTooltip:SetText(e.name or "?", 1, 1, 1) end
+    GameTooltip:Show()
 end
 
 function PW:_ClearDetail()

@@ -298,31 +298,15 @@ function UI:RefreshPostPlans()
             end
         end
     end
-    -- Réactifs en poche (P2) : les plans immédiatement fabricables remontent en tête, même quand
-    -- le filtre est désactivé (visibilité gratuite, aucune perte d'info).
-    table.sort(out, function(a, b)
-        if a.ready ~= b.ready then return a.ready end
-        return a.name < b.name
-    end)
     self.postPlanList = out
     if self.postPlanHdr then
         self.postPlanHdr:SetText(artFilter
             and L["LISTE DES PLANS"] .. " |cFF33DD33(" .. self:_PostTargetLabel() .. " · " .. (artMode or "") .. ")|r"
             or L["LISTE DES PLANS"])
     end
-    for i, item in ipairs(out) do
-        local row = self:_PostPlanRow(i); local e = item.e
-        local r, g, b = Skin.RarityColor(e.itemID)
-        row.badge:Paint(r, g, b, Skin.FirstChar(item.name), Skin.Icon(e.itemID, e.spellID))
-        local disp = item.name:match("^item:") and "|cFF777777" .. L["Chargement…"] .. "|r" or item.name
-        if item.ready then disp = "|cFF33DD33" .. L["[Prêt]"] .. "|r " .. disp end
-        row.name:SetText(disp); row.name:SetTextColor(r, g, b)
-        row.name:SetTextColor(e == self.postEntry and 1 or r, e == self.postEntry and 0.85 or g, e == self.postEntry and 0.27 or b)
-        row.entry = e; row.tipItemID, row.tipSpellID = e.itemID, e.spellID; row:SetScript("OnClick", function() UI:SelectPostPlan(e) end); row:Show()
-    end
-    for i = #out + 1, #self.postPlanRows do self.postPlanRows[i]:Hide() end
-    self.postPlanContent:SetHeight(math.max(#out * PLH, 10))
-    Skin.AutoHideScroll("COCPostPlanScroll", self.postPlanContent)
+    -- Tri par section (emplacement/type) + rendu en-têtes+lignes : cf. _UI_Post_Categories.lua.
+    -- Le « prêt » (P2) remonte en tête de SA section (plus en tête globale) : le regroupement prime.
+    self:_RenderPostPlanRows(out)
 end
 
 function UI:_PostPlanRow(i)
