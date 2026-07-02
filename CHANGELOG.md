@@ -1,6 +1,6 @@
 # Changelog — Crafting & Gathering Order — Classic
 
-## Unreleased
+## v1.1.0 — artisan matching, loot alerts, partners & buyer-confirmed delivery
 
 **Buyer-confirmed completion.** An order no longer flips to *done* the instant the crafter clicks
 **Deliver** — it now becomes **Delivered** (awaiting confirmation). The buyer confirms receipt, either
