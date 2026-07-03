@@ -25,30 +25,48 @@ function ProfOrders:_OnShow(PW, event)
     else PW:OnProfessionShow() end
 end
 
+-- Combat : la fenêtre métier custom ne se ferme pas au clic en combat (le natif est protégé) → on la
+-- referme AUTOMATIQUEMENT à l'entrée en combat. On masque notre frame (toujours autorisé) et on tente
+-- de fermer la session native. La garde InCombatLockdown de OnProfessionShow empêche toute
+-- ré-ouverture intempestive tant que le combat dure.
+function ProfOrders:_OnCombat()
+    local PW = COC.ProfWindow
+    if not (PW and PW.frame and PW.frame:IsShown()) then return end
+    PW.docked = false
+    PW:Hide()
+    if COC.Craft and COC.Craft:IsCraftOpen() then if CloseCraft then CloseCraft() end
+    elseif CloseTradeSkill then CloseTradeSkill() end
+end
+
 function ProfOrders:Start()
     if not COC.db then return end
     local f = CreateFrame("Frame")
     for _, ev in ipairs({ "TRADE_SKILL_SHOW", "TRADE_SKILL_UPDATE", "TRADE_SKILL_CLOSE",
-                          "CRAFT_SHOW", "CRAFT_UPDATE", "CRAFT_CLOSE" }) do f:RegisterEvent(ev) end
+                          "CRAFT_SHOW", "CRAFT_UPDATE", "CRAFT_CLOSE", "PLAYER_REGEN_DISABLED" }) do f:RegisterEvent(ev) end
     f:SetScript("OnEvent", function(_, event)
-        local PW = COC.ProfWindow
-        local windowOn = PW and PW:IsEnabled()
-        if event:find("UPDATE$") then
-            -- Skill-up / plan appris : recapture mon niveau + ré-annonce (les autres voient mon skill).
-            if COC.Directory then COC.Directory:CaptureSkills(); COC.Directory:AnnounceThrottled() end
-            if windowOn and PW.frame and PW.frame:IsShown() then PW:Refresh()
-            elseif windowOn then PW:OnProfessionShow() end
-        elseif not windowOn then
-            if PW and event:find("SHOW$") then       -- « Vue Blizzard » : pose le bouton de retour
-                if event:find("^CRAFT") then PW:EnsureNativeToggle(_G.CraftFrame, "craft")
-                else PW:EnsureNativeToggle(_G.TradeSkillFrame, "trade") end
-            end
-            return                                  -- on laisse la fenêtre native pour le reste
-        elseif event:find("SHOW$") then
-            ProfOrders:_OnShow(PW, event)
-        else                                        -- *_CLOSE
-            if COC.Craft and COC.Craft:GetOpenProfessionInfo() then PW:OnProfessionShow()  -- un autre métier reste ouvert
+        if event == "PLAYER_REGEN_DISABLED" then ProfOrders:_OnCombat(); return end
+        local PW = COC.ProfWindow; if not PW then return end
+        local craftEv = event:find("^CRAFT")
+        local nativeFrame = craftEv and _G.CraftFrame or _G.TradeSkillFrame
+        -- Skill-up / plan appris : recapture mon niveau + ré-annonce (les autres voient mon skill).
+        if event:find("UPDATE$") and COC.Directory then
+            COC.Directory:CaptureSkills(); COC.Directory:AnnounceThrottled()
+        end
+        if PW:IsEnabled() then                          -- VUE CUSTOM (3 colonnes, native neutralisée)
+            if event:find("UPDATE$") then
+                if PW.frame and PW.frame:IsShown() then PW:Refresh() else PW:OnProfessionShow() end
+            elseif event:find("SHOW$") then ProfOrders:_OnShow(PW, event)
+            elseif COC.Craft and COC.Craft:GetOpenProfessionInfo() then PW:OnProfessionShow()  -- autre métier ouvert
             else PW:OnProfessionClose() end
+        else                                            -- VUE BLIZZARD (native intacte + dock Commandes à droite)
+            if event:find("SHOW$") then
+                PW:EnsureNativeToggle(nativeFrame, craftEv and "craft" or "trade")
+                PW:OpenDock(nativeFrame)
+            elseif event:find("UPDATE$") then
+                if PW.docked then PW:Refresh() end
+            else                                        -- *_CLOSE
+                if PW.CloseDock then PW:CloseDock() end
+            end
         end
     end)
 end

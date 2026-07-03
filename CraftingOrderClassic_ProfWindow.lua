@@ -77,10 +77,12 @@ function PW:_BuildHeader(f)
     local vanilla = Skin.MakeGoldButton(f, 96, 20, L["Vue Blizzard"])
     vanilla:SetPoint("TOPRIGHT", -36, -12)
     vanilla:SetScript("OnClick", function() PW:SetEnabled(false) end)
+    self.vanillaBtn = vanilla
 
     local close = CreateFrame("Button", nil, f, "UIPanelCloseButton")
     close:SetPoint("TOPRIGHT", -6, -6)
     close:SetScript("OnClick", function()
+        if PW.docked then PW:CloseDock(); return end   -- dock : referme juste le panneau, garde la native ouverte
         if COC.Craft and COC.Craft:IsCraftOpen() then if CloseCraft then CloseCraft() end
         elseif CloseTradeSkill then CloseTradeSkill() end
         PW:Hide()
@@ -164,6 +166,55 @@ function PW:EnsureNativeToggle(frame, key)
 end
 
 -- ------------------------------------------------------------------
+-- Dock « Commandes » en VUE BLIZZARD : la fenêtre native reste VISIBLE (non neutralisée) et on épingle
+-- NOTRE colonne Commandes à sa droite (le « panneau de commande » demandé). Réutilise tel quel le rendu
+-- de _ProfWindow_Orders via le layout compact. S'EXCLUT de la vue custom 3 colonnes (custom = frame
+-- neutralisée + 3 colonnes ; dock = native intacte + colonne seule) → jamais les deux à la fois.
+-- ------------------------------------------------------------------
+function PW:OpenDock(nativeFrame)
+    if not nativeFrame then return end
+    self:Build()
+    self.docked = true
+    self.standaloneKey = nil
+    self._compact = nil                 -- force _ApplyMode à recalculer au retour en vue custom
+    self:_ApplyMode(true)               -- colonne Commandes seule (réutilise le layout compact)
+    if self.vanillaBtn then self.vanillaBtn:Hide() end   -- « Vue Blizzard » redondant : on Y est déjà
+    self.frame:ClearAllPoints()
+    self.frame:SetPoint("TOPLEFT", nativeFrame, "TOPRIGHT", 6, 0)
+    self.frame:Show()
+    self:Refresh()
+end
+
+function PW:CloseDock()
+    if not self.docked then return end
+    self.docked = false
+    if self.vanillaBtn then self.vanillaBtn:Show() end
+    self:Hide()
+end
+
+-- Replace la fenêtre custom à sa position mémorisée (drag) ou au centre après un passage en dock
+-- (qui l'avait épinglée à la native).
+function PW:_RestorePlacement()
+    if not self.frame then return end
+    self.frame:ClearAllPoints()
+    local pos = COC.db and COC.db.profWinPos
+    if pos then self.frame:SetPoint(pos[1], UIParent, pos[2], pos[3], pos[4]) else self.frame:SetPoint("CENTER") end
+end
+
+-- Refresh en mode dock : on ne touche NI aux recettes NI au détail (la native s'en charge), juste le
+-- titre/rang + la colonne Commandes. Native fermée entre-temps → on retire le dock.
+function PW:_RefreshDock()
+    local craft = COC.Craft
+    local name = craft and craft:GetOpenProfessionInfo()
+    if not name then self:CloseDock(); return end
+    self.profKey = craft:OpenProfessionKey()
+    self.titleFS:SetText(name)
+    local rank, maxRank = craft:OpenRank()
+    self.rankFS:SetText((rank and maxRank) and string.format("|cFFE8B84B%d|r / %d", rank, maxRank) or "")
+    if self.RefreshOrders then self:RefreshOrders() end
+end
+
+-- ------------------------------------------------------------------
 -- Refresh global (coalescé)
 -- ------------------------------------------------------------------
 function PW:Hide() if self.frame then self.frame:Hide() end end
@@ -171,6 +222,7 @@ function PW:Hide() if self.frame then self.frame:Hide() end end
 function PW:_DoRefresh()
     self._pending = false
     if not self.frame or not self.frame:IsShown() then return end
+    if self.docked then self:_RefreshDock(); return end
     local craft = COC.Craft
     local name = craft and craft:GetOpenProfessionInfo()
     if name then                                   -- mode PLEIN : fenêtre métier native ouverte
@@ -286,8 +338,17 @@ function PW:SetEnabled(on)
         print("|cFF33DD88Crafting Order|r " .. L["fenêtre métier custom |cFF33DD33activée|r — ouvre un métier. (Guild Economy laisse la main.)"])
         self:OnProfessionShow()
     else
+        self.docked = false
         self:Hide(); self:RestoreNative()
         print("|cFF33DD88Crafting Order|r " .. L["fenêtre métier custom |cFFFFCC00désactivée|r (vue Blizzard)."])
+        -- Vue Blizzard : si un métier est ouvert, épingle tout de suite le dock Commandes à sa droite.
+        local craft = COC.Craft
+        if craft and craft:GetOpenProfessionInfo() then
+            local isCraft = craft.IsCraftOpen and craft:IsCraftOpen()
+            local nf = (isCraft and _G.CraftFrame) or _G.TradeSkillFrame
+            self:EnsureNativeToggle(nf, isCraft and "craft" or "trade")
+            self:OpenDock(nf)
+        end
     end
 end
 
@@ -300,11 +361,14 @@ end
 
 function PW:OnProfessionShow()
     if not self:IsEnabled() then return end
+    if InCombatLockdown and InCombatLockdown() then return end   -- pas de (re)neutralisation du natif en combat
     local craft = COC.Craft
     if not (craft and craft:GetOpenProfessionInfo()) then return end
     silenceGE()                         -- coexistence : pas de double panneau si GE est chargé
     self.standaloneKey = nil            -- la fenêtre native prend le dessus sur une ouverture par clé
-    self:Build(); self:NeutralizeNative()
+    self:Build()
+    if self.docked then self.docked = false; self:_RestorePlacement(); if self.vanillaBtn then self.vanillaBtn:Show() end end
+    self:NeutralizeNative()
     if not self.frame:IsShown() then self.frame:Show() end
     self:Refresh()
     -- L'ordre de dispatch des events entre addons n'est pas garanti : si GE traite SHOW APRÈS nous
