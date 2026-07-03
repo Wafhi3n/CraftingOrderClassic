@@ -180,6 +180,18 @@ if loc == "enUS" or loc == "enGB" then
         ["en ligne · annuaire"] = "online · directory", ["annuaire"] = "directory",
         ["pas encore dans l'annuaire (sans COC ?)"] = "not in directory yet (no COC?)",
         ["confédérés GreenWall repérés (SoD live only)"] = "GreenWall confederates seen (SoD live only)",
+        -- Greffons échange / courrier (panneaux compagnons)
+        ["Commandes pour ce joueur"] = "Orders for this player",
+        ["+%d autre(s)"] = "+%d more",
+        ["Remplir depuis commande"] = "Fill from order",
+        ["Marquer livrée"] = "Mark delivered",
+        ["À réclamer : %s"] = "Collect: %s",
+        ["À payer : %s"] = "To pay: %s",
+        ["Pas de prix convenu."] = "No agreed price.",
+        ["Gratuit."] = "Free.",
+        ["Commande : %s"] = "Order: %s",
+        ["Voici ta commande. Prix convenu : %s."] = "Here is your order. Agreed price: %s.",
+        ["Voici ta commande."] = "Here is your order.",
         -- Fenêtre métier (ProfWindow)
         ["Recettes"] = "Recipes", ["Commandes"] = "Orders", ["Réactifs :"] = "Reagents:",
         ["Créer"] = "Create", ["Créer tout"] = "Create All", ["Vue Blizzard"] = "Blizzard view",

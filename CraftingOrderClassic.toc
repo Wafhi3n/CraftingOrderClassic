@@ -42,4 +42,7 @@ CraftingOrderClassic_Inbound.lua
 CraftingOrderClassic_Handoff.lua
 CraftingOrderClassic_Moderation.lua
 CraftingOrderClassic_LootAlert.lua
+CraftingOrderClassic_Companion.lua
+CraftingOrderClassic_Companion_Mail.lua
+CraftingOrderClassic_Companion_Trade.lua
 Debug.lua
