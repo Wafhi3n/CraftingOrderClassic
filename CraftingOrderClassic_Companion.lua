@@ -81,6 +81,20 @@ function Comp:OrdersWith(partner)
     return sortOrders(out)
 end
 
+-- TOUTES mes commandes à livrer (rôle vendeur), quel que soit l'acheteur — utilisé par le greffon
+-- courrier quand aucun destinataire n'est encore saisi (on affiche tout, cliquer remplit le « À: »).
+function Comp:MyDeliverables()
+    local out = {}
+    local m = me()
+    if not (COC.db and COC.db.orders) then return out end
+    for _, o in pairs(COC.db.orders) do
+        if o.acceptedBy == m and o.buyer and (o.status == "accepted" or o.status == "delivered") then
+            out[#out + 1] = o
+        end
+    end
+    return sortOrders(out)
+end
+
 -- ------------------------------------------------------------------
 -- Panneau compagnon skinné : en-tête (icône work-order + titre + partenaire) + puits de lignes.
 -- Le pied (boutons, ligne prix) est ajouté par chaque greffon. `maxRows` lignes visibles + « +N ».
@@ -103,6 +117,7 @@ function Comp.MakePanel(name, parent, width, maxRows)
     local sub = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     sub:SetPoint("TOPLEFT", 15, -36); Skin.ApplyShadow(sub)
     sub:SetText("|c" .. Skin.hex.gold .. L["Commandes pour ce joueur"] .. "|r")
+    f.subFS = sub   -- exposé : un greffon peut changer le sous-titre (ex. courrier « à livrer »)
 
     local well = CreateFrame("Frame", nil, f, "BackdropTemplate")
     well:SetPoint("TOPLEFT", 12, -50); well:SetPoint("TOPRIGHT", -12, -50)

@@ -182,6 +182,7 @@ if loc == "enUS" or loc == "enGB" then
         ["confédérés GreenWall repérés (SoD live only)"] = "GreenWall confederates seen (SoD live only)",
         -- Greffons échange / courrier (panneaux compagnons)
         ["Commandes pour ce joueur"] = "Orders for this player",
+        ["Commandes à livrer"] = "Orders to deliver",
         ["+%d autre(s)"] = "+%d more",
         ["Remplir depuis commande"] = "Fill from order",
         ["Marquer livrée"] = "Mark delivered",
