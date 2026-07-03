@@ -1,13 +1,7 @@
 -- Crafting Order - Classic — Directory : l'annuaire des GENS (présence + qui peut crafter quoi).
---
--- Côté PRODUIT (pas dans la lib) : la relecture sépare le registre des recettes (CraftLink) de
--- l'annuaire des gens (ici). Construit à partir du transport CraftLink :
---   * présence : events JOIN/LEAVE du canal caché (pas de heartbeat) → Dir.online.
---   * recettes des autres : verbe RK reçu sur le canal global → Dir.roster (cache persistant).
---   * proximité : PING/PONG en YELL → porteurs de l'addon autour de soi.
---
--- Discipline cache : réseau → Dir.roster (mémoire = COC.db.roster, persistant) → UI. L'UI ne lit
--- QUE le cache, jamais le réseau.
+-- Côté PRODUIT (pas dans la lib), séparé du registre de recettes (CraftLink). Présence via JOIN/LEAVE
+-- du canal caché (Dir.online) ; recettes via RK sur le canal global (Dir.roster, persistant) ; PING/PONG
+-- YELL en proximité. Discipline cache : réseau → Dir.roster (COC.db.roster) → UI (jamais le réseau direct).
 
 local COC = CraftingOrderClassic
 local Dir = {}
@@ -212,26 +206,29 @@ function Dir:_Touch(name)
     return r
 end
 
--- HI reçu (un client sollicite l'annuaire). DIRIGÉ (whisper) → je réponds DIRECTEMENT à l'émetteur
--- (fiable sans canal). GLOBAL → réponse jittée en broadcast (anti-burst).
+-- HI reçu, DIRIGÉ (whisper) → je réponds à l'émetteur ET le pingue en retour (DiscoverPlayer,
+-- throttlé) : sinon l'échange est à SENS UNIQUE (il apprend mes métiers, jamais l'inverse) —
+-- symptôme observé : « Croisé » en ligne sans métiers. GLOBAL → réponse jittée (anti-burst).
 function Dir:OnHello(sender, _, distribution)
     if not CraftLink then return end
     self:_Touch(sender)
     if distribution == "WHISPER" then
         self:AnnounceTo(sender)
+        self:DiscoverPlayer(sender)
     elseif C_Timer then
         C_Timer.After(math.random() * 3, function() Dir:Announce() end)
     end
 end
 
 -- PING reçu → PONG sur la MÊME portée (whisper si dirigé, sinon yell). Dirigé → j'envoie aussi mes
--- métiers à l'émetteur (le « croiseur » voit mes métiers tout de suite, sans attendre un scan).
+-- métiers ET je pingue en retour pour connaître les siens (cf. OnHello).
 function Dir:OnPing(sender, _, distribution)
     if not CraftLink then return end
     self:_Touch(sender)
     if distribution == "WHISPER" and sender then
         CraftLink:Send("PONG", "whisper", sender)
         self:AnnounceTo(sender)
+        self:DiscoverPlayer(sender)
     else
         CraftLink:Send("PONG", "yell")
     end

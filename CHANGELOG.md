@@ -1,5 +1,12 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.4.1 — fix: directory discovery only taught the other side about you
+
+A directed whisper ping, whether from crossing paths or from someone hitting **Refresh directory**,
+only ever taught the *other* side your professions. You'd see them online in your Directory with no
+professions listed, and they'd see yours just fine. Discovery is now mutual: receiving a directed
+ping or hello also pings back, so both sides learn each other in one exchange.
+
 ## v1.4.0 — order a crafter straight from the Friends & Guild panels
 
 **Professions on the native Friends & Guild windows.** Hover a character friend in the **Friends list**
