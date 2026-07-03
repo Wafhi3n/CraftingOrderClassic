@@ -196,7 +196,7 @@ function UI:_MakeGSCGather(parent, x, y)
 end
 
 function UI:_BuildGatherArtisanSection(panel)
-    local srcDefs = { {id="guild",label=L["Guilde"]}, {id="friend",label=L["Amis"]}, {id="added",label=L["Ajoutés"]}, {id="recent",label=L["Croisés"]} }
+    local srcDefs = { {id="guild",label=L["Guilde"]}, {id="friend",label=L["Amis"]}, {id="added",label=L["Ajoutés"]}, {id="recent",label=L["Annuaire"]} }
     self.gatherSrcBtns = {}
     for i, d in ipairs(srcDefs) do
         local b = Skin.MakeGoldButton(panel, 58, 20, d.label); b:SetPoint("TOPLEFT", RX + (i-1)*62, -317)

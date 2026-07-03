@@ -24,6 +24,17 @@ if loc == "enUS" or loc == "enGB" then
         ["ARTISAN"] = "CRAFTER",
         -- Filtres Carnet
         ["Tous"] = "All", ["Guilde"] = "Guild", ["Amis"] = "Friends", ["Croisés"] = "Met", ["Entrantes"] = "Incoming",
+        ["Annuaire"] = "Directory",
+        ["Rafraîchir l'annuaire"] = "Refresh directory",
+        ["annuaire : appel lancé sur le canal — les porteurs en ligne vont répondre."] =
+            "directory: call sent on the channel — online holders will respond.",
+        ["Nouveautés (v1.4.0)"] = "What's new (v1.4.0)",
+        ["Survole un ami dans la liste d'amis, ou sélectionne un membre dans le panneau de guilde : ses métiers primaires s'affichent sans ouvrir cette fenêtre."] =
+            "Hover a friend in the Friends list, or select a guildmate in the Guild panel, to see their primary professions without opening this window.",
+        ["Clic droit sur un joueur qui a l'addon (ami, guilde, croisé) : « Passer commande à… » ouvre l'onglet Commande déjà ciblé sur lui."] =
+            "Right-click a player who runs the addon (friend, guild, met): \"Order from…\" opens the Order tab already aimed at them.",
+        ["« Met » devient « Annuaire ». Le bouton « Rafraîchir l'annuaire » appelle le canal : tous les porteurs en ligne répondent et s'y ajoutent."] =
+            "\"Met\" is now \"Directory\". The \"Refresh directory\" button calls the channel: every online addon user answers and joins it.",
         ["Archivées"] = "Archived", ["En cours"] = "Active", ["libre"] = "open",
         ["Aucune commande. Onglet « Commande » pour en poster une."] = "No orders. Use the « Order » tab to post one.",
         ["Aucune commande entrante. (Capture /commerce et /guilde des joueurs sans l'addon.)"] =
@@ -44,6 +55,7 @@ if loc == "enUS" or loc == "enGB" then
         ["diag"] = "diag", ["Sourdine"] = "Muted", ["Réafficher"] = "Unmute",
         -- Modération / anti-spam (/co mute|unmute|lowlevel, popup spam, menu contextuel joueur)
         ["Muter"] = "Mute", ["Ajouter aux artisans"] = "Add to artisans",
+        ["Passer commande à %s"] = "Order from %s", ["Passer commande"] = "Place order",
         ["%s est mis en sourdine — plus aucune notification de sa part."] = "%s is now muted — no more notifications from them.",
         ["%s n'est plus en sourdine."] = "%s is no longer muted.",
         ["usage : /co unmute <nom>"] = "usage: /co unmute <name>",

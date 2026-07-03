@@ -59,7 +59,7 @@ function UI:_TargetArtisanFilter(prof)
 end
 
 function UI:_BuildPostArtisanSection(panel)
-    local srcDefs = { {id="guild", label=L["Guilde"]}, {id="friend", label=L["Amis"]}, {id="added", label=L["Ajoutés"]}, {id="recent", label=L["Croisés"]} }
+    local srcDefs = { {id="guild", label=L["Guilde"]}, {id="friend", label=L["Amis"]}, {id="added", label=L["Ajoutés"]}, {id="recent", label=L["Annuaire"]} }
     self.postSrcBtns = {}
     for i, d in ipairs(srcDefs) do
         local b = Skin.MakeGoldButton(panel, 58, 20, d.label); b:SetPoint("TOPLEFT", RX + (i-1)*62, -337)
@@ -177,4 +177,28 @@ function UI:_UpdateArtisanLabel()
         -- Affichage localisé ; la VALEUR canonique (FR) sert au réseau (cf. _PostTargetLabel / DoPostOrder).
         self.postArtisanName:SetText("|c" .. col .. L[self:_PostTargetLabel()] .. "|r")
     end
+end
+
+-- =========================================================================
+-- Ouverture directe sur l'onglet Commande avec un artisan pré-ciblé (menu clic-droit joueur /
+-- bouton du panneau de guilde — cf. _Social_Menu.lua / _Social_Roster.lua). Pré-sélectionne un métier
+-- CRAFTABLE connu de l'artisan ; le dropdown se corrige de lui-même si c'est une récolte pure
+-- (cf. _RefreshProfDropdown). postTarget = "@Nom" → la liste de plans se filtre à ce que l'artisan sait.
+-- =========================================================================
+function UI:OpenPostForArtisan(name)
+    if not (name and name ~= "" and self.frame) then return end
+    local D = COC.Directory
+    local r = D and D.roster and D.roster[name]
+    if r then
+        local pick
+        for p in pairs(r.skill or {})   do pick = p; break end
+        if not pick then for p in pairs(r.recipes or {}) do pick = p; break end end
+        if pick then self.postProf = pick end
+    end
+    self.postTarget = "@" .. name
+    if not self.frame:IsShown() then self.frame:Show() end
+    self:ShowTab("post")
+    self:RefreshPost()
+    -- Sollicite le registre FRAIS (RK+SK à jour) si l'artisan est en ligne — throttlé 60 s/nom.
+    if r and D.online and D.online[name] and D.DiscoverPlayer then D:DiscoverPlayer(name) end
 end

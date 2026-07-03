@@ -1,6 +1,8 @@
--- CraftingOrderClassic_Social.lua — Étape D : couche sociale passive.
--- * Tooltip joueur : survol → métiers + niveaux depuis Directory.roster (verbe SK).
--- * Clic-droit : « Ajouter aux artisans » dans le menu contextuel joueur.
+-- CraftingOrderClassic_Social.lua — couche sociale passive (socle).
+-- * Social:ProfSummary(nom) : résumé métiers+niveaux d'un joueur présent dans Directory.roster
+--   (icônes + « 250/300 » via SK, repli bitfield RK). Réutilisé par le tooltip MONDE (ci-dessous),
+--   le tooltip d'AMI et le panneau de GUILDE (_Social_Roster.lua), et le menu (_Social_Menu.lua).
+-- * Découverte au croisement : survol / cible / groupe → whisper PING+HI throttlé (Dir:DiscoverPlayer).
 
 local COC    = CraftingOrderClassic
 local Social = {}
@@ -8,17 +10,19 @@ COC.Social   = Social
 
 local function GetSkin() return COC.UI and COC.UI.Skin end
 
--- =========================================================================
--- Tooltip social
--- =========================================================================
-local function OnTooltipUnit(tooltip)
-    local _, unit = tooltip:GetUnit()
-    if not unit then return end
-    local name = UnitName(unit)
-    if not (name and COC.Directory) then return end
-    local r = COC.Directory.roster[name]
-    if not r then return end
+-- Métiers SECONDAIRES (WoW) : jamais affichés dans le résumé social — seuls les métiers PRIMAIRES
+-- (production/récolte à emplacement unique) intéressent la prise de commande. Clés CraftLink exactes
+-- (cf. RegisterProfession dans Libs/CraftLink-1.0/Data/*/{Cooking,FirstAid,Fishing}.lua).
+local SECONDARY_PROF = { Cooking = true, ["First Aid"] = true, Fishing = true }
 
+-- =========================================================================
+-- Résumé métiers d'un joueur connu (roster CraftLink) — icônes INLINE + niveaux. Métiers PRIMAIRES
+-- uniquement (cf. SECONDARY_PROF). Renvoie nil si le joueur n'a pas l'addon / aucun métier primaire connu.
+-- =========================================================================
+function Social:ProfSummary(name)
+    if not (name and COC.Directory) then return nil end
+    local r = COC.Directory.roster[name]
+    if not r then return nil end
     local sk = GetSkin()
     -- Icône de métier INLINE (|T…|t) plutôt que le nom long → ligne compacte. Repli sur le libellé
     -- si le client n'a pas l'icône en cache.
@@ -29,82 +33,37 @@ local function OnTooltipUnit(tooltip)
     local parts = {}
     -- Priorité : niveaux SK reçus (plus précis — icône + « 250/300 »).
     for key, sv in pairs(r.skill or {}) do
-        parts[#parts + 1] = profMark(key) .. " " .. sv[1] .. "/" .. sv[2]
+        if not SECONDARY_PROF[key] then parts[#parts + 1] = profMark(key) .. " " .. sv[1] .. "/" .. sv[2] end
     end
     -- Fallback : métiers connus via bitfield RK, sans niveau → icône seule.
     if #parts == 0 then
-        for key in pairs(r.recipes or {}) do parts[#parts + 1] = profMark(key) end
-    end
-
-    if #parts == 0 then return end
-    table.sort(parts)
-    -- Marque addon = icône WorkOrder (le glyphe « ✓ » s'affichait en tofu dans la police WoW).
-    local mark = sk and ("  |T" .. sk.tex.workorder .. ":14:14:0:0|t") or ""
-    local rep = (r.rep and r.rep > 0) and ("  |cFFE8B84B" .. string.format(COC.L["%d livrés"], r.rep) .. "|r") or ""
-    tooltip:AddLine("|cFF33DD88CO-Classic|r" .. mark .. "  " .. table.concat(parts, "   ") .. rep, 1, 1, 1)
-    tooltip:Show()
-end
-
--- =========================================================================
--- Clic-droit : « Ajouter aux artisans »
--- =========================================================================
-local COC_MENU_KEY    = "COC_ADD_TO_CRAFTERS"
-local COC_MUTE_KEY    = "COC_MUTE_PLAYER"
-local COC_PARTNER_KEY = "COC_TOGGLE_PARTNER"
-
--- Nom du joueur ciblé par le menu contextuel ouvert (convention variable selon la version Classic).
-local function menuTargetName()
-    local name
-    local menu = UIDROPDOWNMENU_OPEN_MENU
-    if menu then
-        name = menu.name
-        if not name and menu.unit then name = UnitName(menu.unit) end
-    end
-    if not (name and name ~= "") then name = UnitName("mouseover") end   -- dernier recours : sous la souris
-    return name
-end
-
-local function InjectContextMenu()
-    if not (UnitPopupMenus and UnitPopupButtons) then return end
-    local L = COC.L
-    local targets = { "PLAYER", "PARTY", "RAID_PLAYER", "FRIEND", "GUILD" }
-    for _, t in ipairs(targets) do
-        local menu = UnitPopupMenus[t]
-        if menu then
-            for _, key in ipairs({ COC_MENU_KEY, COC_PARTNER_KEY, COC_MUTE_KEY }) do
-                local already = false
-                for _, k in ipairs(menu) do if k == key then already = true; break end end
-                if not already then
-                    -- Insère avant « CANCEL » (dernier item) pour respecter l'ordre visuel.
-                    local n = #menu
-                    if menu[n] == "CANCEL" then table.insert(menu, n, key)
-                    else menu[#menu + 1] = key end
-                end
-            end
+        for key in pairs(r.recipes or {}) do
+            if not SECONDARY_PROF[key] then parts[#parts + 1] = profMark(key) end
         end
     end
+    if #parts == 0 then return nil end
+    table.sort(parts)
+    local rep = (r.rep and r.rep > 0) and ("  |cFFE8B84B" .. string.format(COC.L["%d livrés"], r.rep) .. "|r") or ""
+    return table.concat(parts, "   ") .. rep
+end
 
-    UnitPopupButtons[COC_MENU_KEY] = {
-        text = L["Ajouter aux artisans"], dist = 0,
-        func = function()
-            local name = menuTargetName()
-            if name and name ~= "" and COC.UI and COC.UI._AddArtisan then COC.UI:_AddArtisan(name) end
-        end,
-    }
-    UnitPopupButtons[COC_PARTNER_KEY] = {
-        text = L["Partenaire (basculer)"], dist = 0,
-        func = function()
-            local name = menuTargetName()
-            if name and name ~= "" and COC.UI and COC.UI._TogglePartner then COC.UI:_TogglePartner(name) end
-        end,
-    }
-    UnitPopupButtons[COC_MUTE_KEY] = {
-        text = L["Muter"], dist = 0,
-        func = function()
-            local name = menuTargetName()
-            if name and name ~= "" and COC.Moderation then COC.Moderation:Mute(name) end
-        end,
-    }
+-- =========================================================================
+-- Tooltip MONDE (unité). Migré de OnTooltipSetUnit (mort depuis le refactor tooltip de Classic Era)
+-- vers TooltipDataProcessor.AddTooltipPostCall ; repli sur l'ancien script hook pour un vieux client.
+-- =========================================================================
+local function OnUnitTooltip(tooltip)
+    if tooltip ~= GameTooltip or tooltip._cocProfAdded then return end   -- _cocProfAdded : anti-doublon (2 chemins)
+    local _, unit = tooltip:GetUnit()
+    if not unit then return end
+    local name = UnitName(unit)
+    local summary = name and Social:ProfSummary(name)
+    if not summary then return end
+    local sk = GetSkin()
+    -- Marque addon = icône WorkOrder (le glyphe « ✓ » s'affichait en tofu dans la police WoW).
+    local mark = sk and ("  |T" .. sk.tex.workorder .. ":14:14:0:0|t") or ""
+    tooltip:AddLine("|cFF33DD88CO-Classic|r" .. mark .. "  " .. summary, 1, 1, 1)
+    tooltip._cocProfAdded = true
+    tooltip:Show()
 end
 
 -- =========================================================================
@@ -140,9 +99,52 @@ end
 -- Activation (appelé depuis PLAYER_LOGIN dans CraftingOrderClassic.lua)
 -- =========================================================================
 function Social:Start()
-    if GameTooltip and GameTooltip.HookScript then
-        GameTooltip:HookScript("OnTooltipSetUnit", OnTooltipUnit)
+    -- pcall : un pépin dans un hook social ne doit JAMAIS avorter la chaîne PLAYER_LOGIN qui suit
+    -- (BuildMinimapButton, Inbound, slash…). L'erreur est mémorisée (/co socialdiag) et remontée.
+    local ok, err = pcall(function()
+        -- Tooltip MONDE : OnTooltipSetUnit fonctionne en Classic Era (l'API tooltip n'a PAS été
+        -- neutralisée comme le menu) → chemin ÉPROUVÉ, on le garde en primaire. On enregistre AUSSI
+        -- l'API moderne en repli ; _cocProfAdded (remis à zéro sur OnTooltipCleared) évite le doublon.
+        if GameTooltip and GameTooltip.HookScript then
+            GameTooltip:HookScript("OnTooltipSetUnit", OnUnitTooltip)
+            GameTooltip:HookScript("OnTooltipCleared", function(tt) tt._cocProfAdded = nil end)
+        end
+        if TooltipDataProcessor and TooltipDataProcessor.AddTooltipPostCall
+            and Enum and Enum.TooltipDataType and Enum.TooltipDataType.Unit then
+            TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, OnUnitTooltip)
+        end
+        if Social.InstallMenus  then Social:InstallMenus()  end   -- _Social_Menu.lua (menu clic-droit)
+        if Social.WireRosterUI  then Social:WireRosterUI()  end   -- _Social_Roster.lua (tooltip ami + guilde)
+        Social:_WireDiscovery()
+    end)
+    if not ok then
+        self._startError = err
+        if geterrorhandler then geterrorhandler()(err) end
     end
-    InjectContextMenu()
-    self:_WireDiscovery()
+end
+
+-- Diagnostic (/co socialdiag [nom]) : état des hooks + données roster de la cible → pour comprendre
+-- pourquoi un tooltip reste vide (souvent : le joueur n'a pas de métier PRIMAIRE, ou pas encore découvert).
+function Social:Diag(name)
+    local out = function(s) DEFAULT_CHAT_FRAME:AddMessage("|cFF33DD88[CO diag]|r " .. s) end
+    if not (name and name ~= "") then
+        if UnitIsPlayer and UnitIsPlayer("target") then name = UnitName("target")
+        elseif UnitIsPlayer and UnitIsPlayer("mouseover") then name = UnitName("mouseover") end
+    end
+    out("Start: " .. (self._startError and ("|cFFFF4444ERREUR|r " .. tostring(self._startError)) or "|cFF33DD33ok|r"))
+    out(("UIPanels_Game=%s · FriendsFrameTooltip_Show=%s · GuildStatus_Update=%s"):format(
+        tostring(C_AddOns and C_AddOns.IsAddOnLoaded and C_AddOns.IsAddOnLoaded("Blizzard_UIPanels_Game")),
+        type(FriendsFrameTooltip_Show), type(GuildStatus_Update)))
+    out(("hooks: ami=%s guilde=%s menu=%s"):format(
+        tostring(self._friendHooked), tostring(self._guildHooked), tostring(self._menuHooked)))
+    if not (name and name ~= "") then out("aucune cible — cible un joueur ou /co socialdiag <nom>"); return end
+    local r = COC.Directory and COC.Directory.roster and COC.Directory.roster[name]
+    out("cible=|cFFFFFFFF" .. name .. "|r roster=" .. (r and "|cFF33DD33oui|r" or "|cFFFF4444non|r"))
+    if r then
+        local sk = {}; for k, v in pairs(r.skill or {}) do sk[#sk+1] = k .. " " .. tostring(v[1]) .. "/" .. tostring(v[2]) end
+        local rk = {}; for k in pairs(r.recipes or {}) do rk[#rk+1] = k end
+        out("  skill: " .. (next(sk) and table.concat(sk, ", ") or "(vide)"))
+        out("  recipes: " .. (next(rk) and table.concat(rk, ", ") or "(vide)"))
+    end
+    out("  ProfSummary=" .. (self:ProfSummary(name) or "|cFFFF4444nil|r (rien à afficher)"))
 end

@@ -4,5 +4,6 @@ ignore:
   - CURSEFORGE.md
   - .gitignore
   - .pkgmeta
+  - docs
   - Libs/CraftLink-1.0/Data/Curated
   - Libs/CraftLink-1.0/tools

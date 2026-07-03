@@ -2,7 +2,7 @@
 ## Title: Crafting & Gathering Order - Classic
 ## Notes: Réseau global et social de commandes de craft ET de récolte (autonome — sans guilde). /co pour le statut.
 ## Author: Wafhi3n
-## Version: 1.3.0
+## Version: 1.4.0
 ## X-Category: Auction & Economy
 ## X-Website: https://github.com/Wafhi3n/CraftingOrderClassic
 ## SavedVariables: CraftingOrderClassicDB
@@ -27,6 +27,8 @@ CraftingOrderClassic_UI_Gather.lua
 CraftingOrderClassic_UI_Artisans.lua
 CraftingOrderClassic_UI_Help.lua
 CraftingOrderClassic_Social.lua
+CraftingOrderClassic_Social_Menu.lua
+CraftingOrderClassic_Social_Roster.lua
 CraftingOrderClassic_Minimap.lua
 CraftingOrderClassic_ProfOrders.lua
 CraftingOrderClassic_Craft.lua

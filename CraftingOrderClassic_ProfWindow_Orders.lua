@@ -22,7 +22,7 @@ local REL = {
     { id = "all",    label = L["Tous"]    },
     { id = "guild",  label = L["Guilde"]  },
     { id = "friend", label = L["Amis"]    },
-    { id = "recent", label = L["Croisés"] },
+    { id = "recent", label = L["Annuaire"] },
 }
 local REL_COL = { guild = "FF8FD98F", friend = "FF6FB7FF", recent = "FFCBB389" }
 

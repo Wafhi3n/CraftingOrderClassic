@@ -1,5 +1,28 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.4.0 — order a crafter straight from the Friends & Guild panels
+
+**Professions on the native Friends & Guild windows.** Hover a character friend in the **Friends list**
+and a small Crafting Order tooltip now shows their **primary professions and skill levels** beside the
+game's own tooltip. Select a guildmate in the **Guild** panel and the same summary docks under the
+member detail — with an **Order** button right there — so you can size up (and order from) a crafter
+without opening the board, even while they're offline.
+
+**"Order from…" in the right-click menu.** Right-click a player who runs the addon — in the Friends
+list, an online guildmate, or anyone you cross in the world — and a **Crafting Order** section offers
+**Order from _name_** (opens the Order tab pre-targeted at them), alongside Add to artisans / Partner /
+Mute. _This also revives those entries: Classic moved to a new context-menu system and the old ones had
+silently stopped appearing — they're back, on the modern API._
+
+**Primary professions only** in the social tooltips now — Cooking, First Aid and Fishing are hidden, so
+you see the craftable trades that matter.
+
+**"Met" is now the "Directory", with a Refresh button.** The met-on-the-channel source is renamed
+**Directory**, and a one-click **Refresh directory** button calls out on the hidden channel so every
+addon user currently online answers and lands in your directory — no more waiting to cross paths.
+
+_Fix: the world tooltip's profession line (hovering a player in the world) is back after a regression._
+
 ## v1.3.0 — companion panels: deliver orders straight from the trade & mail windows
 
 **Trade & mail companion panels.** When you open a **trade** with someone, or the **mail** composer, a

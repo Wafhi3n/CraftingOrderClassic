@@ -254,6 +254,7 @@ function COC:Slash(msg)
     elseif cmd == "gwroster" or cmd == "confed" then COC:GreenWallDiag()
     elseif cmd == "wipe"   then COC:WipeRoster()
     elseif cmd == "debug"  then if COC.Debug then COC.Debug:Toggle() end
+    elseif cmd == "socialdiag" or cmd == "sdiag" then if COC.Social then COC.Social:Diag(rest) end
     elseif cmd == "trace"  then if COC.Trace then COC.Trace:Cmd(rest) end
     elseif cmd == "help"   then COC:Help()
     else COC:Status() end

@@ -1,109 +1,96 @@
 # Crafting & Gathering Order — Classic — CurseForge description
 
-> Source of truth for the CurseForge page description. Copy-paste into the addon page on each notable
-> update. (Not packaged — see `.pkgmeta` ignore.)
+> Source of truth for the CurseForge page. Copy it onto the addon page on each notable update.
+> (Not packaged; see `.pkgmeta` ignore.)
 
 ---
 
-**Crafting & Gathering Order — Classic** brings a real work-order board to WoW Classic — for **both
-crafting and gathering** — without needing a shared guild or the Auction House. Post what you want
-crafted or gathered once, and every addon user on your realm can see and answer it.
+Crafting & Gathering Order is a work-order board for WoW Classic, for both crafting and gathering. No
+shared guild, no auction house, no server. You post what you want made or gathered, and everyone
+running the addon on your realm can see it and answer. It talks over a hidden realm channel, so it works
+between total strangers as long as they've got the addon too.
 
-**Post once, reach the realm**
+## What it does
 
-A clean, tavern-styled window lets you post **craft orders** (pick a profession and recipe, tick the
-reagents you'll provide, set a commission) and **gather orders** (ore, herbs, leather, fish — by the
-unit or by the stack, always shown with the real total, e.g. *3 stacks (60)*). Orders broadcast over a
-hidden realm-wide channel — there's no central server and no shared guild required.
+- Post craft and gather orders from a tavern-styled window, or straight from chat with `/co post`.
+- Send an order to everyone, your guild, your friends, or one named player. A named order gets pushed to that person the moment they log in.
+- Get a toast, a chat line and a sound when an order is meant for you. `/co notify` sets how much of that you want.
+- Browse the Artisans directory: who can make what, who's online, their skill levels, and how you know them.
+- Pick a crafter and the recipe list narrows to what they can actually make, so you never send someone a request they can't fill.
+- Filter recipes down to what you can make right now with the reagents already in your bags.
+- Order from your friends and guildmates without opening the board (new in 1.4).
 
-**Send it to the right people**
+## Order from your Friends and Guild list
 
-Broadcast to **everyone**, or scope an order to your **Guild**, your **Friends**, or one **specific
-player**. Targeted orders only reach eligible recipients, and are pushed to them the moment they log
-in. Open orders re-broadcast periodically and expire on their own, so the board never fills with stale
-requests.
+Hover a friend in the Friends list and their professions and skill levels show up next to the game's own
+tooltip. Click a guildmate in the Guild panel and the same summary sits under their detail, with an
+Order button right there, so it works even when they're offline.
 
-**Never miss an order meant for you**
+Right-click anyone who runs the addon, a friend, an online guildmate, or someone you bumped into in the
+world, and you get an "Order from ___" entry that opens the Order tab already aimed at them.
 
-When an order lands for you — broadcast to all, sent to your guild or friends, or addressed to you by
-name — you get a toast, a chat line, and a sound. Dial it in with **/co notify**: notify on
-*everything*, only *directed* orders (named + guild + friends), only orders that *name* you, or turn
-it *off* entirely.
+The directory fills itself in as you cross paths with other users. When it's looking empty, the Refresh
+button calls out on the channel and everyone online answers.
 
-**Find the crafter you need**
+## Sending an order where it belongs
 
-The **Artisans** directory shows who can make what, who's **online right now**, their **skill levels**
-(e.g. *Blacksmithing 250/300*), and how you know them (guild, friend, added, or simply met on the
-channel). Add anyone by name or right-click their portrait, and get a notification when a favourite
-crafter comes online. Hover any player to see their professions in the tooltip.
+Broadcast to the whole realm, or keep it to your guild, your friends, or a single player. Scoped orders
+only reach people who qualify. Open ones re-broadcast every couple of hours and expire on their own, so
+the board doesn't rot with dead requests.
 
-Running a cross-guild confederation with **GreenWall**? The Artisans directory adds a **Confederation**
-section listing addon users from your sister guilds, spotted passively from the guild-chat bridge — no
-extra network traffic. Diagnose with **/co gwroster**.
+Gather orders handle stacks properly. Ask by the unit or by the stack, and you always see the real
+total, so it reads *3 stacks (60)* instead of a cryptic *3 st*.
 
-**Order from the crafter who can make it**
+## Delivery that counts
 
-Pick a crafter in the Order tab and the recipe list — now grouped by section for easier browsing —
-narrows to what *they* can actually craft — from their known-recipe registry, or a skill-level estimate
-when that's all that's shared yet. No more sending someone a request they can't fill. Their registry is
-pulled fresh the moment you select them.
+An order isn't done the second a crafter clicks Deliver. It goes to Delivered, and the buyer confirms
+they got it, either automatically when the item lands in their bags or with a Received button. A
+crafter's delivered-count only ticks up on that confirmation, so it tracks goods that actually changed
+hands rather than clicks.
 
-**Craft what your bags allow**
+## Hand off from the trade and mail windows
 
-Filter the recipe list to the plans you can make **right now** with the reagents already in your bags —
-it updates live as your inventory changes, so you always know what you can start immediately.
+Open a trade or start a letter and a small panel shows the orders between you and that player. In the
+mail composer, Fill from order sets the recipient, subject, body and cash-on-delivery, and attaches the
+crafted item from your bags. You still read it over and hit Send yourself. At the trade window each side
+sees their half: the crafter what to collect, the buyer what to pay and a button to confirm. The panel
+sticks around after the trade closes so whoever's left can finish up.
 
-**Partners, loot alerts & recipe gifts**
+## Partners, loot alerts and gifts
 
 Loot a recipe, formula, schematic or pattern and the addon tells you what it teaches, whether you
-already know it, and which of your **partners** don't. Mark anyone a partner with a right-click, then
-offer them a spare plan with **/co gift** — a friendly whisper, never automatic.
+already know it, and which of your partners don't. Mark someone a partner with a right-click, then offer
+them a spare plan with `/co gift`. It drafts a friendly whisper; it never sends on its own.
 
-**Delivery you can trust**
+## Catching requests from non-users
 
-An order isn't *done* the instant a crafter clicks Deliver — it becomes **Delivered**, and the buyer
-confirms receipt (automatically when the item reaches their bags, or with a one-click **Received**
-button). Crafter reputation is credited only on that confirmation, so delivered-counts reflect real
-hand-offs.
+When someone without the addon posts a request in `/trade` or `/guild`, it lands in an Incoming queue so
+it doesn't slip past you. Accept it, then reply to them in chat yourself. Sales (WTS) and crafters
+advertising their services (LFW) get filtered out. `/co scan` turns the scanner on and off.
 
-**Hand off from the trade & mail windows**
+## The profession window (optional)
 
-Open a **trade** or the **mail** composer and a Crafting Order panel appears alongside it, showing the
-orders between you and that player — no need to open the board. In the mail composer, **Fill from order**
-sets the recipient, subject, body and **cash-on-delivery**, and even **attaches the crafted item from
-your bags**; you review and hit Send. At the trade window each side sees their part — the crafter what to
-**collect**, the buyer what to **pay** and a **Received** button to confirm — and the panel **stays up
-after the trade** so anyone can finalize on the spot.
+There's an optional three-column profession window: a searchable, difficulty-colored recipe list,
+reagents with have/need counts and Create / Create All, and the live orders for that profession right
+alongside. One click swaps to the Blizzard window and back. Enchanting works too, which takes a little
+doing in Classic since its craft function is protected.
 
-**Catches requests from non-users too**
+## Confederations (GreenWall)
 
-Requests posted in **/trade** and **/guild** by players who don't run the addon are captured into an
-**Incoming** queue so you never miss one — accept it, then reply to them yourself in chat. Selling posts
-(WTS) and crafters advertising their services (LFW) are filtered out, so only real requests show up.
-Toggle the scanner anytime with **/co scan**.
+If you run GreenWall for a cross-guild confederation, the Artisans directory grows a Confederation
+section listing addon users from your sister guilds, picked up passively from the guild-chat bridge with
+no extra traffic. `/co gwroster` shows what it found.
 
-**A profession window that does the work** *(optional)*
+## Bilingual and standalone
 
-Enable the experimental custom profession window for a three-column browser: a searchable, difficulty-
-colored recipe list, reagents with have/need counts and **Create / Create All**, and the live orders
-for that profession side-by-side. One click flips back to the Blizzard view and back. It even handles
-**Enchanting** correctly.
+English and French are both built in, and item and recipe names come out in your client's language. The
+addon stands on its own (it embeds the shared CraftLink library) and runs happily next to Guild Economy.
 
-**Bilingual & standalone**
+## Commands
 
-Full **English and French** interface; item and recipe names appear in your client's own language. The
-addon is completely standalone (it embeds the shared **CraftLink** library) and coexists cleanly with
-**Guild Economy** if you run both.
+`/co help` lists them all. The ones you'll reach for: `/co` opens the board, `/co profwindow` toggles the
+custom profession window, `/co notify` sets notifications, `/co scan` toggles the chat scanner, `/co gift`
+offers a looted plan to a partner, `/co refresh` re-polls the directory.
 
-**Commands**
-
-Use **/co help** for the full list. Popular: **/co** (open the board), **/co profwindow** (custom
-profession window), **/co notify** (notification scope), **/co scan** (toggle the /trade + /guild
-scanner), **/co gift** (offer a looted plan to a partner), **/co lootalert** (toggle recipe-loot
-alerts), **/co refresh** (re-poll the directory).
-
-**Perfect for**
-
-- Season of Discovery & Fresh realms
-- Guild-economy challenges and Auction-House-restricted servers
-- Community-driven crafting economies
+Made with Season of Discovery and Fresh realms in mind, guild-economy challenges, and servers where the
+auction house isn't the answer.

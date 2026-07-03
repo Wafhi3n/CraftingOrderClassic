@@ -60,7 +60,7 @@ function UI:BuildArtisansTab(f)
 
     -- « Confédération » (confed) : bucket EN PLUS, masqué si GreenWall absent (cf. RefreshArtisans). Placé
     -- en dernier → le masquer ne laisse aucun trou dans la sidebar.
-    local srcDefs = { {id="all",label=L["Tous"]}, {id="guild",label=L["Guilde"]}, {id="friend",label=L["Amis"]}, {id="added",label=L["Ajoutés"]}, {id="recent",label=L["Croisés"]}, {id="confed",label=L["Confédération"]} }
+    local srcDefs = { {id="all",label=L["Tous"]}, {id="guild",label=L["Guilde"]}, {id="friend",label=L["Amis"]}, {id="added",label=L["Ajoutés"]}, {id="recent",label=L["Annuaire"]}, {id="confed",label=L["Confédération"]} }
     self.artSrcBtns = {}
     for i, d in ipairs(srcDefs) do
         local b = Skin.MakeGoldButton(panel, 190, 28, d.label)
@@ -73,7 +73,24 @@ function UI:BuildArtisansTab(f)
     end
     self:_RefreshArtSrcTabs()
 
-    -- Sidebar : ajout manuel d'un joueur
+    self:_BuildArtisanAddScan(panel)   -- ajout manuel d'un joueur + bouton « Scanner la faction »
+
+    -- Zone droite : libellé Métier + pills (construits paresseusement), puis liste
+    self.artPillHdr = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    self.artPillHdr:SetPoint("TOPLEFT", ARX, -98); self.artPillHdr:SetText("|cFF888888" .. L["Métier :"] .. "|r"); Skin.ApplyShadow(self.artPillHdr)
+    self.artPills = {}
+
+    local ascroll = CreateFrame("ScrollFrame", "COCArtScroll", panel, "UIPanelScrollFrameTemplate")
+    ascroll:SetPoint("TOPLEFT", ARX, -150); ascroll:SetPoint("BOTTOMRIGHT", -42, 22)
+    -- Largeur < zone visible du scroll (sinon les lignes passent SOUS la scrollbar → boutons masqués).
+    local ac = CreateFrame("Frame", nil, ascroll); ac:SetSize(ARW - 54, 10); ascroll:SetScrollChild(ac)
+    self.artScroll = ascroll; self.artListContent = ac; self.artListRows = {}
+end
+
+-- Cluster bas-gauche « remplir l'annuaire » : champ d'ajout manuel + bouton « Scanner la faction »
+-- (brique Dead Faction : /who recense les EN LIGNE et pingue chaque nom en HELLO → les porteurs
+-- remontent dans l'Annuaire ; UNE tranche par clic car SendWho = hardware event, cf. Directory_WhoScan).
+function UI:_BuildArtisanAddScan(panel)
     local addHdr = panel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
     addHdr:SetPoint("BOTTOMLEFT", 14, 86); addHdr:SetText(L["AJOUTER UN JOUEUR"])
     addHdr:SetTextColor(Skin.unpack(Skin.color.textMuted))
@@ -88,20 +105,23 @@ function UI:BuildArtisansTab(f)
     addBtn:SetPoint("LEFT", addBox, "RIGHT", 6, 0)
     addBtn:SetScript("OnClick", function() UI:_AddArtisan(addBox:GetText()); addBox:SetText("") end)
 
-    -- Zone droite : libellé Métier + pills (construits paresseusement), puis liste
-    self.artPillHdr = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    self.artPillHdr:SetPoint("TOPLEFT", ARX, -98); self.artPillHdr:SetText("|cFF888888" .. L["Métier :"] .. "|r"); Skin.ApplyShadow(self.artPillHdr)
-    self.artPills = {}
-
-    local ascroll = CreateFrame("ScrollFrame", "COCArtScroll", panel, "UIPanelScrollFrameTemplate")
-    ascroll:SetPoint("TOPLEFT", ARX, -150); ascroll:SetPoint("BOTTOMRIGHT", -42, 22)
-    -- Largeur < zone visible du scroll (sinon les lignes passent SOUS la scrollbar → boutons masqués).
-    local ac = CreateFrame("Frame", nil, ascroll); ac:SetSize(ARW - 54, 10); ascroll:SetScrollChild(ac)
-    self.artScroll = ascroll; self.artListContent = ac; self.artListRows = {}
+    local refreshBtn = Skin.MakeGoldButton(panel, 190, 24, L["Rafraîchir l'annuaire"])
+    refreshBtn:SetPoint("BOTTOMLEFT", 16, 112)
+    refreshBtn:SetScript("OnClick", function() UI:_RefreshDirectory() end)
+    self.artRefreshBtn = refreshBtn
 end
 
 function UI:_RefreshArtSrcTabs()
     for id, b in pairs(self.artSrcBtns or {}) do b:SetSelected(id == self.artSource) end
+end
+
+-- « Rafraîchir l'annuaire » : émet la balise CLNK1 + HI sur le canal CraftLink (le clic = hardware
+-- event requis par la balise) → tous les porteurs EN LIGNE répondent en whisper et remontent dans
+-- l'annuaire ; re-ping aussi les artisans déjà connus. (Remplace l'ancien scan /who, retiré.)
+function UI:_RefreshDirectory()
+    if COC.Directory and COC.Directory.Refresh then COC.Directory:Refresh() end
+    print("|cFF33DD88Crafting Order|r " .. L["annuaire : appel lancé sur le canal — les porteurs en ligne vont répondre."])
+    if C_Timer then C_Timer.After(2, function() if UI.RefreshArtisans then UI:RefreshArtisans() end end) end
 end
 
 -- Le bucket « Confédération » n'existe que si GreenWall est actif (display-only) : on le montre/masque et,
