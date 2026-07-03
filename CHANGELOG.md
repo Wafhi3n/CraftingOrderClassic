@@ -1,5 +1,31 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.3.0 — companion panels: deliver orders straight from the trade & mail windows
+
+**Trade & mail companion panels.** When you open a **trade** with someone, or the **mail** composer, a
+small Crafting Order panel now appears alongside the native window, listing the orders that tie you to
+that player — so you can hand a craft off without ever opening the board.
+
+- **Mail.** On the Send tab it lists every order you owe (all buyers). **Fill from order** sets the
+  recipient, subject, body and **C.O.D.** (= the agreed price), and **attaches the crafted item from
+  your bags** (exact quantity, whole stacks or a split for the remainder). It never sends for you — you
+  review and click Send; the order flips to *Delivered* on a successful send. Anti-duplicate if you
+  click Fill twice.
+- **Trade.** The panel is two-sided: the **crafter** sees the amount to **collect** and a **Mark
+  delivered** button; the **buyer** sees what to **pay** and what they'll receive, with a **Received**
+  button to confirm on the spot. It **persists after the trade closes** (with a close button) so either
+  side can still finalize without going back to the Ledger. Prices show real gold/silver/copper coin
+  icons.
+- Panels only appear when there's actually a relevant order — no clutter otherwise. The trade money
+  field is display-only (Blizzard forbids addons from touching it); gold is settled the normal way.
+
+**Orders dock in Blizzard profession view.** In the Blizzard (non-custom) profession view, the Crafting
+Order **orders column now docks to the right** of the native window, so you keep your order list whether
+you use the custom window or Blizzard's. Toggle either way with the on-frame buttons.
+
+**Profession window closes on entering combat.** The custom profession window (or the orders dock) now
+auto-closes when combat starts, fixing the case where it couldn't be dismissed mid-fight.
+
 ## v1.2.0 — confederation directory, sectioned recipe lists & quieter incoming requests
 
 **Confederation directory (GreenWall).** If you run [GreenWall](https://legacy.curseforge.com/wow/addons/greenwall)

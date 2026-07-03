@@ -66,6 +66,15 @@ confirms receipt (automatically when the item reaches their bags, or with a one-
 button). Crafter reputation is credited only on that confirmation, so delivered-counts reflect real
 hand-offs.
 
+**Hand off from the trade & mail windows**
+
+Open a **trade** or the **mail** composer and a Crafting Order panel appears alongside it, showing the
+orders between you and that player — no need to open the board. In the mail composer, **Fill from order**
+sets the recipient, subject, body and **cash-on-delivery**, and even **attaches the crafted item from
+your bags**; you review and hit Send. At the trade window each side sees their part — the crafter what to
+**collect**, the buyer what to **pay** and a **Received** button to confirm — and the panel **stays up
+after the trade** so anyone can finalize on the spot.
+
 **Catches requests from non-users too**
 
 Requests posted in **/trade** and **/guild** by players who don't run the addon are captured into an

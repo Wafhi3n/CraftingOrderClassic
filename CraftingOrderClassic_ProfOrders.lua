@@ -32,8 +32,8 @@ end
 function ProfOrders:_OnCombat()
     local PW = COC.ProfWindow
     if not (PW and PW.frame and PW.frame:IsShown()) then return end
-    PW.docked = false
-    PW:Hide()
+    if PW.docked then PW:CloseDock(); return end   -- Vue Blizzard : on masque NOTRE colonne, la native reste intacte
+    PW:Hide()                                      -- Vue custom : on ferme aussi la session native (fenêtre neutralisée)
     if COC.Craft and COC.Craft:IsCraftOpen() then if CloseCraft then CloseCraft() end
     elseif CloseTradeSkill then CloseTradeSkill() end
 end
@@ -61,7 +61,7 @@ function ProfOrders:Start()
         else                                            -- VUE BLIZZARD (native intacte + dock Commandes à droite)
             if event:find("SHOW$") then
                 PW:EnsureNativeToggle(nativeFrame, craftEv and "craft" or "trade")
-                PW:OpenDock(nativeFrame)
+                if not (InCombatLockdown and InCombatLockdown()) then PW:OpenDock(nativeFrame) end
             elseif event:find("UPDATE$") then
                 if PW.docked then PW:Refresh() end
             else                                        -- *_CLOSE

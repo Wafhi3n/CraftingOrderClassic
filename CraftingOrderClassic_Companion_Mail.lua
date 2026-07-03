@@ -50,6 +50,8 @@ end
 -- Best-effort : objet absent des sacs ou 12 slots pleins → on s'arrête sans erreur.
 local function attachItem(itemID, qty)
     if not (itemID and _G.SendMailFrame and _G.SendMailFrame:IsShown()) then return end
+    if InCombatLockdown and InCombatLockdown() then return end   -- UseContainerItem/Split protégés en combat
+
     local C = C_Container
     if not (C and C.GetContainerNumSlots and C.GetContainerItemID and C.UseContainerItem) then return end
     local remaining = math.max(qty or 1, 1)
