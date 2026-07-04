@@ -52,6 +52,11 @@ if loc == "enUS" or loc == "enGB" then
             "Companion panels on the trade and mail windows to deliver an order without opening the board.",
         ["La colonne Commandes peut s'ancrer à droite de la fenêtre métier native (vue Blizzard)."] =
             "The Orders column can dock to the right of the native profession window (Blizzard view).",
+        ["Allemand et espagnol + onglet Nouveautés"] = "German and Spanish + a What's New tab",
+        ["L'interface se traduit en allemand et en espagnol selon la langue de ton client WoW."] =
+            "The interface is translated into German and Spanish depending on your WoW client language.",
+        ["Ce nouvel onglet « Nouveautés » affiche les notes de version directement en jeu."] =
+            "This new What's New tab shows the release notes right in the game.",
         ["VU"] = "SEEN",
         ["vu en train de crafter (sans l'addon)"] = "seen crafting (no addon)",
         ["vu crafter (sans l'addon)"] = "seen crafting (no addon)",

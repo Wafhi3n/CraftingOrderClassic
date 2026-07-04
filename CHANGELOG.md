@@ -1,5 +1,17 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.6.0 — German and Spanish, plus an in-game What's New tab
+
+Crafting Order now speaks German and Spanish. The whole interface switches with your client language:
+tabs, buttons, tooltips, chat messages. Item and recipe names were already localized by the game; now
+the addon's own text follows. French and English are unchanged.
+
+There's also a new What's New tab, next to Help, that shows the recent release notes right in the
+window, so you can see what changed without alt-tabbing to a website.
+
+What travels over the network stays language-neutral, so a German and a French player still read each
+other's orders fine on the channel. Only the display is translated.
+
 ## v1.5.0 — spot crafters without the addon, plus a performance pass
 
 **Passive crafter detection.** Turn on "Repérer les crafteurs autour" in the Artisans tab (or

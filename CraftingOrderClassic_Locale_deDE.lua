@@ -45,6 +45,11 @@ local de = {
         "Begleitfenster am Handels- und Postfenster, um einen Auftrag zu liefern, ohne das Auftragsbuch zu öffnen.",
     ["La colonne Commandes peut s'ancrer à droite de la fenêtre métier native (vue Blizzard)."] =
         "Die Auftragsspalte kann rechts am nativen Berufsfenster andocken (Blizzard-Ansicht).",
+    ["Allemand et espagnol + onglet Nouveautés"] = "Deutsch und Spanisch + Tab Neues",
+    ["L'interface se traduit en allemand et en espagnol selon la langue de ton client WoW."] =
+        "Die Oberfläche wird je nach Sprache deines WoW-Clients ins Deutsche und Spanische übersetzt.",
+    ["Ce nouvel onglet « Nouveautés » affiche les notes de version directement en jeu."] =
+        "Dieser neue Tab « Neues » zeigt die Versionshinweise direkt im Spiel.",
     ["VU"] = "GESEHEN",
     ["vu en train de crafter (sans l'addon)"] = "beim Herstellen gesehen (ohne Addon)",
     ["vu crafter (sans l'addon)"] = "beim Herstellen gesehen (ohne Addon)",

@@ -15,6 +15,13 @@ local BODY_W = 780
 local function versions()
     return {
         {
+            v = "v1.6.0", title = L["Allemand et espagnol + onglet Nouveautés"],
+            lines = {
+                L["L'interface se traduit en allemand et en espagnol selon la langue de ton client WoW."],
+                L["Ce nouvel onglet « Nouveautés » affiche les notes de version directement en jeu."],
+            },
+        },
+        {
             v = "v1.5.0", title = L["Repérer les crafteurs sans l'addon + passe de performance"],
             lines = {
                 L["Repérage passif des crafteurs autour de toi, même sans l'addon (onglet Artisans → « Repérer les crafteurs autour », ou |cFFFFFFFF/co crafters on|r). Désactivé par défaut, en ville seulement."],

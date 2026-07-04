@@ -46,6 +46,11 @@ local es = {
         "Paneles complementarios en la ventana de intercambio y correo para entregar un pedido sin abrir el libro.",
     ["La colonne Commandes peut s'ancrer à droite de la fenêtre métier native (vue Blizzard)."] =
         "La columna Pedidos puede anclarse a la derecha de la ventana de profesión nativa (vista Blizzard).",
+    ["Allemand et espagnol + onglet Nouveautés"] = "Alemán y español + pestaña Novedades",
+    ["L'interface se traduit en allemand et en espagnol selon la langue de ton client WoW."] =
+        "La interfaz se traduce al alemán y al español según el idioma de tu cliente de WoW.",
+    ["Ce nouvel onglet « Nouveautés » affiche les notes de version directement en jeu."] =
+        "Esta nueva pestaña « Novedades » muestra las notas de versión directamente en el juego.",
     ["VU"] = "VISTO",
     ["vu en train de crafter (sans l'addon)"] = "visto fabricando (sin el addon)",
     ["vu crafter (sans l'addon)"] = "visto fabricando (sin el addon)",

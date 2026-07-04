@@ -2,7 +2,7 @@
 ## Title: Crafting & Gathering Order - Classic
 ## Notes: Réseau global et social de commandes de craft ET de récolte (autonome — sans guilde). /co pour le statut.
 ## Author: Wafhi3n
-## Version: 1.5.0
+## Version: 1.6.0
 ## X-Category: Auction & Economy
 ## X-Website: https://github.com/Wafhi3n/CraftingOrderClassic
 ## SavedVariables: CraftingOrderClassicDB
