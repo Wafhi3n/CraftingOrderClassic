@@ -18,22 +18,39 @@ local SRC_TAG = { guild = L["GUILDE"], friend = L["AMIS"], added = L["AJOUTÉ"],
 local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true) end
 local function trim(s) return s and s:gsub("^%s+", ""):gsub("%s+$", "") or "" end
 
+-- Case à cocher CLIQUABLE : Skin.MakeCheck ne renvoie qu'une texture, on la pose sur un Button + libellé.
+-- get() lit l'état courant, set(bool) l'applique. `.Sync()` recale la coche sur l'état réel (ex. slash).
+local function makeToggle(parent, x, y, label, get, set)
+    local btn = CreateFrame("Button", nil, parent); btn:SetPoint("BOTTOMLEFT", x, y)
+    local box = Skin.MakeCheck(btn, 16); box:SetPoint("LEFT", 0, 0)
+    local fs = btn:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+    fs:SetPoint("LEFT", box, "RIGHT", 5, 0); fs:SetText(label); fs:SetTextColor(Skin.unpack(Skin.color.textMuted))
+    btn:SetSize(21 + fs:GetStringWidth() + 4, 18)
+    btn:SetScript("OnClick", function() local nv = not get(); set(nv); box:SetChecked(nv) end)
+    btn.Sync = function() box:SetChecked(get() and true or false) end
+    btn.Sync()
+    return btn
+end
+
 -- Connaît-on un métier de cet artisan ? UNION des niveaux SK (r.skill) ET des recettes RK (r.recipes) :
 -- un artisan croisé sans avoir ouvert sa fenêtre métier n'a que des SK → il DOIT quand même s'afficher.
 local function knowsProf(r, pf)
-    return (r.skill and r.skill[pf]) or (r.recipes and r.recipes[pf]) or false
+    return (r.skill and r.skill[pf]) or (r.recipes and r.recipes[pf]) or (r.craftSeen and r.craftSeen[pf]) or false
 end
 
 -- Métiers connus d'un artisan, en liste { key, sv } : niveau (SK) si connu, sinon recette seule (RK).
 -- Union des deux sources, triée par libellé localisé — même ordre visuel que l'ancien texte concaténé.
 local function profsList(r)
+    local SEC = COC.SECONDARY_PROF or {}   -- Cuisine/Secours/Pêche jamais affichés (pas de commande)
     local seen, parts = {}, {}
     for key, sv in pairs(r.skill or {}) do
-        seen[key] = true
-        parts[#parts + 1] = { key = key, sv = sv }
+        if not SEC[key] then seen[key] = true; parts[#parts + 1] = { key = key, sv = sv } end
     end
     for key in pairs(r.recipes or {}) do
-        if not seen[key] then seen[key] = true; parts[#parts + 1] = { key = key } end
+        if not (SEC[key] or seen[key]) then seen[key] = true; parts[#parts + 1] = { key = key } end
+    end
+    for key, floor in pairs(r.craftSeen or {}) do   -- non-porteur vu crafter : plancher estimé
+        if not (SEC[key] or seen[key]) then seen[key] = true; parts[#parts + 1] = { key = key, est = floor } end
     end
     table.sort(parts, function(a, b) return Skin.ProfLabel(a.key) < Skin.ProfLabel(b.key) end)
     return parts
@@ -109,7 +126,15 @@ function UI:_BuildArtisanAddScan(panel)
     refreshBtn:SetPoint("BOTTOMLEFT", 16, 112)
     refreshBtn:SetScript("OnClick", function() UI:_RefreshDirectory() end)
     self.artRefreshBtn = refreshBtn
+
+    -- Toggle « détecter les crafteurs autour » (opt-in, en ville only) — cf. Directory_LootScan.
+    self.artScanChk = makeToggle(panel, 16, 36, L["Repérer les crafteurs autour (en ville)"],
+        function() return COC.Directory and COC.Directory:CrafterScanEnabled() end,
+        function(nv) if COC.Directory then COC.Directory:SetCrafterScan(nv) end end)
 end
+
+-- Recale la case (ex. après « /co crafters on/off » en dehors de l'UI).
+function UI:_SyncCrafterScanChk() if self.artScanChk then self.artScanChk.Sync() end end
 
 function UI:_RefreshArtSrcTabs()
     for id, b in pairs(self.artSrcBtns or {}) do b:SetSelected(id == self.artSource) end
@@ -138,7 +163,9 @@ end
 function UI:_BuildArtPills(panel)
     local c = CL(); local profs = c and c:Professions() or {}
     local defs = { "Tous" }
-    for _, p in ipairs(profs) do defs[#defs + 1] = p end
+    for _, p in ipairs(profs) do   -- primaires seulement : pas de pill Cuisine/Secours/Pêche
+        if not (COC.SECONDARY_PROF and COC.SECONDARY_PROF[p]) then defs[#defs + 1] = p end
+    end
     local x, y, rowH = 50, 0, 24      -- x départ = 50 pour dégager « Métier : »
     local maxW = ARW - 4
     for _, key in ipairs(defs) do
@@ -214,6 +241,7 @@ end
 function UI:RefreshArtisans()
     local panel = self.artisansPanel; if not panel then return end
     if not self.artPillsBuilt then self:_BuildArtPills(panel); self.artPillsBuilt = true end
+    self:_SyncCrafterScanChk()
     local D = COC.Directory
     self:_SyncConfedTab()   -- montre/masque le bucket « Confédération » selon GreenWall (display-only)
 
@@ -242,21 +270,7 @@ function UI:RefreshArtisans()
 
     local n = 0
     for _, a in ipairs(list) do
-        n = n + 1; local row = self:_ArtRow(n)
-        row.dot:SetOnline(a.online and true or false)
-        -- Étiquette « Partenaire » (texte, pas de glyphe — cf. wow-ui-tofu-textures) : tag doré devant le nom.
-        local pTag = a.r.isPartner and ("|cFFFFD100" .. L["[Partenaire]"] .. "|r ") or ""
-        row.name:SetText(pTag .. "|cFFFFFFFF" .. a.name .. "|r")
-        local lvl = a.r.level and (L["niv "] .. a.r.level) or L["niv ?"]
-        local rep = (a.r.rep and a.r.rep > 0) and (" · " .. string.format(L["%d livrés"], a.r.rep)) or ""
-        row.sub:SetText("|cFF888888" .. (a.online and L["En ligne"] or L["Hors ligne"]) .. " · " .. lvl .. rep .. "|r")
-        UI:_SetArtProfIcons(row, profsList(a.r))
-        row.src:SetText("|cFF888888" .. (SRC_TAG[a.r.source or "recent"] or "") .. "|r")
-        row.whisper:SetScript("OnClick", function()
-            if ChatFrame_SendTell then ChatFrame_SendTell(a.name) end
-        end)
-        row.whisper:SetShown(a.online == true or a.r.source ~= "added")
-        row:Show()
+        n = n + 1; self:_FillArtRow(self:_ArtRow(n), a)
     end
     for i = n + 1, #self.artListRows do self.artListRows[i]:Hide() end
     self.artListContent:SetHeight(math.max(n * ARH, 10))
@@ -264,9 +278,66 @@ function UI:RefreshArtisans()
     if n == 0 and self.artListRows[1] then
         local row = self:_ArtRow(1)
         row.dot:SetOnline(nil); row.name:SetText("|cFF888888" .. L["Aucun artisan dans cette source."] .. "|r")
-        row.sub:SetText(""); UI:_SetArtProfIcons(row, {}); row.src:SetText(""); row.whisper:Hide()
+        row.sub:SetText(""); UI:_SetArtProfIcons(row, {}); row.src:SetText(""); row.whisper:Hide(); row.addFriend:Hide()
         row:Show()
     end
+end
+
+-- Remplit une ligne artisan. Distingue les NON-porteurs (r.nonAddon, vus crafter via CHAT_MSG_LOOT) :
+-- sous-ligne « vu crafter » + tag « VU » au lieu de présence/niveau/réputation.
+function UI:_FillArtRow(row, a)
+    row.dot:SetOnline(a.online and true or false)
+    local pTag = a.r.isPartner and ("|cFFFFD100" .. L["[Partenaire]"] .. "|r ") or ""   -- texte, pas de glyphe tofu
+    row.name:SetText(pTag .. "|cFFFFFFFF" .. a.name .. "|r")
+    -- « non-porteur » = vu crafter ET aucune vraie donnée réseau reçue de lui (s'il finit par diffuser
+    -- ses SK/RK, on repasse en artisan normal même si le flag nonAddon traîne).
+    local nonAddon = a.r.nonAddon and not (a.r.skill or a.r.recipes)
+    if nonAddon then
+        local mv = self:_SeenProfNames(a.r)   -- le métier VU (au moins un)
+        row.sub:SetText("|cFF888888" .. L["vu crafter"] .. (mv ~= "" and (" : |cFFBBBBBB" .. mv) or "") .. "|r")
+    else
+        local lvl = a.r.level and (L["niv "] .. a.r.level) or L["niv ?"]
+        local rep = (a.r.rep and a.r.rep > 0) and (" · " .. string.format(L["%d livrés"], a.r.rep)) or ""
+        row.sub:SetText("|cFF888888" .. (a.online and L["En ligne"] or L["Hors ligne"]) .. " · " .. lvl .. rep .. "|r")
+    end
+    UI:_SetArtProfIcons(row, profsList(a.r))
+    row.src:SetText("|cFF888888" .. (nonAddon and L["VU"] or (SRC_TAG[a.r.source or "recent"] or "")) .. "|r")
+    self:_ArtRowButtons(row, a, nonAddon)
+    row:Show()
+end
+
+-- Libellés des métiers VUS d'un non-porteur (« vu crafter : Couture, Alchimie »).
+function UI:_SeenProfNames(r)
+    local names = {}
+    for _, it in ipairs(profsList(r)) do names[#names + 1] = Skin.ProfLabel(it.key) end
+    return table.concat(names, ", ")
+end
+
+-- Boutons de droite. Chuchoter : si en ligne / pas un simple ajout hors-ligne. « Ajouter ami » : pour
+-- un non-porteur vu crafter (on ne le connaît que de vue) pas déjà ami → les deux boutons s'empilent.
+function UI:_ArtRowButtons(row, a, nonAddon)
+    row.whisper:SetScript("OnClick", function() if ChatFrame_SendTell then ChatFrame_SendTell(a.name) end end)
+    row.whisper:SetShown(a.online == true or a.r.source ~= "added")
+    local D = COC.Directory
+    local canFriend = nonAddon and not (D and D._friendSet and D._friendSet[a.name])
+    if canFriend then
+        row.whisper:ClearAllPoints(); row.whisper:SetPoint("RIGHT", -6, 9); row.whisper:SetHeight(18)
+        row.addFriend:ClearAllPoints(); row.addFriend:SetPoint("RIGHT", -6, -9)
+        row.addFriend:SetScript("OnClick", function() UI:_AddFriend(a.name) end)
+        row.addFriend:Show()
+    else
+        row.whisper:ClearAllPoints(); row.whisper:SetPoint("RIGHT", -6, 0); row.whisper:SetHeight(22)
+        row.addFriend:Hide()
+    end
+end
+
+-- Ajoute le joueur à la liste d'amis WoW (un clic depuis l'annuaire). Au refresh suivant, ScanRelations
+-- le reclasse en « Amis » → le bouton disparaît de lui-même.
+function UI:_AddFriend(name)
+    if C_FriendList and C_FriendList.AddFriend then C_FriendList.AddFriend(name) end
+    print("|cFF33DD88Crafting Order|r " .. string.format(L["|cFFFFFFFF%s|r ajouté à tes amis."], name))
+    if COC.Directory and COC.Directory.ScanRelations then COC.Directory:ScanRelations() end
+    if C_Timer then C_Timer.After(1, function() if UI.RefreshArtisans then UI:RefreshArtisans() end end) end
 end
 
 function UI:_ArtRow(i)
@@ -283,6 +354,7 @@ function UI:_ArtRow(i)
     r.profIconPool = {}
     r.src   = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall"); r.src:SetPoint("RIGHT", -94, 0); Skin.ApplyShadow(r.src)
     r.whisper = Skin.MakeGoldButton(r, 78, 22, L["Chuchoter"]); r.whisper:SetPoint("RIGHT", -6, 0)
+    r.addFriend = Skin.MakeGoldButton(r, 78, 18, L["Ajouter ami"]); r.addFriend:SetPoint("RIGHT", -6, -9); r.addFriend:Hide()
     self.artListRows[i] = r; return r
 end
 
@@ -308,7 +380,9 @@ function UI:_SetArtProfIcons(row, list)
         ic:ClearAllPoints(); ic:SetPoint("LEFT", (i - 1) * ARI, 0)
         ic.tex:SetTexture(Skin.ProfIcon(item.key) or Skin.tex.unknown)
         ic.tipLabel = Skin.ProfLabel(item.key)
-        ic.tipSub = item.sv and ((item.sv[1] or "?") .. "/" .. (item.sv[2] or "?")) or nil
+        ic.tipSub = item.sv and ((item.sv[1] or "?") .. "/" .. (item.sv[2] or "?"))
+            or (item.est ~= nil and ((item.est > 0) and string.format(L["%d+ · vu crafter"], item.est) or L["vu crafter (sans l'addon)"]))
+            or nil
         ic:Show()
     end
     for i = #list + 1, #pool do pool[i]:Hide() end

@@ -25,6 +25,11 @@ local KW_REQ_TOKEN = { "WTB", "WTC", "ISO", "LF", "B>" }
 -- OFFER/PROPOSE : un artisan qui annonce « Crafting [X], also offer... » matche le stem CRAFT
 -- (demande) sans jamais contenir WTS/VEND ; OFFER/PROPOSE lève l'ambiguïté (bug 2026-07-01).
 local KW_OFFER     = { "WTS", "VDS", "S>", "VEND", "SELL", "LFW", "YOUR MATS", "VOS MATS", "OFFER", "PROPOSE" }
+-- Verbes d'OFFRE en TÊTE de message : un artisan qui annonce son service commence par « Crafting [X]
+-- for … », « Making … », « Can craft … » (≠ un client « WTB [X] » / « need [X] crafted »). Lève
+-- l'ambiguïté du stem CRAFT, présent dans « Crafting » (offre) comme dans « crafted » (demande) —
+-- cas réel manqué : « Crafting [Mageweave Bag] 12 slot for 22 [Mageweave Cloth] at org bank ».
+local KW_OFFER_LEAD = { "CRAFTING", "MAKING", "CAN CRAFT", "CAN MAKE", "I CRAFT", "I MAKE", "I CAN CRAFT", "I CAN MAKE" }
 
 local function me() return (UnitName and UnitName("player")) or "?" end
 local function pmsg(m) print("|cFF33DD88Crafting Order|r " .. m) end
@@ -55,19 +60,25 @@ end
 -- Offre (vente WTS, ou service d'artisan LFW / « your mats ») ? → jamais une commande entrante.
 local function IsOffer(msg)
     local up = " " .. msg:upper() .. " "
+    for _, kw in ipairs(KW_OFFER_LEAD) do
+        if up:find("^%s*" .. kw) then return true end   -- « Crafting [X]… », « Making… » en tête = offre
+    end
     for _, kw in ipairs(KW_OFFER) do
         if (#kw <= 3 and findToken(up, kw)) or (#kw > 3 and up:find(kw, 1, true)) then return true end
     end
     return false
 end
 
-local function ExtractItemIDs(msg)
-    local ids = {}
-    for itemKey in msg:gmatch("|H(item:%d+[^|]*)|h") do
-        local id = tonumber(itemKey:match("item:(%d+)"))
-        if id then ids[#ids + 1] = id end
+-- IDs des objets liés + leur NOM affiché, tiré du lien lui-même (|Hitem:..|h[Nom]|h). Le nom vient
+-- DU MESSAGE → aucune dépendance au cache client (corrige l'affichage « item:10050 » quand l'objet
+-- n'est pas encore résolu par GetItemInfo). Renvoie une liste { id, name }.
+local function ExtractItems(msg)
+    local out = {}
+    for itemStr, name in msg:gmatch("|H(item:%d+[^|]*)|h%[(.-)%]|h") do
+        local id = tonumber(itemStr:match("item:(%d+)"))
+        if id then out[#out + 1] = { id = id, name = name } end
     end
-    return ids
+    return out
 end
 
 -- Prix libre lisible : « 12g 50s », « 5g », « 80s ». Renvoie une chaîne ou nil.
@@ -105,15 +116,15 @@ function Inbound:OnChat(msg, player, source)
     if scanScope() == "off" then return end
     if IsOffer(msg) then return end              -- WTS (vente) ou LFW (artisan offrant) = pas une demande
     if not HasRequestKW(msg) then return end
-    local ids = ExtractItemIDs(msg)
-    if #ids == 0 then return end
+    local items = ExtractItems(msg)
+    if #items == 0 then return end
     local Orders = COC.Orders
-    for _, itemID in ipairs(ids) do
-        local prof = Orders and Orders:ProfForItem(itemID)
+    for _, it in ipairs(items) do
+        local prof = Orders and Orders:ProfForItem(it.id)
         if prof and self:_WantProf(prof) then   -- objet fabricable dans un métier que je surveille
-            local canCraft = CraftLink and CraftLink:IKnowRecipeForItem(prof, itemID) or false
+            local canCraft = CraftLink and CraftLink:IKnowRecipeForItem(prof, it.id) or false
             self:Add({
-                buyer = player, itemID = itemID, qty = ExtractQty(msg),
+                buyer = player, itemID = it.id, itemName = it.name, qty = ExtractQty(msg),
                 price = ExtractPrice(msg), profession = prof, source = source,
                 canCraft = canCraft, raw = msg,
             })
@@ -123,6 +134,7 @@ end
 
 function Inbound:Add(e)
     if not COC.db then return end
+    if e.itemID and GetItemInfo then GetItemInfo(e.itemID) end   -- amorce le cache (nom localisé + rareté)
     COC.db.inbound = COC.db.inbound or {}
     local id = e.buyer .. "_" .. e.itemID
     local existing = COC.db.inbound[id]
@@ -149,7 +161,7 @@ function Inbound:Alert(e)
         or (COC.db.mutedPlayers and COC.db.mutedPlayers[e.buyer])) then return end
     if COC.Moderation and COC.Moderation:BelowThreshold(e.buyer) then return end   -- petit perso (si connu)
     local c = CraftLink
-    local nm = (c and c:ItemName(e.itemID)) or ("item:" .. e.itemID)
+    local nm = (c and c:ItemName(e.itemID, e.itemName)) or e.itemName or ("item:" .. e.itemID)
     local src = (e.source == "guild") and L["guilde"] or L["commerce"]
     local Skin = COC.UI and COC.UI.Skin
     local qty = (Skin and Skin.QtySuffix(e)) or ""

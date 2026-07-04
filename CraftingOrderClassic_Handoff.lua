@@ -37,7 +37,7 @@ end
 
 -- Un ordre de synthèse (recipient=Tous) à partir d'une entrante captée, pour le pousser en whisper.
 function Handoff:_SynthFromInbound(e)
-    return { id = "CAP-" .. e.id, buyer = e.buyer, kind = "item", itemID = e.itemID,
+    return { id = "CAP-" .. e.id, buyer = e.buyer, kind = "item", itemID = e.itemID, itemName = e.itemName,
              qty = e.qty or 1, price = e.price, profession = e.profession, recipient = "Tous" }
 end
 
@@ -151,7 +151,7 @@ function Handoff:NoteInbound(e)
     for _, a in ipairs(list) do names[#names + 1] = a.name end
     if not self._noted[e.id] then
         self._noted[e.id] = true
-        local nm  = (CraftLink:ItemName(e.itemID)) or ("item:" .. e.itemID)
+        local nm  = (CraftLink:ItemName(e.itemID, e.itemName)) or e.itemName or ("item:" .. e.itemID)
         local msg = string.format(L["%s peut faire une commande captée — gardée pour son passage : %s"],
             table.concat(names, ", "), nm)
         local Skin = COC.UI and COC.UI.Skin

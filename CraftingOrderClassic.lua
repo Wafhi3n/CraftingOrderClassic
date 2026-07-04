@@ -14,6 +14,11 @@ local COC = CraftingOrderClassic
 
 local CraftLink = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
 
+-- Métiers SECONDAIRES (WoW) — source de vérité PARTAGÉE (Social, Directory_LootScan, UI_Artisans).
+-- On ne passe PAS de commande pour eux → jamais détectés (découverte de crafteurs) ni affichés dans
+-- l'annuaire/tooltip/pills. Clés CraftLink exactes (cf. Libs/CraftLink-1.0/Data/*/{Cooking,FirstAid,Fishing}.lua).
+COC.SECONDARY_PROF = { Cooking = true, ["First Aid"] = true, Fishing = true }
+
 local function p(msg) print("|cFF33DD88Crafting Order|r " .. msg) end
 
 -- Registre de recettes PAR PERSO. La SavedVariables est partagée par COMPTE, donc on partitionne
@@ -126,6 +131,18 @@ function COC:ScanCmd(arg)
     p(string.format(L["scan chat commerce/guilde : |cFFFFFFFF%s|r — /co scan [mine|all|off]"], cur))
 end
 
+-- /co crafters [on|off] : (dés)active le repérage passif des crafteurs NON-porteurs à proximité (lit
+-- le journal de combat EN VILLE seulement — cf. Directory_LootScan). Persistant via COC.db.crafterScan.
+-- Défaut off. Même réglage que la case à cocher de l'onglet Artisans.
+function COC:CrafterScanCmd(arg)
+    local L, D = COC.L, COC.Directory
+    arg = (arg or ""):lower()
+    if (arg == "on" or arg == "off") and D and D.SetCrafterScan then D:SetCrafterScan(arg == "on") end
+    local on = D and D.CrafterScanEnabled and D:CrafterScanEnabled()
+    p(string.format(L["repérage des crafteurs autour : |cFFFFFFFF%s|r (en ville) — /co crafters [on|off]"], on and "on" or "off"))
+    if COC.UI and COC.UI._SyncCrafterScanChk then COC.UI:_SyncCrafterScanChk() end
+end
+
 -- Avertit UNE FOIS que l'addon rejoint son canal réseau dédié (transparence : le joueur le verra
 -- dans sa liste de canaux). Déclenché à la première acquisition du canal. Dialogue défini
 -- paresseusement (Locale chargé au runtime).
@@ -210,6 +227,7 @@ function COC:Help()
     print("  |cFFFFFFFF/co channel [on|off]|r — " .. L["(dés)activer le canal réseau global"])
     print("  |cFFFFFFFF/co notify [all|directed|named|off]|r — " .. L["portée des notifications de commande"])
     print("  |cFFFFFFFF/co scan [mine|all|off]|r — " .. L["portée du scan des demandes de craft en chat (défaut : mes métiers)"])
+    print("  |cFFFFFFFF/co crafters [on|off]|r — " .. L["repérer les crafteurs sans l'addon qui craftent autour (en ville ; défaut : off)"])
     print("  |cFFFFFFFF/co lootalert [on|off]|r — " .. L["alerte quand tu loots un plan connu de CraftLink (défaut : on)"])
     print("  |cFFFFFFFF/co gift [nom]|r — " .. L["proposer (chuchoter) le dernier plan looté à un partenaire qui ne le connaît pas"])
     print("  |cFFFFFFFF/co mute <nom>|r / |cFFFFFFFF/co unmute <nom>|r — " .. L["muter/démuter un joueur (aucune notif de sa part)"])
@@ -245,6 +263,7 @@ function COC:Slash(msg)
     elseif cmd == "channel" or cmd == "canal" then COC:ChannelCmd(rest)
     elseif cmd == "notify" or cmd == "notif" then COC:NotifyCmd(rest)
     elseif cmd == "scan" then COC:ScanCmd(rest)
+    elseif cmd == "crafters" or cmd == "crafterscan" then COC:CrafterScanCmd(rest)
     elseif cmd == "lootalert" then if COC.LootAlert then COC.LootAlert:Cmd(rest) end
     elseif cmd == "gift" then if COC.LootAlert then COC.LootAlert:GiftCmd(rest) end
     elseif cmd == "mute"   then if COC.Moderation then COC.Moderation:MuteCmd(rest) end

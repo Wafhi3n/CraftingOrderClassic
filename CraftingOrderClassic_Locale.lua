@@ -35,6 +35,19 @@ if loc == "enUS" or loc == "enGB" then
             "Right-click a player who runs the addon (friend, guild, met): \"Order from…\" opens the Order tab already aimed at them.",
         ["« Met » devient « Annuaire ». Le bouton « Rafraîchir l'annuaire » appelle le canal : tous les porteurs en ligne répondent et s'y ajoutent."] =
             "\"Met\" is now \"Directory\". The \"Refresh directory\" button calls the channel: every online addon user answers and joins it.",
+        ["VU"] = "SEEN",
+        ["vu en train de crafter (sans l'addon)"] = "seen crafting (no addon)",
+        ["vu crafter (sans l'addon)"] = "seen crafting (no addon)",
+        ["vu crafter"] = "seen crafting",
+        ["%d+ · vu crafter"] = "%d+ · seen crafting",
+        -- Repérage des crafteurs à proximité (opt-in, en ville) + bouton « Ajouter ami »
+        ["Repérer les crafteurs autour (en ville)"] = "Detect crafters nearby (in town)",
+        ["Ajouter ami"] = "Add friend",
+        ["|cFFFFFFFF%s|r ajouté à tes amis."] = "|cFFFFFFFF%s|r added to your friends.",
+        ["repérage des crafteurs autour : |cFFFFFFFF%s|r (en ville) — /co crafters [on|off]"] =
+            "nearby crafter detection: |cFFFFFFFF%s|r (in town) — /co crafters [on|off]",
+        ["repérer les crafteurs sans l'addon qui craftent autour (en ville ; défaut : off)"] =
+            "detect players without the addon crafting nearby (in town; default: off)",
         ["Archivées"] = "Archived", ["En cours"] = "Active", ["libre"] = "open",
         ["Aucune commande. Onglet « Commande » pour en poster une."] = "No orders. Use the « Order » tab to post one.",
         ["Aucune commande entrante. (Capture /commerce et /guilde des joueurs sans l'addon.)"] =

@@ -231,7 +231,7 @@ end
 -- juste le demandeur/objet et un bouton pour la réafficher (retire l'id de COC.db.muted).
 function PW:_FillMutedRow(card, it)
     local o = it.o; local c = CL()
-    local nm = (c and c:ItemName(o.itemID)) or (o.spellID and c and c:RecipeName(o.spellID)) or ("item:" .. (o.itemID or 0))
+    local nm = (c and c:ItemName(o.itemID, o.itemName)) or (o.spellID and c and c:RecipeName(o.spellID)) or ("item:" .. (o.itemID or 0))
     card.dot:Hide(); card.invite:Hide(); card.age:Hide(); card.badge:Hide(); card.item:Hide(); card.price:Hide()
     card.reagPanel:Hide(); card.act:Hide(); card.refuse:Hide(); card.whisper:Hide(); card.who:Hide()
     card.mutedLabel:Show(); card.mutedText:Show(); card.unmute:Show()
@@ -248,7 +248,7 @@ function PW:_FillCard(card, it)
     card.mutedLabel:Hide(); card.mutedText:Hide(); card.unmute:Hide()
     card.dot:Show(); card.badge:Show(); card.item:Show(); card.price:Show(); card.who:Show(); card.age:Show()
     local o, kind = it.o, it.kind; local c = CL()
-    local nm = (c and c:ItemName(o.itemID)) or (o.spellID and c and c:RecipeName(o.spellID)) or ("item:" .. (o.itemID or 0))
+    local nm = (c and c:ItemName(o.itemID, o.itemName)) or (o.spellID and c and c:RecipeName(o.spellID)) or ("item:" .. (o.itemID or 0))
     local rr, gg, bb = Skin.RarityColor(o.itemID)
     card.tipItemID = o.itemID
     card.badge:Paint(rr, gg, bb, Skin.FirstChar(nm), Skin.Icon(o.itemID, o.spellID) or Skin.tex.unknown)

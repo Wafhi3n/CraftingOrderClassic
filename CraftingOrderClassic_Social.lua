@@ -10,10 +10,9 @@ COC.Social   = Social
 
 local function GetSkin() return COC.UI and COC.UI.Skin end
 
--- Métiers SECONDAIRES (WoW) : jamais affichés dans le résumé social — seuls les métiers PRIMAIRES
--- (production/récolte à emplacement unique) intéressent la prise de commande. Clés CraftLink exactes
--- (cf. RegisterProfession dans Libs/CraftLink-1.0/Data/*/{Cooking,FirstAid,Fishing}.lua).
-local SECONDARY_PROF = { Cooking = true, ["First Aid"] = true, Fishing = true }
+-- Métiers SECONDAIRES : jamais affichés dans le résumé social (seuls les PRIMAIRES intéressent la
+-- prise de commande). Table PARTAGÉE définie dans CraftingOrderClassic.lua (source unique).
+local SECONDARY_PROF = COC.SECONDARY_PROF
 
 -- =========================================================================
 -- Résumé métiers d'un joueur connu (roster CraftLink) — icônes INLINE + niveaux. Métiers PRIMAIRES
@@ -39,6 +38,14 @@ function Social:ProfSummary(name)
     if #parts == 0 then
         for key in pairs(r.recipes or {}) do
             if not SECONDARY_PROF[key] then parts[#parts + 1] = profMark(key) end
+        end
+    end
+    -- Dernier recours : non-porteur d'addon VU crafter (CHAT_MSG_LOOT) → plancher de skill « N+ ».
+    if #parts == 0 then
+        for key, floor in pairs(r.craftSeen or {}) do
+            if not SECONDARY_PROF[key] then
+                parts[#parts + 1] = profMark(key) .. ((floor and floor > 0) and (" " .. floor .. "+") or "")
+            end
         end
     end
     if #parts == 0 then return nil end

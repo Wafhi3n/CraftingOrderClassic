@@ -37,6 +37,7 @@ CraftingOrderClassic_ProfWindow_Detail.lua
 CraftingOrderClassic_ProfWindow_Orders.lua
 Directory.lua
 Directory_Skills.lua
+Directory_LootScan.lua
 Orders.lua
 Orders_Net.lua
 CraftingOrderClassic_Inbound.lua

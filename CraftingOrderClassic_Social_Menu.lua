@@ -2,9 +2,10 @@
 -- Utilise la NOUVELLE API Menu (Menu.ModifyMenu / rootDescription), sans taint. Remplace l'ancienne
 -- injection UnitPopupMenus/UnitPopupButtons, MORTE depuis le refactor menu de Classic Era
 -- (table UnitPopupButtons absente du client → l'ancien code était un no-op silencieux ; cf. mémoire
--- coc-classic-menu-api). Les entrées n'apparaissent QUE pour un joueur présent dans le roster
--- (= porteur de l'addon découvert) : amis, guildies EN LIGNE, joueurs croisés. Un guildie HORS-LIGNE
--- n'ouvre aucun menu (garde Blizzard) → il est couvert par le panneau de guilde (_Social_Roster.lua).
+-- coc-classic-menu-api). Les entrées n'apparaissent QUE pour un PORTEUR de l'addon présent dans le
+-- roster (amis, guildies EN LIGNE, joueurs croisés) — PAS pour un simple non-porteur vu crafter au
+-- scan (nonAddon) : les actions supposent l'addon en face. Un guildie HORS-LIGNE n'ouvre aucun menu
+-- (garde Blizzard) → il est couvert par le panneau de guilde (_Social_Roster.lua).
 
 local COC    = CraftingOrderClassic
 local Social = COC.Social
@@ -36,6 +37,9 @@ local function addEntries(_, rootDescription, contextData)
     local D = COC.Directory
     local r = D and D.roster and D.roster[name]
     if not r then return end
+    -- Non-porteur (seulement VU crafter via le scan, aucune donnée réseau) : « Passer commande »,
+    -- « Partenaire », « Muter »… supposent l'addon EN FACE → inutiles. On n'ajoute rien (menu propre).
+    if r.nonAddon and not (r.skill or r.recipes) then return end
 
     local L = COC.L
     rootDescription:CreateDivider()

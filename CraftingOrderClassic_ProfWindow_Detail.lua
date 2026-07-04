@@ -129,6 +129,18 @@ function PW:_WireCreateButton(isCraft)
     end
 end
 
+-- Enchantement : la SEULE voie de craft est le bouton natif CraftCreateButton (DoCraft direct est
+-- bloqué par taint après neutralisation du natif). Or ce bouton n'est ACTIVÉ que pour le craft
+-- SÉLECTIONNÉ côté natif, et l'activation transite par CRAFT_UPDATE (asynchrone). On aligne donc la
+-- sélection native sur la recette affichée DÈS l'affichage — sinon un SelectCraft au seul PreClick
+-- arrive trop tard : le bouton natif est encore désactivé et le clic sécurisé ne crafte rien.
+-- Garde anti-boucle : SelectCraft refire CRAFT_UPDATE → RefreshDetail (throttlé), d'où le test d'égalité.
+function PW:_SyncNativeCraftSelection(e)
+    if e and SelectCraft and GetCraftSelectionIndex and GetCraftSelectionIndex() ~= e.index then
+        SelectCraft(e.index)
+    end
+end
+
 function PW:RefreshDetail()
     if not self.detNameFS then return end
     local e = self:GetSelectedRecipe()
@@ -165,6 +177,10 @@ function PW:RefreshDetail()
     local isCraft = COC.Craft:IsCraftOpen()
     self:_SetCraftButtons(avail > 0, (not isCraft) and avail > 1)
     self.detAllBtn:SetShown(not isCraft)
+    -- Craft (enchant) = 1 par clic (l'API n'a pas de compteur, comme l'UI Blizzard) → pas de Qté.
+    self.detQtyBox:SetShown(not isCraft)
+    self.detQtyLbl:SetShown(not isCraft)
+    if isCraft then self:_SyncNativeCraftSelection(e) end   -- active CraftCreateButton pour CETTE recette
     self:_WireCreateButton(isCraft)
 end
 
