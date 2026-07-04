@@ -57,6 +57,7 @@ function UI:Build()
     if self.BuildPostTab   then self:BuildPostTab(f)   end
     if self.BuildGatherTab then self:BuildGatherTab(f) end
     if self.BuildHelpTab   then self:BuildHelpTab(f)   end
+    if self.BuildNewsTab   then self:BuildNewsTab(f)   end
     self:ShowTab("orders")
 
     -- Résolution asynchrone des noms : Blizzard renvoie les infos d'objet en différé. Un seul
@@ -85,6 +86,7 @@ function UI:BuildTabs(f)
         { id = "gather",  label = L["Récolte"]  },
         { id = "artisans",label = L["Artisans"] },
         { id = "help",    label = L["Aide"]     },
+        { id = "news",    label = L["Nouveautés"] },
     }
     for i, d in ipairs(defs) do
         local b = Skin.MakeGoldButton(f, 118, 24, d.label)
@@ -108,6 +110,7 @@ function UI:ShowTab(id)
     if self.gatherPanel then self.gatherPanel:SetShown(id == "gather") end
     self.artisansPanel:SetShown(id == "artisans")
     if self.helpPanel   then self.helpPanel:SetShown(id == "help")    end
+    if self.newsPanel   then self.newsPanel:SetShown(id == "news")    end
     self:Refresh()
 end
 
@@ -393,6 +396,7 @@ function UI:Refresh()
     elseif self.activeTab == "post"   and self.RefreshPost       then self:RefreshPost()
     elseif self.activeTab == "gather" and self.RefreshGather     then self:RefreshGather()
     elseif self.activeTab == "help"   and self.RefreshHelp       then self:RefreshHelp()
+    elseif self.activeTab == "news"   and self.RefreshNews       then self:RefreshNews()
     else self:RefreshOrders() end
     -- Compteur d'ordres du Carnet = ce qui est RÉELLEMENT visible (All() applique TTL + routage
     -- VisibleTo), pas le cache brut → plus d'écart « Carnet (5) mais liste vide ».

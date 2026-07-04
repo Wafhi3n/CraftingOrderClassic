@@ -35,6 +35,23 @@ if loc == "enUS" or loc == "enGB" then
             "Right-click a player who runs the addon (friend, guild, met): \"Order from…\" opens the Order tab already aimed at them.",
         ["« Met » devient « Annuaire ». Le bouton « Rafraîchir l'annuaire » appelle le canal : tous les porteurs en ligne répondent et s'y ajoutent."] =
             "\"Met\" is now \"Directory\". The \"Refresh directory\" button calls the channel: every online addon user answers and joins it.",
+        -- Onglet Nouveautés (changelog en jeu)
+        ["Nouveautés"] = "What's New",
+        ["Repérer les crafteurs sans l'addon + passe de performance"] = "Spot crafters without the addon + a performance pass",
+        ["Repérage passif des crafteurs autour de toi, même sans l'addon (onglet Artisans → « Repérer les crafteurs autour », ou |cFFFFFFFF/co crafters on|r). Désactivé par défaut, en ville seulement."] =
+            "Passive detection of crafters around you, even without the addon (Artisans tab, or |cFFFFFFFF/co crafters on|r). Off by default, towns only.",
+        ["Liste de plans de l'onglet Commande réécrite : plus fluide sur les métiers à centaines de recettes (Couture)."] =
+            "The Order tab's plan list was rewritten: smoother on professions with hundreds of recipes (Tailoring).",
+        ["La fenêtre ne se redessine plus à chaque message réseau : les rafales sont regroupées en un seul rendu."] =
+            "The window no longer redraws on every network message: bursts are batched into a single redraw.",
+        ["Protocole de commande durci : un autre client ne peut plus annuler ta commande, usurper une acceptation, ni s'attribuer une livraison."] =
+            "Hardened order protocol: another client can no longer cancel your order, fake an acceptance, or claim a delivery.",
+        ["Commander depuis les panneaux Amis & Guilde"] = "Order from the Friends & Guild panels",
+        ["Greffons échange & courrier, dock en vue Blizzard"] = "Trade & mail companions, Blizzard-view dock",
+        ["Panneaux compagnons sur la fenêtre d'échange et de courrier pour livrer une commande sans ouvrir le carnet."] =
+            "Companion panels on the trade and mail windows to deliver an order without opening the board.",
+        ["La colonne Commandes peut s'ancrer à droite de la fenêtre métier native (vue Blizzard)."] =
+            "The Orders column can dock to the right of the native profession window (Blizzard view).",
         ["VU"] = "SEEN",
         ["vu en train de crafter (sans l'addon)"] = "seen crafting (no addon)",
         ["vu crafter (sans l'addon)"] = "seen crafting (no addon)",

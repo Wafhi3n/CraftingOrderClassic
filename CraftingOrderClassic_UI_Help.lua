@@ -111,23 +111,11 @@ local function contentSocial()
     }
 end
 
--- Section « Nouveautés » (patch notes de la version courante), affichée en tête de l'Aide.
-local function contentWhatsNew()
-    return {
-        {
-            icon = Skin.tex.workorder, title = L["Nouveautés (v1.4.0)"],
-            lines = {
-                L["Survole un ami dans la liste d'amis, ou sélectionne un membre dans le panneau de guilde : ses métiers primaires s'affichent sans ouvrir cette fenêtre."],
-                L["Clic droit sur un joueur qui a l'addon (ami, guilde, croisé) : « Passer commande à… » ouvre l'onglet Commande déjà ciblé sur lui."],
-                L["« Met » devient « Annuaire ». Le bouton « Rafraîchir l'annuaire » appelle le canal : tous les porteurs en ligne répondent et s'y ajoutent."],
-            },
-        },
-    }
-end
+-- (Les notes de version « Nouveautés » ont leur propre onglet — cf. CraftingOrderClassic_UI_News.lua.)
 
 local function content()
     local out = {}
-    for _, part in ipairs({ contentWhatsNew(), contentIntro(), contentPosting(), contentFulfill(), contentSocial() }) do
+    for _, part in ipairs({ contentIntro(), contentPosting(), contentFulfill(), contentSocial() }) do
         for _, sec in ipairs(part) do out[#out + 1] = sec end
     end
     return out
