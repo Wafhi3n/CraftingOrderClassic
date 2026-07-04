@@ -1,5 +1,31 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.5.0 — spot crafters without the addon, plus a performance pass
+
+**Passive crafter detection.** Turn on "Repérer les crafteurs autour" in the Artisans tab (or
+`/co crafters on`) and Crafting Order quietly watches for players near you casting recipes it
+recognizes, even without the addon. They land in your directory tagged as "seen crafting," with an
+estimated skill floor, and get a discovery ping in case they turn out to be a silent addon user after
+all. Off by default, and it only watches while you're resting in a town or inn, so it won't touch the
+combat log while you're out farming.
+
+**Performance pass.** This release is mostly about making the board lighter, especially on
+professions with a lot of recipes:
+
+- The Order tab's plan list got rewritten to reuse a small pool of rows instead of spawning one per
+  recipe, so opening a profession with a few hundred plans (Tailoring, looking at you) doesn't bog
+  down the frame.
+- The bag check on the Order tab stopped re-scanning your inventory item by item for every single
+  plan on screen.
+- The window no longer redraws itself on every single network message during a busy moment (someone
+  posting an order, a wave of directory replies). It now batches those into one redraw.
+- Login bursts after a server restart no longer make everyone re-announce their whole recipe list to
+  every new arrival at once.
+
+This release also hardens the order protocol: it now checks who actually sent a message before
+acting on it, so a stray or malicious client can't cancel someone else's order, fake an acceptance,
+or take credit for a delivery that isn't theirs.
+
 ## v1.4.1 — fix: directory discovery only taught the other side about you
 
 A directed whisper ping, whether from crossing paths or from someone hitting **Refresh directory**,
