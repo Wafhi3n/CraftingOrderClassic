@@ -7,8 +7,13 @@ local Skin = UI.Skin
 local L    = COC.L   -- localisation du chrome (clé = FR ; overlay enUS). NB : les VALEURS canoniques
                      -- de destinataire restent en FR (clé) pour rester identiques sur le réseau.
 
-local PLH = 20    -- hauteur ligne plan
+local PLH = 20    -- hauteur ligne plan (en-tête de section INCLUS : pool virtualisé homogène)
 local RRH = 21    -- hauteur ligne réactif
+-- Liste des plans VIRTUALISÉE : pool FIXE de lignes physiques réutilisées au scroll (ne dépend plus
+-- du nb de plans → ~24 frames au lieu de ~300 en Couture). INVARIANT (cf. ProfWindow_Recipes) : VISIBLE
+-- doit être ≥ au nb de lignes que le viewport peut afficher, sinon la queue de liste est inatteignable.
+-- Viewport ≈ 366 px (frame 600 − en-têtes/pieds) / 20 ≈ 18 lignes → 24 avec marge.
+local VISIBLE = 24
 
 -- Filtre qualité MINIMALE (cycle) : false = Toutes, sinon seuil WoW (2=Inhabituel, 3=Rare, 4=Épique).
 -- Les NOMS de qualité sont localisés par le client via _G["ITEM_QUALITY<n>_DESC"] (zéro clé à baker).
@@ -118,7 +123,11 @@ function UI:_BuildPostLeft(panel)
     local pscroll = CreateFrame("ScrollFrame", "COCPostPlanScroll", panel, "UIPanelScrollFrameTemplate")
     pscroll:SetPoint("TOPLEFT", 12, -192); pscroll:SetPoint("BOTTOMLEFT", 12, 22); pscroll:SetWidth(LSW)
     local pc = CreateFrame("Frame", nil, pscroll); pc:SetSize(LW - 22, 10); pscroll:SetScrollChild(pc)
-    self.postPlanContent = pc; self.postPlanRows = {}
+    pscroll:HookScript("OnVerticalScroll", function() UI:_RenderPostPlanWindow() end)
+    self.postPlanScroll = pscroll; self.postPlanContent = pc
+    -- Pool FIXE de lignes réutilisées au scroll (virtualisation ; cf. VISIBLE + _RenderPostPlanWindow).
+    self.postPlanRows = {}
+    for i = 1, VISIBLE do self.postPlanRows[i] = self:_PostPlanRow(i) end
 end
 
 -- Filtre qualité (pill) + recherche + filtre « réactifs en poche » (P2). Extrait de _BuildPostLeft
@@ -210,7 +219,7 @@ function UI:_BuildPostRight(panel)
     -- Commission g/s/c + Qté
     local comLbl = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     comLbl:SetPoint("TOPLEFT", RX, -308); comLbl:SetText("|cFFE8B84B" .. L["Commission"] .. "|r"); Skin.ApplyShadow(comLbl)
-    self.postGold, self.postSilver, self.postCopper = self:_MakeGSC(panel, RX + 92, -306)
+    self.postGold, self.postSilver, self.postCopper = Skin.MakeMoneyRow(panel, RX + 92, -306)
     local qLbl = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     qLbl:SetPoint("TOPLEFT", RX + 330, -308); qLbl:SetText(L["Qté"]); Skin.ApplyShadow(qLbl)
     self.postQty = CreateFrame("EditBox", nil, panel, "InputBoxTemplate")
@@ -223,20 +232,7 @@ function UI:_BuildPostRight(panel)
     self:_BuildPostArtisanSection(panel)
 end
 
-function UI:_MakeGSC(parent, x, y)
-    local cfg = { {40, "gold"}, {34, "silver"}, {34, "copper"} }
-    local fields, cx = {}, x
-    for i, c in ipairs(cfg) do
-        local eb = CreateFrame("EditBox", nil, parent, "InputBoxTemplate")
-        eb:SetSize(c[1], 16); eb:SetPoint("TOPLEFT", cx, y)
-        eb:SetAutoFocus(false); eb:SetNumeric(true); eb:SetText("0")
-        eb:SetScript("OnEscapePressed", function(b) b:ClearFocus() end)
-        Skin.MoneyIcon(parent, c[2], eb)               -- vraie icône or/argent/cuivre du jeu
-        fields[i] = eb; cx = cx + c[1] + 20
-    end
-    return fields[1], fields[2], fields[3]
-end
-
+-- (g/s/c : Skin.MakeMoneyRow, partagé avec l'onglet Récolte.)
 -- (Section artisan/destinataire/Poster : voir CraftingOrderClassic_UI_Post_Artisans.lua)
 
 -- =========================================================================
@@ -308,7 +304,6 @@ function UI:RefreshPostPlans()
             end
         end
     end
-    self.postPlanList = out
     if self.postPlanHdr then
         self.postPlanHdr:SetText(artFilter
             and L["LISTE DES PLANS"] .. " |cFF33DD33(" .. self:_PostTargetLabel() .. " · " .. (artMode or "") .. ")|r"
@@ -319,6 +314,9 @@ function UI:RefreshPostPlans()
     self:_RenderPostPlanRows(out)
 end
 
+-- Ligne UNIFIÉE du pool virtualisé : rend soit un PLAN (badge + nom, cliquable) soit un EN-TÊTE de
+-- section (libellé doré + filet, non interactif). Le remplissage/bascule se fait dans _FillPostPlanRow
+-- (_UI_Post_Categories) ; le clic lit self.item (pas de closure recréée au scroll).
 function UI:_PostPlanRow(i)
     local r = self.postPlanRows[i]; if r then return r end
     r = CreateFrame("Button", nil, self.postPlanContent); r:SetSize(LW - 22, PLH); r:SetPoint("TOPLEFT", 0, -(i-1)*PLH)
@@ -326,6 +324,17 @@ function UI:_PostPlanRow(i)
     r.badge = Skin.MakeBadge(r, 14); r.badge:SetPoint("LEFT", 2, 0)
     r.name  = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     r.name:SetPoint("LEFT", 20, 0); r.name:SetJustifyH("LEFT"); r.name:SetWidth(LW - 46); Skin.ApplyShadow(r.name)
+    -- Variante EN-TÊTE (même ligne physique) : libellé + filet, masqués quand la ligne rend un plan.
+    r.hdr = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    r.hdr:SetPoint("BOTTOMLEFT", 4, 5); r.hdr:SetJustifyH("LEFT")
+    r.hdr:SetTextColor(Skin.unpack(Skin.color.gold)); Skin.ApplyShadow(r.hdr); r.hdr:Hide()
+    r.hdrLine = r:CreateTexture(nil, "ARTWORK"); r.hdrLine:SetHeight(1)
+    r.hdrLine:SetColorTexture(Skin.color.gold[1], Skin.color.gold[2], Skin.color.gold[3], 0.25)
+    r.hdrLine:SetPoint("BOTTOMLEFT", 2, 3); r.hdrLine:SetPoint("BOTTOMRIGHT", -2, 3); r.hdrLine:Hide()
+    r:SetScript("OnClick", function(self2)
+        local it = self2.item
+        if it and not it.isHeader and it.e then UI:SelectPostPlan(it.e) end
+    end)
     self.postPlanRows[i] = r; Skin.WireItemTooltip(r); return r
 end
 

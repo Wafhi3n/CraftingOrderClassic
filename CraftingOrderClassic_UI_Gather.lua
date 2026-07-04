@@ -22,15 +22,10 @@ local RW    = 818 - RX
 local GATHER_PROFS = { "Mining", "Herbalism", "Skinning", "Fishing" }
 
 local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true) end
--- Même logique que _UI_Post.lua : un métier est « connu » via son niveau de skill (SK) OU une recette
--- captée (RK). Crucial en récolte : Skinning/Herbalism/Fishing n'émettent AUCUN RK → seul r.skill les
--- porte. inSource respecte les drapeaux de relation (un ajouté aussi ami compte dans « Amis »).
-local function knowsProf(r, p) return (r.skill and r.skill[p]) or (r.recipes and r.recipes[p]) or false end
-local function inSource(r, src)
-    -- « confed » (display-only) traité comme « recent » ici : un confédéré reste sélectionnable sous « Croisés ».
-    return (src == "friend" and r.isFriend) or (src == "guild" and r.isGuild)
-        or (r.source == "confed" and "recent" or r.source or "recent") == src
-end
+-- Helpers d'annuaire PARTAGÉS (cf. Skin). knowsProf = niveau SK OU recette RK (crucial en récolte :
+-- Skinning/Herbalism/Fishing n'émettent AUCUN RK → seul r.skill les porte) ; SANS craftSeen (on ne
+-- cible que des porteurs). inSource = source Guilde/Amis (drapeaux) ou catégorie d'affichage.
+local knowsProf, inSource = Skin.KnowsProf, Skin.InSource
 local function sep1px(parent, x1, x2, y)
     local s = parent:CreateTexture(nil, "ARTWORK"); s:SetHeight(1)
     s:SetColorTexture(Skin.color.separator[1], Skin.color.separator[2], Skin.color.separator[3], 0.5)
@@ -174,25 +169,11 @@ function UI:_BuildGatherRight(panel)
     -- Prix par pile
     local pLbl = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     pLbl:SetPoint("TOPLEFT", RX, -288); pLbl:SetText("|cFFE8B84B" .. L["Prix proposé"] .. "|r"); Skin.ApplyShadow(pLbl)
-    self.gatherGold, self.gatherSilver, self.gatherCopper = self:_MakeGSCGather(panel, RX + 96, -286)
+    self.gatherGold, self.gatherSilver, self.gatherCopper = Skin.MakeMoneyRow(panel, RX + 96, -286)
 
     sep1px(panel, RX, REDGE, -308)
 
     self:_BuildGatherArtisanSection(panel)
-end
-
-function UI:_MakeGSCGather(parent, x, y)
-    local cfg = { {40, "gold"}, {34, "silver"}, {34, "copper"} }
-    local fields, cx = {}, x
-    for i, c in ipairs(cfg) do
-        local eb = CreateFrame("EditBox", nil, parent, "InputBoxTemplate")
-        eb:SetSize(c[1], 16); eb:SetPoint("TOPLEFT", cx, y)
-        eb:SetAutoFocus(false); eb:SetNumeric(true); eb:SetText("0")
-        eb:SetScript("OnEscapePressed", function(b) b:ClearFocus() end)
-        Skin.MoneyIcon(parent, c[2], eb)
-        fields[i] = eb; cx = cx + c[1] + 20
-    end
-    return fields[1], fields[2], fields[3]
 end
 
 function UI:_BuildGatherArtisanSection(panel)

@@ -15,15 +15,9 @@ local RW  = 818 - RX
 
 local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true) end
 
--- knowsProf : métier connu via SK (sans fenêtre) OU RK. inSource : liste source (Amis/Guilde via
--- drapeaux de relation → un ajouté aussi ami compte dans Amis), sinon catégorie d'affichage.
-local function knowsProf(r, p) return (r.skill and r.skill[p]) or (r.recipes and r.recipes[p]) or false end
-local function inSource(r, src)
-    -- « confed » (display-only, onglet Artisans) n'est pas une portée de post → on le traite comme « recent »
-    -- ici pour que les confédérés restent sélectionnables sous « Croisés ».
-    return (src == "friend" and r.isFriend) or (src == "guild" and r.isGuild)
-        or (r.source == "confed" and "recent" or r.source or "recent") == src
-end
+-- Helpers d'annuaire PARTAGÉS (cf. Skin). knowsProf = VRAIES données réseau (SK/RK) SANS craftSeen :
+-- on ne cible une commande que sur un porteur de l'addon. inSource = source Guilde/Amis (drapeaux) ou catégorie.
+local knowsProf, inSource = Skin.KnowsProf, Skin.InSource
 
 -- Prédicat de filtrage des plans par l'artisan ciblé (postTarget = "@Nom") pour ce métier, ou nil
 -- si aucune donnée exploitable (on ne filtre alors pas). Deux niveaux de précision, du plus fiable

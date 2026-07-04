@@ -107,6 +107,48 @@ function Skin.QtySuffix(o)
     return " " .. Skin.QtyText(o)
 end
 
+-- =========================================================================
+-- Filtres d'annuaire PARTAGÉS (Commande / Récolte / Artisans) — anciennement dupliqués (knowsProf/
+-- inSource) dans chaque onglet, avec une divergence SUBTILE (Artisans incluait craftSeen, pas les
+-- autres). On expose ici DEUX variantes NOMMÉES pour rendre la divergence EXPLICITE et voulue.
+-- =========================================================================
+-- Un artisan (entrée roster) connaît-il ce métier via de VRAIES données réseau (niveau SK ou recette
+-- RK) ? À utiliser pour CIBLER une commande : seul un porteur de l'addon peut la recevoir → on exclut
+-- les non-porteurs « vu crafter » (craftSeen). Onglets Commande & Récolte.
+function Skin.KnowsProf(r, p)
+    return (r.skill and r.skill[p]) or (r.recipes and r.recipes[p]) or false
+end
+
+-- + craftSeen (non-porteur repéré à proximité, sans l'addon). À utiliser pour l'ANNUAIRE D'AFFICHAGE
+-- (onglet Artisans), où l'on montre AUSSI les crafteurs vus mais qu'on ne peut pas commander.
+function Skin.KnowsProfOrSeen(r, p)
+    return Skin.KnowsProf(r, p) or (r.craftSeen and r.craftSeen[p]) or false
+end
+
+-- Un artisan entre-t-il dans la SOURCE (Guilde/Amis via drapeaux de relation, sinon catégorie
+-- d'affichage) ? « confed » (display-only) traité comme « recent » : un confédéré reste sélectionnable
+-- sous « Croisés ». Partagé par les listes d'artisans de Commande et Récolte.
+function Skin.InSource(r, src)
+    return (src == "friend" and r.isFriend) or (src == "guild" and r.isGuild)
+        or (r.source == "confed" and "recent" or r.source or "recent") == src
+end
+
+-- Trois champs de saisie or/argent/cuivre alignés (icônes de monnaie) → (goldEB, silverEB, copperEB).
+-- Partagé par la commission (Commande) et le prix par pile (Récolte) — jadis _MakeGSC / _MakeGSCGather.
+function Skin.MakeMoneyRow(parent, x, y)
+    local cfg = { {40, "gold"}, {34, "silver"}, {34, "copper"} }
+    local fields, cx = {}, x
+    for i, c in ipairs(cfg) do
+        local eb = CreateFrame("EditBox", nil, parent, "InputBoxTemplate")
+        eb:SetSize(c[1], 16); eb:SetPoint("TOPLEFT", cx, y)
+        eb:SetAutoFocus(false); eb:SetNumeric(true); eb:SetText("0")
+        eb:SetScript("OnEscapePressed", function(b) b:ClearFocus() end)
+        Skin.MoneyIcon(parent, c[2], eb)
+        fields[i] = eb; cx = cx + c[1] + 20
+    end
+    return fields[1], fields[2], fields[3]
+end
+
 -- Premier caractère (UTF-8) en capitale — pour le badge de rareté.
 function Skin.FirstChar(s)
     if not s or s == "" then return "?" end

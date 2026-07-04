@@ -32,11 +32,9 @@ local function makeToggle(parent, x, y, label, get, set)
     return btn
 end
 
--- Connaît-on un métier de cet artisan ? UNION des niveaux SK (r.skill) ET des recettes RK (r.recipes) :
--- un artisan croisé sans avoir ouvert sa fenêtre métier n'a que des SK → il DOIT quand même s'afficher.
-local function knowsProf(r, pf)
-    return (r.skill and r.skill[pf]) or (r.recipes and r.recipes[pf]) or (r.craftSeen and r.craftSeen[pf]) or false
-end
+-- Annuaire d'affichage : on montre AUSSI les non-porteurs « vu crafter » (craftSeen) → variante OrSeen
+-- du helper partagé (cf. Skin), contrairement aux onglets Commande/Récolte qui n'incluent QUE SK/RK.
+local knowsProf = Skin.KnowsProfOrSeen
 
 -- Métiers connus d'un artisan, en liste { key, sv } : niveau (SK) si connu, sinon recette seule (RK).
 -- Union des deux sources, triée par libellé localisé — même ordre visuel que l'ancien texte concaténé.

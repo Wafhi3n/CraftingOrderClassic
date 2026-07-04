@@ -11,10 +11,7 @@ local UI   = COC.UI
 local Skin = UI.Skin
 local L    = COC.L
 
-local SEP   = 308
-local LW    = SEP - 14   -- largeur panneau gauche (= locale de _UI_Post.lua)
-local PLH   = 20         -- hauteur ligne plan (DOIT égaler _UI_Post.lua : mêmes frames)
-local HDR_H = 22         -- hauteur ligne d'en-tête de section
+local PLH   = 20         -- hauteur ligne (plan ET en-tête : pool virtualisé homogène ; DOIT égaler _UI_Post.lua)
 
 local INSTANT = GetItemInfoInstant
 
@@ -62,24 +59,10 @@ end
 COC.SectionOf = sectionOf
 function UI:_PostSection(itemID) return sectionOf(itemID) end
 
--- Ligne d'en-tête de section (frame non cliquable) : libellé doré + filet de séparation.
-function UI:_PostHeaderRow(i)
-    local r = self.postPlanHeaders[i]; if r then return r end
-    r = CreateFrame("Frame", nil, self.postPlanContent); r:SetSize(LW - 22, HDR_H)
-    local ln = r:CreateTexture(nil, "ARTWORK"); ln:SetHeight(1)
-    ln:SetColorTexture(Skin.color.gold[1], Skin.color.gold[2], Skin.color.gold[3], 0.25)
-    ln:SetPoint("BOTTOMLEFT", 2, 3); ln:SetPoint("BOTTOMRIGHT", -2, 3)
-    r.text = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    r.text:SetPoint("BOTTOMLEFT", 4, 5); r.text:SetJustifyH("LEFT")
-    r.text:SetTextColor(Skin.unpack(Skin.color.gold)); Skin.ApplyShadow(r.text)
-    self.postPlanHeaders[i] = r; return r
-end
-
--- Trie la liste filtrée par (section, prêt, nom) et rend en-têtes + lignes de plan interleavés.
--- Position par curseur `y` accumulé (les en-têtes et les plans n'ont pas la même hauteur), avec
--- deux pools indépendants (postPlanHeaders / postPlanRows). Appelé par RefreshPostPlans.
+-- Trie la liste filtrée par (section, prêt, nom), construit la liste d'AFFICHAGE plate (en-têtes de
+-- section + plans interleavés, hauteurs homogènes PLH) puis fenêtre le pool virtualisé. Appelé par
+-- RefreshPostPlans. Le rendu réel (positionnement + remplissage) est dans _RenderPostPlanWindow.
 function UI:_RenderPostPlanRows(list)
-    self.postPlanHeaders = self.postPlanHeaders or {}
     for _, item in ipairs(list) do
         item.section, item.secOrder = sectionOf(item.e.itemID)
     end
@@ -89,28 +72,62 @@ function UI:_RenderPostPlanRows(list)
         if a.ready    ~= b.ready    then return a.ready end   -- « prêt » en tête de SA section (P2)
         return a.name < b.name
     end)
-    local pIdx, hIdx, y, lastSec = 0, 0, 0, nil
+    local disp, lastSec = {}, nil
     for _, item in ipairs(list) do
-        if item.section ~= lastSec then
-            hIdx = hIdx + 1; local hr = self:_PostHeaderRow(hIdx)
-            hr:ClearAllPoints(); hr:SetPoint("TOPLEFT", 0, -y)
-            hr.text:SetText(item.section); hr:Show()
-            y = y + HDR_H; lastSec = item.section
-        end
-        pIdx = pIdx + 1; local row = self:_PostPlanRow(pIdx); local e = item.e
-        row:ClearAllPoints(); row:SetPoint("TOPLEFT", 0, -y)
-        local r, g, b = Skin.RarityColor(e.itemID)
-        row.badge:Paint(r, g, b, Skin.FirstChar(item.name), Skin.Icon(e.itemID, e.spellID))
-        local disp = item.name:match("^item:") and "|cFF777777" .. L["Chargement…"] .. "|r" or item.name
-        if item.ready then disp = "|cFF33DD33" .. L["[Prêt]"] .. "|r " .. disp end
-        row.name:SetText(disp)
-        row.name:SetTextColor(e == self.postEntry and 1 or r, e == self.postEntry and 0.85 or g, e == self.postEntry and 0.27 or b)
-        row.entry = e; row.tipItemID, row.tipSpellID = e.itemID, e.spellID
-        row:SetScript("OnClick", function() UI:SelectPostPlan(e) end); row:Show()
-        y = y + PLH
+        if item.section ~= lastSec then disp[#disp + 1] = { isHeader = true, label = item.section }; lastSec = item.section end
+        disp[#disp + 1] = item
     end
-    for i = pIdx + 1, #self.postPlanRows    do self.postPlanRows[i]:Hide() end
-    for i = hIdx + 1, #self.postPlanHeaders do self.postPlanHeaders[i]:Hide() end
-    self.postPlanContent:SetHeight(math.max(y, 10))
+    self.postPlanDisplay = disp
+    self.postPlanContent:SetHeight(math.max(#disp * PLH, 10))
+    -- Clamp du scroll si la liste a rétréci (nouveau filtre/recherche) → pas de vide en bas. Le hook
+    -- OnVerticalScroll re-fenêtre si le scroll bouge ; on rappelle _RenderPostPlanWindow ensuite
+    -- (idempotent) au cas où il n'a pas changé.
+    local scroll = self.postPlanScroll
+    if scroll then
+        local maxScroll = math.max(0, #disp * PLH - (scroll:GetHeight() or 0))
+        if (scroll:GetVerticalScroll() or 0) > maxScroll then scroll:SetVerticalScroll(maxScroll) end
+    end
+    self:_RenderPostPlanWindow()
     Skin.AutoHideScroll("COCPostPlanScroll", self.postPlanContent)
+end
+
+-- Fenêtrage : place le pool FIXE de lignes sur la tranche visible de postPlanDisplay (offset = scroll
+-- / PLH). Appelé au scroll (hook) et après chaque _RenderPostPlanRows. Coût borné par #postPlanRows.
+function UI:_RenderPostPlanWindow()
+    local list = self.postPlanDisplay or {}
+    local scroll = self.postPlanScroll
+    local off = scroll and math.floor((scroll:GetVerticalScroll() or 0) / PLH) or 0
+    if off < 0 then off = 0 end
+    for i = 1, #(self.postPlanRows or {}) do
+        local row, listIdx = self.postPlanRows[i], off + i
+        local item = list[listIdx]
+        if item then
+            row.item = item
+            row:ClearAllPoints(); row:SetPoint("TOPLEFT", 0, -(listIdx - 1) * PLH)
+            self:_FillPostPlanRow(row, item); row:Show()
+        else
+            row.item = nil; row:Hide()
+        end
+    end
+end
+
+-- Remplit une ligne du pool : soit un EN-TÊTE de section (libellé doré + filet, non interactif),
+-- soit un PLAN (badge de rareté, nom, marqueur « [Prêt] », surbrillance de sélection, tooltip objet).
+function UI:_FillPostPlanRow(row, item)
+    if item.isHeader then
+        row:EnableMouse(false)
+        row.badge:Hide(); row.name:Hide()
+        row.hdr:SetText(item.label); row.hdr:Show(); row.hdrLine:Show()
+        row.tipItemID, row.tipSpellID = nil, nil
+        return
+    end
+    row:EnableMouse(true); row.hdr:Hide(); row.hdrLine:Hide()
+    local e = item.e
+    local r, g, b = Skin.RarityColor(e.itemID)
+    row.badge:Paint(r, g, b, Skin.FirstChar(item.name), Skin.Icon(e.itemID, e.spellID)); row.badge:Show()
+    local disp = item.name:match("^item:") and "|cFF777777" .. L["Chargement…"] .. "|r" or item.name
+    if item.ready then disp = "|cFF33DD33" .. L["[Prêt]"] .. "|r " .. disp end
+    row.name:SetText(disp); row.name:Show()
+    row.name:SetTextColor(e == self.postEntry and 1 or r, e == self.postEntry and 0.85 or g, e == self.postEntry and 0.27 or b)
+    row.tipItemID, row.tipSpellID = e.itemID, e.spellID
 end
