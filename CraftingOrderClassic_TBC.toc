@@ -48,3 +48,4 @@ CraftingOrderClassic_Companion.lua
 CraftingOrderClassic_Companion_Mail.lua
 CraftingOrderClassic_Companion_Trade.lua
 Debug.lua
+CraftingOrderClassic_SelfTest.lua
