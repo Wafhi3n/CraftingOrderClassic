@@ -17,6 +17,8 @@ Libs\CraftLink-1.0\Data\Vanilla.xml
 CraftingOrderClassic.lua
 CraftingOrderClassic_Trace.lua
 CraftingOrderClassic_Locale.lua
+CraftingOrderClassic_Locale_deDE.lua
+CraftingOrderClassic_Locale_esES.lua
 CraftingOrderClassic_Elemental.lua
 CraftingOrderClassic_UI_Skin.lua
 CraftingOrderClassic_UI.lua

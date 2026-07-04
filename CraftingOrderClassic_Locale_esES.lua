@@ -1,0 +1,352 @@
+-- CraftingOrderClassic_Locale_esES.lua — overlay ESPAGNOL (esES/esMX). Clé FR → texte ES.
+-- Chargé APRÈS CraftingOrderClassic_Locale.lua (qui crée COC.L via setmetatable). Repli sur la clé FR
+-- pour toute chaîne non traduite. Guillemets « » dans les valeurs → évite l'échappement Lua des ".
+-- Sur un client non-hispanophone : early-return, coût nul.
+
+local COC = CraftingOrderClassic
+local loc = GetLocale and GetLocale() or ""
+if loc ~= "esES" and loc ~= "esMX" then return end
+local L = COC.L
+
+local es = {
+    -- Onglets / fenêtre
+    ["Carnet"] = "Libro", ["Commande"] = "Pedir", ["Récolte"] = "Recolectar", ["Artisans"] = "Artesanos",
+    ["Classic · canal global"] = "Classic · canal global",
+    -- En-têtes de colonnes (Carnet)
+    ["COMMANDE"] = "PEDIDO", ["QTÉ"] = "CANT.", ["PRIX PROPOSÉ"] = "PRECIO OFRECIDO",
+    ["MÉTIER"] = "PROFESIÓN", ["DESTINATAIRE"] = "DESTINATARIO", ["STATUT"] = "ESTADO", ["DEMANDEUR"] = "SOLICITANTE",
+    ["ARTISAN"] = "ARTESANO",
+    -- Filtres Carnet
+    ["Tous"] = "Todos", ["Guilde"] = "Hermandad", ["Amis"] = "Amigos", ["Croisés"] = "Vistos", ["Entrantes"] = "Entrantes",
+    ["Annuaire"] = "Directorio",
+    ["Rafraîchir l'annuaire"] = "Actualizar directorio",
+    ["annuaire : appel lancé sur le canal — les porteurs en ligne vont répondre."] =
+        "directorio: llamada enviada al canal — los usuarios en línea responderán.",
+    ["Nouveautés (v1.4.0)"] = "Novedades (v1.4.0)",
+    ["Survole un ami dans la liste d'amis, ou sélectionne un membre dans le panneau de guilde : ses métiers primaires s'affichent sans ouvrir cette fenêtre."] =
+        "Pasa el cursor sobre un amigo en la lista de amigos, o selecciona un miembro en el panel de hermandad: sus profesiones principales se muestran sin abrir esta ventana.",
+    ["Clic droit sur un joueur qui a l'addon (ami, guilde, croisé) : « Passer commande à… » ouvre l'onglet Commande déjà ciblé sur lui."] =
+        "Clic derecho sobre un jugador que tiene el addon (amigo, hermandad, visto): « Pedir a… » abre la pestaña Pedir ya dirigida a él.",
+    ["« Met » devient « Annuaire ». Le bouton « Rafraîchir l'annuaire » appelle le canal : tous les porteurs en ligne répondent et s'y ajoutent."] =
+        "« Vistos » pasa a « Directorio ». El botón « Actualizar directorio » llama al canal: todos los usuarios en línea responden y se añaden.",
+    -- Onglet Nouveautés (changelog en jeu)
+    ["Nouveautés"] = "Novedades",
+    ["Repérer les crafteurs sans l'addon + passe de performance"] = "Detectar artesanos sin el addon + mejoras de rendimiento",
+    ["Repérage passif des crafteurs autour de toi, même sans l'addon (onglet Artisans → « Repérer les crafteurs autour », ou |cFFFFFFFF/co crafters on|r). Désactivé par défaut, en ville seulement."] =
+        "Detección pasiva de artesanos a tu alrededor, incluso sin el addon (pestaña Artesanos, o |cFFFFFFFF/co crafters on|r). Desactivado por defecto, solo en ciudad.",
+    ["Liste de plans de l'onglet Commande réécrite : plus fluide sur les métiers à centaines de recettes (Couture)."] =
+        "Lista de recetas de la pestaña Pedir reescrita: más fluida en profesiones con cientos de recetas (Sastrería).",
+    ["La fenêtre ne se redessine plus à chaque message réseau : les rafales sont regroupées en un seul rendu."] =
+        "La ventana ya no se redibuja con cada mensaje de red: las ráfagas se agrupan en un solo dibujado.",
+    ["Protocole de commande durci : un autre client ne peut plus annuler ta commande, usurper une acceptation, ni s'attribuer une livraison."] =
+        "Protocolo de pedidos reforzado: otro cliente ya no puede cancelar tu pedido, falsear una aceptación ni atribuirse una entrega.",
+    ["Commander depuis les panneaux Amis & Guilde"] = "Pedir desde los paneles Amigos y Hermandad",
+    ["Greffons échange & courrier, dock en vue Blizzard"] = "Complementos de intercambio y correo, anclaje en vista Blizzard",
+    ["Panneaux compagnons sur la fenêtre d'échange et de courrier pour livrer une commande sans ouvrir le carnet."] =
+        "Paneles complementarios en la ventana de intercambio y correo para entregar un pedido sin abrir el libro.",
+    ["La colonne Commandes peut s'ancrer à droite de la fenêtre métier native (vue Blizzard)."] =
+        "La columna Pedidos puede anclarse a la derecha de la ventana de profesión nativa (vista Blizzard).",
+    ["VU"] = "VISTO",
+    ["vu en train de crafter (sans l'addon)"] = "visto fabricando (sin el addon)",
+    ["vu crafter (sans l'addon)"] = "visto fabricando (sin el addon)",
+    ["vu crafter"] = "visto fabricando",
+    ["%d+ · vu crafter"] = "%d+ · visto fabricando",
+    ["Repérer les crafteurs autour (en ville)"] = "Detectar artesanos cercanos (en ciudad)",
+    ["Ajouter ami"] = "Añadir amigo",
+    ["|cFFFFFFFF%s|r ajouté à tes amis."] = "|cFFFFFFFF%s|r añadido a tus amigos.",
+    ["repérage des crafteurs autour : |cFFFFFFFF%s|r (en ville) — /co crafters [on|off]"] =
+        "detección de artesanos cercanos: |cFFFFFFFF%s|r (en ciudad) — /co crafters [on|off]",
+    ["repérer les crafteurs sans l'addon qui craftent autour (en ville ; défaut : off)"] =
+        "detectar a jugadores sin el addon que fabrican cerca (en ciudad; por defecto: off)",
+    ["Archivées"] = "Archivados", ["En cours"] = "Activos", ["libre"] = "abierto",
+    ["Aucune commande. Onglet « Commande » pour en poster une."] = "Sin pedidos. Pestaña « Pedir » para crear uno.",
+    ["Aucune commande entrante. (Capture /commerce et /guilde des joueurs sans l'addon.)"] =
+        "Sin pedidos entrantes. (Capturados de /comercio y /hermandad de jugadores sin el addon.)",
+    ["Demande captée dans /"] = "Solicitud capturada en /",
+    ["Clic droit : ignorer"] = "Clic derecho: descartar",
+    ["Clic : "] = "Clic: ", ["Accepter"] = "Aceptar", ["Annuler"] = "Cancelar", ["Livrer"] = "Entregar",
+    ["J'ai reçu"] = "Recibido", ["Remise"] = "Entregado",
+    ["remise — en attente de confirmation de %s : %s"] = "entregado — esperando confirmación de %s: %s",
+    ["réception confirmée : %s"] = "recepción confirmada: %s",
+    ["réception confirmée par %s ! crafts livrés au total : %d"] = "¡recepción confirmada por %s! total de fabricaciones entregadas: %d",
+    ["%s a remis ta commande : %s — clique « J'ai reçu » pour confirmer"] =
+        "%s ha entregado tu pedido: %s — haz clic en « Recibido » para confirmar",
+    ["Refuser"] = "Rechazar", ["%s a refusé ta commande : %s"] = "%s ha rechazado tu pedido: %s",
+    ["guilde"] = "hermandad", ["commerce"] = "comercio", ["acceptée"] = "aceptado",
+    ["Inviter en groupe"] = "Invitar al grupo", ["en attente"] = "pendiente", ["acceptées"] = "aceptados", ["en sourdine"] = "silenciados",
+    ["diag"] = "diag", ["Sourdine"] = "Silencio", ["Réafficher"] = "Mostrar",
+    ["Muter"] = "Silenciar", ["Ajouter aux artisans"] = "Añadir a artesanos",
+    ["Passer commande à %s"] = "Pedir a %s", ["Passer commande"] = "Hacer pedido",
+    ["%s est mis en sourdine — plus aucune notification de sa part."] = "%s ha sido silenciado — no más notificaciones suyas.",
+    ["%s n'est plus en sourdine."] = "%s ya no está silenciado.",
+    ["usage : /co unmute <nom>"] = "uso: /co unmute <nombre>",
+    ["aucun joueur en sourdine. /co mute <nom> pour en ajouter un."] = "ningún jugador silenciado. /co mute <nombre> para añadir uno.",
+    ["en sourdine (%d) : %s"] = "silenciados (%d): %s",
+    ["mute auto bas niveau : |cFFFFFFFFdésactivé|r — /co lowlevel <niveau>"] = "silencio auto de nivel bajo: |cFFFFFFFFdesactivado|r — /co lowlevel <nivel>",
+    ["mute auto bas niveau : sous le niveau |cFFFFFFFF%d|r — /co lowlevel [N|off]"] = "silencio auto de nivel bajo: por debajo de nivel |cFFFFFFFF%d|r — /co lowlevel [N|off]",
+    ["%s a posté %d fois en peu de temps. Le mettre en sourdine ?"] = "%s ha publicado %d veces en poco tiempo. ¿Silenciarlo?",
+    ["muter/démuter un joueur (aucune notif de sa part)"] = "silenciar/reactivar a un jugador (ninguna notificación suya)",
+    ["seuil de mute auto des persos bas niveau (défaut 5)"] = "umbral de silencio auto para personajes de nivel bajo (por defecto 5)",
+    ["%d livrés"] = "%d entregados",
+    ["ton reroll |cFFFFFFFF%s|r sait le faire : %s"] = "tu alt |cFFFFFFFF%s|r sabe hacerlo: %s",
+    ["COMPOSANTS FOURNIS"] = "COMPONENTES APORTADOS", ["À FOURNIR"] = "APORTAR", ["complet"] = "completo",
+    ["chargé — |cFFFFFFFF/co help|r pour les commandes. (Réseau global de craft — autonome.)"] =
+        "cargado — |cFFFFFFFF/co help|r para los comandos. (Red global de fabricación — autónoma.)",
+    ["CraftLink introuvable — l'infra partagée n'est pas chargée."] =
+        "CraftLink no encontrado — la infraestructura compartida no está cargada.",
+    ["infra CraftLink — dataVersion=|cFFE8B84B%d|r, protocole=v%d, catalogue=%d métier(s) %s"] =
+        "infra CraftLink — dataVersion=|cFFE8B84B%d|r, protocolo=v%d, catálogo=%d profesión(es) %s",
+    ["prêt"] = "listo", ["vide"] = "vacío",
+    ["mes recettes captées : "] = "mis recetas capturadas: ",
+    ["aucune recette captée — ouvre une fenêtre de métier une fois pour l'amorcer."] =
+        "ninguna receta capturada — abre una ventana de profesión una vez para iniciarlas.",
+    ["réseau global : %s — |cFFFFFFFF%d|r en ligne, |cFFFFFFFF%d|r crafteur(s) connus"] =
+        "red global: %s — |cFFFFFFFF%d|r en línea, |cFFFFFFFF%d|r artesano(s) conocido(s)",
+    ["connexion…"] = "conectando…",
+    ["réseau : sollicitation envoyée (HI global + PING proximité)."] =
+        "red: solicitud enviada (HI global + PING de proximidad).",
+    ["métier inconnu : "] = "profesión desconocida: ",
+    ["commandes :"] = "comandos:",
+    ["statut (infra, mes recettes, réseau)"] = "estado (infra, mis recetas, red)",
+    ["carnet d'ordres"] = "libro de pedidos", ["poster une commande"] = "crear un pedido",
+    ["solliciter l'annuaire (présence + proximité)"] = "consultar el directorio (presencia + proximidad)",
+    ["teste l'aller-retour réseau (PING global → PONG des autres porteurs)"] =
+        "prueba el ida y vuelta de red (PING global → PONG de otros usuarios)",
+    ["vue commandes d'un métier (ou menu des métiers si vide)"] =
+        "vista de pedidos de una profesión (o menú de profesiones si vacío)",
+    ["basculer fenêtre métier custom / vue Blizzard"] = "alternar ventana de profesión propia / vista Blizzard",
+    ["portée des notifications de commande"] = "alcance de las notificaciones de pedido",
+    ["notifications : |cFFFFFFFF%s|r — /co notify [all|directed|named|off]"] =
+        "notificaciones: |cFFFFFFFF%s|r — /co notify [all|directed|named|off]",
+    ["portée du scan des demandes de craft en chat (défaut : mes métiers)"] =
+        "alcance del escaneo de solicitudes de fabricación en el chat (por defecto: mis profesiones)",
+    ["scan chat commerce/guilde : |cFFFFFFFF%s|r — /co scan [mine|all|off]"] =
+        "escaneo de chat comercio/hermandad: |cFFFFFFFF%s|r — /co scan [mine|all|off]",
+    ["mode solo"] = "modo solo",
+    ["injecte/retire un réseau fictif (artisans + commandes)"] = "inyecta/quita una red ficticia (artesanos + pedidos)",
+    ["journalise le réseau dans la SavedVariable (off | clear | dump)"] =
+        "registra la red en la SavedVariable (off | clear | dump)",
+    ["commande introuvable : "] = "pedido no encontrado: ", ["ce n'est pas ta commande."] = "este no es tu pedido.",
+    ["commande annulée : "] = "pedido cancelado: ", ["commande non disponible : "] = "pedido no disponible: ",
+    ["c'est ta propre commande."] = "es tu propio pedido.",
+    ["cette commande ne t'est pas destinée."] = "este pedido no es para ti.",
+    ["commande acceptée : %s (%s)"] = "pedido aceptado: %s (%s)",
+    ["tu n'as pas accepté cette commande."] = "no has aceptado este pedido.",
+    ["commande relâchée : "] = "pedido liberado: ", ["carnet d'ordres :"] = "libro de pedidos:",
+    [" par "] = " por ", ["  (aucune commande active)"] = "  (ningún pedido activo)",
+    ["usage : /co post [shift-clic objet] [xN] [prix]"] = "uso: /co post [mayús-clic objeto] [xN] [precio]",
+    ["commande postée |cFFFFFFFF%s|r : %s x%d %s[%s]"] = "pedido creado |cFFFFFFFF%s|r: %s x%d %s[%s]",
+    ["CraftLink absent — l'infra réseau n'est pas chargée."] = "CraftLink ausente — la infraestructura de red no está cargada.",
+    ["PING envoyé (canal %s%s). En attente des PONG…"] = "PING enviado (canal %s%s). Esperando los PONG…",
+    ["rejoint"] = "unido", ["PAS rejoint"] = "NO unido",
+    [", +|cFFFFFFFF%d|r whisper(s)"] = ", +|cFFFFFFFF%d|r susurro(s)",
+    ["entrante acceptée : |cFFFFFFFF%s|r"] = "entrante aceptada: |cFFFFFFFF%s|r",
+    ["infra non prête."] = "infra no lista.",
+    ["activé — %d artisans + %d commandes + %d entrantes injectés."] =
+        "activado — %d artesanos + %d pedidos + %d entrantes inyectados.",
+    ["désactivé — faux artisans et commandes purgés."] = "desactivado — artesanos y pedidos ficticios eliminados.",
+    ["vidée."] = "vaciado.", ["%d lignes (30 dernières) :"] = "%d líneas (últimas 30):",
+    ["ON. Fais tes tests, puis |cFFFFFFFF/reload|r, puis lis SavedVariables\\CraftingOrderClassic.lua (clé trace)."] =
+        "ON. Haz tus pruebas, luego |cFFFFFFFF/reload|r, luego lee SavedVariables\\CraftingOrderClassic.lua (clave trace).",
+    ["réseau"] = "red", ["canal rejoint"] = "canal unido",
+    ["en ligne"] = "en línea", ["artisan(s)"] = "artesano(s)",
+    ["Alchimie"] = "Alquimia", ["Forge"] = "Herrería", ["Cuisine"] = "Cocina",
+    ["Enchantement"] = "Encantamiento", ["Ingénierie"] = "Ingeniería", ["Secourisme"] = "Primeros auxilios",
+    ["Pêche"] = "Pesca", ["Herboristerie"] = "Herboristería", ["Travail du cuir"] = "Peletería",
+    ["Minage"] = "Minería", ["Dépeçage"] = "Desuello", ["Couture"] = "Sastrería",
+    ["Joaillerie"] = "Joyería", ["Calligraphie"] = "Inscripción", ["Élémentaire"] = "Elemental",
+    ["En attente"] = "Pendiente", ["Acceptée"] = "Aceptado", ["Livrée"] = "Entregado", ["Annulée"] = "Cancelado", ["Refusée"] = "Rechazado",
+    ["LISTE DES PLANS"] = "LISTA DE RECETAS", ["JE FOURNIS"] = "YO APORTO", ["Réactifs"] = "Reactivos",
+    ["(cocher = je fournis)"] = "(marcar = yo aporto)", ["Commission"] = "Comisión", ["Qté"] = "Cant.",
+    ["Destinataire :"] = "Destinatario:", ["Diffuser à tous"] = "Difundir a todos", ["Poster"] = "Publicar",
+    ["Choisis un métier puis un plan."] = "Elige una profesión y luego una receta.",
+    ["Rechercher un plan"] = "Buscar una receta", ["Qualité : Toutes"] = "Calidad: Todas", ["Qualité : "] = "Calidad: ",
+    ["Sélection : "] = "Selección: ", ["Commande postée !"] = "¡Pedido publicado!",
+    ["Réactifs : j'ai tout"] = "Reactivos: lo tengo todo", ["Réactifs : "] = "Reactivos: ",
+    ["[Prêt]"] = "[Listo]",
+    ["Autres"] = "Otros",
+    ["connus"] = "conocidas", ["niv. %d"] = "niv. %d",
+    ["Choisis d'abord un plan."] = "Elige primero una receta.", ["Aucun plan sélectionné."] = "Ninguna receta seleccionada.",
+    ["Ajoutés"] = "Añadidos", ["fournis"] = "aportados", ["Chargement…"] = "Cargando…",
+    ["Toute la guilde"] = "Toda la hermandad", ["Tous les amis"] = "Todos los amigos",
+    ["Tous les ajoutés"] = "Todos los añadidos", ["Tous les croisés"] = "Todos los vistos",
+    ["MÉTIER DE RÉCOLTE"] = "PROFESIÓN DE RECOLECCIÓN", ["Rechercher une ressource"] = "Buscar un recurso",
+    ["LISTE DES RESSOURCES"] = "LISTA DE RECURSOS", ["Demande de récolte — quantité voulue"] = "Solicitud de recolección — cantidad deseada",
+    ["stacks"] = "montones", ["pile"] = "montón", ["piles"] = "montones",
+    ["Récolteur :"] = "Recolector:", ["Prix proposé"] = "Precio ofrecido",
+    ["Choisis un métier de récolte puis une ressource."] = "Elige una profesión de recolección y luego un recurso.",
+    ["Aucune ressource sélectionnée."] = "Ningún recurso seleccionado.", ["par stack"] = "por montón", ["à l'unité"] = "por unidad",
+    ["Commande de récolte postée !"] = "¡Pedido de recolección publicado!", ["Choisis d'abord une ressource."] = "Elige primero un recurso.",
+    ["Toutes"] = "Todas",
+    ["Objet |cFFE8B84Bélémentaire|r (farmé sur les mobs, pas de métier). Diffusé à tous. Quantité et prix |cFFE8B84B%s.|r"] =
+        "Objeto |cFFE8B84Belemental|r (obtenido de las criaturas, sin profesión). Difundido a todos. Cantidad y precio |cFFE8B84B%s.|r",
+    ["Diffusée aux récolteurs ayant |cFFE8B84B%s.|r Quantité et prix proposé |cFFE8B84B%s.|r"] =
+        "Difundido a recolectores con |cFFE8B84B%s|r. Cantidad y precio ofrecido |cFFE8B84B%s.|r",
+    ["SOURCE"] = "FUENTE", ["AJOUTER UN JOUEUR"] = "AÑADIR UN JUGADOR", ["Nom du personnage"] = "Nombre del personaje",
+    ["Métier :"] = "Profesión:", ["Chuchoter"] = "Susurrar", ["Aucun artisan dans cette source."] = "Ningún artesano en esta fuente.",
+    ["En ligne"] = "En línea", ["Hors ligne"] = "Desconectado", ["niv "] = "niv ", ["niv ?"] = "niv ?",
+    ["GUILDE"] = "HERMANDAD", ["AMIS"] = "AMIGO", ["AJOUTÉ"] = "AÑADIDO", ["CROISÉ"] = "VISTO", ["CONFÉDÉRÉ"] = "CONFED.",
+    ["Confédération"] = "Confederación",
+    ["artisan ajouté : "] = "artesano añadido: ",
+    ["(lié quand il sera en ligne avec l'addon)"] = "(vinculado cuando esté en línea con el addon)",
+    ["GreenWall non détecté — section « Confédération » masquée."] = "GreenWall no detectado — sección « Confederación » oculta.",
+    ["GreenWall actif, aucun confédéré repéré (il faut qu'ils parlent en /g)."] = "GreenWall activo, ningún confederado detectado (deben hablar en /g).",
+    ["confédérés repérés (%d) :"] = "confederados detectados (%d):",
+    ["en ligne · annuaire"] = "en línea · directorio", ["annuaire"] = "directorio",
+    ["pas encore dans l'annuaire (sans COC ?)"] = "aún no en el directorio (¿sin COC?)",
+    ["confédérés GreenWall repérés (SoD live only)"] = "confederados GreenWall detectados (solo SoD en vivo)",
+    ["Commandes pour ce joueur"] = "Pedidos para este jugador",
+    ["Commandes à livrer"] = "Pedidos por entregar",
+    ["+%d autre(s)"] = "+%d más",
+    ["Remplir depuis commande"] = "Rellenar desde pedido",
+    ["Marquer livrée"] = "Marcar como entregado",
+    ["À réclamer : %s"] = "A cobrar: %s",
+    ["À payer : %s"] = "A pagar: %s",
+    ["Pas de prix convenu."] = "Sin precio acordado.",
+    ["Gratuit."] = "Gratis.",
+    ["Commande : %s"] = "Pedido: %s",
+    ["Voici ta commande. Prix convenu : %s."] = "Aquí está tu pedido. Precio acordado: %s.",
+    ["Voici ta commande."] = "Aquí está tu pedido.",
+    ["Recettes"] = "Recetas", ["Commandes"] = "Pedidos", ["Réactifs :"] = "Reactivos:",
+    ["Créer"] = "Crear", ["Créer tout"] = "Crear todo", ["Vue Blizzard"] = "Vista Blizzard",
+    ["Sélectionne une recette."] = "Selecciona una receta.", ["Produit "] = "Produce ",
+    ["entrante · "] = "entrante · ", ["réactifs insuffisants."] = "reactivos insuficientes.",
+    ["fenêtre métier custom |cFF33DD33activée|r — ouvre un métier. (Guild Economy laisse la main.)"] =
+        "ventana de profesión propia |cFF33DD33activada|r — abre una profesión. (Guild Economy cede el paso.)",
+    ["fenêtre métier custom |cFFFFCC00désactivée|r (vue Blizzard)."] =
+        "ventana de profesión propia |cFFFFCC00desactivada|r (vista Blizzard).",
+    ["» Vue Crafting Order"] = "» Vista Crafting Order", ["Masquer"] = "Ocultar",
+    ["overlay métier masqué — |cFFFFFFFF/co prof|r pour le réafficher."] =
+        "superposición de profesión oculta — |cFFFFFFFF/co prof|r para mostrarla de nuevo.",
+    ["Module Commandes non chargé — redémarre complètement WoW (quitter/relancer), pas un simple /reload."] =
+        "Módulo de Pedidos no cargado — reinicia WoW por completo (salir/relanzar), no solo /reload.",
+    ["Clic : ouvrir le carnet d'ordres"] = "Clic: abrir el libro de pedidos",
+    ["Clic droit : mes métiers"] = "Clic derecho: mis profesiones",
+    ["Mes métiers"] = "Mis profesiones", ["Aucun métier connu."] = "Ninguna profesión conocida.",
+    ["Don / gratuit"] = "Regalo / gratis",
+    ["|cFFFF8800entrante|r |cFFFFFFFF%s|r (%s) : %s%s%s"] = "|cFFFF8800entrante|r |cFFFFFFFF%s|r (%s): %s%s%s",
+    ["   |cFF33DD33→ tu sais la crafter|r — Carnet › Entrantes"] = "   |cFF33DD33→ sabes fabricarlo|r — Libro › Entrantes",
+    ["|cFFFFCC00commande pour TOI|r de |cFFFFFFFF%s|r : %s%s%s"] = "|cFFFFCC00pedido para TI|r de |cFFFFFFFF%s|r: %s%s%s",
+    ["ton artisan |cFFFFFFFF%s|r est en ligne."] = "tu artesano |cFFFFFFFF%s|r está en línea.",
+    ["plan looté : |cFFFFFFFF%s|r — enseigne |cFFFFFFFF%s|r (%s) %s"] =
+        "receta saqueada: |cFFFFFFFF%s|r — enseña |cFFFFFFFF%s|r (%s) %s",
+    ["|cFF888888(tu la connais déjà)|r"] = "|cFF888888(ya la conoces)|r",
+    ["|cFF33DD33(tu ne la connais pas encore !)|r"] = "|cFF33DD33(¡aún no la conoces!)|r",
+    ["alerte plan looté : |cFFFFFFFF%s|r — /co lootalert [on|off]"] =
+        "alerta de receta saqueada: |cFFFFFFFF%s|r — /co lootalert [on|off]",
+    ["alerte quand tu loots un plan connu de CraftLink (défaut : on)"] =
+        "avisa cuando saqueas una receta conocida por CraftLink (por defecto: on)",
+    ["Partenaire (basculer)"] = "Socio (alternar)",
+    ["[Partenaire]"] = "[Socio]",
+    ["|cFFFFFFFF%s|r marqué comme partenaire — priorité sur les alertes de don."] =
+        "|cFFFFFFFF%s|r marcado como socio — prioridad en las alertas de regalo.",
+    ["|cFFFFFFFF%s|r n'est plus marqué comme partenaire."] = "|cFFFFFFFF%s|r ya no está marcado como socio.",
+    ["|cFF66CCFFpartenaires intéressés :|r %s (|cFFFFFFFF/co gift <nom>|r)"] =
+        "|cFF66CCFFsocios interesados:|r %s (|cFFFFFFFF/co gift <nombre>|r)",
+    ["proposer (chuchoter) le dernier plan looté à un partenaire qui ne le connaît pas"] =
+        "ofrecer (susurrar) la última receta saqueada a un socio que no la conoce",
+    ["aucun plan looté en attente de don pour l'instant."] = "ninguna receta saqueada esperando un regalo por ahora.",
+    ["don en attente pour |cFFFFFFFF%s|r — partenaires : %s (|cFFFFFFFF/co gift <nom>|r)"] =
+        "regalo pendiente para |cFFFFFFFF%s|r — socios: %s (|cFFFFFFFF/co gift <nombre>|r)",
+    ["|cFFFFFFFF%s|r n'est pas dans la liste des partenaires en attente pour ce plan."] =
+        "|cFFFFFFFF%s|r no está en la lista de socios en espera para esta receta.",
+    ["Salut ! J'ai looté %s (%s) — tu ne le connais pas encore, ça t'intéresse ?"] =
+        "¡Hola! He saqueado %s (%s) — aún no la conoces, ¿te interesa?",
+    ["don proposé à |cFFFFFFFF%s|r pour %s."] = "regalo ofrecido a |cFFFFFFFF%s|r por %s.",
+    ["|cFF66CCFFtu sais le faire|r — demandé par |cFFFFFFFF%s|r : %s%s%s"] =
+        "|cFF66CCFFsabes fabricarlo|r — solicitado por |cFFFFFFFF%s|r: %s%s%s",
+    ["%s peut faire une commande captée — gardée pour son passage : %s"] =
+        "%s puede fabricar un pedido capturado — guardado para su visita: %s",
+    ["Confiées"] = "Confiados", ["Remis"] = "Enviado",
+    ["Aucune commande confiée pour l'instant."] = "Ningún pedido confiado por ahora.",
+    ["canal : |cFFFFFFFF%s|r"] = "canal: |cFFFFFFFF%s|r",
+    ["canal : non rejoint — |cFFFFFFFF/co channel on|r pour réessayer"] =
+        "canal: no unido — |cFFFFFFFF/co channel on|r para reintentar",
+    ["auto-join du canal réseau désactivé — le carnet global ne fonctionnera plus (whisper/guilde restent actifs)."] =
+        "auto-unión al canal de red desactivada — el libro global dejará de funcionar (susurro/hermandad siguen activos).",
+    ["canal réseau (re)rejoint."] = "canal de red (re)unido.",
+    ["canal global actuel : |cFFFFFFFF%s|r. |cFFFFFFFF/co channel off|r pour le quitter, |cFFFFFFFF/co channel on|r pour le rejoindre."] =
+        "canal global actual: |cFFFFFFFF%s|r. |cFFFFFFFF/co channel off|r para salir, |cFFFFFFFF/co channel on|r para volver a unirte.",
+    ["(dés)activer le canal réseau global"] = "(des)activar el canal de red global",
+    ["balise TEXTE émise=%s (canal idx=%s) — lance |cFFFFFFFF/co trace dump|r sur l'AUTRE perso et cherche |cFFFFFFFF[recv] beacon|r."] =
+        "baliza TEXTO enviada=%s (canal idx=%s) — ejecuta |cFFFFFFFF/co trace dump|r en el OTRO personaje y busca |cFFFFFFFF[recv] beacon|r.",
+    ["annuaire local vidé (diag) — exécute aussi |cFFFFFFFF/co wipe|r sur l'autre compte pour un test de découverte propre."] =
+        "directorio local vaciado (diag) — ejecuta también |cFFFFFFFF/co wipe|r en la otra cuenta para una prueba de descubrimiento limpia.",
+    ["Crafting Order rejoint un canal dédié (|cFFFFD100%s|r) pour faire circuler le carnet de commandes entre joueurs de l'addon. Tu le verras dans ta liste de canaux ; aucun message lisible n'y est envoyé. Tu peux le quitter à tout moment — |cFFFFFFFF/co channel off|r."] =
+        "Crafting Order se une a un canal dedicado (|cFFFFD100%s|r) para transmitir el libro de pedidos entre usuarios del addon. Lo verás en tu lista de canales; no se envía ningún mensaje legible. Puedes salir en cualquier momento — |cFFFFFFFF/co channel off|r.",
+    ["Aide"] = "Ayuda",
+    ["C'est quoi Crafting Order ?"] = "¿Qué es Crafting Order?",
+    ["Réseau GLOBAL et SOCIAL de commandes de craft — fonctionne sans guilde, entre tous les joueurs de l'addon."] =
+        "Red GLOBAL y SOCIAL de pedidos de fabricación — funciona sin hermandad, entre todos los usuarios del addon.",
+    ["Poste ce dont tu as besoin, ou consulte les commandes que tu peux honorer avec tes métiers."] =
+        "Publica lo que necesitas, o consulta los pedidos que puedes cumplir con tus profesiones.",
+    ["Ouvrir la fenêtre et commandes utiles"] = "Abrir la ventana y comandos útiles",
+    ["Clic gauche sur l'icône minimap (ou |cFFFFFFFF/co|r) : ouvre cette fenêtre."] =
+        "Clic izquierdo en el icono del minimapa (o |cFFFFFFFF/co|r): abre esta ventana.",
+    ["Clic droit sur l'icône minimap (ou |cFFFFFFFF/co métier|r) : ouvre la Vue Métier d'un de tes métiers."] =
+        "Clic derecho en el icono del minimapa (o |cFFFFFFFF/co métier|r): abre la Vista de Profesión de una de tus profesiones.",
+    ["|cFFFFFFFF/co help|r dans le chat : liste complète des commandes slash."] =
+        "|cFFFFFFFF/co help|r en el chat: lista completa de comandos slash.",
+    ["|cFFFFFFFF/co channel off|r / |cFFFFFFFF/co channel on|r : quitter/rejoindre le canal réseau."] =
+        "|cFFFFFFFF/co channel off|r / |cFFFFFFFF/co channel on|r: salir/unirse al canal de red.",
+    ["Les 4 onglets de cette fenêtre"] = "Las 4 pestañas de esta ventana",
+    ["|cFFE8B84BCarnet|r : tes commandes à toi (postées), en cours ou archivées."] =
+        "|cFFE8B84BLibro|r: tus propios pedidos (publicados), activos o archivados.",
+    ["|cFFE8B84BCommande|r : poster une demande de craft à faire réaliser par un artisan."] =
+        "|cFFE8B84BPedir|r: publicar una solicitud de fabricación para que la cumpla un artesano.",
+    ["|cFFE8B84BRécolte|r : poster une demande de matières à un récolteur (mine, herbe, peau, pêche)."] =
+        "|cFFE8B84BRecolectar|r: publicar una solicitud de materiales a un recolector (minería, hierbas, cuero, pesca).",
+    ["|cFFE8B84BArtisans|r : l'annuaire — qui sait crafter quoi, en ligne ou non."] =
+        "|cFFE8B84BArtesanos|r: el directorio — quién sabe fabricar qué, en línea o no.",
+    ["Poster une commande de craft"] = "Publicar un pedido de fabricación",
+    ["Onglet |cFFE8B84BCommande|r → choisis un métier puis un plan dans la liste."] =
+        "Pestaña |cFFE8B84BPedir|r → elige una profesión y luego una receta de la lista.",
+    ["Shift-clic un objet dans un sac ou un lien de chat pour le présélectionner s'il correspond à un plan."] =
+        "Mayús-clic en un objeto de una bolsa o un enlace de chat para preseleccionarlo si corresponde a una receta.",
+    ["Coche les réactifs que TU fournis toi-même (le reste reste à la charge de l'artisan)."] =
+        "Marca los reactivos que TÚ aportas (el resto queda a cargo del artesano).",
+    ["Choisis la quantité, la commission proposée, puis le destinataire (guilde, amis, un artisan précis, ou diffuser à tous)."] =
+        "Elige la cantidad, la comisión ofrecida, y luego el destinatario (hermandad, amigos, un artesano concreto, o difundir a todos).",
+    ["Clique |cFFE8B84BPoster|r : la commande apparaît dans ton Carnet et chez les artisans concernés."] =
+        "Haz clic en |cFFE8B84BPublicar|r: el pedido aparece en tu Libro y en los artesanos correspondientes.",
+    ["Poster une commande de récolte"] = "Publicar un pedido de recolección",
+    ["Onglet |cFFE8B84BRécolte|r → choisis un métier de récolte puis une ressource."] =
+        "Pestaña |cFFE8B84BRecolectar|r → elige una profesión de recolección y luego un recurso.",
+    ["Choisis à l'unité ou par pile, la quantité voulue et le prix proposé, puis le destinataire."] =
+        "Elige por unidad o por montón, la cantidad deseada y el precio ofrecido, y luego el destinatario.",
+    ["Fonctionne comme une commande de craft, mais ciblée sur les joueurs qui ont le métier de récolte, pas de recette à connaître."] =
+        "Funciona como un pedido de fabricación, pero dirigido a jugadores con la profesión de recolección — sin receta necesaria.",
+    ["Accepter / livrer une commande — la Vue Métier"] = "Aceptar / entregar un pedido — la Vista de Profesión",
+    ["L'acceptation et la livraison ne se font PAS dans le Carnet : ouvre la |cFFE8B84BVue Métier|r du métier concerné (clic droit minimap, ou |cFFFFFFFF/co métier <nom>|r)."] =
+        "Aceptar y entregar NO se hacen en el Libro: abre la |cFFE8B84BVista de Profesión|r de la profesión correspondiente (clic derecho minimapa, o |cFFFFFFFF/co métier <nombre>|r).",
+    ["La 3ᵉ colonne de la Vue Métier liste toutes les commandes de ce métier : accepte, crafte, puis livre."] =
+        "La 3.ª columna de la Vista de Profesión lista todos los pedidos de esa profesión: acepta, fabrica, luego entrega.",
+    ["Les demandes captées dans |cFFE8B84B/commerce|r et |cFFE8B84B/guilde|r de joueurs sans l'addon apparaissent aussi ici, marquées « entrante »."] =
+        "Las solicitudes capturadas en |cFFE8B84B/comercio|r y |cFFE8B84B/hermandad|r de jugadores sin el addon también aparecen aquí, marcadas como « entrante ».",
+    ["Un artisan connu qui sait honorer une commande captée est notifié à sa prochaine connexion (voir « Confiées » dans le Carnet)."] =
+        "Un artesano conocido capaz de cumplir un pedido capturado recibe aviso en su próxima conexión (ver « Confiados » en el Libro).",
+    ["Le Carnet en détail"] = "El Libro en detalle",
+    ["|cFFE8B84BEn cours|r : tes commandes ouvertes ou acceptées par un artisan."] =
+        "|cFFE8B84BActivos|r: tus pedidos abiertos o aceptados por un artesano.",
+    ["|cFFE8B84BArchivées|r : tes commandes livrées ou annulées."] =
+        "|cFFE8B84BArchivados|r: tus pedidos entregados o cancelados.",
+    ["|cFFE8B84BConfiées|r : commandes gardées pour un artisan connu capable de les honorer, en attendant qu'il se reconnecte."] =
+        "|cFFE8B84BConfiados|r: pedidos guardados para un artesano conocido capaz de cumplirlos, esperando a que vuelva a conectarse.",
+    ["Depuis le Carnet, tu peux annuler une commande tant qu'elle n'est pas livrée."] =
+        "Desde el Libro, puedes cancelar un pedido mientras no esté entregado.",
+    ["Annuaire & social"] = "Directorio y social",
+    ["L'onglet Artisans liste les joueurs connus par source : guilde, amis, ajoutés manuellement, croisés récemment."] =
+        "La pestaña Artesanos lista los jugadores conocidos por fuente: hermandad, amigos, añadidos manualmente, vistos recientemente.",
+    ["Survole un joueur (tooltip) pour voir ses métiers et son niveau de compétence."] =
+        "Pasa el cursor sobre un jugador (tooltip) para ver sus profesiones y su nivel de habilidad.",
+    ["Clic droit sur un joueur (chat, groupe...) pour l'ajouter à ton annuaire — utile pour le retrouver même hors ligne."] =
+        "Clic derecho en un jugador (chat, grupo...) para añadirlo a tu directorio — útil para reencontrarlo incluso desconectado.",
+    ["La pastille verte/grise indique s'il est en ligne."] = "El punto verde/gris indica si está en línea.",
+    ["Réseau, confidentialité & statuts"] = "Red, privacidad y estados",
+    ["L'addon rejoint un canal dédié pour faire circuler le carnet entre joueurs de l'addon — aucun message lisible n'y est envoyé."] =
+        "El addon se une a un canal dedicado para transmitir el libro entre usuarios del addon — no se envía ningún mensaje legible.",
+    ["|cFFFFFFFF/co channel off|r le quitte à tout moment (whisper et guilde restent actifs) ; |cFFFFFFFF/co channel on|r le rejoint."] =
+        "|cFFFFFFFF/co channel off|r sale en cualquier momento (susurro y hermandad siguen activos); |cFFFFFFFF/co channel on|r vuelve a unirse.",
+    ["Statuts d'une commande : "] = "Estados de un pedido: ",
+}
+for k, v in pairs(es) do L[k] = v end
