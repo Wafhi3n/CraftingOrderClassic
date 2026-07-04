@@ -11,8 +11,11 @@
 -- COC.db.orders/muted/delivered (restauration inconditionnelle après pcall). Ne fait AUCUN envoi réseau.
 -- La virtualisation de la liste de plans se vérifie à l'œil (rappel imprimé en fin de suite).
 --
--- NB : fichier de QA. Pour l'exclure d'une release, retire cette ligne des 3 .toc + supprime le fichier.
+-- DEV-ONLY : tout le corps est encadré par les marqueurs --@debug@ / --@end-debug@ que le packager
+-- CurseForge RETIRE du build public (le zip livré n'a donc pas /cotest). En local, deploy.ps1 ne les
+-- retire PAS → la commande reste disponible pour la QA. Le fichier reste listé dans les .toc (parité).
 
+--@debug@
 local COC = CraftingOrderClassic
 local T = { pass = 0, fail = 0, log = {} }
 COC.SelfTest = T
@@ -141,3 +144,4 @@ end
 
 SLASH_COCTEST1 = "/cotest"
 SlashCmdList["COCTEST"] = function() if COC.SelfTest then COC.SelfTest:Run() end end
+--@end-debug@
