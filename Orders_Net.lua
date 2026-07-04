@@ -116,27 +116,31 @@ function Orders:_OnNew(message)
 end
 
 -- Transitions de cycle (CANCEL/ACK/DLV/DONE/NACK). Voir _CycleTargets pour le sens des messages.
-function Orders:_OnCycle(action, message)
+-- `sender` = émetteur RÉEL (nom court, posé par le transport, non falsifiable) → on l'utilise pour
+-- AUTORISER la transition, au lieu de faire confiance aveuglément au champ du payload (anti-griefing :
+-- sans ça, n'importe quel porteur pouvait annuler la commande d'autrui ou usurper l'accepteur/refuseur).
+function Orders:_OnCycle(action, message, sender)
     if action == "CANCEL" then
         local id = message:match("^ORD|CANCEL|(.+)$"); local o = id and COC.db.orders[id]
-        if o then o.status = "cancelled" end
+        if o and sender == o.buyer then o.status = "cancelled" end   -- seul l'AUTEUR peut annuler
     elseif action == "ACK" then
         local id, crafter = message:match("^ORD|ACK|([^|]*)|(.*)$"); local o = id and COC.db.orders[id]
-        if o then o.status = "accepted"; o.acceptedBy = (crafter ~= "" and crafter) or nil end
+        if o then o.status = "accepted"; o.acceptedBy = sender or (crafter ~= "" and crafter) or nil end   -- l'accepteur = l'émetteur
     elseif action == "DLV" then
         -- Crafteur → acheteur : « j'ai remis ». Passe « remise » (pas encore terminée) ; côté acheteur
-        -- on l'invite à confirmer la réception (bouton / auto-loot).
+        -- on l'invite à confirmer la réception (bouton / auto-loot). L'émetteur EST le crafteur.
         local id, crafter = message:match("^ORD|DLV|([^|]*)|(.*)$"); local o = id and COC.db.orders[id]
         if o and o.status ~= "done" then
-            o.status = "delivered"; o.acceptedBy = (crafter ~= "" and crafter) or o.acceptedBy
+            o.status = "delivered"; o.acceptedBy = sender or (crafter ~= "" and crafter) or o.acceptedBy
             if o.buyer == me() then self:AlertDelivered(o) end
         end
     elseif action == "DONE" then
         -- Acheteur → crafteur : confirmation de réception. Idempotent (DONE arrive en global ET whisper) :
         -- réputation créditée à la 1re transition vers « terminée », et seulement si JE suis le crafteur.
+        -- SEUL l'acheteur peut confirmer (sinon un tiers pourrait gonfler la réputation d'un crafteur).
         local id, crafter = message:match("^ORD|DONE|([^|]*)|(.*)$"); local o = id and COC.db.orders[id]
-        if o and o.status ~= "done" then
-            o.acceptedBy = (crafter ~= "" and crafter) or o.acceptedBy
+        if o and o.status ~= "done" and sender == o.buyer then
+            o.acceptedBy = (crafter ~= "" and crafter) or o.acceptedBy   -- attesté par l'acheteur : qui créditer
             o.status = "done"
             if o.acceptedBy == me() then
                 COC.db.delivered = (COC.db.delivered or 0) + 1   -- réputation : créditée à la confirmation acheteur
@@ -145,14 +149,16 @@ function Orders:_OnCycle(action, message)
             end
         end
     elseif action == "NACK" then
-        self:_OnNack(message)
+        self:_OnNack(message, sender)
     end
 end
 
 -- ORD|NACK : refus/désistement d'un artisan. acceptedBy==who → réouverte ; ordre nommé à moi → refusée.
-function Orders:_OnNack(message)
-    local id, who = message:match("^ORD|NACK|([^|]*)|(.*)$"); local o = id and COC.db.orders[id]
-    if not (o and who ~= "") then return end
+-- `who` = l'émetteur RÉEL (anti-spoof : sinon un tiers pouvait relâcher la commande acceptée par autrui).
+function Orders:_OnNack(message, sender)
+    local id, payloadWho = message:match("^ORD|NACK|([^|]*)|(.*)$"); local o = id and COC.db.orders[id]
+    local who = sender or payloadWho
+    if not (o and who and who ~= "") then return end
     if o.acceptedBy == who then
         o.status = "open"; o.acceptedBy = nil                   -- l'artisan se désiste → réouverte
     elseif o.buyer == me() and o.recipient == who then
@@ -171,8 +177,8 @@ function Orders:OnNetwork(sender, message)
     local action = message:match("^ORD|([A-Z]+)|")
     if action == "NEW" then self:_OnNew(message)
     elseif action == "SUGG" then self:_OnSuggest(message)
-    else self:_OnCycle(action, message) end
-    if COC.UI and COC.UI.Refresh then COC.UI:Refresh() end   -- maj live de la fenêtre si ouverte
+    else self:_OnCycle(action, message, sender) end
+    if COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end   -- maj live coalescée (rafales de fanout)
     local PW = COC.ProfWindow
     if PW and PW.RefreshOrders and PW.frame and PW.frame:IsShown() then PW:RefreshOrders() end
 end

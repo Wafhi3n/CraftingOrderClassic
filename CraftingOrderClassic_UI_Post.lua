@@ -32,11 +32,20 @@ end
 -- P2 : ai-je déjà TOUS les réactifs de cette recette dans mes sacs (GetItemCount, sacs seuls) ?
 -- false si la recette n'a pas de données `reagents` (CraftLink v6, cf. tools/gen_metadata.lua) —
 -- on ne peut alors ni confirmer ni infirmer, donc on ne la propose pas comme « prête ».
-local function hasReagentsInBags(c, prof, spellID)
+-- `countCache` (optionnel) mémoïse GetItemCount par itemID le temps d'UN refresh : un même réactif
+-- (ex. Bolt of Cloth) apparaît dans des dizaines de plans → sans cache on rappelait GetItemCount
+-- des centaines de fois par rafraîchissement de la liste.
+local function bagCount(id, cache)
+    if not cache then return GetItemCount(id, false) or 0 end
+    local v = cache[id]
+    if v == nil then v = GetItemCount(id, false) or 0; cache[id] = v end
+    return v
+end
+local function hasReagentsInBags(c, prof, spellID, countCache)
     local reag = spellID and c:RecipeReagents(prof, spellID)
     if not reag or #reag == 0 then return false end
     for _, rg in ipairs(reag) do
-        if (GetItemCount(rg[1], false) or 0) < rg[2] then return false end
+        if bagCount(rg[1], countCache) < rg[2] then return false end
     end
     return true
 end
@@ -280,6 +289,7 @@ function UI:RefreshPostPlans()
     -- cf. _TargetArtisanFilter). L'inverse du flux plan→artisans. artMode = libellé du mode (en-tête).
     local artFilter, artMode = nil, nil
     if self.postProf then artFilter, artMode = self:_TargetArtisanFilter(self.postProf) end
+    local countCache = {}   -- mémo GetItemCount par itemID, valable le temps de CE refresh (cf. hasReagentsInBags)
     local out = {}
     for _, e in ipairs(list) do
         -- Commande = objets CRAFTABLES uniquement (recette/sort) ; les récoltes pures (sans spellID)
@@ -291,7 +301,7 @@ function UI:RefreshPostPlans()
             if qmin and e.itemID then local q = select(3, GetItemInfo(e.itemID)); okq = q ~= nil and q >= qmin end
             local nm = entryName(e)
             if okq and (not s or s == "" or nm:lower():find(s, 1, true)) then
-                local ready = hasReagentsInBags(c, self.postProf, e.spellID)
+                local ready = hasReagentsInBags(c, self.postProf, e.spellID, countCache)
                 if not self.postReagFilter or ready then
                     out[#out + 1] = {e = e, name = nm, ready = ready}
                 end

@@ -31,11 +31,11 @@ function Dir:OnPresence(kind, who)
             if COC.UI and COC.UI.Toast then COC.UI:Toast(msg) end
         end
         if COC.Orders and COC.Orders.OnArtisanOnline then COC.Orders:OnArtisanOnline(who) end  -- push commande ciblée
-        self:Announce()                 -- un nouveau arrive → je (re)publie mes recettes
+        self:AnnounceThrottled()        -- un nouveau arrive → je (re)publie mes recettes (throttlé : anti-burst login en masse)
     else
         self.online[who] = nil
     end
-    if COC.UI and COC.UI.Refresh then COC.UI:Refresh() end
+    if COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end
 end
 
 -- Un artisan AJOUTÉ À LA MAIN qu'on voit enfin en ligne avec l'addon → liaison confirmée (#6).
@@ -108,7 +108,7 @@ end
 
 function Dir:ReclassifyAll()
     for name, r in pairs(self.roster or {}) do self:_ApplySource(name, r) end
-    if COC.UI and COC.UI.Refresh then COC.UI:Refresh() end
+    if COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end
 end
 
 -- ------------------------------------------------------------------
@@ -130,7 +130,7 @@ function Dir:_NoteConfederate(name, guild_id)   -- guild_id = guilde d'origine (
     local prev = self._confedSet[sn]
     if prev == nil or gid then self._confedSet[sn] = gid or prev or true end
     local r = self.roster and self.roster[sn]   -- reclasse maintenant si déjà connu, sinon à sa découverte
-    if r then self:_ApplySource(sn, r); if COC.UI and COC.UI.Refresh then COC.UI:Refresh() end end
+    if r then self:_ApplySource(sn, r); if COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end end
 end
 
 -- Greffe PASSIVE (hooksecurefunc = observe, ne remplace rien). API pas prête au login → retry ~1 min.
@@ -170,6 +170,9 @@ function Dir:PruneRoster(maxAgeDays, maxRecent)
         table.sort(recents, function(a, b) return a.t > b.t end)   -- garde les plus récents
         for i = maxRecent + 1, #recents do self.roster[recents[i].name] = nil end
     end
+    -- Prune du throttle de découverte (_lastPing, runtime) : > 5× la fenêtre de 60 s → inutile (borne mémoire).
+    local t = now()
+    for name, ts in pairs(self._lastPing or {}) do if t - ts > 300 then self._lastPing[name] = nil end end
 end
 
 -- RK reçu (recettes d'un autre) → cache roster persistant.
@@ -187,7 +190,7 @@ function Dir:OnRK(sender, message)
     self:_NoteLinked(sender, r)
     -- Un RK frais peut changer le filtre « plans de cet artisan » (onglet Commande) ou l'annuaire :
     -- on rafraîchit la vue courante (no-op si la fenêtre est fermée). Idem OnSkill.
-    if COC.UI and COC.UI.Refresh then COC.UI:Refresh() end
+    if COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end
 end
 
 -- Garantit une entrée roster pour un joueur QUI A RÉPONDU (a donc l'addon) : classe la source
@@ -237,7 +240,7 @@ end
 -- PONG reçu (l'autre A l'addon) → on le connaît : entrée roster (Croisé) + en ligne.
 function Dir:OnPong(sender)
     self:_Touch(sender)
-    if COC.UI and COC.UI.Refresh then COC.UI:Refresh() end
+    if COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end
 end
 
 -- ------------------------------------------------------------------
@@ -473,7 +476,7 @@ function Dir:_WireEvents()
         Dir:CaptureSkills(); Dir:AnnounceThrottled()
         local PW = COC.ProfWindow
         if PW and PW.frame and PW.frame:IsShown() and PW.Refresh then PW:Refresh() end
-        if COC.UI and COC.UI.Refresh then COC.UI:Refresh() end
+        if COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end
     end)
 end
 

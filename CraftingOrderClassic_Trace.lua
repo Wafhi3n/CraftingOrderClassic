@@ -31,7 +31,13 @@ function Trace:Log(cat, msg)
     local b = buf()
     local t = (date and date("%H:%M:%S")) or tostring((time and time()) or 0)
     b[#b + 1] = string.format("%s [%s] %s", t, tostring(cat or "?"), tostring(msg or ""))
-    if #b > CAP then table.remove(b, 1) end
+    -- Purge par LOT (décalage unique tous les ~100 dépassements) au lieu d'un table.remove(b,1) à
+    -- CHAQUE ligne une fois plein (O(n) par ligne). Ordre séquentiel préservé → SavedVariables lisible.
+    if #b > CAP + 100 then
+        local excess = #b - CAP
+        for i = 1, CAP do b[i] = b[i + excess] end
+        for i = CAP + 1, #b do b[i] = nil end
+    end
 end
 
 function Trace:Clear()

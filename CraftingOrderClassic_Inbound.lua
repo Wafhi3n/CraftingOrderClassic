@@ -141,17 +141,23 @@ function Inbound:Add(e)
     e.id = id; e.ts = time()
     e.status = (existing and existing.status == "dismissed") and "dismissed" or (existing and existing.status) or "new"
     COC.db.inbound[id] = e
-    -- Purge des trop vieilles / cap.
-    local n = 0
+    -- Purge des trop vieilles (EXPIRY) PUIS plafond MAX_IN (retire les plus anciennes) — anti-explosion
+    -- mémoire sur un canal Commerce actif. `e` vient d'être posée (ts = maintenant) → jamais retirée.
+    local survivors = {}
     for k, v in pairs(COC.db.inbound) do
-        if (time() - (v.ts or 0)) > EXPIRY then COC.db.inbound[k] = nil else n = n + 1 end
+        if (time() - (v.ts or 0)) > EXPIRY then COC.db.inbound[k] = nil
+        else survivors[#survivors + 1] = { k = k, ts = v.ts or 0 } end
+    end
+    if #survivors > MAX_IN then
+        table.sort(survivors, function(a, b) return a.ts > b.ts end)   -- plus récentes d'abord
+        for i = MAX_IN + 1, #survivors do COC.db.inbound[survivors[i].k] = nil end
     end
     if e.status == "new" then self:Alert(e) end
     if e.status == "new" and COC.Moderation then COC.Moderation:NotePost(e.buyer) end   -- anti-spam
     -- « Garder pour un ami capable » : si un artisan connu sait la faire, on me le signale et on la
     -- lui pousse (maintenant s'il est en ligne, sinon à sa connexion via Handoff:OnArtisanOnline).
     if e.status == "new" and COC.Handoff then COC.Handoff:NoteInbound(e) end
-    if COC.UI and COC.UI.Refresh then COC.UI:Refresh() end
+    if COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end
 end
 
 function Inbound:Alert(e)

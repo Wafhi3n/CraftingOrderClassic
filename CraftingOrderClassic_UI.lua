@@ -375,6 +375,18 @@ end
 -- ------------------------------------------------------------------
 -- Refresh global + statut + toggle
 -- ------------------------------------------------------------------
+-- Refresh COALESCÉ (0,1 s) pour les rafales réseau : un fanout NEW arrive par salves de whispers
+-- (~6/s) et chaque message appelait UI:Refresh → autant de redraws complets (dont RefreshPostPlans,
+-- coûteux). On regroupe. Les chemins INTERACTIFS (ouverture, onglet, clic action) appellent Refresh
+-- direct pour rester immédiats. Même patron que PW:Refresh / UI:_NamesDirty.
+function UI:RefreshSoon()
+    if not (C_Timer and C_Timer.After) then return self:Refresh() end
+    if not (self.frame and self.frame:IsShown()) then return end
+    if self._refreshPending then return end
+    self._refreshPending = true
+    C_Timer.After(0.1, function() UI._refreshPending = nil; UI:Refresh() end)
+end
+
 function UI:Refresh()
     if not self.frame or not self.frame:IsShown() then return end
     if     self.activeTab == "artisans"                          then self:RefreshArtisans()

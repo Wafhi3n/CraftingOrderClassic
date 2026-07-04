@@ -182,7 +182,7 @@ function Handoff:AlertCapable(o, tries)
     pmsg((Skin and ("|T" .. Skin.tex.workorder .. ":0|t ") or "") .. msg)
     if COC.UI and COC.UI.Toast then COC.UI:Toast(msg, Skin and Skin.tex.workorder) end
     pcall(function() PlaySound(SOUNDKIT and SOUNDKIT.TELL_MESSAGE or 3081, "Master") end)
-    if COC.UI and COC.UI.Refresh then COC.UI:Refresh() end
+    if COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end
 end
 
 -- ------------------------------------------------------------------

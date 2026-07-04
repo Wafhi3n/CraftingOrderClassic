@@ -19,8 +19,9 @@ local L = COC.L
 
 local CraftLink = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
 
-local ORDER_TTL  = 6 * 3600   -- 6 h : au-delà, une commande OUVERTE est tenue pour expirée (cachée/élaguée)
-local REBROADCAST = 2 * 3600  -- 2 h : ré-émission périodique de MES commandes ouvertes (anti-oubli réseau)
+local ORDER_TTL  = 6 * 3600     -- 6 h : au-delà, une commande OUVERTE est tenue pour expirée (cachée/élaguée)
+local REBROADCAST = 2 * 3600    -- 2 h : ré-émission périodique de MES commandes ouvertes (anti-oubli réseau)
+local DONE_RETENTION = 7 * 86400 -- 7 j (depuis la création) : au-delà, une commande TERMINÉE est purgée du cache
 
 local function me()  return (UnitName and UnitName("player")) or "?" end
 local function pmsg(m) print("|cFF33DD88Crafting Order|r " .. m) end
@@ -254,7 +255,7 @@ function Orders:AlertTargeted(o, tries)
         local alt = COC.Handoff:MyRerollCanCraft(o)
         if alt then COC.Handoff:AlertReroll(o, alt) end
     end
-    if COC.UI and COC.UI.Refresh then COC.UI:Refresh() end
+    if COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end
 end
 
 -- Ré-émet MES commandes ouvertes/acceptées. Appelée sur HI reçu, (re)acquisition du canal (bring-up)
@@ -269,10 +270,14 @@ function Orders:RebroadcastMine()
     end
 end
 
--- Resync sur HI : je ré-annonce MES commandes ouvertes/acceptées (jitté, anti-burst).
+-- Resync sur HI : je ré-annonce MES commandes ouvertes/acceptées. COALESCÉ (une salve de HI au
+-- login en masse ne doit pas rediffuser tout mon carnet en global N fois) : un seul rebroadcast par
+-- fenêtre ~3-6 s, jitté (anti-burst). Les pushes DIRIGÉS restent plafonnés ailleurs (OnArtisanOnline).
 function Orders:OnHello()
     if not (CraftLink and C_Timer) then return end
-    C_Timer.After(math.random() * 3, function() Orders:RebroadcastMine() end)
+    if self._rebTimer then return end
+    self._rebTimer = true
+    C_Timer.After(3 + math.random() * 3, function() Orders._rebTimer = nil; Orders:RebroadcastMine() end)
 end
 
 -- ------------------------------------------------------------------
@@ -289,14 +294,25 @@ function Orders:All()
     return out
 end
 
--- Élague du cache les commandes ouvertes trop vieilles (sauf les miennes, gardées pour réémission).
+-- Entretien du cache d'ordres (au démarrage) :
+--   * commandes OUVERTES d'autrui expirées (TTL) — les miennes restent (gardées pour réémission) ;
+--   * commandes TERMINÉES (livrée/annulée/refusée) trop anciennes (rétention, depuis la création) —
+--     sinon done/cancelled/declined + toutes mes archives s'accumulaient sans borne dans la SV ;
+--   * ids « en sourdine » orphelins (leur commande a été purgée) — sinon COC.db.muted enflait sans fin.
 function Orders:PruneExpired()
     if not COC.db then return end
-    local now = time()
-    for id, o in pairs(COC.db.orders or {}) do
-        if o.status == "open" and o.buyer ~= me() and (now - (o.ts or now)) > ORDER_TTL then
-            COC.db.orders[id] = nil
+    local now, m = time(), me()
+    local orders = COC.db.orders or {}
+    for id, o in pairs(orders) do
+        local terminal = o.status == "done" or o.status == "cancelled" or o.status == "declined"
+        if o.status == "open" and o.buyer ~= m and (now - (o.ts or now)) > ORDER_TTL then
+            orders[id] = nil
+        elseif terminal and (now - (o.ts or now)) > DONE_RETENTION then
+            orders[id] = nil
         end
+    end
+    if COC.db.muted then
+        for id in pairs(COC.db.muted) do if not orders[id] then COC.db.muted[id] = nil end end
     end
 end
 

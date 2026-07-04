@@ -57,5 +57,5 @@ function Dir:OnSkill(sender, message)
             if key then r.skill[key] = { tonumber(cur), tonumber(max) } end
         end
     end
-    if COC.UI and COC.UI.Refresh then COC.UI:Refresh() end
+    if COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end
 end

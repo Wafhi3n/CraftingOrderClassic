@@ -46,6 +46,16 @@ function COC:Scan()
     end
 end
 
+-- Scan DÉBOUNCÉ : TRADE_SKILL_UPDATE / CRAFT_UPDATE spamment pendant un craft en série (20 objets =
+-- 20+ events) → on regroupe en une seule capture sous 0,3 s (l'union est idempotente de toute façon).
+-- pcall : un pépin de lecture de la fenêtre ne doit pas remonter en erreur Lua visible au joueur.
+function COC:ScanSoon()
+    if self._scanTimer then return end
+    if not (C_Timer and C_Timer.After) then pcall(COC.Scan, COC); return end
+    self._scanTimer = true
+    C_Timer.After(0.3, function() COC._scanTimer = nil; pcall(COC.Scan, COC) end)
+end
+
 -- /co : statut. Infra CraftLink (catalogue + versions) + MES recettes captées (autonome).
 function COC:Status()
     local L = COC.L
@@ -332,7 +342,7 @@ f:SetScript("OnEvent", function(_, event, arg1)
             end)
         end
     else
-        -- TRADE_SKILL_* / CRAFT_* : la fenêtre est lisible → on capte.
-        pcall(function() COC:Scan() end)
+        -- TRADE_SKILL_* / CRAFT_* : la fenêtre est lisible → on capte (débouncé, cf. COC:ScanSoon).
+        COC:ScanSoon()
     end
 end)
