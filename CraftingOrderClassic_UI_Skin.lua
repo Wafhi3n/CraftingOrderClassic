@@ -59,6 +59,7 @@ function Skin.ProfIcon(key)
     local sid = Skin.profSpellID[key]
     if sid and GetSpellTexture then local t = GetSpellTexture(sid); if t then return t end end
     if key == "Elemental" then return "Interface\\Icons\\Spell_Fire_FlameBolt" end
+    if key == "Poisons"   then return "Interface\\Icons\\Trade_BrewPoison" end   -- pas de spell d'apprenti
     return nil
 end
 

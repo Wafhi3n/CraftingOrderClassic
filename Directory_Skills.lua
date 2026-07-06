@@ -48,13 +48,26 @@ function Dir:OnSkill(sender, message)
     if not body then body = message:match("^SK|(.+)$") end
     if not body then return end
     local r = self:_Touch(sender)
-    r.skill = r.skill or {}
     if lvl then r.level = tonumber(lvl) end
+    -- SK = énumération COMPLÈTE des métiers RÉELS du perso courant de l'émetteur (GetNumSkillLines,
+    -- jamais bleedée par les alts contrairement au RK). On reconstruit à neuf (un métier abandonné
+    -- disparaît) puis on s'en sert comme vérité terrain pour purger les RK périmés.
+    local skills = {}
     for chunk in body:gmatch("[^;]+") do
         local rep = chunk:match("^rep=(%d+)$")           -- réputation = pseudo-chunk final
         if rep then r.rep = tonumber(rep) else
             local key, cur, max = chunk:match("^([^,]+),(%d+),(%d+)$")
-            if key then r.skill[key] = { tonumber(cur), tonumber(max) } end
+            if key then skills[key] = { tonumber(cur), tonumber(max) } end
+        end
+    end
+    if next(skills) then
+        r.skill = skills
+        -- Purge la fuite d'alts : un RK pour un métier que le perso n'a pas réellement (absent du SK)
+        -- est périmé/bleedé par un vieux client (ex. « Poisons » diffusé par un non-voleur) → on l'enlève.
+        if r.recipes then
+            for prof in pairs(r.recipes) do
+                if not skills[prof] then r.recipes[prof] = nil end
+            end
         end
     end
     if COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end

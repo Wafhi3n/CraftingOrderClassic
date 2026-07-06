@@ -46,6 +46,15 @@ local es = {
         "Paneles complementarios en la ventana de intercambio y correo para entregar un pedido sin abrir el libro.",
     ["La colonne Commandes peut s'ancrer à droite de la fenêtre métier native (vue Blizzard)."] =
         "La columna Pedidos puede anclarse a la derecha de la ventana de profesión nativa (vista Blizzard).",
+    ["Amis Battle.net + commande par métier"] = "Amigos de Battle.net + pedido por profesión",
+    ["Les métiers et le menu Crafting Order fonctionnent maintenant sur les amis Battle.net, pas seulement les amis ajoutés par personnage."] =
+        "Las profesiones y el menú de Crafting Order ahora funcionan con amigos de Battle.net, no solo con amigos añadidos por personaje.",
+    ["Clic droit sur un artisan : une entrée « Passer commande » par métier, qui ouvre l'onglet Commande déjà réglé sur ce métier."] =
+        "Clic derecho en un artesano: una entrada « Pedir » por profesión, que abre la pestaña Pedido ya ajustada a esa profesión.",
+    ["Le résumé d'un artisan indique la profondeur de son carnet (« · N plans ») ; maintiens Maj sur son infobulle en jeu pour lister ses recettes connues."] =
+        "El resumen de un artesano indica la amplitud de su recetario (« · N recetas »); mantén Mayús sobre su información en el mundo para listar las recetas que conoce.",
+    ["Correctif : un personnage n'affiche plus par erreur les métiers de ses rerolls dans ton annuaire."] =
+        "Corrección: un personaje ya no muestra por error las profesiones de sus alts en tu directorio.",
     ["Allemand et espagnol + onglet Nouveautés"] = "Alemán y español + pestaña Novedades",
     ["L'interface se traduit en allemand et en espagnol selon la langue de ton client WoW."] =
         "La interfaz se traduce al alemán y al español según el idioma de tu cliente de WoW.",
@@ -82,6 +91,7 @@ local es = {
     ["diag"] = "diag", ["Sourdine"] = "Silencio", ["Réafficher"] = "Mostrar",
     ["Muter"] = "Silenciar", ["Ajouter aux artisans"] = "Añadir a artesanos",
     ["Passer commande à %s"] = "Pedir a %s", ["Passer commande"] = "Hacer pedido",
+    ["Passer commande à %s (%s)"] = "Pedir a %s (%s)",
     ["%s est mis en sourdine — plus aucune notification de sa part."] = "%s ha sido silenciado — no más notificaciones suyas.",
     ["%s n'est plus en sourdine."] = "%s ya no está silenciado.",
     ["usage : /co unmute <nom>"] = "uso: /co unmute <nombre>",
@@ -93,6 +103,9 @@ local es = {
     ["muter/démuter un joueur (aucune notif de sa part)"] = "silenciar/reactivar a un jugador (ninguna notificación suya)",
     ["seuil de mute auto des persos bas niveau (défaut 5)"] = "umbral de silencio auto para personajes de nivel bajo (por defecto 5)",
     ["%d livrés"] = "%d entregados",
+    ["· %d plans"] = "· %d recetas",
+    ["+%d de plus"] = "+%d más",
+    ["Maj : plans connus"] = "Mayús: recetas conocidas",
     ["ton reroll |cFFFFFFFF%s|r sait le faire : %s"] = "tu alt |cFFFFFFFF%s|r sabe hacerlo: %s",
     ["COMPOSANTS FOURNIS"] = "COMPONENTES APORTADOS", ["À FOURNIR"] = "APORTAR", ["complet"] = "completo",
     ["chargé — |cFFFFFFFF/co help|r pour les commandes. (Réseau global de craft — autonome.)"] =

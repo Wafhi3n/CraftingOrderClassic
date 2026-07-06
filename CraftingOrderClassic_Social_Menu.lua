@@ -15,12 +15,24 @@ local Social = COC.Social
 -- PLAYER/TARGET/PARTY/RAID_PLAYER = joueurs croisés (monde, cadre d'unité, groupe).
 local MENU_TAGS = {
     "MENU_UNIT_FRIEND", "MENU_UNIT_FRIEND_OFFLINE",
+    "MENU_UNIT_BN_FRIEND",                          -- ami Battle.net EN LIGNE (perso résolu ci-dessous)
     "MENU_UNIT_PLAYER", "MENU_UNIT_TARGET",
     "MENU_UNIT_PARTY",  "MENU_UNIT_RAID_PLAYER",
 }
 
+-- Ami Battle.net : le menu ne passe que le nom de COMPTE (contextData.name = « Volkdieb »), jamais le
+-- nom du PERSONNAGE joué → notre roster (indexé par perso) ne le trouve pas et la section n'apparaît
+-- pas. On résout le perso WoW via bnetIDAccount (Social:BNetCharFromAccount gate client + version).
+local function bnetCharacterName(contextData)
+    local id = contextData and contextData.bnetIDAccount
+    if not (id and C_BattleNet and C_BattleNet.GetAccountInfoByID) then return nil end
+    return Social:BNetCharFromAccount(C_BattleNet.GetAccountInfoByID(id))
+end
+
 local function targetName(contextData)
     if not contextData then return nil end
+    -- BNet d'abord : contextData.name est le compte, pas le perso.
+    if contextData.bnetIDAccount then return bnetCharacterName(contextData) end
     if contextData.name and contextData.name ~= "" then return contextData.name end
     if contextData.unit and UnitName then return UnitName(contextData.unit) end
     return nil
@@ -32,6 +44,11 @@ local function addEntries(_, rootDescription, contextData)
     local name = targetName(contextData)
     if not (name and name ~= "") then return end
     if contextData.unit and UnitIsUnit and UnitIsUnit(contextData.unit, "player") then return end  -- pas soi-même
+    -- Découverte proactive MODÉRÉE (cf. Social:MaybeDiscover — ne ping que si métiers manquants,
+    -- anti-rafale + throttle 60 s/nom) : rafraîchit skill/recipes pour que le PROCHAIN clic-droit ait
+    -- ses métiers (SK/RK arrivent en whisper, async). Sans ça, un ami capté tard n'affichait la section
+    -- qu'« au hasard » d'un message reçu (cf. clic-droit répété).
+    Social:MaybeDiscover(name)
     -- Uniquement un porteur d'addon découvert (roster). Exclut de fait les non-porteurs et l'ennemi
     -- (jamais découvert : DiscoverPlayer ne ping que les alliés coopérables).
     local D = COC.Directory
@@ -44,9 +61,22 @@ local function addEntries(_, rootDescription, contextData)
     local L = COC.L
     rootDescription:CreateDivider()
     rootDescription:CreateTitle("Crafting Order")
-    rootDescription:CreateButton(string.format(L["Passer commande à %s"], name), function()
-        if COC.UI and COC.UI.OpenPostForArtisan then COC.UI:OpenPostForArtisan(name) end
-    end)
+    -- Une entrée « Commander <métier> » par métier PRIMAIRE craftable connu (pré-cible le joueur ET le
+    -- métier) ; repli sur l'entrée générique si on ne connaît aucun métier craftable de sa part.
+    local orderable = Social.OrderableProfs and Social:OrderableProfs(name) or {}
+    local Skin = COC.UI and COC.UI.Skin
+    if #orderable > 0 then
+        for _, prof in ipairs(orderable) do
+            local lbl = (Skin and Skin.ProfLabel(prof)) or prof
+            rootDescription:CreateButton(string.format(L["Passer commande à %s (%s)"], name, lbl), function()
+                if COC.UI and COC.UI.OpenPostForArtisan then COC.UI:OpenPostForArtisan(name, prof) end
+            end)
+        end
+    else
+        rootDescription:CreateButton(string.format(L["Passer commande à %s"], name), function()
+            if COC.UI and COC.UI.OpenPostForArtisan then COC.UI:OpenPostForArtisan(name) end
+        end)
+    end
     rootDescription:CreateButton(L["Ajouter aux artisans"], function()
         if COC.UI and COC.UI._AddArtisan then COC.UI:_AddArtisan(name) end
     end)

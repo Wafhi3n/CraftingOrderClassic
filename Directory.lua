@@ -181,8 +181,8 @@ function Dir:OnRK(sender, message)
     local prof, hex, dv = CraftLink:ParseRK(message)
     if not prof then return end
     local r = self.roster[sender]; if not r then r = {}; self.roster[sender] = r end
-    r.recipes = r.recipes or {}
-    r.recipes[prof] = hex
+    if r.skill and next(r.skill) and not r.skill[prof] then return end  -- anti fuite d'alts : SK = vérité terrain
+    r.recipes = r.recipes or {}; r.recipes[prof] = hex
     r.recipeDV = dv
     self:_ApplySource(sender, r)          -- guilde/ami si reconnu, sinon « recent »
     r.lastSeen = time()
@@ -246,26 +246,26 @@ end
 -- ------------------------------------------------------------------
 -- Émission
 -- ------------------------------------------------------------------
--- Publie MES recettes (un RK par métier) + MES niveaux de skill sur le canal global.
+-- SK PUIS RK (ordre voulu : le receveur établit la vérité terrain des métiers avant les recettes → garde anti-fuite OnRK).
 function Dir:Announce()
     if not (CraftLink and CraftLink:IsNetworkReady()) then return end
+    self:AnnounceSkills()
     for _, prof in ipairs(CraftLink:MyProfessions()) do
         local msg = CraftLink:BuildRK(prof)
         if msg then CraftLink:Send(msg, "global") end
     end
-    self:AnnounceSkills()
 end
 
 -- Publie MON profil DIRECTEMENT à un joueur (whisper) — fiable hors canal/guilde. Sert aux réponses
 -- de découverte dirigée (HI/PING whisper) : l'autre reçoit mes métiers + niveaux immédiatement.
 function Dir:AnnounceTo(target)
     if not (CraftLink and target) then return end
+    local sk = self:_SkillPayload()
+    if sk then CraftLink:Send(sk, "whisper", target) end     -- SK d'abord (vérité terrain avant les RK)
     for _, prof in ipairs(CraftLink:MyProfessions()) do
         local msg = CraftLink:BuildRK(prof)
         if msg then CraftLink:Send(msg, "whisper", target) end
     end
-    local sk = self:_SkillPayload()
-    if sk then CraftLink:Send(sk, "whisper", target) end
 end
 
 -- Découverte DIRIGÉE d'un joueur (croisement / ajout manuel) : on lui chuchote PING + HI. S'il a

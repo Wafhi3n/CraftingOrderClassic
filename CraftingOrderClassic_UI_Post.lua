@@ -79,7 +79,7 @@ end
 
 -- Professions de récolte pure (aucune recette) → exclues de l'onglet Commande, elles vivent
 -- dans l'onglet Récolte. Mining reste ici (fonte = recettes) ET dans Récolte (minerais).
-local GATHER_ONLY = { Fishing = true, Herbalism = true, Skinning = true }
+local GATHER_ONLY = COC.GATHER_ONLY   -- source partagée (cf. CraftingOrderClassic.lua)
 
 -- =========================================================================
 -- Panneau gauche : dropdown métier + liste des plans

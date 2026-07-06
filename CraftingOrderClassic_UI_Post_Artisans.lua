@@ -179,11 +179,15 @@ end
 -- CRAFTABLE connu de l'artisan ; le dropdown se corrige de lui-même si c'est une récolte pure
 -- (cf. _RefreshProfDropdown). postTarget = "@Nom" → la liste de plans se filtre à ce que l'artisan sait.
 -- =========================================================================
-function UI:OpenPostForArtisan(name)
+function UI:OpenPostForArtisan(name, prof)
     if not (name and name ~= "" and self.frame) then return end
     local D = COC.Directory
     local r = D and D.roster and D.roster[name]
-    if r then
+    if prof then
+        -- Métier explicite (entrée « Commander <métier> » du menu) : pré-sélection directe. Le dropdown
+        -- se corrige seul si ce n'est pas craftable (récolte pure) — cf. _RefreshProfDropdown.
+        self.postProf = prof
+    elseif r then
         local pick
         for p in pairs(r.skill or {})   do pick = p; break end
         if not pick then for p in pairs(r.recipes or {}) do pick = p; break end end

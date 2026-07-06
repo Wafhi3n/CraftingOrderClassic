@@ -15,6 +15,15 @@ local BODY_W = 780
 local function versions()
     return {
         {
+            v = "v1.7.0", title = L["Amis Battle.net + commande par métier"],
+            lines = {
+                L["Les métiers et le menu Crafting Order fonctionnent maintenant sur les amis Battle.net, pas seulement les amis ajoutés par personnage."],
+                L["Clic droit sur un artisan : une entrée « Passer commande » par métier, qui ouvre l'onglet Commande déjà réglé sur ce métier."],
+                L["Le résumé d'un artisan indique la profondeur de son carnet (« · N plans ») ; maintiens Maj sur son infobulle en jeu pour lister ses recettes connues."],
+                L["Correctif : un personnage n'affiche plus par erreur les métiers de ses rerolls dans ton annuaire."],
+            },
+        },
+        {
             v = "v1.6.0", title = L["Allemand et espagnol + onglet Nouveautés"],
             lines = {
                 L["L'interface se traduit en allemand et en espagnol selon la langue de ton client WoW."],

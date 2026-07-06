@@ -52,6 +52,15 @@ if loc == "enUS" or loc == "enGB" then
             "Companion panels on the trade and mail windows to deliver an order without opening the board.",
         ["La colonne Commandes peut s'ancrer à droite de la fenêtre métier native (vue Blizzard)."] =
             "The Orders column can dock to the right of the native profession window (Blizzard view).",
+        ["Amis Battle.net + commande par métier"] = "Battle.net friends + order by profession",
+        ["Les métiers et le menu Crafting Order fonctionnent maintenant sur les amis Battle.net, pas seulement les amis ajoutés par personnage."] =
+            "Professions and the Crafting Order menu now work on Battle.net friends, not just character friends.",
+        ["Clic droit sur un artisan : une entrée « Passer commande » par métier, qui ouvre l'onglet Commande déjà réglé sur ce métier."] =
+            "Right-click a crafter: one \"Order\" entry per profession, opening the Order tab already set to that profession.",
+        ["Le résumé d'un artisan indique la profondeur de son carnet (« · N plans ») ; maintiens Maj sur son infobulle en jeu pour lister ses recettes connues."] =
+            "A crafter's summary shows how deep their book is (\"· N recipes\"); hold Shift over their in-world tooltip to list the recipes they know.",
+        ["Correctif : un personnage n'affiche plus par erreur les métiers de ses rerolls dans ton annuaire."] =
+            "Fix: a character no longer shows their alts' professions by mistake in your directory.",
         ["Allemand et espagnol + onglet Nouveautés"] = "German and Spanish + a What's New tab",
         ["L'interface se traduit en allemand et en espagnol selon la langue de ton client WoW."] =
             "The interface is translated into German and Spanish depending on your WoW client language.",
@@ -91,6 +100,7 @@ if loc == "enUS" or loc == "enGB" then
         -- Modération / anti-spam (/co mute|unmute|lowlevel, popup spam, menu contextuel joueur)
         ["Muter"] = "Mute", ["Ajouter aux artisans"] = "Add to artisans",
         ["Passer commande à %s"] = "Order from %s", ["Passer commande"] = "Place order",
+        ["Passer commande à %s (%s)"] = "Order from %s (%s)",
         ["%s est mis en sourdine — plus aucune notification de sa part."] = "%s is now muted — no more notifications from them.",
         ["%s n'est plus en sourdine."] = "%s is no longer muted.",
         ["usage : /co unmute <nom>"] = "usage: /co unmute <name>",
@@ -103,6 +113,10 @@ if loc == "enUS" or loc == "enGB" then
         ["seuil de mute auto des persos bas niveau (défaut 5)"] = "auto-mute threshold for low-level characters (default 5)",
         -- Réputation sociale (crafts livrés, diffusée via SK)
         ["%d livrés"] = "%d delivered",
+        -- Profondeur du carnet + dépliage des plans connus (tooltip social)
+        ["· %d plans"] = "· %d recipes",
+        ["+%d de plus"] = "+%d more",
+        ["Maj : plans connus"] = "Shift: known recipes",
         -- Rerolls / alts du compte
         ["ton reroll |cFFFFFFFF%s|r sait le faire : %s"] = "your alt |cFFFFFFFF%s|r can make this: %s",
         -- Panneau « composants » des cartes de commande

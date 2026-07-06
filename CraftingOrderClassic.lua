@@ -19,6 +19,11 @@ local CraftLink = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
 -- l'annuaire/tooltip/pills. Clés CraftLink exactes (cf. Libs/CraftLink-1.0/Data/*/{Cooking,FirstAid,Fishing}.lua).
 COC.SECONDARY_PROF = { Cooking = true, ["First Aid"] = true, Fishing = true }
 
+-- Métiers de RÉCOLTE pure — source de vérité PARTAGÉE (UI_Post, Social_Menu). On ne passe pas de
+-- commande de CRAFT dessus : le dropdown de la fenêtre Commande les exclut et les entrées « Commander
+-- <métier> » du menu clic-droit ne les proposent pas. (Minage reste craftable : fonte/smelting.)
+COC.GATHER_ONLY = { Fishing = true, Herbalism = true, Skinning = true }
+
 local function p(msg) print("|cFF33DD88Crafting Order|r " .. msg) end
 
 -- Registre de recettes PAR PERSO. La SavedVariables est partagée par COMPTE, donc on partitionne

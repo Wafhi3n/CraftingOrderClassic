@@ -19,14 +19,27 @@ local function ensureFriendTip()
     return friendTip
 end
 
+-- Résout le nom de perso ciblé par une ligne d'amis : ami-perso (type WOW) → nom direct ;
+-- ami Battle.net → perso WoW joué (Social:BNetCharFromAccount gate client + version, nil sinon).
+local function friendLineName(button)
+    if not (button and button.id) then return nil end
+    if button.buttonType == FRIENDS_BUTTON_TYPE_WOW then
+        local info = C_FriendList and C_FriendList.GetFriendInfoByIndex(button.id)
+        return info and info.name
+    elseif button.buttonType == FRIENDS_BUTTON_TYPE_BNET then
+        if not (C_BattleNet and C_BattleNet.GetFriendAccountInfo) then return nil end
+        return Social:BNetCharFromAccount(C_BattleNet.GetFriendAccountInfo(button.id))
+    end
+    return nil
+end
+
 local function onFriendTooltip(button)
     local tip = ensureFriendTip()
     tip:Hide()
-    -- Amis-perso (type WOW) uniquement ; les amis BNet (nom de compte ≠ nom de perso) sont ignorés.
-    if not (button and FRIENDS_BUTTON_TYPE_WOW and button.buttonType == FRIENDS_BUTTON_TYPE_WOW) then return end
-    if not (C_FriendList and button.id) then return end
-    local info = C_FriendList.GetFriendInfoByIndex(button.id)
-    local name = info and info.name
+    local name = friendLineName(button)
+    -- Survol = découverte proactive MODÉRÉE (anti-rafale contre le balayage souris + throttle 60 s/nom ;
+    -- ne ping que si métiers inconnus) → skill/recipes se remplissent avant le clic-droit.
+    if name then Social:MaybeDiscover(name) end
     local summary = name and Social:ProfSummary(name)
     if not (summary and FriendsTooltip) then return end
     tip:SetOwner(UIParent, "ANCHOR_NONE")
@@ -76,6 +89,9 @@ local function updateGuildBox()
     if not box then return end
     local name = GuildFrame and GuildFrame.selectedName
     if name and Ambiguate then name = Ambiguate(name, "short") end
+    -- Sélection d'un guildie = découverte proactive MODÉRÉE (anti-rafale + throttle 60 s/nom, seulement
+    -- si métiers inconnus) → métiers à jour dans l'encart.
+    if name then Social:MaybeDiscover(name) end
     local summary = name and Social:ProfSummary(name)
     if not (summary and GuildMemberDetailFrame:IsShown()) then box:Hide(); return end
     box.text:SetText("|cFF33DD88Crafting Order|r   " .. summary)

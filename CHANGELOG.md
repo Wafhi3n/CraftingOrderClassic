@@ -1,5 +1,29 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.7.0 — Battle.net friends, and ordering by profession
+
+Friends-list professions and the right-click Crafting Order menu used to work only on friends you'd
+added by character name. Add someone by their Battle.net account and they got skipped. Now the addon
+resolves the character they're actually playing, so a Battle.net friend on your realm shows their
+professions on hover and gets the full menu, the same as a character friend.
+
+Right-clicking a crafter gave you a single "Order from ___". Now you get one entry per profession they
+craft, and each opens the Order tab already set to it. A miner-blacksmith shows Mining and
+Blacksmithing; an alchemist who also gathers herbs just shows Alchemy, since you can't place a craft
+order against a gathering skill.
+
+A crafter's summary now shows how deep their book is, like "· 142 recipes", beside their skill. Hold
+Shift over their tooltip out in the world and it lists the recipes by name, grouped by profession.
+
+Fixed characters showing professions they don't have. If someone's addon was broadcasting recipes from
+their other characters, a warrior could turn up in your directory with a rogue's Poisons. Skill levels
+are the truth about which professions a character really has, so the directory now uses them to drop
+anything that doesn't belong, even when the sender keeps pushing the stale data from an older build.
+
+Hovering a friend, opening their menu, or selecting a guildmate now nudges a discovery ping so their
+professions fill in before you act instead of after. It's throttled and skips anyone already known, so
+running your mouse down the Friends list won't spam the channel.
+
 ## v1.6.0 — German and Spanish, plus an in-game What's New tab
 
 Crafting Order now speaks German and Spanish. The whole interface switches with your client language:

@@ -8,11 +8,44 @@ local COC    = CraftingOrderClassic
 local Social = {}
 COC.Social   = Social
 
+local CraftLink = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
+
 local function GetSkin() return COC.UI and COC.UI.Skin end
+
+-- Découverte MODÉRÉE depuis une interaction UI (survol d'ami, ouverture de menu, sélection guilde).
+-- Trois garde-fous CUMULÉS pour ne jamais spammer le réseau :
+--   1) on ne ping QUE si ses métiers manquent (ni skill ni recipes en roster) → un crafteur déjà connu
+--      n'est jamais re-pingé au survol ;
+--   2) throttle GLOBAL 1,5 s → une rafale (balayage souris sur la liste d'amis) ne lance qu'UN ping ;
+--   3) DiscoverPlayer reste throttlé 60 s/nom en dernier rempart.
+local _lastInteractDiscover = 0
+function Social:MaybeDiscover(name)
+    local D = COC.Directory
+    if not (name and name ~= "" and D and D.DiscoverPlayer) then return end
+    local r = D.roster and D.roster[name]
+    if r and (r.skill or r.recipes) then return end                 -- déjà connu → inutile
+    local t = (GetTime and GetTime()) or 0
+    if t - _lastInteractDiscover < 1.5 then return end              -- anti-rafale (sweep souris)
+    _lastInteractDiscover = t
+    D:DiscoverPlayer(name)
+end
 
 -- Métiers SECONDAIRES : jamais affichés dans le résumé social (seuls les PRIMAIRES intéressent la
 -- prise de commande). Table PARTAGÉE définie dans CraftingOrderClassic.lua (source unique).
 local SECONDARY_PROF = COC.SECONDARY_PROF
+
+-- =========================================================================
+-- Résolution Battle.net → nom de PERSONNAGE WoW. Les surfaces natives d'amis BNet (menu, tooltip)
+-- exposent le nom de COMPTE, pas le perso joué ; notre roster est indexé par perso. On extrait le
+-- perso d'un BNetAccountInfo (C_BattleNet.*), SEULEMENT s'il joue à CETTE version de WoW (même
+-- client + wowProjectID). nil sinon : Retail, autre jeu Blizzard, ou hors ligne → rien à cibler.
+-- =========================================================================
+function Social:BNetCharFromAccount(acc)
+    local g = acc and acc.gameAccountInfo
+    if not g or g.clientProgram ~= BNET_CLIENT_WOW then return nil end
+    if WOW_PROJECT_ID and g.wowProjectID and g.wowProjectID ~= WOW_PROJECT_ID then return nil end
+    return (g.characterName and g.characterName ~= "") and g.characterName or nil
+end
 
 -- =========================================================================
 -- Résumé métiers d'un joueur connu (roster CraftLink) — icônes INLINE + niveaux. Métiers PRIMAIRES
@@ -29,15 +62,22 @@ function Social:ProfSummary(name)
         local t = sk and sk.ProfIcon(key)
         return t and ("|T" .. t .. ":14:14:0:0|t") or (sk and sk.ProfLabel(key) or key)
     end
+    -- Suffixe « · N plans » : profondeur du carnet connu de ce joueur pour CE métier (bitfield RK
+    -- décompté sans matérialiser le set). nil/0 → rien (SK sans RK, ou catalogue absent).
+    local function recipeCount(key)
+        local hex = r.recipes and r.recipes[key]
+        local n = (CraftLink and hex) and CraftLink:CountKnown(key, hex) or 0
+        return (n > 0) and ("  |cFF8FbFa0" .. string.format(COC.L["· %d plans"], n) .. "|r") or ""
+    end
     local parts = {}
     -- Priorité : niveaux SK reçus (plus précis — icône + « 250/300 »).
     for key, sv in pairs(r.skill or {}) do
-        if not SECONDARY_PROF[key] then parts[#parts + 1] = profMark(key) .. " " .. sv[1] .. "/" .. sv[2] end
+        if not SECONDARY_PROF[key] then parts[#parts + 1] = profMark(key) .. " " .. sv[1] .. "/" .. sv[2] .. recipeCount(key) end
     end
     -- Fallback : métiers connus via bitfield RK, sans niveau → icône seule.
     if #parts == 0 then
         for key in pairs(r.recipes or {}) do
-            if not SECONDARY_PROF[key] then parts[#parts + 1] = profMark(key) end
+            if not SECONDARY_PROF[key] then parts[#parts + 1] = profMark(key) .. recipeCount(key) end
         end
     end
     -- Dernier recours : non-porteur d'addon VU crafter (CHAT_MSG_LOOT) → plancher de skill « N+ ».
@@ -55,6 +95,73 @@ function Social:ProfSummary(name)
 end
 
 -- =========================================================================
+-- Détail des recettes connues d'un joueur (déplié sur Maj), groupé par métier PRIMAIRE. Décode le
+-- bitfield RK en spellID → nom localisé (GetSpellInfo). Plafonné par métier (perProfCap) pour ne pas
+-- déborder l'écran : au-delà, une ligne « +N de plus ». Renvoie une liste { {text=, header=} } ou nil.
+-- =========================================================================
+-- Check LÉGER (pas de décodage) : ce joueur a-t-il au moins un métier PRIMAIRE avec un bitfield RK
+-- non vide ? Sert à n'afficher le rappel « Maj » que quand il y a réellement des plans à déplier.
+function Social:HasRecipeDetail(name)
+    if not (name and COC.Directory) then return false end
+    local r = COC.Directory.roster[name]
+    if not (r and r.recipes) then return false end
+    for key, hex in pairs(r.recipes) do
+        if not SECONDARY_PROF[key] and hex and hex ~= "" then return true end
+    end
+    return false
+end
+
+function Social:RecipeDetail(name, perProfCap)
+    if not (name and CraftLink and COC.Directory) then return nil end
+    local r = COC.Directory.roster[name]
+    if not (r and r.recipes) then return nil end
+    perProfCap = perProfCap or 20
+    local sk = GetSkin()
+    local lines = {}
+    for key, hex in pairs(r.recipes) do
+        if not SECONDARY_PROF[key] then
+            local set = CraftLink:DecodeKnown(key, hex)
+            local names = {}
+            for spellID in pairs(set or {}) do names[#names + 1] = CraftLink:RecipeName(spellID) end
+            if #names > 0 then
+                table.sort(names)
+                lines[#lines + 1] = { header = true, text = (sk and sk.ProfLabel(key)) or key }
+                for i = 1, math.min(#names, perProfCap) do lines[#lines + 1] = { text = names[i] } end
+                if #names > perProfCap then
+                    lines[#lines + 1] = { dim = true, text = string.format(COC.L["+%d de plus"], #names - perProfCap) }
+                end
+            end
+        end
+    end
+    return (#lines > 0) and lines or nil
+end
+
+-- =========================================================================
+-- Métiers CRAFTABLES connus d'un joueur, pour les entrées « Commander <métier> » du menu clic-droit.
+-- skill ∪ recipes, moins les SECONDAIRES (pas de commande — cf. COC.SECONDARY_PROF) et les récoltes
+-- pures (COC.GATHER_ONLY) que la fenêtre Commande n'accepte pas. Trié par libellé localisé (ordre
+-- stable pour l'UI). Renvoie un tableau de clés métier (typiquement 0..2 métiers primaires).
+-- =========================================================================
+function Social:OrderableProfs(name)
+    if not (name and COC.Directory) then return {} end
+    local r = COC.Directory.roster[name]
+    if not r then return {} end
+    local gather = COC.GATHER_ONLY or {}
+    local seen, out = {}, {}
+    local function add(t)
+        for k in pairs(t or {}) do
+            if not SECONDARY_PROF[k] and not gather[k] and not seen[k] then
+                seen[k] = true; out[#out + 1] = k
+            end
+        end
+    end
+    add(r.skill); add(r.recipes)
+    local sk = GetSkin()
+    table.sort(out, function(a, b) return ((sk and sk.ProfLabel(a)) or a) < ((sk and sk.ProfLabel(b)) or b) end)
+    return out
+end
+
+-- =========================================================================
 -- Tooltip MONDE (unité). Migré de OnTooltipSetUnit (mort depuis le refactor tooltip de Classic Era)
 -- vers TooltipDataProcessor.AddTooltipPostCall ; repli sur l'ancien script hook pour un vieux client.
 -- =========================================================================
@@ -69,8 +176,28 @@ local function OnUnitTooltip(tooltip)
     -- Marque addon = icône WorkOrder (le glyphe « ✓ » s'affichait en tofu dans la police WoW).
     local mark = sk and ("  |T" .. sk.tex.workorder .. ":14:14:0:0|t") or ""
     tooltip:AddLine("|cFF33DD88CO-Classic|r" .. mark .. "  " .. summary, 1, 1, 1)
+    -- Maj déplie la liste des plans connus ; sinon un rappel discret. RecipeDetail = nil si aucun RK reçu.
+    local detail = (IsShiftKeyDown and IsShiftKeyDown()) and Social:RecipeDetail(name)
+    if detail then
+        for _, ln in ipairs(detail) do
+            if ln.header then tooltip:AddLine(ln.text, 0.6, 0.85, 1.0)
+            elseif ln.dim then tooltip:AddLine("   " .. ln.text, 0.5, 0.5, 0.5)
+            else tooltip:AddLine("   " .. ln.text, 0.9, 0.9, 0.9) end
+        end
+    elseif Social:HasRecipeDetail(name) then
+        tooltip:AddLine("|cFF808080" .. COC.L["Maj : plans connus"] .. "|r")
+    end
     tooltip._cocProfAdded = true
     tooltip:Show()
+end
+
+-- Presser/relâcher Maj sur un joueur survolé → reconstruire le tooltip pour (dé)plier les plans.
+-- SetUnit force un rebuild complet → le post-call ci-dessus re-tourne avec le nouvel état de Maj.
+local function OnShiftToggle(_, key)
+    if key ~= "LSHIFT" and key ~= "RSHIFT" then return end
+    if UnitExists and UnitExists("mouseover") and GameTooltip and GameTooltip:IsShown() then
+        GameTooltip:SetUnit("mouseover")
+    end
 end
 
 -- =========================================================================
@@ -123,6 +250,9 @@ function Social:Start()
         if Social.InstallMenus  then Social:InstallMenus()  end   -- _Social_Menu.lua (menu clic-droit)
         if Social.WireRosterUI  then Social:WireRosterUI()  end   -- _Social_Roster.lua (tooltip ami + guilde)
         Social:_WireDiscovery()
+        local sf = CreateFrame("Frame")     -- Maj (dé)plie les plans dans le tooltip monde
+        sf:RegisterEvent("MODIFIER_STATE_CHANGED")
+        sf:SetScript("OnEvent", function(_, _, key) OnShiftToggle(nil, key) end)
     end)
     if not ok then
         self._startError = err

@@ -23,11 +23,14 @@ between total strangers as long as they've got the addon too.
 ## Order from your Friends and Guild list
 
 Hover a friend in the Friends list and their professions and skill levels show up next to the game's own
-tooltip. Click a guildmate in the Guild panel and the same summary sits under their detail, with an
-Order button right there, so it works even when they're offline.
+tooltip. Battle.net friends count too, not just friends added by character name. Click a guildmate in the
+Guild panel and the same summary sits under their detail, with an Order button right there, so it works
+even when they're offline.
 
 Right-click anyone who runs the addon, a friend, an online guildmate, or someone you bumped into in the
-world, and you get an "Order from ___" entry that opens the Order tab already aimed at them.
+world, and you get an Order entry for each profession they craft, each one opening the Order tab already
+set to it. Their summary also shows how many recipes they know, and holding Shift over their in-world
+tooltip lists those recipes by name.
 
 The directory fills itself in as you cross paths with other users. When it's looking empty, the Refresh
 button calls out on the channel and everyone online answers.
@@ -83,8 +86,9 @@ no extra traffic. `/co gwroster` shows what it found.
 
 ## Bilingual and standalone
 
-English and French are both built in, and item and recipe names come out in your client's language. The
-addon stands on its own (it embeds the shared CraftLink library) and runs happily next to Guild Economy.
+English, French, German and Spanish are all built in, and item and recipe names come out in your client's
+language. The addon stands on its own (it embeds the shared CraftLink library) and runs happily next to
+Guild Economy.
 
 ## Commands
 

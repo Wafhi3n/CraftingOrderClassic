@@ -45,6 +45,15 @@ local de = {
         "Begleitfenster am Handels- und Postfenster, um einen Auftrag zu liefern, ohne das Auftragsbuch zu öffnen.",
     ["La colonne Commandes peut s'ancrer à droite de la fenêtre métier native (vue Blizzard)."] =
         "Die Auftragsspalte kann rechts am nativen Berufsfenster andocken (Blizzard-Ansicht).",
+    ["Amis Battle.net + commande par métier"] = "Battle.net-Freunde + Auftrag nach Beruf",
+    ["Les métiers et le menu Crafting Order fonctionnent maintenant sur les amis Battle.net, pas seulement les amis ajoutés par personnage."] =
+        "Berufe und das Crafting-Order-Menü funktionieren jetzt bei Battle.net-Freunden, nicht nur bei über den Charakter hinzugefügten Freunden.",
+    ["Clic droit sur un artisan : une entrée « Passer commande » par métier, qui ouvre l'onglet Commande déjà réglé sur ce métier."] =
+        "Rechtsklick auf einen Handwerker: ein « Auftrag »-Eintrag pro Beruf, der den Tab Bestellen bereits auf diesen Beruf eingestellt öffnet.",
+    ["Le résumé d'un artisan indique la profondeur de son carnet (« · N plans ») ; maintiens Maj sur son infobulle en jeu pour lister ses recettes connues."] =
+        "Die Zusammenfassung eines Handwerkers zeigt den Umfang seines Rezeptbuchs (« · N Rezepte »); halte Umschalt über seiner Tooltip in der Welt, um seine bekannten Rezepte aufzulisten.",
+    ["Correctif : un personnage n'affiche plus par erreur les métiers de ses rerolls dans ton annuaire."] =
+        "Fehlerbehebung: Ein Charakter zeigt in deinem Verzeichnis nicht mehr fälschlich die Berufe seiner Twinks.",
     ["Allemand et espagnol + onglet Nouveautés"] = "Deutsch und Spanisch + Tab Neues",
     ["L'interface se traduit en allemand et en espagnol selon la langue de ton client WoW."] =
         "Die Oberfläche wird je nach Sprache deines WoW-Clients ins Deutsche und Spanische übersetzt.",
@@ -81,6 +90,7 @@ local de = {
     ["diag"] = "Diag", ["Sourdine"] = "Stumm", ["Réafficher"] = "Einblenden",
     ["Muter"] = "Stummschalten", ["Ajouter aux artisans"] = "Zu Handwerkern hinzufügen",
     ["Passer commande à %s"] = "Auftrag an %s", ["Passer commande"] = "Auftrag erteilen",
+    ["Passer commande à %s (%s)"] = "Auftrag an %s (%s)",
     ["%s est mis en sourdine — plus aucune notification de sa part."] = "%s wurde stummgeschaltet — keine Benachrichtigungen mehr von ihm.",
     ["%s n'est plus en sourdine."] = "%s ist nicht mehr stummgeschaltet.",
     ["usage : /co unmute <nom>"] = "Verwendung: /co unmute <Name>",
@@ -92,6 +102,9 @@ local de = {
     ["muter/démuter un joueur (aucune notif de sa part)"] = "einen Spieler stumm-/entstummschalten (keine Benachrichtigungen von ihm)",
     ["seuil de mute auto des persos bas niveau (défaut 5)"] = "Schwelle für Auto-Stumm niedrigstufiger Charaktere (Standard 5)",
     ["%d livrés"] = "%d geliefert",
+    ["· %d plans"] = "· %d Rezepte",
+    ["+%d de plus"] = "+%d weitere",
+    ["Maj : plans connus"] = "Umschalt: bekannte Rezepte",
     ["ton reroll |cFFFFFFFF%s|r sait le faire : %s"] = "dein Twink |cFFFFFFFF%s|r kann das herstellen: %s",
     ["COMPOSANTS FOURNIS"] = "BEREITGESTELLTE MATERIALIEN", ["À FOURNIR"] = "BEREITSTELLEN", ["complet"] = "vollständig",
     ["chargé — |cFFFFFFFF/co help|r pour les commandes. (Réseau global de craft — autonome.)"] =
