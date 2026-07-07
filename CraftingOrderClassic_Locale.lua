@@ -293,15 +293,15 @@ if loc == "enUS" or loc == "enGB" then
         ["|cFFFFFFFF%s|r marqué comme partenaire — priorité sur les alertes de don."] =
             "|cFFFFFFFF%s|r marked as partner — prioritized in gift alerts.",
         ["|cFFFFFFFF%s|r n'est plus marqué comme partenaire."] = "|cFFFFFFFF%s|r is no longer marked as partner.",
-        ["|cFF66CCFFpartenaires intéressés :|r %s (|cFFFFFFFF/co gift <nom>|r)"] =
-            "|cFF66CCFFinterested partners:|r %s (|cFFFFFFFF/co gift <name>|r)",
-        ["proposer (chuchoter) le dernier plan looté à un partenaire qui ne le connaît pas"] =
-            "propose (whisper) the last looted recipe to a partner who doesn't know it",
+        ["|cFF66CCFFamis/partenaires intéressés :|r %s (|cFFFFFFFF/co gift <nom>|r)"] =
+            "|cFF66CCFFinterested friends/partners:|r %s (|cFFFFFFFF/co gift <name>|r)",
+        ["proposer (chuchoter) le dernier plan looté à un ami/partenaire qui ne le connaît pas"] =
+            "propose (whisper) the last looted recipe to a friend/partner who doesn't know it",
         ["aucun plan looté en attente de don pour l'instant."] = "no looted recipe pending a gift right now.",
-        ["don en attente pour |cFFFFFFFF%s|r — partenaires : %s (|cFFFFFFFF/co gift <nom>|r)"] =
-            "gift pending for |cFFFFFFFF%s|r — partners: %s (|cFFFFFFFF/co gift <name>|r)",
-        ["|cFFFFFFFF%s|r n'est pas dans la liste des partenaires en attente pour ce plan."] =
-            "|cFFFFFFFF%s|r isn't in the list of partners waiting for this recipe.",
+        ["don en attente pour |cFFFFFFFF%s|r — amis/partenaires : %s (|cFFFFFFFF/co gift <nom>|r)"] =
+            "gift pending for |cFFFFFFFF%s|r — friends/partners: %s (|cFFFFFFFF/co gift <name>|r)",
+        ["|cFFFFFFFF%s|r n'est pas dans la liste des amis/partenaires en attente pour ce plan."] =
+            "|cFFFFFFFF%s|r isn't in the list of friends/partners waiting for this recipe.",
         ["Salut ! J'ai looté %s (%s) — tu ne le connais pas encore, ça t'intéresse ?"] =
             "Hey! I looted %s (%s) — you don't know it yet, are you interested?",
         ["don proposé à |cFFFFFFFF%s|r pour %s."] = "gift proposed to |cFFFFFFFF%s|r for %s.",

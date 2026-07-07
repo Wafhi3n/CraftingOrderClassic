@@ -1,8 +1,9 @@
 -- CraftingOrderClassic_LootAlert.lua — alerte quand TU loots un objet-PLAN (recette/formule/
--- schéma/patron) catalogué par CraftLink : t'informe du métier + de la recette enseignée, si tu
--- la connais déjà, et quels AMIS de ton annuaire ne la connaissent pas encore (candidats à un don
--- — cf. request/FEATURE_friend.md). Débloqué par les métadonnées `taughtBy` (P4, CraftLink v6) :
--- sans elles, CraftLink:RecipeFromPlanItem ne pouvait résoudre aucun itemID de plan.
+-- schéma/patron) catalogué par CraftLink, MAIS seulement s'il te CONCERNE : soit tu as le métier
+-- (candidat à l'apprendre), soit un AMI/PARTENAIRE de ton annuaire ne le connaît pas encore
+-- (candidat à un don — cf. request/FEATURE_friend.md). Sinon : silence — un Joaillier/Mineur qui
+-- loote un patron de Couture sans ami couturier intéressé n'est PAS notifié. Débloqué par les
+-- métadonnées `taughtBy` (P4, CraftLink v6) : sans elles, RecipeFromPlanItem ne résout aucun plan.
 
 local COC = CraftingOrderClassic
 local Loot = {}
@@ -52,14 +53,15 @@ function Loot:Cmd(arg)
         self:IsEnabled() and "on" or "off"))
 end
 
--- Partenaires (annuaire, drapeau EXPLICITE isPartner — cf. UI:_TogglePartner, menu contextuel
--- joueur) qui NE connaissent PAS cette recette (bitfield RK reçu et bit absent). Un partenaire
--- dont on n'a encore aucun RK n'est ni inclus ni exclu — donnée insuffisante pour trancher.
-local function partnersMissing(c, prof, spellID)
+-- Amis (drapeau automatique isFriend, liste d'amis WoW) OU partenaires (drapeau EXPLICITE isPartner
+-- — cf. UI:_TogglePartner, menu contextuel joueur) de l'annuaire qui NE connaissent PAS cette recette
+-- (bitfield RK reçu et bit absent). Une relation dont on n'a encore aucun RK n'est ni incluse ni
+-- exclue — donnée insuffisante pour trancher. Candidats à un don (/co gift).
+local function relationsMissing(c, prof, spellID)
     local D = COC.Directory; if not D then return {} end
     local out = {}
     for name, r in pairs(D.roster or {}) do
-        if r.isPartner then
+        if r.isPartner or r.isFriend then
             local hex = r.recipes and r.recipes[prof]
             if hex and not c:HasBit(prof, hex, spellID) then out[#out + 1] = name end
         end
@@ -83,14 +85,14 @@ function Loot:GiftCmd(arg)
     end
     local name = (arg or ""):match("^%s*(.-)%s*$")
     if name == "" then
-        pmsg(string.format(L["don en attente pour |cFFFFFFFF%s|r — partenaires : %s (|cFFFFFFFF/co gift <nom>|r)"],
+        pmsg(string.format(L["don en attente pour |cFFFFFFFF%s|r — amis/partenaires : %s (|cFFFFFFFF/co gift <nom>|r)"],
             g.itemName, table.concat(g.missing, ", ")))
         return
     end
     local target
     for _, n in ipairs(g.missing) do if n:lower() == name:lower() then target = n end end
     if not target then
-        pmsg(string.format(L["|cFFFFFFFF%s|r n'est pas dans la liste des partenaires en attente pour ce plan."], name))
+        pmsg(string.format(L["|cFFFFFFFF%s|r n'est pas dans la liste des amis/partenaires en attente pour ce plan."], name))
         return
     end
     SendChatMessage(string.format(L["Salut ! J'ai looté %s (%s) — tu ne le connais pas encore, ça t'intéresse ?"],
@@ -104,22 +106,32 @@ local function onSelfLoot(itemLink)
     if not itemID or seen[itemID] then return end
     local prof, spellID = c:RecipeFromPlanItem(itemID)
     if not prof then return end   -- pas un objet-plan catalogué
+
+    -- Filtre de PERTINENCE (cf. en-tête) : n'alerte que si ce plan te concerne — soit tu as le métier
+    -- (mySkills, lisible sans fenêtre), soit un ami/partenaire de l'annuaire ne le connaît pas encore.
+    -- Sinon : silence, et on NE marque PAS `seen` (un RK d'ami reçu plus tard pourra encore déclencher).
+    local D = COC.Directory
+    local iHaveProf = (D and D.mySkills and D.mySkills[prof]) ~= nil
+    local missing = relationsMissing(c, prof, spellID)
+    if not iHaveProf and #missing == 0 then return end
     seen[itemID] = true
 
     local profLbl  = (COC.UI and COC.UI.Skin and COC.UI.Skin.ProfLabel(prof)) or prof
     local itemName = c:ItemName(itemID) or ("item:" .. itemID)
     local recipeNm = c:RecipeName(spellID) or ("spell:" .. spellID)
-    local status = c:IKnowRecipeBySpell(prof, spellID)
+    -- « tu connais / tu ne connais pas » n'a de sens que si TU as le métier ; pour un plan destiné à
+    -- un ami on l'omet (tu n'es pas le crafteur, savoir que tu ne le connais pas est du bruit).
+    local status = iHaveProf and (c:IKnowRecipeBySpell(prof, spellID)
         and L["|cFF888888(tu la connais déjà)|r"]
-        or  L["|cFF33DD33(tu ne la connais pas encore !)|r"]
+        or  L["|cFF33DD33(tu ne la connais pas encore !)|r"]) or ""
 
     local msg = string.format(L["plan looté : |cFFFFFFFF%s|r — enseigne |cFFFFFFFF%s|r (%s) %s"],
         itemName, recipeNm, profLbl, status)
+    msg = (msg:gsub("%s+$", ""))   -- parenthèses : ne garder que la chaîne (gsub renvoie aussi un compteur)
 
-    local missing = partnersMissing(c, prof, spellID)
     Loot.lastGiftable = { itemLink = itemLink, itemName = itemName, recipeName = recipeNm, prof = prof, missing = missing }
     if #missing > 0 then
-        msg = msg .. " " .. string.format(L["|cFF66CCFFpartenaires intéressés :|r %s (|cFFFFFFFF/co gift <nom>|r)"], table.concat(missing, ", "))
+        msg = msg .. " " .. string.format(L["|cFF66CCFFamis/partenaires intéressés :|r %s (|cFFFFFFFF/co gift <nom>|r)"], table.concat(missing, ", "))
     end
 
     pmsg(msg)

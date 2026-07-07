@@ -259,15 +259,15 @@ local es = {
     ["|cFFFFFFFF%s|r marqué comme partenaire — priorité sur les alertes de don."] =
         "|cFFFFFFFF%s|r marcado como socio — prioridad en las alertas de regalo.",
     ["|cFFFFFFFF%s|r n'est plus marqué comme partenaire."] = "|cFFFFFFFF%s|r ya no está marcado como socio.",
-    ["|cFF66CCFFpartenaires intéressés :|r %s (|cFFFFFFFF/co gift <nom>|r)"] =
-        "|cFF66CCFFsocios interesados:|r %s (|cFFFFFFFF/co gift <nombre>|r)",
-    ["proposer (chuchoter) le dernier plan looté à un partenaire qui ne le connaît pas"] =
-        "ofrecer (susurrar) la última receta saqueada a un socio que no la conoce",
+    ["|cFF66CCFFamis/partenaires intéressés :|r %s (|cFFFFFFFF/co gift <nom>|r)"] =
+        "|cFF66CCFFamigos/socios interesados:|r %s (|cFFFFFFFF/co gift <nombre>|r)",
+    ["proposer (chuchoter) le dernier plan looté à un ami/partenaire qui ne le connaît pas"] =
+        "ofrecer (susurrar) la última receta saqueada a un amigo/socio que no la conoce",
     ["aucun plan looté en attente de don pour l'instant."] = "ninguna receta saqueada esperando un regalo por ahora.",
-    ["don en attente pour |cFFFFFFFF%s|r — partenaires : %s (|cFFFFFFFF/co gift <nom>|r)"] =
-        "regalo pendiente para |cFFFFFFFF%s|r — socios: %s (|cFFFFFFFF/co gift <nombre>|r)",
-    ["|cFFFFFFFF%s|r n'est pas dans la liste des partenaires en attente pour ce plan."] =
-        "|cFFFFFFFF%s|r no está en la lista de socios en espera para esta receta.",
+    ["don en attente pour |cFFFFFFFF%s|r — amis/partenaires : %s (|cFFFFFFFF/co gift <nom>|r)"] =
+        "regalo pendiente para |cFFFFFFFF%s|r — amigos/socios: %s (|cFFFFFFFF/co gift <nombre>|r)",
+    ["|cFFFFFFFF%s|r n'est pas dans la liste des amis/partenaires en attente pour ce plan."] =
+        "|cFFFFFFFF%s|r no está en la lista de amigos/socios en espera para esta receta.",
     ["Salut ! J'ai looté %s (%s) — tu ne le connais pas encore, ça t'intéresse ?"] =
         "¡Hola! He saqueado %s (%s) — aún no la conoces, ¿te interesa?",
     ["don proposé à |cFFFFFFFF%s|r pour %s."] = "regalo ofrecido a |cFFFFFFFF%s|r por %s.",

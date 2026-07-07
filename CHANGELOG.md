@@ -1,5 +1,15 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.7.1 — Looted-recipe alerts that actually concern you
+
+The looted-recipe alert used to pop for every catalogued recipe you picked up — including a Tailoring
+pattern when you're a miner-jeweler who'll never craft it. Now it stays quiet unless the recipe is
+yours to act on: either you have the profession and could learn it, or a friend or partner in your
+directory doesn't know it yet and you could hand it over.
+
+Gift candidates now include your friends, not just people you'd explicitly flagged as partners — so the
+"interested" list and `/co gift` reach anyone on your list who's missing the recipe.
+
 ## v1.7.0 — Battle.net friends, and ordering by profession
 
 Friends-list professions and the right-click Crafting Order menu used to work only on friends you'd

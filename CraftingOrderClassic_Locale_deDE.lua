@@ -258,15 +258,15 @@ local de = {
     ["|cFFFFFFFF%s|r marqué comme partenaire — priorité sur les alertes de don."] =
         "|cFFFFFFFF%s|r als Partner markiert — Vorrang bei Geschenk-Warnungen.",
     ["|cFFFFFFFF%s|r n'est plus marqué comme partenaire."] = "|cFFFFFFFF%s|r ist nicht mehr als Partner markiert.",
-    ["|cFF66CCFFpartenaires intéressés :|r %s (|cFFFFFFFF/co gift <nom>|r)"] =
-        "|cFF66CCFFinteressierte Partner:|r %s (|cFFFFFFFF/co gift <Name>|r)",
-    ["proposer (chuchoter) le dernier plan looté à un partenaire qui ne le connaît pas"] =
-        "das zuletzt erbeutete Rezept einem Partner anbieten (flüstern), der es nicht kennt",
+    ["|cFF66CCFFamis/partenaires intéressés :|r %s (|cFFFFFFFF/co gift <nom>|r)"] =
+        "|cFF66CCFFinteressierte Freunde/Partner:|r %s (|cFFFFFFFF/co gift <Name>|r)",
+    ["proposer (chuchoter) le dernier plan looté à un ami/partenaire qui ne le connaît pas"] =
+        "das zuletzt erbeutete Rezept einem Freund/Partner anbieten (flüstern), der es nicht kennt",
     ["aucun plan looté en attente de don pour l'instant."] = "derzeit kein erbeutetes Rezept, das auf ein Geschenk wartet.",
-    ["don en attente pour |cFFFFFFFF%s|r — partenaires : %s (|cFFFFFFFF/co gift <nom>|r)"] =
-        "Geschenk ausstehend für |cFFFFFFFF%s|r — Partner: %s (|cFFFFFFFF/co gift <Name>|r)",
-    ["|cFFFFFFFF%s|r n'est pas dans la liste des partenaires en attente pour ce plan."] =
-        "|cFFFFFFFF%s|r ist nicht in der Partnerliste für dieses Rezept.",
+    ["don en attente pour |cFFFFFFFF%s|r — amis/partenaires : %s (|cFFFFFFFF/co gift <nom>|r)"] =
+        "Geschenk ausstehend für |cFFFFFFFF%s|r — Freunde/Partner: %s (|cFFFFFFFF/co gift <Name>|r)",
+    ["|cFFFFFFFF%s|r n'est pas dans la liste des amis/partenaires en attente pour ce plan."] =
+        "|cFFFFFFFF%s|r ist nicht in der Freunde-/Partnerliste für dieses Rezept.",
     ["Salut ! J'ai looté %s (%s) — tu ne le connais pas encore, ça t'intéresse ?"] =
         "Hallo! Ich habe %s (%s) erbeutet — du kennst es noch nicht, hast du Interesse?",
     ["don proposé à |cFFFFFFFF%s|r pour %s."] = "Geschenk an |cFFFFFFFF%s|r für %s angeboten.",
