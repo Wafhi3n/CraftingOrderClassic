@@ -45,6 +45,11 @@ local es = {
         "Paneles complementarios en la ventana de intercambio y correo para entregar un pedido sin abrir el libro.",
     ["La colonne Commandes peut s'ancrer à droite de la fenêtre métier native (vue Blizzard)."] =
         "La columna Pedidos puede anclarse a la derecha de la ventana de profesión nativa (vista Blizzard).",
+    ["Sous le capot : mises à jour plus sûres"] = "Bajo el capó: actualizaciones más seguras",
+    ["Tes données sauvegardées portent désormais une version : une mise à jour qui doit les réorganiser ne tourne qu'une fois, tes recettes et commandes restent intactes."] =
+        "Tus datos guardados ahora llevan una versión, así que una actualización que deba reorganizarlos se ejecuta una sola vez y tus recetas y pedidos quedan intactos.",
+    ["Protocole de commandes consolidé (mêmes échanges réseau) : ce build reste compatible avec les joueurs encore en 1.7.x."] =
+        "El protocolo de pedidos se consolidó (mismos intercambios de red); esta versión sigue entendiéndose con jugadores en 1.7.x.",
     ["Alertes de plan looté qui te concernent"] = "Alertas de receta saqueada que te conciernen",
     ["L'alerte de plan looté ne se déclenche plus que s'il te concerne : tu as le métier et peux l'apprendre, ou un ami/partenaire de ton annuaire ne le connaît pas encore."] =
         "La alerta de receta saqueada ya solo salta cuando te concierne: tienes la profesión y puedes aprenderla, o un amigo/socio de tu directorio aún no la conoce.",

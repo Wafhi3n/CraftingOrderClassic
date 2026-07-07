@@ -51,6 +51,11 @@ if loc == "enUS" or loc == "enGB" then
             "Companion panels on the trade and mail windows to deliver an order without opening the board.",
         ["La colonne Commandes peut s'ancrer à droite de la fenêtre métier native (vue Blizzard)."] =
             "The Orders column can dock to the right of the native profession window (Blizzard view).",
+        ["Sous le capot : mises à jour plus sûres"] = "Under the hood: safer upgrades",
+        ["Tes données sauvegardées portent désormais une version : une mise à jour qui doit les réorganiser ne tourne qu'une fois, tes recettes et commandes restent intactes."] =
+            "Your saved data now carries a version, so an upgrade that needs to reshape it runs once and your recipes and orders stay intact.",
+        ["Protocole de commandes consolidé (mêmes échanges réseau) : ce build reste compatible avec les joueurs encore en 1.7.x."] =
+            "The order protocol was consolidated (same network exchanges); this build still talks to players still on 1.7.x.",
         ["Alertes de plan looté qui te concernent"] = "Looted-recipe alerts that concern you",
         ["L'alerte de plan looté ne se déclenche plus que s'il te concerne : tu as le métier et peux l'apprendre, ou un ami/partenaire de ton annuaire ne le connaît pas encore."] =
             "The looted-recipe alert now fires only when it concerns you: you have the profession and can learn it, or a friend/partner in your directory doesn't know it yet.",

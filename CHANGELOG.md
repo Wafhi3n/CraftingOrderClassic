@@ -1,5 +1,19 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.8.0 — Under the hood: safer upgrades, tidier order protocol
+
+Nothing changes on screen. Two things got sturdier underneath.
+
+Saved data now carries a schema version, so an upgrade that needs to reshape it runs once, in order, and
+skips itself if it already ran. Your known recipes and posted orders survive a version jump untouched
+(checked against a real save file before shipping).
+
+The order message format now lives in one place instead of being spelled out across five files. The
+bytes on the wire are identical, so this build still talks to anyone on 1.7.x. A headless test suite
+checks that every message round-trips before a build goes out.
+
+The What's New tab was also missing its 1.7.1 note. It's back.
+
 ## v1.7.1 — Looted-recipe alerts that actually concern you
 
 The looted-recipe alert used to pop for every catalogued recipe you picked up — including a Tailoring

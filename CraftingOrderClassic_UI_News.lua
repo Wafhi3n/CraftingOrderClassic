@@ -15,6 +15,13 @@ local BODY_W = 780
 local function versions()
     return {
         {
+            v = "v1.8.0", title = L["Sous le capot : mises à jour plus sûres"],
+            lines = {
+                L["Tes données sauvegardées portent désormais une version : une mise à jour qui doit les réorganiser ne tourne qu'une fois, tes recettes et commandes restent intactes."],
+                L["Protocole de commandes consolidé (mêmes échanges réseau) : ce build reste compatible avec les joueurs encore en 1.7.x."],
+            },
+        },
+        {
             v = "v1.7.1", title = L["Alertes de plan looté qui te concernent"],
             lines = {
                 L["L'alerte de plan looté ne se déclenche plus que s'il te concerne : tu as le métier et peux l'apprendre, ou un ami/partenaire de ton annuaire ne le connaît pas encore."],
