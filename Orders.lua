@@ -5,12 +5,9 @@
 --   poster (NEW) → accepter (ACK) → livrer (DONE) ; annuler (CANCEL) à tout moment par l'auteur.
 --
 -- Discipline cache : tout passe par COC.db.orders (persistant) ; l'UI (à venir) lira CE cache.
--- Protocole sur le transport CraftLink (portée "global" par défaut) :
---   ORD|NEW|id|buyer|kind|objId|qty|prof|price
---   ORD|CANCEL|id
---   ORD|ACK|id|crafter
---   ORD|DONE|id|crafter
---   ORD|NACK|id|crafter   (refus/désistement : l'artisan ne prend pas — ou relâche — la commande)
+-- Protocole sur le transport CraftLink (portée "global" par défaut) : 7 verbes
+--   NEW / CANCEL / ACK / DLV / DONE / NACK / SUGG, sérialisés/parsés par Orders_Codec.lua.
+--   Grammaire filaire complète + règles d'autorité (anti-spoof sender==buyer) : docs\protocol-ord.md.
 
 local COC = CraftingOrderClassic
 local Orders = {}
@@ -18,6 +15,7 @@ COC.Orders = Orders
 local L = COC.L
 
 local CraftLink = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
+local Codec     = COC.OrdersCodec   -- sérialisation ORD| (Orders_Codec.lua, chargé avant)
 
 local ORDER_TTL  = 6 * 3600     -- 6 h : au-delà, une commande OUVERTE est tenue pour expirée (cachée/élaguée)
 local REBROADCAST = 2 * 3600    -- 2 h : ré-émission périodique de MES commandes ouvertes (anti-oubli réseau)
@@ -191,8 +189,9 @@ function Orders:Decline(o)
     if o.acceptedBy == m and o.status == "accepted" then
         o.status = "open"; o.acceptedBy = nil
         if CraftLink then
-            CraftLink:Send("ORD|NACK|" .. o.id .. "|" .. m, "global")
-            if o.buyer and o.buyer ~= m then CraftLink:Send("ORD|NACK|" .. o.id .. "|" .. m, "whisper", o.buyer) end
+            local nack = Codec.Encode("NACK", { id = o.id, who = m })
+            CraftLink:Send(nack, "global")
+            if o.buyer and o.buyer ~= m then CraftLink:Send(nack, "whisper", o.buyer) end
         end
         pmsg(L["commande relâchée : "] .. o.id)
     else
@@ -200,7 +199,7 @@ function Orders:Decline(o)
         -- Refus d'une commande qui me visait NOMMÉMENT → j'alerte l'acheteur (il la verra « Refusée »).
         -- Portée large (Tous/Guilde/Amis) → silencieux : d'autres artisans la voient encore.
         if CraftLink and o.buyer and o.buyer ~= m and o.recipient == m then
-            CraftLink:Send("ORD|NACK|" .. o.id .. "|" .. m, "whisper", o.buyer)
+            CraftLink:Send(Codec.Encode("NACK", { id = o.id, who = m }), "whisper", o.buyer)
         end
     end
 end

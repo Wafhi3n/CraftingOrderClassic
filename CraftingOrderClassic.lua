@@ -307,14 +307,8 @@ f:SetScript("OnEvent", function(_, event, arg1)
     if event == "ADDON_LOADED" and arg1 == ADDON then
         CraftingOrderClassicDB = CraftingOrderClassicDB or {}
         COC.db = CraftingOrderClassicDB
-        COC.db.knownRecipes = COC.db.knownRecipes or {}
-        -- Migration v2 : l'ancien format était PLAT (métier→recettes) et PARTAGÉ par compte → union
-        -- polluée inter-persos, non attribuable. On le purge une fois ; chaque perso reconstruit sa
-        -- partition propre (knownRecipes[nom-royaume]) en rouvrant sa fenêtre métier. Cf. COC:_MyKnownStore.
-        if not COC.db.knownRecipesVer then
-            if next(COC.db.knownRecipes) then COC.db.knownRecipes = {} end
-            COC.db.knownRecipesVer = 2
-        end
+        -- Schéma SV versionné (échelle de migrations ordonnée) — voir CraftingOrderClassic_Migrations.lua.
+        if COC.Migrations then COC.Migrations.Apply(COC.db) end
     elseif event == "PLAYER_LOGIN" then
         if CraftLink and COC.db then CraftLink:LoadMyRecipes(COC:_MyKnownStore()) end
         -- Trace réseau persistée (diagnostic 2 comptes) : on branche le tracer de la lib sur COC.Trace.

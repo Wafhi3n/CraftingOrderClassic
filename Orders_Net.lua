@@ -10,6 +10,7 @@ local Orders = COC.Orders
 local L      = COC.L
 
 local CraftLink = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
+local Codec     = COC.OrdersCodec   -- sérialisation ⇄ parsing ORD| (Orders_Codec.lua, chargé avant)
 
 local function me()  return (UnitName and UnitName("player")) or "?" end
 local function pmsg(m) print("|cFF33DD88Crafting Order|r " .. m) end
@@ -22,11 +23,7 @@ local KEYWORD_RCPT = { Tous = true, Guilde = true, Amis = true }
 -- Sérialise un ORD|NEW (partagé par Broadcast et le push à la connexion). Dernier champ = liste CSV
 -- des itemID que l'ACHETEUR fournit (vide si aucun) → l'artisan voit « À FOURNIR » vs déjà fournis.
 function Orders:_NewPayload(o)
-    return string.format("ORD|NEW|%s|%s|%s|%d|%d|%s|%s|%s|%d|%s",
-        o.id, o.buyer, o.kind, o.itemID or o.spellID or 0, o.qty or 1,
-        o.profession or "", (o.price or ""):gsub("|", ""),
-        (o.recipient or "Tous"):gsub("|", ""), o.byStack and 1 or 0,
-        table.concat(o.provided or {}, ","))
+    return Codec.Encode("NEW", o)
 end
 
 -- Un joueur (de mon annuaire) entre-t-il dans la portée d'un ordre ? Tous / guilde-amis / nommé.
@@ -67,14 +64,7 @@ end
 
 function Orders:Broadcast(action, o)
     if not CraftLink then return end
-    local payload
-    if action == "NEW" then
-        payload = self:_NewPayload(o)
-    elseif action == "CANCEL" then payload = "ORD|CANCEL|" .. o.id
-    elseif action == "ACK"    then payload = string.format("ORD|ACK|%s|%s", o.id, o.acceptedBy or "")
-    elseif action == "DLV"    then payload = string.format("ORD|DLV|%s|%s", o.id, o.acceptedBy or "")
-    elseif action == "DONE"   then payload = string.format("ORD|DONE|%s|%s", o.id, o.acceptedBy or "")
-    end
+    local payload = Codec.Encode(action, o)   -- NEW/CANCEL/ACK/DLV/DONE (nil sinon)
     if not payload then return end
     CraftLink:Send(payload, "global")
     if action == "NEW" then
@@ -91,9 +81,10 @@ end
 -- ------------------------------------------------------------------
 -- ORD|NEW : nouvelle commande (ou re-broadcast). Peuple/rafraîchit le cache + alerte si pertinent.
 function Orders:_OnNew(message)
+    local f = Codec.Decode(message)
+    if not f or not f.id or f.id == "" then return end
     local id, buyer, kind, oid, qty, prof, price, recipient, byStack, prov =
-        message:match("^ORD|NEW|([^|]*)|([^|]*)|([^|]*)|([^|]*)|([^|]*)|([^|]*)|([^|]*)|([^|]*)|(%d*)|?([%d,]*)$")
-    if not id or id == "" then return end
+        f.id, f.buyer, f.kind, f.oid, f.qty, f.prof, f.price, f.recipient, f.byStack, f.prov
     local existed = COC.db.orders[id] ~= nil   -- déjà connue ? (anti-spam sur re-broadcast)
     local o = COC.db.orders[id] or {}
     o.id, o.buyer, o.kind = id, buyer, (kind ~= "" and kind) or "item"
@@ -120,27 +111,27 @@ end
 -- AUTORISER la transition, au lieu de faire confiance aveuglément au champ du payload (anti-griefing :
 -- sans ça, n'importe quel porteur pouvait annuler la commande d'autrui ou usurper l'accepteur/refuseur).
 function Orders:_OnCycle(action, message, sender)
+    if action == "NACK" then return self:_OnNack(message, sender) end
+    local f = Codec.Decode(message)
+    local o = f and f.id and COC.db.orders[f.id]
+    if not o then return end
     if action == "CANCEL" then
-        local id = message:match("^ORD|CANCEL|(.+)$"); local o = id and COC.db.orders[id]
-        if o and sender == o.buyer then o.status = "cancelled" end   -- seul l'AUTEUR peut annuler
+        if sender == o.buyer then o.status = "cancelled" end   -- seul l'AUTEUR peut annuler
     elseif action == "ACK" then
-        local id, crafter = message:match("^ORD|ACK|([^|]*)|(.*)$"); local o = id and COC.db.orders[id]
-        if o then o.status = "accepted"; o.acceptedBy = sender or (crafter ~= "" and crafter) or nil end   -- l'accepteur = l'émetteur
+        o.status = "accepted"; o.acceptedBy = sender or (f.crafter ~= "" and f.crafter) or nil   -- l'accepteur = l'émetteur
     elseif action == "DLV" then
         -- Crafteur → acheteur : « j'ai remis ». Passe « remise » (pas encore terminée) ; côté acheteur
         -- on l'invite à confirmer la réception (bouton / auto-loot). L'émetteur EST le crafteur.
-        local id, crafter = message:match("^ORD|DLV|([^|]*)|(.*)$"); local o = id and COC.db.orders[id]
-        if o and o.status ~= "done" then
-            o.status = "delivered"; o.acceptedBy = sender or (crafter ~= "" and crafter) or o.acceptedBy
+        if o.status ~= "done" then
+            o.status = "delivered"; o.acceptedBy = sender or (f.crafter ~= "" and f.crafter) or o.acceptedBy
             if o.buyer == me() then self:AlertDelivered(o) end
         end
     elseif action == "DONE" then
         -- Acheteur → crafteur : confirmation de réception. Idempotent (DONE arrive en global ET whisper) :
         -- réputation créditée à la 1re transition vers « terminée », et seulement si JE suis le crafteur.
         -- SEUL l'acheteur peut confirmer (sinon un tiers pourrait gonfler la réputation d'un crafteur).
-        local id, crafter = message:match("^ORD|DONE|([^|]*)|(.*)$"); local o = id and COC.db.orders[id]
-        if o and o.status ~= "done" and sender == o.buyer then
-            o.acceptedBy = (crafter ~= "" and crafter) or o.acceptedBy   -- attesté par l'acheteur : qui créditer
+        if o.status ~= "done" and sender == o.buyer then
+            o.acceptedBy = (f.crafter ~= "" and f.crafter) or o.acceptedBy   -- attesté par l'acheteur : qui créditer
             o.status = "done"
             if o.acceptedBy == me() then
                 COC.db.delivered = (COC.db.delivered or 0) + 1   -- réputation : créditée à la confirmation acheteur
@@ -148,16 +139,14 @@ function Orders:_OnCycle(action, message, sender)
                 pmsg(string.format(L["réception confirmée par %s ! crafts livrés au total : %d"], o.buyer or "?", COC.db.delivered))
             end
         end
-    elseif action == "NACK" then
-        self:_OnNack(message, sender)
     end
 end
 
 -- ORD|NACK : refus/désistement d'un artisan. acceptedBy==who → réouverte ; ordre nommé à moi → refusée.
 -- `who` = l'émetteur RÉEL (anti-spoof : sinon un tiers pouvait relâcher la commande acceptée par autrui).
 function Orders:_OnNack(message, sender)
-    local id, payloadWho = message:match("^ORD|NACK|([^|]*)|(.*)$"); local o = id and COC.db.orders[id]
-    local who = sender or payloadWho
+    local f = Codec.Decode(message); local o = f and f.id and COC.db.orders[f.id]
+    local who = sender or (f and f.who)
     if not (o and who and who ~= "") then return end
     if o.acceptedBy == who then
         o.status = "open"; o.acceptedBy = nil                   -- l'artisan se désiste → réouverte
@@ -186,10 +175,10 @@ end
 -- Nudge « garde pour toi » (ORD|SUGG|id[|1]) : un pair me signale une commande de son cache que JE
 -- saurais faire. « |1 » = captée /commerce·/guilde → viaAddon=false + captured. Alerte ssi H:ICanCraft.
 function Orders:_OnSuggest(message)
-    local id, cap = message:match("^ORD|SUGG|([^|]*)|?(%d*)$")
-    local o = id and COC.db.orders[id]
+    local f = Codec.Decode(message)
+    local o = f and f.id and COC.db.orders[f.id]
     if not o then return end
-    if cap == "1" then o.viaAddon = false; o.captured = true end
+    if f.captured == "1" then o.viaAddon = false; o.captured = true end
     -- Hors portée : ordre nommé à un TIERS précis → ne pas suggérer à moi (fuite d'info sur commande privée).
     local rcpt = o.recipient or "Tous"
     if not KEYWORD_RCPT[rcpt] and rcpt ~= me() then return end

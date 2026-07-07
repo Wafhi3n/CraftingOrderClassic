@@ -20,6 +20,7 @@ COC.Handoff   = Handoff
 local L       = COC.L
 
 local CraftLink = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
+local Codec     = COC.OrdersCodec   -- sérialisation ORD|SUGG (Orders_Codec.lua, chargé avant)
 
 -- Dédup RUNTIME (non persisté) : on re-signale à chaque session tant que la commande reste ouverte,
 -- mais une seule fois par (commande, artisan) et par session → pas de spam sur relog/transition.
@@ -94,7 +95,7 @@ function Handoff:Suggest(o, who)
     local key = o.id .. "@" .. who
     if self._sent[key] then return end
     self._sent[key] = true
-    CraftLink:Send("ORD|SUGG|" .. o.id, "whisper", who)
+    CraftLink:Send(Codec.Encode("SUGG", { id = o.id }), "whisper", who)
 end
 
 -- Palier 2 : pousse à `who` les ENTRANTES qu'il sait faire (ordre de synthèse + nudge captured).
@@ -110,7 +111,7 @@ function Handoff:ForwardInboundTo(who)
             if not self._sent[key] and self:CanCraft(who, o) then
                 self._sent[key] = true
                 CraftLink:Send(O:_NewPayload(o), "whisper", who)          -- l'ordre lui-même
-                CraftLink:Send("ORD|SUGG|" .. o.id .. "|1", "whisper", who) -- nudge + captured
+                CraftLink:Send(Codec.Encode("SUGG", { id = o.id, captured = true }), "whisper", who) -- nudge + captured
             end
         end
     end

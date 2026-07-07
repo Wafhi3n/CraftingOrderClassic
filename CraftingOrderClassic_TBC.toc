@@ -15,6 +15,7 @@ Libs\CraftLink-1.0\Data\TBC.xml
 
 CraftingOrderClassic.lua
 CraftingOrderClassic_Trace.lua
+CraftingOrderClassic_Migrations.lua
 CraftingOrderClassic_Locale.lua
 CraftingOrderClassic_Locale_deDE.lua
 CraftingOrderClassic_Locale_esES.lua
@@ -39,8 +40,10 @@ CraftingOrderClassic_ProfWindow_Recipes.lua
 CraftingOrderClassic_ProfWindow_Detail.lua
 CraftingOrderClassic_ProfWindow_Orders.lua
 Directory.lua
+Directory_Confed.lua
 Directory_Skills.lua
 Directory_LootScan.lua
+Orders_Codec.lua
 Orders.lua
 Orders_Net.lua
 CraftingOrderClassic_Inbound.lua
