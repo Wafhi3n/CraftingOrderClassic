@@ -45,6 +45,11 @@ local es = {
         "Paneles complementarios en la ventana de intercambio y correo para entregar un pedido sin abrir el libro.",
     ["La colonne Commandes peut s'ancrer à droite de la fenêtre métier native (vue Blizzard)."] =
         "La columna Pedidos puede anclarse a la derecha de la ventana de profesión nativa (vista Blizzard).",
+    ["Alertes de plan looté qui te concernent"] = "Alertas de receta saqueada que te conciernen",
+    ["L'alerte de plan looté ne se déclenche plus que s'il te concerne : tu as le métier et peux l'apprendre, ou un ami/partenaire de ton annuaire ne le connaît pas encore."] =
+        "La alerta de receta saqueada ya solo salta cuando te concierne: tienes la profesión y puedes aprenderla, o un amigo/socio de tu directorio aún no la conoce.",
+    ["Les candidats au don incluent désormais tes amis, pas seulement les partenaires marqués — l'alerte « intéressés » et |cFFFFFFFF/co gift|r touchent tout ton annuaire."] =
+        "Los candidatos a regalo ahora incluyen a tus amigos, no solo a los socios marcados — la alerta « interesados » y |cFFFFFFFF/co gift|r llegan a todo tu directorio.",
     ["Amis Battle.net + commande par métier"] = "Amigos de Battle.net + pedido por profesión",
     ["Les métiers et le menu Crafting Order fonctionnent maintenant sur les amis Battle.net, pas seulement les amis ajoutés par personnage."] =
         "Las profesiones y el menú de Crafting Order ahora funcionan con amigos de Battle.net, no solo con amigos añadidos por personaje.",

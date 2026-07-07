@@ -15,6 +15,13 @@ local BODY_W = 780
 local function versions()
     return {
         {
+            v = "v1.7.1", title = L["Alertes de plan looté qui te concernent"],
+            lines = {
+                L["L'alerte de plan looté ne se déclenche plus que s'il te concerne : tu as le métier et peux l'apprendre, ou un ami/partenaire de ton annuaire ne le connaît pas encore."],
+                L["Les candidats au don incluent désormais tes amis, pas seulement les partenaires marqués — l'alerte « intéressés » et |cFFFFFFFF/co gift|r touchent tout ton annuaire."],
+            },
+        },
+        {
             v = "v1.7.0", title = L["Amis Battle.net + commande par métier"],
             lines = {
                 L["Les métiers et le menu Crafting Order fonctionnent maintenant sur les amis Battle.net, pas seulement les amis ajoutés par personnage."],

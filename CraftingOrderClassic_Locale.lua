@@ -51,6 +51,11 @@ if loc == "enUS" or loc == "enGB" then
             "Companion panels on the trade and mail windows to deliver an order without opening the board.",
         ["La colonne Commandes peut s'ancrer à droite de la fenêtre métier native (vue Blizzard)."] =
             "The Orders column can dock to the right of the native profession window (Blizzard view).",
+        ["Alertes de plan looté qui te concernent"] = "Looted-recipe alerts that concern you",
+        ["L'alerte de plan looté ne se déclenche plus que s'il te concerne : tu as le métier et peux l'apprendre, ou un ami/partenaire de ton annuaire ne le connaît pas encore."] =
+            "The looted-recipe alert now fires only when it concerns you: you have the profession and can learn it, or a friend/partner in your directory doesn't know it yet.",
+        ["Les candidats au don incluent désormais tes amis, pas seulement les partenaires marqués — l'alerte « intéressés » et |cFFFFFFFF/co gift|r touchent tout ton annuaire."] =
+            "Gift candidates now include your friends, not just flagged partners — the \"interested\" alert and |cFFFFFFFF/co gift|r reach your whole directory.",
         ["Amis Battle.net + commande par métier"] = "Battle.net friends + order by profession",
         ["Les métiers et le menu Crafting Order fonctionnent maintenant sur les amis Battle.net, pas seulement les amis ajoutés par personnage."] =
             "Professions and the Crafting Order menu now work on Battle.net friends, not just character friends.",

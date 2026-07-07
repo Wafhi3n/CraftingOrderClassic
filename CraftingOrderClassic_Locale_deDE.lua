@@ -44,6 +44,11 @@ local de = {
         "Begleitfenster am Handels- und Postfenster, um einen Auftrag zu liefern, ohne das Auftragsbuch zu öffnen.",
     ["La colonne Commandes peut s'ancrer à droite de la fenêtre métier native (vue Blizzard)."] =
         "Die Auftragsspalte kann rechts am nativen Berufsfenster andocken (Blizzard-Ansicht).",
+    ["Alertes de plan looté qui te concernent"] = "Beute-Rezept-Warnungen, die dich betreffen",
+    ["L'alerte de plan looté ne se déclenche plus que s'il te concerne : tu as le métier et peux l'apprendre, ou un ami/partenaire de ton annuaire ne le connaît pas encore."] =
+        "Die Beute-Rezept-Warnung erscheint nur noch, wenn sie dich betrifft: du hast den Beruf und kannst es lernen, oder ein Freund/Partner in deinem Verzeichnis kennt es noch nicht.",
+    ["Les candidats au don incluent désormais tes amis, pas seulement les partenaires marqués — l'alerte « intéressés » et |cFFFFFFFF/co gift|r touchent tout ton annuaire."] =
+        "Geschenk-Kandidaten umfassen jetzt deine Freunde, nicht nur markierte Partner — die « Interessiert »-Warnung und |cFFFFFFFF/co gift|r erreichen dein ganzes Verzeichnis.",
     ["Amis Battle.net + commande par métier"] = "Battle.net-Freunde + Auftrag nach Beruf",
     ["Les métiers et le menu Crafting Order fonctionnent maintenant sur les amis Battle.net, pas seulement les amis ajoutés par personnage."] =
         "Berufe und das Crafting-Order-Menü funktionieren jetzt bei Battle.net-Freunden, nicht nur bei über den Charakter hinzugefügten Freunden.",
