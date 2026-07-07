@@ -61,4 +61,48 @@ identité du **payload** n'est qu'un repli informatif. Les autorisations vivent 
 `open → accepted → delivered → done` ; `open → cancelled` ; un désistement (`NACK` d'un accepteur)
 ramène `accepted → open` (`acceptedBy = nil`) ; un ordre **nommé** refusé passe `→ declined`.
 
-*(Sections TTL / rétention / déduplication / relais mesh / transports : complétées en P5.)*
+## Portée, déduplication, TTL et rétention
+
+- **Portée / visibilité** (`Orders:VisibleTo`, `_ScopeMatch`) : `Tous` = tout le monde ; `Guilde` /
+  `Amis` = drapeaux de relation `isGuild`/`isFriend` (marche aussi pour un artisan « ajouté » qui est
+  guildmate/ami en jeu) ; sinon **nommé** = `name == recipient`. Un récepteur **affiche** selon
+  `VisibleTo` mais garde le cache complet (il peut re-relayer, cf. mesh).
+- **Déduplication par `id`.** Les re-broadcasts (RebroadcastMine, ticker, arrivée d'un pair) sont
+  **idempotents** côté récepteur : `_OnNew` fusionne sur `COC.db.orders[id]` (flag `existed` → pas de
+  double toast/anti-spam). L'`id` est la clé unique de l'ordre.
+- **TTL** `ORDER_TTL = 6 h` : au-delà, une commande **ouverte** est tenue pour expirée — masquée de
+  l'affichage ET élaguée (`PruneExpired`), **sauf les miennes** (jamais élaguées tant qu'ouvertes).
+- **Rétention** `DONE_RETENTION = 7 j` (depuis création) : une commande **terminale** (done/cancelled/
+  declined) est purgée au-delà. `PruneExpired` nettoie aussi les `id` de `COC.db.muted` orphelins.
+- **Ré-émission** `REBROADCAST = 2 h` : ticker qui ré-émet MES commandes ouvertes/acceptées (un pair
+  qui rejoint le canal sans HI finit par les voir).
+
+## Relais mesh (propagation entre pairs)
+
+`OnArtisanOnline(who)` → pour chaque commande, `_RelayMatch(o, who)` décide d'un push dirigé (whisper).
+Garde-fous : **plafond** ~25 envois par événement, ordre **non expiré** (`ORDER_TTL`), et la portée est
+respectée. `RebroadcastMine` est jitté (fenêtre 3–6 s) pour éviter les rafales. Un ordre **capté**
+(`captured`) n'est pas re-répandu comme un ordre réseau normal.
+
+## Sémantique `captured` / `viaAddon`
+
+- `viaAddon = true` par défaut (l'ordre est arrivé par le canal addon → l'auteur a l'addon).
+- Une **entrante** captée dans `/commerce`·`/guilde` d'un joueur **sans** l'addon est poussée à un ami
+  capable avec `SUGG|…|1` → chez lui `viaAddon = false` + `captured = true`, pour que l'acceptation
+  prévienne l'auteur par **whisper** (il n'a pas l'addon pour recevoir l'ACK réseau).
+- `SUGG` n'alerte que si le récepteur sait **vraiment** faire (`Handoff:ICanCraft`), jamais sur la
+  simple supposition de l'émetteur.
+
+## Transports (fournis par CraftLink-1.0)
+
+- **whisper 1:1** = canal FIABLE : ordres ciblés, transitions de cycle dirigées, forward. Zéro race au
+  login, pas de dépendance guilde/canal.
+- **canal custom `CraftLinkNet`** (`JoinTemporaryChannel`) = portée « global », **best-effort** : la
+  distribution `CHAT_MSG_ADDON` sur CHANNEL est muette entre deux comptes d'un même Battle.net (PTR
+  2026-06-30). D'où le fanout whisper qui **double** chaque `NEW` vers les artisans connus en ligne.
+- **balise TEXTE `CLNK1`** (throttlée, hardware-event only) : découverte d'inconnus, puis tout le
+  trafic de données bascule en whisper.
+- **guilde** (`GUILD`) : distribution intra-guilde (+ relais GreenWall, hardware-event only).
+
+> Voir `Libs\CraftLink-1.0\CraftLink_Transport.lua` (`TRANSPORT_REV`) et la mémoire
+> `craftlink-addonmessage-system-channels` pour le détail des contraintes de transport.
