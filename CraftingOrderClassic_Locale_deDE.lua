@@ -13,15 +13,14 @@ local de = {
     ["Classic · canal global"] = "Classic · globaler Kanal",
     -- En-têtes de colonnes (Carnet)
     ["COMMANDE"] = "AUFTRAG", ["QTÉ"] = "ANZ.", ["PRIX PROPOSÉ"] = "GEBOTENER PREIS",
-    ["MÉTIER"] = "BERUF", ["DESTINATAIRE"] = "EMPFÄNGER", ["STATUT"] = "STATUS", ["DEMANDEUR"] = "ANFRAGER",
+    ["MÉTIER"] = "BERUF", ["STATUT"] = "STATUS",
     ["ARTISAN"] = "HANDWERKER",
     -- Filtres Carnet
-    ["Tous"] = "Alle", ["Guilde"] = "Gilde", ["Amis"] = "Freunde", ["Croisés"] = "Getroffen", ["Entrantes"] = "Eingehend",
+    ["Tous"] = "Alle", ["Guilde"] = "Gilde", ["Amis"] = "Freunde",
     ["Annuaire"] = "Verzeichnis",
     ["Rafraîchir l'annuaire"] = "Verzeichnis aktualisieren",
     ["annuaire : appel lancé sur le canal — les porteurs en ligne vont répondre."] =
         "Verzeichnis: Aufruf im Kanal gesendet — Online-Nutzer antworten.",
-    ["Nouveautés (v1.4.0)"] = "Neuigkeiten (v1.4.0)",
     ["Survole un ami dans la liste d'amis, ou sélectionne un membre dans le panneau de guilde : ses métiers primaires s'affichent sans ouvrir cette fenêtre."] =
         "Fahre über einen Freund in der Freundesliste oder wähle ein Gildenmitglied im Gildenfenster: seine Hauptberufe werden angezeigt, ohne dieses Fenster zu öffnen.",
     ["Clic droit sur un joueur qui a l'addon (ami, guilde, croisé) : « Passer commande à… » ouvre l'onglet Commande déjà ciblé sur lui."] =
@@ -60,7 +59,6 @@ local de = {
     ["Ce nouvel onglet « Nouveautés » affiche les notes de version directement en jeu."] =
         "Dieser neue Tab « Neues » zeigt die Versionshinweise direkt im Spiel.",
     ["VU"] = "GESEHEN",
-    ["vu en train de crafter (sans l'addon)"] = "beim Herstellen gesehen (ohne Addon)",
     ["vu crafter (sans l'addon)"] = "beim Herstellen gesehen (ohne Addon)",
     ["vu crafter"] = "beim Herstellen gesehen",
     ["%d+ · vu crafter"] = "%d+ · beim Herstellen gesehen",
@@ -71,12 +69,8 @@ local de = {
         "Erkennen von Handwerkern in der Nähe: |cFFFFFFFF%s|r (in Stadt) — /co crafters [on|off]",
     ["repérer les crafteurs sans l'addon qui craftent autour (en ville ; défaut : off)"] =
         "Spieler ohne Addon erkennen, die in der Nähe herstellen (in Stadt; Standard: aus)",
-    ["Archivées"] = "Archiviert", ["En cours"] = "Aktiv", ["libre"] = "offen",
+    ["Archivées"] = "Archiviert", ["En cours"] = "Aktiv",
     ["Aucune commande. Onglet « Commande » pour en poster une."] = "Keine Aufträge. Tab « Bestellen », um einen zu erstellen.",
-    ["Aucune commande entrante. (Capture /commerce et /guilde des joueurs sans l'addon.)"] =
-        "Keine eingehenden Aufträge. (Erfasst aus /Handel und /Gilde von Spielern ohne Addon.)",
-    ["Demande captée dans /"] = "Anfrage erfasst in /",
-    ["Clic droit : ignorer"] = "Rechtsklick: ignorieren",
     ["Clic : "] = "Klick: ", ["Accepter"] = "Annehmen", ["Annuler"] = "Abbrechen", ["Livrer"] = "Liefern",
     ["J'ai reçu"] = "Erhalten", ["Remise"] = "Geliefert",
     ["remise — en attente de confirmation de %s : %s"] = "geliefert — Bestätigung von %s ausstehend: %s",
@@ -85,7 +79,7 @@ local de = {
     ["%s a remis ta commande : %s — clique « J'ai reçu » pour confirmer"] =
         "%s hat deinen Auftrag geliefert: %s — klicke « Erhalten » zum Bestätigen",
     ["Refuser"] = "Ablehnen", ["%s a refusé ta commande : %s"] = "%s hat deinen Auftrag abgelehnt: %s",
-    ["guilde"] = "Gilde", ["commerce"] = "Handel", ["acceptée"] = "angenommen",
+    ["guilde"] = "Gilde", ["commerce"] = "Handel",
     ["Inviter en groupe"] = "In Gruppe einladen", ["en attente"] = "ausstehend", ["acceptées"] = "angenommen", ["en sourdine"] = "stumm",
     ["diag"] = "Diag", ["Sourdine"] = "Stumm", ["Réafficher"] = "Einblenden",
     ["Muter"] = "Stummschalten", ["Ajouter aux artisans"] = "Zu Handwerkern hinzufügen",
@@ -177,7 +171,7 @@ local de = {
     ["(cocher = je fournis)"] = "(anhaken = ich stelle bereit)", ["Commission"] = "Provision", ["Qté"] = "Anz.",
     ["Destinataire :"] = "Empfänger:", ["Diffuser à tous"] = "An alle senden", ["Poster"] = "Erstellen",
     ["Choisis un métier puis un plan."] = "Wähle einen Beruf, dann ein Rezept.",
-    ["Rechercher un plan"] = "Rezept suchen", ["Qualité : Toutes"] = "Qualität: Alle", ["Qualité : "] = "Qualität: ",
+    ["Rechercher un plan"] = "Rezept suchen", ["Qualité : "] = "Qualität: ",
     ["Sélection : "] = "Auswahl: ", ["Commande postée !"] = "Auftrag erstellt!",
     ["Réactifs : j'ai tout"] = "Materialien: alles vorhanden", ["Réactifs : "] = "Materialien: ",
     ["[Prêt]"] = "[Bereit]",
@@ -227,14 +221,12 @@ local de = {
     ["Recettes"] = "Rezepte", ["Commandes"] = "Aufträge", ["Réactifs :"] = "Materialien:",
     ["Créer"] = "Herstellen", ["Créer tout"] = "Alle herstellen", ["Vue Blizzard"] = "Blizzard-Ansicht",
     ["Sélectionne une recette."] = "Wähle ein Rezept.", ["Produit "] = "Ergibt ",
-    ["entrante · "] = "eingehend · ", ["réactifs insuffisants."] = "nicht genug Materialien.",
+    ["réactifs insuffisants."] = "nicht genug Materialien.",
     ["fenêtre métier custom |cFF33DD33activée|r — ouvre un métier. (Guild Economy laisse la main.)"] =
         "eigenes Berufsfenster |cFF33DD33aktiviert|r — öffne einen Beruf. (Guild Economy tritt zurück.)",
     ["fenêtre métier custom |cFFFFCC00désactivée|r (vue Blizzard)."] =
         "eigenes Berufsfenster |cFFFFCC00deaktiviert|r (Blizzard-Ansicht).",
-    ["» Vue Crafting Order"] = "» Crafting-Order-Ansicht", ["Masquer"] = "Ausblenden",
-    ["overlay métier masqué — |cFFFFFFFF/co prof|r pour le réafficher."] =
-        "Berufs-Overlay ausgeblendet — |cFFFFFFFF/co prof|r zum Wiederanzeigen.",
+    ["» Vue Crafting Order"] = "» Crafting-Order-Ansicht",
     ["Module Commandes non chargé — redémarre complètement WoW (quitter/relancer), pas un simple /reload."] =
         "Auftragsmodul nicht geladen — starte WoW komplett neu (beenden/neu starten), nicht nur /reload.",
     ["Clic : ouvrir le carnet d'ordres"] = "Klick: Auftragsbuch öffnen",

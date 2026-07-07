@@ -20,15 +20,14 @@ if loc == "enUS" or loc == "enGB" then
         ["Classic · canal global"] = "Classic · global channel",
         -- En-têtes de colonnes (Carnet)
         ["COMMANDE"] = "ORDER", ["QTÉ"] = "QTY", ["PRIX PROPOSÉ"] = "PRICE OFFERED",
-        ["MÉTIER"] = "PROFESSION", ["DESTINATAIRE"] = "RECIPIENT", ["STATUT"] = "STATUS", ["DEMANDEUR"] = "REQUESTER",
+        ["MÉTIER"] = "PROFESSION", ["STATUT"] = "STATUS",
         ["ARTISAN"] = "CRAFTER",
         -- Filtres Carnet
-        ["Tous"] = "All", ["Guilde"] = "Guild", ["Amis"] = "Friends", ["Croisés"] = "Met", ["Entrantes"] = "Incoming",
+        ["Tous"] = "All", ["Guilde"] = "Guild", ["Amis"] = "Friends",
         ["Annuaire"] = "Directory",
         ["Rafraîchir l'annuaire"] = "Refresh directory",
         ["annuaire : appel lancé sur le canal — les porteurs en ligne vont répondre."] =
             "directory: call sent on the channel — online holders will respond.",
-        ["Nouveautés (v1.4.0)"] = "What's new (v1.4.0)",
         ["Survole un ami dans la liste d'amis, ou sélectionne un membre dans le panneau de guilde : ses métiers primaires s'affichent sans ouvrir cette fenêtre."] =
             "Hover a friend in the Friends list, or select a guildmate in the Guild panel, to see their primary professions without opening this window.",
         ["Clic droit sur un joueur qui a l'addon (ami, guilde, croisé) : « Passer commande à… » ouvre l'onglet Commande déjà ciblé sur lui."] =
@@ -67,7 +66,6 @@ if loc == "enUS" or loc == "enGB" then
         ["Ce nouvel onglet « Nouveautés » affiche les notes de version directement en jeu."] =
             "This new What's New tab shows the release notes right in the game.",
         ["VU"] = "SEEN",
-        ["vu en train de crafter (sans l'addon)"] = "seen crafting (no addon)",
         ["vu crafter (sans l'addon)"] = "seen crafting (no addon)",
         ["vu crafter"] = "seen crafting",
         ["%d+ · vu crafter"] = "%d+ · seen crafting",
@@ -79,12 +77,8 @@ if loc == "enUS" or loc == "enGB" then
             "nearby crafter detection: |cFFFFFFFF%s|r (in town) — /co crafters [on|off]",
         ["repérer les crafteurs sans l'addon qui craftent autour (en ville ; défaut : off)"] =
             "detect players without the addon crafting nearby (in town; default: off)",
-        ["Archivées"] = "Archived", ["En cours"] = "Active", ["libre"] = "open",
+        ["Archivées"] = "Archived", ["En cours"] = "Active",
         ["Aucune commande. Onglet « Commande » pour en poster une."] = "No orders. Use the « Order » tab to post one.",
-        ["Aucune commande entrante. (Capture /commerce et /guilde des joueurs sans l'addon.)"] =
-            "No incoming orders. (Captured from /trade and /guild of players without the addon.)",
-        ["Demande captée dans /"] = "Request captured in /",
-        ["Clic droit : ignorer"] = "Right click: dismiss",
         ["Clic : "] = "Click: ", ["Accepter"] = "Accept", ["Annuler"] = "Cancel", ["Livrer"] = "Deliver",
         ["J'ai reçu"] = "Received", ["Remise"] = "Delivered",
         ["remise — en attente de confirmation de %s : %s"] = "delivered — awaiting %s's confirmation: %s",
@@ -93,7 +87,7 @@ if loc == "enUS" or loc == "enGB" then
         ["%s a remis ta commande : %s — clique « J'ai reçu » pour confirmer"] =
             "%s delivered your order: %s — click \"Received\" to confirm",
         ["Refuser"] = "Decline", ["%s a refusé ta commande : %s"] = "%s declined your order: %s",
-        ["guilde"] = "guild", ["commerce"] = "trade", ["acceptée"] = "accepted",
+        ["guilde"] = "guild", ["commerce"] = "trade",
         -- Vue métier (cabine) : pied de colonne Commandes + action carte
         ["Inviter en groupe"] = "Invite to group", ["en attente"] = "pending", ["acceptées"] = "accepted", ["en sourdine"] = "muted",
         ["diag"] = "diag", ["Sourdine"] = "Muted", ["Réafficher"] = "Unmute",
@@ -198,7 +192,7 @@ if loc == "enUS" or loc == "enGB" then
         ["(cocher = je fournis)"] = "(check = I provide)", ["Commission"] = "Commission", ["Qté"] = "Qty",
         ["Destinataire :"] = "Recipient:", ["Diffuser à tous"] = "Broadcast to all", ["Poster"] = "Post",
         ["Choisis un métier puis un plan."] = "Pick a profession then a recipe.",
-        ["Rechercher un plan"] = "Search a recipe", ["Qualité : Toutes"] = "Quality: All", ["Qualité : "] = "Quality: ",
+        ["Rechercher un plan"] = "Search a recipe", ["Qualité : "] = "Quality: ",
         ["Sélection : "] = "Selection: ", ["Commande postée !"] = "Order posted!",
         -- Filtre réactifs en poche (P2)
         ["Réactifs : j'ai tout"] = "Reagents: I have it all", ["Réactifs : "] = "Reagents: ",
@@ -258,14 +252,12 @@ if loc == "enUS" or loc == "enGB" then
         ["Recettes"] = "Recipes", ["Commandes"] = "Orders", ["Réactifs :"] = "Reagents:",
         ["Créer"] = "Create", ["Créer tout"] = "Create All", ["Vue Blizzard"] = "Blizzard view",
         ["Sélectionne une recette."] = "Select a recipe.", ["Produit "] = "Makes ",
-        ["entrante · "] = "incoming · ", ["réactifs insuffisants."] = "not enough reagents.",
+        ["réactifs insuffisants."] = "not enough reagents.",
         ["fenêtre métier custom |cFF33DD33activée|r — ouvre un métier. (Guild Economy laisse la main.)"] =
             "custom profession window |cFF33DD33enabled|r — open a profession. (Guild Economy stands down.)",
         ["fenêtre métier custom |cFFFFCC00désactivée|r (vue Blizzard)."] =
             "custom profession window |cFFFFCC00disabled|r (Blizzard view).",
-        ["» Vue Crafting Order"] = "» Crafting Order view", ["Masquer"] = "Hide",
-        ["overlay métier masqué — |cFFFFFFFF/co prof|r pour le réafficher."] =
-            "profession overlay hidden — |cFFFFFFFF/co prof|r to show it again.",
+        ["» Vue Crafting Order"] = "» Crafting Order view",
         ["Module Commandes non chargé — redémarre complètement WoW (quitter/relancer), pas un simple /reload."] =
             "Orders module not loaded — fully restart WoW (quit/relaunch), not just /reload.",
         -- Minimap + menu métiers
