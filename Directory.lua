@@ -124,8 +124,11 @@ function Dir:PruneRoster(maxAgeDays, maxRecent)
     for name, r in pairs(self.roster) do
         local keep = r.manual or r.source == "guild" or r.source == "friend" or r.source == "added"
         if not keep then
-            if (r.lastSeen or 0) < cutoff then self.roster[name] = nil
-            else recents[#recents + 1] = { name = name, t = r.lastSeen or 0 } end
+            -- Rétention = dernier signe de vie DIRECT ou RELAYÉ : une entrée créée par pur relais
+            -- n'a pas de lastSeen (pas de fausse présence) — sans ce max elle serait purgée aussitôt.
+            local seen = math.max(r.lastSeen or 0, r.relayed and r.relayed.ts or 0)
+            if seen < cutoff then self.roster[name] = nil
+            else recents[#recents + 1] = { name = name, t = seen } end
         end
     end
     maxRecent = maxRecent or 500
@@ -136,6 +139,10 @@ function Dir:PruneRoster(maxAgeDays, maxRecent)
     -- Prune du throttle de découverte (_lastPing, runtime) : > 5× la fenêtre de 60 s → inutile (borne mémoire).
     local t = now()
     for name, ts in pairs(self._lastPing or {}) do if t - ts > 300 then self._lastPing[name] = nil end end
+    if self.PruneCooldowns then self:PruneCooldowns() end   -- readyAt trop vieux (Directory_Cooldowns.lua)
+    if self.PruneRelays then self:PruneRelays() end         -- relais périmés (Directory_Relay.lua)
+    if self.PruneAlts then self:PruneAlts() end             -- claims de rerolls périmées (Directory_Alts.lua)
+    if self.PruneMySkills then self:PruneMySkills() end     -- partitions skill orphelines (Directory_MyArtisans.lua)
 end
 
 -- RK reçu (recettes d'un autre) → cache roster persistant.
@@ -164,6 +171,7 @@ function Dir:_Touch(name)
     if not r then r = {}; self.roster = self.roster or {}; self.roster[name] = r end
     self:_ApplySource(name, r)
     r.lastSeen = time()
+    r.relayed = nil   -- il répond LUI-MÊME : ses données directes invalident tout relais de partenaire
     local wasOnline = self.online[name]
     self.online[name] = true
     self:_NoteLinked(name, r)
@@ -181,6 +189,7 @@ function Dir:OnHello(sender, _, distribution)
     if distribution == "WHISPER" then
         self:AnnounceTo(sender)
         self:DiscoverPlayer(sender)
+        if self.RelayPartnersTo then self:RelayPartnersTo(sender) end   -- fiches de mes partenaires hors ligne
     elseif C_Timer then
         C_Timer.After(math.random() * 3, function() Dir:Announce() end)
     end
@@ -195,6 +204,7 @@ function Dir:OnPing(sender, _, distribution)
         CraftLink:Send("PONG", "whisper", sender)
         self:AnnounceTo(sender)
         self:DiscoverPlayer(sender)
+        if self.RelayPartnersTo then self:RelayPartnersTo(sender) end   -- fiches de mes partenaires hors ligne
     else
         CraftLink:Send("PONG", "yell")
     end
@@ -217,6 +227,8 @@ function Dir:Announce()
         local msg = CraftLink:BuildRK(prof)
         if msg then CraftLink:Send(msg, "global") end
     end
+    if self.AnnounceCooldowns then self:AnnounceCooldowns("global") end
+    if self.AnnounceAlts then self:AnnounceAlts("global") end   -- opt-in : no-op sans /co alts on
 end
 
 -- Publie MON profil DIRECTEMENT à un joueur (whisper) — fiable hors canal/guilde. Sert aux réponses
@@ -229,6 +241,8 @@ function Dir:AnnounceTo(target)
         local msg = CraftLink:BuildRK(prof)
         if msg then CraftLink:Send(msg, "whisper", target) end
     end
+    if self.AnnounceCooldowns then self:AnnounceCooldowns("whisper", target) end
+    if self.AnnounceAlts then self:AnnounceAlts("whisper", target) end   -- opt-in : no-op sinon
 end
 
 -- Découverte DIRIGÉE d'un joueur (croisement / ajout manuel) : on lui chuchote PING + HI. S'il a
@@ -392,6 +406,9 @@ function Dir:Start()
     CraftLink:RegisterHandler("HI",   function(s, m, d) Dir:OnHello(s, m, d) end)
     CraftLink:RegisterHandler("PING", function(s, m, d) Dir:OnPing(s, m, d) end)
     CraftLink:RegisterHandler("PONG", function(s)       Dir:OnPong(s) end)
+    if self.StartCooldowns then self:StartCooldowns() end   -- verbe CD (Directory_Cooldowns.lua)
+    if self.StartRelay then self:StartRelay() end           -- verbe RLY (Directory_Relay.lua)
+    if self.StartAlts then self:StartAlts() end             -- verbe ALT (Directory_Alts.lua)
     CraftLink:OnPresence(function(kind, who) Dir:OnPresence(kind, who) end)
     if CraftLink.OnBeacon then CraftLink:OnBeacon(function(who) Dir:OnBeacon(who) end) end
 

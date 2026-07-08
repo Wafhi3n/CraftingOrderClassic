@@ -37,6 +37,24 @@ local function ensureReverse()
     return byItem, bySpell
 end
 
+-- Recette à COOLDOWN vue partir → estimation « indispo jusqu'à » (readyAt = cast + durée Wowhead),
+-- étendue au groupe partagé (la catégorie verrouille tout le groupe pour la durée du sort casté).
+-- Stockée À PART (r.cdSeen), jamais dans r.cooldowns (réservé aux vraies données réseau CD).
+local function noteCdSeen(c, r, prof, spellID)
+    local dur = c and spellID and c.RecipeCooldown and c:RecipeCooldown(prof, spellID)
+    if not dur or (r.cooldowns and r.cooldowns[prof]) then return end
+    local set = r.cdSeen and r.cdSeen[prof]
+    if not set then r.cdSeen = r.cdSeen or {}; set = {}; r.cdSeen[prof] = set end
+    local readyAt = (time and time() or 0) + dur
+    set[spellID] = readyAt
+    local grp = c:RecipeCdGroup(prof, spellID)
+    if grp then
+        for sid in pairs(c:CooldownRecipes(prof) or {}) do
+            if sid ~= spellID and c:RecipeCdGroup(prof, sid) == grp then set[sid] = readyAt end
+        end
+    end
+end
+
 -- Cœur : `who` (joueur ≠ moi) a crafté une recette de `prof` (spellID → plancher learnedAt).
 function Dir:_NoteSeen(who, prof, spellID)
     who = who and (who:match("^([^%-]+)") or who)
@@ -49,6 +67,7 @@ function Dir:_NoteSeen(who, prof, spellID)
     local c = CL(); local floor = (c and spellID and c:RecipeLearnedAt(prof, spellID)) or 0
     r.craftSeen = r.craftSeen or {}
     if floor > (r.craftSeen[prof] or 0) then r.craftSeen[prof] = floor end
+    noteCdSeen(c, r, prof, spellID)
     if not (r.skill or r.recipes) then r.nonAddon = true end
     r.lastSeen = time and time() or 0
     self:_ApplySource(who, r)          -- guilde/ami si relation, sinon « recent » (Annuaire)

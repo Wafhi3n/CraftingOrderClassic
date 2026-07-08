@@ -108,6 +108,21 @@ function Skin.QtySuffix(o)
     return " " .. Skin.QtyText(o)
 end
 
+-- Durée compacte pour les cooldowns : « 2j 3h » / « 14h 5min » / « 12min » (2 unités max,
+-- jamais 0 : un restant < 60 s s'affiche « 1min » — l'échelle des CD se compte en heures/jours).
+function Skin.FormatDuration(sec)
+    sec = math.max(0, math.floor(tonumber(sec) or 0))
+    local d = math.floor(sec / 86400)
+    local h = math.floor((sec % 86400) / 3600)
+    local m = math.floor((sec % 3600) / 60)
+    if d > 0 then
+        return string.format(L["%dj"], d) .. ((h > 0) and (" " .. string.format(L["%dh"], h)) or "")
+    elseif h > 0 then
+        return string.format(L["%dh"], h) .. ((m > 0) and (" " .. string.format(L["%dmin"], m)) or "")
+    end
+    return string.format(L["%dmin"], math.max(1, m))
+end
+
 -- =========================================================================
 -- Filtres d'annuaire PARTAGÉS (Commande / Récolte / Artisans) — anciennement dupliqués (knowsProf/
 -- inSource) dans chaque onglet, avec une divergence SUBTILE (Artisans incluait craftSeen, pas les
@@ -120,10 +135,14 @@ function Skin.KnowsProf(r, p)
     return (r.skill and r.skill[p]) or (r.recipes and r.recipes[p]) or false
 end
 
--- + craftSeen (non-porteur repéré à proximité, sans l'addon). À utiliser pour l'ANNUAIRE D'AFFICHAGE
--- (onglet Artisans), où l'on montre AUSSI les crafteurs vus mais qu'on ne peut pas commander.
+-- + craftSeen (non-porteur repéré à proximité, sans l'addon) + relayed (fiche servie par un
+-- partenaire pendant que l'artisan est hors ligne — estimation display-only). À utiliser pour
+-- l'ANNUAIRE D'AFFICHAGE (onglet Artisans) UNIQUEMENT : KnowsProf (routage) reste INTACT —
+-- on n'adresse jamais une commande sur la foi d'un relais.
 function Skin.KnowsProfOrSeen(r, p)
-    return Skin.KnowsProf(r, p) or (r.craftSeen and r.craftSeen[p]) or false
+    return Skin.KnowsProf(r, p) or (r.craftSeen and r.craftSeen[p])
+        or (r.relayed and (r.relayed.skill and r.relayed.skill[p]
+            or r.relayed.recipes and r.relayed.recipes[p])) or false
 end
 
 -- Un artisan entre-t-il dans la SOURCE (Guilde/Amis via drapeaux de relation, sinon catégorie

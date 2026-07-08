@@ -52,6 +52,9 @@ function Orders:VisibleTo(o, who)
     if not rcpt or rcpt == "" or rcpt == "Tous" then return true end
     if o.buyer == who then return true end          -- ma propre commande : toujours visible
     if rcpt == who then return true end             -- ciblée nommément sur moi (@Nom)
+    -- Nommée sur un de mes REROLLS (décision 100 % locale : MA SavedVariable, sans opt-in) :
+    -- visible depuis n'importe quel perso du compte — le Carnet/la vue métier l'affichent, l'alerte suit.
+    if who == me() and COC.IsMyChar and COC:IsMyChar(rcpt) then return true end
     local D = COC.Directory
     if rcpt == "Guilde" then return (D and D._guildSet  and D._guildSet[o.buyer]) == true end
     if rcpt == "Amis"   then return (D and D._friendSet and D._friendSet[o.buyer]) == true end
@@ -61,6 +64,15 @@ end
 -- ------------------------------------------------------------------
 -- Cycle (actions locales → diffusion)
 -- ------------------------------------------------------------------
+-- « Agit pour » : moi-même, ou — rerolls OPT-IN actifs — un perso de MON compte (IsMyChar, local).
+-- Le gating sur altsEnabled évite d'émettre une transition inter-perso que les pairs (qui exigent
+-- la réciprocité ALT) rejetteraient en face : sans opt-in, strictement équivalent à « == me() ».
+local function actsFor(name)
+    if not name then return false end
+    if name == me() then return true end
+    return (COC.db and COC.db.altsEnabled and COC.IsMyChar and COC:IsMyChar(name)) or false
+end
+
 local function genId()
     COC.db.orderSeq = (COC.db.orderSeq or 0) + 1
     return me() .. "-" .. COC.db.orderSeq
@@ -111,7 +123,7 @@ end
 function Orders:Cancel(id)
     local o = id and COC.db.orders[id]
     if not o then pmsg(L["commande introuvable : "] .. tostring(id)); return end
-    if o.buyer ~= me() then pmsg(L["ce n'est pas ta commande."]); return end
+    if not actsFor(o.buyer) then pmsg(L["ce n'est pas ta commande."]); return end
     o.status = "cancelled"; self:Broadcast("CANCEL", o)
     pmsg(L["commande annulée : "] .. id)
 end
@@ -119,8 +131,16 @@ end
 function Orders:Accept(id)
     local o = id and COC.db.orders[id]
     if not o or o.status ~= "open" then pmsg(L["commande non disponible : "] .. tostring(id)); return end
-    if o.buyer == me() then pmsg(L["c'est ta propre commande."]); return end
+    -- IsMyChar (sans opt-in) : ferme aussi l'auto-acceptation entre rerolls du même compte (rep).
+    if o.buyer == me() or (COC.IsMyChar and COC:IsMyChar(o.buyer)) then pmsg(L["c'est ta propre commande."]); return end
     if not self:VisibleTo(o) then pmsg(L["cette commande ne t'est pas destinée."]); return end
+    -- Nommée pour un de mes rerolls SANS opt-in : l'acheteur (réciprocité) rejetterait l'ACK —
+    -- on n'émet pas un demi-état, on explique quoi faire.
+    local rcpt = o.recipient
+    if rcpt and rcpt ~= me() and COC.IsMyChar and COC:IsMyChar(rcpt) and not (COC.db and COC.db.altsEnabled) then
+        pmsg(string.format(L["commande nommée pour %s : connecte ce perso, ou active /co alts on pour accepter d'ici."], rcpt))
+        return
+    end
     o.status = "accepted"; o.acceptedBy = me(); self:Broadcast("ACK", o)
     pmsg(string.format(L["commande acceptée : %s (%s)"], id, itemName(o.itemID)))
 end
@@ -132,7 +152,7 @@ end
 function Orders:Deliver(id)
     local o = id and COC.db.orders[id]
     if not o then pmsg(L["commande introuvable : "] .. tostring(id)); return end
-    if o.acceptedBy ~= me() then pmsg(L["tu n'as pas accepté cette commande."]); return end
+    if not actsFor(o.acceptedBy) then pmsg(L["tu n'as pas accepté cette commande."]); return end
     o.status = "delivered"; self:Broadcast("DLV", o)
     pmsg(string.format(L["remise — en attente de confirmation de %s : %s"], o.buyer or "?", self:OrderName(o)))
 end
@@ -143,7 +163,7 @@ end
 function Orders:Confirm(id, auto)
     local o = id and COC.db.orders[id]
     if not o then if not auto then pmsg(L["commande introuvable : "] .. tostring(id)) end; return end
-    if o.buyer ~= me() then if not auto then pmsg(L["ce n'est pas ta commande."]) end; return end
+    if not actsFor(o.buyer) then if not auto then pmsg(L["ce n'est pas ta commande."]) end; return end
     if o.status == "done" then return end
     o.status = "done"; self:Broadcast("DONE", o)
     pmsg(string.format(L["réception confirmée : %s"], self:OrderName(o)))
@@ -156,7 +176,7 @@ end
 function Orders:TryAutoComplete(itemID, source)
     if not (itemID and COC.db and COC.db.orders) then return false end
     for id, o in pairs(COC.db.orders) do
-        if o.buyer == me() and o.status == "delivered" and o.itemID == itemID then
+        if actsFor(o.buyer) and o.status == "delivered" and o.itemID == itemID then
             self:Confirm(id, true)
             return true
         end
@@ -186,7 +206,7 @@ end
 function Orders:Decline(o)
     if not (o and COC.db) then return end
     local m = me()
-    if o.acceptedBy == m and o.status == "accepted" then
+    if actsFor(o.acceptedBy) and o.status == "accepted" then
         o.status = "open"; o.acceptedBy = nil
         if CraftLink then
             local nack = Codec.Encode("NACK", { id = o.id, who = m })
@@ -198,7 +218,7 @@ function Orders:Decline(o)
         COC.db.muted = COC.db.muted or {}; COC.db.muted[o.id] = true
         -- Refus d'une commande qui me visait NOMMÉMENT → j'alerte l'acheteur (il la verra « Refusée »).
         -- Portée large (Tous/Guilde/Amis) → silencieux : d'autres artisans la voient encore.
-        if CraftLink and o.buyer and o.buyer ~= m and o.recipient == m then
+        if CraftLink and o.buyer and o.buyer ~= m and (o.recipient == m or actsFor(o.recipient)) then
             CraftLink:Send(Codec.Encode("NACK", { id = o.id, who = m }), "whisper", o.buyer)
         end
     end
@@ -208,11 +228,11 @@ end
 -- accepte/livre — le Carnet ne fait que LISTER mes propres commandes. Renvoie (label, fn) ou nil.
 function Orders:ProfRowAction(o)
     if not o then return nil end
-    local m = me()
-    if o.status == "open" and o.buyer ~= m and self:VisibleTo(o) then
+    local mine = o.buyer == me() or (COC.IsMyChar and COC:IsMyChar(o.buyer))   -- miroir de Accept (anti auto-farm)
+    if o.status == "open" and not mine and self:VisibleTo(o) then
         return L["Accepter"], function() Orders:Accept(o.id) end
     end
-    if o.acceptedBy == m and o.status == "accepted" then
+    if actsFor(o.acceptedBy) and o.status == "accepted" then
         return L["Livrer"], function() Orders:Deliver(o.id) end
     end
     return nil
@@ -226,7 +246,9 @@ end
 function Orders:_ShouldAlert(o)
     local m = (COC.db and COC.db.notifyScope) or "all"
     if m == "off" or (COC.db and COC.db.mutedPlayers and COC.db.mutedPlayers[o.buyer]) then return false end
-    if o.recipient == me() then return true end                     -- nommée : toujours (même petit perso)
+    -- Nommée sur moi OU sur un de mes rerolls (IsMyChar = MA SavedVariable — aucun message réseau
+    -- ne peut m'assigner un reroll, donc pas d'alerte forcée) : toujours (même petit perso).
+    if o.recipient == me() or (COC.IsMyChar and COC:IsMyChar(o.recipient)) then return true end
     if m == "named" or not self:VisibleTo(o) or (COC.Moderation and COC.Moderation:BelowThreshold(o.buyer)) then return false end  -- restreint / hors portée / bas niveau (anti-bot)
     return (o.recipient and o.recipient ~= "" and o.recipient ~= "Tous") or m == "all"  -- Guilde/Amis vs large
 end
@@ -243,7 +265,14 @@ function Orders:AlertTargeted(o, tries)
     local Skin = COC.UI and COC.UI.Skin
     local qty = (Skin and Skin.QtySuffix(o)) or ""
     local pr  = o.price and (" — |cFFFFDD00" .. o.price .. "|r") or ""
-    local msg = string.format(L["|cFFFFCC00commande pour TOI|r de |cFFFFFFFF%s|r : %s%s%s"], o.buyer, nm, qty, pr)
+    local msg
+    local rcpt = o.recipient
+    if rcpt and rcpt ~= me() and COC.IsMyChar and COC:IsMyChar(rcpt) then
+        -- Nommée pour un de mes REROLLS (visible ici grâce à VisibleTo étendu) : texte dédié.
+        msg = string.format(L["|cFFFFCC00commande pour ton reroll %s|r de |cFFFFFFFF%s|r : %s%s%s"], rcpt, o.buyer, nm, qty, pr)
+    else
+        msg = string.format(L["|cFFFFCC00commande pour TOI|r de |cFFFFFFFF%s|r : %s%s%s"], o.buyer, nm, qty, pr)
+    end
     pmsg((Skin and ("|T" .. Skin.tex.workorder .. ":0|t ") or "") .. msg)
     if COC.UI and COC.UI.Toast then COC.UI:Toast(msg) end
     pcall(function() PlaySound(SOUNDKIT and SOUNDKIT.TELL_MESSAGE or 3081, "Master") end)
@@ -261,9 +290,11 @@ end
 -- et par le ticker périodique : un porteur qui (re)joint le canal finit par les recevoir. Idempotent
 -- côté récepteur (dédup par id). L'appelant peut jitter (anti-burst).
 function Orders:RebroadcastMine()
-    local m = me()
     for _, o in pairs(COC.db.orders or {}) do
-        if o.buyer == m and (o.status == "open" or o.status == "accepted") then
+        -- « Miennes » = celles de MON COMPTE (IsMyChar, local) : la SV étant partagée, les commandes
+        -- d'un reroll hors ligne restent maintenues en vie par le perso connecté. Mesh-sûr (dédup id).
+        local mine = o.buyer == me() or (COC.IsMyChar and COC:IsMyChar(o.buyer))
+        if mine and (o.status == "open" or o.status == "accepted") then
             self:Broadcast("NEW", o)
         end
     end
@@ -304,7 +335,10 @@ function Orders:PruneExpired()
     local orders = COC.db.orders or {}
     for id, o in pairs(orders) do
         local terminal = o.status == "done" or o.status == "cancelled" or o.status == "declined"
-        if o.status == "open" and o.buyer ~= m and (now - (o.ts or now)) > ORDER_TTL then
+        -- « d'autrui » exclut mes REROLLS (IsMyChar) : la SV est partagée — sinon le login d'un perso
+        -- purgerait les commandes ouvertes d'un alt du même compte.
+        local foreign = o.buyer ~= m and not (COC.IsMyChar and COC:IsMyChar(o.buyer))
+        if o.status == "open" and foreign and (now - (o.ts or now)) > ORDER_TTL then
             orders[id] = nil
         elseif terminal and (now - (o.ts or now)) > DONE_RETENTION then
             orders[id] = nil
@@ -327,7 +361,9 @@ function Orders:_RelayMatch(o, who)
     if o.buyer == who then return false end
     local rcpt = o.recipient or "Tous"
     if rcpt == "Tous" or rcpt == "Guilde" or rcpt == "Amis" then return true end
-    return rcpt == who                                   -- nommé : seulement vers la cible
+    if rcpt == who then return true end                  -- nommé : vers la cible…
+    local D = COC.Directory                              -- …ou un perso de son set VÉRIFIÉ (rerolls)
+    return (D and D.SamePlayer and D:SamePlayer(rcpt, who)) == true
 end
 
 -- Un artisan apparaît EN LIGNE (présence JOIN ou découverte whisper) : je lui RELAIE en direct

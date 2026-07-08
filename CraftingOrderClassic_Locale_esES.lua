@@ -69,10 +69,58 @@ local es = {
         "La interfaz se traduce al alemán y al español según el idioma de tu cliente de WoW.",
     ["Ce nouvel onglet « Nouveautés » affiche les notes de version directement en jeu."] =
         "Esta nueva pestaña « Novedades » muestra las notas de versión directamente en el juego.",
+    -- Onglet Nouveautés — v1.9.0
+    ["Tes rerolls réunis : cooldowns partagés, une identité, l'onglet Mes artisans"] =
+        "Tus alters reunidos: enfriamientos compartidos, una identidad, la pestaña Mis artesanos",
+    ["Cooldowns de recettes partagés : les autres voient « Transmutation : prête » ou « dans 14h » sur ton infobulle d'artisan — fini de demander en canal si ton Arcanite est dispo."] =
+        "Enfriamientos de recetas compartidos: los demás ven «Transmutación: lista» o «en 14h» en tu información de artesano — se acabó preguntar por el canal si tu Arcanita está lista.",
+    ["Regroupe tes persos sous une identité (|cFFFFFFFF/co alts on|r) : une commande nommée pour ton alchimiste hors ligne arrive sur le perso où tu es connecté, et tu peux l'accepter depuis n'importe lequel. Vérifié des deux côtés (personne ne peut se faire passer pour le reroll d'autrui). Désactivé par défaut."] =
+        "Agrupa tus personajes bajo una identidad (|cFFFFFFFF/co alts on|r): un pedido dirigido a tu alquimista desconectado llega al personaje en el que estás conectado, y puedes aceptarlo desde cualquiera. Verificado en ambos sentidos (nadie puede hacerse pasar por el alter de otro). Desactivado por defecto.",
+    ["Nouvel onglet « Mes artisans » : tous les métiers de ton compte sur le royaume en une vue, comme un seul perso — niveau, recettes connues par catégorie, cooldowns en tête, et quel perso porte chaque recette."] =
+        "Nueva pestaña «Mis artesanos»: todas las profesiones de tu cuenta en el reino en una vista, como un solo personaje — nivel, recetas conocidas por categoría, enfriamientos arriba, y qué personaje tiene cada receta.",
     ["VU"] = "VISTO",
     ["vu crafter (sans l'addon)"] = "visto fabricando (sin el addon)",
     ["vu crafter"] = "visto fabricando",
     ["%d+ · vu crafter"] = "%d+ · visto fabricando",
+    -- Cooldowns de recettes (transmutations & co)
+    ["%s : prête"] = "%s: lista",
+    ["%s : dans %s"] = "%s: en %s",
+    ["(estimé)"] = "(estimado)",
+    ["Transmutation"] = "Transmutación",
+    ["%dj"] = "%dd", ["%dh"] = "%dh", ["%dmin"] = "%dmin",
+    -- Relais partenaire
+    ["via %s · il y a %s"] = "vía %s · hace %s",
+    ["RELAIS"] = "RELEVO",
+    -- Rerolls (identité joueur multi-persos, /co alts — opt-in)
+    ["rerolls : ACTIVÉS — ta liste de persos est annoncée au réseau."] =
+        "alters: ACTIVADOS — tu lista de personajes se anuncia a la red.",
+    ["rerolls : désactivés — rien n'est annoncé (opt-in : /co alts on)."] =
+        "alters: desactivados — no se anuncia nada (opt-in: /co alts on).",
+    ["perso principal (vitrine) : %s"] = "personaje principal (escaparate): %s",
+    ["persos du compte (%s) : %s"] = "personajes de la cuenta (%s): %s",
+    ["le lien n'est vérifié chez les autres qu'après une connexion de CHAQUE perso (addon actif)."] =
+        "los demás solo verifican el vínculo cuando CADA personaje se ha conectado una vez (addon activo).",
+    ["rerolls activés — perso principal : %s (changer : /co alts main <nom>)"] =
+        "alters activados — personaje principal: %s (cambiar: /co alts main <nombre>)",
+    ["rerolls désactivés — dissolution annoncée au réseau."] =
+        "alters desactivados — disolución anunciada a la red.",
+    ["perso inconnu sur ce compte : %s (connecte-le une fois avec l'addon)"] =
+        "personaje desconocido en esta cuenta: %s (conéctalo una vez con el addon)",
+    ["regrouper tes rerolls (opt-in) : liste annoncée, commandes routées vers ton perso connecté"] =
+        "agrupar tus alters (opt-in): lista anunciada, pedidos dirigidos a tu personaje conectado",
+    ["commande nommée pour %s : connecte ce perso, ou active /co alts on pour accepter d'ici."] =
+        "pedido dirigido a %s: conecta ese personaje, o activa /co alts on para aceptar desde aquí.",
+    ["|cFFFFCC00commande pour ton reroll %s|r de |cFFFFFFFF%s|r : %s%s%s"] =
+        "|cFFFFCC00pedido para tu alter %s|r de |cFFFFFFFF%s|r: %s%s%s",
+    ["En ligne via %s"] = "En línea vía %s",
+    ["reroll : %s (%s)"] = "alter: %s (%s)",
+    -- Onglet « Mes artisans » (vue agrégée des métiers du compte — 100 % local)
+    ["Mes artisans"] = "Mis artesanos",
+    ["MÉTIERS DU COMPTE"] = "PROFESIONES DE LA CUENTA",
+    ["%d recettes"] = "%d recetas",
+    ["Aucun métier. Ouvre ta fenêtre métier sur chaque perso une fois."] =
+        "Sin profesiones. Abre la ventana de profesión en cada personaje una vez.",
+    ["Pas de recettes connues (métier de récolte ?)."] = "Sin recetas conocidas (¿profesión de recolección?).",
     ["Repérer les crafteurs autour (en ville)"] = "Detectar artesanos cercanos (en ciudad)",
     ["Ajouter ami"] = "Añadir amigo",
     ["|cFFFFFFFF%s|r ajouté à tes amis."] = "|cFFFFFFFF%s|r añadido a tus amigos.",

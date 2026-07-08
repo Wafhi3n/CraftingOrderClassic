@@ -40,6 +40,18 @@ function COC:_MyKnownStore()
     return self.db.knownRecipes[me]
 end
 
+-- myCooldowns[nom-royaume] : même partition PAR PERSO que knownRecipes — un CD de transmutation
+-- appartient au perso, pas au compte (sinon le CD d'un alt fuirait dans MON annonce).
+function COC:_MyCooldownStore()
+    if not self.db then return nil end
+    self.db.myCooldowns = self.db.myCooldowns or {}
+    local n  = (UnitName and UnitName("player")) or "?"
+    local rl = (GetRealmName and GetRealmName()) or ""
+    local me = n .. "-" .. rl
+    self.db.myCooldowns[me] = self.db.myCooldowns[me] or {}
+    return self.db.myCooldowns[me]
+end
+
 -- Scan de la fenêtre métier ouverte → union dans CraftLink ; miroir vers MA partition SavedVariables.
 function COC:Scan()
     if not (CraftLink and self.db) then return end
@@ -47,8 +59,19 @@ function COC:Scan()
     if changed then
         local store = self:_MyKnownStore()
         if store then CraftLink:SaveMyRecipes(store) end     -- persiste à chaque plan appris
-        if self.Directory then self.Directory:AnnounceThrottled() end   -- + rediffuse aux autres
     end
+    -- Cooldowns de recettes : une transmutation castée déclenche TRADE_SKILL_UPDATE → ce même
+    -- scan relit GetTradeSkillCooldown et détecte le départ du CD (pas besoin de combat log).
+    local cdChanged = false
+    if CraftLink.ScanOpenCooldowns then
+        local _, c = CraftLink:ScanOpenCooldowns()
+        if c then
+            cdChanged = true
+            local cdStore = self:_MyCooldownStore()
+            if cdStore then CraftLink:SaveMyCooldowns(cdStore) end
+        end
+    end
+    if (changed or cdChanged) and self.Directory then self.Directory:AnnounceThrottled() end   -- rediffuse aux autres
 end
 
 -- Scan DÉBOUNCÉ : TRADE_SKILL_UPDATE / CRAFT_UPDATE spamment pendant un craft en série (20 objets =
@@ -245,6 +268,7 @@ function COC:Help()
     print("  |cFFFFFFFF/co crafters [on|off]|r — " .. L["repérer les crafteurs sans l'addon qui craftent autour (en ville ; défaut : off)"])
     print("  |cFFFFFFFF/co lootalert [on|off]|r — " .. L["alerte quand tu loots un plan connu de CraftLink (défaut : on)"])
     print("  |cFFFFFFFF/co gift [nom]|r — " .. L["proposer (chuchoter) le dernier plan looté à un ami/partenaire qui ne le connaît pas"])
+    print("  |cFFFFFFFF/co alts [on|off|main <nom>]|r — " .. L["regrouper tes rerolls (opt-in) : liste annoncée, commandes routées vers ton perso connecté"])
     print("  |cFFFFFFFF/co mute <nom>|r / |cFFFFFFFF/co unmute <nom>|r — " .. L["muter/démuter un joueur (aucune notif de sa part)"])
     print("  |cFFFFFFFF/co lowlevel [N|off]|r — " .. L["seuil de mute auto des persos bas niveau (défaut 5)"])
     print("  |cFFFFFFFF/co debug|r — |cFFFF8800" .. L["mode solo"] .. "|r : " .. L["injecte/retire un réseau fictif (artisans + commandes)"])
@@ -284,6 +308,7 @@ function COC:Slash(msg)
     elseif cmd == "mute"   then if COC.Moderation then COC.Moderation:MuteCmd(rest) end
     elseif cmd == "unmute" then if COC.Moderation then COC.Moderation:UnmuteCmd(rest) end
     elseif cmd == "lowlevel" or cmd == "lowlvl" then if COC.Moderation then COC.Moderation:LowLevelCmd(rest) end
+    elseif cmd == "alts" or cmd == "rerolls" then if D and D.AltsCmd then D:AltsCmd(rest) end
     elseif cmd == "beacon" then COC:BeaconDiag()
     elseif cmd == "gwroster" or cmd == "confed" then COC:GreenWallDiag()
     elseif cmd == "wipe"   then COC:WipeRoster()
@@ -311,6 +336,8 @@ f:SetScript("OnEvent", function(_, event, arg1)
         if COC.Migrations then COC.Migrations.Apply(COC.db) end
     elseif event == "PLAYER_LOGIN" then
         if CraftLink and COC.db then CraftLink:LoadMyRecipes(COC:_MyKnownStore()) end
+        -- Mes CD persistés (readyAt absolus) → annonçables au bringup SANS rouvrir la fenêtre métier.
+        if CraftLink and COC.db and CraftLink.LoadMyCooldowns then CraftLink:LoadMyCooldowns(COC:_MyCooldownStore()) end
         -- Trace réseau persistée (diagnostic 2 comptes) : on branche le tracer de la lib sur COC.Trace.
         if CraftLink and CraftLink.SetTracer then
             CraftLink:SetTracer(function(c, m) if COC.Trace then COC.Trace:Log(c, m) end end)

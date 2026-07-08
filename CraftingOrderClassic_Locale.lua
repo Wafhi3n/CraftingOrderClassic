@@ -75,10 +75,58 @@ if loc == "enUS" or loc == "enGB" then
             "The interface is translated into German and Spanish depending on your WoW client language.",
         ["Ce nouvel onglet « Nouveautés » affiche les notes de version directement en jeu."] =
             "This new What's New tab shows the release notes right in the game.",
+        -- Onglet Nouveautés — v1.9.0
+        ["Tes rerolls réunis : cooldowns partagés, une identité, l'onglet Mes artisans"] =
+            "Your alts, together: shared cooldowns, one identity, a My Artisans tab",
+        ["Cooldowns de recettes partagés : les autres voient « Transmutation : prête » ou « dans 14h » sur ton infobulle d'artisan — fini de demander en canal si ton Arcanite est dispo."] =
+            "Shared recipe cooldowns: others see \"Transmute: ready\" or \"in 14h\" on your artisan tooltip — no more asking in chat whether your Arcanite is up.",
+        ["Regroupe tes persos sous une identité (|cFFFFFFFF/co alts on|r) : une commande nommée pour ton alchimiste hors ligne arrive sur le perso où tu es connecté, et tu peux l'accepter depuis n'importe lequel. Vérifié des deux côtés (personne ne peut se faire passer pour le reroll d'autrui). Désactivé par défaut."] =
+            "Group your characters under one identity (|cFFFFFFFF/co alts on|r): an order named for your offline alchemist reaches whichever character you're on, and you can accept it from any of them. Verified both ways (nobody can pose as someone else's alt). Off by default.",
+        ["Nouvel onglet « Mes artisans » : tous les métiers de ton compte sur le royaume en une vue, comme un seul perso — niveau, recettes connues par catégorie, cooldowns en tête, et quel perso porte chaque recette."] =
+            "New \"My Artisans\" tab: all your account's professions on the realm in one view, as a single character — level, known recipes by category, cooldowns at the top, and which character carries each recipe.",
         ["VU"] = "SEEN",
         ["vu crafter (sans l'addon)"] = "seen crafting (no addon)",
         ["vu crafter"] = "seen crafting",
         ["%d+ · vu crafter"] = "%d+ · seen crafting",
+        -- Cooldowns de recettes (transmutations & co)
+        ["%s : prête"] = "%s: ready",
+        ["%s : dans %s"] = "%s: in %s",
+        ["(estimé)"] = "(estimated)",
+        ["Transmutation"] = "Transmute",
+        ["%dj"] = "%dd", ["%dh"] = "%dh", ["%dmin"] = "%dmin",
+        -- Relais partenaire (fiche d'un artisan hors ligne servie par un contact de confiance)
+        ["via %s · il y a %s"] = "via %s · %s ago",
+        ["RELAIS"] = "RELAYED",
+        -- Rerolls (identité joueur multi-persos, /co alts — opt-in)
+        ["rerolls : ACTIVÉS — ta liste de persos est annoncée au réseau."] =
+            "alts: ENABLED — your character list is announced to the network.",
+        ["rerolls : désactivés — rien n'est annoncé (opt-in : /co alts on)."] =
+            "alts: disabled — nothing is announced (opt-in: /co alts on).",
+        ["perso principal (vitrine) : %s"] = "main character (front): %s",
+        ["persos du compte (%s) : %s"] = "account characters (%s): %s",
+        ["le lien n'est vérifié chez les autres qu'après une connexion de CHAQUE perso (addon actif)."] =
+            "others only verify the link after EACH character has logged in once (addon running).",
+        ["rerolls activés — perso principal : %s (changer : /co alts main <nom>)"] =
+            "alts enabled — main character: %s (change: /co alts main <name>)",
+        ["rerolls désactivés — dissolution annoncée au réseau."] =
+            "alts disabled — dissolution announced to the network.",
+        ["perso inconnu sur ce compte : %s (connecte-le une fois avec l'addon)"] =
+            "unknown character on this account: %s (log it in once with the addon)",
+        ["regrouper tes rerolls (opt-in) : liste annoncée, commandes routées vers ton perso connecté"] =
+            "group your alts (opt-in): list announced, orders routed to your online character",
+        ["commande nommée pour %s : connecte ce perso, ou active /co alts on pour accepter d'ici."] =
+            "order named for %s: log that character in, or enable /co alts on to accept from here.",
+        ["|cFFFFCC00commande pour ton reroll %s|r de |cFFFFFFFF%s|r : %s%s%s"] =
+            "|cFFFFCC00order for your alt %s|r from |cFFFFFFFF%s|r: %s%s%s",
+        ["En ligne via %s"] = "Online via %s",
+        ["reroll : %s (%s)"] = "alt: %s (%s)",
+        -- Onglet « Mes artisans » (vue agrégée des métiers du compte — 100 % local)
+        ["Mes artisans"] = "My Artisans",
+        ["MÉTIERS DU COMPTE"] = "ACCOUNT PROFESSIONS",
+        ["%d recettes"] = "%d recipes",
+        ["Aucun métier. Ouvre ta fenêtre métier sur chaque perso une fois."] =
+            "No professions. Open your profession window on each character once.",
+        ["Pas de recettes connues (métier de récolte ?)."] = "No known recipes (gathering profession?).",
         -- Repérage des crafteurs à proximité (opt-in, en ville) + bouton « Ajouter ami »
         ["Repérer les crafteurs autour (en ville)"] = "Detect crafters nearby (in town)",
         ["Ajouter ami"] = "Add friend",

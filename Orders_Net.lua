@@ -17,6 +17,25 @@ local function pmsg(m) print("|cFF33DD88Crafting Order|r " .. m) end
 
 local KEYWORD_RCPT = { Tous = true, Guilde = true, Amis = true }
 
+-- Ce nom est-il un perso de MON compte ? (IsMyChar = MA SavedVariable, décision locale — cf.
+-- Directory_Alts.) Sert à ne pas s'auto-alerter/anti-spammer sur les commandes de mes rerolls.
+local function myChar(n) return n == me() or (COC.IsMyChar and COC:IsMyChar(n)) or false end
+
+-- `a` agit-il pour `b` ? Lui-même, ou un perso de son set VÉRIFIÉ (réciprocité ALT : les deux
+-- annonces sortent du même compte — une claim unilatérale ne lie JAMAIS, donc pas d'usurpation).
+local function samePlayer(a, b)
+    if not (a and b) then return false end
+    if a == b then return true end
+    local D = COC.Directory
+    return (D and D.SamePlayer and D:SamePlayer(a, b)) == true
+end
+
+-- Ordre NOMMÉ (destinataire = un joueur précis, pas une portée Tous/Guilde/Amis).
+local function isNamed(o)
+    local rcpt = o and o.recipient
+    return (rcpt and rcpt ~= "" and not KEYWORD_RCPT[rcpt]) == true
+end
+
 -- ------------------------------------------------------------------
 -- Émission (encodage ORD| + routage par portée)
 -- ------------------------------------------------------------------
@@ -46,6 +65,13 @@ function Orders:_FanoutTargets(o)
     for name, r in pairs(D.roster) do
         if name ~= m and D.online[name] and self:_ScopeMatch(o, name, r) then out[name] = true end
     end
+    -- Ordre NOMMÉ sur un joueur HORS LIGNE : whisper aussi son perso connecté VÉRIFIÉ (rerolls) —
+    -- +1 cible max, uniquement sur lien mutuel (une claim unilatérale ne détourne jamais un whisper).
+    local rcpt = o.recipient
+    if rcpt and not KEYWORD_RCPT[rcpt] and rcpt ~= m and not D.online[rcpt] and D.OnlineCharOf then
+        local alt = D:OnlineCharOf(rcpt)
+        if alt and alt ~= m then out[alt] = true end
+    end
     return out
 end
 
@@ -57,7 +83,13 @@ function Orders:_CycleTargets(action, o)
     local t, m = {}, me()
     local function add(n) if n and n ~= "" and n ~= m and not KEYWORD_RCPT[n] then t[n] = true end end
     if action == "ACK" or action == "DLV" then add(o.buyer)
-    elseif action == "DONE" then add(o.acceptedBy)
+    elseif action == "DONE" then
+        add(o.acceptedBy)
+        -- L'accepteur a pu relog un reroll : whisper aussi son perso EN LIGNE vérifié (crédit fiable).
+        local D = COC.Directory
+        if o.acceptedBy and D and D.OnlineCharOf and not (D.online and D.online[o.acceptedBy]) then
+            add(D:OnlineCharOf(o.acceptedBy))
+        end
     elseif action == "CANCEL" then add(o.acceptedBy); add(o.recipient) end
     return t
 end
@@ -102,8 +134,8 @@ function Orders:_OnNew(message)
     o.status     = o.status or "open"
     o.ts         = o.ts or time()
     COC.db.orders[id] = o
-    if not existed and o.buyer ~= me() and COC.Moderation then COC.Moderation:NotePost(o.buyer) end   -- anti-spam
-    if not existed and o.buyer ~= me() and o.status == "open" and self:_ShouldAlert(o) then self:AlertTargeted(o) end
+    if not existed and not myChar(o.buyer) and COC.Moderation then COC.Moderation:NotePost(o.buyer) end   -- anti-spam (pas sur mes rerolls)
+    if not existed and not myChar(o.buyer) and o.status == "open" and self:_ShouldAlert(o) then self:AlertTargeted(o) end
 end
 
 -- Transitions de cycle (CANCEL/ACK/DLV/DONE/NACK). Voir _CycleTargets pour le sens des messages.
@@ -116,24 +148,38 @@ function Orders:_OnCycle(action, message, sender)
     local o = f and f.id and COC.db.orders[f.id]
     if not o then return end
     if action == "CANCEL" then
-        if sender == o.buyer then o.status = "cancelled" end   -- seul l'AUTEUR peut annuler
+        -- Seul l'AUTEUR peut annuler — ou un perso de son set VÉRIFIÉ (extension pure : jamais un tiers).
+        if samePlayer(sender, o.buyer) then o.status = "cancelled" end
     elseif action == "ACK" then
+        -- Ordre NOMMÉ : seul le destinataire (ou son reroll VÉRIFIÉ) accepte — ferme le spoof
+        -- « un tiers capture une commande privée » (avant : aucune garde). Portées larges : ouvert
+        -- à tous comme toujours (le désistement NACK + ré-ACK d'un autre artisan doit rester libre).
+        if isNamed(o) and not samePlayer(sender, o.recipient) then return end
         o.status = "accepted"; o.acceptedBy = sender or (f.crafter ~= "" and f.crafter) or nil   -- l'accepteur = l'émetteur
     elseif action == "DLV" then
         -- Crafteur → acheteur : « j'ai remis ». Passe « remise » (pas encore terminée) ; côté acheteur
         -- on l'invite à confirmer la réception (bouton / auto-loot). L'émetteur EST le crafteur.
         if o.status ~= "done" then
-            o.status = "delivered"; o.acceptedBy = sender or (f.crafter ~= "" and f.crafter) or o.acceptedBy
-            if o.buyer == me() then self:AlertDelivered(o) end
+            local ab = o.acceptedBy
+            -- NOMMÉ : l'émetteur doit être lié à l'accepteur ou au destinataire (ab==nil = 1re
+            -- revendication, ex. acheteur hors ligne pendant l'ACK — comportement historique).
+            if isNamed(o) and ab and not (samePlayer(sender, ab) or samePlayer(sender, o.recipient)) then return end
+            o.status = "delivered"
+            -- Reroll qui livre (lié à l'accepteur) : on GARDE « accepté par X » — sinon historique.
+            if not (ab and samePlayer(sender, ab)) then
+                o.acceptedBy = sender or (f.crafter ~= "" and f.crafter) or ab
+            end
+            if myChar(o.buyer) then self:AlertDelivered(o) end
         end
     elseif action == "DONE" then
         -- Acheteur → crafteur : confirmation de réception. Idempotent (DONE arrive en global ET whisper) :
-        -- réputation créditée à la 1re transition vers « terminée », et seulement si JE suis le crafteur.
-        -- SEUL l'acheteur peut confirmer (sinon un tiers pourrait gonfler la réputation d'un crafteur).
-        if o.status ~= "done" and sender == o.buyer then
+        -- réputation créditée à la 1re transition vers « terminée », et seulement si le crafteur est
+        -- un perso de MON compte (la rep db.delivered est par compte — sinon elle se perdait quand un
+        -- autre perso que l'accepteur recevait le DONE). SEUL l'acheteur (ou son reroll vérifié) confirme.
+        if o.status ~= "done" and samePlayer(sender, o.buyer) then
             o.acceptedBy = (f.crafter ~= "" and f.crafter) or o.acceptedBy   -- attesté par l'acheteur : qui créditer
             o.status = "done"
-            if o.acceptedBy == me() then
+            if myChar(o.acceptedBy) then
                 COC.db.delivered = (COC.db.delivered or 0) + 1   -- réputation : créditée à la confirmation acheteur
                 if COC.Directory then COC.Directory:AnnounceSkills() end
                 pmsg(string.format(L["réception confirmée par %s ! crafts livrés au total : %d"], o.buyer or "?", COC.db.delivered))
@@ -148,12 +194,12 @@ function Orders:_OnNack(message, sender)
     local f = Codec.Decode(message); local o = f and f.id and COC.db.orders[f.id]
     local who = sender or (f and f.who)
     if not (o and who and who ~= "") then return end
-    if o.acceptedBy == who then
-        o.status = "open"; o.acceptedBy = nil                   -- l'artisan se désiste → réouverte
-    elseif o.buyer == me() and o.recipient == who then
-        o.status = "declined"; o.declinedBy = who               -- commande nommée refusée → refusée
+    if o.acceptedBy and samePlayer(who, o.acceptedBy) then
+        o.status = "open"; o.acceptedBy = nil                   -- l'artisan (ou son reroll vérifié) se désiste → réouverte
+    elseif myChar(o.buyer) and (o.recipient == who or samePlayer(who, o.recipient)) then
+        o.status = "declined"; o.declinedBy = who               -- commande nommée refusée (par le perso ou son reroll)
     end
-    if o.buyer == me() then
+    if myChar(o.buyer) then
         local txt = string.format(L["%s a refusé ta commande : %s"], who, self:OrderName(o))
         pmsg(txt)
         if o.status == "declined" and COC.UI and COC.UI.Toast then
@@ -179,11 +225,13 @@ function Orders:_OnSuggest(message)
     local o = f and f.id and COC.db.orders[f.id]
     if not o then return end
     if f.captured == "1" then o.viaAddon = false; o.captured = true end
-    -- Hors portée : ordre nommé à un TIERS précis → ne pas suggérer à moi (fuite d'info sur commande privée).
+    -- Hors portée : ordre nommé à un TIERS précis → ne pas suggérer à moi (fuite d'info sur commande
+    -- privée). « Moi » inclut mes rerolls (IsMyChar, local).
     local rcpt = o.recipient or "Tous"
-    if not KEYWORD_RCPT[rcpt] and rcpt ~= me() then return end
+    if not KEYWORD_RCPT[rcpt] and not myChar(rcpt) then return end
     local H = COC.Handoff
-    if H and o.status == "open" and o.buyer ~= me() and o.recipient ~= me() then
+    -- Nommée sur moi OU un de mes persos → AlertTargeted (via _ShouldAlert) s'en charge, pas le nudge.
+    if H and o.status == "open" and not myChar(o.buyer) and not myChar(o.recipient) then
         if H:ICanCraft(o) then H:AlertCapable(o)
         else local alt = H:MyRerollCanCraft(o); if alt then H:AlertReroll(o, alt) end end
     end

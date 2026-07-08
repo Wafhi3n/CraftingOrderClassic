@@ -1,5 +1,29 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.9.0 — Your alts, together: shared cooldowns, one identity, a "My Artisans" tab
+
+Three things arrive together.
+
+**Recipe cooldowns are now shared.** When you cast a Transmute (or any recipe on a cooldown), other
+addon users see "Transmute: ready" or "Transmute: in 14h" on your artisan tooltip — no more asking in
+chat whether your Arcanite is off cooldown. It reads your own cooldowns from the game and broadcasts
+them; a small curated table knows which recipes actually have a cooldown.
+
+**Your alts can be grouped under one identity.** Opt in with `/co alts on` and pick a main character.
+The network then knows your characters belong to the same player — verified both ways, so nobody can
+claim to be someone else's alt. A crafting order named for your offline alchemist now reaches whichever
+character you're logged in on ("order for your alt Luletta"), and you can accept it from any of your
+characters. In the Artisans tab, a player's alts collapse into one line. This is off by default and
+changes nothing on the wire until you enable it.
+
+**A new "My Artisans" tab.** It shows all your account's professions on the realm at once, as if they
+were one character: level, known recipes grouped by category like the profession window, active
+cooldowns pinned at the top, and which of your characters carries each recipe. Fully local — it works
+whether or not `/co alts` is on.
+
+Offline partners can also relay each other's profiles now, shown as an estimate ("via Bob") that direct
+data always overrides.
+
 ## v1.8.0 — Under the hood: safer upgrades, tidier order protocol
 
 Nothing changes on screen. Two things got sturdier underneath.

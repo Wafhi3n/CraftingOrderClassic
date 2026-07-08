@@ -80,11 +80,15 @@ local function addEntries(_, rootDescription, contextData)
     rootDescription:CreateButton(L["Ajouter aux artisans"], function()
         if COC.UI and COC.UI._AddArtisan then COC.UI:_AddArtisan(name) end
     end)
+    -- Actions « de set » : sur un joueur aux rerolls VÉRIFIÉS, partenaire/mute s'appliquent à tous
+    -- ses persos (muter le main sans les rerolls serait contournable). Repli = action mono-perso.
     rootDescription:CreateButton(L["Partenaire (basculer)"], function()
-        if COC.UI and COC.UI._TogglePartner then COC.UI:_TogglePartner(name) end
+        if COC.UI and COC.UI._TogglePartnerSet then COC.UI:_TogglePartnerSet(name)
+        elseif COC.UI and COC.UI._TogglePartner then COC.UI:_TogglePartner(name) end
     end)
     rootDescription:CreateButton(L["Muter"], function()
-        if COC.Moderation then COC.Moderation:Mute(name) end
+        if COC.UI and COC.UI._MuteSet then COC.UI:_MuteSet(name)
+        elseif COC.Moderation then COC.Moderation:Mute(name) end
     end)
 end
 

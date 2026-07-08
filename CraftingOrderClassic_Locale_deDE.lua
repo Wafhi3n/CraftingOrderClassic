@@ -68,10 +68,58 @@ local de = {
         "Die Oberfläche wird je nach Sprache deines WoW-Clients ins Deutsche und Spanische übersetzt.",
     ["Ce nouvel onglet « Nouveautés » affiche les notes de version directement en jeu."] =
         "Dieser neue Tab « Neues » zeigt die Versionshinweise direkt im Spiel.",
+    -- Onglet Nouveautés — v1.9.0
+    ["Tes rerolls réunis : cooldowns partagés, une identité, l'onglet Mes artisans"] =
+        "Deine Twinks vereint: geteilte Abklingzeiten, eine Identität, ein Tab „Meine Handwerker“",
+    ["Cooldowns de recettes partagés : les autres voient « Transmutation : prête » ou « dans 14h » sur ton infobulle d'artisan — fini de demander en canal si ton Arcanite est dispo."] =
+        "Geteilte Rezept-Abklingzeiten: andere sehen „Transmutation: bereit“ oder „in 14h“ in deinem Handwerker-Tooltip — kein Nachfragen im Chat mehr, ob dein Arkanit bereit ist.",
+    ["Regroupe tes persos sous une identité (|cFFFFFFFF/co alts on|r) : une commande nommée pour ton alchimiste hors ligne arrive sur le perso où tu es connecté, et tu peux l'accepter depuis n'importe lequel. Vérifié des deux côtés (personne ne peut se faire passer pour le reroll d'autrui). Désactivé par défaut."] =
+        "Gruppiere deine Charaktere unter einer Identität (|cFFFFFFFF/co alts on|r): ein Auftrag für deinen offline Alchemisten erreicht den Charakter, auf dem du eingeloggt bist, und du kannst ihn von jedem annehmen. Beidseitig bestätigt (niemand kann sich als fremder Twink ausgeben). Standardmäßig aus.",
+    ["Nouvel onglet « Mes artisans » : tous les métiers de ton compte sur le royaume en une vue, comme un seul perso — niveau, recettes connues par catégorie, cooldowns en tête, et quel perso porte chaque recette."] =
+        "Neuer Tab „Meine Handwerker“: alle Berufe deines Accounts auf dem Realm in einer Ansicht, wie ein einziger Charakter — Stufe, bekannte Rezepte nach Kategorie, Abklingzeiten oben, und welcher Charakter jedes Rezept kennt.",
     ["VU"] = "GESEHEN",
     ["vu crafter (sans l'addon)"] = "beim Herstellen gesehen (ohne Addon)",
     ["vu crafter"] = "beim Herstellen gesehen",
     ["%d+ · vu crafter"] = "%d+ · beim Herstellen gesehen",
+    -- Cooldowns de recettes (transmutations & co)
+    ["%s : prête"] = "%s: bereit",
+    ["%s : dans %s"] = "%s: in %s",
+    ["(estimé)"] = "(geschätzt)",
+    ["Transmutation"] = "Transmutation",
+    ["%dj"] = "%dT", ["%dh"] = "%dh", ["%dmin"] = "%dMin",
+    -- Relais partenaire
+    ["via %s · il y a %s"] = "via %s · vor %s",
+    ["RELAIS"] = "RELAIS",
+    -- Rerolls (identité joueur multi-persos, /co alts — opt-in)
+    ["rerolls : ACTIVÉS — ta liste de persos est annoncée au réseau."] =
+        "Twinks: AKTIVIERT — deine Charakterliste wird im Netzwerk angekündigt.",
+    ["rerolls : désactivés — rien n'est annoncé (opt-in : /co alts on)."] =
+        "Twinks: deaktiviert — nichts wird angekündigt (Opt-in: /co alts on).",
+    ["perso principal (vitrine) : %s"] = "Hauptcharakter (Aushängeschild): %s",
+    ["persos du compte (%s) : %s"] = "Charaktere des Accounts (%s): %s",
+    ["le lien n'est vérifié chez les autres qu'après une connexion de CHAQUE perso (addon actif)."] =
+        "Andere bestätigen die Verknüpfung erst, wenn sich JEDER Charakter einmal eingeloggt hat (Addon aktiv).",
+    ["rerolls activés — perso principal : %s (changer : /co alts main <nom>)"] =
+        "Twinks aktiviert — Hauptcharakter: %s (ändern: /co alts main <Name>)",
+    ["rerolls désactivés — dissolution annoncée au réseau."] =
+        "Twinks deaktiviert — Auflösung im Netzwerk angekündigt.",
+    ["perso inconnu sur ce compte : %s (connecte-le une fois avec l'addon)"] =
+        "Unbekannter Charakter auf diesem Account: %s (einmal mit dem Addon einloggen)",
+    ["regrouper tes rerolls (opt-in) : liste annoncée, commandes routées vers ton perso connecté"] =
+        "Twinks gruppieren (Opt-in): Liste angekündigt, Aufträge zu deinem Online-Charakter geleitet",
+    ["commande nommée pour %s : connecte ce perso, ou active /co alts on pour accepter d'ici."] =
+        "Auftrag benannt für %s: logge diesen Charakter ein oder aktiviere /co alts on, um von hier anzunehmen.",
+    ["|cFFFFCC00commande pour ton reroll %s|r de |cFFFFFFFF%s|r : %s%s%s"] =
+        "|cFFFFCC00Auftrag für deinen Twink %s|r von |cFFFFFFFF%s|r: %s%s%s",
+    ["En ligne via %s"] = "Online über %s",
+    ["reroll : %s (%s)"] = "Twink: %s (%s)",
+    -- Onglet « Mes artisans » (vue agrégée des métiers du compte — 100 % local)
+    ["Mes artisans"] = "Meine Handwerker",
+    ["MÉTIERS DU COMPTE"] = "BERUFE DES ACCOUNTS",
+    ["%d recettes"] = "%d Rezepte",
+    ["Aucun métier. Ouvre ta fenêtre métier sur chaque perso une fois."] =
+        "Keine Berufe. Öffne das Berufsfenster auf jedem Charakter einmal.",
+    ["Pas de recettes connues (métier de récolte ?)."] = "Keine bekannten Rezepte (Sammelberuf?).",
     ["Repérer les crafteurs autour (en ville)"] = "Handwerker in der Nähe erkennen (in Stadt)",
     ["Ajouter ami"] = "Freund hinzufügen",
     ["|cFFFFFFFF%s|r ajouté à tes amis."] = "|cFFFFFFFF%s|r zu deinen Freunden hinzugefügt.",
