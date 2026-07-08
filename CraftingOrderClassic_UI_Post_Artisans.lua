@@ -98,39 +98,20 @@ end
 function UI:RefreshPostArtisans()
     local D = COC.Directory; if not (D and self.postArtContent) then return end
     local src, prof = self.postSource or "guild", self.postProf
-    local list = {}
-    for name, r in pairs(D.roster or {}) do
-        if inSource(r, src) and (not prof or knowsProf(r, prof)) then
-            list[#list+1] = {name=name, r=r, online=D.online[name]}
-        end
-    end
+    -- Fusion par joueur vérifié (rerolls → une ligne) ; le CLIC re-résout la cible vers le PERSO
+    -- du set qui connaît le métier (cf. UI:_FillPostArtGroupRow / _ResolvePostChar). Le groupe passe
+    -- le filtre si n'importe quel perso le passe (union) — KnowsProf STRICT par perso, inchangé.
+    local list = self:_ArtisanGroups(function(r)
+        return inSource(r, src) and (not prof or knowsProf(r, prof))
+    end)
     table.sort(list, function(a, b)
-        if (a.online and true) ~= (b.online and true) then return a.online end
-        return a.name < b.name
+        if (a.onlineChar ~= nil) ~= (b.onlineChar ~= nil) then return a.onlineChar ~= nil end
+        return a.leader < b.leader
     end)
     local n = 0
-    for _, a in ipairs(list) do
-        n = n + 1; local row = self:_PostArtRow(n)
-        local sk = a.r.skill and prof and a.r.skill[prof]
-        local skTxt = sk and ("|cFF888888"..sk[1].."/"..sk[2].."|r  ") or ""
-        local profs2 = {}
-        for p2 in pairs(a.r.recipes or {}) do profs2[#profs2+1] = Skin.ProfLabel(p2) end
-        row.dot:SetOnline(a.online and true or false)
-        row.name:SetText("|cFFFFFFFF"..a.name.."|r  "..skTxt.."|cFF888888"..table.concat(profs2, " · ").."|r")
-        row.src:SetText("|cFF888888"..(a.r.source or "recent"):upper().."|r")
-        row.artEntry = a
-        row.selTex:SetShown(UI.postTarget == "@" .. a.name)
-        row:SetScript("OnClick", function()
-            UI.postTarget = "@" .. a.name
-            -- Sollicite le registre FRAIS de l'artisan (RK+SK à jour, bonne dataVersion) au lieu de se
-            -- fier au cache éventuellement périmé : HI/PING dirigés → il répond via AnnounceTo, OnRK
-            -- rafraîchit la liste. Throttlé 60 s/nom. Seulement s'il est en ligne (offline = pas de réponse).
-            if a.online and COC.Directory and COC.Directory.DiscoverPlayer then
-                COC.Directory:DiscoverPlayer(a.name)
-            end
-            UI:RefreshPostArtisans(); UI:RefreshPostPlans()
-        end)
-        row:Show()
+    for _, g in ipairs(list) do
+        n = n + 1
+        self:_FillPostArtGroupRow(self:_PostArtRow(n), g, prof)
     end
     for i = n+1, #self.postArtRows do self.postArtRows[i]:Hide() end
     self.postArtContent:SetHeight(math.max(n * ARH, 10))

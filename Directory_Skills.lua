@@ -10,6 +10,21 @@ local Dir = COC.Directory
 
 local CraftLink = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
 
+local function me() return (UnitName and UnitName("player")) or "?" end
+local function myRealm() return (GetRealmName and GetRealmName()) or "" end
+
+-- Miroir de mySkills (perso COURANT) vers une partition PAR PERSO (clé « Nom-Royaume », comme
+-- knownRecipes/myChars) → l'onglet « Mes artisans » lit les niveaux de TOUS mes rerolls hors ligne.
+-- COPIE des {rank,max} : self.mySkills est réassigné {} à chaque CaptureSkills, une référence
+-- pointerait vers une table qui sera remplacée.
+local function mirrorMySkills(skills)
+    if not COC.db then return end
+    COC.db.mySkillsByChar = COC.db.mySkillsByChar or {}
+    local part = {}
+    for key, sk in pairs(skills) do part[key] = { sk[1], sk[2] } end
+    COC.db.mySkillsByChar[me() .. "-" .. myRealm()] = part
+end
+
 -- Capture MES niveaux de métier via l'API skill. Le nom de ligne est localisé → ResolveProfession
 -- le ramène à la clé interne EN (les aliases de CraftLink contiennent les noms FR/DE/ES).
 function Dir:CaptureSkills()
@@ -22,7 +37,7 @@ function Dir:CaptureSkills()
             if key and CraftLink.professions[key] then self.mySkills[key] = { rank, maxRank } end
         end
     end
-    if COC.db then COC.db.mySkills = self.mySkills end
+    if COC.db then COC.db.mySkills = self.mySkills; mirrorMySkills(self.mySkills) end
 end
 
 -- Fil SK : "SK|lvl=<n>|key,cur,max;...[;rep=<n>]". rep (crafts livrés) = pseudo-chunk FINAL, ignoré par un
@@ -41,25 +56,35 @@ function Dir:AnnounceSkills()
     if sk then CraftLink:Send(sk, "global") end
 end
 
--- SK reçu (niveaux d'un autre) → cache roster. Formats : "SK|lvl=N|..." (avec niveau) ou ancien "SK|...".
-function Dir:OnSkill(sender, message)
-    if not sender then return end
-    local lvl, body = message:match("^SK|lvl=(%d+)|(.+)$")
-    if not body then body = message:match("^SK|(.+)$") end
-    if not body then return end
-    local r = self:_Touch(sender)
-    if lvl then r.level = tonumber(lvl) end
-    -- SK = énumération COMPLÈTE des métiers RÉELS du perso courant de l'émetteur (GetNumSkillLines,
-    -- jamais bleedée par les alts contrairement au RK). On reconstruit à neuf (un métier abandonné
-    -- disparaît) puis on s'en sert comme vérité terrain pour purger les RK périmés.
-    local skills = {}
+-- Parse le message SK → (skills, level, rep) ou nil. PUR (aucun effet sur le roster) : réutilisé
+-- par OnSkill (données directes) ET Directory_Relay (fiche relayée). Formats : "SK|lvl=N|..."
+-- (avec niveau) ou ancien "SK|...". rep = pseudo-chunk final.
+function Dir:_ParseSKBody(message)
+    local lvl, body = (message or ""):match("^SK|lvl=(%d+)|(.+)$")
+    if not body then body = (message or ""):match("^SK|(.+)$") end
+    if not body then return nil end
+    local skills, rep = {}, nil
     for chunk in body:gmatch("[^;]+") do
-        local rep = chunk:match("^rep=(%d+)$")           -- réputation = pseudo-chunk final
-        if rep then r.rep = tonumber(rep) else
+        local rp = chunk:match("^rep=(%d+)$")
+        if rp then rep = tonumber(rp) else
             local key, cur, max = chunk:match("^([^,]+),(%d+),(%d+)$")
             if key then skills[key] = { tonumber(cur), tonumber(max) } end
         end
     end
+    return skills, lvl and tonumber(lvl) or nil, rep
+end
+
+-- SK reçu (niveaux d'un autre) → cache roster.
+function Dir:OnSkill(sender, message)
+    if not sender then return end
+    local skills, lvl, rep = self:_ParseSKBody(message)
+    if not skills then return end
+    local r = self:_Touch(sender)
+    if lvl then r.level = lvl end
+    if rep then r.rep = rep end
+    -- SK = énumération COMPLÈTE des métiers RÉELS du perso courant de l'émetteur (GetNumSkillLines,
+    -- jamais bleedée par les alts contrairement au RK). On reconstruit à neuf (un métier abandonné
+    -- disparaît) puis on s'en sert comme vérité terrain pour purger les RK périmés.
     if next(skills) then
         r.skill = skills
         -- Purge la fuite d'alts : un RK pour un métier que le perso n'a pas réellement (absent du SK)

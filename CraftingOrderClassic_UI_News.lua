@@ -11,9 +11,18 @@ local L    = COC.L
 local BODY_W = 780
 
 -- Une entrée par version. Les lignes v1.4.0 REUTILISENT les clés déjà traduites de l'ancienne section
--- « Nouveautés » de l'Aide (overlay enUS existant) → pas de doublon de traduction.
-local function versions()
+-- « Nouveautés » de l'Aide (overlay enUS existant) → pas de doublon de traduction. Scindé en deux
+-- blocs (récent / plus ancien) concaténés par versions() : chaque bloc reste sous le seuil anti-monolithe.
+local function versionsRecent()
     return {
+        {
+            v = "v1.9.0", title = L["Tes rerolls réunis : cooldowns partagés, une identité, l'onglet Mes artisans"],
+            lines = {
+                L["Cooldowns de recettes partagés : les autres voient « Transmutation : prête » ou « dans 14h » sur ton infobulle d'artisan — fini de demander en canal si ton Arcanite est dispo."],
+                L["Regroupe tes persos sous une identité (|cFFFFFFFF/co alts on|r) : une commande nommée pour ton alchimiste hors ligne arrive sur le perso où tu es connecté, et tu peux l'accepter depuis n'importe lequel. Vérifié des deux côtés (personne ne peut se faire passer pour le reroll d'autrui). Désactivé par défaut."],
+                L["Nouvel onglet « Mes artisans » : tous les métiers de ton compte sur le royaume en une vue, comme un seul perso — niveau, recettes connues par catégorie, cooldowns en tête, et quel perso porte chaque recette."],
+            },
+        },
         {
             v = "v1.8.0", title = L["Sous le capot : mises à jour plus sûres"],
             lines = {
@@ -37,6 +46,11 @@ local function versions()
                 L["Correctif : un personnage n'affiche plus par erreur les métiers de ses rerolls dans ton annuaire."],
             },
         },
+    }
+end
+
+local function versionsOlder()
+    return {
         {
             v = "v1.6.0", title = L["Allemand et espagnol + onglet Nouveautés"],
             lines = {
@@ -69,6 +83,12 @@ local function versions()
             },
         },
     }
+end
+
+local function versions()
+    local out = versionsRecent()
+    for _, e in ipairs(versionsOlder()) do out[#out + 1] = e end
+    return out
 end
 
 -- Peint une version (titre doré « vX.Y.Z + résumé », puis une puce par ligne). Renvoie le Y suivant.

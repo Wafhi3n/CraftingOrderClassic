@@ -46,15 +46,26 @@ normalisations restent dans `Orders:_OnNew` / `_OnCycle` :
 
 Le nom de l'émetteur (`sender`) est posé par le **transport** (nom court, non falsifiable) ; le champ
 identité du **payload** n'est qu'un repli informatif. Les autorisations vivent dans `Orders:_OnCycle`
-/ `_OnNack`, **jamais** dans le codec :
+/ `_OnNack`, **jamais** dans le codec.
 
-| Transition | Qui a le droit |
-|---|---|
-| CANCEL → `cancelled` | `sender == o.buyer` (seul l'auteur annule) |
-| DONE → `done` (+ crédit réputation) | `sender == o.buyer` (seul l'auteur confirme la réception) |
-| ACK → `accepted` | l'accepteur = `sender` (le champ crafter n'est qu'un repli) |
-| DLV → `delivered` | l'émetteur EST le crafteur (`sender`) |
-| NACK → réouverture / refus | `who = sender` : `o.acceptedBy == who` réouvre ; ordre nommé (`o.recipient == who`) refusé |
+**Identité « joueur » (rerolls, verbe ALT).** Depuis v1.9.0, `sender == X` est élargi à
+`Dir:SamePlayer(sender, X)` : vrai ssi les deux persos sont liés par des annonces ALT **réciproques**
+(chacun cite l'autre — les deux annonces sortent de la même SavedVariable de compte, donc un tiers ne
+peut pas usurper le lien). Un perso de MON compte se teste localement via `COC:IsMyChar` (lecture de ma
+SV, jamais pilotable par le réseau). Sans opt-in `/co alts` et sans claim reçue, `SamePlayer` ≡ `==`.
+
+| Transition | Qui a le droit | Précondition de statut |
+|---|---|---|
+| CANCEL → `cancelled` | `sender == o.buyer` **ou `SamePlayer`** (l'auteur ou son reroll) | — |
+| DONE → `done` (+ crédit réputation) | `sender == o.buyer` **ou `SamePlayer`** ; crédit si `IsMyChar(acceptedBy)` (rep par compte) | `status ≠ done` |
+| ACK → `accepted` | **nommé** : destinataire ou reroll lié (`SamePlayer(sender, recipient)`) ; **large** : n'importe qui (1er arrivé) | **`status == open`** (ferme le re-ACK/vol d'attribution) |
+| DLV → `delivered` | **nommé** : destinataire OU accepteur (ou rerolls liés), sans précondition de statut (préserve « acheteur a raté l'ACK ») ; **large** : l'accepteur (ou reroll lié) uniquement | **large : `status == accepted`** ; entrée exclut `delivered` (idempotence) |
+| NACK → réouverture / refus | `SamePlayer(who, o.acceptedBy)` réouvre ; ordre nommé (`who == recipient` ou lié, si `IsMyChar(buyer)`) refusé | — |
+
+> Durcissement v1.9.0 (revue protocole) : ACK exige désormais un ordre **ouvert**, et un DLV en portée
+> **large** exige que l'émetteur soit **l'accepteur** — fermant le vol d'attribution/réputation par un
+> tiers (DLV direct sur un ordre nommé jamais accepté, ou re-ACK d'un ordre déjà pris). Le `captured=1`
+> d'un `SUGG` n'est honoré que d'un émetteur **connu du roster** (`_OnSuggest`).
 
 ## Cycle de vie
 

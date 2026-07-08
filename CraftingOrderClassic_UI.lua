@@ -54,6 +54,7 @@ function UI:Build()
     self:BuildTabs(f)
     self:BuildOrdersTab(f)
     self:BuildArtisansTab(f)
+    if self.BuildMyArtisansTab then self:BuildMyArtisansTab(f) end
     if self.BuildPostTab   then self:BuildPostTab(f)   end
     if self.BuildGatherTab then self:BuildGatherTab(f) end
     if self.BuildHelpTab   then self:BuildHelpTab(f)   end
@@ -81,16 +82,21 @@ end
 function UI:BuildTabs(f)
     self.tabs = {}
     local defs = {
-        { id = "orders",  label = L["Carnet"]   },
-        { id = "post",    label = L["Commande"] },
-        { id = "gather",  label = L["Récolte"]  },
-        { id = "artisans",label = L["Artisans"] },
-        { id = "help",    label = L["Aide"]     },
-        { id = "news",    label = L["Nouveautés"] },
+        { id = "orders",    label = L["Carnet"]      },
+        { id = "post",      label = L["Commande"]    },
+        { id = "gather",    label = L["Récolte"]     },
+        { id = "artisans",  label = L["Artisans"]    },
+        { id = "myartisans",label = L["Mes artisans"] },
+        { id = "help",      label = L["Aide"]        },
+        { id = "news",      label = L["Nouveautés"]  },
     }
+    -- 7 onglets : largeur/pas resserrés (118/122 → 112/115) + libellé en petite police pour tenir
+    -- dans le cadre (868) même avec le libellé le plus long (deDE « Meine Handwerker »). Dernier
+    -- bouton : 12 + 6×115 + 112 = 814 < 868.
     for i, d in ipairs(defs) do
-        local b = Skin.MakeGoldButton(f, 118, 24, d.label)
-        b:SetPoint("TOPLEFT", 12 + (i - 1) * 122, -54)
+        local b = Skin.MakeGoldButton(f, 112, 24, d.label)
+        b.text:SetFontObject("GameFontNormalSmall")   -- 7 onglets serrés : évite le débordement multilingue
+        b:SetPoint("TOPLEFT", 12 + (i - 1) * 115, -54)
         b:SetScript("OnClick", function() UI:ShowTab(d.id) end)
         self.tabs[d.id] = b
     end
@@ -109,6 +115,7 @@ function UI:ShowTab(id)
     if self.postPanel   then self.postPanel:SetShown(id == "post")    end
     if self.gatherPanel then self.gatherPanel:SetShown(id == "gather") end
     self.artisansPanel:SetShown(id == "artisans")
+    if self.myArtisansPanel then self.myArtisansPanel:SetShown(id == "myartisans") end
     if self.helpPanel   then self.helpPanel:SetShown(id == "help")    end
     if self.newsPanel   then self.newsPanel:SetShown(id == "news")    end
     self:Refresh()
@@ -393,6 +400,7 @@ end
 function UI:Refresh()
     if not self.frame or not self.frame:IsShown() then return end
     if     self.activeTab == "artisans"                          then self:RefreshArtisans()
+    elseif self.activeTab == "myartisans" and self.RefreshMyArtisans then self:RefreshMyArtisans()
     elseif self.activeTab == "post"   and self.RefreshPost       then self:RefreshPost()
     elseif self.activeTab == "gather" and self.RefreshGather     then self:RefreshGather()
     elseif self.activeTab == "help"   and self.RefreshHelp       then self:RefreshHelp()

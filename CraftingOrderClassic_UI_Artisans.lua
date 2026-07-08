@@ -50,9 +50,20 @@ local function profsList(r)
     for key, floor in pairs(r.craftSeen or {}) do   -- non-porteur vu crafter : plancher estimé
         if not (SEC[key] or seen[key]) then seen[key] = true; parts[#parts + 1] = { key = key, est = floor } end
     end
+    local rel = r.relayed                            -- fiche relayée par un partenaire (hors ligne)
+    if rel then
+        for key, sv in pairs(rel.skill or {}) do
+            if not (SEC[key] or seen[key]) then seen[key] = true; parts[#parts + 1] = { key = key, sv = sv, relay = true } end
+        end
+        for key in pairs(rel.recipes or {}) do
+            if not (SEC[key] or seen[key]) then seen[key] = true; parts[#parts + 1] = { key = key, relay = true } end
+        end
+    end
     table.sort(parts, function(a, b) return Skin.ProfLabel(a.key) < Skin.ProfLabel(b.key) end)
     return parts
 end
+UI._ProfsList = profsList   -- partagé avec la couche de fusion (UI_Artisans_Groups.lua)
+UI._SrcTag    = SRC_TAG
 
 -- =========================================================================
 -- Construction
@@ -250,31 +261,33 @@ function UI:RefreshArtisans()
     end
     for id, b in pairs(self.artSrcBtns) do b.count:SetText("|cFFE8B84B" .. (counts[id] or 0) .. "|r") end
 
-    -- Liste filtrée (source + métier). src == "all" → toutes sources confondues.
+    -- Liste filtrée (source + métier), FUSIONNÉE par joueur vérifié : les rerolls (liens ALT
+    -- mutuels) tiennent sur UNE ligne, perso principal en vitrine (cf. UI_Artisans_Groups.lua).
+    -- Le groupe passe le filtre si N'IMPORTE QUEL de ses persos le passe (union).
     local src, pf = self.artSource or "all", self.artProfFilter
-    local list = {}
-    for name, r in pairs(D and D.roster or {}) do
-        if (src == "all" or (r.source or "recent") == src) and (not pf or knowsProf(r, pf)) then
-            list[#list + 1] = { name = name, r = r, online = D.online[name] }
-        end
-    end
+    local list = self:_ArtisanGroups(function(r)
+        return (src == "all" or (r.source or "recent") == src) and (not pf or knowsProf(r, pf))
+    end)
     table.sort(list, function(a, b)
-        if (a.r.isPartner and true) ~= (b.r.isPartner and true) then return a.r.isPartner end   -- partenaires en tête
-        if (a.online and true) ~= (b.online and true) then return a.online end
-        local ra, rb = a.r.rep or 0, b.r.rep or 0
-        if ra ~= rb then return ra > rb end       -- réputation (crafts livrés) décroissante
-        return a.name < b.name
+        if (a.anyPartner and true) ~= (b.anyPartner and true) then return a.anyPartner end   -- partenaires en tête
+        if (a.onlineChar ~= nil) ~= (b.onlineChar ~= nil) then return a.onlineChar ~= nil end
+        if a.repMax ~= b.repMax then return a.repMax > b.repMax end   -- réputation max du set, décroissante
+        return a.leader < b.leader
     end)
 
     local n = 0
-    for _, a in ipairs(list) do
-        n = n + 1; self:_FillArtRow(self:_ArtRow(n), a)
+    for _, g in ipairs(list) do
+        n = n + 1
+        local row = self:_ArtRow(n)
+        if #g.members > 1 then self:_FillArtGroupRow(row, g)
+        else self:_FillArtRow(row, { name = g.leader, r = g.lead.r, online = g.lead.online }) end
     end
     for i = n + 1, #self.artListRows do self.artListRows[i]:Hide() end
     self.artListContent:SetHeight(math.max(n * ARH, 10))
     Skin.AutoHideScroll("COCArtScroll", self.artListContent)
     if n == 0 and self.artListRows[1] then
         local row = self:_ArtRow(1)
+        row:SetScript("OnEnter", nil); row:SetScript("OnLeave", nil)
         row.dot:SetOnline(nil); row.name:SetText("|cFF888888" .. L["Aucun artisan dans cette source."] .. "|r")
         row.sub:SetText(""); UI:_SetArtProfIcons(row, {}); row.src:SetText(""); row.whisper:Hide(); row.addFriend:Hide()
         row:Show()
@@ -284,13 +297,20 @@ end
 -- Remplit une ligne artisan. Distingue les NON-porteurs (r.nonAddon, vus crafter via CHAT_MSG_LOOT) :
 -- sous-ligne « vu crafter » + tag « VU » au lieu de présence/niveau/réputation.
 function UI:_FillArtRow(row, a)
+    row:SetScript("OnEnter", nil); row:SetScript("OnLeave", nil)   -- lignes poolées : purge le tooltip de groupe
     row.dot:SetOnline(a.online and true or false)
     local pTag = a.r.isPartner and ("|cFFFFD100" .. L["[Partenaire]"] .. "|r ") or ""   -- texte, pas de glyphe tofu
     row.name:SetText(pTag .. "|cFFFFFFFF" .. a.name .. "|r")
-    -- « non-porteur » = vu crafter ET aucune vraie donnée réseau reçue de lui (s'il finit par diffuser
-    -- ses SK/RK, on repasse en artisan normal même si le flag nonAddon traîne).
-    local nonAddon = a.r.nonAddon and not (a.r.skill or a.r.recipes)
-    if nonAddon then
+    -- « relayé » = fiche servie par un partenaire pendant que l'artisan est HORS LIGNE, sans aucune
+    -- donnée directe ; « non-porteur » = vu crafter ET aucune vraie donnée réseau reçue de lui (s'il
+    -- finit par diffuser ses SK/RK, on repasse en artisan normal même si le flag nonAddon traîne).
+    local relayed  = a.r.relayed and not (a.r.skill or a.r.recipes)
+    local nonAddon = a.r.nonAddon and not (a.r.skill or a.r.recipes) and not relayed
+    if relayed then
+        local rel = a.r.relayed
+        row.sub:SetText("|cFF888888" .. string.format(L["via %s · il y a %s"], rel.via or "?",
+            Skin.FormatDuration(math.max(0, time() - (rel.ts or time())))) .. "|r")
+    elseif nonAddon then
         local mv = self:_SeenProfNames(a.r)   -- le métier VU (au moins un)
         row.sub:SetText("|cFF888888" .. L["vu crafter"] .. (mv ~= "" and (" : |cFFBBBBBB" .. mv) or "") .. "|r")
     else
@@ -298,8 +318,9 @@ function UI:_FillArtRow(row, a)
         local rep = (a.r.rep and a.r.rep > 0) and (" · " .. string.format(L["%d livrés"], a.r.rep)) or ""
         row.sub:SetText("|cFF888888" .. (a.online and L["En ligne"] or L["Hors ligne"]) .. " · " .. lvl .. rep .. "|r")
     end
-    UI:_SetArtProfIcons(row, profsList(a.r))
-    row.src:SetText("|cFF888888" .. (nonAddon and L["VU"] or (SRC_TAG[a.r.source or "recent"] or "")) .. "|r")
+    UI:_SetArtProfIcons(row, profsList(a.r), a.r)
+    row.src:SetText("|cFF888888" .. (relayed and L["RELAIS"] or nonAddon and L["VU"]
+        or (SRC_TAG[a.r.source or "recent"] or "")) .. "|r")
     self:_ArtRowButtons(row, a, nonAddon)
     row:Show()
 end
@@ -356,9 +377,9 @@ function UI:_ArtRow(i)
     self.artListRows[i] = r; return r
 end
 
--- Icônes de métier (survol = tooltip nom + niveau) à la place du texte concaténé — moins encombrant.
+-- Icônes de métier (survol = tooltip nom + niveau + cooldowns) à la place du texte concaténé.
 local ARI = 22   -- pas horizontal entre icônes
-function UI:_SetArtProfIcons(row, list)
+function UI:_SetArtProfIcons(row, list, r)
     local pool = row.profIconPool
     for i, item in ipairs(list) do
         local ic = pool[i]
@@ -370,6 +391,10 @@ function UI:_SetArtProfIcons(row, list)
                 GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
                 GameTooltip:SetText(self.tipLabel or "", 1, 1, 1)
                 if self.tipSub then GameTooltip:AddLine(self.tipSub, 0.910, 0.722, 0.294) end
+                for _, ln in ipairs(self.tipCds or {}) do   -- cooldowns : vert = prête, orange = en recharge
+                    if ln.ready then GameTooltip:AddLine(ln.text, 0.3, 0.9, 0.4)
+                    else GameTooltip:AddLine(ln.text, 1.0, 0.65, 0.2) end
+                end
                 GameTooltip:Show()
             end)
             ic:SetScript("OnLeave", GameTooltip_Hide)
@@ -378,9 +403,14 @@ function UI:_SetArtProfIcons(row, list)
         ic:ClearAllPoints(); ic:SetPoint("LEFT", (i - 1) * ARI, 0)
         ic.tex:SetTexture(Skin.ProfIcon(item.key) or Skin.tex.unknown)
         ic.tipLabel = Skin.ProfLabel(item.key)
-        ic.tipSub = item.sv and ((item.sv[1] or "?") .. "/" .. (item.sv[2] or "?"))
+        local sub = item.sv and ((item.sv[1] or "?") .. "/" .. (item.sv[2] or "?"))
             or (item.est ~= nil and ((item.est > 0) and string.format(L["%d+ · vu crafter"], item.est) or L["vu crafter (sans l'addon)"]))
             or nil
+        if item.who then sub = (sub and (sub .. " — ") or "") .. item.who end   -- ligne fusionnée : PORTEUR du métier
+        ic.tipSub = sub
+        local rr = item.r or r                       -- fusion : les CD viennent du PORTEUR, pas de la vitrine
+        local So = COC.Social
+        ic.tipCds = (rr and So and So.CooldownLines) and So:CooldownLines(rr, 3, item.key) or nil
         ic:Show()
     end
     for i = #list + 1, #pool do pool[i]:Hide() end

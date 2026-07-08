@@ -120,6 +120,38 @@ function T:_TestPrune()
     if not ok then check(false, "exception pendant le test prune") end
 end
 
+-- === Groupe 7 : rerolls (ALT) — réciprocité + gardes de cycle inter-persos ===
+-- Claims injectées DIRECTEMENT dans le roster (pas via OnAlt : zéro effet de présence), noms
+-- synthétiques, snapshot+restauration inconditionnelle + bump du cache de vérification.
+function T:_TestAlts()
+    local D, O = COC.Directory, COC.Orders
+    if not (D and D.SamePlayer and O and COC.db and D.roster) then return check(false, "Directory/Orders absent") end
+    local A, B, M = "CotestAltA", "CotestAltB", "CotestMallory"
+    local savedA, savedB, savedM, savedO = D.roster[A], D.roster[B], D.roster[M], COC.db.orders
+    local ok = pcall(function()
+        D.roster[A] = { altClaim = { main = A, list = { A, B }, ts = time() } }
+        D.roster[B] = { altClaim = { main = A, list = { A, B }, ts = time() } }
+        D.roster[M] = { altClaim = { main = M, list = { M, A }, ts = time() } }   -- unilatérale : A ne cite pas M
+        D:_BumpAltRev()
+        check(D:SamePlayer(A, B) == true, "ALT : réciprocité → même joueur")
+        check(D:SamePlayer(A, M) == false, "ALT : claim unilatérale ne lie JAMAIS")
+        check(D:GroupLeader(B) == A, "ALT : GroupLeader = main déclaré")
+        COC.db.orders = { X1 = { id = "X1", buyer = "Zed_cotest", status = "open", recipient = B } }
+        O:_OnCycle("ACK", "ORD|ACK|X1|" .. M, M)
+        check(COC.db.orders.X1.status == "open", "ACK nommé par un tiers non lié : IGNORÉ")
+        O:_OnCycle("ACK", "ORD|ACK|X1|" .. A, A)
+        check(COC.db.orders.X1.status == "accepted" and COC.db.orders.X1.acceptedBy == A,
+            "ACK nommé par le reroll vérifié : accepté")
+        O:_OnCycle("DLV", "ORD|DLV|X1|" .. B, B)
+        check(COC.db.orders.X1.status == "delivered" and COC.db.orders.X1.acceptedBy == A,
+            "DLV par le reroll : livré, acceptedBy conservé")
+    end)
+    D.roster[A], D.roster[B], D.roster[M] = savedA, savedB, savedM
+    D:_BumpAltRev()
+    COC.db.orders = savedO   -- restauration inconditionnelle
+    if not ok then check(false, "exception pendant le test ALT") end
+end
+
 -- === Groupe 6 : découpage en sections (SectionOf) ===
 function T:_TestSection()
     if not (COC.SectionOf and GetItemInfoInstant) then return end
@@ -134,6 +166,7 @@ function T:Run()
     self:_TestHelpers()
     self:_TestOrderSecurity()
     self:_TestPrune()
+    self:_TestAlts()
     self:_TestSection()
     out(string.format("terminé : |cFF33DD33%d OK|r · %s%d échec(s)|r",
         self.pass, self.fail > 0 and "|cFFFF4444" or "|cFF888888", self.fail))

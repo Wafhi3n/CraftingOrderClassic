@@ -80,6 +80,18 @@ function Social:ProfSummary(name)
             if not SECONDARY_PROF[key] then parts[#parts + 1] = profMark(key) .. recipeCount(key) end
         end
     end
+    -- Repli : fiche RELAYÉE par un partenaire (artisan hors ligne) — plus riche qu'un « vu crafter »,
+    -- mais grade estimation (la ligne « via X » d'OnUnitTooltip qualifie la provenance).
+    if #parts == 0 and r.relayed then
+        for key, sv in pairs(r.relayed.skill or {}) do
+            if not SECONDARY_PROF[key] then parts[#parts + 1] = profMark(key) .. " " .. sv[1] .. "/" .. sv[2] end
+        end
+        if #parts == 0 then
+            for key in pairs(r.relayed.recipes or {}) do
+                if not SECONDARY_PROF[key] then parts[#parts + 1] = profMark(key) end
+            end
+        end
+    end
     -- Dernier recours : non-porteur d'addon VU crafter (CHAT_MSG_LOOT) → plancher de skill « N+ ».
     if #parts == 0 then
         for key, floor in pairs(r.craftSeen or {}) do
@@ -92,6 +104,64 @@ function Social:ProfSummary(name)
     table.sort(parts)
     local rep = (r.rep and r.rep > 0) and ("  |cFFE8B84B" .. string.format(COC.L["%d livrés"], r.rep) .. "|r") or ""
     return table.concat(parts, "   ") .. rep
+end
+
+-- =========================================================================
+-- Cooldowns de recettes (transmutations & co) — lignes prêtes à afficher.
+-- =========================================================================
+-- Libellé d'un groupe de CD partagé : UNE ligne pour tout le groupe (12 transmutations = 1 ligne,
+-- même readyAt puisque la catégorie est partagée). Un littéral L[clé] par groupe (porte check_locale).
+local function groupLabel(grp)
+    if grp == "transmute" then return COC.L["Transmutation"] end
+    return nil
+end
+
+-- Lignes cooldown d'un artisan (ENTRÉE ROSTER, pas un nom) : { { text=, ready= } } triées prêtes
+-- d'abord puis par échéance, ou nil. Sources par priorité : r.cooldowns (réseau direct) >
+-- r.relayed.cooldowns (relais partenaire) > r.cdSeen (estimation CLEU) — les deux dernières avec
+-- suffixe « (estimé) ». `profFilter` limite à un métier (tooltips d'icône de l'annuaire).
+function Social:CooldownLines(r, cap, profFilter)
+    if not (r and CraftLink and CraftLink.RecipeCdGroup) then return nil end
+    local src, est = r.cooldowns, false
+    if not (src and next(src)) then src, est = (r.relayed and r.relayed.cooldowns), true end
+    if not (src and next(src)) then src, est = r.cdSeen, true end
+    if not (src and next(src)) then return nil end
+    local now, agg = time(), {}
+    for prof, set in pairs(src) do
+        if (not profFilter or prof == profFilter) and not SECONDARY_PROF[prof] then
+            for sid, readyAt in pairs(set) do
+                local grp = CraftLink:RecipeCdGroup(prof, sid)
+                local key = grp and (prof .. "|" .. grp) or (prof .. "#" .. sid)
+                local a = agg[key]
+                if not a then
+                    local label = (grp and groupLabel(grp))
+                        or CraftLink:RecipeName(sid) or tostring(sid)
+                    agg[key] = { label = label, readyAt = readyAt }
+                elseif readyAt > a.readyAt then a.readyAt = readyAt end   -- fusion groupe : le plus tardif
+            end
+        end
+    end
+    local rows = {}
+    for _, a in pairs(agg) do rows[#rows + 1] = a end
+    if #rows == 0 then return nil end
+    table.sort(rows, function(x, y)
+        if (x.readyAt <= now) ~= (y.readyAt <= now) then return x.readyAt <= now end   -- prêtes d'abord
+        if x.readyAt ~= y.readyAt then return x.readyAt < y.readyAt end
+        return x.label < y.label
+    end)
+    local sk, out = GetSkin(), {}
+    local sfx = est and (" |cFF808080" .. COC.L["(estimé)"] .. "|r") or ""
+    for i = 1, math.min(#rows, cap or #rows) do
+        local a = rows[i]
+        if a.readyAt <= now then
+            out[#out + 1] = { ready = true, text = string.format(COC.L["%s : prête"], a.label) .. sfx }
+        else
+            local dur = (sk and sk.FormatDuration) and sk.FormatDuration(a.readyAt - now)
+                or (tostring(a.readyAt - now) .. "s")
+            out[#out + 1] = { text = string.format(COC.L["%s : dans %s"], a.label, dur) .. sfx }
+        end
+    end
+    return out
 end
 
 -- =========================================================================
@@ -176,6 +246,17 @@ local function OnUnitTooltip(tooltip)
     -- Marque addon = icône WorkOrder (le glyphe « ✓ » s'affichait en tofu dans la police WoW).
     local mark = sk and ("  |T" .. sk.tex.workorder .. ":14:14:0:0|t") or ""
     tooltip:AddLine("|cFF33DD88CO-Classic|r" .. mark .. "  " .. summary, 1, 1, 1)
+    -- Cooldowns de recettes : 3 lignes max — vert = prête, orange = en cours de recharge.
+    local rr = COC.Directory and COC.Directory.roster and COC.Directory.roster[name]
+    for _, ln in ipairs((rr and Social:CooldownLines(rr, 3)) or {}) do
+        if ln.ready then tooltip:AddLine("   " .. ln.text, 0.3, 0.9, 0.4)
+        else tooltip:AddLine("   " .. ln.text, 1.0, 0.65, 0.2) end
+    end
+    -- Résumé issu d'un RELAIS de partenaire (aucune donnée directe) → provenance + fraîcheur.
+    if rr and rr.relayed and not (rr.skill or rr.recipes) then
+        local dur = (sk and sk.FormatDuration) and sk.FormatDuration(math.max(0, time() - (rr.relayed.ts or time()))) or "?"
+        tooltip:AddLine("   |cFF808080" .. string.format(COC.L["via %s · il y a %s"], rr.relayed.via or "?", dur) .. "|r")
+    end
     -- Maj déplie la liste des plans connus ; sinon un rappel discret. RecipeDetail = nil si aucun RK reçu.
     local detail = (IsShiftKeyDown and IsShiftKeyDown()) and Social:RecipeDetail(name)
     if detail then
