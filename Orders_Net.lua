@@ -151,21 +151,33 @@ function Orders:_OnCycle(action, message, sender)
         -- Seul l'AUTEUR peut annuler — ou un perso de son set VÉRIFIÉ (extension pure : jamais un tiers).
         if samePlayer(sender, o.buyer) then o.status = "cancelled" end
     elseif action == "ACK" then
+        -- Un ACK ne s'applique qu'à un ordre OUVERT : ferme le vol d'attribution (re-ACK d'un ordre
+        -- déjà accepté/livré/annulé/terminé pour s'en attribuer le crédit). Idempotent : la 2e copie
+        -- (global + whisper) voit « accepted » et sort. Après un désistement NACK, l'ordre redevient
+        -- « open » → un autre artisan peut ré-ACK (comportement voulu conservé).
+        if o.status ~= "open" then return end
         -- Ordre NOMMÉ : seul le destinataire (ou son reroll VÉRIFIÉ) accepte — ferme le spoof
-        -- « un tiers capture une commande privée » (avant : aucune garde). Portées larges : ouvert
-        -- à tous comme toujours (le désistement NACK + ré-ACK d'un autre artisan doit rester libre).
+        -- « un tiers capture une commande privée ». Portées larges : premier arrivé (n'importe qui).
         if isNamed(o) and not samePlayer(sender, o.recipient) then return end
         o.status = "accepted"; o.acceptedBy = sender or (f.crafter ~= "" and f.crafter) or nil   -- l'accepteur = l'émetteur
     elseif action == "DLV" then
-        -- Crafteur → acheteur : « j'ai remis ». Passe « remise » (pas encore terminée) ; côté acheteur
-        -- on l'invite à confirmer la réception (bouton / auto-loot). L'émetteur EST le crafteur.
-        if o.status ~= "done" then
+        -- Crafteur → acheteur : « j'ai remis ». Passe « remise » (pas terminée). Exclut « delivered »
+        -- de l'entrée → idempotent (pas de double toast sur la copie global+whisper).
+        if o.status ~= "done" and o.status ~= "delivered" then
             local ab = o.acceptedBy
-            -- NOMMÉ : l'émetteur doit être lié à l'accepteur ou au destinataire (ab==nil = 1re
-            -- revendication, ex. acheteur hors ligne pendant l'ACK — comportement historique).
-            if isNamed(o) and ab and not (samePlayer(sender, ab) or samePlayer(sender, o.recipient)) then return end
+            if isNamed(o) then
+                -- NOMMÉ : autorisé au destinataire OU à l'accepteur (ou leurs rerolls liés). PAS de
+                -- précondition de statut → préserve le cas « acheteur hors ligne pendant l'ACK » (chez
+                -- lui l'ordre est encore « open », mais le vrai destinataire a le droit de livrer).
+                if not (samePlayer(sender, o.recipient) or (ab and samePlayer(sender, ab))) then return end
+            else
+                -- PUBLIC : doit être passé par « accepted » PAR l'émetteur (ou son reroll lié) — ferme
+                -- le DLV direct d'un tiers sur un ordre jamais accepté (vol d'attribution + réputation).
+                if o.status ~= "accepted" or not (ab and samePlayer(sender, ab)) then return end
+            end
             o.status = "delivered"
-            -- Reroll qui livre (lié à l'accepteur) : on GARDE « accepté par X » — sinon historique.
+            -- Reroll qui livre (lié à l'accepteur) : on GARDE « accepté par X » ; sinon (nommé livré
+            -- sans ACK vu) l'émetteur devient l'accepteur attesté.
             if not (ab and samePlayer(sender, ab)) then
                 o.acceptedBy = sender or (f.crafter ~= "" and f.crafter) or ab
             end
@@ -211,7 +223,7 @@ end
 function Orders:OnNetwork(sender, message)
     local action = message:match("^ORD|([A-Z]+)|")
     if action == "NEW" then self:_OnNew(message)
-    elseif action == "SUGG" then self:_OnSuggest(message)
+    elseif action == "SUGG" then self:_OnSuggest(message, sender)
     else self:_OnCycle(action, message, sender) end
     if COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end   -- maj live coalescée (rafales de fanout)
     local PW = COC.ProfWindow
@@ -220,11 +232,15 @@ end
 
 -- Nudge « garde pour toi » (ORD|SUGG|id[|1]) : un pair me signale une commande de son cache que JE
 -- saurais faire. « |1 » = captée /commerce·/guilde → viaAddon=false + captured. Alerte ssi H:ICanCraft.
-function Orders:_OnSuggest(message)
+function Orders:_OnSuggest(message, sender)
     local f = Codec.Decode(message)
     local o = f and f.id and COC.db.orders[f.id]
     if not o then return end
-    if f.captured == "1" then o.viaAddon = false; o.captured = true end
+    -- `captured=1` coupe le relais mesh de l'ordre (_RelayMatch) : ne l'honorer que d'un porteur
+    -- CONNU (présent dans le roster). Sinon un inconnu pourrait, avec un SUGG forgé, étouffer
+    -- silencieusement et définitivement la propagation d'une commande vers les bons artisans.
+    local known = sender and COC.Directory and COC.Directory.roster and COC.Directory.roster[sender]
+    if f.captured == "1" and known then o.viaAddon = false; o.captured = true end
     -- Hors portée : ordre nommé à un TIERS précis → ne pas suggérer à moi (fuite d'info sur commande
     -- privée). « Moi » inclut mes rerolls (IsMyChar, local).
     local rcpt = o.recipient or "Tous"
