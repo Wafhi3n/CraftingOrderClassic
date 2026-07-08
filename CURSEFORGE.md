@@ -19,6 +19,9 @@ between total strangers as long as they've got the addon too.
 - Pick a crafter and the recipe list narrows to what they can actually make, so you never send someone a request they can't fill.
 - Filter recipes down to what you can make right now with the reagents already in your bags.
 - Order from your friends and guildmates without opening the board (new in 1.4).
+- See recipe cooldowns on other artisans, so you know whether their Transmute is ready or still ticking (new in 1.9).
+- Group your alts under one identity, so an order for your offline alchemist reaches whatever character you're playing (new in 1.9).
+- Check every profession on your whole account at once in the My Artisans tab (new in 1.9).
 
 ## Order from your Friends and Guild list
 
@@ -59,6 +62,25 @@ crafted item from your bags. You still read it over and hit Send yourself. At th
 sees their half: the crafter what to collect, the buyer what to pay and a button to confirm. The panel
 sticks around after the trade closes so whoever's left can finish up.
 
+## Shared recipe cooldowns
+
+Cast a Transmute and everyone running the addon sees it on your artisan tooltip, either "Transmute:
+ready" or "Transmute: in 14h". No more asking around the realm to find out whose Arcanite transmute is
+up. It reads your own cooldowns straight from the game and shares them the way it already shares your
+skill levels; a small built-in table knows which recipes actually sit on a timer.
+
+## One player, all your characters
+
+Turn on `/co alts` (or tick the box in the My Artisans tab) and pick a main. Your characters get linked
+as one player, checked from both ends so nobody can pass themselves off as someone else's alt. Someone
+orders from your alchemist while you're on your warrior, and the order still finds you, with a note that
+it's for your alt. You can accept it from whichever character you're on, and the delivery follows once
+you hop over.
+
+The My Artisans tab gathers every profession on your account for the realm into one place, as if a
+single character knew them all. Skill levels, known recipes grouped by category the way the profession
+window does it, active cooldowns pinned at the top, and which of your characters holds each recipe.
+
 ## Partners, loot alerts and gifts
 
 Loot a recipe, formula, schematic or pattern and the addon tells you what it teaches, whether you
@@ -94,7 +116,8 @@ Guild Economy.
 
 `/co help` lists them all. The ones you'll reach for: `/co` opens the board, `/co profwindow` toggles the
 custom profession window, `/co notify` sets notifications, `/co scan` toggles the chat scanner, `/co gift`
-offers a looted plan to a partner, `/co refresh` re-polls the directory.
+offers a looted plan to a partner, `/co refresh` re-polls the directory, `/co alts` groups your
+characters (off by default).
 
 Made with Season of Discovery and Fresh realms in mind, guild-economy challenges, and servers where the
 auction house isn't the answer.
