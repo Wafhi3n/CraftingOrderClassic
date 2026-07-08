@@ -119,6 +119,8 @@ local de = {
     ["%d recettes"] = "%d Rezepte",
     ["Aucun métier. Ouvre ta fenêtre métier sur chaque perso une fois."] =
         "Keine Berufe. Öffne das Berufsfenster auf jedem Charakter einmal.",
+    ["Partager mes rerolls sur le réseau"] = "Meine Twinks im Netzwerk teilen",
+    ["Vitrine : %s"] = "Aushängeschild: %s",
     ["Pas de recettes connues (métier de récolte ?)."] = "Keine bekannten Rezepte (Sammelberuf?).",
     ["Repérer les crafteurs autour (en ville)"] = "Handwerker in der Nähe erkennen (in Stadt)",
     ["Ajouter ami"] = "Freund hinzufügen",

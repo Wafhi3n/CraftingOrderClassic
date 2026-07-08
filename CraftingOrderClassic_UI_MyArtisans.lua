@@ -32,24 +32,105 @@ function UI:BuildMyArtisansTab(f)
     self.myArtisansPanel = panel
     self.myArtSelProf = nil
 
-    sep1px(panel, SEP, -82, 1, 494)
+    self:_BuildMyArtHeader(panel)          -- bandeau : activer le partage + choix de la vitrine
+    sep1px(panel, SEP, -110, 1, 466)
 
     local lhdr = panel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    lhdr:SetPoint("TOPLEFT", 14, -80); lhdr:SetText(L["MÉTIERS DU COMPTE"])
+    lhdr:SetPoint("TOPLEFT", 14, -108); lhdr:SetText(L["MÉTIERS DU COMPTE"])
     lhdr:SetTextColor(Skin.unpack(Skin.color.textMuted))
 
     local lscroll = CreateFrame("ScrollFrame", "COCMyArtProfScroll", panel, "UIPanelScrollFrameTemplate")
-    lscroll:SetPoint("TOPLEFT", 12, -98); lscroll:SetPoint("BOTTOMLEFT", 12, 22); lscroll:SetWidth(LW - 22)
+    lscroll:SetPoint("TOPLEFT", 12, -126); lscroll:SetPoint("BOTTOMLEFT", 12, 22); lscroll:SetWidth(LW - 22)
     local lc = CreateFrame("Frame", nil, lscroll); lc:SetSize(LW - 24, 10); lscroll:SetScrollChild(lc)
     self.myArtProfContent = lc; self.myArtProfRows = {}
 
     local rhdr = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    rhdr:SetPoint("TOPLEFT", RX, -80); Skin.ApplyShadow(rhdr); self.myArtDetailHdr = rhdr
+    rhdr:SetPoint("TOPLEFT", RX, -108); Skin.ApplyShadow(rhdr); self.myArtDetailHdr = rhdr
 
     local rscroll = CreateFrame("ScrollFrame", "COCMyArtRecScroll", panel, "UIPanelScrollFrameTemplate")
-    rscroll:SetPoint("TOPLEFT", RX, -102); rscroll:SetPoint("BOTTOMRIGHT", -30, 22)
+    rscroll:SetPoint("TOPLEFT", RX, -128); rscroll:SetPoint("BOTTOMRIGHT", -30, 22)
     local rc = CreateFrame("Frame", nil, rscroll); rc:SetSize(RW - 24, 10); rscroll:SetScrollChild(rc)
     self.myArtRecContent = rc; self.myArtRecRows = {}
+end
+
+-- Bandeau haut : case à cocher opt-in « partager mes rerolls » (délègue à Dir:AltsCmd on/off, qui
+-- gère défaut du main + annonce/dissolution) + bouton « Vitrine : Nom » ouvrant un flyout des persos
+-- du compte pour choisir le perso principal. Toute la logique réseau/sécurité reste dans Directory_Alts.
+function UI:_BuildMyArtHeader(panel)
+    local chk = CreateFrame("Button", nil, panel); chk:SetPoint("TOPLEFT", 14, -74)
+    local box = Skin.MakeCheck(chk, 16); box:SetPoint("LEFT", 0, 0)
+    local fs = chk:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    fs:SetPoint("LEFT", box, "RIGHT", 5, 0); fs:SetText(L["Partager mes rerolls sur le réseau"])
+    fs:SetTextColor(Skin.unpack(Skin.color.text)); Skin.ApplyShadow(fs)
+    chk:SetSize(21 + fs:GetStringWidth() + 4, 18)
+    chk:SetScript("OnClick", function()
+        local on = not (COC.db and COC.db.altsEnabled)
+        local D = COC.Directory
+        if D and D.AltsCmd then D:AltsCmd(on and "on" or "off") end
+        UI:RefreshMyArtisans()
+    end)
+    self.myArtEnableBox = box
+
+    local mainBtn = Skin.MakeGoldButton(panel, 190, 20, "—"); mainBtn:SetPoint("TOPRIGHT", -30, -73)
+    mainBtn.text:ClearAllPoints(); mainBtn.text:SetPoint("LEFT", 8, 0); mainBtn.text:SetJustifyH("LEFT")
+    local arrow = mainBtn:CreateTexture(nil, "OVERLAY"); arrow:SetSize(14, 14)
+    arrow:SetPoint("RIGHT", -4, 0); arrow:SetTexture(Skin.tex.arrowDown)
+    mainBtn:SetScript("OnClick", function() UI:_ToggleMyArtMainFlyout() end)
+    self.myArtMainBtn = mainBtn
+
+    local fly = CreateFrame("Frame", "COCMyArtMainFlyout", UIParent, "BackdropTemplate")
+    fly:SetSize(190, 10); fly:SetFrameStrata("DIALOG"); fly:Hide(); Skin.SkinWell(fly)
+    self.myArtMainFlyout = fly; self.myArtMainFlyRows = {}
+    local closer = CreateFrame("Button", nil, UIParent)
+    closer:SetAllPoints(); closer:SetFrameStrata("DIALOG"); closer:Hide()
+    fly:SetFrameLevel(closer:GetFrameLevel() + 1)
+    closer:SetScript("OnClick", function() fly:Hide(); closer:Hide() end)
+    fly:SetScript("OnShow", function() closer:Show() end)
+    fly:SetScript("OnHide", function() closer:Hide() end)
+
+    sep1px(panel, 12, -100, 822, 1)
+end
+
+-- Ouvre/ferme le flyout de choix du perso principal (vitrine). Liste = mes persos du royaume
+-- (Dir:_MyAltNames) ; clic → Dir:AltsCmd("main X") (revalide que c'est bien un de mes persos).
+function UI:_ToggleMyArtMainFlyout()
+    local fly = self.myArtMainFlyout; if not fly then return end
+    if fly:IsShown() then fly:Hide(); return end
+    local D = COC.Directory
+    local names = (D and D._MyAltNames and D:_MyAltNames()) or {}
+    local n = 0
+    for _, nm in ipairs(names) do
+        n = n + 1
+        local row = self.myArtMainFlyRows[n]
+        if not row then
+            row = Skin.MakeGoldButton(fly, 182, 18, "")
+            row:SetPoint("TOPLEFT", 4, -4 - (n - 1) * 20)
+            row.text:ClearAllPoints(); row.text:SetPoint("LEFT", 6, 0); row.text:SetJustifyH("LEFT")
+            self.myArtMainFlyRows[n] = row
+        end
+        row:SetText(nm)
+        row:SetScript("OnClick", function()
+            if D and D.AltsCmd then D:AltsCmd("main " .. nm) end
+            fly:Hide(); UI:RefreshMyArtisans()
+        end)
+        row:Show()
+    end
+    for i = n + 1, #self.myArtMainFlyRows do self.myArtMainFlyRows[i]:Hide() end
+    if n == 0 then return end
+    fly:SetHeight(n * 20 + 8)
+    fly:ClearAllPoints(); fly:SetPoint("TOPRIGHT", self.myArtMainBtn, "BOTTOMRIGHT", 0, -2); fly:Show()
+end
+
+-- Recale le bandeau sur l'état réel (coche + libellé vitrine) — le bouton vitrine n'a de sens que
+-- si le partage est actif (masqué sinon).
+function UI:_SyncMyArtHeader()
+    local on = COC.db and COC.db.altsEnabled
+    if self.myArtEnableBox then self.myArtEnableBox:SetChecked(on and true or false) end
+    if self.myArtMainBtn then
+        self.myArtMainBtn:SetShown(on and true or false)
+        self.myArtMainBtn:SetText(string.format(L["Vitrine : %s"], (COC.db and COC.db.altMain) or "?"))
+    end
+    if not on and self.myArtMainFlyout then self.myArtMainFlyout:Hide() end
 end
 
 -- =========================================================================
@@ -201,6 +282,7 @@ end
 -- =========================================================================
 function UI:RefreshMyArtisans()
     local panel = self.myArtisansPanel; if not panel then return end
+    self:_SyncMyArtHeader()
     local D = COC.Directory
     local list = (D and D.AggregateMyProfs and D:AggregateMyProfs()) or {}
     -- Tri par libellé LOCALISÉ à rang égal (le cœur trie déjà par bestRank desc puis clé EN).

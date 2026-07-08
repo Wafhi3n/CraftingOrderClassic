@@ -126,6 +126,8 @@ if loc == "enUS" or loc == "enGB" then
         ["%d recettes"] = "%d recipes",
         ["Aucun métier. Ouvre ta fenêtre métier sur chaque perso une fois."] =
             "No professions. Open your profession window on each character once.",
+        ["Partager mes rerolls sur le réseau"] = "Share my alts on the network",
+        ["Vitrine : %s"] = "Front: %s",
         ["Pas de recettes connues (métier de récolte ?)."] = "No known recipes (gathering profession?).",
         -- Repérage des crafteurs à proximité (opt-in, en ville) + bouton « Ajouter ami »
         ["Repérer les crafteurs autour (en ville)"] = "Detect crafters nearby (in town)",

@@ -120,6 +120,8 @@ local es = {
     ["%d recettes"] = "%d recetas",
     ["Aucun métier. Ouvre ta fenêtre métier sur chaque perso une fois."] =
         "Sin profesiones. Abre la ventana de profesión en cada personaje una vez.",
+    ["Partager mes rerolls sur le réseau"] = "Compartir mis alters en la red",
+    ["Vitrine : %s"] = "Escaparate: %s",
     ["Pas de recettes connues (métier de récolte ?)."] = "Sin recetas conocidas (¿profesión de recolección?).",
     ["Repérer les crafteurs autour (en ville)"] = "Detectar artesanos cercanos (en ciudad)",
     ["Ajouter ami"] = "Añadir amigo",
