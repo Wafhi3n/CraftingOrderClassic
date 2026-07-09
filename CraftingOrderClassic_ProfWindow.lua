@@ -26,6 +26,7 @@ local GATHER = { Mining = true, Herbalism = true, Skinning = true, Fishing = tru
 -- Sais-je honorer cette commande ? (récolte = j'ai le skill ; craft = je connais la recette)
 function PW.CanFulfill(o)
     local prof = o.profession; if not prof then return nil end
+    if PW.rerollKey then return PW:RerollKnows(o) end   -- vue reroll : lit la partition du reroll, pas le perso courant
     local c, D = CL(), COC.Directory
     if GATHER[prof] then return (D and D.mySkills and D.mySkills[prof]) ~= nil end
     if not c then return nil end
@@ -176,6 +177,7 @@ function PW:OpenDock(nativeFrame)
     self:Build()
     self.docked = true
     self.standaloneKey = nil
+    self.rerollKey = nil                -- défense en profondeur : docké natif ≠ vue reroll
     self._compact = nil                 -- force _ApplyMode à recalculer au retour en vue custom
     self:_ApplyMode(true)               -- colonne Commandes seule (réutilise le layout compact)
     if self.vanillaBtn then self.vanillaBtn:Hide() end   -- « Vue Blizzard » redondant : on Y est déjà
@@ -226,11 +228,23 @@ function PW:_DoRefresh()
     local craft = COC.Craft
     local name = craft and craft:GetOpenProfessionInfo()
     if name then                                   -- mode PLEIN : fenêtre métier native ouverte
+        self.rerollKey = nil                        -- la native prime sur une vue reroll résiduelle
         self.profKey = craft:OpenProfessionKey()
         self.titleFS:SetText(name)
         local rank, maxRank = craft:OpenRank()
         self.rankFS:SetText((rank and maxRank) and string.format("|cFFE8B84B%d|r / %d", rank, maxRank) or "")
         self.recipes = craft:ReadRecipes() or {}
+        self:_ApplyMode(false)
+        if self.RefreshRecipes then self:RefreshRecipes() end
+        if self.RefreshDetail  then self:RefreshDetail()  end
+    elseif self.rerollKey then                     -- mode REROLL : lecture seule, recettes depuis le cache
+        self.profKey = self.standaloneKey
+        self.titleFS:SetText(Skin.ProfLabel(self.profKey) .. "  |cFF888888"
+            .. string.format(L["%s — lecture seule"], self.rerollName or "?") .. "|r")
+        local mc = COC.db and COC.db.mySkillsByChar and COC.db.mySkillsByChar[self.rerollKey]
+        local sk = mc and mc[self.profKey]
+        self.rankFS:SetText(sk and string.format("|cFFE8B84B%d|r / %d", sk[1], sk[2]) or "|cFF888888?|r")
+        self.recipes = self:_RerollRecipeList()
         self:_ApplyMode(false)
         if self.RefreshRecipes then self:RefreshRecipes() end
         if self.RefreshDetail  then self:RefreshDetail()  end
@@ -275,6 +289,7 @@ end
 --  * Métier de RÉCOLTE (pas de fenêtre) → vue COMPACTE autonome (colonne Commandes seule).
 function PW:OpenFor(profKey)
     if not profKey then return end
+    self.rerollKey = nil                              -- ouverture normale (perso courant) : sort du mode reroll
     if not GATHER[profKey] then
         local craft = COC.Craft
         if craft and craft:GetOpenProfessionInfo() and craft:OpenProfessionKey() == profKey then
@@ -302,6 +317,7 @@ end
 -- OnProfessionClose, qui voit standaloneKey posé et RESTE VISIBLE en mode compact (au lieu de masquer).
 function PW:_OpenCompact(profKey)
     self.standaloneKey = profKey
+    self.rerollKey = nil                              -- compact récolte ≠ vue reroll
     self:Build()
     local craft = COC.Craft
     if craft and craft:GetOpenProfessionInfo() then
@@ -366,6 +382,7 @@ function PW:OnProfessionShow()
     if not (craft and craft:GetOpenProfessionInfo()) then return end
     silenceGE()                         -- coexistence : pas de double panneau si GE est chargé
     self.standaloneKey = nil            -- la fenêtre native prend le dessus sur une ouverture par clé
+    self.rerollKey = nil                -- …et sur une vue reroll lecture seule
     self:Build()
     if self.docked then self.docked = false; self:_RestorePlacement(); if self.vanillaBtn then self.vanillaBtn:Show() end end
     self:NeutralizeNative()

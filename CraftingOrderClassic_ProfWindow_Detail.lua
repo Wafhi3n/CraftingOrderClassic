@@ -157,25 +157,42 @@ function PW:RefreshDetail()
         self.detMakesFS:SetText("")
     end
 
-    local reags = COC.Craft:Reagents(e.index)
+    -- Réactifs : catalogue (mode reroll, « à fournir » sans have) sinon fenêtre native (have/need).
+    local reags = self.rerollKey and self:_RerollReagents(e.index) or COC.Craft:Reagents(e.index)
     for i, row in ipairs(self.detReagRows) do
         local rg = reags[i]
         if rg then
             row.reagLink = rg.link
             row.icon:SetTexture(rg.texture or "Interface\\Icons\\INV_Misc_QuestionMark")
             row.nameFS:SetText(rg.name or "?")
-            local enough = (rg.have or 0) >= (rg.need or 0)
-            local cc = enough and "|cFF33DD33" or "|cFFFF5555"
-            row.cntFS:SetText(string.format("%s%d|r|cFF888888/%d|r", cc, rg.have or 0, rg.need or 0))
+            if rg.readonly then                       -- reroll : quantité requise seule (sacs inconnus)
+                row.cntFS:SetText(string.format("|cFF888888x%d|r", rg.need or 0))
+            else
+                local enough = (rg.have or 0) >= (rg.need or 0)
+                local cc = enough and "|cFF33DD33" or "|cFFFF5555"
+                row.cntFS:SetText(string.format("%s%d|r|cFF888888/%d|r", cc, rg.have or 0, rg.need or 0))
+            end
             row:Show()
         else
             row:Hide()
         end
     end
 
+    -- Vue reroll = LECTURE SEULE : aucun bouton créer (on n'est pas sur ce perso). Désarme aussi
+    -- l'attribut sécurisé (type/clickbutton) laissé par une session précédente — défense en profondeur :
+    -- Hide() suffit à empêcher le clic, mais un futur réaffichage accidentel du bouton ne doit pas
+    -- hériter d'un clickbutton pointant sur CraftCreateButton natif.
+    if self.rerollKey then
+        self:_WireCreateButton(false)
+        self.detCreateBtn:Hide(); self.detAllBtn:Hide()
+        self.detQtyBox:Hide(); self.detQtyLbl:Hide()
+        return
+    end
+
     local avail   = e.numAvailable or 0
     local isCraft = COC.Craft:IsCraftOpen()
     self:_SetCraftButtons(avail > 0, (not isCraft) and avail > 1)
+    self.detCreateBtn:Show()
     self.detAllBtn:SetShown(not isCraft)
     -- Craft (enchant) = 1 par clic (l'API n'a pas de compteur, comme l'UI Blizzard) → pas de Qté.
     self.detQtyBox:SetShown(not isCraft)
