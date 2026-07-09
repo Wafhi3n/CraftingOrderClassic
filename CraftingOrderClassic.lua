@@ -17,7 +17,8 @@ local CraftLink = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
 -- Métiers SECONDAIRES (WoW) — source de vérité PARTAGÉE (Social, Directory_LootScan, UI_Artisans).
 -- On ne passe PAS de commande pour eux → jamais détectés (découverte de crafteurs) ni affichés dans
 -- l'annuaire/tooltip/pills. Clés CraftLink exactes (cf. Libs/CraftLink-1.0/Data/*/{Cooking,FirstAid,Fishing}.lua).
-COC.SECONDARY_PROF = { Cooking = true, ["First Aid"] = true, Fishing = true }
+-- Poisons inclus : pseudo-métier exclusif voleur (usage perso, non commandable à un tiers).
+COC.SECONDARY_PROF = { Cooking = true, ["First Aid"] = true, Fishing = true, Poisons = true }
 
 -- Métiers de RÉCOLTE pure — source de vérité PARTAGÉE (UI_Post, Social_Menu). On ne passe pas de
 -- commande de CRAFT dessus : le dropdown de la fenêtre Commande les exclut et les entrées « Commander
@@ -271,6 +272,7 @@ function COC:Help()
     print("  |cFFFFFFFF/co alts [on|off|main <nom>]|r — " .. L["regrouper tes rerolls (opt-in) : liste annoncée, commandes routées vers ton perso connecté"])
     print("  |cFFFFFFFF/co mute <nom>|r / |cFFFFFFFF/co unmute <nom>|r — " .. L["muter/démuter un joueur (aucune notif de sa part)"])
     print("  |cFFFFFFFF/co lowlevel [N|off]|r — " .. L["seuil de mute auto des persos bas niveau (défaut 5)"])
+    print("  |cFFFFFFFF/co spam [off|auto|<max> [fenêtre]]|r — " .. L["réglage anti-spam : seuil, fenêtre, mute auto vs popup"])
     print("  |cFFFFFFFF/co debug|r — |cFFFF8800" .. L["mode solo"] .. "|r : " .. L["injecte/retire un réseau fictif (artisans + commandes)"])
     print("  |cFFFFFFFF/co trace|r — |cFFFF8800" .. L["diag"] .. "|r : " .. L["journalise le réseau dans la SavedVariable (off | clear | dump)"])
     print("  |cFFFFFFFF/co gwroster|r — |cFFFF8800" .. L["diag"] .. "|r : " .. L["confédérés GreenWall repérés (SoD live only)"])
@@ -308,6 +310,7 @@ function COC:Slash(msg)
     elseif cmd == "mute"   then if COC.Moderation then COC.Moderation:MuteCmd(rest) end
     elseif cmd == "unmute" then if COC.Moderation then COC.Moderation:UnmuteCmd(rest) end
     elseif cmd == "lowlevel" or cmd == "lowlvl" then if COC.Moderation then COC.Moderation:LowLevelCmd(rest) end
+    elseif cmd == "spam" then if COC.Moderation then COC.Moderation:SpamCmd(rest) end
     elseif cmd == "alts" or cmd == "rerolls" then if D and D.AltsCmd then D:AltsCmd(rest) end
     elseif cmd == "beacon" then COC:BeaconDiag()
     elseif cmd == "gwroster" or cmd == "confed" then COC:GreenWallDiag()

@@ -77,6 +77,20 @@ function UI:_ProfMenuRow(m, i)
     m.rows[i] = r; return r
 end
 
+-- Configure une ligne du pool : header de section (doré, sans icône, non cliquable) ou entrée
+-- cliquable (icône + libellé + OnClick). Recycle proprement l'état entre ouvertures.
+local function fillMenuRow(r, y, opts)
+    r:ClearAllPoints(); r:SetPoint("TOPLEFT", 10, y)
+    if opts.header then
+        r.ic:Hide(); r.text:ClearAllPoints(); r.text:SetPoint("LEFT", 10, 0)
+        r:SetText("|cFF888888" .. opts.label .. "|r"); r:SetScript("OnClick", nil); r:Disable()
+    else
+        r.ic:Show(); r.ic:SetTexture(opts.icon); r.text:ClearAllPoints(); r.text:SetPoint("LEFT", 26, 0)
+        r:SetText(opts.label); r:SetScript("OnClick", opts.onClick); r:Enable()
+    end
+    r:Show()
+end
+
 function UI:ToggleProfMenu()
     local m = self.profMenu or self:_BuildProfMenu()
     if m:IsShown() then m:Hide(); return end
@@ -84,16 +98,28 @@ function UI:ToggleProfMenu()
     local keys = {}
     for k in pairs((D and D.mySkills) or {}) do keys[#keys + 1] = k end
     table.sort(keys, function(a, b) return Skin.ProfLabel(a) < Skin.ProfLabel(b) end)
-    m.title:SetText((#keys > 0) and ("|cFFE8B84B" .. L["Mes métiers"] .. "|r") or ("|cFF888888" .. L["Aucun métier connu."] .. "|r"))
-    local y = -26
-    for i, key in ipairs(keys) do
-        local r = self:_ProfMenuRow(m, i)
-        r:ClearAllPoints(); r:SetPoint("TOPLEFT", 10, y)
-        r.ic:SetTexture(Skin.ProfIcon(key) or Skin.tex.unknown); r:SetText(Skin.ProfLabel(key))
-        r:SetScript("OnClick", function() m:Hide(); if COC.ProfWindow then COC.ProfWindow:OpenFor(key) end end)
-        r:Show(); y = y - 22
+    local rerolls = (D and D.RerollProfEntries and D:RerollProfEntries()) or {}
+    local any = #keys > 0 or #rerolls > 0
+    m.title:SetText(any and ("|cFFE8B84B" .. L["Mes métiers"] .. "|r") or ("|cFF888888" .. L["Aucun métier connu."] .. "|r"))
+    local y, i = -26, 0
+    for _, key in ipairs(keys) do
+        i = i + 1
+        fillMenuRow(self:_ProfMenuRow(m, i), y, { icon = Skin.ProfIcon(key) or Skin.tex.unknown, label = Skin.ProfLabel(key),
+            onClick = function() m:Hide(); if COC.ProfWindow then COC.ProfWindow:OpenFor(key) end end })
+        y = y - 22
     end
-    for i = #keys + 1, #m.rows do m.rows[i]:Hide() end
+    if #rerolls > 0 then
+        i = i + 1; fillMenuRow(self:_ProfMenuRow(m, i), y, { header = true, label = L["Rerolls"] }); y = y - 22
+        for _, e in ipairs(rerolls) do
+            i = i + 1
+            fillMenuRow(self:_ProfMenuRow(m, i), y, { icon = Skin.ProfIcon(e.prof) or Skin.tex.unknown,
+                label = Skin.ProfLabel(e.prof) .. " |cFF888888— " .. e.name .. "|r",
+                onClick = function() m:Hide(); if COC.ProfWindow then COC.ProfWindow:OpenForReroll(e.prof, e.key, e.name) end end })
+            y = y - 22
+        end
+    end
+    for j = i + 1, #m.rows do m.rows[j]:Hide() end
+    m:SetWidth(rerolls[1] and 220 or 184)             -- élargi pour « Métier — Nom »
     m:SetHeight(math.max(-y + 6, 40))
     m:ClearAllPoints(); m:SetPoint("TOPRIGHT", self.minimapBtn or Minimap, "BOTTOMLEFT", 0, 0); m:Show()
 end

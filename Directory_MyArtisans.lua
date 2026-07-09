@@ -84,6 +84,49 @@ function Dir:AggregateMyProfs()
     return aggregate(db.myChars, db.knownRecipes, db.mySkillsByChar, myRealm(), main, COC.SECONDARY_PROF or {})
 end
 
+-- Cœur PUR. Une entrée par (perso ≠ `cur`, métier connu) du royaume — pour le menu « Mes métiers »
+-- (section Rerolls). Métier « connu » = présent dans knownRecipes[key] OU mySkillsByChar[key] (un
+-- métier de récolte sans recette n'apparaît que via le skill). Filtre les secondaires (Cooking,
+-- First Aid, Fishing) pour afficher SEULEMENT les métiers primaires. Tri par nom de perso puis clé
+-- de métier (libellé localisé côté UI).
+local function rerollEntries(knownRecipes, mySkillsByChar, realm, cur, secondary)
+    knownRecipes, mySkillsByChar = knownRecipes or {}, mySkillsByChar or {}
+    secondary = secondary or {}
+    local out = {}
+    local function scan(store)
+        for key, byProf in pairs(store) do
+            local short = charOfRealm(key, realm)
+            if short and short ~= cur then
+                for prof in pairs(byProf) do
+                    if not secondary[prof] then
+                        out[short .. "|" .. prof] = { name = short, key = key, prof = prof }
+                    end
+                end
+            end
+        end
+    end
+    scan(mySkillsByChar); scan(knownRecipes)     -- union ; la 2e passe écrase par la même valeur
+    local list = {}
+    for _, e in pairs(out) do
+        local sk = mySkillsByChar[e.key] and mySkillsByChar[e.key][e.prof]
+        e.rank, e.max = sk and sk[1] or nil, sk and sk[2] or nil
+        list[#list + 1] = e
+    end
+    table.sort(list, function(a, b)
+        if a.name ~= b.name then return a.name < b.name end
+        return a.prof < b.prof
+    end)
+    return list
+end
+Dir._RerollProfEntries = rerollEntries   -- exposé pour tests/test_myartisans.lua
+
+-- Wrapper : (perso, métier) de MES rerolls du royaume courant (perso courant exclu), primaires seulement.
+function Dir:RerollProfEntries()
+    local db = COC.db
+    if not db then return {} end
+    return rerollEntries(db.knownRecipes, db.mySkillsByChar, myRealm(), me(), COC.SECONDARY_PROF or {})
+end
+
 -- Purge conservatrice des partitions de skill orphelines (perso supprimé en jeu) : clé absente à
 -- LA FOIS de myChars ET de knownRecipes. Ne touche JAMAIS knownRecipes (feature reroll) ni le perso
 -- courant. Appelé par PruneRoster au démarrage.

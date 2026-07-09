@@ -112,7 +112,7 @@ end
 -- Réception (protocole) — met à jour le cache
 -- ------------------------------------------------------------------
 -- ORD|NEW : nouvelle commande (ou re-broadcast). Peuple/rafraîchit le cache + alerte si pertinent.
-function Orders:_OnNew(message)
+function Orders:_OnNew(message, distribution)
     local f = Codec.Decode(message)
     if not f or not f.id or f.id == "" then return end
     local id, buyer, kind, oid, qty, prof, price, recipient, byStack, prov =
@@ -135,7 +135,15 @@ function Orders:_OnNew(message)
     o.ts         = o.ts or time()
     COC.db.orders[id] = o
     if not existed and not myChar(o.buyer) and COC.Moderation then COC.Moderation:NotePost(o.buyer) end   -- anti-spam (pas sur mes rerolls)
-    if not existed and not myChar(o.buyer) and o.status == "open" and self:_ShouldAlert(o) then self:AlertTargeted(o) end
+    -- Garde d'alerte : `o.alerted` (PAS `existed`). Le gate métier du canal-texte (_ShouldAlert) refuse
+    -- parfois une 1re réception CHANNEL sans pour autant que l'ordre ait eu sa chance d'alerter — s'il
+    -- arrive ENSUITE en whisper (fiable, non filtré par métier), il doit encore pouvoir alerter. Si on
+    -- réutilisait `existed`, la mise en cache par la réception CHANNEL bloquerait silencieusement à
+    -- jamais l'alerte whisper suivante pour le même id (course de transport).
+    if not o.alerted and not myChar(o.buyer) and o.status == "open" and self:_ShouldAlert(o, distribution) then
+        o.alerted = true
+        self:AlertTargeted(o)
+    end
 end
 
 -- Transitions de cycle (CANCEL/ACK/DLV/DONE/NACK). Voir _CycleTargets pour le sens des messages.
@@ -220,9 +228,9 @@ function Orders:_OnNack(message, sender)
     end
 end
 
-function Orders:OnNetwork(sender, message)
+function Orders:OnNetwork(sender, message, distribution)
     local action = message:match("^ORD|([A-Z]+)|")
-    if action == "NEW" then self:_OnNew(message)
+    if action == "NEW" then self:_OnNew(message, distribution)
     elseif action == "SUGG" then self:_OnSuggest(message, sender)
     else self:_OnCycle(action, message, sender) end
     if COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end   -- maj live coalescée (rafales de fanout)

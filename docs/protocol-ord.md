@@ -113,6 +113,15 @@ respectée. `RebroadcastMine` est jitté (fenêtre 3–6 s) pour éviter les raf
   2026-06-30). D'où le fanout whisper qui **double** chaque `NEW` vers les artisans connus en ligne.
 - **balise TEXTE `CLNK1`** (throttlée, hardware-event only) : découverte d'inconnus, puis tout le
   trafic de données bascule en whisper.
+- **canal-texte `CLD1`** (`BroadcastText`, hardware-event only, confiné au royaume courant + royaumes
+  connectés) : diffuse `ORD|NEW` en TEXTE de canal (swap `|`↔`~`, le `|` casse le chat) pour une portée
+  royaume réelle, au-delà du roster whisperable. **NEW UNIQUEMENT, best-effort, non fiable au cycle
+  complet** : CANCEL/ACK/DLV/DONE/NACK ne sont PAS diffusés sur ce chemin (seulement whisper dirigé +
+  AddonMessage). Un joueur atteint SEULEMENT par ce canal (jamais croisé, hors roster) peut donc voir un
+  ordre « open » périmé jusqu'à expiration du **TTL** (6 h) après son acceptation/annulation ailleurs —
+  pas de duplication ni de corruption, juste un affichage best-effort borné dans le temps. Le champ libre
+  d'un ordre (ex. `price`) ne doit jamais contenir de `~` : le swap inverse à la réception décalerait
+  silencieusement les champs suivants du décodeur NEW.
 - **guilde** (`GUILD`) : distribution intra-guilde (+ relais GreenWall, hardware-event only).
 
 > Voir `Libs\CraftLink-1.0\CraftLink_Transport.lua` (`TRANSPORT_REV`) et la mémoire

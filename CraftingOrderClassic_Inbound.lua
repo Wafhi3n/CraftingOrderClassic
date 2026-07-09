@@ -163,6 +163,10 @@ end
 function Inbound:Alert(e)
     -- Même discipline que les toasts P2P (Orders:_ShouldAlert) : « /co notify off » et les joueurs
     -- mutés ne déclenchent AUCUNE notif (chat/toast/son). L'entrée reste dans le Carnet › Entrantes.
+    if COC.Moderation and COC.Moderation:IsMuted(e.buyer) then
+        if COC.Trace then COC.Trace:Log("mod", "entrante silencée : " .. tostring(e.buyer) .. " (muté)") end
+        return
+    end
     if COC.db and (COC.db.notifyScope == "off"
         or (COC.db.mutedPlayers and COC.db.mutedPlayers[e.buyer])) then return end
     if COC.Moderation and COC.Moderation:BelowThreshold(e.buyer) then return end   -- petit perso (si connu)

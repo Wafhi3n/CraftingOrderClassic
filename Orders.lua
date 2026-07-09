@@ -78,6 +78,15 @@ local function genId()
     return me() .. "-" .. COC.db.orderSeq
 end
 
+-- Diffuse une commande PUBLIQUE (« Tous ») en TEXTE de canal → portée ROYAUME réelle, en complément du
+-- whisper de Broadcast. À N'APPELER QUE depuis Post/PostEntry (clic/slash = hardware event, requis par
+-- SendChatMessage). Guilde/Amis/nommé restent whisper-only (vie privée) → jamais broadcastés sur le canal.
+function Orders:_ChannelBroadcastPublic(o)
+    if not (CraftLink and CraftLink.BroadcastText and Codec) then return end
+    if (o.recipient or "Tous") ~= "Tous" then return end
+    CraftLink:BroadcastText(Codec.Encode("NEW", o))
+end
+
 -- opts (optionnel) : { spellID, profession, provided = { itemID,... } } depuis l'UI Poster.
 function Orders:Post(itemID, qty, price, opts)
     if not (itemID and COC.db) then return nil end
@@ -91,6 +100,7 @@ function Orders:Post(itemID, qty, price, opts)
     }
     COC.db.orders[o.id] = o
     self:Broadcast("NEW", o)
+    self:_ChannelBroadcastPublic(o)   -- portée royaume (texte-canal) si publique — hardware event OK ici
     return o
 end
 
@@ -109,6 +119,7 @@ function Orders:PostEntry(entry, qty, price, opts)
     }
     COC.db.orders[o.id] = o
     self:Broadcast("NEW", o)
+    self:_ChannelBroadcastPublic(o)   -- portée royaume (texte-canal) si publique — hardware event OK ici
     return o
 end
 
@@ -243,12 +254,19 @@ end
 -- car appelés par OnNetwork via self: sur la table partagée COC.Orders.
 
 -- Notifier (toast) à la 1re réception ? Selon COC.db.notifyScope : all(défaut)/directed/named/off ; cf. /co notify.
-function Orders:_ShouldAlert(o)
+function Orders:_ShouldAlert(o, distribution)
     local m = (COC.db and COC.db.notifyScope) or "all"
+    if COC.Moderation and COC.Moderation:IsMuted(o.buyer) then
+        if COC.Trace then COC.Trace:Log("mod", "toast P2P silencé : " .. tostring(o.buyer) .. " (muté)") end
+        return false
+    end
     if m == "off" or (COC.db and COC.db.mutedPlayers and COC.db.mutedPlayers[o.buyer]) then return false end
     -- Nommée sur moi OU sur un de mes rerolls (IsMyChar = MA SavedVariable — aucun message réseau
     -- ne peut m'assigner un reroll, donc pas d'alerte forcée) : toujours (même petit perso).
     if o.recipient == me() or (COC.IsMyChar and COC:IsMyChar(o.recipient)) then return true end
+    -- Commande reçue en TEXTE de canal (portée ROYAUME) : ne notifier QUE pour un métier que J'AI
+    -- (anti-flood sur royaume actif). Elle reste dans le carnet quoi qu'il arrive. Whisper = inchangé.
+    if distribution == "CHANNEL" and not (COC.Inbound and COC.Inbound:_WantProf(o.profession)) then return false end
     if m == "named" or not self:VisibleTo(o) or (COC.Moderation and COC.Moderation:BelowThreshold(o.buyer)) then return false end  -- restreint / hors portée / bas niveau (anti-bot)
     return (o.recipient and o.recipient ~= "" and o.recipient ~= "Tous") or m == "all"  -- Guilde/Amis vs large
 end
@@ -444,7 +462,7 @@ function Orders:Start()
     if not (COC.db and CraftLink) then return end
     COC.db.orders = COC.db.orders or {}
     self:PruneExpired()                                  -- entretien au démarrage
-    CraftLink:RegisterHandler("ORD", function(s, m) Orders:OnNetwork(s, m) end)
+    CraftLink:RegisterHandler("ORD", function(s, m, d) Orders:OnNetwork(s, m, d) end)
     CraftLink:RegisterHandler("HI",  function() Orders:OnHello() end)
     CraftLink:RegisterHandler("PING", function(s) Orders:OnPing(s) end)
     -- PONG : plus d'affichage chat (c'était du debug). Dir:OnPong gère la présence en coulisse.
