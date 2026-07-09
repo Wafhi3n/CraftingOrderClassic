@@ -69,6 +69,15 @@ local es = {
         "La interfaz se traduce al alemán y al español según el idioma de tu cliente de WoW.",
     ["Ce nouvel onglet « Nouveautés » affiche les notes de version directement en jeu."] =
         "Esta nueva pestaña « Novedades » muestra las notas de versión directamente en el juego.",
+    -- Onglet Nouveautés — v1.10.0
+    ["Les commandes touchent tout le royaume + un coup d'œil sur les recettes de tes rerolls"] =
+        "Los pedidos llegan a todo el reino, más un vistazo de solo lectura a las recetas de tus alters",
+    ["Une commande postée à « Tous » part maintenant aussi sur le canal du royaume, pas seulement vers les joueurs déjà croisés ou tes amis/guilde — un inconnu qui n'a jamais croisé ton chemin peut désormais la voir. Tu ne reçois un toast que pour un métier que tu as : une commande de Forge ne dérange pas un Enchanteur."] =
+        "Un pedido publicado a «Todos» ahora también se difunde por el canal del reino, no solo a jugadores ya conocidos o a tus amigos/hermandad — un desconocido con el que nunca te has cruzado puede verlo ahora. Solo recibes un aviso para una profesión que realmente tienes: un pedido de Herrería no molesta a un Encantador.",
+    ["Clique sur le métier d'un reroll depuis le menu minimap : fenêtre en lecture seule avec ses recettes connues, réactifs requis et niveau de compétence. Pas de bouton créer (tu n'es pas connecté sur ce perso), pas de comptage de sacs."] =
+        "Haz clic en la profesión de un alter desde el menú del minimapa: una ventana de solo lectura muestra sus recetas conocidas, reactivos necesarios y nivel de habilidad. Sin botón de crear (no estás conectado con ese personaje), sin conteo de bolsas.",
+    ["Le menu reroll de la minimap ne liste plus que les vrais métiers (Cuisine, Premiers soins, Pêche et Poisons n'encombrent plus la liste) ; le seuil de détection de spam est réglable via |cFFFFFFFF/co spam|r, avec un mode mute automatique en plus du popup habituel."] =
+        "El menú de alters del minimapa ahora solo lista profesiones reales (Cocina, Primeros auxilios, Pesca y Venenos ya no lo saturan); el umbral de detección de spam es ajustable con |cFFFFFFFF/co spam|r, incluyendo un modo de silencio automático además de la ventana emergente habitual.",
     -- Onglet Nouveautés — v1.9.0
     ["Tes rerolls réunis : cooldowns partagés, une identité, l'onglet Mes artisans"] =
         "Tus alters reunidos: enfriamientos compartidos, una identidad, la pestaña Mis artesanos",
@@ -122,6 +131,8 @@ local es = {
         "Sin profesiones. Abre la ventana de profesión en cada personaje una vez.",
     ["Partager mes rerolls sur le réseau"] = "Compartir mis alters en la red",
     ["Vitrine : %s"] = "Escaparate: %s",
+    ["Rerolls"] = "Alters",
+    ["%s — lecture seule"] = "%s — solo lectura",
     ["Pas de recettes connues (métier de récolte ?)."] = "Sin recetas conocidas (¿profesión de recolección?).",
     ["Repérer les crafteurs autour (en ville)"] = "Detectar artesanos cercanos (en ciudad)",
     ["Ajouter ami"] = "Añadir amigo",
@@ -156,6 +167,11 @@ local es = {
     ["%s a posté %d fois en peu de temps. Le mettre en sourdine ?"] = "%s ha publicado %d veces en poco tiempo. ¿Silenciarlo?",
     ["muter/démuter un joueur (aucune notif de sa part)"] = "silenciar/reactivar a un jugador (ninguna notificación suya)",
     ["seuil de mute auto des persos bas niveau (défaut 5)"] = "umbral de silencio auto para personajes de nivel bajo (por defecto 5)",
+    ["mute auto"] = "silencio auto", ["popup"] = "ventana",
+    ["détection de spam : |cFFFFFFFFdésactivée|r — /co spam <max> [fenêtre] pour l'activer"] = "detección de spam: |cFFFFFFFFdesactivada|r — /co spam <max> [ventana] para activar",
+    ["détection de spam : |cFFFFFFFF%d|r posts / |cFFFFFFFF%ds|r → %s"] = "detección de spam: |cFFFFFFFF%d|r mensajes / |cFFFFFFFF%ds|r → %s",
+    ["  /co spam <max> [fenêtre] · /co spam auto · /co spam off"] = "  /co spam <max> [ventana] · /co spam auto · /co spam off",
+    ["réglage anti-spam : seuil, fenêtre, mute auto vs popup"] = "ajuste anti-spam: umbral, ventana, silencio auto vs ventana",
     ["%d livrés"] = "%d entregados",
     ["· %d plans"] = "· %d recetas",
     ["+%d de plus"] = "+%d más",

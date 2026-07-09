@@ -1,5 +1,23 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.10.0 — Orders reach the whole realm, plus a read-only peek at your alts
+
+Posting to "Everyone" now also broadcasts on the realm channel, not just to people you or your friends
+have already crossed paths with. Before this, a public order only reached players you'd whispered
+before, or friends and guildmates who could relay it along; a total stranger running the addon had no
+way to see it until you happened to find each other. Now it goes out over the shared channel too,
+confined to your own realm, so anyone can pick it up. You'll still only get a toast for professions you
+actually have, a Blacksmithing order won't bother an Enchanter, it just sits quietly on the board for
+whoever's looking.
+
+Click a reroll's profession from the minimap menu and you get a read-only window showing what that
+character knows: recipes, required reagents, skill level. No craft button (you're not logged in as
+them), no bag counts, just a quick check before you log over.
+
+Two smaller fixes: the reroll menu on the minimap now only lists real professions (Cooking, First Aid,
+Fishing, and Poisons don't clutter it up anymore), and the spam-detection threshold is adjustable with
+`/co spam`, including an auto-mute mode instead of the usual pop-up.
+
 ## v1.9.0 — Your alts, together: shared cooldowns, one identity, a "My Artisans" tab
 
 Three things arrive together.

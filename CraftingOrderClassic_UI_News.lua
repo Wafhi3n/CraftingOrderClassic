@@ -16,6 +16,14 @@ local BODY_W = 780
 local function versionsRecent()
     return {
         {
+            v = "v1.10.0", title = L["Les commandes touchent tout le royaume + un coup d'œil sur les recettes de tes rerolls"],
+            lines = {
+                L["Une commande postée à « Tous » part maintenant aussi sur le canal du royaume, pas seulement vers les joueurs déjà croisés ou tes amis/guilde — un inconnu qui n'a jamais croisé ton chemin peut désormais la voir. Tu ne reçois un toast que pour un métier que tu as : une commande de Forge ne dérange pas un Enchanteur."],
+                L["Clique sur le métier d'un reroll depuis le menu minimap : fenêtre en lecture seule avec ses recettes connues, réactifs requis et niveau de compétence. Pas de bouton créer (tu n'es pas connecté sur ce perso), pas de comptage de sacs."],
+                L["Le menu reroll de la minimap ne liste plus que les vrais métiers (Cuisine, Premiers soins, Pêche et Poisons n'encombrent plus la liste) ; le seuil de détection de spam est réglable via |cFFFFFFFF/co spam|r, avec un mode mute automatique en plus du popup habituel."],
+            },
+        },
+        {
             v = "v1.9.0", title = L["Tes rerolls réunis : cooldowns partagés, une identité, l'onglet Mes artisans"],
             lines = {
                 L["Cooldowns de recettes partagés : les autres voient « Transmutation : prête » ou « dans 14h » sur ton infobulle d'artisan — fini de demander en canal si ton Arcanite est dispo."],
@@ -37,6 +45,11 @@ local function versionsRecent()
                 L["Les candidats au don incluent désormais tes amis, pas seulement les partenaires marqués — l'alerte « intéressés » et |cFFFFFFFF/co gift|r touchent tout ton annuaire."],
             },
         },
+    }
+end
+
+local function versionsOlder()
+    return {
         {
             v = "v1.7.0", title = L["Amis Battle.net + commande par métier"],
             lines = {
@@ -46,11 +59,6 @@ local function versionsRecent()
                 L["Correctif : un personnage n'affiche plus par erreur les métiers de ses rerolls dans ton annuaire."],
             },
         },
-    }
-end
-
-local function versionsOlder()
-    return {
         {
             v = "v1.6.0", title = L["Allemand et espagnol + onglet Nouveautés"],
             lines = {

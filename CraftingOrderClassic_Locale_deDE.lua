@@ -68,6 +68,15 @@ local de = {
         "Die Oberfläche wird je nach Sprache deines WoW-Clients ins Deutsche und Spanische übersetzt.",
     ["Ce nouvel onglet « Nouveautés » affiche les notes de version directement en jeu."] =
         "Dieser neue Tab « Neues » zeigt die Versionshinweise direkt im Spiel.",
+    -- Onglet Nouveautés — v1.10.0
+    ["Les commandes touchent tout le royaume + un coup d'œil sur les recettes de tes rerolls"] =
+        "Aufträge erreichen den ganzen Realm, plus ein Nur-Lese-Blick auf die Rezepte deiner Twinks",
+    ["Une commande postée à « Tous » part maintenant aussi sur le canal du royaume, pas seulement vers les joueurs déjà croisés ou tes amis/guilde — un inconnu qui n'a jamais croisé ton chemin peut désormais la voir. Tu ne reçois un toast que pour un métier que tu as : une commande de Forge ne dérange pas un Enchanteur."] =
+        "Ein an „Alle“ gerichteter Auftrag wird jetzt auch auf dem Realm-Kanal gesendet, nicht nur an bereits getroffene Spieler oder deine Freunde/Gilde — ein Fremder, dem du nie begegnet bist, kann ihn jetzt auch sehen. Du bekommst nur für Berufe, die du tatsächlich hast, eine Benachrichtigung: ein Schmiede-Auftrag stört keinen Verzauberer.",
+    ["Clique sur le métier d'un reroll depuis le menu minimap : fenêtre en lecture seule avec ses recettes connues, réactifs requis et niveau de compétence. Pas de bouton créer (tu n'es pas connecté sur ce perso), pas de comptage de sacs."] =
+        "Klicke im Minimap-Menü auf den Beruf eines Twinks: ein Nur-Lese-Fenster zeigt seine bekannten Rezepte, benötigten Reagenzien und die Fertigkeitsstufe. Kein Erstellen-Knopf (du bist nicht mit diesem Charakter eingeloggt), keine Taschenzählung.",
+    ["Le menu reroll de la minimap ne liste plus que les vrais métiers (Cuisine, Premiers soins, Pêche et Poisons n'encombrent plus la liste) ; le seuil de détection de spam est réglable via |cFFFFFFFF/co spam|r, avec un mode mute automatique en plus du popup habituel."] =
+        "Das Twink-Menü der Minimap listet jetzt nur noch echte Berufe (Kochkunst, Erste Hilfe, Angeln und Gifte überladen die Liste nicht mehr); die Spam-Erkennungsschwelle ist über |cFFFFFFFF/co spam|r einstellbar, inklusive eines Auto-Stumm-Modus zusätzlich zum üblichen Popup.",
     -- Onglet Nouveautés — v1.9.0
     ["Tes rerolls réunis : cooldowns partagés, une identité, l'onglet Mes artisans"] =
         "Deine Twinks vereint: geteilte Abklingzeiten, eine Identität, ein Tab „Meine Handwerker“",
@@ -121,6 +130,8 @@ local de = {
         "Keine Berufe. Öffne das Berufsfenster auf jedem Charakter einmal.",
     ["Partager mes rerolls sur le réseau"] = "Meine Twinks im Netzwerk teilen",
     ["Vitrine : %s"] = "Aushängeschild: %s",
+    ["Rerolls"] = "Twinks",
+    ["%s — lecture seule"] = "%s — schreibgeschützt",
     ["Pas de recettes connues (métier de récolte ?)."] = "Keine bekannten Rezepte (Sammelberuf?).",
     ["Repérer les crafteurs autour (en ville)"] = "Handwerker in der Nähe erkennen (in Stadt)",
     ["Ajouter ami"] = "Freund hinzufügen",
@@ -155,6 +166,11 @@ local de = {
     ["%s a posté %d fois en peu de temps. Le mettre en sourdine ?"] = "%s hat %d Mal in kurzer Zeit gepostet. Stummschalten?",
     ["muter/démuter un joueur (aucune notif de sa part)"] = "einen Spieler stumm-/entstummschalten (keine Benachrichtigungen von ihm)",
     ["seuil de mute auto des persos bas niveau (défaut 5)"] = "Schwelle für Auto-Stumm niedrigstufiger Charaktere (Standard 5)",
+    ["mute auto"] = "Auto-Stumm", ["popup"] = "Popup",
+    ["détection de spam : |cFFFFFFFFdésactivée|r — /co spam <max> [fenêtre] pour l'activer"] = "Spam-Erkennung: |cFFFFFFFFaus|r — /co spam <max> [Fenster] zum Aktivieren",
+    ["détection de spam : |cFFFFFFFF%d|r posts / |cFFFFFFFF%ds|r → %s"] = "Spam-Erkennung: |cFFFFFFFF%d|r Posts / |cFFFFFFFF%ds|r → %s",
+    ["  /co spam <max> [fenêtre] · /co spam auto · /co spam off"] = "  /co spam <max> [Fenster] · /co spam auto · /co spam off",
+    ["réglage anti-spam : seuil, fenêtre, mute auto vs popup"] = "Anti-Spam-Einstellung: Schwelle, Fenster, Auto-Stumm vs. Popup",
     ["%d livrés"] = "%d geliefert",
     ["· %d plans"] = "· %d Rezepte",
     ["+%d de plus"] = "+%d weitere",

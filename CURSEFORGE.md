@@ -40,9 +40,12 @@ button calls out on the channel and everyone online answers.
 
 ## Sending an order where it belongs
 
-Broadcast to the whole realm, or keep it to your guild, your friends, or a single player. Scoped orders
-only reach people who qualify. Open ones re-broadcast every couple of hours and expire on their own, so
-the board doesn't rot with dead requests.
+Post to the whole realm, or keep it to your guild, your friends, or a single player. A realm-wide order
+goes out over the shared channel, not just to people you've already crossed paths with, so it reaches
+strangers running the addon too. You'll only get a toast for professions you actually have, so someone
+else's Blacksmithing order won't ping your Enchanter. Scoped orders only reach people who qualify. Open
+ones re-broadcast every couple of hours and expire on their own, so the board doesn't rot with dead
+requests.
 
 Gather orders handle stacks properly. Ask by the unit or by the stack, and you always see the real
 total, so it reads *3 stacks (60)* instead of a cryptic *3 st*.
@@ -80,6 +83,10 @@ you hop over.
 The My Artisans tab gathers every profession on your account for the realm into one place, as if a
 single character knew them all. Skill levels, known recipes grouped by category the way the profession
 window does it, active cooldowns pinned at the top, and which of your characters holds each recipe.
+
+Click an alt's profession from the minimap menu for a read-only look: recipes it knows, the reagents
+each one needs, and its skill level. No craft button, since you're not logged in as that character, and
+no bag counts, just what's needed.
 
 ## Partners, loot alerts and gifts
 

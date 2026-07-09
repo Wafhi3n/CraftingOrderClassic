@@ -75,6 +75,15 @@ if loc == "enUS" or loc == "enGB" then
             "The interface is translated into German and Spanish depending on your WoW client language.",
         ["Ce nouvel onglet « Nouveautés » affiche les notes de version directement en jeu."] =
             "This new What's New tab shows the release notes right in the game.",
+        -- Onglet Nouveautés — v1.10.0
+        ["Les commandes touchent tout le royaume + un coup d'œil sur les recettes de tes rerolls"] =
+            "Orders reach the whole realm, plus a read-only peek at your alts' recipes",
+        ["Une commande postée à « Tous » part maintenant aussi sur le canal du royaume, pas seulement vers les joueurs déjà croisés ou tes amis/guilde — un inconnu qui n'a jamais croisé ton chemin peut désormais la voir. Tu ne reçois un toast que pour un métier que tu as : une commande de Forge ne dérange pas un Enchanteur."] =
+            "Posting to \"Everyone\" now also broadcasts on the realm channel, not just to people you or your friends have already crossed paths with — a stranger who's never met you can now see it too. You'll still only get a toast for professions you actually have: a Blacksmithing order won't bother an Enchanter.",
+        ["Clique sur le métier d'un reroll depuis le menu minimap : fenêtre en lecture seule avec ses recettes connues, réactifs requis et niveau de compétence. Pas de bouton créer (tu n'es pas connecté sur ce perso), pas de comptage de sacs."] =
+            "Click a reroll's profession from the minimap menu: a read-only window shows their known recipes, required reagents, and skill level. No craft button (you're not logged in as them), no bag counts.",
+        ["Le menu reroll de la minimap ne liste plus que les vrais métiers (Cuisine, Premiers soins, Pêche et Poisons n'encombrent plus la liste) ; le seuil de détection de spam est réglable via |cFFFFFFFF/co spam|r, avec un mode mute automatique en plus du popup habituel."] =
+            "The minimap reroll menu now only lists real professions (Cooking, First Aid, Fishing, and Poisons no longer clutter it up); the spam-detection threshold is adjustable with |cFFFFFFFF/co spam|r, including an auto-mute mode alongside the usual pop-up.",
         -- Onglet Nouveautés — v1.9.0
         ["Tes rerolls réunis : cooldowns partagés, une identité, l'onglet Mes artisans"] =
             "Your alts, together: shared cooldowns, one identity, a My Artisans tab",
@@ -128,6 +137,8 @@ if loc == "enUS" or loc == "enGB" then
             "No professions. Open your profession window on each character once.",
         ["Partager mes rerolls sur le réseau"] = "Share my alts on the network",
         ["Vitrine : %s"] = "Front: %s",
+        ["Rerolls"] = "Alts",
+        ["%s — lecture seule"] = "%s — read-only",
         ["Pas de recettes connues (métier de récolte ?)."] = "No known recipes (gathering profession?).",
         -- Repérage des crafteurs à proximité (opt-in, en ville) + bouton « Ajouter ami »
         ["Repérer les crafteurs autour (en ville)"] = "Detect crafters nearby (in town)",
@@ -165,6 +176,12 @@ if loc == "enUS" or loc == "enGB" then
         ["%s a posté %d fois en peu de temps. Le mettre en sourdine ?"] = "%s posted %d times in a short while. Mute them?",
         ["muter/démuter un joueur (aucune notif de sa part)"] = "mute/unmute a player (no notifications from them)",
         ["seuil de mute auto des persos bas niveau (défaut 5)"] = "auto-mute threshold for low-level characters (default 5)",
+        -- Détection de spam configurable (/co spam)
+        ["mute auto"] = "auto-mute", ["popup"] = "popup",
+        ["détection de spam : |cFFFFFFFFdésactivée|r — /co spam <max> [fenêtre] pour l'activer"] = "spam detection: |cFFFFFFFFoff|r — /co spam <max> [window] to enable",
+        ["détection de spam : |cFFFFFFFF%d|r posts / |cFFFFFFFF%ds|r → %s"] = "spam detection: |cFFFFFFFF%d|r posts / |cFFFFFFFF%ds|r → %s",
+        ["  /co spam <max> [fenêtre] · /co spam auto · /co spam off"] = "  /co spam <max> [window] · /co spam auto · /co spam off",
+        ["réglage anti-spam : seuil, fenêtre, mute auto vs popup"] = "anti-spam tuning: threshold, window, auto-mute vs popup",
         -- Réputation sociale (crafts livrés, diffusée via SK)
         ["%d livrés"] = "%d delivered",
         -- Profondeur du carnet + dépliage des plans connus (tooltip social)
