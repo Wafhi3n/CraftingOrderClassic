@@ -1,4 +1,4 @@
-## Interface: 20504
+## Interface: 20506
 ## Title: Crafting & Gathering Order - Classic
 ## Notes: Réseau global et social de commandes de craft ET de récolte (autonome — sans guilde). /co pour le statut.
 ## Author: Wafhi3n
