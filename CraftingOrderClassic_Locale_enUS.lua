@@ -51,25 +51,18 @@ local en = {
         "Your saved data now carries a version, so an upgrade that needs to reshape it runs once and your recipes and orders stay intact.",
     ["Protocole de commandes consolidé (mêmes échanges réseau) : ce build reste compatible avec les joueurs encore en 1.7.x."] =
         "The order protocol was consolidated (same network exchanges); this build still talks to players still on 1.7.x.",
-    ["Alertes de plan looté qui te concernent"] = "Looted-recipe alerts that concern you",
-    ["L'alerte de plan looté ne se déclenche plus que s'il te concerne : tu as le métier et peux l'apprendre, ou un ami/partenaire de ton annuaire ne le connaît pas encore."] =
-        "The looted-recipe alert now fires only when it concerns you: you have the profession and can learn it, or a friend/partner in your directory doesn't know it yet.",
-    ["Les candidats au don incluent désormais tes amis, pas seulement les partenaires marqués — l'alerte « intéressés » et |cFFFFFFFF/co gift|r touchent tout ton annuaire."] =
-        "Gift candidates now include your friends, not just flagged partners — the \"interested\" alert and |cFFFFFFFF/co gift|r reach your whole directory.",
-    ["Amis Battle.net + commande par métier"] = "Battle.net friends + order by profession",
-    ["Les métiers et le menu Crafting Order fonctionnent maintenant sur les amis Battle.net, pas seulement les amis ajoutés par personnage."] =
-        "Professions and the Crafting Order menu now work on Battle.net friends, not just character friends.",
-    ["Clic droit sur un artisan : une entrée « Passer commande » par métier, qui ouvre l'onglet Commande déjà réglé sur ce métier."] =
-        "Right-click a crafter: one \"Order\" entry per profession, opening the Order tab already set to that profession.",
-    ["Le résumé d'un artisan indique la profondeur de son carnet (« · N plans ») ; maintiens Maj sur son infobulle en jeu pour lister ses recettes connues."] =
-        "A crafter's summary shows how deep their book is (\"· N recipes\"); hold Shift over their in-world tooltip to list the recipes they know.",
-    ["Correctif : un personnage n'affiche plus par erreur les métiers de ses rerolls dans ton annuaire."] =
-        "Fix: a character no longer shows their alts' professions by mistake in your directory.",
+    -- (clés v1.7.0/v1.7.1 retirées : ces versions ne sont plus listées dans l'onglet Nouveautés)
     ["Allemand et espagnol + onglet Nouveautés"] = "German and Spanish + a What's New tab",
     ["L'interface se traduit en allemand et en espagnol selon la langue de ton client WoW."] =
         "The interface is translated into German and Spanish depending on your WoW client language.",
     ["Ce nouvel onglet « Nouveautés » affiche les notes de version directement en jeu."] =
         "This new What's New tab shows the release notes right in the game.",
+    -- Onglet Nouveautés — v1.12.1
+    ["Personne ne peut poster une commande en ton nom"] = "Nobody can post an order in your name",
+    ["Une commande arrivant par le canal du royaume était crue sur parole quant à son acheteur : un joueur pouvait publier de fausses commandes au nom d'autrui, et nourrir la détection de spam contre sa victime jusqu'à ce que tout le monde la mette en sourdine. Elles doivent désormais venir du joueur qui les a postées."] =
+        "An order arriving on the realm channel was trusted to name its own buyer: one player could publish fake orders under someone else's name, and feed the spam detector against that person until everyone muted them. Such orders must now come from the player who posted them.",
+    ["|cFFFFFFFF/co channel off|r quitte maintenant vraiment le canal. Il se contentait d'empêcher de le rejoindre au login suivant : tes commandes continuaient de partir au royaume pendant toute la session."] =
+        "|cFFFFFFFF/co channel off|r now really leaves the channel. It used to only stop rejoining at the next login: your orders kept going out to the realm for the rest of the session.",
     -- Onglet Nouveautés — v1.12.0
     ["Les recettes de la Saison de la Découverte"] = "Season of Discovery recipes",
     ["304 recettes de la Saison de la Découverte entrent au catalogue : 80 en Travail du cuir, 65 en Forge, 57 en Couture, 48 en Enchantement, 29 en Ingénierie, 16 en Alchimie, plus la Cuisine, le Secourisme et le Minage. Elles apparaissent dans l'onglet Commande, avec leurs réactifs et leur palier d'apprentissage."] =

@@ -129,9 +129,22 @@ end
 -- Réception (protocole) — met à jour le cache
 -- ------------------------------------------------------------------
 -- ORD|NEW : nouvelle commande (ou re-broadcast). Peuple/rafraîchit le cache + alerte si pertinent.
-function Orders:_OnNew(message, distribution)
+--
+-- ANTI-USURPATION sur le CANAL. `NEW` est le seul verbe sans contrôle d'autorité : l'acheteur est un
+-- champ du payload, pas l'émetteur. C'est VOULU pour le relais whisper (OnArtisanOnline pousse les
+-- commandes d'AUTRUI à un pair qui se connecte → sender ≠ buyer, légitimement).
+-- Mais le canal-texte, lui, n'est alimenté QUE par Post/PostEntry/Cancel sur SES PROPRES commandes
+-- (`opts.channel`) : on peut donc y exiger `sender == buyer`. Sans cette garde, un seul joueur
+-- pouvait publier au ROYAUME ENTIER de fausses commandes au nom d'autrui — et, pire, déclencher
+-- l'anti-spam (`NotePost(o.buyer)`) contre sa victime jusqu'au mute automatique chez tout le monde.
+function Orders:_OnNew(message, distribution, sender)
     local f = Codec.Decode(message)
     if not f or not f.id or f.id == "" then return end
+    if distribution == "CHANNEL" and sender and f.buyer ~= sender then
+        if COC.Trace then COC.Trace:Log("recv", string.format(
+            "canal : NEW usurpé (%s prétend poster pour %s) — rejeté", tostring(sender), tostring(f.buyer))) end
+        return
+    end
     local id, buyer, kind, oid, qty, prof, price, recipient, byStack, prov =
         f.id, f.buyer, f.kind, f.oid, f.qty, f.prof, f.price, f.recipient, f.byStack, f.prov
     local existed = COC.db.orders[id] ~= nil   -- déjà connue ? (anti-spam sur re-broadcast)
@@ -247,7 +260,7 @@ end
 
 function Orders:OnNetwork(sender, message, distribution)
     local action = message:match("^ORD|([A-Z]+)|")
-    if action == "NEW" then self:_OnNew(message, distribution)
+    if action == "NEW" then self:_OnNew(message, distribution, sender)
     elseif action == "SUGG" then self:_OnSuggest(message, sender)
     else self:_OnCycle(action, message, sender) end
     if COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end   -- maj live coalescée (rafales de fanout)

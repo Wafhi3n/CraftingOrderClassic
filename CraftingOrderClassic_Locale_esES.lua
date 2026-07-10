@@ -50,25 +50,18 @@ local es = {
         "Tus datos guardados ahora llevan una versión, así que una actualización que deba reorganizarlos se ejecuta una sola vez y tus recetas y pedidos quedan intactos.",
     ["Protocole de commandes consolidé (mêmes échanges réseau) : ce build reste compatible avec les joueurs encore en 1.7.x."] =
         "El protocolo de pedidos se consolidó (mismos intercambios de red); esta versión sigue entendiéndose con jugadores en 1.7.x.",
-    ["Alertes de plan looté qui te concernent"] = "Alertas de receta saqueada que te conciernen",
-    ["L'alerte de plan looté ne se déclenche plus que s'il te concerne : tu as le métier et peux l'apprendre, ou un ami/partenaire de ton annuaire ne le connaît pas encore."] =
-        "La alerta de receta saqueada ya solo salta cuando te concierne: tienes la profesión y puedes aprenderla, o un amigo/socio de tu directorio aún no la conoce.",
-    ["Les candidats au don incluent désormais tes amis, pas seulement les partenaires marqués — l'alerte « intéressés » et |cFFFFFFFF/co gift|r touchent tout ton annuaire."] =
-        "Los candidatos a regalo ahora incluyen a tus amigos, no solo a los socios marcados — la alerta « interesados » y |cFFFFFFFF/co gift|r llegan a todo tu directorio.",
-    ["Amis Battle.net + commande par métier"] = "Amigos de Battle.net + pedido por profesión",
-    ["Les métiers et le menu Crafting Order fonctionnent maintenant sur les amis Battle.net, pas seulement les amis ajoutés par personnage."] =
-        "Las profesiones y el menú de Crafting Order ahora funcionan con amigos de Battle.net, no solo con amigos añadidos por personaje.",
-    ["Clic droit sur un artisan : une entrée « Passer commande » par métier, qui ouvre l'onglet Commande déjà réglé sur ce métier."] =
-        "Clic derecho en un artesano: una entrada « Pedir » por profesión, que abre la pestaña Pedido ya ajustada a esa profesión.",
-    ["Le résumé d'un artisan indique la profondeur de son carnet (« · N plans ») ; maintiens Maj sur son infobulle en jeu pour lister ses recettes connues."] =
-        "El resumen de un artesano indica la amplitud de su recetario (« · N recetas »); mantén Mayús sobre su información en el mundo para listar las recetas que conoce.",
-    ["Correctif : un personnage n'affiche plus par erreur les métiers de ses rerolls dans ton annuaire."] =
-        "Corrección: un personaje ya no muestra por error las profesiones de sus alts en tu directorio.",
+    -- (clés v1.7.0/v1.7.1 retirées : ces versions ne sont plus listées dans l'onglet Nouveautés)
     ["Allemand et espagnol + onglet Nouveautés"] = "Alemán y español + pestaña Novedades",
     ["L'interface se traduit en allemand et en espagnol selon la langue de ton client WoW."] =
         "La interfaz se traduce al alemán y al español según el idioma de tu cliente de WoW.",
     ["Ce nouvel onglet « Nouveautés » affiche les notes de version directement en jeu."] =
         "Esta nueva pestaña « Novedades » muestra las notas de versión directamente en el juego.",
+    -- Onglet Nouveautés — v1.12.1
+    ["Personne ne peut poster une commande en ton nom"] = "Nadie puede publicar un pedido en tu nombre",
+    ["Une commande arrivant par le canal du royaume était crue sur parole quant à son acheteur : un joueur pouvait publier de fausses commandes au nom d'autrui, et nourrir la détection de spam contre sa victime jusqu'à ce que tout le monde la mette en sourdine. Elles doivent désormais venir du joueur qui les a postées."] =
+        "A un pedido que llegaba por el canal del reino se le creía su comprador sin más: un jugador podía publicar pedidos falsos en nombre de otro, y alimentar la detección de spam contra su víctima hasta que todos la silenciaran. Ahora deben venir del jugador que los publicó.",
+    ["|cFFFFFFFF/co channel off|r quitte maintenant vraiment le canal. Il se contentait d'empêcher de le rejoindre au login suivant : tes commandes continuaient de partir au royaume pendant toute la session."] =
+        "|cFFFFFFFF/co channel off|r ahora abandona de verdad el canal. Antes solo impedía volver a unirse en el siguiente inicio de sesión: tus pedidos seguían saliendo al reino durante toda la sesión.",
     -- Onglet Nouveautés — v1.12.0
     ["Les recettes de la Saison de la Découverte"] = "Recetas de la Temporada de Descubrimientos",
     ["304 recettes de la Saison de la Découverte entrent au catalogue : 80 en Travail du cuir, 65 en Forge, 57 en Couture, 48 en Enchantement, 29 en Ingénierie, 16 en Alchimie, plus la Cuisine, le Secourisme et le Minage. Elles apparaissent dans l'onglet Commande, avec leurs réactifs et leur palier d'apprentissage."] =

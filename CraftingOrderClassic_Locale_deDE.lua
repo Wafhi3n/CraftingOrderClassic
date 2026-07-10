@@ -49,25 +49,18 @@ local de = {
         "Deine gespeicherten Daten tragen jetzt eine Version, sodass ein Update, das sie umbauen muss, nur einmal läuft und deine Rezepte und Aufträge unversehrt bleiben.",
     ["Protocole de commandes consolidé (mêmes échanges réseau) : ce build reste compatible avec les joueurs encore en 1.7.x."] =
         "Das Auftragsprotokoll wurde konsolidiert (gleiche Netzwerk-Kommunikation); dieser Build versteht sich weiterhin mit Spielern auf 1.7.x.",
-    ["Alertes de plan looté qui te concernent"] = "Beute-Rezept-Warnungen, die dich betreffen",
-    ["L'alerte de plan looté ne se déclenche plus que s'il te concerne : tu as le métier et peux l'apprendre, ou un ami/partenaire de ton annuaire ne le connaît pas encore."] =
-        "Die Beute-Rezept-Warnung erscheint nur noch, wenn sie dich betrifft: du hast den Beruf und kannst es lernen, oder ein Freund/Partner in deinem Verzeichnis kennt es noch nicht.",
-    ["Les candidats au don incluent désormais tes amis, pas seulement les partenaires marqués — l'alerte « intéressés » et |cFFFFFFFF/co gift|r touchent tout ton annuaire."] =
-        "Geschenk-Kandidaten umfassen jetzt deine Freunde, nicht nur markierte Partner — die « Interessiert »-Warnung und |cFFFFFFFF/co gift|r erreichen dein ganzes Verzeichnis.",
-    ["Amis Battle.net + commande par métier"] = "Battle.net-Freunde + Auftrag nach Beruf",
-    ["Les métiers et le menu Crafting Order fonctionnent maintenant sur les amis Battle.net, pas seulement les amis ajoutés par personnage."] =
-        "Berufe und das Crafting-Order-Menü funktionieren jetzt bei Battle.net-Freunden, nicht nur bei über den Charakter hinzugefügten Freunden.",
-    ["Clic droit sur un artisan : une entrée « Passer commande » par métier, qui ouvre l'onglet Commande déjà réglé sur ce métier."] =
-        "Rechtsklick auf einen Handwerker: ein « Auftrag »-Eintrag pro Beruf, der den Tab Bestellen bereits auf diesen Beruf eingestellt öffnet.",
-    ["Le résumé d'un artisan indique la profondeur de son carnet (« · N plans ») ; maintiens Maj sur son infobulle en jeu pour lister ses recettes connues."] =
-        "Die Zusammenfassung eines Handwerkers zeigt den Umfang seines Rezeptbuchs (« · N Rezepte »); halte Umschalt über seiner Tooltip in der Welt, um seine bekannten Rezepte aufzulisten.",
-    ["Correctif : un personnage n'affiche plus par erreur les métiers de ses rerolls dans ton annuaire."] =
-        "Fehlerbehebung: Ein Charakter zeigt in deinem Verzeichnis nicht mehr fälschlich die Berufe seiner Twinks.",
+    -- (clés v1.7.0/v1.7.1 retirées : ces versions ne sont plus listées dans l'onglet Nouveautés)
     ["Allemand et espagnol + onglet Nouveautés"] = "Deutsch und Spanisch + Tab Neues",
     ["L'interface se traduit en allemand et en espagnol selon la langue de ton client WoW."] =
         "Die Oberfläche wird je nach Sprache deines WoW-Clients ins Deutsche und Spanische übersetzt.",
     ["Ce nouvel onglet « Nouveautés » affiche les notes de version directement en jeu."] =
         "Dieser neue Tab « Neues » zeigt die Versionshinweise direkt im Spiel.",
+    -- Onglet Nouveautés — v1.12.1
+    ["Personne ne peut poster une commande en ton nom"] = "Niemand kann einen Auftrag in deinem Namen aufgeben",
+    ["Une commande arrivant par le canal du royaume était crue sur parole quant à son acheteur : un joueur pouvait publier de fausses commandes au nom d'autrui, et nourrir la détection de spam contre sa victime jusqu'à ce que tout le monde la mette en sourdine. Elles doivent désormais venir du joueur qui les a postées."] =
+        "Einem über den Realm-Kanal eintreffenden Auftrag wurde sein Käufer aufs Wort geglaubt: ein Spieler konnte falsche Aufträge im Namen anderer veröffentlichen und die Spam-Erkennung gegen sein Opfer füttern, bis alle es stummschalteten. Solche Aufträge müssen nun vom Spieler kommen, der sie aufgegeben hat.",
+    ["|cFFFFFFFF/co channel off|r quitte maintenant vraiment le canal. Il se contentait d'empêcher de le rejoindre au login suivant : tes commandes continuaient de partir au royaume pendant toute la session."] =
+        "|cFFFFFFFF/co channel off|r verlässt den Kanal jetzt wirklich. Zuvor verhinderte es nur das erneute Beitreten beim nächsten Login: deine Aufträge gingen den Rest der Sitzung weiter an den Realm.",
     -- Onglet Nouveautés — v1.12.0
     ["Les recettes de la Saison de la Découverte"] = "Rezepte der Saison der Entdeckungen",
     ["304 recettes de la Saison de la Découverte entrent au catalogue : 80 en Travail du cuir, 65 en Forge, 57 en Couture, 48 en Enchantement, 29 en Ingénierie, 16 en Alchimie, plus la Cuisine, le Secourisme et le Minage. Elles apparaissent dans l'onglet Commande, avec leurs réactifs et leur palier d'apprentissage."] =

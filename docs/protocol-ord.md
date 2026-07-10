@@ -61,6 +61,15 @@ SV, jamais pilotable par le réseau). Sans opt-in `/co alts` et sans claim reçu
 | ACK → `accepted` | **nommé** : destinataire ou reroll lié (`SamePlayer(sender, recipient)`) ; **large** : n'importe qui (1er arrivé) | **`status == open`** (ferme le re-ACK/vol d'attribution) |
 | DLV → `delivered` | **nommé** : destinataire OU accepteur (ou rerolls liés), sans précondition de statut (préserve « acheteur a raté l'ACK ») ; **large** : l'accepteur (ou reroll lié) uniquement | **large : `status == accepted`** ; entrée exclut `delivered` (idempotence) |
 | NACK → réouverture / refus | `SamePlayer(who, o.acceptedBy)` réouvre ; ordre nommé (`who == recipient` ou lié, si `IsMyChar(buyer)`) refusé | — |
+| **NEW reçu en `CHANNEL`** | **`sender == buyer` EXIGÉ** (`_OnNew`) — le canal n'est alimenté que par `Post`/`PostEntry`/`Cancel` sur ses PROPRES commandes | — |
+
+> **NEW n'a pas d'autorité… sauf sur le canal.** L'acheteur est un champ du payload, pas l'émetteur :
+> c'est nécessaire au **relais whisper** (`OnArtisanOnline` pousse les commandes d'AUTRUI à un pair qui
+> se connecte → `sender ≠ buyer`, légitimement). Mais le canal-texte porte uniquement des commandes que
+> l'émetteur vient de poster ou d'annuler lui-même. Depuis v1.12.1, un `NEW` de canal dont le `buyer`
+> diffère du `sender` est **rejeté** : sans cette garde, un seul joueur publiait au ROYAUME ENTIER de
+> fausses commandes au nom d'autrui, et déclenchait l'anti-spam (`NotePost(o.buyer)`) contre sa victime
+> jusqu'au mute automatique chez tous les porteurs de l'addon.
 
 > Durcissement v1.9.0 (revue protocole) : ACK exige désormais un ordre **ouvert**, et un DLV en portée
 > **large** exige que l'émetteur soit **l'accepteur** — fermant le vol d'attribution/réputation par un

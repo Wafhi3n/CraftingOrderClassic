@@ -1,5 +1,16 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.12.1 — Nobody can post an order in your name
+
+A code review of the realm channel found that an order arriving on it was trusted to name its own buyer.
+One player could publish fake orders across the whole realm under someone else's name — and, worse, feed
+the spam detector against that person until every addon user muted them. Orders arriving on the channel
+must now come from the player who posted them. Nothing changes for orders relayed between friends, where
+a third party legitimately forwards someone else's order.
+
+`/co channel off` now really leaves the channel. It used to only stop rejoining at the next login, so
+your orders kept going out to the realm for the rest of the session, despite the message saying otherwise.
+
 ## v1.12.0 — Season of Discovery recipes
 
 304 Season of Discovery recipes now live in the catalogue: 80 for Leatherworking, 65 for Blacksmithing,

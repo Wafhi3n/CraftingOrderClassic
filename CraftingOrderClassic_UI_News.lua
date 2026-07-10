@@ -16,6 +16,13 @@ local BODY_W = 780
 local function versionsRecent()
     return {
         {
+            v = "v1.12.1", title = L["Personne ne peut poster une commande en ton nom"],
+            lines = {
+                L["Une commande arrivant par le canal du royaume était crue sur parole quant à son acheteur : un joueur pouvait publier de fausses commandes au nom d'autrui, et nourrir la détection de spam contre sa victime jusqu'à ce que tout le monde la mette en sourdine. Elles doivent désormais venir du joueur qui les a postées."],
+                L["|cFFFFFFFF/co channel off|r quitte maintenant vraiment le canal. Il se contentait d'empêcher de le rejoindre au login suivant : tes commandes continuaient de partir au royaume pendant toute la session."],
+            },
+        },
+        {
             v = "v1.12.0", title = L["Les recettes de la Saison de la Découverte"],
             lines = {
                 L["304 recettes de la Saison de la Découverte entrent au catalogue : 80 en Travail du cuir, 65 en Forge, 57 en Couture, 48 en Enchantement, 29 en Ingénierie, 16 en Alchimie, plus la Cuisine, le Secourisme et le Minage. Elles apparaissent dans l'onglet Commande, avec leurs réactifs et leur palier d'apprentissage."],
@@ -60,6 +67,11 @@ local function versionsRecent()
                 L["Nouvel onglet « Mes artisans » : tous les métiers de ton compte sur le royaume en une vue, comme un seul perso — niveau, recettes connues par catégorie, cooldowns en tête, et quel perso porte chaque recette."],
             },
         },
+    }
+end
+
+local function versionsOlder()
+    return {
         {
             v = "v1.8.0", title = L["Sous le capot : mises à jour plus sûres"],
             lines = {
@@ -67,27 +79,10 @@ local function versionsRecent()
                 L["Protocole de commandes consolidé (mêmes échanges réseau) : ce build reste compatible avec les joueurs encore en 1.7.x."],
             },
         },
-    }
-end
-
-local function versionsOlder()
-    return {
-        {
-            v = "v1.7.1", title = L["Alertes de plan looté qui te concernent"],
-            lines = {
-                L["L'alerte de plan looté ne se déclenche plus que s'il te concerne : tu as le métier et peux l'apprendre, ou un ami/partenaire de ton annuaire ne le connaît pas encore."],
-                L["Les candidats au don incluent désormais tes amis, pas seulement les partenaires marqués — l'alerte « intéressés » et |cFFFFFFFF/co gift|r touchent tout ton annuaire."],
-            },
-        },
-        {
-            v = "v1.7.0", title = L["Amis Battle.net + commande par métier"],
-            lines = {
-                L["Les métiers et le menu Crafting Order fonctionnent maintenant sur les amis Battle.net, pas seulement les amis ajoutés par personnage."],
-                L["Clic droit sur un artisan : une entrée « Passer commande » par métier, qui ouvre l'onglet Commande déjà réglé sur ce métier."],
-                L["Le résumé d'un artisan indique la profondeur de son carnet (« · N plans ») ; maintiens Maj sur son infobulle en jeu pour lister ses recettes connues."],
-                L["Correctif : un personnage n'affiche plus par erreur les métiers de ses rerolls dans ton annuaire."],
-            },
-        },
+        -- v1.7.0 / v1.7.1 retirées de l'onglet (l'historique complet vit dans CHANGELOG.md). Cet onglet
+        -- ne garde qu'une fenêtre glissante de versions : sinon il croît sans fin, et avec lui les 3
+        -- overlays de locale, qui butent sur le plafond anti-monolithe. Retirer ici = retirer les clés
+        -- correspondantes des overlays (sinon check_locale les signale comme traductions MORTES).
         {
             v = "v1.6.0", title = L["Allemand et espagnol + onglet Nouveautés"],
             lines = {
