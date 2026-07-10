@@ -16,6 +16,13 @@ local BODY_W = 780
 local function versionsRecent()
     return {
         {
+            v = "v1.15.0", title = L["Recherche de travail : signale que tu es dispo"],
+            lines = {
+                L["Ouvre un métier et clique « Chercher du travail » : tout le royaume sait que tu es dispo, une icône d'artisan s'affiche au-dessus de ta tête pour ceux qui passent, et tu apparais « [Dispo] » dans leur annuaire. Ça s'éteint tout seul au bout d'un moment si tu oublies."],
+                L["Au passage : les deux fenêtres ne s'emmêlent plus (un clic la ramène au premier plan), l'annuaire a un bouton partenaire et se limite à ta faction (pas d'échange cross-faction sur Classic), et un artisan ne s'affiche plus avec un métier qui n'est pas le sien."],
+            },
+        },
+        {
             v = "v1.14.0", title = L["Un panneau pour gérer les mis en sourdine"],
             lines = {
                 L["L'onglet Artisans a maintenant une section « En sourdine » : chaque joueur muté y apparaît avec sa raison et le temps restant (ou « permanent »), avec un bouton pour le rétablir directement — plus besoin de deviner qui est encore muté."],

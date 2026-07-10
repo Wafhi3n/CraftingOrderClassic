@@ -1,5 +1,24 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.15.0 — Looking for work, and a few fixes
+
+You can now flag yourself as looking for work. Open a profession and hit "Look for work": the whole realm
+knows you're available for it, an artisan icon shows over your head for anyone passing by, and you appear as
+"[LFW]" in their directory. Turn it off the same way, and it lapses on its own after a while if you forget.
+
+Two windows no longer tangle into each other. The main window and the profession window used to stack at the
+same spot; now clicking either one brings it cleanly to the front.
+
+The directory got a partner button (a click, instead of digging through the right-click menu), and it now
+drops people you crossed once and haven't seen in a week.
+
+Same-faction only. You can't trade across factions on Classic, so the directory no longer mixes in contacts
+from your other-faction characters.
+
+Fixed a case where an artisan showed a profession that wasn't theirs. A recipe leaking from an old client
+could briefly mislabel someone (a blacksmith showing up as an enchanter); their real professions are what
+shows now.
+
 ## v1.14.0 — A panel to manage who you've muted
 
 `/co mute` could list names, but there was no way to browse mutes or lift one without already knowing

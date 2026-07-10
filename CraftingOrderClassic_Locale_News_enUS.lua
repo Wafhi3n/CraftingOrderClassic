@@ -11,6 +11,12 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "What's New",
+    -- v1.15.0
+    ["Recherche de travail : signale que tu es dispo"] = "Looking for work: flag yourself as available",
+    ["Ouvre un métier et clique « Chercher du travail » : tout le royaume sait que tu es dispo, une icône d'artisan s'affiche au-dessus de ta tête pour ceux qui passent, et tu apparais « [Dispo] » dans leur annuaire. Ça s'éteint tout seul au bout d'un moment si tu oublies."] =
+        "Open a profession and click \"Look for work\": the whole realm knows you're available, an artisan icon shows over your head for anyone passing by, and you appear as \"[LFW]\" in their directory. It lapses on its own after a while if you forget.",
+    ["Au passage : les deux fenêtres ne s'emmêlent plus (un clic la ramène au premier plan), l'annuaire a un bouton partenaire et se limite à ta faction (pas d'échange cross-faction sur Classic), et un artisan ne s'affiche plus avec un métier qui n'est pas le sien."] =
+        "Along the way: the two windows no longer tangle (a click brings one to the front), the directory has a partner button and sticks to your faction (no cross-faction trading on Classic), and an artisan no longer shows a profession that isn't theirs.",
     ["Repérer les crafteurs sans l'addon + passe de performance"] = "Spot crafters without the addon + a performance pass",
     ["Repérage passif des crafteurs autour de toi, même sans l'addon (onglet Artisans → « Repérer les crafteurs autour », ou |cFFFFFFFF/co crafters on|r). Désactivé par défaut, en ville seulement."] =
         "Passive detection of crafters around you, even without the addon (Artisans tab, or |cFFFFFFFF/co crafters on|r). Off by default, towns only.",
