@@ -272,6 +272,16 @@ local en = {
         "|cFFFFFFFF%s|r marked as partner — prioritized in gift alerts.",
     ["|cFFFFFFFF%s|r n'est plus marqué comme partenaire."] = "|cFFFFFFFF%s|r is no longer marked as partner.",
     ["Marquer comme partenaire"] = "Mark as partner", ["Retirer des partenaires"] = "Remove from partners",
+    -- Recherche de travail (LFW) : /co lfw
+    ["[Dispo]"] = "[LFW]",
+    ["Chercher du travail"] = "Look for work",
+    ["Tu cherches du travail — clic pour arrêter."] = "You're looking for work — click to stop.",
+    ["Signale au royaume que tu cherches du travail dans ce métier."] = "Tell the realm you're looking for work in this profession.",
+    ["recherche de travail : |cFF33DD33%s|r — /co lfw off pour arrêter"] = "looking for work: |cFF33DD33%s|r — /co lfw off to stop",
+    ["recherche de travail : |cFFFFCC00désactivée|r — /co lfw <métier>"] = "looking for work: |cFFFFCC00off|r — /co lfw <profession>",
+    ["recherche de travail arrêtée."] = "looking for work stopped.",
+    ["tu n'as pas le métier %s — impossible de chercher du travail dessus."] = "you don't have %s — can't look for work in it.",
+    ["recherche de travail : |cFF33DD33%s|r — visible au royaume"] = "looking for work: |cFF33DD33%s|r — visible across the realm",
     ["|cFF66CCFFamis/partenaires intéressés :|r %s (|cFFFFFFFF/co gift <nom>|r)"] =
         "|cFF66CCFFinterested friends/partners:|r %s (|cFFFFFFFF/co gift <name>|r)",
     ["proposer (chuchoter) le dernier plan looté à un ami/partenaire qui ne le connaît pas"] =

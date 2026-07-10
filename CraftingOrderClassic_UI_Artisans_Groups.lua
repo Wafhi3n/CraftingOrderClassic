@@ -25,6 +25,7 @@ function UI:_ArtisanGroups(memberOk)
     if not (D and D.roster) then return {} end
     local groups, order = {}, {}
     for name, r in pairs(D.roster) do
+      if not D._SameFaction or D:_SameFaction(r) then   -- confinement faction (Classic : pas d'échange cross-faction)
         local leader = (D.GroupLeader and D:GroupLeader(name)) or name
         local g = groups[leader]
         if not g then
@@ -37,8 +38,10 @@ function UI:_ArtisanGroups(memberOk)
         if name == leader then g.lead = m end
         if memberOk == nil or memberOk(r) then g.ok = true end
         if r.isPartner then g.anyPartner = true end
+        if D.LFWOf and D:LFWOf(name) then g.anyLFW = true end   -- un perso du set cherche du travail (LFW)
         if (r.rep or 0) > g.repMax then g.repMax = r.rep end
         if online and (not g.onlineChar or name == leader) then g.onlineChar = name end
+      end
     end
     local list = {}
     for _, g in ipairs(order) do
@@ -83,7 +86,8 @@ function UI:_FillArtGroupRow(row, g)
     local lead = g.lead
     row.dot:SetOnline(g.onlineChar ~= nil)
     local pTag = g.anyPartner and ("|cFFFFD100" .. L["[Partenaire]"] .. "|r ") or ""
-    row.name:SetText(pTag .. "|cFFFFFFFF" .. g.leader .. "|r |cFF888888+" .. (#g.members - 1) .. "|r")
+    local lfwTag = g.anyLFW and ("|cFF4CDB6E" .. L["[Dispo]"] .. "|r ") or ""   -- cherche du travail
+    row.name:SetText(lfwTag .. pTag .. "|cFFFFFFFF" .. g.leader .. "|r |cFF888888+" .. (#g.members - 1) .. "|r")
     local sub
     if g.onlineChar and g.onlineChar ~= g.leader then
         sub = string.format(L["En ligne via %s"], g.onlineChar)

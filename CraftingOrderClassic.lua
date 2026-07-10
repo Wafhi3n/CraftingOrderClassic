@@ -315,6 +315,7 @@ function COC:Slash(msg)
     elseif cmd == "lowlevel" or cmd == "lowlvl" then if COC.Moderation then COC.Moderation:LowLevelCmd(rest) end
     elseif cmd == "spam" then if COC.Moderation then COC.Moderation:SpamCmd(rest) end
     elseif cmd == "alts" or cmd == "rerolls" then if D and D.AltsCmd then D:AltsCmd(rest) end
+    elseif cmd == "lfw" then if D and D.LFWCmd then D:LFWCmd(rest) end
     elseif cmd == "beacon" then COC:BeaconDiag()
     elseif cmd == "gwroster" or cmd == "confed" then COC:GreenWallDiag()
     elseif cmd == "wipe"   then COC:WipeRoster()
@@ -358,6 +359,7 @@ f:SetScript("OnEvent", function(_, event, arg1)
         if COC.Social   then COC.Social:Start()   end      -- tooltip social + clic-droit (Étape D)
         if COC.Inbound  then COC.Inbound:Start()  end      -- capture /commerce + /guilde (non-addon)
         if COC.ProfOrders then COC.ProfOrders:Start() end  -- overlay « commandes du métier » sur la fenêtre métier
+        if COC.Nameplate then COC.Nameplate:Start() end    -- icône LFW (recherche de travail) sur les plaques
         if COC.UI and COC.UI.BuildMinimapButton then COC.UI:BuildMinimapButton() end
         if COC.Debug and C_Timer then C_Timer.After(1, function() COC.Debug:Reapply() end) end
         SLASH_CRAFTINGORDER1 = "/co"

@@ -40,6 +40,7 @@ CraftingOrderClassic_Social.lua
 CraftingOrderClassic_Social_Menu.lua
 CraftingOrderClassic_Social_Roster.lua
 CraftingOrderClassic_Minimap.lua
+CraftingOrderClassic_Nameplate.lua
 CraftingOrderClassic_ProfOrders.lua
 CraftingOrderClassic_Craft.lua
 CraftingOrderClassic_ProfWindow.lua
@@ -55,6 +56,7 @@ Directory_RelayCodec.lua
 Directory_Relay.lua
 Directory_AltCodec.lua
 Directory_Alts.lua
+Directory_LFW.lua
 Directory_MyArtisans.lua
 Directory_LootScan.lua
 Orders_Codec.lua

@@ -165,6 +165,13 @@ function Dir:OnRK(sender, message)
     if COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end
 end
 
+-- Confinement FACTION (Classic Era : aucun échange cross-faction, rerolls compris). La SavedVariable
+-- est PAR COMPTE → un compte bi-faction mélange les deux rosters. Le transport (canal/whisper) est déjà
+-- segmenté par faction, donc toute donnée REÇUE est de MA faction : on la stampe. Les entrées héritées
+-- (faction nil) passent le filtre (pas de régression) et se re-stampent au prochain contact.
+function Dir:_MyFaction() return (UnitFactionGroup and UnitFactionGroup("player")) or nil end
+function Dir:_SameFaction(r) local f = r and r.faction; return f == nil or f == self:_MyFaction() end
+
 -- Garantit une entrée roster pour un joueur QUI A RÉPONDU (a donc l'addon) : classe la source
 -- (guilde/ami/ajouté sinon « recent » = Croisé/Met), marque en ligne, horodate. Idempotent.
 function Dir:_Touch(name)
@@ -172,6 +179,7 @@ function Dir:_Touch(name)
     local r = self.roster and self.roster[name]
     if not r then r = {}; self.roster = self.roster or {}; self.roster[name] = r end
     self:_ApplySource(name, r)
+    r.faction = self:_MyFaction()   -- donnée reçue = ma faction (transport segmenté) → stampe
     r.lastSeen = time()
     r.relayed = nil   -- il répond LUI-MÊME : ses données directes invalident tout relais de partenaire
     local wasOnline = self.online[name]
@@ -411,6 +419,7 @@ function Dir:Start()
     if self.StartCooldowns then self:StartCooldowns() end   -- verbe CD (Directory_Cooldowns.lua)
     if self.StartRelay then self:StartRelay() end           -- verbe RLY (Directory_Relay.lua)
     if self.StartAlts then self:StartAlts() end             -- verbe ALT (Directory_Alts.lua)
+    if self.StartLFW then self:StartLFW() end               -- verbe LFW (Directory_LFW.lua)
     CraftLink:OnPresence(function(kind, who) Dir:OnPresence(kind, who) end)
     if CraftLink.OnBeacon then CraftLink:OnBeacon(function(who) Dir:OnBeacon(who) end) end
 

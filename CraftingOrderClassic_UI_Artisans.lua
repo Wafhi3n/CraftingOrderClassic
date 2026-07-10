@@ -41,11 +41,17 @@ local knowsProf = Skin.KnowsProfOrSeen
 local function profsList(r)
     local SEC = COC.SECONDARY_PROF or {}   -- Cuisine/Secours/Pêche jamais affichés (pas de commande)
     local seen, parts = {}, {}
+    local skKnown = r.skill and next(r.skill)   -- SK = vérité terrain du perso : s'il est connu, il PRIME
     for key, sv in pairs(r.skill or {}) do
         if not SEC[key] then seen[key] = true; parts[#parts + 1] = { key = key, sv = sv } end
     end
     for key in pairs(r.recipes or {}) do
-        if not (SEC[key] or seen[key]) then seen[key] = true; parts[#parts + 1] = { key = key } end
+        -- Filet de sécurité : ne PAS afficher un métier vu en RK qui CONTREDIT un SK connu (fuite d'alt
+        -- d'un vieux client, captée avant que la purge OnSkill ne passe) → « forgeron » ne montre pas
+        -- « enchanteur » juste parce qu'un RK enchanteur a fuité. Sans SK connu, on affiche (cas légitime).
+        if not (SEC[key] or seen[key]) and not (skKnown and not r.skill[key]) then
+            seen[key] = true; parts[#parts + 1] = { key = key }
+        end
     end
     for key, floor in pairs(r.craftSeen or {}) do   -- non-porteur vu crafter : plancher estimé
         if not (SEC[key] or seen[key]) then seen[key] = true; parts[#parts + 1] = { key = key, est = floor } end
@@ -261,7 +267,9 @@ function UI:RefreshArtisans()
     -- Compteurs par source (+ « all » = total ; « muted » = mis en sourdine, hors roster)
     local counts = { all = 0, guild = 0, friend = 0, added = 0, recent = 0, confed = 0 }
     for _, r in pairs(D and D.roster or {}) do
-        local s = r.source or "recent"; counts[s] = (counts[s] or 0) + 1; counts.all = counts.all + 1
+        if not (D and D._SameFaction) or D:_SameFaction(r) then   -- confinement faction (mêmes règles que la liste)
+            local s = r.source or "recent"; counts[s] = (counts[s] or 0) + 1; counts.all = counts.all + 1
+        end
     end
     counts.muted = (COC.Moderation and COC.Moderation.MutedList) and #COC.Moderation:MutedList() or 0
     for id, b in pairs(self.artSrcBtns) do b.count:SetText("|cFFE8B84B" .. (counts[id] or 0) .. "|r") end
@@ -314,7 +322,9 @@ function UI:_FillArtRow(row, a)
     row:SetScript("OnEnter", nil); row:SetScript("OnLeave", nil)   -- lignes poolées : purge le tooltip de groupe
     row.dot:SetOnline(a.online and true or false)
     local pTag = a.r.isPartner and ("|cFFFFD100" .. L["[Partenaire]"] .. "|r ") or ""   -- texte, pas de glyphe tofu
-    row.name:SetText(pTag .. "|cFFFFFFFF" .. a.name .. "|r")
+    local D0 = COC.Directory
+    local lfwTag = (D0 and D0.LFWOf and D0:LFWOf(a.name)) and ("|cFF4CDB6E" .. L["[Dispo]"] .. "|r ") or ""
+    row.name:SetText(lfwTag .. pTag .. "|cFFFFFFFF" .. a.name .. "|r")
     -- « relayé » = fiche servie par un partenaire pendant que l'artisan est HORS LIGNE, sans aucune
     -- donnée directe ; « non-porteur » = vu crafter ET aucune vraie donnée réseau reçue de lui (s'il
     -- finit par diffuser ses SK/RK, on repasse en artisan normal même si le flag nonAddon traîne).

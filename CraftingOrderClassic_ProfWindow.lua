@@ -80,6 +80,22 @@ function PW:_BuildHeader(f)
     vanilla:SetScript("OnClick", function() PW:SetEnabled(false) end)
     self.vanillaBtn = vanilla
 
+    -- Toggle « Chercher du travail » (LFW) : signale au royaume que tu cherches du travail dans le métier
+    -- OUVERT (donc forcément le tien). Masqué hors vue pleine (reroll/compact = pas ton perso courant).
+    local lfw = Skin.MakeGoldButton(f, 150, 18, L["Chercher du travail"])
+    lfw:SetPoint("TOPLEFT", 12, -32)
+    lfw:SetScript("OnClick", function() PW:_ToggleLFW() end)
+    lfw:SetScript("OnEnter", function(b)
+        local D = COC.Directory; local on = D and D.MyLFW and D:MyLFW() == PW.profKey
+        GameTooltip:SetOwner(b, "ANCHOR_BOTTOMLEFT")
+        GameTooltip:SetText(on and L["Tu cherches du travail — clic pour arrêter."]
+            or L["Signale au royaume que tu cherches du travail dans ce métier."], 1, 1, 1, 1, true)
+        GameTooltip:Show()
+    end)
+    lfw:SetScript("OnLeave", GameTooltip_Hide)
+    lfw:Hide()   -- caché jusqu'au 1er _SyncLFWBtn (évite un flash en vue reroll/compact)
+    self.lfwBtn = lfw
+
     local close = CreateFrame("Button", nil, f, "UIPanelCloseButton")
     close:SetPoint("TOPRIGHT", -6, -6)
     close:SetScript("OnClick", function()
@@ -89,6 +105,24 @@ function PW:_BuildHeader(f)
         PW:Hide()
     end)
     Skin.MakeSeparator(f, -(self.HEADER_H - 2))
+end
+
+-- Bascule mon statut LFW pour le métier OUVERT (mien). Ignoré hors vue pleine (reroll = pas mon perso).
+function PW:_ToggleLFW()
+    local D = COC.Directory
+    if not (D and D.SetLFW and self.profKey) or self.rerollKey then return end
+    if D.MyLFW and D:MyLFW() == self.profKey then D:SetLFW(nil) else D:SetLFW(self.profKey) end
+    self:_SyncLFWBtn()
+end
+
+-- Le bouton LFW n'a de sens qu'en VUE PLEINE d'un métier À MOI (pas reroll, pas compact/dock). État
+-- sélectionné = je cherche déjà du travail dans CE métier.
+function PW:_SyncLFWBtn()
+    local b = self.lfwBtn; if not b then return end
+    local D = COC.Directory
+    local show = self.profKey and not self.rerollKey and not self._compact and D and D.SetLFW
+    b:SetShown(show and true or false)
+    if show then b:SetSelected(D.MyLFW and D:MyLFW() == self.profKey and true or false) end
 end
 
 function PW:_BuildColumn(f, width, leftAnchor)
@@ -218,6 +252,7 @@ function PW:_RefreshDock()
     self.titleFS:SetText(name)
     local rank, maxRank = craft:OpenRank()
     self.rankFS:SetText((rank and maxRank) and string.format("|cFFE8B84B%d|r / %d", rank, maxRank) or "")
+    self:_SyncLFWBtn()
     if self.RefreshOrders then self:RefreshOrders() end
 end
 
@@ -262,6 +297,7 @@ function PW:_DoRefresh()
     else
         return
     end
+    self:_SyncLFWBtn()
     if self.RefreshOrders then self:RefreshOrders() end
 end
 

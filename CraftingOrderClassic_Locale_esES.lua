@@ -245,6 +245,16 @@ local es = {
         "|cFFFFFFFF%s|r marcado como socio — prioridad en las alertas de regalo.",
     ["|cFFFFFFFF%s|r n'est plus marqué comme partenaire."] = "|cFFFFFFFF%s|r ya no está marcado como socio.",
     ["Marquer comme partenaire"] = "Marcar como socio", ["Retirer des partenaires"] = "Quitar de socios",
+    -- Búsqueda de trabajo (LFW) : /co lfw
+    ["[Dispo]"] = "[Busca]",
+    ["Chercher du travail"] = "Buscar trabajo",
+    ["Tu cherches du travail — clic pour arrêter."] = "Estás buscando trabajo — clic para parar.",
+    ["Signale au royaume que tu cherches du travail dans ce métier."] = "Avisa al reino que buscas trabajo en esta profesión.",
+    ["recherche de travail : |cFF33DD33%s|r — /co lfw off pour arrêter"] = "buscando trabajo: |cFF33DD33%s|r — /co lfw off para parar",
+    ["recherche de travail : |cFFFFCC00désactivée|r — /co lfw <métier>"] = "buscando trabajo: |cFFFFCC00desactivado|r — /co lfw <profesión>",
+    ["recherche de travail arrêtée."] = "búsqueda de trabajo detenida.",
+    ["tu n'as pas le métier %s — impossible de chercher du travail dessus."] = "no tienes %s — no puedes buscar trabajo en ella.",
+    ["recherche de travail : |cFF33DD33%s|r — visible au royaume"] = "buscando trabajo: |cFF33DD33%s|r — visible en todo el reino",
     ["|cFF66CCFFamis/partenaires intéressés :|r %s (|cFFFFFFFF/co gift <nom>|r)"] =
         "|cFF66CCFFamigos/socios interesados:|r %s (|cFFFFFFFF/co gift <nombre>|r)",
     ["proposer (chuchoter) le dernier plan looté à un ami/partenaire qui ne le connaît pas"] =
