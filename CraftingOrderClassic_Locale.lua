@@ -75,6 +75,14 @@ if loc == "enUS" or loc == "enGB" then
             "The interface is translated into German and Spanish depending on your WoW client language.",
         ["Ce nouvel onglet « Nouveautés » affiche les notes de version directement en jeu."] =
             "This new What's New tab shows the release notes right in the game.",
+        -- Onglet Nouveautés — v1.11.0
+        ["Annuler une commande publique atteint tout le royaume"] = "Cancelling a public order now reaches the whole realm",
+        ["Une commande publique voyage sur le canal du royaume depuis la v1.10.0, mais pas son annulation : un artisan que tu n'as jamais croisé la voyait « ouverte » pendant six heures, l'acceptait, et farmait les réactifs pour rien. L'annulation part désormais sur le même canal."] =
+            "A public order has travelled the realm channel since v1.10.0, but its cancellation did not. A crafter you have never met kept seeing it as open for up to six hours, could accept it, and gathered the reagents for nothing. Cancelling now goes out on the same channel.",
+        ["Poster et annuler ne perdent plus de messages. Le canal exige un clic ou une touche et n'accepte qu'une ligne par seconde : un |cFFFFFFFF/co post|r tapé au chat, ou deux commandes postées dans la même seconde, disparaissaient sans trace. Ces lignes patientent maintenant dans une file et partent à ton prochain clic."] =
+            "Posting and cancelling no longer lose messages. The channel needs a click or a keypress to carry a line, and takes one line per second: a |cFFFFFFFF/co post|r typed in chat, or two orders posted in the same second, used to vanish without a trace. Those lines now wait in a queue and go out on your next click.",
+        ["Seules les commandes NOUVELLES et les ANNULATIONS voyagent sur le canal, et seulement les publiques. Guilde, amis et commandes nommées restent privées ; les acceptations restent entre les deux joueurs concernés."] =
+            "Only new orders and cancellations ever travel the channel, and only public ones. Guild, friends and named orders stay private; acceptances stay between the two players involved.",
         -- Onglet Nouveautés — v1.10.2
         ["Correctif : erreur en combat dans la vue métier"] = "Fix: an in-combat error in the profession view",
         ["Sélectionner une recette pendant un combat ne provoque plus d'erreur bloquée : le bouton « Créer » est un bouton sécurisé, que le jeu interdit de masquer en plein combat. L'addon attend maintenant la fin du combat pour l'afficher ou le masquer."] =

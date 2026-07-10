@@ -113,16 +113,31 @@ respectée. `RebroadcastMine` est jitté (fenêtre 3–6 s) pour éviter les raf
   2026-06-30). D'où le fanout whisper qui **double** chaque `NEW` vers les artisans connus en ligne.
 - **balise TEXTE `CLNK1`** (throttlée, hardware-event only) : découverte d'inconnus, puis tout le
   trafic de données bascule en whisper.
-- **canal-texte `CLD1`** (`BroadcastText`, hardware-event only, confiné au royaume courant + royaumes
-  connectés) : diffuse `ORD|NEW` en TEXTE de canal (swap `|`↔`~`, le `|` casse le chat) pour une portée
-  royaume réelle, au-delà du roster whisperable. **NEW UNIQUEMENT, best-effort, non fiable au cycle
-  complet** : CANCEL/ACK/DLV/DONE/NACK ne sont PAS diffusés sur ce chemin (seulement whisper dirigé +
-  AddonMessage). Un joueur atteint SEULEMENT par ce canal (jamais croisé, hors roster) peut donc voir un
-  ordre « open » périmé jusqu'à expiration du **TTL** (6 h) après son acceptation/annulation ailleurs —
-  pas de duplication ni de corruption, juste un affichage best-effort borné dans le temps. Le contrat
-  « aucun champ ne contient `~` » est **imposé par le codec** (`ENCODERS.NEW` strippe `[|~]` de `price`
-  et `recipient`), pas seulement documenté : sans ça, le swap inverse à la réception décalerait
-  silencieusement les champs suivants du décodeur NEW. Tout futur champ libre doit être strippé de même.
+- **canal-texte `CLD1`** (`BroadcastText`, confiné au royaume courant + royaumes connectés) : diffuse en
+  TEXTE de canal (swap `|`↔`~`, le `|` casse le chat) pour une portée royaume réelle, au-delà du roster
+  whisperable. **Liste blanche de verbes : `NEW` et `CANCEL` seulement** (`CHANNEL_VERBS`, `Orders_Net`),
+  et **commandes PUBLIQUES seulement** (`recipient == "Tous"`) — Guilde/Amis/nommé restent whisper-only
+  (portée = vie privée), et ACK/DLV/DONE/NACK/SUGG restent dirigés (ils nomment un accepteur : les
+  publier serait une fuite). La diffusion doit être **voulue** (`opts.channel`, posé par `Post`/
+  `PostEntry`/`Cancel`) : ni le ticker de ré-émission ni les transitions dirigées ne touchent le canal.
+  - **File d'envoi (REV 8)** : `SendChatMessage` est hardware-event-only et throttlé. Un envoi qui échoue
+    (canal pas encore joint, throttle d'1 s, appel hors input) n'est plus perdu : la ligne part en FILE
+    FIFO (max 24, TTL 120 s) drainée **une par événement d'input** (`WorldFrame:OnMouseDown` + frame caché
+    `OnKeyDown`, pattern Deathlog). L'appelant n'a donc plus à garantir le contexte d'input. FIFO garantit
+    qu'un `NEW` part avant son `CANCEL`. La **balise `CLNK1` n'est PAS mise en file** : throttlée, elle
+    doit être perdue (la rejouer plus tard ne vaut rien et floode).
+  - **Reste best-effort** : `ACK`/`DLV`/`DONE` ne transitent pas par ce chemin. Un joueur atteint
+    SEULEMENT par le canal peut donc voir un ordre « open » qu'un autre a accepté ailleurs, jusqu'au
+    **TTL** (6 h). Depuis la diffusion de `CANCEL`, ce n'est plus le cas d'une commande **annulée** — sauf
+    si le `CANCEL` lui-même est manqué (une seule tentative), auquel cas le TTL borne la fenêtre. Pas de
+    duplication ni de corruption : juste un affichage best-effort borné dans le temps.
+  - **Sécurité** : le `sender` d'un texte de canal est posé par le transport (`playerShort(author)`), non
+    falsifiable → l'anti-spoof `samePlayer(sender, o.buyer)` de `_OnCycle` couvre le `CANCEL` reçu par
+    canal exactement comme celui reçu par whisper. Un récepteur qui n'a jamais vu le `NEW` n'a pas l'ordre
+    en cache et `_OnCycle` sort immédiatement.
+  - **Contrat `~`** : « aucun champ ne contient `~` » est **imposé par le codec** (`ENCODERS.NEW` strippe
+    `[|~]` de `price` et `recipient`), pas seulement documenté : sans ça, le swap inverse à la réception
+    décalerait silencieusement les champs suivants du décodeur NEW. Tout futur champ libre doit l'être aussi.
 - **guilde** (`GUILD`) : distribution intra-guilde (+ relais GreenWall, hardware-event only).
 
 > Voir `Libs\CraftLink-1.0\CraftLink_Transport.lua` (`TRANSPORT_REV`) et la mémoire

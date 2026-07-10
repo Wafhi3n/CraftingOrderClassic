@@ -17,6 +17,11 @@ local function pmsg(m) print("|cFF33DD88Crafting Order|r " .. m) end
 
 local KEYWORD_RCPT = { Tous = true, Guilde = true, Amis = true }
 
+-- SEULS verbes autorisés en TEXTE de canal (portée royaume). Liste blanche volontaire : un verbe ajouté
+-- au protocole ne doit pas se retrouver diffusé au royaume entier par accident. ACK/DLV/DONE/NACK/SUGG
+-- restent DIRIGÉS (whisper) — ils nomment un accepteur/acheteur, les publier serait une fuite gratuite.
+local CHANNEL_VERBS = { NEW = true, CANCEL = true }
+
 -- Ce nom est-il un perso de MON compte ? (IsMyChar = MA SavedVariable, décision locale — cf.
 -- Directory_Alts.) Sert à ne pas s'auto-alerter/anti-spammer sur les commandes de mes rerolls.
 local function myChar(n) return n == me() or (COC.IsMyChar and COC:IsMyChar(n)) or false end
@@ -94,9 +99,11 @@ function Orders:_CycleTargets(action, o)
     return t
 end
 
--- `opts.channel` (posé UNIQUEMENT par Post/PostEntry = clic/slash = hardware event) autorise, pour une
+-- `opts.channel` (posé par Post/PostEntry/Cancel = actions VOULUES de l'utilisateur) autorise, pour une
 -- commande PUBLIQUE « Tous », la diffusion en texte-canal (portée royaume) EN PLUS du fanout whisper.
--- RebroadcastMine/timer et les transitions de cycle n'ont pas ce flag → jamais de SendChatMessage hors input.
+-- RebroadcastMine/timer et les transitions dirigées ne posent pas ce flag → jamais de bruit sur le canal.
+-- Le contexte hardware-event n'est plus une précondition : CraftLink:BroadcastText met en file et draine
+-- au prochain input si l'envoi immédiat échoue (cf. CraftLink_Transport, TRANSPORT_REV 8).
 function Orders:Broadcast(action, o, opts)
     if not CraftLink then return end
     local payload = Codec.Encode(action, o)   -- NEW/CANCEL/ACK/DLV/DONE (nil sinon)
@@ -106,12 +113,15 @@ function Orders:Broadcast(action, o, opts)
         if o.recipient == "Guilde" then CraftLink:Send(payload, "guild") end
         -- Fanout whisper vers les artisans connus EN LIGNE concernés (contourne le canal caché HS).
         for name in pairs(self:_FanoutTargets(o)) do CraftLink:Send(payload, "whisper", name) end
-        -- Portée ROYAUME (texte-canal) : commandes PUBLIQUES seulement, contexte hardware-event seulement.
-        if opts and opts.channel and (o.recipient or "Tous") == "Tous" and CraftLink.BroadcastText then
-            CraftLink:BroadcastText(payload)
-        end
     else
         for name in pairs(self:_CycleTargets(action, o)) do CraftLink:Send(payload, "whisper", name) end
+    end
+    -- Portée ROYAUME (texte-canal) : verbe en liste blanche + commande PUBLIQUE + diffusion demandée.
+    -- Un récepteur atteint SEULEMENT par le canal reçoit ainsi le NEW *et* son CANCEL — sans quoi la
+    -- commande resterait « open » chez lui jusqu'au TTL (6 h) après son annulation ailleurs.
+    if opts and opts.channel and CHANNEL_VERBS[action]
+       and (o.recipient or "Tous") == "Tous" and CraftLink.BroadcastText then
+        CraftLink:BroadcastText(payload)
     end
 end
 

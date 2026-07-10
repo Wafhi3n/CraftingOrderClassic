@@ -69,6 +69,14 @@ local es = {
         "La interfaz se traduce al alemán y al español según el idioma de tu cliente de WoW.",
     ["Ce nouvel onglet « Nouveautés » affiche les notes de version directement en jeu."] =
         "Esta nueva pestaña « Novedades » muestra las notas de versión directamente en el juego.",
+    -- Onglet Nouveautés — v1.11.0
+    ["Annuler une commande publique atteint tout le royaume"] = "Cancelar un pedido público ahora llega a todo el reino",
+    ["Une commande publique voyage sur le canal du royaume depuis la v1.10.0, mais pas son annulation : un artisan que tu n'as jamais croisé la voyait « ouverte » pendant six heures, l'acceptait, et farmait les réactifs pour rien. L'annulation part désormais sur le même canal."] =
+        "Un pedido público viaja por el canal del reino desde la v1.10.0, pero su cancelación no. Un artesano que nunca has cruzado lo veía « abierto » durante seis horas, lo aceptaba y reunía los reactivos para nada. La cancelación sale ahora por el mismo canal.",
+    ["Poster et annuler ne perdent plus de messages. Le canal exige un clic ou une touche et n'accepte qu'une ligne par seconde : un |cFFFFFFFF/co post|r tapé au chat, ou deux commandes postées dans la même seconde, disparaissaient sans trace. Ces lignes patientent maintenant dans une file et partent à ton prochain clic."] =
+        "Publicar y cancelar ya no pierden mensajes. El canal necesita un clic o una tecla para llevar una línea, y acepta una línea por segundo: un |cFFFFFFFF/co post|r escrito en el chat, o dos pedidos publicados en el mismo segundo, desaparecían sin rastro. Esas líneas ahora esperan en una cola y salen en tu siguiente clic.",
+    ["Seules les commandes NOUVELLES et les ANNULATIONS voyagent sur le canal, et seulement les publiques. Guilde, amis et commandes nommées restent privées ; les acceptations restent entre les deux joueurs concernés."] =
+        "Solo los pedidos NUEVOS y las CANCELACIONES viajan por el canal, y solo los públicos. Los pedidos de hermandad, de amigos y con destinatario siguen siendo privados; las aceptaciones quedan entre los dos jugadores implicados.",
     -- Onglet Nouveautés — v1.10.2
     ["Correctif : erreur en combat dans la vue métier"] = "Corrección: un error en combate en la vista de profesión",
     ["Sélectionner une recette pendant un combat ne provoque plus d'erreur bloquée : le bouton « Créer » est un bouton sécurisé, que le jeu interdit de masquer en plein combat. L'addon attend maintenant la fin du combat pour l'afficher ou le masquer."] =

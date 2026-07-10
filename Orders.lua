@@ -90,7 +90,7 @@ function Orders:Post(itemID, qty, price, opts)
         status = "open", ts = time(),
     }
     COC.db.orders[o.id] = o
-    self:Broadcast("NEW", o, { channel = true })   -- {channel} = contexte hardware-event → portée royaume si publique
+    self:Broadcast("NEW", o, { channel = true })   -- {channel} = diffusion voulue → portée royaume si publique
     return o
 end
 
@@ -108,7 +108,7 @@ function Orders:PostEntry(entry, qty, price, opts)
         status = "open", ts = time(),
     }
     COC.db.orders[o.id] = o
-    self:Broadcast("NEW", o, { channel = true })   -- {channel} = contexte hardware-event → portée royaume si publique
+    self:Broadcast("NEW", o, { channel = true })   -- {channel} = diffusion voulue → portée royaume si publique
     return o
 end
 
@@ -124,7 +124,9 @@ function Orders:Cancel(id)
     local o = id and COC.db.orders[id]
     if not o then pmsg(L["commande introuvable : "] .. tostring(id)); return end
     if not actsFor(o.buyer) then pmsg(L["ce n'est pas ta commande."]); return end
-    o.status = "cancelled"; self:Broadcast("CANCEL", o)
+    -- {channel} : une commande PUBLIQUE a pu atteindre, par texte-canal, des artisans hors de mon roster
+    -- whisperable. Son annulation doit suivre le même chemin, sinon ils la voient « open » jusqu'au TTL.
+    o.status = "cancelled"; self:Broadcast("CANCEL", o, { channel = true })
     pmsg(L["commande annulée : "] .. id)
 end
 

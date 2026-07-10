@@ -68,6 +68,14 @@ local de = {
         "Die Oberfläche wird je nach Sprache deines WoW-Clients ins Deutsche und Spanische übersetzt.",
     ["Ce nouvel onglet « Nouveautés » affiche les notes de version directement en jeu."] =
         "Dieser neue Tab « Neues » zeigt die Versionshinweise direkt im Spiel.",
+    -- Onglet Nouveautés — v1.11.0
+    ["Annuler une commande publique atteint tout le royaume"] = "Das Abbrechen eines öffentlichen Auftrags erreicht jetzt den ganzen Realm",
+    ["Une commande publique voyage sur le canal du royaume depuis la v1.10.0, mais pas son annulation : un artisan que tu n'as jamais croisé la voyait « ouverte » pendant six heures, l'acceptait, et farmait les réactifs pour rien. L'annulation part désormais sur le même canal."] =
+        "Ein öffentlicher Auftrag reist seit v1.10.0 über den Realm-Kanal, sein Abbruch jedoch nicht. Ein Handwerker, dem du nie begegnet bist, sah ihn bis zu sechs Stunden lang als offen, konnte ihn annehmen und sammelte die Reagenzien umsonst. Der Abbruch geht jetzt über denselben Kanal.",
+    ["Poster et annuler ne perdent plus de messages. Le canal exige un clic ou une touche et n'accepte qu'une ligne par seconde : un |cFFFFFFFF/co post|r tapé au chat, ou deux commandes postées dans la même seconde, disparaissaient sans trace. Ces lignes patientent maintenant dans une file et partent à ton prochain clic."] =
+        "Aufgeben und Abbrechen verlieren keine Nachrichten mehr. Der Kanal braucht einen Klick oder Tastendruck und nimmt eine Zeile pro Sekunde: ein im Chat getipptes |cFFFFFFFF/co post|r oder zwei Aufträge in derselben Sekunde verschwanden spurlos. Diese Zeilen warten nun in einer Warteschlange und gehen beim nächsten Klick raus.",
+    ["Seules les commandes NOUVELLES et les ANNULATIONS voyagent sur le canal, et seulement les publiques. Guilde, amis et commandes nommées restent privées ; les acceptations restent entre les deux joueurs concernés."] =
+        "Nur neue Aufträge und Abbrüche reisen über den Kanal, und nur öffentliche. Gilden-, Freundes- und benannte Aufträge bleiben privat; Annahmen bleiben zwischen den beiden beteiligten Spielern.",
     -- Onglet Nouveautés — v1.10.2
     ["Correctif : erreur en combat dans la vue métier"] = "Behoben: Fehler im Kampf in der Berufsansicht",
     ["Sélectionner une recette pendant un combat ne provoque plus d'erreur bloquée : le bouton « Créer » est un bouton sécurisé, que le jeu interdit de masquer en plein combat. L'addon attend maintenant la fin du combat pour l'afficher ou le masquer."] =

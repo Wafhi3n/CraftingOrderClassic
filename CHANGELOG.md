@@ -1,5 +1,20 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.11.0 — Cancelling a public order now reaches the whole realm
+
+Since v1.10.0 a public order travels the realm channel, so crafters you have never met can see it. Its
+cancellation did not. Anyone reached only through the channel kept seeing the order as open for up to six
+hours, could accept it, and gather the reagents for nothing — their acceptance was silently discarded by
+your client, which already knew the order was cancelled. Cancelling now goes out on the same channel.
+
+Posting and cancelling also stopped losing messages. The realm channel needs a mouse click or a key press
+to carry a line, and it accepts one line per second. Anything sent outside those windows — a `/co post`
+typed in chat, two orders posted in the same second, a post made before the channel finished connecting —
+used to vanish without a trace. Those lines now wait in a queue and go out on your next click or keypress.
+
+Only new orders and cancellations ever travel the channel, and only public ones. Guild, friends and named
+orders stay private, and acceptances stay between the two players involved.
+
 ## v1.10.2 — Fix: an in-combat error in the profession view
 
 Picking a recipe while in combat threw a blocked-action error. The Create button inherits from a secure
