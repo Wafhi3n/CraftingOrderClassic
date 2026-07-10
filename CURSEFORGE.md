@@ -22,6 +22,8 @@ between total strangers as long as they've got the addon too.
 - See recipe cooldowns on other artisans, so you know whether their Transmute is ready or still ticking (new in 1.9).
 - Group your alts under one identity, so an order for your offline alchemist reaches whatever character you're playing (new in 1.9).
 - Check every profession on your whole account at once in the My Artisans tab (new in 1.9).
+- Season of Discovery recipes are built in, on SoD realms only, so seasonal crafts show up on the board like any other (new in 1.12).
+- Keep the board clean: mute a spammer (with a reason, or just for an hour), or trust a busy friend so they're never auto-muted (new in 1.13).
 
 ## Order from your Friends and Guild list
 
@@ -42,10 +44,12 @@ button calls out on the channel and everyone online answers.
 
 Post to the whole realm, or keep it to your guild, your friends, or a single player. A realm-wide order
 goes out over the shared channel, not just to people you've already crossed paths with, so it reaches
-strangers running the addon too. You'll only get a toast for professions you actually have, so someone
-else's Blacksmithing order won't ping your Enchanter. Scoped orders only reach people who qualify. Open
-ones re-broadcast every couple of hours and expire on their own, so the board doesn't rot with dead
-requests.
+strangers running the addon too. Cancel it and the cancellation travels the same way, so it doesn't sit
+open on a stranger's board for hours. You'll only get a toast for professions you actually have, so
+someone else's Blacksmithing order won't ping your Enchanter. Scoped orders only reach people who qualify.
+Open ones re-broadcast every couple of hours and expire on their own, so the board doesn't rot with dead
+requests. Only the player who posted an order can put it on the realm channel under their name, so nobody
+can post in your name.
 
 Gather orders handle stacks properly. Ask by the unit or by the stack, and you always see the real
 total, so it reads *3 stacks (60)* instead of a cryptic *3 st*.
@@ -100,12 +104,30 @@ When someone without the addon posts a request in `/trade` or `/guild`, it lands
 it doesn't slip past you. Accept it, then reply to them in chat yourself. Sales (WTS) and crafters
 advertising their services (LFW) get filtered out. `/co scan` turns the scanner on and off.
 
+## Keeping the board clean
+
+Mute anyone whose orders you'd rather not see: `/co mute <name>`, optionally with a reason and a
+duration, so `/co mute Bob 1h spammer` mutes Bob for an hour and then forgets about it on its own. `/co
+mute` on its own lists who you've muted, why, and how long is left. There's also automatic help — the
+addon watches for the same player flooding orders and offers to mute them (or does it for you, your
+call), and it can ignore very-low-level posters that look like bots. Someone legitimate who just posts a
+lot? `/co trust <name>` and they're never auto-muted. It's all yours alone; muting never touches anyone
+else's game.
+
 ## The profession window (optional)
 
 There's an optional three-column profession window: a searchable, difficulty-colored recipe list,
 reagents with have/need counts and Create / Create All, and the live orders for that profession right
 alongside. One click swaps to the Blizzard window and back. Enchanting works too, which takes a little
 doing in Classic since its craft function is protected.
+
+## Season of Discovery
+
+On a Season of Discovery realm, the 304 seasonal recipes are in the catalogue too — Leatherworking,
+Blacksmithing, Tailoring, Enchanting, Engineering, Alchemy and the rest — so a seasonal craft posts,
+shows its reagents, and gets matched to crafters like any classic recipe. On a regular Era realm none of
+this loads and nothing changes; the recipes your friends have already shared with you stay exactly as
+they were.
 
 ## Confederations (GreenWall)
 
@@ -124,7 +146,7 @@ Guild Economy.
 `/co help` lists them all. The ones you'll reach for: `/co` opens the board, `/co profwindow` toggles the
 custom profession window, `/co notify` sets notifications, `/co scan` toggles the chat scanner, `/co gift`
 offers a looted plan to a partner, `/co refresh` re-polls the directory, `/co alts` groups your
-characters (off by default).
+characters (off by default), `/co mute` and `/co trust` handle noisy or trusted players.
 
 Made with Season of Discovery and Fresh realms in mind, guild-economy challenges, and servers where the
 auction house isn't the answer.
