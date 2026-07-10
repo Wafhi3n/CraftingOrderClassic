@@ -68,6 +68,10 @@ local de = {
         "Die Oberfläche wird je nach Sprache deines WoW-Clients ins Deutsche und Spanische übersetzt.",
     ["Ce nouvel onglet « Nouveautés » affiche les notes de version directement en jeu."] =
         "Dieser neue Tab « Neues » zeigt die Versionshinweise direkt im Spiel.",
+    -- Onglet Nouveautés — v1.10.2
+    ["Correctif : erreur en combat dans la vue métier"] = "Behoben: Fehler im Kampf in der Berufsansicht",
+    ["Sélectionner une recette pendant un combat ne provoque plus d'erreur bloquée : le bouton « Créer » est un bouton sécurisé, que le jeu interdit de masquer en plein combat. L'addon attend maintenant la fin du combat pour l'afficher ou le masquer."] =
+        "Ein Rezept während des Kampfes auszuwählen löst keinen blockierten Fehler mehr aus. Der Erstellen-Knopf ist ein geschützter Knopf, den das Spiel mitten im Kampf nicht verbergen lässt. Das Addon wartet nun das Kampfende ab, um ihn ein- oder auszublenden.",
     -- Onglet Nouveautés — v1.10.1
     ["Corrections : qui reçoit les alertes de commandes"] = "Korrekturen: wer Auftragsbenachrichtigungen erhält",
     ["Les alertes de commandes ne dépendent plus du réglage |cFFFFFFFF/co scan|r : le scanner de chat et le carnet partageaient une option par erreur. Une commande publique te prévient désormais dès que tu as le métier."] =

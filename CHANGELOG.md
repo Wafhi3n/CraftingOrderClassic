@@ -1,5 +1,14 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.10.2 — Fix: an in-combat error in the profession view
+
+Picking a recipe while in combat threw a blocked-action error. The Create button inherits from a secure
+template, and WoW forbids hiding a secure button mid-combat — the read-only view of an alt's profession
+tried to do exactly that on every recipe click.
+
+The addon now remembers the state it wants and applies it when combat ends. Nothing is lost: the button
+simply stays greyed out until you leave combat, and it refuses to craft in the meantime.
+
 ## v1.10.1 — Fixes to who gets notified
 
 Order alerts no longer depend on your `/co scan` setting. The chat scanner and the order book shared one

@@ -16,6 +16,12 @@ local BODY_W = 780
 local function versionsRecent()
     return {
         {
+            v = "v1.10.2", title = L["Correctif : erreur en combat dans la vue métier"],
+            lines = {
+                L["Sélectionner une recette pendant un combat ne provoque plus d'erreur bloquée : le bouton « Créer » est un bouton sécurisé, que le jeu interdit de masquer en plein combat. L'addon attend maintenant la fin du combat pour l'afficher ou le masquer."],
+            },
+        },
+        {
             v = "v1.10.1", title = L["Corrections : qui reçoit les alertes de commandes"],
             lines = {
                 L["Les alertes de commandes ne dépendent plus du réglage |cFFFFFFFF/co scan|r : le scanner de chat et le carnet partageaient une option par erreur. Une commande publique te prévient désormais dès que tu as le métier."],

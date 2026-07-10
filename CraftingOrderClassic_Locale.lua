@@ -75,6 +75,10 @@ if loc == "enUS" or loc == "enGB" then
             "The interface is translated into German and Spanish depending on your WoW client language.",
         ["Ce nouvel onglet « Nouveautés » affiche les notes de version directement en jeu."] =
             "This new What's New tab shows the release notes right in the game.",
+        -- Onglet Nouveautés — v1.10.2
+        ["Correctif : erreur en combat dans la vue métier"] = "Fix: an in-combat error in the profession view",
+        ["Sélectionner une recette pendant un combat ne provoque plus d'erreur bloquée : le bouton « Créer » est un bouton sécurisé, que le jeu interdit de masquer en plein combat. L'addon attend maintenant la fin du combat pour l'afficher ou le masquer."] =
+            "Picking a recipe during combat no longer throws a blocked-action error. The Create button is a secure button, and the game forbids hiding one mid-combat. The addon now waits until combat ends to show or hide it.",
         -- Onglet Nouveautés — v1.10.1
         ["Corrections : qui reçoit les alertes de commandes"] = "Fixes to who gets notified",
         ["Les alertes de commandes ne dépendent plus du réglage |cFFFFFFFF/co scan|r : le scanner de chat et le carnet partageaient une option par erreur. Une commande publique te prévient désormais dès que tu as le métier."] =

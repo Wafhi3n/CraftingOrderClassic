@@ -107,7 +107,7 @@ function PW:_ClearDetail()
     -- restaient invisibles jusqu'à la prochaine sélection. En reroll : lecture seule, on les laisse cachés.
     if not self.rerollKey then
         local isCraft = COC.Craft and COC.Craft:IsCraftOpen()
-        self.detCreateBtn:Show()
+        self:_SetCreateShown(true)
         self.detAllBtn:SetShown(not isCraft)
         self.detQtyBox:SetShown(not isCraft); self.detQtyLbl:SetShown(not isCraft)
     end
@@ -121,6 +121,29 @@ function PW:_SetCraftButtons(canCreate, canAll)
         btn.text:SetTextColor(on and 0.941 or 0.45, on and 0.776 or 0.45, on and 0.455 or 0.45)
     end
     paint(self.detCreateBtn, canCreate); paint(self.detAllBtn, canAll)
+end
+
+-- Le bouton « Créer » hérite de SecureActionButtonTemplate → il est PROTÉGÉ, donc Show/Hide DESSUS
+-- lèvent ADDON_ACTION_BLOCKED en combat (la protection descend du parent vers l'enfant, jamais
+-- l'inverse : masquer la FENÊTRE reste permis). On mémorise l'état voulu et on le rejoue à la sortie de
+-- combat. En attendant, le bouton reste visible mais inoffensif : _SetCraftButtons le grise et
+-- _CraftSelected refuse (numAvailable nil hors fenêtre native = 0 réactif).
+-- `wireCraft` nil = ne pas toucher à la redirection sécurisée.
+function PW:_SetCreateShown(shown, wireCraft)
+    self._createWant, self._createWire = shown, wireCraft
+    local b = self.detCreateBtn
+    if not b then return end
+    if InCombatLockdown() then
+        if not self._regenFrame then
+            local rf = CreateFrame("Frame")
+            rf:RegisterEvent("PLAYER_REGEN_ENABLED")
+            rf:SetScript("OnEvent", function() PW:_SetCreateShown(PW._createWant, PW._createWire) end)
+            self._regenFrame = rf
+        end
+        return
+    end
+    b:SetShown(shown)
+    if wireCraft ~= nil then self:_WireCreateButton(wireCraft) end
 end
 
 -- Branche/débranche la redirection sécurisée du bouton « Créer » selon le métier ouvert. À n'appeler
@@ -187,13 +210,12 @@ function PW:RefreshDetail()
     end
 
     -- Vue reroll = LECTURE SEULE : aucun bouton créer (on n'est pas sur ce perso). Le Hide() EST la
-    -- protection (un bouton caché n'est pas cliquable). Le _WireCreateButton(false) désarme en plus
-    -- l'attribut sécurisé laissé par une session précédente, pour qu'un futur réaffichage accidentel
-    -- n'hérite pas d'un clickbutton pointant sur CraftCreateButton natif. NB : il no-op EN COMBAT
-    -- (SetAttribute verrouillé) — sans conséquence, le bouton reste caché.
+    -- protection (un bouton caché n'est pas cliquable) et le désarmement de l'attribut sécurisé évite
+    -- qu'un futur réaffichage hérite d'un clickbutton pointant sur CraftCreateButton natif. Les deux
+    -- sont DIFFÉRÉS en combat (bouton protégé) → _SetCreateShown les rejoue à PLAYER_REGEN_ENABLED.
     if self.rerollKey then
-        self:_WireCreateButton(false)
-        self.detCreateBtn:Hide(); self.detAllBtn:Hide()
+        self:_SetCreateShown(false, false)
+        self.detAllBtn:Hide()
         self.detQtyBox:Hide(); self.detQtyLbl:Hide()
         return
     end
@@ -201,13 +223,12 @@ function PW:RefreshDetail()
     local avail   = e.numAvailable or 0
     local isCraft = COC.Craft:IsCraftOpen()
     self:_SetCraftButtons(avail > 0, (not isCraft) and avail > 1)
-    self.detCreateBtn:Show()
     self.detAllBtn:SetShown(not isCraft)
     -- Craft (enchant) = 1 par clic (l'API n'a pas de compteur, comme l'UI Blizzard) → pas de Qté.
     self.detQtyBox:SetShown(not isCraft)
     self.detQtyLbl:SetShown(not isCraft)
     if isCraft then self:_SyncNativeCraftSelection(e) end   -- active CraftCreateButton pour CETTE recette
-    self:_WireCreateButton(isCraft)
+    self:_SetCreateShown(true, isCraft)
 end
 
 function PW:_CraftSelected(all)
