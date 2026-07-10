@@ -1,5 +1,16 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.12.0 — Season of Discovery recipes
+
+304 Season of Discovery recipes now live in the catalogue: 80 for Leatherworking, 65 for Blacksmithing,
+57 for Tailoring, 48 for Enchanting, 29 for Engineering, 16 for Alchemy, plus Cooking, First Aid and
+Mining. They show up in the Order tab, their reagents and skill levels are known, and looting a seasonal
+plan is recognised like any other.
+
+They load only on a Season of Discovery realm. On a regular Era realm nothing changes at all — the addon
+sees exactly the recipe set it saw before, and the recipes your friends have already shared with you stay
+readable. Seasonal recipes are appended to the base set rather than mixed into it, so no position shifts.
+
 ## v1.11.0 — Cancelling a public order now reaches the whole realm
 
 Since v1.10.0 a public order travels the realm channel, so crafters you have never met can see it. Its

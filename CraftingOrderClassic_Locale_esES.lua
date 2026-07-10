@@ -69,6 +69,12 @@ local es = {
         "La interfaz se traduce al alemán y al español según el idioma de tu cliente de WoW.",
     ["Ce nouvel onglet « Nouveautés » affiche les notes de version directement en jeu."] =
         "Esta nueva pestaña « Novedades » muestra las notas de versión directamente en el juego.",
+    -- Onglet Nouveautés — v1.12.0
+    ["Les recettes de la Saison de la Découverte"] = "Recetas de la Temporada de Descubrimientos",
+    ["304 recettes de la Saison de la Découverte entrent au catalogue : 80 en Travail du cuir, 65 en Forge, 57 en Couture, 48 en Enchantement, 29 en Ingénierie, 16 en Alchimie, plus la Cuisine, le Secourisme et le Minage. Elles apparaissent dans l'onglet Commande, avec leurs réactifs et leur palier d'apprentissage."] =
+        "304 recetas de la Temporada de Descubrimientos entran en el catálogo: 80 de Peletería, 65 de Herrería, 57 de Sastrería, 48 de Encantamiento, 29 de Ingeniería, 16 de Alquimia, más Cocina, Primeros auxilios y Minería. Aparecen en la pestaña Pedido, con sus reactivos y su nivel de aprendizaje.",
+    ["Elles ne se chargent que sur un royaume Saison de la Découverte. Sur un royaume Era classique, rien ne change : l'addon voit exactement le même jeu de recettes qu'avant, et les recettes que tes amis t'ont déjà partagées restent lisibles."] =
+        "Solo se cargan en un reino de la Temporada de Descubrimientos. En un reino Era normal no cambia nada: el addon ve exactamente el mismo conjunto de recetas que antes, y las recetas que tus amigos ya te compartieron siguen siendo legibles.",
     -- Onglet Nouveautés — v1.11.0
     ["Annuler une commande publique atteint tout le royaume"] = "Cancelar un pedido público ahora llega a todo el reino",
     ["Une commande publique voyage sur le canal du royaume depuis la v1.10.0, mais pas son annulation : un artisan que tu n'as jamais croisé la voyait « ouverte » pendant six heures, l'acceptait, et farmait les réactifs pour rien. L'annulation part désormais sur le même canal."] =

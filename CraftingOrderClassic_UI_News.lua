@@ -16,6 +16,13 @@ local BODY_W = 780
 local function versionsRecent()
     return {
         {
+            v = "v1.12.0", title = L["Les recettes de la Saison de la Découverte"],
+            lines = {
+                L["304 recettes de la Saison de la Découverte entrent au catalogue : 80 en Travail du cuir, 65 en Forge, 57 en Couture, 48 en Enchantement, 29 en Ingénierie, 16 en Alchimie, plus la Cuisine, le Secourisme et le Minage. Elles apparaissent dans l'onglet Commande, avec leurs réactifs et leur palier d'apprentissage."],
+                L["Elles ne se chargent que sur un royaume Saison de la Découverte. Sur un royaume Era classique, rien ne change : l'addon voit exactement le même jeu de recettes qu'avant, et les recettes que tes amis t'ont déjà partagées restent lisibles."],
+            },
+        },
+        {
             v = "v1.11.0", title = L["Annuler une commande publique atteint tout le royaume"],
             lines = {
                 L["Une commande publique voyage sur le canal du royaume depuis la v1.10.0, mais pas son annulation : un artisan que tu n'as jamais croisé la voyait « ouverte » pendant six heures, l'acceptait, et farmait les réactifs pour rien. L'annulation part désormais sur le même canal."],
@@ -60,6 +67,11 @@ local function versionsRecent()
                 L["Protocole de commandes consolidé (mêmes échanges réseau) : ce build reste compatible avec les joueurs encore en 1.7.x."],
             },
         },
+    }
+end
+
+local function versionsOlder()
+    return {
         {
             v = "v1.7.1", title = L["Alertes de plan looté qui te concernent"],
             lines = {
@@ -67,11 +79,6 @@ local function versionsRecent()
                 L["Les candidats au don incluent désormais tes amis, pas seulement les partenaires marqués — l'alerte « intéressés » et |cFFFFFFFF/co gift|r touchent tout ton annuaire."],
             },
         },
-    }
-end
-
-local function versionsOlder()
-    return {
         {
             v = "v1.7.0", title = L["Amis Battle.net + commande par métier"],
             lines = {
