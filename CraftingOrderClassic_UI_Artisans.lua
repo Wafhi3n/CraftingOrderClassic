@@ -86,7 +86,9 @@ function UI:BuildArtisansTab(f)
 
     -- « Confédération » (confed) : bucket EN PLUS, masqué si GreenWall absent (cf. RefreshArtisans). Placé
     -- en dernier → le masquer ne laisse aucun trou dans la sidebar.
-    local srcDefs = { {id="all",label=L["Tous"]}, {id="guild",label=L["Guilde"]}, {id="friend",label=L["Amis"]}, {id="added",label=L["Ajoutés"]}, {id="recent",label=L["Annuaire"]}, {id="confed",label=L["Confédération"]} }
+    -- « confed » reste EN DERNIER (masqué hors GreenWall → aucun trou). « muted » = panneau de gestion
+    -- des mis en sourdine (données = COC.db.mutedPlayers, pas le roster ; cf. UI_Artisans_Muted.lua).
+    local srcDefs = { {id="all",label=L["Tous"]}, {id="guild",label=L["Guilde"]}, {id="friend",label=L["Amis"]}, {id="added",label=L["Ajoutés"]}, {id="recent",label=L["Annuaire"]}, {id="muted",label=L["En sourdine"]}, {id="confed",label=L["Confédération"]} }
     self.artSrcBtns = {}
     for i, d in ipairs(srcDefs) do
         local b = Skin.MakeGoldButton(panel, 190, 28, d.label)
@@ -111,6 +113,8 @@ function UI:BuildArtisansTab(f)
     -- Largeur < zone visible du scroll (sinon les lignes passent SOUS la scrollbar → boutons masqués).
     local ac = CreateFrame("Frame", nil, ascroll); ac:SetSize(ARW - 54, 10); ascroll:SetScrollChild(ac)
     self.artScroll = ascroll; self.artListContent = ac; self.artListRows = {}
+
+    if self._BuildMutedList then self:_BuildMutedList(panel) end   -- panneau « En sourdine » (superposé, caché)
 end
 
 -- Cluster bas-gauche « remplir l'annuaire » : champ d'ajout manuel + bouton « Scanner la faction »
@@ -254,12 +258,22 @@ function UI:RefreshArtisans()
     local D = COC.Directory
     self:_SyncConfedTab()   -- montre/masque le bucket « Confédération » selon GreenWall (display-only)
 
-    -- Compteurs par source (+ « all » = total)
+    -- Compteurs par source (+ « all » = total ; « muted » = mis en sourdine, hors roster)
     local counts = { all = 0, guild = 0, friend = 0, added = 0, recent = 0, confed = 0 }
     for _, r in pairs(D and D.roster or {}) do
         local s = r.source or "recent"; counts[s] = (counts[s] or 0) + 1; counts.all = counts.all + 1
     end
+    counts.muted = (COC.Moderation and COC.Moderation.MutedList) and #COC.Moderation:MutedList() or 0
     for id, b in pairs(self.artSrcBtns) do b.count:SetText("|cFFE8B84B" .. (counts[id] or 0) .. "|r") end
+
+    -- Source « En sourdine » : panneau de gestion dédié (renderer + données propres) au lieu de la
+    -- liste d'artisans. On bascule l'affichage et on sort avant tout le pipeline roster/filtre/tri.
+    if self.artSource == "muted" then
+        if self._ShowMutedMode then self:_ShowMutedMode(true) end
+        if self.RefreshMuted then self:RefreshMuted() end
+        return
+    end
+    if self._ShowMutedMode then self:_ShowMutedMode(false) end
 
     -- Liste filtrée (source + métier), FUSIONNÉE par joueur vérifié : les rerolls (liens ALT
     -- mutuels) tiennent sur UNE ligne, perso principal en vitrine (cf. UI_Artisans_Groups.lua).

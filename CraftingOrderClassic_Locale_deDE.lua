@@ -67,6 +67,11 @@ local de = {
     ["aucun joueur en sourdine. /co mute <nom> pour en ajouter un."] = "keine stummgeschalteten Spieler. /co mute <Name>, um einen hinzuzufügen.",
     ["en sourdine (%d) :"] = "stumm (%d):",
     ["permanent"] = "dauerhaft", ["expiré"] = "abgelaufen", ["spam détecté"] = "Spam erkannt",
+    -- Verwaltungsbereich für Stummgeschaltete (Reiter Handwerker › Stummgeschaltet)
+    ["En sourdine"] = "Stummgeschaltet", ["Rétablir"] = "Aufheben",
+    ["Joueurs en sourdine — aucune notification de leur part."] = "Stummgeschaltete Spieler — keine Benachrichtigungen von ihnen.",
+    ["Personne en sourdine."] = "Niemand ist stummgeschaltet.",
+    ["Mets un joueur en sourdine par clic-droit sur sa carte ou /co mute <nom>."] = "Schalte einen Spieler per Rechtsklick auf seine Karte oder /co mute <Name> stumm.",
     ["%s est de confiance — jamais muté automatiquement."] = "%s ist vertrauenswürdig — nie automatisch stummgeschaltet.",
     ["%s n'est plus de confiance."] = "%s ist nicht mehr vertrauenswürdig.",
     ["aucun joueur de confiance. /co trust <nom> pour en ajouter un."] = "keine vertrauenswürdigen Spieler. /co trust <Name>, um einen hinzuzufügen.",

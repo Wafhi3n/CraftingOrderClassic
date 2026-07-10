@@ -1,5 +1,11 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.14.0 — A panel to manage who you've muted
+
+`/co mute` could list names, but there was no way to browse mutes or lift one without already knowing
+the name. The Artisans tab now has a Muted section: every muted player shows up with their reason and
+time left (or "permanent"), and an Unmute button right on the row.
+
 ## v1.13.0 — Moderation: reasons, temporary mutes, a trust list
 
 Muting someone now records a reason and a date, and can be temporary. `/co mute Bob 1h spammer` mutes Bob

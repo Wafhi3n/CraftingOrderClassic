@@ -68,6 +68,11 @@ local es = {
     ["aucun joueur en sourdine. /co mute <nom> pour en ajouter un."] = "ningún jugador silenciado. /co mute <nombre> para añadir uno.",
     ["en sourdine (%d) :"] = "silenciados (%d):",
     ["permanent"] = "permanente", ["expiré"] = "expirado", ["spam détecté"] = "spam detectado",
+    -- Panel de gestión de silenciados (pestaña Artesanos › Silenciados)
+    ["En sourdine"] = "Silenciados", ["Rétablir"] = "Reactivar",
+    ["Joueurs en sourdine — aucune notification de leur part."] = "Jugadores silenciados — sin notificaciones suyas.",
+    ["Personne en sourdine."] = "Nadie está silenciado.",
+    ["Mets un joueur en sourdine par clic-droit sur sa carte ou /co mute <nom>."] = "Silencia a un jugador con clic derecho en su tarjeta o /co mute <nombre>.",
     ["%s est de confiance — jamais muté automatiquement."] = "%s es de confianza — nunca silenciado automáticamente.",
     ["%s n'est plus de confiance."] = "%s ya no es de confianza.",
     ["aucun joueur de confiance. /co trust <nom> pour en ajouter un."] = "ningún jugador de confianza. /co trust <nombre> para añadir uno.",

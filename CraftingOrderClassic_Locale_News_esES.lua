@@ -70,15 +70,10 @@ local news = {
         "Un pedido público con un objeto ausente del catálogo llegaba en silencio. Ahora te avisa, en lugar de quedarse sin ver en el libro.",
     ["Démuter un joueur réarme la détection de spam le concernant ; revenir de la vue métier d'un reroll ne laisse plus les boutons Créer masqués ; et l'addon travaille nettement moins à chaque ligne de chat sur un royaume chargé."] =
         "Reactivar a un jugador silenciado rearma la detección de spam para él; volver de la vista de profesión de un alter ya no deja ocultos los botones Crear; y el addon trabaja notablemente menos por cada línea de chat en un reino concurrido.",
-    -- Onglet Nouveautés — v1.10.0
-    ["Les commandes touchent tout le royaume + un coup d'œil sur les recettes de tes rerolls"] =
-        "Los pedidos llegan a todo el reino, más un vistazo de solo lectura a las recetas de tus alters",
-    ["Une commande postée à « Tous » part maintenant aussi sur le canal du royaume, pas seulement vers les joueurs déjà croisés ou tes amis/guilde — un inconnu qui n'a jamais croisé ton chemin peut désormais la voir. Tu ne reçois un toast que pour un métier que tu as : une commande de Forge ne dérange pas un Enchanteur."] =
-        "Un pedido publicado a «Todos» ahora también se difunde por el canal del reino, no solo a jugadores ya conocidos o a tus amigos/hermandad — un desconocido con el que nunca te has cruzado puede verlo ahora. Solo recibes un aviso para una profesión que realmente tienes: un pedido de Herrería no molesta a un Encantador.",
-    ["Clique sur le métier d'un reroll depuis le menu minimap : fenêtre en lecture seule avec ses recettes connues, réactifs requis et niveau de compétence. Pas de bouton créer (tu n'es pas connecté sur ce perso), pas de comptage de sacs."] =
-        "Haz clic en la profesión de un alter desde el menú del minimapa: una ventana de solo lectura muestra sus recetas conocidas, reactivos necesarios y nivel de habilidad. Sin botón de crear (no estás conectado con ese personaje), sin conteo de bolsas.",
-    ["Le menu reroll de la minimap ne liste plus que les vrais métiers (Cuisine, Premiers soins, Pêche et Poisons n'encombrent plus la liste) ; le seuil de détection de spam est réglable via |cFFFFFFFF/co spam|r, avec un mode mute automatique en plus du popup habituel."] =
-        "El menú de alters del minimapa ahora solo lista profesiones reales (Cocina, Primeros auxilios, Pesca y Venenos ya no lo saturan); el umbral de detección de spam es ajustable con |cFFFFFFFF/co spam|r, incluyendo un modo de silencio automático además de la ventana emergente habitual.",
+    -- Onglet Nouveautés — v1.14.0
+    ["Un panneau pour gérer les mis en sourdine"] = "Un panel para gestionar a los silenciados",
+    ["L'onglet Artisans a maintenant une section « En sourdine » : chaque joueur muté y apparaît avec sa raison et le temps restant (ou « permanent »), avec un bouton pour le rétablir directement — plus besoin de deviner qui est encore muté."] =
+        "La pestaña Artesanos ahora tiene una sección «Silenciados»: cada jugador silenciado aparece con su motivo y el tiempo restante (o «permanente»), con un botón para reactivarlo directamente — sin adivinar quién sigue silenciado.",
     -- Onglet Nouveautés — v1.9.0
     ["Tes rerolls réunis : cooldowns partagés, une identité, l'onglet Mes artisans"] =
         "Tus alters reunidos: enfriamientos compartidos, una identidad, la pestaña Mis artesanos",

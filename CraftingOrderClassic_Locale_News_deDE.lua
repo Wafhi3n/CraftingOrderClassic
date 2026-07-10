@@ -70,15 +70,10 @@ local news = {
         "Ein öffentlicher Auftrag mit einem Gegenstand, der nicht im Katalog steht, kam bisher lautlos an. Jetzt benachrichtigt er dich, statt unbemerkt im Auftragsbuch zu liegen.",
     ["Démuter un joueur réarme la détection de spam le concernant ; revenir de la vue métier d'un reroll ne laisse plus les boutons Créer masqués ; et l'addon travaille nettement moins à chaque ligne de chat sur un royaume chargé."] =
         "Das Entstummschalten eines Spielers aktiviert die Spam-Erkennung für ihn wieder; die Rückkehr aus der Berufsansicht eines Twinks lässt die Erstellen-Knöpfe nicht mehr verborgen; und das Addon leistet pro Chat-Zeile auf einem stark besuchten Realm deutlich weniger Arbeit.",
-    -- Onglet Nouveautés — v1.10.0
-    ["Les commandes touchent tout le royaume + un coup d'œil sur les recettes de tes rerolls"] =
-        "Aufträge erreichen den ganzen Realm, plus ein Nur-Lese-Blick auf die Rezepte deiner Twinks",
-    ["Une commande postée à « Tous » part maintenant aussi sur le canal du royaume, pas seulement vers les joueurs déjà croisés ou tes amis/guilde — un inconnu qui n'a jamais croisé ton chemin peut désormais la voir. Tu ne reçois un toast que pour un métier que tu as : une commande de Forge ne dérange pas un Enchanteur."] =
-        "Ein an „Alle“ gerichteter Auftrag wird jetzt auch auf dem Realm-Kanal gesendet, nicht nur an bereits getroffene Spieler oder deine Freunde/Gilde — ein Fremder, dem du nie begegnet bist, kann ihn jetzt auch sehen. Du bekommst nur für Berufe, die du tatsächlich hast, eine Benachrichtigung: ein Schmiede-Auftrag stört keinen Verzauberer.",
-    ["Clique sur le métier d'un reroll depuis le menu minimap : fenêtre en lecture seule avec ses recettes connues, réactifs requis et niveau de compétence. Pas de bouton créer (tu n'es pas connecté sur ce perso), pas de comptage de sacs."] =
-        "Klicke im Minimap-Menü auf den Beruf eines Twinks: ein Nur-Lese-Fenster zeigt seine bekannten Rezepte, benötigten Reagenzien und die Fertigkeitsstufe. Kein Erstellen-Knopf (du bist nicht mit diesem Charakter eingeloggt), keine Taschenzählung.",
-    ["Le menu reroll de la minimap ne liste plus que les vrais métiers (Cuisine, Premiers soins, Pêche et Poisons n'encombrent plus la liste) ; le seuil de détection de spam est réglable via |cFFFFFFFF/co spam|r, avec un mode mute automatique en plus du popup habituel."] =
-        "Das Twink-Menü der Minimap listet jetzt nur noch echte Berufe (Kochkunst, Erste Hilfe, Angeln und Gifte überladen die Liste nicht mehr); die Spam-Erkennungsschwelle ist über |cFFFFFFFF/co spam|r einstellbar, inklusive eines Auto-Stumm-Modus zusätzlich zum üblichen Popup.",
+    -- Onglet Nouveautés — v1.14.0
+    ["Un panneau pour gérer les mis en sourdine"] = "Ein Panel zur Verwaltung von Stummgeschalteten",
+    ["L'onglet Artisans a maintenant une section « En sourdine » : chaque joueur muté y apparaît avec sa raison et le temps restant (ou « permanent »), avec un bouton pour le rétablir directement — plus besoin de deviner qui est encore muté."] =
+        "Der Handwerker-Reiter hat jetzt einen Bereich „Stummgeschaltet“: jeder stummgeschaltete Spieler erscheint dort mit Grund und verbleibender Zeit (oder „dauerhaft“), mit einem Knopf, um ihn direkt wieder freizuschalten — kein Rätselraten mehr, wer noch stummgeschaltet ist.",
     -- Onglet Nouveautés — v1.9.0
     ["Tes rerolls réunis : cooldowns partagés, une identité, l'onglet Mes artisans"] =
         "Deine Twinks vereint: geteilte Abklingzeiten, eine Identität, ein Tab „Meine Handwerker“",

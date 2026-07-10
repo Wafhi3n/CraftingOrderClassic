@@ -73,15 +73,10 @@ local news = {
         "A public order carrying an item missing from the catalogue used to arrive silently. It notifies you now, instead of sitting unseen on the board.",
     ["Démuter un joueur réarme la détection de spam le concernant ; revenir de la vue métier d'un reroll ne laisse plus les boutons Créer masqués ; et l'addon travaille nettement moins à chaque ligne de chat sur un royaume chargé."] =
         "Unmuting a player re-arms spam detection for them; coming back from an alt's profession view no longer leaves the Create buttons hidden; and the addon does noticeably less work per chat line on a busy realm.",
-    -- Onglet Nouveautés — v1.10.0
-    ["Les commandes touchent tout le royaume + un coup d'œil sur les recettes de tes rerolls"] =
-        "Orders reach the whole realm, plus a read-only peek at your alts' recipes",
-    ["Une commande postée à « Tous » part maintenant aussi sur le canal du royaume, pas seulement vers les joueurs déjà croisés ou tes amis/guilde — un inconnu qui n'a jamais croisé ton chemin peut désormais la voir. Tu ne reçois un toast que pour un métier que tu as : une commande de Forge ne dérange pas un Enchanteur."] =
-        "Posting to \"Everyone\" now also broadcasts on the realm channel, not just to people you or your friends have already crossed paths with — a stranger who's never met you can now see it too. You'll still only get a toast for professions you actually have: a Blacksmithing order won't bother an Enchanter.",
-    ["Clique sur le métier d'un reroll depuis le menu minimap : fenêtre en lecture seule avec ses recettes connues, réactifs requis et niveau de compétence. Pas de bouton créer (tu n'es pas connecté sur ce perso), pas de comptage de sacs."] =
-        "Click a reroll's profession from the minimap menu: a read-only window shows their known recipes, required reagents, and skill level. No craft button (you're not logged in as them), no bag counts.",
-    ["Le menu reroll de la minimap ne liste plus que les vrais métiers (Cuisine, Premiers soins, Pêche et Poisons n'encombrent plus la liste) ; le seuil de détection de spam est réglable via |cFFFFFFFF/co spam|r, avec un mode mute automatique en plus du popup habituel."] =
-        "The minimap reroll menu now only lists real professions (Cooking, First Aid, Fishing, and Poisons no longer clutter it up); the spam-detection threshold is adjustable with |cFFFFFFFF/co spam|r, including an auto-mute mode alongside the usual pop-up.",
+    -- Onglet Nouveautés — v1.14.0
+    ["Un panneau pour gérer les mis en sourdine"] = "A panel to manage who you've muted",
+    ["L'onglet Artisans a maintenant une section « En sourdine » : chaque joueur muté y apparaît avec sa raison et le temps restant (ou « permanent »), avec un bouton pour le rétablir directement — plus besoin de deviner qui est encore muté."] =
+        "The Artisans tab now has a Muted section: every muted player shows up with their reason and time left (or \"permanent\"), with a button to unmute them right there — no more guessing who's still muted.",
     -- Onglet Nouveautés — v1.9.0
     ["Tes rerolls réunis : cooldowns partagés, une identité, l'onglet Mes artisans"] =
         "Your alts, together: shared cooldowns, one identity, a My Artisans tab",

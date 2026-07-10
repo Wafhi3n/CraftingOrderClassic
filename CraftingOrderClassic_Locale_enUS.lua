@@ -71,6 +71,11 @@ local en = {
     ["aucun joueur en sourdine. /co mute <nom> pour en ajouter un."] = "no muted players. /co mute <name> to add one.",
     ["en sourdine (%d) :"] = "muted (%d):", ["%s n'est plus de confiance."] = "%s is no longer trusted.",
     ["permanent"] = "permanent", ["expiré"] = "expired", ["spam détecté"] = "spam detected",
+    -- Panel de gestion des mis en sourdine (onglet Artisans › En sourdine)
+    ["En sourdine"] = "Muted", ["Rétablir"] = "Unmute",
+    ["Joueurs en sourdine — aucune notification de leur part."] = "Muted players — no notifications from them.",
+    ["Personne en sourdine."] = "No one is muted.",
+    ["Mets un joueur en sourdine par clic-droit sur sa carte ou /co mute <nom>."] = "Mute a player by right-clicking their card or /co mute <name>.",
     ["%s est de confiance — jamais muté automatiquement."] = "%s is trusted — never auto-muted.",
     ["aucun joueur de confiance. /co trust <nom> pour en ajouter un."] = "no trusted players. /co trust <name> to add one.",
     ["de confiance (%d) : %s"] = "trusted (%d): %s", ["usage : /co untrust <nom>"] = "usage: /co untrust <name>",

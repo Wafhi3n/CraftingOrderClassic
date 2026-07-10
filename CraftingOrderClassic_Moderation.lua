@@ -123,6 +123,31 @@ function Mod:PrintMuted()
     for _, it in ipairs(list) do pmsg("  " .. self:_MutedLabel(it[1], it[2])) end
 end
 
+-- Instantané TRIÉ des joueurs en sourdine, pour le panel de gestion (onglet Artisans › En sourdine).
+-- Chaque entrée porte un `durLabel` déjà rendu (« permanent » / « 42min » / « expiré ») pour que l'UI
+-- reste passive. Un mute temporaire EXPIRÉ est inclus (expired=true) tant qu'IsMuted ne l'a pas purgé
+-- sur le chemin chaud d'alerte → l'utilisateur peut le Rétablir tout de suite depuis le panel.
+function Mod:MutedList()
+    local out, now = {}, time()
+    for name, e in pairs(COC.db and COC.db.mutedPlayers or {}) do
+        local reason, remaining, permanent, expired, ts
+        if type(e) == "table" then
+            reason, ts = e.reason, e.ts
+            if e.expiry then
+                local rem = e.expiry - now
+                if rem > 0 then remaining = rem else expired = true end
+            else permanent = true end
+        else
+            permanent = true                       -- forme booléenne héritée (client < v1.13)
+        end
+        local durLabel = permanent and L["permanent"] or expired and L["expiré"] or humanRemaining(remaining)
+        out[#out + 1] = { name = name, reason = reason, remaining = remaining,
+            permanent = permanent, expired = expired, ts = ts, durLabel = durLabel }
+    end
+    table.sort(out, function(a, b) return a.name < b.name end)
+    return out
+end
+
 -- /co mute [nom [durée] [raison…]] : sans argument, liste les mutés. La durée (2e mot) est optionnelle
 -- (« 1h », « 30m », « 2d », ou un nombre = minutes) ; si le 2e mot n'est pas une durée, tout le reste
 -- est la raison. Ex. : « /co mute Bob 1h spam », « /co mute Bob usurpateur », « /co mute Bob ».
