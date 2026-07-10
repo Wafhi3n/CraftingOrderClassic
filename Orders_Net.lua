@@ -94,7 +94,10 @@ function Orders:_CycleTargets(action, o)
     return t
 end
 
-function Orders:Broadcast(action, o)
+-- `opts.channel` (posé UNIQUEMENT par Post/PostEntry = clic/slash = hardware event) autorise, pour une
+-- commande PUBLIQUE « Tous », la diffusion en texte-canal (portée royaume) EN PLUS du fanout whisper.
+-- RebroadcastMine/timer et les transitions de cycle n'ont pas ce flag → jamais de SendChatMessage hors input.
+function Orders:Broadcast(action, o, opts)
     if not CraftLink then return end
     local payload = Codec.Encode(action, o)   -- NEW/CANCEL/ACK/DLV/DONE (nil sinon)
     if not payload then return end
@@ -103,6 +106,10 @@ function Orders:Broadcast(action, o)
         if o.recipient == "Guilde" then CraftLink:Send(payload, "guild") end
         -- Fanout whisper vers les artisans connus EN LIGNE concernés (contourne le canal caché HS).
         for name in pairs(self:_FanoutTargets(o)) do CraftLink:Send(payload, "whisper", name) end
+        -- Portée ROYAUME (texte-canal) : commandes PUBLIQUES seulement, contexte hardware-event seulement.
+        if opts and opts.channel and (o.recipient or "Tous") == "Tous" and CraftLink.BroadcastText then
+            CraftLink:BroadcastText(payload)
+        end
     else
         for name in pairs(self:_CycleTargets(action, o)) do CraftLink:Send(payload, "whisper", name) end
     end
