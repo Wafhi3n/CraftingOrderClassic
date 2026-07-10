@@ -34,6 +34,10 @@ function Dir:OnPresence(kind, who)
         self:AnnounceThrottled()        -- un nouveau arrive → je (re)publie mes recettes (throttlé : anti-burst login en masse)
     else
         self.online[who] = nil
+        if self.lfw and self.lfw[who] then          -- quitte le canal → son statut « recherche de travail » s'éteint
+            self.lfw[who] = nil
+            if COC.Nameplate and COC.Nameplate.Refresh then COC.Nameplate:Refresh(who) end
+        end
     end
     if COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end
 end

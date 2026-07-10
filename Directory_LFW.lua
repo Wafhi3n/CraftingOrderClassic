@@ -19,12 +19,16 @@ local function profLabel(key)
     return (Skin and Skin.ProfLabel and Skin.ProfLabel(key)) or key
 end
 
-local LFW_TTL     = 45 * 60    -- durée de vie côté récepteur (s) : au-delà, l'artisan n'est plus « LFW »
-local LFW_REFRESH = 20 * 60    -- ré-émission périodique tant que LFW (< TTL, marge de sécurité)
+local LFW_TTL     = 20 * 60    -- durée de vie côté récepteur SANS rafraîchissement : un joueur qui cesse
+                               -- d'émettre (parti, ou FULL AFK — cf. ticker) sort du radar au bout de ça.
+local LFW_REFRESH =  8 * 60    -- ré-émission tant que présent ET NON AFK (< TTL) : maintient le LFW frais.
 
 Dir.lfw = Dir.lfw or {}         -- RUNTIME : [nom court] = { prof = <clé>, expiry = <time> } (AUTRES joueurs)
 
--- Statut LFW vivant d'un joueur (nil si absent/expiré). Purge paresseuse de l'entrée expirée.
+-- Statut LFW vivant d'un joueur (nil si absent/expiré). Le TTL est rafraîchi par les ré-émissions du
+-- joueur ; s'il PART ou passe FULL AFK, il cesse d'émettre (cf. _StartLFWTicker : pas de ré-émission en
+-- AFK, et un AFK ne peut de toute façon pas parler sur le canal) → il sort du radar au bout du TTL. On ne
+-- veut PAS afficher « dispo » pour un joueur absent : ça leurrerait les gens. Purge paresseuse à la lecture.
 function Dir:LFWOf(name)
     local e = name and self.lfw and self.lfw[name]
     if not e then return nil end
@@ -68,8 +72,11 @@ function Dir:SetLFW(profKey)
     if COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end
 end
 
--- Ré-émission périodique tant que je suis LFW (sinon je sors du radar des autres au bout du TTL). Ticker
--- unique, qui s'auto-annule dès que je ne suis plus LFW. L'envoi passe par la file (drainée au prochain input).
+-- Ré-émission périodique : (1) maintient mon LFW FRAIS chez les autres (sinon le TTL l'expire), (2) atteint
+-- les joueurs qui rejoignent le canal APRÈS mon annonce. STOPPÉE si je suis FULL AFK (UnitIsAFK) → je cesse
+-- d'émettre et je sors du radar au bout du TTL, au lieu de leurrer les gens avec un « dispo » d'un absent.
+-- Ticker unique, auto-annulé dès que je ne suis plus LFW. Envoi via la file (drainée au 1er input — un AFK
+-- ne draine pas, cohérent : il n'émet plus).
 function Dir:_StartLFWTicker()
     if not (C_Timer and C_Timer.NewTicker) or self._lfwTicker then return end
     self._lfwTicker = C_Timer.NewTicker(LFW_REFRESH, function()
@@ -77,6 +84,7 @@ function Dir:_StartLFWTicker()
             if Dir._lfwTicker then Dir._lfwTicker:Cancel(); Dir._lfwTicker = nil end
             return
         end
+        if UnitIsAFK and UnitIsAFK("player") then return end   -- full AFK → on cesse d'émettre (anti-leurre)
         Dir:_BroadcastLFW()
     end)
 end
