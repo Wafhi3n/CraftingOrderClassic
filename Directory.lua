@@ -116,10 +116,12 @@ end
 -- dans Dir:Start ci-dessous, et la lecture self._confedSet dans ClassifySource.
 
 -- Entretien de la « mini BDD » des métiers : on GARDE à vie guilde/amis/ajoutés (relations) ;
--- on purge les simples « croisés » trop vieux + on plafonne leur nombre (anti-explosion serveur actif).
+-- on purge les simples « croisés » (Annuaire) pas revus depuis RECENT_TTL_DAYS + on plafonne leur
+-- nombre (anti-explosion serveur actif). Tourne au login (Dir:Start), pas en continu.
+local RECENT_TTL_DAYS = 7   -- un croisé non revu depuis 1 semaine sort de l'annuaire
 function Dir:PruneRoster(maxAgeDays, maxRecent)
     if not self.roster then return end
-    local cutoff = time() - (maxAgeDays or 30) * 86400
+    local cutoff = time() - (maxAgeDays or RECENT_TTL_DAYS) * 86400
     local recents = {}
     for name, r in pairs(self.roster) do
         local keep = r.manual or r.source == "guild" or r.source == "friend" or r.source == "added"

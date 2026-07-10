@@ -117,7 +117,12 @@ function PW:Build()
         local p, _, rp, x, y = fr:GetPoint()
         if COC.db then COC.db.profWinPos = { p, rp, x, y } end
     end)
-    f:SetClampedToScreen(true); f:SetFrameStrata("HIGH"); Skin.SkinFrameBackdrop(f); f:Hide()
+    f:SetClampedToScreen(true); f:SetFrameStrata("HIGH")
+    -- Empilement propre avec la fenêtre principale (même strata) : un clic la remonte AU-DESSUS d'un
+    -- bloc, et Raise à l'ouverture met la dernière ouverte devant. Cf. CraftingOrderClassicWindow.
+    f:SetToplevel(true)
+    f:SetScript("OnShow", function(fr) fr:Raise() end)
+    Skin.SkinFrameBackdrop(f); f:Hide()
     self.frame = f
     self:_BuildHeader(f)
 

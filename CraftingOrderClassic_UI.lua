@@ -25,6 +25,11 @@ function UI:Build()
     f:SetMovable(true); f:EnableMouse(true); f:RegisterForDrag("LeftButton")
     f:SetScript("OnDragStart", f.StartMoving); f:SetScript("OnDragStop", f.StopMovingOrSizing)
     f:SetClampedToScreen(true); f:SetFrameStrata("HIGH")
+    -- Empilement propre avec la fenêtre métier (même strata) : SetToplevel = un clic sur cette fenêtre
+    -- la fait passer AU-DESSUS de l'autre d'un bloc (fini l'interclassement des éléments) ; Raise à
+    -- l'ouverture → la dernière ouverte est devant. Cf. CraftingOrderProfWindow, même traitement.
+    f:SetToplevel(true)
+    f:SetScript("OnShow", function(fr) fr:Raise() end)
     Skin.SkinFrameBackdrop(f)
     f:Hide()
     self.frame = f

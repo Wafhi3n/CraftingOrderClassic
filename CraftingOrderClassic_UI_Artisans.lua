@@ -303,7 +303,7 @@ function UI:RefreshArtisans()
         local row = self:_ArtRow(1)
         row:SetScript("OnEnter", nil); row:SetScript("OnLeave", nil)
         row.dot:SetOnline(nil); row.name:SetText("|cFF888888" .. L["Aucun artisan dans cette source."] .. "|r")
-        row.sub:SetText(""); UI:_SetArtProfIcons(row, {}); row.src:SetText(""); row.whisper:Hide(); row.addFriend:Hide()
+        row.sub:SetText(""); UI:_SetArtProfIcons(row, {}); row.src:SetText(""); row.whisper:Hide(); row.addFriend:Hide(); row.partner:Hide()
         row:Show()
     end
 end
@@ -348,9 +348,17 @@ end
 
 -- Boutons de droite. Chuchoter : si en ligne / pas un simple ajout hors-ligne. « Ajouter ami » : pour
 -- un non-porteur vu crafter (on ne le connaît que de vue) pas déjà ami → les deux boutons s'empilent.
-function UI:_ArtRowButtons(row, a, nonAddon)
+-- Toggle Partenaire toujours présent ; `partnerOn` (nil = lit a.r.isPartner) permet à la ligne
+-- FUSIONNÉE de refléter g.anyPartner (un reroll non-vitrine peut porter le drapeau).
+function UI:_ArtRowButtons(row, a, nonAddon, partnerOn)
     row.whisper:SetScript("OnClick", function() if ChatFrame_SendTell then ChatFrame_SendTell(a.name) end end)
     row.whisper:SetShown(a.online == true or a.r.source ~= "added")
+    if partnerOn == nil then partnerOn = a.r.isPartner and true or false end
+    row.partner._on = partnerOn
+    row.partner.tex:SetDesaturated(not partnerOn)
+    row.partner.tex:SetAlpha(partnerOn and 1 or 0.4)
+    row.partner:SetScript("OnClick", function() UI:_TogglePartnerSet(a.name) end)
+    row.partner:Show()
     local D = COC.Directory
     local canFriend = nonAddon and not (D and D._friendSet and D._friendSet[a.name])
     if canFriend then
@@ -383,9 +391,20 @@ function UI:_ArtRow(i)
     r.sub   = r:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
     r.sub:SetPoint("TOPLEFT", 22, -22); r.sub:SetWidth(150); r.sub:SetJustifyH("LEFT"); Skin.ApplyShadow(r.sub)
     r.profsFrame = CreateFrame("Frame", nil, r)
-    r.profsFrame:SetPoint("LEFT", 180, 0); r.profsFrame:SetSize(ARW - 320, ARH)
+    r.profsFrame:SetPoint("LEFT", 180, 0); r.profsFrame:SetSize(ARW - 360, ARH)   -- resserré : place à l'étoile partenaire
     r.profIconPool = {}
-    r.src   = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall"); r.src:SetPoint("RIGHT", -94, 0); Skin.ApplyShadow(r.src)
+    r.src   = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall"); r.src:SetPoint("RIGHT", -116, 0); Skin.ApplyShadow(r.src)
+    -- Toggle « Partenaire » (drapeau explicite priorisé dans l'alerte de don) : icône pleine = partenaire,
+    -- désaturée = non. Câblé sur _TogglePartnerSet (agit sur tout le set de rerolls vérifiés).
+    r.partner = CreateFrame("Button", nil, r); r.partner:SetSize(18, 18); r.partner:SetPoint("RIGHT", -92, 0)
+    r.partner.tex = r.partner:CreateTexture(nil, "ARTWORK"); r.partner.tex:SetAllPoints()
+    r.partner.tex:SetTexture(Skin.tex.partner); r.partner.tex:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+    r.partner:SetScript("OnEnter", function(btn)
+        GameTooltip:SetOwner(btn, "ANCHOR_RIGHT")
+        GameTooltip:SetText(btn._on and L["Retirer des partenaires"] or L["Marquer comme partenaire"], 1, 1, 1)
+        GameTooltip:Show()
+    end)
+    r.partner:SetScript("OnLeave", GameTooltip_Hide)
     r.whisper = Skin.MakeGoldButton(r, 78, 22, L["Chuchoter"]); r.whisper:SetPoint("RIGHT", -6, 0)
     r.addFriend = Skin.MakeGoldButton(r, 78, 18, L["Ajouter ami"]); r.addFriend:SetPoint("RIGHT", -6, -9); r.addFriend:Hide()
     self.artListRows[i] = r; return r

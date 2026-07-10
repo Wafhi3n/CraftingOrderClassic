@@ -238,6 +238,7 @@ Skin.tex = {
     broadcast = "Interface\\FriendsFrame\\BroadcastIcon",
     workorder = "Interface\\GossipFrame\\WorkOrderGossipIcon",
     crate     = "Interface\\Icons\\INV_Crate_03",   -- récolte « par stack »
+    partner   = "Interface\\Icons\\INV_Misc_Gift_01",   -- drapeau « partenaire » (priorité alertes de don)
     unknown   = "Interface\\Icons\\INV_Misc_QuestionMark",   -- repli « rien de sélectionné »
     checkBox  = "Interface\\Buttons\\UI-CheckBox-Up",        -- case vide (texture native, pas de glyphe tofu)
     checkMark = "Interface\\Buttons\\UI-CheckBox-Check",     -- coche verte
