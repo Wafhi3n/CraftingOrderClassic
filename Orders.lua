@@ -78,15 +78,6 @@ local function genId()
     return me() .. "-" .. COC.db.orderSeq
 end
 
--- Diffuse une commande PUBLIQUE (« Tous ») en TEXTE de canal → portée ROYAUME réelle, en complément du
--- whisper de Broadcast. À N'APPELER QUE depuis Post/PostEntry (clic/slash = hardware event, requis par
--- SendChatMessage). Guilde/Amis/nommé restent whisper-only (vie privée) → jamais broadcastés sur le canal.
-function Orders:_ChannelBroadcastPublic(o)
-    if not (CraftLink and CraftLink.BroadcastText and Codec) then return end
-    if (o.recipient or "Tous") ~= "Tous" then return end
-    CraftLink:BroadcastText(Codec.Encode("NEW", o))
-end
-
 -- opts (optionnel) : { spellID, profession, provided = { itemID,... } } depuis l'UI Poster.
 function Orders:Post(itemID, qty, price, opts)
     if not (itemID and COC.db) then return nil end
@@ -99,8 +90,7 @@ function Orders:Post(itemID, qty, price, opts)
         status = "open", ts = time(),
     }
     COC.db.orders[o.id] = o
-    self:Broadcast("NEW", o)
-    self:_ChannelBroadcastPublic(o)   -- portée royaume (texte-canal) si publique — hardware event OK ici
+    self:Broadcast("NEW", o, { channel = true })   -- {channel} = contexte hardware-event → portée royaume si publique
     return o
 end
 
@@ -118,8 +108,7 @@ function Orders:PostEntry(entry, qty, price, opts)
         status = "open", ts = time(),
     }
     COC.db.orders[o.id] = o
-    self:Broadcast("NEW", o)
-    self:_ChannelBroadcastPublic(o)   -- portée royaume (texte-canal) si publique — hardware event OK ici
+    self:Broadcast("NEW", o, { channel = true })   -- {channel} = contexte hardware-event → portée royaume si publique
     return o
 end
 
@@ -260,13 +249,17 @@ function Orders:_ShouldAlert(o, distribution)
         if COC.Trace then COC.Trace:Log("mod", "toast P2P silencé : " .. tostring(o.buyer) .. " (muté)") end
         return false
     end
-    if m == "off" or (COC.db and COC.db.mutedPlayers and COC.db.mutedPlayers[o.buyer]) then return false end
+    if m == "off" then return false end   -- mute déjà couvert par IsMuted ci-dessus (source unique)
     -- Nommée sur moi OU sur un de mes rerolls (IsMyChar = MA SavedVariable — aucun message réseau
     -- ne peut m'assigner un reroll, donc pas d'alerte forcée) : toujours (même petit perso).
     if o.recipient == me() or (COC.IsMyChar and COC:IsMyChar(o.recipient)) then return true end
     -- Commande reçue en TEXTE de canal (portée ROYAUME) : ne notifier QUE pour un métier que J'AI
-    -- (anti-flood sur royaume actif). Elle reste dans le carnet quoi qu'il arrive. Whisper = inchangé.
-    if distribution == "CHANNEL" and not (COC.Inbound and COC.Inbound:_WantProf(o.profession)) then return false end
+    -- (mySkills du perso courant) — anti-flood sur royaume actif, DÉCOUPLÉ du scanner de chat (/co scan).
+    -- Métier inconnu (nil, objet hors catalogue) → fail-open : ne pas rendre une commande publique muette.
+    if distribution == "CHANNEL" and o.profession then
+        local D = COC.Directory
+        if not (D and D.mySkills and D.mySkills[o.profession]) then return false end
+    end
     if m == "named" or not self:VisibleTo(o) or (COC.Moderation and COC.Moderation:BelowThreshold(o.buyer)) then return false end  -- restreint / hors portée / bas niveau (anti-bot)
     return (o.recipient and o.recipient ~= "" and o.recipient ~= "Tous") or m == "all"  -- Guilde/Amis vs large
 end

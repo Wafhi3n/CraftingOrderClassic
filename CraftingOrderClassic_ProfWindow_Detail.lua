@@ -103,6 +103,14 @@ function PW:_ClearDetail()
     self.detNameFS:SetText("|cFF888888" .. L["Sélectionne une recette."] .. "|r")
     self.detMakesFS:SetText("")
     for _, r in ipairs(self.detReagRows) do r:Hide() end
+    -- Ré-affiche les boutons hors mode reroll (une visite en vue reroll a pu les masquer) — sinon ils
+    -- restaient invisibles jusqu'à la prochaine sélection. En reroll : lecture seule, on les laisse cachés.
+    if not self.rerollKey then
+        local isCraft = COC.Craft and COC.Craft:IsCraftOpen()
+        self.detCreateBtn:Show()
+        self.detAllBtn:SetShown(not isCraft)
+        self.detQtyBox:SetShown(not isCraft); self.detQtyLbl:SetShown(not isCraft)
+    end
     self:_SetCraftButtons(false, false)
 end
 
@@ -178,10 +186,11 @@ function PW:RefreshDetail()
         end
     end
 
-    -- Vue reroll = LECTURE SEULE : aucun bouton créer (on n'est pas sur ce perso). Désarme aussi
-    -- l'attribut sécurisé (type/clickbutton) laissé par une session précédente — défense en profondeur :
-    -- Hide() suffit à empêcher le clic, mais un futur réaffichage accidentel du bouton ne doit pas
-    -- hériter d'un clickbutton pointant sur CraftCreateButton natif.
+    -- Vue reroll = LECTURE SEULE : aucun bouton créer (on n'est pas sur ce perso). Le Hide() EST la
+    -- protection (un bouton caché n'est pas cliquable). Le _WireCreateButton(false) désarme en plus
+    -- l'attribut sécurisé laissé par une session précédente, pour qu'un futur réaffichage accidentel
+    -- n'hérite pas d'un clickbutton pointant sur CraftCreateButton natif. NB : il no-op EN COMBAT
+    -- (SetAttribute verrouillé) — sans conséquence, le bouton reste caché.
     if self.rerollKey then
         self:_WireCreateButton(false)
         self.detCreateBtn:Hide(); self.detAllBtn:Hide()

@@ -167,8 +167,7 @@ function Inbound:Alert(e)
         if COC.Trace then COC.Trace:Log("mod", "entrante silencée : " .. tostring(e.buyer) .. " (muté)") end
         return
     end
-    if COC.db and (COC.db.notifyScope == "off"
-        or (COC.db.mutedPlayers and COC.db.mutedPlayers[e.buyer])) then return end
+    if COC.db and COC.db.notifyScope == "off" then return end   -- mute déjà couvert par IsMuted ci-dessus
     if COC.Moderation and COC.Moderation:BelowThreshold(e.buyer) then return end   -- petit perso (si connu)
     local c = CraftLink
     local nm = (c and c:ItemName(e.itemID, e.itemName)) or e.itemName or ("item:" .. e.itemID)

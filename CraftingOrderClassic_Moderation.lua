@@ -20,7 +20,7 @@ local function pmsg(m) print("|cFF33DD88Crafting Order|r " .. m) end
 -- SavedVariables (clé trace) après /co trace on. OFF en prod (Trace:Log garde sur IsOn). Strings FR
 -- dev (comme les autres lignes de trace), pas de clé de locale.
 local function tr(fmt, ...)
-    if not COC.Trace then return end
+    if not (COC.Trace and COC.Trace:IsOn()) then return end   -- ne PAS payer string.format si trace OFF (chemin chaud)
     COC.Trace:Log("mod", (select("#", ...) > 0) and string.format(fmt, ...) or fmt)
 end
 
@@ -52,6 +52,7 @@ function Mod:Unmute(name)
     name = canon(name)
     if not (name and COC.db and COC.db.mutedPlayers) then return end
     COC.db.mutedPlayers[name] = nil
+    self._prompted[name], self._posts[name] = nil, nil   -- ré-arme la détection de spam après un démute
     tr("démuté : %s", name)
     pmsg(string.format(L["%s n'est plus en sourdine."], name))
     if COC.UI and COC.UI.Refresh then COC.UI:Refresh() end

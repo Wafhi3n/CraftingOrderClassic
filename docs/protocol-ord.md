@@ -119,9 +119,10 @@ respectée. `RebroadcastMine` est jitté (fenêtre 3–6 s) pour éviter les raf
   complet** : CANCEL/ACK/DLV/DONE/NACK ne sont PAS diffusés sur ce chemin (seulement whisper dirigé +
   AddonMessage). Un joueur atteint SEULEMENT par ce canal (jamais croisé, hors roster) peut donc voir un
   ordre « open » périmé jusqu'à expiration du **TTL** (6 h) après son acceptation/annulation ailleurs —
-  pas de duplication ni de corruption, juste un affichage best-effort borné dans le temps. Le champ libre
-  d'un ordre (ex. `price`) ne doit jamais contenir de `~` : le swap inverse à la réception décalerait
-  silencieusement les champs suivants du décodeur NEW.
+  pas de duplication ni de corruption, juste un affichage best-effort borné dans le temps. Le contrat
+  « aucun champ ne contient `~` » est **imposé par le codec** (`ENCODERS.NEW` strippe `[|~]` de `price`
+  et `recipient`), pas seulement documenté : sans ça, le swap inverse à la réception décalerait
+  silencieusement les champs suivants du décodeur NEW. Tout futur champ libre doit être strippé de même.
 - **guilde** (`GUILD`) : distribution intra-guilde (+ relais GreenWall, hardware-event only).
 
 > Voir `Libs\CraftLink-1.0\CraftLink_Transport.lua` (`TRANSPORT_REV`) et la mémoire

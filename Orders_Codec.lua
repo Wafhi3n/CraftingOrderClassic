@@ -21,13 +21,15 @@ COC.OrdersCodec = Codec
 -- ENCODAGE — une fonction par verbe, expressions reprises telles quelles du code d'origine.
 -- ------------------------------------------------------------------
 local ENCODERS = {
-    -- Champs : id, buyer, kind, itemID|spellID|0, qty|1, profession|"", price|"" (sans |),
-    --          recipient|"Tous" (sans |), byStack 1/0, provided CSV itemID.
+    -- Champs : id, buyer, kind, itemID|spellID|0, qty|1, profession|"", price|"" (sans | ni ~),
+    --          recipient|"Tous" (sans | ni ~), byStack 1/0, provided CSV itemID.
+    -- On strippe `|` (séparateur du fil) ET `~` (séparateur du transport canal-texte, cf. BroadcastText :
+    -- le canal remplace | par ~, un ~ littéral dans un champ décalerait le décodage à la réception canal).
     NEW = function(o)
         return string.format("ORD|NEW|%s|%s|%s|%d|%d|%s|%s|%s|%d|%s",
             o.id, o.buyer, o.kind, o.itemID or o.spellID or 0, o.qty or 1,
-            o.profession or "", (o.price or ""):gsub("|", ""),
-            (o.recipient or "Tous"):gsub("|", ""), o.byStack and 1 or 0,
+            o.profession or "", (o.price or ""):gsub("[|~]", ""),
+            (o.recipient or "Tous"):gsub("[|~]", ""), o.byStack and 1 or 0,
             table.concat(o.provided or {}, ","))
     end,
     CANCEL = function(o) return "ORD|CANCEL|" .. o.id end,
