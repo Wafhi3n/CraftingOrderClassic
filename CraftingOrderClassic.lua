@@ -270,7 +270,8 @@ function COC:Help()
     print("  |cFFFFFFFF/co lootalert [on|off]|r — " .. L["alerte quand tu loots un plan connu de CraftLink (défaut : on)"])
     print("  |cFFFFFFFF/co gift [nom]|r — " .. L["proposer (chuchoter) le dernier plan looté à un ami/partenaire qui ne le connaît pas"])
     print("  |cFFFFFFFF/co alts [on|off|main <nom>]|r — " .. L["regrouper tes rerolls (opt-in) : liste annoncée, commandes routées vers ton perso connecté"])
-    print("  |cFFFFFFFF/co mute <nom>|r / |cFFFFFFFF/co unmute <nom>|r — " .. L["muter/démuter un joueur (aucune notif de sa part)"])
+    print("  |cFFFFFFFF/co mute <nom> [durée] [raison]|r / |cFFFFFFFF/co unmute <nom>|r — " .. L["muter/démuter un joueur (aucune notif ; durée ex. 1h/30m/2d)"])
+    print("  |cFFFFFFFF/co trust <nom>|r / |cFFFFFFFF/co untrust <nom>|r — " .. L["marquer un joueur de confiance (jamais muté automatiquement)"])
     print("  |cFFFFFFFF/co lowlevel [N|off]|r — " .. L["seuil de mute auto des persos bas niveau (défaut 5)"])
     print("  |cFFFFFFFF/co spam [off|auto|<max> [fenêtre]]|r — " .. L["réglage anti-spam : seuil, fenêtre, mute auto vs popup"])
     print("  |cFFFFFFFF/co debug|r — |cFFFF8800" .. L["mode solo"] .. "|r : " .. L["injecte/retire un réseau fictif (artisans + commandes)"])
@@ -309,6 +310,8 @@ function COC:Slash(msg)
     elseif cmd == "gift" then if COC.LootAlert then COC.LootAlert:GiftCmd(rest) end
     elseif cmd == "mute"   then if COC.Moderation then COC.Moderation:MuteCmd(rest) end
     elseif cmd == "unmute" then if COC.Moderation then COC.Moderation:UnmuteCmd(rest) end
+    elseif cmd == "trust"   then if COC.Moderation then COC.Moderation:TrustCmd(rest) end
+    elseif cmd == "untrust" then if COC.Moderation then COC.Moderation:UntrustCmd(rest) end
     elseif cmd == "lowlevel" or cmd == "lowlvl" then if COC.Moderation then COC.Moderation:LowLevelCmd(rest) end
     elseif cmd == "spam" then if COC.Moderation then COC.Moderation:SpamCmd(rest) end
     elseif cmd == "alts" or cmd == "rerolls" then if D and D.AltsCmd then D:AltsCmd(rest) end

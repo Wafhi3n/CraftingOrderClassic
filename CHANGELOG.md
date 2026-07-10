@@ -1,5 +1,19 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.13.0 — Moderation: reasons, temporary mutes, a trust list
+
+Muting someone now records a reason and a date, and can be temporary. `/co mute Bob 1h spammer` mutes Bob
+for an hour, then lifts itself. Duration accepts `30m`, `2h`, `2d`, or a plain number of minutes; anything
+that isn't a duration is taken as the reason. `/co mute` with no argument lists everyone you've muted, with
+their reason and the time left.
+
+`/co trust <name>` marks a player as trusted: they are never auto-muted, neither by the low-level
+threshold nor by spam detection. Manual muting still works if you ever need it. `/co untrust <name>`
+removes the mark; `/co trust` alone lists your trusted players.
+
+Existing mutes keep working unchanged — no data migration, and older clients that only understand plain
+mutes still interoperate.
+
 ## v1.12.1 — Nobody can post an order in your name
 
 A code review of the realm channel found that an order arriving on it was trusted to name its own buyer.

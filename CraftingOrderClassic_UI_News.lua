@@ -16,6 +16,12 @@ local BODY_W = 780
 local function versionsRecent()
     return {
         {
+            v = "v1.13.0", title = L["Modération : mutes avec raison, temporaires, liste de confiance"],
+            lines = {
+                L["Un mute porte désormais une raison et une date, et peut être temporaire : |cFFFFFFFF/co mute Bob 1h spammeur|r se lève tout seul au bout d'une heure (|cFFFFFFFF/co mute|r seul liste les mutés avec raison et temps restant). Et |cFFFFFFFF/co trust <nom>|r marque un joueur de confiance, jamais mis en sourdine automatiquement — le mute manuel restant toujours possible."],
+            },
+        },
+        {
             v = "v1.12.1", title = L["Personne ne peut poster une commande en ton nom"],
             lines = {
                 L["Une commande arrivant par le canal du royaume était crue sur parole quant à son acheteur : un joueur pouvait publier de fausses commandes au nom d'autrui, et nourrir la détection de spam contre sa victime jusqu'à ce que tout le monde la mette en sourdine. Elles doivent désormais venir du joueur qui les a postées."],
@@ -59,6 +65,11 @@ local function versionsRecent()
                 L["Le menu reroll de la minimap ne liste plus que les vrais métiers (Cuisine, Premiers soins, Pêche et Poisons n'encombrent plus la liste) ; le seuil de détection de spam est réglable via |cFFFFFFFF/co spam|r, avec un mode mute automatique en plus du popup habituel."],
             },
         },
+    }
+end
+
+local function versionsOlder()
+    return {
         {
             v = "v1.9.0", title = L["Tes rerolls réunis : cooldowns partagés, une identité, l'onglet Mes artisans"],
             lines = {
@@ -67,11 +78,6 @@ local function versionsRecent()
                 L["Nouvel onglet « Mes artisans » : tous les métiers de ton compte sur le royaume en une vue, comme un seul perso — niveau, recettes connues par catégorie, cooldowns en tête, et quel perso porte chaque recette."],
             },
         },
-    }
-end
-
-local function versionsOlder()
-    return {
         {
             v = "v1.8.0", title = L["Sous le capot : mises à jour plus sûres"],
             lines = {

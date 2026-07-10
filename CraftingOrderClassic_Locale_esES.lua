@@ -56,6 +56,10 @@ local es = {
         "La interfaz se traduce al alemán y al español según el idioma de tu cliente de WoW.",
     ["Ce nouvel onglet « Nouveautés » affiche les notes de version directement en jeu."] =
         "Esta nueva pestaña « Novedades » muestra las notas de versión directamente en el juego.",
+    -- Onglet Nouveautés — v1.13.0
+    ["Modération : mutes avec raison, temporaires, liste de confiance"] = "Moderación: silencios con motivo, temporales, lista de confianza",
+    ["Un mute porte désormais une raison et une date, et peut être temporaire : |cFFFFFFFF/co mute Bob 1h spammeur|r se lève tout seul au bout d'une heure (|cFFFFFFFF/co mute|r seul liste les mutés avec raison et temps restant). Et |cFFFFFFFF/co trust <nom>|r marque un joueur de confiance, jamais mis en sourdine automatiquement — le mute manuel restant toujours possible."] =
+        "Un silencio ahora lleva un motivo y una fecha, y puede ser temporal: |cFFFFFFFF/co mute Bob 1h spammer|r se levanta solo tras una hora (|cFFFFFFFF/co mute|r solo lista a los silenciados con motivo y tiempo restante). Y |cFFFFFFFF/co trust <nombre>|r marca a un jugador como de confianza, nunca silenciado automáticamente — el silencio manual sigue disponible.",
     -- Onglet Nouveautés — v1.12.1
     ["Personne ne peut poster une commande en ton nom"] = "Nadie puede publicar un pedido en tu nombre",
     ["Une commande arrivant par le canal du royaume était crue sur parole quant à son acheteur : un joueur pouvait publier de fausses commandes au nom d'autrui, et nourrir la détection de spam contre sa victime jusqu'à ce que tout le monde la mette en sourdine. Elles doivent désormais venir du joueur qui les a postées."] =
@@ -180,11 +184,18 @@ local es = {
     ["%s n'est plus en sourdine."] = "%s ya no está silenciado.",
     ["usage : /co unmute <nom>"] = "uso: /co unmute <nombre>",
     ["aucun joueur en sourdine. /co mute <nom> pour en ajouter un."] = "ningún jugador silenciado. /co mute <nombre> para añadir uno.",
-    ["en sourdine (%d) : %s"] = "silenciados (%d): %s",
+    ["en sourdine (%d) :"] = "silenciados (%d):",
+    ["permanent"] = "permanente", ["expiré"] = "expirado", ["spam détecté"] = "spam detectado",
+    ["%s est de confiance — jamais muté automatiquement."] = "%s es de confianza — nunca silenciado automáticamente.",
+    ["%s n'est plus de confiance."] = "%s ya no es de confianza.",
+    ["aucun joueur de confiance. /co trust <nom> pour en ajouter un."] = "ningún jugador de confianza. /co trust <nombre> para añadir uno.",
+    ["de confiance (%d) : %s"] = "de confianza (%d): %s",
+    ["usage : /co untrust <nom>"] = "uso: /co untrust <nombre>",
     ["mute auto bas niveau : |cFFFFFFFFdésactivé|r — /co lowlevel <niveau>"] = "silencio auto de nivel bajo: |cFFFFFFFFdesactivado|r — /co lowlevel <nivel>",
     ["mute auto bas niveau : sous le niveau |cFFFFFFFF%d|r — /co lowlevel [N|off]"] = "silencio auto de nivel bajo: por debajo de nivel |cFFFFFFFF%d|r — /co lowlevel [N|off]",
     ["%s a posté %d fois en peu de temps. Le mettre en sourdine ?"] = "%s ha publicado %d veces en poco tiempo. ¿Silenciarlo?",
-    ["muter/démuter un joueur (aucune notif de sa part)"] = "silenciar/reactivar a un jugador (ninguna notificación suya)",
+    ["muter/démuter un joueur (aucune notif ; durée ex. 1h/30m/2d)"] = "silenciar/reactivar a un jugador (sin notificaciones; duración ej. 1h/30m/2d)",
+    ["marquer un joueur de confiance (jamais muté automatiquement)"] = "marcar a un jugador como de confianza (nunca silenciado automáticamente)",
     ["seuil de mute auto des persos bas niveau (défaut 5)"] = "umbral de silencio auto para personajes de nivel bajo (por defecto 5)",
     ["mute auto"] = "silencio auto", ["popup"] = "ventana",
     ["détection de spam : |cFFFFFFFFdésactivée|r — /co spam <max> [fenêtre] pour l'activer"] = "detección de spam: |cFFFFFFFFdesactivada|r — /co spam <max> [ventana] para activar",

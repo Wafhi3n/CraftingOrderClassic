@@ -57,6 +57,10 @@ local en = {
         "The interface is translated into German and Spanish depending on your WoW client language.",
     ["Ce nouvel onglet « Nouveautés » affiche les notes de version directement en jeu."] =
         "This new What's New tab shows the release notes right in the game.",
+    -- Onglet Nouveautés — v1.13.0
+    ["Modération : mutes avec raison, temporaires, liste de confiance"] = "Moderation: mutes with a reason, temporary mutes, a trust list",
+    ["Un mute porte désormais une raison et une date, et peut être temporaire : |cFFFFFFFF/co mute Bob 1h spammeur|r se lève tout seul au bout d'une heure (|cFFFFFFFF/co mute|r seul liste les mutés avec raison et temps restant). Et |cFFFFFFFF/co trust <nom>|r marque un joueur de confiance, jamais mis en sourdine automatiquement — le mute manuel restant toujours possible."] =
+        "A mute now carries a reason and a date, and can be temporary: |cFFFFFFFF/co mute Bob 1h spammer|r lifts itself after an hour (|cFFFFFFFF/co mute|r alone lists muted players with reason and time left). And |cFFFFFFFF/co trust <name>|r marks a player as trusted, never auto-muted — manual muting still available.",
     -- Onglet Nouveautés — v1.12.1
     ["Personne ne peut poster une commande en ton nom"] = "Nobody can post an order in your name",
     ["Une commande arrivant par le canal du royaume était crue sur parole quant à son acheteur : un joueur pouvait publier de fausses commandes au nom d'autrui, et nourrir la détection de spam contre sa victime jusqu'à ce que tout le monde la mette en sourdine. Elles doivent désormais venir du joueur qui les a postées."] =
@@ -181,14 +185,18 @@ local en = {
     ["Passer commande à %s"] = "Order from %s", ["Passer commande"] = "Place order",
     ["Passer commande à %s (%s)"] = "Order from %s (%s)",
     ["%s est mis en sourdine — plus aucune notification de sa part."] = "%s is now muted — no more notifications from them.",
-    ["%s n'est plus en sourdine."] = "%s is no longer muted.",
-    ["usage : /co unmute <nom>"] = "usage: /co unmute <name>",
+    ["%s n'est plus en sourdine."] = "%s is no longer muted.", ["usage : /co unmute <nom>"] = "usage: /co unmute <name>",
     ["aucun joueur en sourdine. /co mute <nom> pour en ajouter un."] = "no muted players. /co mute <name> to add one.",
-    ["en sourdine (%d) : %s"] = "muted (%d): %s",
+    ["en sourdine (%d) :"] = "muted (%d):", ["%s n'est plus de confiance."] = "%s is no longer trusted.",
+    ["permanent"] = "permanent", ["expiré"] = "expired", ["spam détecté"] = "spam detected",
+    ["%s est de confiance — jamais muté automatiquement."] = "%s is trusted — never auto-muted.",
+    ["aucun joueur de confiance. /co trust <nom> pour en ajouter un."] = "no trusted players. /co trust <name> to add one.",
+    ["de confiance (%d) : %s"] = "trusted (%d): %s", ["usage : /co untrust <nom>"] = "usage: /co untrust <name>",
     ["mute auto bas niveau : |cFFFFFFFFdésactivé|r — /co lowlevel <niveau>"] = "low-level auto-mute: |cFFFFFFFFoff|r — /co lowlevel <level>",
     ["mute auto bas niveau : sous le niveau |cFFFFFFFF%d|r — /co lowlevel [N|off]"] = "low-level auto-mute: below level |cFFFFFFFF%d|r — /co lowlevel [N|off]",
     ["%s a posté %d fois en peu de temps. Le mettre en sourdine ?"] = "%s posted %d times in a short while. Mute them?",
-    ["muter/démuter un joueur (aucune notif de sa part)"] = "mute/unmute a player (no notifications from them)",
+    ["muter/démuter un joueur (aucune notif ; durée ex. 1h/30m/2d)"] = "mute/unmute a player (no notifications; duration e.g. 1h/30m/2d)",
+    ["marquer un joueur de confiance (jamais muté automatiquement)"] = "mark a player as trusted (never auto-muted)",
     ["seuil de mute auto des persos bas niveau (défaut 5)"] = "auto-mute threshold for low-level characters (default 5)",
     -- Détection de spam configurable (/co spam)
     ["mute auto"] = "auto-mute", ["popup"] = "popup",
