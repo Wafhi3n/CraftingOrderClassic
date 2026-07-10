@@ -1,5 +1,19 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.10.1 — Fixes to who gets notified
+
+Order alerts no longer depend on your `/co scan` setting. The chat scanner and the order book shared one
+option by accident, so turning the scanner off, or opening it wide, quietly changed which realm-wide
+orders pinged you. They're separate now. A public order toasts you when you have the profession for it.
+
+Public orders carrying an item the addon doesn't have in its catalogue used to arrive silently. They
+notify now, instead of sitting unseen on the board.
+
+Unmuting someone re-arms spam detection for them, so a mistaken mute doesn't switch the check off for the
+rest of your session. Coming back from an alt's read-only profession view no longer leaves the Create
+buttons hidden until you click a recipe. And on a busy realm the addon does noticeably less work per chat
+line, which shows on Hardcore where the death channel never stops.
+
 ## v1.10.0 — Orders reach the whole realm, plus a read-only peek at your alts
 
 Posting to "Everyone" now also broadcasts on the realm channel, not just to people you or your friends

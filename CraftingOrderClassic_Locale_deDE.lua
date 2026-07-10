@@ -68,6 +68,14 @@ local de = {
         "Die Oberfläche wird je nach Sprache deines WoW-Clients ins Deutsche und Spanische übersetzt.",
     ["Ce nouvel onglet « Nouveautés » affiche les notes de version directement en jeu."] =
         "Dieser neue Tab « Neues » zeigt die Versionshinweise direkt im Spiel.",
+    -- Onglet Nouveautés — v1.10.1
+    ["Corrections : qui reçoit les alertes de commandes"] = "Korrekturen: wer Auftragsbenachrichtigungen erhält",
+    ["Les alertes de commandes ne dépendent plus du réglage |cFFFFFFFF/co scan|r : le scanner de chat et le carnet partageaient une option par erreur. Une commande publique te prévient désormais dès que tu as le métier."] =
+        "Auftragsbenachrichtigungen hängen nicht mehr von deiner |cFFFFFFFF/co scan|r-Einstellung ab. Der Chat-Scanner und das Auftragsbuch teilten sich versehentlich eine Option. Ein öffentlicher Auftrag benachrichtigt dich jetzt, sobald du den Beruf dafür hast.",
+    ["Une commande publique portant un objet absent du catalogue arrivait en silence : elle te prévient maintenant, au lieu de dormir dans le carnet."] =
+        "Ein öffentlicher Auftrag mit einem Gegenstand, der nicht im Katalog steht, kam bisher lautlos an. Jetzt benachrichtigt er dich, statt unbemerkt im Auftragsbuch zu liegen.",
+    ["Démuter un joueur réarme la détection de spam le concernant ; revenir de la vue métier d'un reroll ne laisse plus les boutons Créer masqués ; et l'addon travaille nettement moins à chaque ligne de chat sur un royaume chargé."] =
+        "Das Entstummschalten eines Spielers aktiviert die Spam-Erkennung für ihn wieder; die Rückkehr aus der Berufsansicht eines Twinks lässt die Erstellen-Knöpfe nicht mehr verborgen; und das Addon leistet pro Chat-Zeile auf einem stark besuchten Realm deutlich weniger Arbeit.",
     -- Onglet Nouveautés — v1.10.0
     ["Les commandes touchent tout le royaume + un coup d'œil sur les recettes de tes rerolls"] =
         "Aufträge erreichen den ganzen Realm, plus ein Nur-Lese-Blick auf die Rezepte deiner Twinks",

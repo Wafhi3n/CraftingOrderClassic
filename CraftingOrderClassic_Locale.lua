@@ -75,6 +75,14 @@ if loc == "enUS" or loc == "enGB" then
             "The interface is translated into German and Spanish depending on your WoW client language.",
         ["Ce nouvel onglet « Nouveautés » affiche les notes de version directement en jeu."] =
             "This new What's New tab shows the release notes right in the game.",
+        -- Onglet Nouveautés — v1.10.1
+        ["Corrections : qui reçoit les alertes de commandes"] = "Fixes to who gets notified",
+        ["Les alertes de commandes ne dépendent plus du réglage |cFFFFFFFF/co scan|r : le scanner de chat et le carnet partageaient une option par erreur. Une commande publique te prévient désormais dès que tu as le métier."] =
+            "Order alerts no longer depend on your |cFFFFFFFF/co scan|r setting. The chat scanner and the order book shared one option by accident. A public order now toasts you as soon as you have the profession for it.",
+        ["Une commande publique portant un objet absent du catalogue arrivait en silence : elle te prévient maintenant, au lieu de dormir dans le carnet."] =
+            "A public order carrying an item missing from the catalogue used to arrive silently. It notifies you now, instead of sitting unseen on the board.",
+        ["Démuter un joueur réarme la détection de spam le concernant ; revenir de la vue métier d'un reroll ne laisse plus les boutons Créer masqués ; et l'addon travaille nettement moins à chaque ligne de chat sur un royaume chargé."] =
+            "Unmuting a player re-arms spam detection for them; coming back from an alt's profession view no longer leaves the Create buttons hidden; and the addon does noticeably less work per chat line on a busy realm.",
         -- Onglet Nouveautés — v1.10.0
         ["Les commandes touchent tout le royaume + un coup d'œil sur les recettes de tes rerolls"] =
             "Orders reach the whole realm, plus a read-only peek at your alts' recipes",
