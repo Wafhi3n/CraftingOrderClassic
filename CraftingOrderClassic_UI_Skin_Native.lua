@@ -188,6 +188,7 @@ function Skin.MakeFlatRow(parent, w, h)
     local fs = row:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     fs:SetPoint("LEFT", 6, 0); fs:SetJustifyH("LEFT"); Skin.ApplyShadow(fs)
     row.text = fs
+    row.SetText = function(self, t) self.text:SetText(t) end   -- les appelants écrivent sur le BOUTON
     row.SetSelected = function(self, on) self.selTex:SetShown(on and true or false) end
     return row
 end

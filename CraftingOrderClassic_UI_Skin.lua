@@ -335,15 +335,17 @@ function Skin.ApplyShadow(fs)
     return fs
 end
 
+-- Cadre doré sur fond ROCHE natif (la tuile 256² des fenêtres Blizzard) — utilisé par le Toast et le
+-- socle des panneaux compagnons (Trade/Mail). Bordure UI-DialogBox-Gold-Border = art natif de dialogue.
 function Skin.SkinFrameBackdrop(f)
     if not f.SetBackdrop then Mixin(f, BackdropTemplateMixin) end
     f:SetBackdrop({
-        bgFile   = "Interface\\ChatFrame\\ChatFrameBackground",
+        bgFile   = "Interface\\FrameGeneral\\UI-Background-Rock",
         edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Gold-Border",
-        tile = true, tileSize = 16, edgeSize = 32,
+        tile = true, tileSize = 256, edgeSize = 32,
         insets = { left = 11, right = 12, top = 12, bottom = 11 },
     })
-    f:SetBackdropColor(Skin.color.panel[1], Skin.color.panel[2], Skin.color.panel[3], 1)
+    f:SetBackdropColor(1, 1, 1, 1)   -- la teinte MULTIPLIE la texture : blanc = roche telle quelle
     f:SetBackdropBorderColor(1, 1, 1, 1)
 end
 

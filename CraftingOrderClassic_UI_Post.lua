@@ -268,8 +268,7 @@ function UI:_RefreshProfDropdown()
     for i, prof in ipairs(profs) do
         local r = frows[i]
         if not r then
-            r = Skin.MakeGoldButton(fly, LW - 4, 20, ""); r:SetPoint("TOPLEFT", 2, -2 - (i-1)*20)
-            r.text:SetJustifyH("LEFT"); r.text:ClearAllPoints(); r.text:SetPoint("LEFT", 6, 0)
+            r = Skin.MakeFlatRow(fly, LW - 4, 20); r:SetPoint("TOPLEFT", 2, -2 - (i-1)*20)
             frows[i] = r
         end
         r:SetText(Skin.ProfLabel(prof)); r:SetSelected(prof == self.postProf)

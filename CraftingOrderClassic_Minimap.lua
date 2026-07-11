@@ -71,8 +71,8 @@ end
 
 function UI:_ProfMenuRow(m, i)
     local r = m.rows[i]; if r then return r end
-    r = Skin.MakeGoldButton(m, 164, 20, "")
-    r.text:SetJustifyH("LEFT"); r.text:ClearAllPoints(); r.text:SetPoint("LEFT", 26, 0)
+    r = Skin.MakeFlatRow(m, 164, 20)   -- ligne de menu plate (fillMenuRow ré-ancre .text selon le cas)
+    r.text:SetPoint("LEFT", 26, 0)
     r.ic = r:CreateTexture(nil, "OVERLAY"); r.ic:SetSize(16, 16); r.ic:SetPoint("LEFT", 5, 0)
     m.rows[i] = r; return r
 end

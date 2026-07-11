@@ -127,9 +127,8 @@ function UI:_ToggleMyArtMainFlyout()
         n = n + 1
         local row = self.myArtMainFlyRows[n]
         if not row then
-            row = Skin.MakeGoldButton(fly, 182, 18, "")
+            row = Skin.MakeFlatRow(fly, 182, 18)
             row:SetPoint("TOPLEFT", 4, -4 - (n - 1) * 20)
-            row.text:ClearAllPoints(); row.text:SetPoint("LEFT", 6, 0); row.text:SetJustifyH("LEFT")
             self.myArtMainFlyRows[n] = row
         end
         row:SetText(nm)
