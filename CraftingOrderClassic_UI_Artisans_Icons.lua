@@ -18,18 +18,12 @@ local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
 -- =========================================================================
 -- Pills de filtre métier — icône seule
 -- =========================================================================
--- Un bouton doré carré portant l'icône du métier. Le libellé passe en tooltip : on récupère la
--- largeur des 10 pills texte (« Blacksmithing », « Leatherworking »… débordaient sur 2 rangées).
--- On CHAÎNE les scripts de survol éventuels au lieu de les écraser. Depuis le bouton au look natif, la
--- surbrillance est une texture de couche HIGHLIGHT (automatique) et MakeGoldButton ne pose plus
--- d'OnEnter/OnLeave → hoverIn/hoverOut peuvent être nil : on les appelle sous garde.
+-- Un bouton-icône carré (kit MakeIconButton : liseré 1 px, icône désaturable, SetSelected = liseré
+-- doré) portant l'icône du métier. Le libellé passe en tooltip : on récupère la largeur des 10 pills
+-- texte (« Blacksmithing », « Leatherworking »… débordaient sur 2 rangées). On CHAÎNE les scripts de
+-- survol éventuels sous garde nil (le kit n'en pose pas : surbrillance = couche HIGHLIGHT auto).
 local function makeProfPill(panel, key)
-    local b = Skin.MakeGoldButton(panel, 24, 24, "")
-    local tex = b:CreateTexture(nil, "ARTWORK")
-    tex:SetPoint("CENTER"); tex:SetSize(16, 16)
-    tex:SetTexture(Skin.ProfIcon(key) or Skin.tex.unknown)
-    tex:SetTexCoord(0.08, 0.92, 0.08, 0.92)
-    b.icon = tex
+    local b = Skin.MakeIconButton(panel, 24, Skin.ProfIcon(key) or Skin.tex.unknown)
     local hoverIn, hoverOut = b:GetScript("OnEnter"), b:GetScript("OnLeave")
     b:SetScript("OnEnter", function(self)
         if hoverIn then hoverIn(self) end

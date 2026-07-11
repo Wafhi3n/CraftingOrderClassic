@@ -1,15 +1,13 @@
--- CraftingOrderClassic_UI.lua — fenêtre principale (skin tavern doré).
--- Deux onglets : Carnet d'ordres (poster/accepter/livrer/annuler) et Artisans (annuaire global).
+-- CraftingOrderClassic_UI.lua — fenêtre principale (chrome Blizzard natif, kit UI_Skin_Native).
+-- Onglets : Carnet / Commande / Récolte / Artisans / Mes artisans / Aide / Nouveautés.
 -- Lit le cache (COC.db.orders + Directory), jamais le réseau directement.
 
 local COC  = CraftingOrderClassic
 local UI   = COC.UI
 local Skin = UI.Skin
 local L    = COC.L
-local ROW_H = 22
 
 local function me() return (UnitName and UnitName("player")) or "?" end
-local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true) end
 
 -- Le Carnet = MES commandes (postées par moi). L'acceptation/livraison se fait dans la VUE MÉTIER,
 -- pas ici → ce fichier ne filtre plus par relation : il liste mes ordres (actifs vs archivés).
@@ -19,28 +17,12 @@ local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
 -- ------------------------------------------------------------------
 function UI:Build()
     if self.frame then return self.frame end
-    -- PROTOTYPE reskin natif (branche feat/native-blizzard-skin) : chrome Blizzard « stock » via
-    -- ButtonFrameTemplate — barre de titre + portrait + bouton fermer + panneau encastré marbre
-    -- (f.Inset). Remplace l'ancien backdrop « tavern doré » + le fond TGA peint. Le langage couleur
-    -- (statuts d'ordre / rareté d'objet) reste INTOUCHÉ ; seul le chrome change.
-    local f = CreateFrame("Frame", "CraftingOrderClassicWindow", UIParent, "ButtonFrameTemplate")
-    f:SetSize(868, 600)
-    f:SetPoint("CENTER")
-    f:SetMovable(true); f:EnableMouse(true); f:RegisterForDrag("LeftButton")
-    f:SetScript("OnDragStart", f.StartMoving); f:SetScript("OnDragStop", f.StopMovingOrSizing)
-    f:SetClampedToScreen(true); f:SetFrameStrata("HIGH")
-    f.maxTabWidth = 120                                 -- borne le resize natif des onglets (bas de cadre)
-    -- Empilement propre avec la fenêtre métier (même strata) : SetToplevel = un clic sur cette fenêtre
-    -- la fait passer AU-DESSUS de l'autre d'un bloc (fini l'interclassement des éléments) ; Raise à
-    -- l'ouverture → la dernière ouverte est devant. Cf. CraftingOrderProfWindow, même traitement.
-    f:SetToplevel(true)
-    f:SetScript("OnShow", function(fr) fr:Raise() end)
-    if f.SetTitle then f:SetTitle("Crafting & Gathering Order") end
-    if f.portrait then f.portrait:SetTexture(Skin.tex.workorder) end
-    -- Pas de barre de boutons en bas → on la masque pour que le marbre descende jusqu'en bas (guardé :
-    -- la fonction n'existe que si le template la fournit).
-    if ButtonFrameTemplate_HideButtonBar then ButtonFrameTemplate_HideButtonBar(f) end
-    f:Hide()
+    -- Chrome Blizzard natif via le kit (CraftingOrderClassic_UI_Skin_Native.lua) : barre de titre +
+    -- portrait + bouton fermer + panneau encastré marbre (f.Inset). Le langage couleur (statuts
+    -- d'ordre / rareté d'objet) reste INTOUCHÉ ; seul le chrome change.
+    local f = Skin.MakeWindow("CraftingOrderClassicWindow", 868, 600, {
+        title = "Crafting & Gathering Order", portrait = Skin.tex.workorder,
+    })
     self.frame = f
 
     local status = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
@@ -86,21 +68,10 @@ function UI:BuildTabs(f)
         { id = "help",      label = L["Aide"]        },
         { id = "news",      label = L["Nouveautés"]  },
     }
-    -- PROTOTYPE reskin natif : onglets Blizzard « bas de cadre » (CharacterFrameTabButtonTemplate,
-    -- textures garanties en Era) au lieu des boutons « or maison ». Le template câble son OnClick sur
-    -- CharacterFrame et son OnShow sur CharacterFrame_TabBoundsCheck (qui lit la fiche de perso) → on
-    -- REMPLACE les deux par SetScript. Sélection gérée par PanelTemplates_SelectTab/Deselect (ShowTab).
-    local prev
-    for i, d in ipairs(defs) do
-        local b = CreateFrame("Button", "CraftingOrderClassicTab" .. i, f, "CharacterFrameTabButtonTemplate")
-        b:SetText(d.label)
-        PanelTemplates_TabResize(b, 0, nil, 40, f.maxTabWidth)
-        if prev then b:SetPoint("LEFT", prev, "RIGHT", -16, 0)
-        else b:SetPoint("TOPLEFT", f, "BOTTOMLEFT", 12, 2) end
-        b:SetScript("OnShow", function(tab) PanelTemplates_TabResize(tab, 0, nil, 40, f.maxTabWidth) end)
-        b:SetScript("OnClick", function() UI:ShowTab(d.id) end)
-        self.tabs[d.id] = b; prev = b
-    end
+    -- Onglets natifs « bas de cadre » via le kit (pièges du template gérés là-bas). self.tabs reste
+    -- l'index id→bouton (compat) ; la sélection et les SetText passent par self.tabBar.
+    self.tabBar = Skin.MakeTabs(f, defs, function(id) UI:ShowTab(id) end)
+    self.tabs = self.tabBar.buttons
 end
 
 function UI:ShowTab(id)
@@ -111,9 +82,7 @@ function UI:ShowTab(id)
         self.gatherEntry = nil
     end
     self.activeTab = id
-    for tid, b in pairs(self.tabs) do
-        if tid == id then PanelTemplates_SelectTab(b) else PanelTemplates_DeselectTab(b) end
-    end
+    self.tabBar:Select(id)
     self.ordersPanel:SetShown(id == "orders")
     if self.postPanel   then self.postPanel:SetShown(id == "post")    end
     if self.gatherPanel then self.gatherPanel:SetShown(id == "gather") end
@@ -122,17 +91,6 @@ function UI:ShowTab(id)
     if self.helpPanel   then self.helpPanel:SetShown(id == "help")    end
     if self.newsPanel   then self.newsPanel:SetShown(id == "news")    end
     self:Refresh()
-end
-
--- ------------------------------------------------------------------
--- Helpers de liste (pool de lignes simple, non virtualisé : petits volumes)
--- ------------------------------------------------------------------
-local function makeScroll(parent, name)
-    local scroll = CreateFrame("ScrollFrame", name, parent, "UIPanelScrollFrameTemplate")
-    scroll:SetPoint("TOPLEFT", 12, -78); scroll:SetPoint("BOTTOMRIGHT", -32, 64)
-    local content = CreateFrame("Frame", nil, scroll); content:SetSize(440, 10)
-    scroll:SetScrollChild(content)
-    return scroll, content
 end
 
 -- ------------------------------------------------------------------
@@ -151,16 +109,12 @@ local ALL_SRC_LABEL = {
 -- kind = "post" | "gather" ; top = Y de la ligne épinglée. Construit la ligne + le ScrollFrame (4
 -- lignes visibles) juste en dessous, et renseigne self.<kind>AllRow / <kind>ArtContent / <kind>ArtRows.
 function UI:_BuildAllRowAndScroll(panel, scrollName, kind, top)
-    local row = CreateFrame("Button", nil, panel)
-    row:SetSize(ALL_RW - 22, ALL_ARH); row:SetPoint("TOPLEFT", ALL_RX, top)
-    local hi = row:CreateTexture(nil, "HIGHLIGHT"); hi:SetAllPoints(); hi:SetColorTexture(Skin.unpack(Skin.color.rowHover))
-    local st = row:CreateTexture(nil, "BACKGROUND"); st:SetAllPoints()
-    st:SetColorTexture(Skin.color.tabActive[1], Skin.color.tabActive[2], Skin.color.tabActive[3], 0.30); st:Hide()
-    row.selTex = st
+    local row = Skin.MakeFlatRow(panel, ALL_RW - 22, ALL_ARH)
+    row:SetPoint("TOPLEFT", ALL_RX, top)
     local ic = row:CreateTexture(nil, "OVERLAY"); ic:SetSize(14, 14); ic:SetPoint("LEFT", 5, 0); ic:SetTexture(Skin.tex.broadcast)
-    row.label = row:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    row.label:SetPoint("LEFT", 24, 0); row.label:SetJustifyH("LEFT"); row.label:SetWidth(ALL_RW - 60)
-    row.label:SetTextColor(Skin.unpack(Skin.color.gold)); Skin.ApplyShadow(row.label)
+    row.label = row.text   -- alias historique (_RefreshAllRow) ; ré-ancré après l'icône
+    row.label:ClearAllPoints(); row.label:SetPoint("LEFT", 24, 0)
+    row.label:SetWidth(ALL_RW - 60); row.label:SetTextColor(Skin.unpack(Skin.color.gold))
     row:SetScript("OnClick", function()
         if kind == "post" then UI.postTarget = UI.postSource; UI:RefreshPostArtisans(); UI:RefreshPostPlans()
         else UI.gatherTarget = UI.gatherSrc; UI:_RefreshGatherArtisans() end
@@ -416,8 +370,7 @@ function UI:Refresh()
         for _, o in pairs((COC.db and COC.db.orders) or {}) do
             if o.buyer == m and o.status ~= "done" and o.status ~= "cancelled" then c = c + 1 end
         end
-        self.tabs.orders:SetText(L["Carnet"] .. " (" .. c .. ")")
-        PanelTemplates_TabResize(self.tabs.orders, 0, nil, 40, self.frame.maxTabWidth)   -- onglet natif : re-mesure après SetText
+        self.tabBar:SetText("orders", L["Carnet"] .. " (" .. c .. ")")   -- re-mesure la largeur (kit)
     end
     if self.orderFilterBtns then self:_RefreshOrderFilterTabs() end
     local CraftLink = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)

@@ -1,7 +1,9 @@
--- CraftingOrderClassic_UI_Skin.lua — Thème « tavern doré » (design system Guild Economy / CraftLink).
--- Palette mappée 1:1 depuis tokens/colors.css (direction warm tavern). Skin PROPRE à cet addon
--- (pas de dépendance à Guild Economy). INTOUCHABLE : le langage couleur des offres et la rareté
--- d'objet ne sont jamais recolorés ; ce module ne touche que le chrome (surfaces, cadre, onglets).
+-- CraftingOrderClassic_UI_Skin.lua — tokens + helpers SÉMANTIQUES du skin (métiers, statuts, rareté,
+-- quantités, icônes natives) et petits widgets d'affichage. Les CONSTRUCTEURS de chrome Blizzard
+-- natif vivent dans CraftingOrderClassic_UI_Skin_Native.lua (même table `Skin`) — voir la skill
+-- projet `coc-native-ui`. La palette « tavern » résiduelle ne sert plus qu'aux ACCENTS texte/lignes
+-- (or des libellés, hover, sélection) ; le chrome (cadre, onglets, boutons) est natif.
+-- INTOUCHABLE : le langage couleur des statuts d'ordre et la rareté d'objet ne sont jamais recolorés.
 
 CraftingOrderClassic.UI = CraftingOrderClassic.UI or {}
 local Skin = {}
@@ -331,19 +333,6 @@ function Skin.ApplyShadow(fs)
     return fs
 end
 
-local wordmarkFont
-function Skin.WordmarkFont()
-    if not wordmarkFont then
-        wordmarkFont = CreateFont("CraftingOrderWordmarkFont")
-        if not wordmarkFont:SetFont("Fonts\\MORPHEUS.ttf", 22, "") then
-            wordmarkFont:SetFontObject("GameFontNormalLarge")
-        end
-        wordmarkFont:SetTextColor(unpackc(Skin.color.goldHi))
-        wordmarkFont:SetShadowColor(0, 0, 0, 1); wordmarkFont:SetShadowOffset(1, -1)
-    end
-    return wordmarkFont
-end
-
 function Skin.SkinFrameBackdrop(f)
     if not f.SetBackdrop then Mixin(f, BackdropTemplateMixin) end
     f:SetBackdrop({
@@ -379,70 +368,5 @@ function Skin.MakeSeparator(parent, offsetY)
     return sep
 end
 
--- =========================================================================
--- Bouton : look NATIF Blizzard, mais SANS hériter d'UIPanelButtonTemplate.
--- =========================================================================
--- Pourquoi ne pas hériter du template : un addon d'interface tiers re-skinne (chez le user : en ROUGE)
--- TOUT ce qui hérite d'UIPanelButtonTemplate — y compris les boutons de Blizzard eux-mêmes (le
--- « Quitter » de la fenêtre de métier native vire au rouge). C'était la raison d'être du bouton or
--- « maison » d'origine (« échappe aux re-skins externes »). On veut les DEUX : l'apparence du jeu ET
--- l'immunité au re-skin. Solution : on REPEINT à la main le 3-tranches natif —
--- `UI-DialogBox-goldbutton-{up,down,disabled}-{left,middle,right}`, qui est littéralement l'art
--- d'UIPanelButtonTemplate — sans le template, et sans les clés `Left`/`Middle`/`Right` sur lesquelles
--- les skinners s'accrochent (nommées `_l`/`_m`/`_r` ici).
-local BTN = "Interface\\Buttons\\UI-DialogBox-goldbutton-"
-
-local function btnPaint(b, state)   -- state = "up" | "down" | "disabled"
-    b._l:SetTexture(BTN .. state .. "-left")
-    b._m:SetTexture(BTN .. state .. "-middle")
-    b._r:SetTexture(BTN .. state .. "-right")
-end
-
--- Repos = l'état RÉEL du bouton (désactivé > sélectionné > normal).
-local function btnRest(b)
-    if not b:IsEnabled() then return btnPaint(b, "disabled") end
-    btnPaint(b, b.selected and "down" or "up")
-end
-
--- Caps latéraux : 32 px en natif. Sur les petits boutons (pills 24 px, filtres), gauche+droite (64)
--- dépasseraient la largeur → on borne à w/3. Recalculé à CHAQUE redimensionnement : plusieurs
--- appelants créent le bouton étroit puis l'élargissent après avoir mesuré leur texte (GetStringWidth).
-local function btnSide(b)
-    local s = math.min(32, math.max(4, math.floor((b:GetWidth() or 12) / 3)))
-    b._l:SetWidth(s); b._r:SetWidth(s)
-end
-
--- Contrat conservé mot pour mot (~35 appelants) : `b.text` (FontString ré-ancré/mesuré/recoloré par
--- les appelants), `b:SetText`/`b:GetFontString` (natifs via SetFontString), `b:SetSelected(on)`.
--- `template` optionnel = bouton SÉCURISÉ ("SecureActionButtonTemplate") pour rediriger un clic vers une
--- fonction PROTÉGÉE de Blizzard (DoCraft des enchantements). NE JAMAIS RETIRER.
-function Skin.MakeGoldButton(parent, w, h, text, template)
-    local b = CreateFrame("Button", nil, parent, template)
-    b:SetSize(w, h)
-    local l = b:CreateTexture(nil, "BACKGROUND"); l:SetPoint("TOPLEFT"); l:SetPoint("BOTTOMLEFT")
-    local r = b:CreateTexture(nil, "BACKGROUND"); r:SetPoint("TOPRIGHT"); r:SetPoint("BOTTOMRIGHT")
-    local m = b:CreateTexture(nil, "BACKGROUND")
-    m:SetPoint("TOPLEFT", l, "TOPRIGHT"); m:SetPoint("BOTTOMRIGHT", r, "BOTTOMLEFT")
-    b._l, b._m, b._r = l, m, r
-
-    local hi = b:CreateTexture(nil, "HIGHLIGHT")   -- surbrillance native (couche HIGHLIGHT = auto au survol)
-    hi:SetTexture("Interface\\Buttons\\UI-Panel-Button-Highlight")
-    hi:SetTexCoord(0, 0.625, 0, 0.6875); hi:SetBlendMode("ADD")
-    hi:SetPoint("TOPLEFT", 2, -1); hi:SetPoint("BOTTOMRIGHT", -2, 1)
-
-    local fs = b:CreateFontString(nil, "OVERLAY", (h <= 16) and "GameFontNormalSmall" or "GameFontNormal")
-    fs:SetPoint("CENTER"); Skin.ApplyShadow(fs)
-    b:SetFontString(fs)   -- → SetText / GetFontString natifs
-    b.text = fs
-    if text then b:SetText(text) end
-
-    b.selected = false
-    b.SetSelected = function(self, on) self.selected = on and true or false; btnRest(self) end
-    b:SetScript("OnMouseDown", function(self) if self:IsEnabled() then btnPaint(self, "down") end end)
-    b:SetScript("OnMouseUp", btnRest)
-    b:SetScript("OnEnable", btnRest)
-    b:SetScript("OnDisable", btnRest)
-    b:SetScript("OnSizeChanged", btnSide)
-    btnSide(b); btnRest(b)
-    return b
-end
+-- (Les CONSTRUCTEURS de chrome natif — MakeGoldButton, MakeWindow, MakeTabs, MakeFlatRow,
+-- MakeIconButton — vivent dans CraftingOrderClassic_UI_Skin_Native.lua, même table `Skin`.)

@@ -26,6 +26,7 @@ CraftingOrderClassic_Locale_News_deDE.lua
 CraftingOrderClassic_Locale_News_esES.lua
 CraftingOrderClassic_Elemental.lua
 CraftingOrderClassic_UI_Skin.lua
+CraftingOrderClassic_UI_Skin_Native.lua
 CraftingOrderClassic_UI.lua
 CraftingOrderClassic_UI_Post.lua
 CraftingOrderClassic_UI_Post_Artisans.lua
