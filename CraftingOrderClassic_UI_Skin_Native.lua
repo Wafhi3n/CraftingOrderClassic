@@ -123,13 +123,17 @@ function Skin.MakeWindow(name, w, h, opts)
     return f
 end
 
--- Médaillon de la fenêtre (rond, haut-gauche). SetPortraitToTexture applique le masque circulaire aux
--- icônes carrées quand l'API existe ; sinon repli SetTexture (l'anneau du cadre recouvre les coins).
--- Sert aussi de feedback dynamique (ex. onglet Commande : le portrait devient l'icône du métier choisi).
+-- Médaillon de la fenêtre (rond, haut-gauche). ⚠️ SetPortraitToTexture EXIGE une texture 64×64 —
+-- le format des icônes standard (Interface\Icons\*, retours de GetSpellTexture) — et LÈVE UNE ERREUR
+-- pour toute autre taille (vécu : WorkOrderGossipIcon, petite icône de gossip). D'où pcall + repli :
+-- SetTexture brut + masque alpha rond (SetMask), l'anneau du cadre recouvrant les bords.
+-- Sert aussi de feedback dynamique (ex. onglet Commande : le portrait devient l'icône du métier choisi
+-- — icônes de sort 64×64, donc chemin heureux).
 function Skin.SetWindowPortrait(f, tex)
     if not (f and f.portrait and tex) then return end
-    if SetPortraitToTexture then SetPortraitToTexture(f.portrait, tex)
-    else f.portrait:SetTexture(tex) end
+    if SetPortraitToTexture and pcall(SetPortraitToTexture, f.portrait, tex) then return end
+    f.portrait:SetTexture(tex)
+    if f.portrait.SetMask then f.portrait:SetMask("Interface\\CharacterFrame\\TempPortraitAlphaMask") end
 end
 
 -- =========================================================================

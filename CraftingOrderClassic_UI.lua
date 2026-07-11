@@ -21,7 +21,7 @@ function UI:Build()
     -- portrait + bouton fermer + panneau encastré marbre (f.Inset). Le langage couleur (statuts
     -- d'ordre / rareté d'objet) reste INTOUCHÉ ; seul le chrome change.
     local f = Skin.MakeWindow("CraftingOrderClassicWindow", 868, 600, {
-        title = "Crafting & Gathering Order", portrait = Skin.tex.workorder,
+        title = "Crafting & Gathering Order", portrait = Skin.tex.scroll,
     })
     self.frame = f
 
