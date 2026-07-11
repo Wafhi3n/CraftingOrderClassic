@@ -20,8 +20,8 @@ local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
 -- =========================================================================
 -- Un bouton doré carré portant l'icône du métier. Le libellé passe en tooltip : on récupère la
 -- largeur des 10 pills texte (« Blacksmithing », « Leatherworking »… débordaient sur 2 rangées).
--- On CHAÎNE les scripts de survol éventuels au lieu de les écraser. Depuis le passage au bouton NATIF
--- (UIPanelButtonTemplate), la surbrillance est une HighlightTexture et MakeGoldButton ne pose plus
+-- On CHAÎNE les scripts de survol éventuels au lieu de les écraser. Depuis le bouton au look natif, la
+-- surbrillance est une texture de couche HIGHLIGHT (automatique) et MakeGoldButton ne pose plus
 -- d'OnEnter/OnLeave → hoverIn/hoverOut peuvent être nil : on les appelle sous garde.
 local function makeProfPill(panel, key)
     local b = Skin.MakeGoldButton(panel, 24, 24, "")

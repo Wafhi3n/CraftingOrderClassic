@@ -62,11 +62,15 @@ function PW:_BuildDetail(col)
     local createBtn = Skin.MakeGoldButton(col, 72, 22, L["Créer"], "SecureActionButtonTemplate")
     createBtn:SetPoint("BOTTOMRIGHT", -10, 12)
     createBtn:RegisterForClicks("AnyUp")
+    -- ⚠️ SelectCraft() GARDÉ (jamais inconditionnel). Blizzard DÉSACTIVE le bouton natif à CHAQUE
+    -- CRAFT_UPDATE (`Blizzard_CraftUI.lua` : `if event == "CRAFT_UPDATE" then CraftCreateButton:Disable()`)
+    -- … et SelectCraft() FIRE CRAFT_UPDATE. Un SelectCraft inconditionnel ici re-désactivait donc le
+    -- bouton natif juste avant que le clic sécurisé ne lui soit redirigé → le clic tombait dans le vide :
+    -- c'était le fameux « il faut spammer Créer ». _SyncNativeCraftSelection ne re-sélectionne QUE si la
+    -- sélection native a dérivé → cas normal (déjà alignée à l'affichage par RefreshDetail) = aucun
+    -- événement, le bouton natif reste ACTIVÉ, et le 1er clic crafte.
     createBtn:SetScript("PreClick", function()
-        if COC.Craft:IsCraftOpen() then
-            local e = PW:GetSelectedRecipe()
-            if e and SelectCraft then SelectCraft(e.index) end   -- le bouton natif craftera CETTE recette
-        end
+        if COC.Craft:IsCraftOpen() then PW:_SyncNativeCraftSelection(PW:GetSelectedRecipe()) end
     end)
     createBtn:SetScript("PostClick", function()
         if not COC.Craft:IsCraftOpen() then PW:_CraftSelected(false) end   -- TradeSkill : DoTradeSkill

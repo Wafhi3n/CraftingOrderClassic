@@ -379,36 +379,70 @@ function Skin.MakeSeparator(parent, offsetY)
     return sep
 end
 
--- Bouton NATIF Blizzard (UIPanelButtonTemplate) — reskin natif COC (cf. ButtonFrameTemplate dans _UI).
--- Le nom `MakeGoldButton` est CONSERVÉ : ~35 appelants en dépendent, le renommer ne changerait rien
--- de visible et ferait un diff bruyant. Contrat préservé mot pour mot :
---   • `b.text` : le FontString du bouton — les appelants le RE-ANCRENT (ClearAllPoints/SetPoint),
---     le MESURENT (GetStringWidth) et le RECOLORENT. On expose donc le FontString natif.
---   • `b:SetText` / `b:GetFontString` : natifs (le template les fournit).
---   • `b:SetSelected(on)` : état « enfoncé » natif (SetButtonState PUSHED verrouillé + LockHighlight).
---     Le bouton reste CLIQUABLE — on ne l'ampute pas via Disable(), contrairement aux onglets natifs.
---   • `template` optionnel : bouton SÉCURISÉ ("SecureActionButtonTemplate") pour rediriger un clic
---     vers une fonction PROTÉGÉE de Blizzard (DoCraft des enchantements). NE JAMAIS RETIRER —
---     sans lui, les enchanteurs ne peuvent plus lancer un craft (cf. ProfWindow_Detail:_WireCreateButton).
--- La surbrillance au survol vient désormais de la HighlightTexture du template : ce constructeur ne
--- pose PLUS d'OnEnter/OnLeave. Les appelants qui les chaînaient doivent tester le nil (makeProfPill).
+-- =========================================================================
+-- Bouton : look NATIF Blizzard, mais SANS hériter d'UIPanelButtonTemplate.
+-- =========================================================================
+-- Pourquoi ne pas hériter du template : un addon d'interface tiers re-skinne (chez le user : en ROUGE)
+-- TOUT ce qui hérite d'UIPanelButtonTemplate — y compris les boutons de Blizzard eux-mêmes (le
+-- « Quitter » de la fenêtre de métier native vire au rouge). C'était la raison d'être du bouton or
+-- « maison » d'origine (« échappe aux re-skins externes »). On veut les DEUX : l'apparence du jeu ET
+-- l'immunité au re-skin. Solution : on REPEINT à la main le 3-tranches natif —
+-- `UI-DialogBox-goldbutton-{up,down,disabled}-{left,middle,right}`, qui est littéralement l'art
+-- d'UIPanelButtonTemplate — sans le template, et sans les clés `Left`/`Middle`/`Right` sur lesquelles
+-- les skinners s'accrochent (nommées `_l`/`_m`/`_r` ici).
+local BTN = "Interface\\Buttons\\UI-DialogBox-goldbutton-"
+
+local function btnPaint(b, state)   -- state = "up" | "down" | "disabled"
+    b._l:SetTexture(BTN .. state .. "-left")
+    b._m:SetTexture(BTN .. state .. "-middle")
+    b._r:SetTexture(BTN .. state .. "-right")
+end
+
+-- Repos = l'état RÉEL du bouton (désactivé > sélectionné > normal).
+local function btnRest(b)
+    if not b:IsEnabled() then return btnPaint(b, "disabled") end
+    btnPaint(b, b.selected and "down" or "up")
+end
+
+-- Caps latéraux : 32 px en natif. Sur les petits boutons (pills 24 px, filtres), gauche+droite (64)
+-- dépasseraient la largeur → on borne à w/3. Recalculé à CHAQUE redimensionnement : plusieurs
+-- appelants créent le bouton étroit puis l'élargissent après avoir mesuré leur texte (GetStringWidth).
+local function btnSide(b)
+    local s = math.min(32, math.max(4, math.floor((b:GetWidth() or 12) / 3)))
+    b._l:SetWidth(s); b._r:SetWidth(s)
+end
+
+-- Contrat conservé mot pour mot (~35 appelants) : `b.text` (FontString ré-ancré/mesuré/recoloré par
+-- les appelants), `b:SetText`/`b:GetFontString` (natifs via SetFontString), `b:SetSelected(on)`.
+-- `template` optionnel = bouton SÉCURISÉ ("SecureActionButtonTemplate") pour rediriger un clic vers une
+-- fonction PROTÉGÉE de Blizzard (DoCraft des enchantements). NE JAMAIS RETIRER.
 function Skin.MakeGoldButton(parent, w, h, text, template)
-    local b = CreateFrame("Button", nil, parent,
-        template and ("UIPanelButtonTemplate, " .. template) or "UIPanelButtonTemplate")
+    local b = CreateFrame("Button", nil, parent, template)
     b:SetSize(w, h)
-    if h <= 16 then   -- petits boutons (filtres, pills) : la police normale déborderait
-        b:SetNormalFontObject("GameFontNormalSmall")
-        b:SetHighlightFontObject("GameFontHighlightSmall")
-        b:SetDisabledFontObject("GameFontDisableSmall")
-    end
+    local l = b:CreateTexture(nil, "BACKGROUND"); l:SetPoint("TOPLEFT"); l:SetPoint("BOTTOMLEFT")
+    local r = b:CreateTexture(nil, "BACKGROUND"); r:SetPoint("TOPRIGHT"); r:SetPoint("BOTTOMRIGHT")
+    local m = b:CreateTexture(nil, "BACKGROUND")
+    m:SetPoint("TOPLEFT", l, "TOPRIGHT"); m:SetPoint("BOTTOMRIGHT", r, "BOTTOMLEFT")
+    b._l, b._m, b._r = l, m, r
+
+    local hi = b:CreateTexture(nil, "HIGHLIGHT")   -- surbrillance native (couche HIGHLIGHT = auto au survol)
+    hi:SetTexture("Interface\\Buttons\\UI-Panel-Button-Highlight")
+    hi:SetTexCoord(0, 0.625, 0, 0.6875); hi:SetBlendMode("ADD")
+    hi:SetPoint("TOPLEFT", 2, -1); hi:SetPoint("BOTTOMRIGHT", -2, 1)
+
+    local fs = b:CreateFontString(nil, "OVERLAY", (h <= 16) and "GameFontNormalSmall" or "GameFontNormal")
+    fs:SetPoint("CENTER"); Skin.ApplyShadow(fs)
+    b:SetFontString(fs)   -- → SetText / GetFontString natifs
+    b.text = fs
     if text then b:SetText(text) end
-    b.text = b:GetFontString()
-    Skin.ApplyShadow(b.text)
+
     b.selected = false
-    b.SetSelected = function(self, on)
-        self.selected = on and true or false
-        if self.selected then self:SetButtonState("PUSHED", true); self:LockHighlight()
-        else self:SetButtonState("NORMAL"); self:UnlockHighlight() end
-    end
+    b.SetSelected = function(self, on) self.selected = on and true or false; btnRest(self) end
+    b:SetScript("OnMouseDown", function(self) if self:IsEnabled() then btnPaint(self, "down") end end)
+    b:SetScript("OnMouseUp", btnRest)
+    b:SetScript("OnEnable", btnRest)
+    b:SetScript("OnDisable", btnRest)
+    b:SetScript("OnSizeChanged", btnSide)
+    btnSide(b); btnRest(b)
     return b
 end
