@@ -63,14 +63,9 @@ function PW:RestoreNative() restore(_G.TradeSkillFrame, "trade"); restore(_G.Cra
 -- Construction du shell
 -- ------------------------------------------------------------------
 function PW:_BuildHeader(f)
-    -- Titre = la barre native (f.TitleText, alimentée par les refresh via self.titleFS — champ conservé,
-    -- les 4 sites d'écriture n'ont pas bougé). Le rang s'affiche EN LIGNE à droite du titre, dans la
-    -- barre. L'ancien wordmark « Crafting Order » du coin est retiré (portrait + titre portent l'identité).
+    -- Titre = la barre native (f.TitleText, alimentée via self.titleFS). L'ancien wordmark « Crafting
+    -- Order » du coin est retiré (portrait + titre portent l'identité).
     self.titleFS = f.TitleText
-
-    local rank = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    rank:SetPoint("LEFT", f.TitleText, "RIGHT", 8, 0); rank:SetTextColor(Skin.unpack(Skin.color.text))
-    Skin.ApplyShadow(rank); self.rankFS = rank
 
     -- Rangée de contrôles SOUS la barre de titre (y −28..−48, HEADER_H = 56 inchangé). À gauche, x = 64 :
     -- le médaillon du portrait déborde dans le cadre (~58 px de large jusqu'à y ≈ −53) → on le contourne.
@@ -118,6 +113,15 @@ end
 -- Le médaillon suit le métier affiché (icônes de sort 64×64 → chemin heureux de SetWindowPortrait).
 function PW:_SyncPortrait()
     Skin.SetWindowPortrait(self.frame, Skin.ProfIcon(self.profKey) or Skin.tex.scroll)
+end
+
+-- ⚠️ Titre + rang dans UNE SEULE chaîne (jamais deux FontStrings séparées). `f.TitleText` natif a ses
+-- ancres LEFT/RIGHT FIXÉES sur le CADRE (PortraitFrameTemplate : x=60 / x=-60), pas sur l'étendue
+-- réelle du texte affiché — ancrer un 2ᵉ FontString sur son bord RIGHT le colle donc TOUJOURS près du
+-- bouton fermer, quelle que soit la longueur du titre (vécu : « 250 » collé au X). En les fusionnant,
+-- le rang hérite du centrage natif du titre et suit son étendue réelle.
+function PW:_SetTitle(label, suffix)
+    self.titleFS:SetText(suffix and (label .. "  " .. suffix) or label)
 end
 
 -- Bascule mon statut LFW pour le métier OUVERT (mien). Ignoré hors vue pleine (reroll = pas mon perso).
@@ -282,9 +286,8 @@ function PW:_RefreshDock()
     local name = craft and craft:GetOpenProfessionInfo()
     if not name then self:CloseDock(); return end
     self.profKey = craft:OpenProfessionKey()
-    self.titleFS:SetText(name)
     local rank, maxRank = craft:OpenRank()
-    self.rankFS:SetText((rank and maxRank) and string.format("|cFFE8B84B%d|r / %d", rank, maxRank) or "")
+    self:_SetTitle(name, (rank and maxRank) and string.format("|cFFE8B84B%d|r / %d", rank, maxRank) or nil)
     self:_SyncPortrait()
     self:_SyncLFWBtn()
     self:_SyncMissingBtn()
@@ -306,29 +309,28 @@ function PW:_DoRefresh()
     if name then                                   -- mode PLEIN : fenêtre métier native ouverte
         self.rerollKey = nil                        -- la native prime sur une vue reroll résiduelle
         self.profKey = craft:OpenProfessionKey()
-        self.titleFS:SetText(name)
         local rank, maxRank = craft:OpenRank()
-        self.rankFS:SetText((rank and maxRank) and string.format("|cFFE8B84B%d|r / %d", rank, maxRank) or "")
+        self:_SetTitle(name, (rank and maxRank) and string.format("|cFFE8B84B%d|r / %d", rank, maxRank) or nil)
         self.recipes = craft:ReadRecipes() or {}
         self:_ApplyMode(false)
         if self.RefreshRecipes then self:RefreshRecipes() end
         if self.RefreshDetail  then self:RefreshDetail()  end
     elseif self.rerollKey then                     -- mode REROLL : lecture seule, recettes depuis le cache
         self.profKey = self.standaloneKey
-        self.titleFS:SetText(Skin.ProfLabel(self.profKey) .. "  |cFF888888"
-            .. string.format(L["%s — lecture seule"], self.rerollName or "?") .. "|r")
+        local label = Skin.ProfLabel(self.profKey) .. "  |cFF888888"
+            .. string.format(L["%s — lecture seule"], self.rerollName or "?") .. "|r"
         local mc = COC.db and COC.db.mySkillsByChar and COC.db.mySkillsByChar[self.rerollKey]
         local sk = mc and mc[self.profKey]
-        self.rankFS:SetText(sk and string.format("|cFFE8B84B%d|r / %d", sk[1], sk[2]) or "|cFF888888?|r")
+        self:_SetTitle(label, sk and string.format("|cFFE8B84B%d|r / %d", sk[1], sk[2]) or "|cFF888888?|r")
         self.recipes = self:_RerollRecipeList()
         self:_ApplyMode(false)
         if self.RefreshRecipes then self:RefreshRecipes() end
         if self.RefreshDetail  then self:RefreshDetail()  end
     elseif self.standaloneKey then                 -- mode COMPACT : ouvert par clé (récolte / menu minimap)
         self.profKey = self.standaloneKey
-        self.titleFS:SetText(Skin.ProfLabel(self.profKey))
         local D = COC.Directory; local sk = D and D.mySkills and D.mySkills[self.profKey]
-        self.rankFS:SetText(sk and string.format("|cFFE8B84B%d|r / %d", sk[1], sk[2]) or "")
+        self:_SetTitle(Skin.ProfLabel(self.profKey),
+            sk and string.format("|cFFE8B84B%d|r / %d", sk[1], sk[2]) or nil)
         self:_ApplyMode(true)
     else
         return

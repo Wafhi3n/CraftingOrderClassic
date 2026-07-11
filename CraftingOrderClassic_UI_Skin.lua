@@ -352,15 +352,18 @@ end
 -- Puits encastré, look NATIF (équivalent backdrop d'InsetFrameTemplate — on ne peut pas ré-hériter un
 -- template sur une frame déjà créée, SkinWell recevant la frame de l'appelant). Bordure NEUTRE : le
 -- liseré doré « tavern » est retiré au profit du gris Blizzard, pour s'accorder au cadre natif.
+-- ⚠️ bgFile = ChatFrameBackground (PAS UI-Tooltip-Background, testé et rendu quasi TRANSPARENT sur les
+-- flyouts malgré l'alpha 0.90 demandé — vécu sur le dropdown métier de l'onglet Commande, cause exacte
+-- non identifiée mais reproductible). ChatFrameBackground est le bg solide déjà éprouvé par MakeBadge/
+-- l'ancien SkinFrameBackdrop dans cette codebase : s'en tenir à des textures dont l'opacité est vérifiée.
 function Skin.SkinWell(f)
     if not f.SetBackdrop then Mixin(f, BackdropTemplateMixin) end
     f:SetBackdrop({
-        bgFile   = "Interface\\Tooltips\\UI-Tooltip-Background",
+        bgFile   = "Interface\\ChatFrame\\ChatFrameBackground",
         edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
-        tile = true, tileSize = 16,
         edgeSize = 12, insets = { left = 3, right = 3, top = 3, bottom = 3 },
     })
-    f:SetBackdropColor(0.05, 0.05, 0.06, 0.90)
+    f:SetBackdropColor(0.05, 0.05, 0.06, 0.95)
     f:SetBackdropBorderColor(0.50, 0.50, 0.50, 0.90)
 end
 
