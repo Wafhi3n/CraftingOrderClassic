@@ -113,15 +113,17 @@ function UI:_BuildPostLeft(panel)
 
     self:_BuildPostPlanFilters(panel)
 
-    sep1px(panel, 12, SEP - 2, -172)
+    -- Filtres compactés sur UNE rangée (cf. _BuildPostPlanFilters) : ~20 px regagnés ici, rendus à la
+    -- LISTE DES PLANS plus bas (pscroll) plutôt qu'à une rangée de filtre qui n'en avait pas besoin.
+    sep1px(panel, 12, SEP - 2, -152)
 
     local lhdr = panel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    lhdr:SetPoint("TOPLEFT", 14, -178); lhdr:SetText(L["LISTE DES PLANS"])
+    lhdr:SetPoint("TOPLEFT", 14, -158); lhdr:SetText(L["LISTE DES PLANS"])
     lhdr:SetTextColor(Skin.unpack(Skin.color.textMuted))
     self.postPlanHdr = lhdr   -- annoté dynamiquement quand un artisan filtre la liste (cf. RefreshPostPlans)
 
     local pscroll = CreateFrame("ScrollFrame", "COCPostPlanScroll", panel, "UIPanelScrollFrameTemplate")
-    pscroll:SetPoint("TOPLEFT", 12, -192); pscroll:SetPoint("BOTTOMLEFT", 12, 22); pscroll:SetWidth(LSW)
+    pscroll:SetPoint("TOPLEFT", 12, -172); pscroll:SetPoint("BOTTOMLEFT", 12, 22); pscroll:SetWidth(LSW)
     local pc = CreateFrame("Frame", nil, pscroll); pc:SetSize(LW - 22, 10); pscroll:SetScrollChild(pc)
     pscroll:HookScript("OnVerticalScroll", function() UI:_RenderPostPlanWindow() end)
     self.postPlanScroll = pscroll; self.postPlanContent = pc
@@ -133,8 +135,9 @@ function UI:_BuildPostLeft(panel)
     self:_BuildPostLGBar(panel, pscroll)   -- pièce (tri rentabilité) + « 123 » (valeurs exactes)
 end
 
--- Filtre qualité (pill) + recherche + filtre « réactifs en poche » (P2). Extrait de _BuildPostLeft
--- pour rester sous le seuil anti-monolithe.
+-- Qualité + recherche + réactifs, sur UNE rangée (réagencement : compacte les filtres, rend la
+-- hauteur gagnée à la LISTE DES PLANS). Réactifs = ICÔNE (caisse, famille du stack-toggle Récolte)
+-- au lieu d'un bouton pleine largeur — tooltip pour l'explicite. Extrait pour l'anti-monolithe.
 function UI:_BuildPostPlanFilters(panel)
     self.postQualityIdx = 1
     local qBtn = Skin.MakeGoldButton(panel, 104, 18, "")
@@ -145,26 +148,33 @@ function UI:_BuildPostPlanFilters(panel)
     end)
     self:_RefreshQualityBtn()
 
+    -- Icône réactifs (RÉTRÉCIT le champ recherche de 20 px pour lui faire une place, sans toucher
+    -- au reste de la grille : chercher un plan reste possible pendant que le filtre reste visible).
+    self.postReagFilter = false
+    local rBtn = Skin.MakeIconButton(panel, 20, Skin.tex.crate)
+    rBtn:SetPoint("TOPRIGHT", -22, -127); self.postReagFilterBtn = rBtn
+    rBtn:SetScript("OnClick", function()
+        UI.postReagFilter = not UI.postReagFilter
+        UI:_RefreshReagFilterBtn(); UI:RefreshPostPlans()
+    end)
+    rBtn:SetScript("OnEnter", function(b)
+        GameTooltip:SetOwner(b, "ANCHOR_BOTTOMLEFT")
+        GameTooltip:SetText(UI.postReagFilter
+            and L["Réactifs : j'ai tout — clic pour tout montrer."]
+            or L["Ne montrer que les plans dont j'ai déjà tous les réactifs."], 1, 1, 1, 1, true)
+        GameTooltip:Show()
+    end)
+    rBtn:SetScript("OnLeave", GameTooltip_Hide)
+    self:_RefreshReagFilterBtn()
+
     local srch = CreateFrame("EditBox", nil, panel, "InputBoxTemplate")
-    srch:SetSize(LW - 110, 16); srch:SetPoint("TOPLEFT", 116, -129); srch:SetAutoFocus(false)
+    srch:SetSize(LW - 134, 16); srch:SetPoint("TOPLEFT", 116, -129); srch:SetAutoFocus(false)
     local hint = Skin.SearchHint(panel, srch, L["Rechercher un plan"])
     srch:SetScript("OnTextChanged", function(b)
         hint:SetShown(b:GetText() == "")
         UI.postSearch = b:GetText():lower(); UI:RefreshPostPlans()
     end)
     srch:SetScript("OnEscapePressed", function(b) b:ClearFocus() end)
-
-    -- Filtre RÉACTIFS EN POCHE (P2) : ne montrer que les plans dont je porte déjà tous les
-    -- composants (cf. _HasReagentsInBags). Les plans prêts remontent toujours en tête de liste,
-    -- que le filtre soit actif ou non (cf. RefreshPostPlans).
-    self.postReagFilter = false
-    local rBtn = Skin.MakeGoldButton(panel, LW, 18, "")
-    rBtn:SetPoint("TOPLEFT", 12, -150); self.postReagFilterBtn = rBtn
-    rBtn:SetScript("OnClick", function()
-        UI.postReagFilter = not UI.postReagFilter
-        UI:_RefreshReagFilterBtn(); UI:RefreshPostPlans()
-    end)
-    self:_RefreshReagFilterBtn()
 end
 
 function UI:_ToggleProfFlyout()
@@ -180,11 +190,11 @@ function UI:_RefreshQualityBtn()
     self.postQualityBtn:SetText(L["Qualité : "] .. name)
 end
 
+-- Icône (pas de texte) : l'état actif se lit au liseré doré (SetSelected, cf. Skin.MakeIconButton) ;
+-- le détail passe par le tooltip (posé une fois à la construction, cf. _BuildPostPlanFilters).
 function UI:_RefreshReagFilterBtn()
     if not self.postReagFilterBtn then return end
-    self.postReagFilterBtn:SetText(self.postReagFilter
-        and ("|cFF33DD33" .. L["Réactifs : j'ai tout"] .. "|r")
-        or  (L["Réactifs : "] .. L["Toutes"]))
+    self.postReagFilterBtn:SetSelected(self.postReagFilter)
 end
 
 -- =========================================================================

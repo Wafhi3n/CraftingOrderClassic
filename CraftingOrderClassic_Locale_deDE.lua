@@ -10,7 +10,6 @@ local L = COC.L
 local de = {
     -- Onglets / fenêtre
     ["Carnet"] = "Auftragsbuch", ["Commande"] = "Bestellen", ["Récolte"] = "Sammeln", ["Artisans"] = "Handwerker",
-    ["Classic · canal global"] = "Classic · globaler Kanal",
     -- En-têtes de colonnes (Carnet)
     ["COMMANDE"] = "AUFTRAG", ["QTÉ"] = "ANZ.", ["PRIX PROPOSÉ"] = "GEBOTENER PREIS",
     ["MÉTIER"] = "BERUF", ["STATUT"] = "STATUS",
@@ -166,7 +165,8 @@ local de = {
     ["Choisis un métier puis un plan."] = "Wähle einen Beruf, dann ein Rezept.",
     ["Rechercher un plan"] = "Rezept suchen", ["Qualité : "] = "Qualität: ",
     ["Sélection : "] = "Auswahl: ", ["Commande postée !"] = "Auftrag erstellt!",
-    ["Réactifs : j'ai tout"] = "Materialien: alles vorhanden", ["Réactifs : "] = "Materialien: ",
+    ["Réactifs : j'ai tout — clic pour tout montrer."] = "Materialien: alles vorhanden — Klick, um alle anzuzeigen.",
+    ["Ne montrer que les plans dont j'ai déjà tous les réactifs."] = "Nur Rezepte anzeigen, für die ich bereits alle Materialien habe.",
     ["[Prêt]"] = "[Bereit]",
     ["Autres"] = "Sonstige",
     ["connus"] = "bekannt", ["niv. %d"] = "Stufe %d",

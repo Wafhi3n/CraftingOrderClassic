@@ -373,6 +373,10 @@ function UI:Refresh()
         self.tabBar:SetText("orders", L["Carnet"] .. " (" .. c .. ")")   -- re-mesure la largeur (kit)
     end
     if self.orderFilterBtns then self:_RefreshOrderFilterTabs() end
+    -- Portrait dynamique : métier choisi sur l'onglet Commande, parchemin par défaut ailleurs
+    -- (même mécanisme que PW:_SyncPortrait sur la vue métier — icônes de sort 64×64, chemin heureux).
+    Skin.SetWindowPortrait(self.frame,
+        (self.activeTab == "post" and Skin.ProfIcon(self.postProf)) or Skin.tex.scroll)
     local CraftLink = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
     local D = COC.Directory
     self.status:SetText(string.format("|c%s" .. L["réseau"] .. "|r %s  ·  %d " .. L["en ligne"] .. "  ·  %d " .. L["artisan(s)"],

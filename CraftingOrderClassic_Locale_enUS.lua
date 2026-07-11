@@ -12,7 +12,6 @@ local L = COC.L
 local en = {
     -- Onglets / fenêtre
     ["Carnet"] = "Ledger", ["Commande"] = "Order", ["Récolte"] = "Gather", ["Artisans"] = "Artisans",
-    ["Classic · canal global"] = "Classic · global channel",
     -- En-têtes de colonnes (Carnet)
     ["COMMANDE"] = "ORDER", ["QTÉ"] = "QTY", ["PRIX PROPOSÉ"] = "PRICE OFFERED",
     ["MÉTIER"] = "PROFESSION", ["STATUT"] = "STATUS",
@@ -180,8 +179,9 @@ local en = {
     ["Choisis un métier puis un plan."] = "Pick a profession then a recipe.",
     ["Rechercher un plan"] = "Search a recipe", ["Qualité : "] = "Quality: ",
     ["Sélection : "] = "Selection: ", ["Commande postée !"] = "Order posted!",
-    -- Filtre réactifs en poche (P2)
-    ["Réactifs : j'ai tout"] = "Reagents: I have it all", ["Réactifs : "] = "Reagents: ",
+    -- Filtre réactifs en poche (P2) — icône + tooltip
+    ["Réactifs : j'ai tout — clic pour tout montrer."] = "Reagents: I have it all — click to show all.",
+    ["Ne montrer que les plans dont j'ai déjà tous les réactifs."] = "Only show recipes I already have all the reagents for.",
     ["[Prêt]"] = "[Ready]",
     -- Sections de la liste des plans (en-têtes) : les noms d'emplacement/type/catégorie viennent
     -- des globales client (déjà localisées) ; seule cette catégorie de repli a besoin d'une clé.

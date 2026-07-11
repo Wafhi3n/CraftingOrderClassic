@@ -11,7 +11,6 @@ local L = COC.L
 local es = {
     -- Onglets / fenêtre
     ["Carnet"] = "Libro", ["Commande"] = "Pedir", ["Récolte"] = "Recolectar", ["Artisans"] = "Artesanos",
-    ["Classic · canal global"] = "Classic · canal global",
     -- En-têtes de colonnes (Carnet)
     ["COMMANDE"] = "PEDIDO", ["QTÉ"] = "CANT.", ["PRIX PROPOSÉ"] = "PRECIO OFRECIDO",
     ["MÉTIER"] = "PROFESIÓN", ["STATUT"] = "ESTADO",
@@ -167,7 +166,8 @@ local es = {
     ["Choisis un métier puis un plan."] = "Elige una profesión y luego una receta.",
     ["Rechercher un plan"] = "Buscar una receta", ["Qualité : "] = "Calidad: ",
     ["Sélection : "] = "Selección: ", ["Commande postée !"] = "¡Pedido publicado!",
-    ["Réactifs : j'ai tout"] = "Reactivos: lo tengo todo", ["Réactifs : "] = "Reactivos: ",
+    ["Réactifs : j'ai tout — clic pour tout montrer."] = "Reactivos: lo tengo todo — clic para mostrar todo.",
+    ["Ne montrer que les plans dont j'ai déjà tous les réactifs."] = "Mostrar solo las recetas para las que ya tengo todos los reactivos.",
     ["[Prêt]"] = "[Listo]",
     ["Autres"] = "Otros",
     ["connus"] = "conocidas", ["niv. %d"] = "niv. %d",
