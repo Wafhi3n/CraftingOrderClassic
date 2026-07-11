@@ -8,6 +8,14 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "Neues",
+    -- v1.15.1
+    ["Tes commandes n'appartiennent qu'à toi"] = "Deine Aufträge gehören nur dir",
+    ["Les identifiants de commande étaient devinables : n'importe qui pouvait réécrire la tienne (acheteur, prix, quantité). C'est fermé : seul son auteur peut la modifier. Le relais entre joueurs, lui, continue de fonctionner — c'est comme ça qu'une commande atteint quelqu'un que le canal n'a jamais touché."] =
+        "Auftrags-IDs waren erratbar, und jeder konnte deinen umschreiben (Käufer, Preis, Menge). Das ist dicht: nur wer einen Auftrag erstellt hat, kann ihn ändern. Die Weitergabe zwischen Spielern funktioniert weiterhin, so erreicht ein Auftrag jemanden, den der Kanal nie erreicht hat.",
+    ["On ne peut plus te faire mettre en sourdine en postant de fausses commandes en ton nom, et un acheteur dont les commandes sont relayées en rafale n'est plus muté par erreur. « X a refusé ta commande » et le rappel « tu sais le faire » ne se rejouent plus en boucle, et rien ne passe d'un joueur que tu as mis en sourdine."] =
+        "Niemand kann dich stummschalten lassen, indem er gefälschte Aufträge in deinem Namen postet, und ein Käufer, dessen Aufträge im Schwall weitergegeben werden, wird nicht mehr versehentlich stummgeschaltet. „X hat deinen Auftrag abgelehnt“ und der Hinweis „du kannst das herstellen“ wiederholen sich nicht mehr endlos, und von jemandem, den du stummgeschaltet hast, kommt nichts mehr durch.",
+    ["La vue métier n'affiche plus les commandes privées destinées à quelqu'un d'autre, ni les expirées. Ton compteur de crafts livrés ne peut plus être gonflé par un tiers. Et croiser un artisan coûte deux fois moins de messages : le bonjour porte maintenant tes métiers, ce qui règle aussi les artisans qui s'affichaient sans aucun métier."] =
+        "Das Berufsfenster zeigt keine privaten Aufträge mehr, die für jemand anderen bestimmt sind, und keine abgelaufenen. Dein Zähler gelieferter Aufträge kann nicht mehr von Fremden aufgebläht werden. Und einem Handwerker zu begegnen kostet halb so viele Nachrichten: die Begrüßung trägt jetzt deine Berufe mit sich, was auch Handwerker behebt, die ganz ohne Berufe angezeigt wurden.",
     -- v1.15.0
     ["Recherche de travail : signale que tu es dispo"] = "Arbeitssuche: zeig, dass du verfügbar bist",
     ["Ouvre un métier et clique « Chercher du travail » : tout le royaume sait que tu es dispo, une icône d'artisan s'affiche au-dessus de ta tête pour ceux qui passent, et tu apparais « [Dispo] » dans leur annuaire. Ça s'éteint tout seul au bout d'un moment si tu oublies."] =
@@ -24,11 +32,6 @@ local news = {
     ["Protocole de commande durci : un autre client ne peut plus annuler ta commande, usurper une acceptation, ni s'attribuer une livraison."] =
         "Auftragsprotokoll gehärtet: ein anderer Client kann deinen Auftrag nicht mehr stornieren, eine Annahme vortäuschen oder eine Lieferung beanspruchen.",
     ["Commander depuis les panneaux Amis & Guilde"] = "Bestellen aus den Fenstern Freunde & Gilde",
-    ["Greffons échange & courrier, dock en vue Blizzard"] = "Handels- & Post-Zusätze, Andocken in Blizzard-Ansicht",
-    ["Panneaux compagnons sur la fenêtre d'échange et de courrier pour livrer une commande sans ouvrir le carnet."] =
-        "Begleitfenster am Handels- und Postfenster, um einen Auftrag zu liefern, ohne das Auftragsbuch zu öffnen.",
-    ["La colonne Commandes peut s'ancrer à droite de la fenêtre métier native (vue Blizzard)."] =
-        "Die Auftragsspalte kann rechts am nativen Berufsfenster andocken (Blizzard-Ansicht).",
     ["Sous le capot : mises à jour plus sûres"] = "Unter der Haube: sicherere Updates",
     ["Tes données sauvegardées portent désormais une version : une mise à jour qui doit les réorganiser ne tourne qu'une fois, tes recettes et commandes restent intactes."] =
         "Deine gespeicherten Daten tragen jetzt eine Version, sodass ein Update, das sie umbauen muss, nur einmal läuft und deine Rezepte und Aufträge unversehrt bleiben.",

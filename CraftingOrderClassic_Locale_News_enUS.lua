@@ -11,6 +11,14 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "What's New",
+    -- v1.15.1
+    ["Tes commandes n'appartiennent qu'à toi"] = "Your orders are yours",
+    ["Les identifiants de commande étaient devinables : n'importe qui pouvait réécrire la tienne (acheteur, prix, quantité). C'est fermé : seul son auteur peut la modifier. Le relais entre joueurs, lui, continue de fonctionner — c'est comme ça qu'une commande atteint quelqu'un que le canal n'a jamais touché."] =
+        "Order ids were guessable, and anyone could rewrite yours (buyer, price, quantity). That's closed: only the person who posted an order can change it. Relaying between players still works, which is how an order reaches someone the channel never touched.",
+    ["On ne peut plus te faire mettre en sourdine en postant de fausses commandes en ton nom, et un acheteur dont les commandes sont relayées en rafale n'est plus muté par erreur. « X a refusé ta commande » et le rappel « tu sais le faire » ne se rejouent plus en boucle, et rien ne passe d'un joueur que tu as mis en sourdine."] =
+        "Nobody can get you muted by posting fake orders under your name, and a buyer whose orders get relayed in a burst is no longer muted by mistake. \"X declined your order\" and the \"you can craft this\" nudge no longer replay on a loop, and nothing gets through from someone you've muted.",
+    ["La vue métier n'affiche plus les commandes privées destinées à quelqu'un d'autre, ni les expirées. Ton compteur de crafts livrés ne peut plus être gonflé par un tiers. Et croiser un artisan coûte deux fois moins de messages : le bonjour porte maintenant tes métiers, ce qui règle aussi les artisans qui s'affichaient sans aucun métier."] =
+        "The profession window no longer shows private orders meant for someone else, nor expired ones. Your delivered count can't be padded by a stranger. And crossing paths with an artisan costs half the messages it used to: saying hello now carries your professions, which also fixes artisans showing up with no professions at all.",
     -- v1.15.0
     ["Recherche de travail : signale que tu es dispo"] = "Looking for work: flag yourself as available",
     ["Ouvre un métier et clique « Chercher du travail » : tout le royaume sait que tu es dispo, une icône d'artisan s'affiche au-dessus de ta tête pour ceux qui passent, et tu apparais « [Dispo] » dans leur annuaire. Ça s'éteint tout seul au bout d'un moment si tu oublies."] =
@@ -27,11 +35,6 @@ local news = {
     ["Protocole de commande durci : un autre client ne peut plus annuler ta commande, usurper une acceptation, ni s'attribuer une livraison."] =
         "Hardened order protocol: another client can no longer cancel your order, fake an acceptance, or claim a delivery.",
     ["Commander depuis les panneaux Amis & Guilde"] = "Order from the Friends & Guild panels",
-    ["Greffons échange & courrier, dock en vue Blizzard"] = "Trade & mail companions, Blizzard-view dock",
-    ["Panneaux compagnons sur la fenêtre d'échange et de courrier pour livrer une commande sans ouvrir le carnet."] =
-        "Companion panels on the trade and mail windows to deliver an order without opening the board.",
-    ["La colonne Commandes peut s'ancrer à droite de la fenêtre métier native (vue Blizzard)."] =
-        "The Orders column can dock to the right of the native profession window (Blizzard view).",
     ["Sous le capot : mises à jour plus sûres"] = "Under the hood: safer upgrades",
     ["Tes données sauvegardées portent désormais une version : une mise à jour qui doit les réorganiser ne tourne qu'une fois, tes recettes et commandes restent intactes."] =
         "Your saved data now carries a version, so an upgrade that needs to reshape it runs once and your recipes and orders stay intact.",

@@ -8,6 +8,14 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "Novedades",
+    -- v1.15.1
+    ["Tes commandes n'appartiennent qu'à toi"] = "Tus pedidos son solo tuyos",
+    ["Les identifiants de commande étaient devinables : n'importe qui pouvait réécrire la tienne (acheteur, prix, quantité). C'est fermé : seul son auteur peut la modifier. Le relais entre joueurs, lui, continue de fonctionner — c'est comme ça qu'une commande atteint quelqu'un que le canal n'a jamais touché."] =
+        "Los identificadores de pedido se podían adivinar, y cualquiera podía reescribir el tuyo (comprador, precio, cantidad). Eso está cerrado: solo quien publicó un pedido puede modificarlo. El relevo entre jugadores sigue funcionando, que es como un pedido llega a alguien a quien el canal nunca alcanzó.",
+    ["On ne peut plus te faire mettre en sourdine en postant de fausses commandes en ton nom, et un acheteur dont les commandes sont relayées en rafale n'est plus muté par erreur. « X a refusé ta commande » et le rappel « tu sais le faire » ne se rejouent plus en boucle, et rien ne passe d'un joueur que tu as mis en sourdine."] =
+        "Nadie puede conseguir que te silencien publicando pedidos falsos en tu nombre, y un comprador cuyos pedidos se retransmiten en ráfaga ya no se silencia por error. «X ha rechazado tu pedido» y el aviso «sabes hacerlo» ya no se repiten en bucle, y no pasa nada de alguien a quien has silenciado.",
+    ["La vue métier n'affiche plus les commandes privées destinées à quelqu'un d'autre, ni les expirées. Ton compteur de crafts livrés ne peut plus être gonflé par un tiers. Et croiser un artisan coûte deux fois moins de messages : le bonjour porte maintenant tes métiers, ce qui règle aussi les artisans qui s'affichaient sans aucun métier."] =
+        "La ventana de profesión ya no muestra pedidos privados destinados a otra persona, ni los caducados. Tu contador de encargos entregados no puede inflarlo un tercero. Y cruzarte con un artesano cuesta la mitad de mensajes: el saludo ahora lleva tus profesiones, lo que también arregla los artesanos que aparecían sin ninguna profesión.",
     -- v1.15.0
     ["Recherche de travail : signale que tu es dispo"] = "Buscar trabajo: avisa que estás disponible",
     ["Ouvre un métier et clique « Chercher du travail » : tout le royaume sait que tu es dispo, une icône d'artisan s'affiche au-dessus de ta tête pour ceux qui passent, et tu apparais « [Dispo] » dans leur annuaire. Ça s'éteint tout seul au bout d'un moment si tu oublies."] =
@@ -24,11 +32,6 @@ local news = {
     ["Protocole de commande durci : un autre client ne peut plus annuler ta commande, usurper une acceptation, ni s'attribuer une livraison."] =
         "Protocolo de pedidos reforzado: otro cliente ya no puede cancelar tu pedido, falsear una aceptación ni atribuirse una entrega.",
     ["Commander depuis les panneaux Amis & Guilde"] = "Pedir desde los paneles Amigos y Hermandad",
-    ["Greffons échange & courrier, dock en vue Blizzard"] = "Complementos de intercambio y correo, anclaje en vista Blizzard",
-    ["Panneaux compagnons sur la fenêtre d'échange et de courrier pour livrer une commande sans ouvrir le carnet."] =
-        "Paneles complementarios en la ventana de intercambio y correo para entregar un pedido sin abrir el libro.",
-    ["La colonne Commandes peut s'ancrer à droite de la fenêtre métier native (vue Blizzard)."] =
-        "La columna Pedidos puede anclarse a la derecha de la ventana de profesión nativa (vista Blizzard).",
     ["Sous le capot : mises à jour plus sûres"] = "Bajo el capó: actualizaciones más seguras",
     ["Tes données sauvegardées portent désormais une version : une mise à jour qui doit les réorganiser ne tourne qu'une fois, tes recettes et commandes restent intactes."] =
         "Tus datos guardados ahora llevan una versión, así que una actualización que deba reorganizarlos se ejecuta una sola vez y tus recetas y pedidos quedan intactos.",

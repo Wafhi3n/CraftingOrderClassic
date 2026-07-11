@@ -1,6 +1,6 @@
 # Changelog — Crafting & Gathering Order — Classic
 
-## Unreleased — Your orders are yours
+## v1.15.1 — Your orders are yours
 
 Order ids were guessable. If someone worked out the id of an order you'd posted, they could rewrite it:
 change the buyer, the price, the quantity, who it was addressed to. That's closed. Only the person who
