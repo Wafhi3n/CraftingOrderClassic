@@ -1,5 +1,37 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.16.0 — Sorted recipes, and where the gold is
+
+Vanilla's profession window puts every potion you know under one heading called "Consumable", in whatever
+order it feels like. Recipes are now grouped properly: healing potions, mana potions, elixirs of strength,
+flasks, transmutes, and so on, each sorted from the highest rank down to the lowest. A potion that restores
+both health and mana appears under both headings, because that's where you'd look for it. The same grouping
+shows up everywhere the same recipes do — the Order tab, My Artisans, and the gathering professions, where
+ores, herbs, leathers and fish get the same treatment.
+
+If you run Lazy Gold, the addon now reads it. Every recipe carries a small coin indicator showing what it
+would earn you: a silver coin for pocket change, one to three gold coins as the numbers climb, stars past a
+thousand gold. Losses show nothing at all — this is here to point at what pays. Click the gold coin above
+the recipe list to sort by profit instead of by name, and the categories drop away so you get one flat
+ranking. The "123" button next to it switches from the coin indicator to exact amounts in gold, silver and
+copper. The Order tab gets the same two buttons, plus a line on every incoming order telling you what the
+goods are worth at auction and what the reagents you'd have to supply will cost you.
+
+In the Artisans directory, professions are now icons rather than names, and a crafter with a genuinely
+profitable plan gets a gold border on that profession's icon. Hover it and it names the plan and the money.
+Click it and you land in the Order tab, aimed at that crafter, that profession, with their plans filtered to
+what they can actually make.
+
+My Artisans got the same treatment, and one addition of its own: "All realm crafts" merges every profession
+of every character on your account into a single list ranked by profit, so you can see at a glance which of
+your alts is sitting on money. Cooking and Fishing are in there now — they sell. So are the essences, dusts
+and shards an enchanter gets from disenchanting, which aren't recipes and were being left out. The list only
+shows characters on your faction: you can't mail a plan to the other side, so listing them was never useful.
+
+If you run MissingTradeSkillsList, a button above the recipe list shows the recipes you haven't learned yet,
+in red, alongside the ones you have. Click one and the middle panel tells you where it comes from — vendor,
+drop, quest, with the NPC and the coordinates.
+
 ## v1.15.1 — Your orders are yours
 
 Order ids were guessable. If someone worked out the id of an order you'd posted, they could rewrite it:

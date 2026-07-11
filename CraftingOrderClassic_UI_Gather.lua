@@ -309,22 +309,28 @@ function UI:RefreshGatherList()
             end
         end
     end
-    table.sort(out, function(a, b) return a.name < b.name end)
+    -- Regroupement SECTION > SOUS-CATÉGORIE (cuirs / écailles / minerais…) par le moteur partagé —
+    -- même mécanique que la vue métier et l'onglet Commande. Un métier de récolte sans table déclarée
+    -- garde la liste plate d'avant. Pendant une recherche, le repliage est ignoré.
     self.gatherOutList = out
-    for i, item in ipairs(out) do
-        local row = self:_GatherListRow(i); local e = item.e
-        local r, g, b = Skin.RarityColor(e.itemID)
-        row.badge:Paint(r, g, b, Skin.FirstChar(item.name), Skin.Icon(e.itemID))
-        local disp = item.name:match("^item:") and ("|cFF777777" .. L["Chargement…"] .. "|r") or item.name
-        row.name:SetText(disp); row.name:SetTextColor(r, g, b)
-        if e == self.gatherEntry then row.name:SetTextColor(1, 0.85, 0.27) end
-        row.stack:SetText("")
-        row.entry = e; row.tipItemID = e.itemID; row:SetScript("OnClick", function() UI:SelectGatherItem(e) end); row:Show()
+    local disp = COC.RecipeCats:BuildDisplay(self.gatherProf, out, {
+        itemID    = function(it) return it.e and it.e.itemID end,
+        name      = function(it) return it.name or "" end,
+        collapsed = ((s or "") ~= "") and nil or self:_GatherCollapseTable(),
+    })
+    self.gatherDisplay = disp
+    for i, item in ipairs(disp) do
+        local row = self:_GatherListRow(i)
+        if item.isHeader then self:_FillGatherHeader(row, item) else self:_FillGatherRow(row, item) end
+        row:Show()
     end
-    for i = #out + 1, #self.gatherListRows do self.gatherListRows[i]:Hide() end
-    self.gatherListContent:SetHeight(math.max(#out * GLH, 10))
+    for i = #disp + 1, #self.gatherListRows do self.gatherListRows[i]:Hide() end
+    self.gatherListContent:SetHeight(math.max(#disp * GLH, 10))
     Skin.AutoHideScroll("COCGatherListScroll", self.gatherListContent)
 end
+
+-- Repliage + remplissage des lignes (en-tête / ressource) : cf. _UI_Gather_Categories.lua
+-- (extrait pour rester sous le plafond anti-monolithe).
 
 function UI:_GatherListRow(i)
     local r = self.gatherListRows[i]; if r then return r end
@@ -335,6 +341,8 @@ function UI:_GatherListRow(i)
     r.name:SetPoint("LEFT", 20, 0); r.name:SetJustifyH("LEFT"); r.name:SetWidth(LW - 80); Skin.ApplyShadow(r.name)
     r.stack = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     r.stack:SetPoint("RIGHT", -4, 0); Skin.ApplyShadow(r.stack)
+    -- Chevron des en-têtes de section/sous-catégorie (cf. _UI_Gather_Categories.lua).
+    r.expand = r:CreateTexture(nil, "ARTWORK"); r.expand:SetSize(14, 14); r.expand:Hide()
     self.gatherListRows[i] = r; Skin.WireItemTooltip(r); return r
 end
 

@@ -15,7 +15,6 @@ local ARW    = AREDGE - ARX
 
 local SRC_TAG = { guild = L["GUILDE"], friend = L["AMIS"], added = L["AJOUTÉ"], recent = L["CROISÉ"], confed = L["CONFÉDÉRÉ"] }
 
-local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true) end
 local function trim(s) return s and s:gsub("^%s+", ""):gsub("%s+$", "") or "" end
 
 -- Case à cocher CLIQUABLE : Skin.MakeCheck ne renvoie qu'une texture, on la pose sur un Button + libellé.
@@ -178,43 +177,8 @@ function UI:_SyncConfedTab()
     if not gwOn and self.artSource == "confed" then self.artSource = "all"; self:_RefreshArtSrcTabs() end
 end
 
--- Pills de filtre métier (Tous + chaque métier), avec retour à la ligne.
-function UI:_BuildArtPills(panel)
-    local c = CL(); local profs = c and c:Professions() or {}
-    local defs = { "Tous" }
-    for _, p in ipairs(profs) do   -- primaires seulement : pas de pill Cuisine/Secours/Pêche
-        if not (COC.SECONDARY_PROF and COC.SECONDARY_PROF[p]) then defs[#defs + 1] = p end
-    end
-    local x, y, rowH = 50, 0, 24      -- x départ = 50 pour dégager « Métier : »
-    local maxW = ARW - 4
-    for _, key in ipairs(defs) do
-        local label = (key == "Tous") and L["Tous"] or Skin.ProfLabel(key)   -- "Tous" = sentinelle (pas localisée)
-        local b = Skin.MakeGoldButton(panel, 10, 18, label)
-        local w = b.text:GetStringWidth() + 16
-        b:SetWidth(w)
-        if x + w > maxW then x = 0; y = y + rowH end
-        b:SetPoint("TOPLEFT", ARX + x, -94 - y)
-        b:SetScript("OnClick", function()
-            -- NB : surtout pas l'idiome `cond and nil or key` (Lua : `true and nil or key` == key).
-            if key == "Tous" then UI.artProfFilter = nil else UI.artProfFilter = key end
-            UI:_RefreshArtPills(); UI:RefreshArtisans()
-        end)
-        self.artPills[#self.artPills + 1] = { btn = b, key = key }
-        x = x + w + 4
-    end
-    -- Recale le haut de la liste sous la dernière rangée de pills.
-    self.artScroll:ClearAllPoints()
-    self.artScroll:SetPoint("TOPLEFT", ARX, -(94 + y + 28))
-    self.artScroll:SetPoint("BOTTOMRIGHT", -42, 22)
-    self:_RefreshArtPills()
-end
-
-function UI:_RefreshArtPills()
-    for _, p in ipairs(self.artPills or {}) do
-        local active = (p.key == "Tous" and self.artProfFilter == nil) or (p.key == self.artProfFilter)
-        p.btn:SetSelected(active)
-    end
-end
+-- Pills de filtre métier + icônes de métier des lignes : cf. _UI_Artisans_Icons.lua
+-- (UI:_BuildArtPills / _RefreshArtPills / _SetArtProfIcons / _SetArtProfitBorder).
 
 -- Ajout manuel (sera lié au vrai profil quand le joueur sera vu en ligne — backend Étape D).
 function UI:_AddArtisan(name)
@@ -342,7 +306,7 @@ function UI:_FillArtRow(row, a)
         local rep = (a.r.rep and a.r.rep > 0) and (" · " .. string.format(L["%d livrés"], a.r.rep)) or ""
         row.sub:SetText("|cFF888888" .. (a.online and L["En ligne"] or L["Hors ligne"]) .. " · " .. lvl .. rep .. "|r")
     end
-    UI:_SetArtProfIcons(row, profsList(a.r), a.r)
+    UI:_SetArtProfIcons(row, profsList(a.r), a.r, a.name)
     row.src:SetText("|cFF888888" .. (relayed and L["RELAIS"] or nonAddon and L["VU"]
         or (SRC_TAG[a.r.source or "recent"] or "")) .. "|r")
     self:_ArtRowButtons(row, a, nonAddon)
@@ -418,43 +382,4 @@ function UI:_ArtRow(i)
     r.whisper = Skin.MakeGoldButton(r, 78, 22, L["Chuchoter"]); r.whisper:SetPoint("RIGHT", -6, 0)
     r.addFriend = Skin.MakeGoldButton(r, 78, 18, L["Ajouter ami"]); r.addFriend:SetPoint("RIGHT", -6, -9); r.addFriend:Hide()
     self.artListRows[i] = r; return r
-end
-
--- Icônes de métier (survol = tooltip nom + niveau + cooldowns) à la place du texte concaténé.
-local ARI = 22   -- pas horizontal entre icônes
-function UI:_SetArtProfIcons(row, list, r)
-    local pool = row.profIconPool
-    for i, item in ipairs(list) do
-        local ic = pool[i]
-        if not ic then
-            ic = CreateFrame("Frame", nil, row.profsFrame); ic:SetSize(18, 18)
-            local tex = ic:CreateTexture(nil, "ARTWORK"); tex:SetAllPoints()
-            tex:SetTexCoord(0.08, 0.92, 0.08, 0.92); ic.tex = tex
-            ic:SetScript("OnEnter", function(self)
-                GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-                GameTooltip:SetText(self.tipLabel or "", 1, 1, 1)
-                if self.tipSub then GameTooltip:AddLine(self.tipSub, 0.910, 0.722, 0.294) end
-                for _, ln in ipairs(self.tipCds or {}) do   -- cooldowns : vert = prête, orange = en recharge
-                    if ln.ready then GameTooltip:AddLine(ln.text, 0.3, 0.9, 0.4)
-                    else GameTooltip:AddLine(ln.text, 1.0, 0.65, 0.2) end
-                end
-                GameTooltip:Show()
-            end)
-            ic:SetScript("OnLeave", GameTooltip_Hide)
-            pool[i] = ic
-        end
-        ic:ClearAllPoints(); ic:SetPoint("LEFT", (i - 1) * ARI, 0)
-        ic.tex:SetTexture(Skin.ProfIcon(item.key) or Skin.tex.unknown)
-        ic.tipLabel = Skin.ProfLabel(item.key)
-        local sub = item.sv and ((item.sv[1] or "?") .. "/" .. (item.sv[2] or "?"))
-            or (item.est ~= nil and ((item.est > 0) and string.format(L["%d+ · vu crafter"], item.est) or L["vu crafter (sans l'addon)"]))
-            or nil
-        if item.who then sub = (sub and (sub .. " — ") or "") .. item.who end   -- ligne fusionnée : PORTEUR du métier
-        ic.tipSub = sub
-        local rr = item.r or r                       -- fusion : les CD viennent du PORTEUR, pas de la vitrine
-        local So = COC.Social
-        ic.tipCds = (rr and So and So.CooldownLines) and So:CooldownLines(rr, 3, item.key) or nil
-        ic:Show()
-    end
-    for i = #list + 1, #pool do pool[i]:Hide() end
 end

@@ -97,7 +97,8 @@ function UI:_FillArtGroupRow(row, g)
     end
     if g.repMax > 0 then sub = sub .. " · " .. string.format(L["%d livrés"], g.repMax) end
     row.sub:SetText("|cFF888888" .. sub .. "|r")
-    UI:_SetArtProfIcons(row, UI:_GroupProfs(g), lead.r)
+    -- 4e arg = repli si le métier n'a pas de porteur nommé (item.who) : le perso en ligne du set.
+    UI:_SetArtProfIcons(row, UI:_GroupProfs(g), lead.r, g.onlineChar or g.leader)
     row.src:SetText("|cFF888888" .. (UI._SrcTag[lead.r.source or "recent"] or "") .. "|r")
     self:_ArtRowButtons(row, { name = g.onlineChar or g.leader, online = g.onlineChar ~= nil, r = lead.r }, false, g.anyPartner)
     row:SetScript("OnEnter", function(self)

@@ -39,13 +39,37 @@ function UI:BuildMyArtisansTab(f)
     lhdr:SetPoint("TOPLEFT", 14, -108); lhdr:SetText(L["MÉTIERS DU COMPTE"])
     lhdr:SetTextColor(Skin.unpack(Skin.color.textMuted))
 
+    -- « Tous les plans du royaume » : au-dessus de la liste des métiers, car c'est une ALTERNATIVE à
+    -- la sélection d'un métier (on sort du découpage par métier), pas une option de la vue de droite.
+    local allBtn = Skin.MakeGoldButton(panel, LW - 22, 20, L["Tous les plans du royaume"])
+    allBtn:SetPoint("TOPLEFT", 12, -124); self.myArtAllBtn = allBtn
+    allBtn:SetScript("OnClick", function()
+        if not (COC.LazyGold and COC.LazyGold:IsAvailable()) then return end
+        UI.myArtAllProfs = not UI.myArtAllProfs
+        UI:RefreshMyArtisans()
+    end)
+
     local lscroll = CreateFrame("ScrollFrame", "COCMyArtProfScroll", panel, "UIPanelScrollFrameTemplate")
-    lscroll:SetPoint("TOPLEFT", 12, -126); lscroll:SetPoint("BOTTOMLEFT", 12, 22); lscroll:SetWidth(LW - 22)
+    lscroll:SetPoint("TOPLEFT", 12, -150); lscroll:SetPoint("BOTTOMLEFT", 12, 22); lscroll:SetWidth(LW - 22)
     local lc = CreateFrame("Frame", nil, lscroll); lc:SetSize(LW - 24, 10); lscroll:SetScrollChild(lc)
     self.myArtProfContent = lc; self.myArtProfRows = {}
 
     local rhdr = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     rhdr:SetPoint("TOPLEFT", RX, -108); Skin.ApplyShadow(rhdr); self.myArtDetailHdr = rhdr
+
+    -- Bascule « recettes manquantes » : mêmes codes que la vue métier. Le manquant est calculé ICI à
+    -- partir du catalogue CraftLink moins ce que le reroll connaît — surtout PAS via MTSL, dont les
+    -- MISSING_SKILLS ne valent que pour le perso CONNECTÉ (faux pour un reroll).
+    self.myArtMissing = false
+    local mBtn = Skin.MakeGoldButton(panel, 110, 18, "")
+    mBtn:SetPoint("TOPRIGHT", -30, -106); self.myArtMissBtn = mBtn
+    mBtn:SetScript("OnClick", function()
+        UI.myArtMissing = not UI.myArtMissing
+        UI:RefreshMyArtisans()
+    end)
+
+    -- Barre Lazy Gold (pièce / « 123 » / « Tout le royaume »), à gauche du bouton Manquantes.
+    self:_BuildMyArtLGBar(panel, mBtn)
 
     local rscroll = CreateFrame("ScrollFrame", "COCMyArtRecScroll", panel, "UIPanelScrollFrameTemplate")
     rscroll:SetPoint("TOPLEFT", RX, -128); rscroll:SetPoint("BOTTOMRIGHT", -30, 22)
@@ -184,17 +208,32 @@ function UI:_MyArtRecRow(i)
     r.icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
     r.name = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     r.name:SetJustifyH("LEFT"); Skin.ApplyShadow(r.name)
+    -- Rentabilité Lazy Gold, tout à droite ; « porté par » se cale à sa gauche.
+    r.profit = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    r.profit:SetPoint("RIGHT", -6, 0); r.profit:SetJustifyH("RIGHT"); Skin.ApplyShadow(r.profit)
     r.who = r:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    r.who:SetPoint("RIGHT", -6, 0); r.who:SetJustifyH("RIGHT"); r.who:SetWidth(120); Skin.ApplyShadow(r.who)
+    r.who:SetPoint("RIGHT", r.profit, "LEFT", -6, 0); r.who:SetJustifyH("RIGHT"); r.who:SetWidth(120); Skin.ApplyShadow(r.who)
+    r:EnableMouse(true); Skin.WireItemTooltip(r)   -- tooltip d'objet/sort (lit tipItemID/tipSpellID)
     self.myArtRecRows[i] = r; return r
 end
 
 -- Ancre le libellé (nom) : après l'icône (x=20) ou collé au bord (header, x=4), largeur bornée pour
--- ne pas chevaucher la colonne « porté par ». SetPoint répété empile les ancres → ClearAllPoints.
-local function anchorName(row, x)
+-- ne pas chevaucher « porté par » ni la colonne de profit. SetPoint répété empile les ancres
+-- → ClearAllPoints. `reserve` = place prise à droite par le profit (0 si la ligne n'en a pas).
+local function anchorName(row, x, reserve)
     row.name:ClearAllPoints()
     row.name:SetPoint("LEFT", x, 0)
-    row.name:SetWidth(RW - 24 - x - 126)
+    row.name:SetWidth(math.max(20, RW - 24 - x - 126 - (reserve or 0)))
+end
+
+-- Profit Lazy Gold d'une ligne (mémorisé le temps du refresh). Renvoie la largeur consommée, pour
+-- que le nom se rétrécisse d'autant.
+function UI:_FillMyArtProfit(row, rc)
+    local LG = COC.LazyGold
+    local txt = LG and LG:ProfitText(self:_MyArtProfit(rc)) or ""
+    row.profit:SetText(txt)
+    row.profit:SetShown(txt ~= "")
+    return (txt ~= "") and (row.profit:GetStringWidth() + 6) or 0
 end
 
 -- Persos du compte qui connaissent CE spellID (colonne « porté par »).
@@ -202,6 +241,17 @@ local function knowersOf(e, sid)
     local out = {}
     for _, c in ipairs(e.chars) do if c.known[sid] then out[#out + 1] = c.name end end
     return table.concat(out, ", ")
+end
+
+-- Une entrée de recette (connue ou manquante). `who` et `profKey` sont figés à la construction : en
+-- mode « tout le royaume » la ligne n'a plus de métier de contexte, elle doit se suffire à elle-même.
+local function recEntryOf(e, sid, missing)
+    local c = CL()
+    local itemID = c and c:RecipeProduct(e.profKey, sid)
+    local nm = (c and c:RecipeName(sid)) or (c and itemID and c:ItemName(itemID)) or ("spell:" .. sid)
+    return { sid = sid, name = nm, itemID = itemID, missing = missing, profKey = e.profKey,
+             who = missing and "" or knowersOf(e, sid),
+             at = c and c:RecipeLearnedAt(e.profKey, sid) }
 end
 
 -- Bandeau cooldowns EN HAUT : une ligne par CD actif et par perso porteur (« Transmutation : dans
@@ -222,52 +272,108 @@ function UI:_MyArtCooldownItems(e)
     return items
 end
 
--- Construit la liste d'affichage : [bandeau CD] puis recettes GROUPÉES PAR SECTION (SectionOf du
--- produit, comme la vue métier). Chaque élément = { cd/header/recipe }.
-function UI:_MyArtDisplayList(e)
+-- Construit la liste d'affichage : [bandeau CD] puis recettes groupées SECTION > SOUS-CATÉGORIE par
+-- le moteur partagé (COC.RecipeCats:BuildDisplay) — mêmes catégories que la vue métier et l'onglet
+-- Commande. Pas de repliage ici : les lignes de ce pool sont des Frame (non cliquables), contrairement
+-- aux deux autres listes. Chaque élément = { cd | en-tête | recette }.
+-- Produits du métier qui n'ont PAS de recette : essences/poussières/éclats de désenchantement,
+-- poissons, minerais… On ne les FABRIQUE pas (aucun spellID), mais ils se vendent — et un métier
+-- comme la Pêche n'a QUE ça. Règle unique : toute entrée du catalogue avec un itemID et sans
+-- spellID. Ils appartiennent à quiconque a le métier, donc pas de filtre « connu ».
+-- Skin.ItemExists écarte les objets ABSENTS du client (poissons TBC/WotLK dans le catalogue commun :
+-- sur un client Era leur nom ne se résout pas et on afficherait « item:41800 »).
+local function itemOnlyEntries(e)
     local c = CL()
-    local list = self:_MyArtCooldownItems(e)
+    local out = {}
+    for _, it in ipairs((c and c:ProfessionCatalogue(e.profKey)) or {}) do
+        if it.itemID and not it.spellID and Skin.ItemExists(it.itemID) then
+            local nm = c:ItemName(it.itemID)
+            local who = {}
+            for _, ch in ipairs(e.chars) do who[#who + 1] = ch.name end
+            out[#out + 1] = { itemID = it.itemID, name = nm, profKey = e.profKey,
+                              noSpell = true, who = table.concat(who, ", ") }
+        end
+    end
+    return out
+end
+
+-- Recettes du métier que ce reroll NE connaît PAS = catalogue CraftLink moins e.known. Calcul local
+-- et exact pour N'IMPORTE quel perso du compte (MTSL, lui, ne sait répondre que pour le connecté).
+function UI:_MyArtMissing(e)
+    if not self.myArtMissing then return 0 end
+    local c = CL()
+    local n = 0
+    for _, sid in ipairs((c and c:GetRecipes(e.profKey)) or {}) do
+        if not e.known[sid] then n = n + 1 end
+    end
+    return n
+end
+
+-- `profs` = tous les métiers du compte (utilisé seulement en mode « tout le royaume »).
+function UI:_MyArtDisplayList(e, profs)
+    -- « Tout le royaume » : liste à plat inter-métiers, triée par profit. Pas de bandeau CD (il est
+    -- propre à un métier), pas de sections (le tri global est justement ce qu'on veut voir).
+    if self.myArtAllProfs then return self:_MyArtAllList(profs or { e }, recEntryOf, itemOnlyEntries) end
+
+    local c = CL()
     local recs = {}
-    for sid in pairs(e.known) do
-        local itemID = c and c:RecipeProduct(e.profKey, sid)
-        local label, rank = L["Autres"], 900
-        if itemID and COC.SectionOf then label, rank = COC.SectionOf(itemID) end
-        local nm = (c and c:RecipeName(sid)) or (c and itemID and c:ItemName(itemID)) or ("spell:" .. sid)
-        recs[#recs + 1] = { sid = sid, name = nm, sec = label, secRank = rank or 900,
-            at = c and c:RecipeLearnedAt(e.profKey, sid), itemID = itemID }
+    for sid in pairs(e.known) do recs[#recs + 1] = recEntryOf(e, sid, false) end
+    for _, it in ipairs(itemOnlyEntries(e)) do recs[#recs + 1] = it end
+    if self.myArtMissing then
+        for _, sid in ipairs((c and c:GetRecipes(e.profKey)) or {}) do
+            if not e.known[sid] then recs[#recs + 1] = recEntryOf(e, sid, true) end
+        end
     end
-    table.sort(recs, function(a, b)
-        if a.secRank ~= b.secRank then return a.secRank < b.secRank end
-        if a.sec ~= b.sec then return a.sec < b.sec end
-        return a.name < b.name
-    end)
-    local curSec
-    for _, rc in ipairs(recs) do
-        if rc.sec ~= curSec then curSec = rc.sec; list[#list + 1] = { header = true, text = rc.sec } end
-        list[#list + 1] = rc
+    -- Tri par rentabilité : liste à PLAT (les catégories disparaissent), comme la vue métier.
+    if self.myArtSortProfit and COC.LazyGold and COC.LazyGold:IsAvailable() then
+        local flat = self:_MyArtCooldownItems(e)
+        for _, rc in ipairs(self:_MyArtSortByProfit(recs)) do flat[#flat + 1] = rc end
+        return flat
     end
+
+    local list = self:_MyArtCooldownItems(e)
+    local disp = COC.RecipeCats:BuildDisplay(e.profKey, recs, {
+        itemID = function(rc) return rc.itemID end,
+        name   = function(rc) return rc.name or "" end,
+    })
+    for _, it in ipairs(disp) do list[#list + 1] = it end
     return list
 end
 
-function UI:_FillMyArtRecipes(e)
-    local list = self:_MyArtDisplayList(e)
+function UI:_FillMyArtRecipes(e, profs)
+    local list = self:_MyArtDisplayList(e, profs)
     local n = 0
     for _, it in ipairs(list) do
         n = n + 1
         local row = self:_MyArtRecRow(n)
-        if it.header then
-            row.icon:Hide(); anchorName(row, 4)
-            row.name:SetText("|cFFE8B84B" .. it.text .. "|r"); row.who:SetText("")
+        row.tipItemID, row.tipSpellID = nil, nil   -- lignes poolées : purge le tooltip précédent
+        if it.isHeader then
+            -- Section (doré, collé au bord) ou sous-catégorie (bronze, indentée) + compte.
+            local sub = (it.depth == 2)
+            row.icon:Hide(); row.profit:Hide(); anchorName(row, sub and 14 or 4, 0)
+            local cnt = (it.count and it.count > 0) and string.format(" |cFF888888(%d)|r", it.count) or ""
+            row.name:SetText((sub and "|cFFC9A227" or "|cFFE8B84B") .. (it.label or "") .. "|r" .. cnt)
+            row.who:SetText("")
         elseif it.cd then
-            row.icon:Show(); row.icon:SetTexture("Interface\\Icons\\Spell_Holy_BorrowedTime"); anchorName(row, 20)
+            row.icon:Show(); row.profit:Hide(); anchorName(row, 20, 0)
+            row.icon:SetTexture("Interface\\Icons\\Spell_Holy_BorrowedTime")
             row.name:SetText((it.ready and "|cFF4CDB6E" or "|cFFFFA633") .. it.text .. "|r")
             row.who:SetText("|cFF888888" .. (it.who or "") .. "|r")
         else
             -- Icône de l'OBJET PRODUIT d'abord (GetItemIcon, fiable), repli sort — GetSpellTexture sur
             -- un spellID de recette rend souvent le placeholder « tête » en Classic Era.
-            row.icon:Show(); row.icon:SetTexture(Skin.Icon(it.itemID, it.sid) or Skin.tex.unknown); anchorName(row, 20)
-            row.name:SetText("|cFFFFFFFF" .. it.name .. "|r" .. (it.at and (" |cFF888888(" .. it.at .. ")|r") or ""))
-            row.who:SetText("|cFF888888" .. knowersOf(e, it.sid) .. "|r")
+            row.icon:Show(); row.icon:SetTexture(Skin.Icon(it.itemID, it.sid) or Skin.tex.unknown)
+            row.icon:ClearAllPoints(); row.icon:SetPoint("LEFT", it._sub and 16 or 2, 0)
+            row.icon:SetDesaturated(it.missing and true or false)   -- non apprise = grisée, comme la vue métier
+            local w = self:_FillMyArtProfit(row, it)
+            anchorName(row, it._sub and 34 or 20, w)
+            row.tipItemID, row.tipSpellID = it.itemID, it.sid   -- tooltip d'objet au survol
+            local col = it.missing and "|cFFDD4444" or "|cFFFFFFFF"   -- non apprise = ROUGE
+            -- Inter-métiers : la ligne n'a plus d'en-tête de métier au-dessus → on préfixe son icône.
+            local pfx = self.myArtAllProfs and it.profKey
+                and ("|T" .. (Skin.ProfIcon(it.profKey) or Skin.tex.unknown) .. ":12|t ") or ""
+            row.name:SetText(pfx .. col .. it.name .. "|r" .. (it.at and (" |cFF888888(" .. it.at .. ")|r") or ""))
+            row.who:SetText("|cFF888888" .. (it.who or "") .. "|r")
         end
         row:Show()
     end
@@ -283,6 +389,8 @@ end
 function UI:RefreshMyArtisans()
     local panel = self.myArtisansPanel; if not panel then return end
     self:_SyncMyArtHeader()
+    self._myArtProfitCache = {}   -- invalidé à chaque refresh (les prix Auctionator ont pu changer)
+    self:_SyncMyArtLGBar()
     local D = COC.Directory
     local list = (D and D.AggregateMyProfs and D:AggregateMyProfs()) or {}
     -- Tri par libellé LOCALISÉ à rang égal (le cœur trie déjà par bestRank desc puis clé EN).
@@ -311,12 +419,25 @@ function UI:RefreshMyArtisans()
         return
     end
 
-    local lvl = selE.bestRank > 0 and (" |cFF888888" .. selE.bestRank .. "/" .. selE.bestMax .. "|r") or ""
-    self.myArtDetailHdr:SetText("|cFFE8B84B" .. Skin.ProfLabel(selE.profKey) .. "|r" .. lvl)
-    local shown = self:_FillMyArtRecipes(selE)
+    -- En-tête : le métier sélectionné, ou « Tout le royaume » quand la vue est inter-métiers.
+    if self.myArtAllProfs then
+        self.myArtDetailHdr:SetText("|cFFE8B84B" .. L["Tous les plans du royaume"] .. "|r |cFF888888"
+            .. string.format(L["%d métiers"], n) .. "|r")
+    else
+        local lvl = selE.bestRank > 0 and (" |cFF888888" .. selE.bestRank .. "/" .. selE.bestMax .. "|r") or ""
+        self.myArtDetailHdr:SetText("|cFFE8B84B" .. Skin.ProfLabel(selE.profKey) .. "|r" .. lvl)
+    end
+    if self.myArtMissBtn then
+        -- « Manquantes » n'a pas de sens inter-métiers (on y montre ce qu'on sait déjà faire).
+        self.myArtMissBtn:SetShown(not self.myArtAllProfs)
+        self.myArtMissBtn:SetSelected(self.myArtMissing)
+        self.myArtMissBtn:SetText(self.myArtMissing
+            and string.format(L["Manquantes (%d)"], self:_MyArtMissing(selE)) or L["Manquantes"])
+    end
+    local shown = self:_FillMyArtRecipes(selE, list)
     if shown == 0 then
         local row = self:_MyArtRecRow(1)
-        row.icon:SetTexture(Skin.tex.unknown)
+        row.icon:SetTexture(Skin.tex.unknown); row.profit:Hide()
         row.name:SetText("|cFF888888" .. L["Pas de recettes connues (métier de récolte ?)."] .. "|r")
         row.who:SetText(""); row:Show()
     end

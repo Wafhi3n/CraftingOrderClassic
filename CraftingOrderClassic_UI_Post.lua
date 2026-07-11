@@ -128,6 +128,9 @@ function UI:_BuildPostLeft(panel)
     -- Pool FIXE de lignes réutilisées au scroll (virtualisation ; cf. VISIBLE + _RenderPostPlanWindow).
     self.postPlanRows = {}
     for i = 1, VISIBLE do self.postPlanRows[i] = self:_PostPlanRow(i) end
+    -- Barre Lazy Gold calée sur le bord DROIT du scroll (pas sur lhdr : un FontString se dimensionne
+    -- à son texte, son bord droit bougerait avec la traduction).
+    self:_BuildPostLGBar(panel, pscroll)   -- pièce (tri rentabilité) + « 123 » (valeurs exactes)
 end
 
 -- Filtre qualité (pill) + recherche + filtre « réactifs en poche » (P2). Extrait de _BuildPostLeft
@@ -227,7 +230,13 @@ function UI:_BuildPostRight(panel)
     self.postQty:SetAutoFocus(false); self.postQty:SetNumeric(true); self.postQty:SetText("1")
     self.postQty:SetScript("OnEscapePressed", function(b) b:ClearFocus() end)
 
-    sep1px(panel, RX, REDGE, -328)
+    -- Repère de prix Lazy Gold : valeur HV du produit + coût des réactifs, pour fixer une commission
+    -- juste. Masqué si Lazy Gold absent. Rempli dans RefreshPostPlanDetail.
+    self.postPriceHint = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    self.postPriceHint:SetPoint("TOPLEFT", RX, -324); self.postPriceHint:SetJustifyH("LEFT")
+    self.postPriceHint:SetTextColor(Skin.unpack(Skin.color.textMuted)); Skin.ApplyShadow(self.postPriceHint)
+
+    sep1px(panel, RX, REDGE, -338)
 
     self:_BuildPostArtisanSection(panel)
 end
@@ -277,6 +286,8 @@ end
 
 function UI:RefreshPostPlans()
     local c = CL(); if not (c and self.postPlanContent) then return end
+    self._postProfitCache = {}   -- invalidé à chaque refresh (les prix Auctionator ont pu changer)
+    self:_SyncPostLGBar()
     local list = self.postProf and c:ProfessionCatalogue(self.postProf) or {}
     local s = self.postSearch
     local qmin = QUALITY_STEPS[self.postQualityIdx or 1]   -- seuil qualité minimal (ou false = Toutes)
@@ -286,18 +297,25 @@ function UI:RefreshPostPlans()
     local artFilter, artMode = nil, nil
     if self.postProf then artFilter, artMode = self:_TargetArtisanFilter(self.postProf) end
     local countCache = {}   -- mémo GetItemCount par itemID, valable le temps de CE refresh (cf. hasReagentsInBags)
+    -- Produits de DÉSENCHANTEMENT (essences, poussières, éclats) : ils n'ont PAS de spellID — on ne les
+    -- fabrique pas, on les obtient en détruisant un objet. Ils sont pourtant parfaitement commandables
+    -- à un enchanteur, donc ils ne doivent pas tomber dans le filtre « craftable uniquement ».
+    local def = c.GetProfession and c:GetProfession(self.postProf)
+    local disen = def and def.disenchant
     local out = {}
     for _, e in ipairs(list) do
-        -- Commande = objets CRAFTABLES uniquement (recette/sort) ; les récoltes pures (sans spellID)
-        -- vivent dans l'onglet Récolte. On masque les objets liés (non échangeables) et ceux absents
-        -- du client (autre extension).
-        if e.spellID and Skin.ItemExists(e.itemID) and not (e.itemID and isSoulbound(e.itemID))
-            and (not artFilter or artFilter(e.spellID)) then
+        -- Commande = objets CRAFTABLES (recette/sort) + produits de désenchantement. Les récoltes pures
+        -- vivent dans l'onglet Récolte. On masque les objets liés (non échangeables) et ceux absents du
+        -- client (autre extension).
+        local isDisen = (not e.spellID) and disen and e.itemID and disen[e.itemID] ~= nil
+        if (e.spellID or isDisen) and Skin.ItemExists(e.itemID) and not (e.itemID and isSoulbound(e.itemID))
+            and (not artFilter or not e.spellID or artFilter(e.spellID)) then
             local okq = true
             if qmin and e.itemID then local q = select(3, GetItemInfo(e.itemID)); okq = q ~= nil and q >= qmin end
             local nm = entryName(e)
             if okq and (not s or s == "" or nm:lower():find(s, 1, true)) then
-                local ready = hasReagentsInBags(c, self.postProf, e.spellID, countCache)
+                -- Sans recette, pas de réactifs à avoir en poche : « prêt » n'a pas de sens (false).
+                local ready = e.spellID and hasReagentsInBags(c, self.postProf, e.spellID, countCache) or false
                 if not self.postReagFilter or ready then
                     out[#out + 1] = {e = e, name = nm, ready = ready}
                 end
@@ -331,9 +349,16 @@ function UI:_PostPlanRow(i)
     r.hdrLine = r:CreateTexture(nil, "ARTWORK"); r.hdrLine:SetHeight(1)
     r.hdrLine:SetColorTexture(Skin.color.gold[1], Skin.color.gold[2], Skin.color.gold[3], 0.25)
     r.hdrLine:SetPoint("BOTTOMLEFT", 2, 3); r.hdrLine:SetPoint("BOTTOMRIGHT", -2, 3); r.hdrLine:Hide()
+    -- Chevron +/- des en-têtes : TEXTURE native (la police rend « ▾ » en tofu).
+    r.expand = r:CreateTexture(nil, "ARTWORK"); r.expand:SetSize(14, 14); r.expand:Hide()
+    -- Indicateur de rentabilité Lazy Gold (cf. _UI_Post_LazyGold.lua) : le plus à droite, masqué
+    -- si Lazy Gold est absent ou si le plan n'est pas rentable.
+    r.profit = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    r.profit:SetPoint("RIGHT", -4, 0); r.profit:SetJustifyH("RIGHT"); Skin.ApplyShadow(r.profit); r.profit:Hide()
     r:SetScript("OnClick", function(self2)
-        local it = self2.item
-        if it and not it.isHeader and it.e then UI:SelectPostPlan(it.e) end
+        local it = self2.item; if not it then return end
+        if it.isHeader then UI:TogglePostSection(it.ckey)
+        elseif it.e then UI:SelectPostPlan(it.e) end
     end)
     self.postPlanRows[i] = r; Skin.WireItemTooltip(r); return r
 end
@@ -345,13 +370,28 @@ function UI:RefreshPostPlanDetail()
         self.postReagHdr:SetShown(false); self.postBQCount:SetText("")
         for i = 1, #self.postReagRows do self.postReagRows[i]:Hide() end
         self.postReagContent:SetHeight(10)
+        if self.postPriceHint then self.postPriceHint:SetText("") end
         if self.postSelLbl then self.postSelLbl:SetText("|cFF888888" .. L["Choisis un métier puis un plan."] .. "|r") end
         return
     end
     local nm = entryName(e); local r, g, b = Skin.RarityColor(e.itemID)
     self.postPlanBadge:Paint(r, g, b, Skin.FirstChar(nm), Skin.Icon(e.itemID, e.spellID)); self.postPlanBadge:Show()
     self.postPlanName:SetText(nm); self.postPlanName:SetTextColor(r, g, b)
+    self:_RefreshPostPriceHint(e)
     self:RefreshPostReagents()
+end
+
+-- Repère de prix Lazy Gold sous la commission : « Valeur HV: Xg · Réactifs: Yg ». Aide à fixer une
+-- commission cohérente avec le marché. Vide si Lazy Gold absent ou prix produit inconnu.
+function UI:_RefreshPostPriceHint(e)
+    local hint = self.postPriceHint; if not hint then return end
+    local LG = COC.LazyGold
+    local val = LG and e.itemID and LG:ItemValue(e.itemID)
+    if not val then hint:SetText(""); return end
+    local txt = "|cFFE8B84B" .. L["Valeur HV"] .. ":|r " .. GetCoinTextureString(val)
+    local p = e.spellID and LG:CraftProfit(self.postProf, e.spellID, 1)
+    if p and p.cost > 0 then txt = txt .. "   |cFFE8B84B" .. L["Réactifs"] .. ":|r " .. GetCoinTextureString(p.cost) end
+    hint:SetText(txt)
 end
 
 function UI:RefreshPostReagents()

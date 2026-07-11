@@ -80,6 +80,22 @@ function PW:_BuildHeader(f)
     vanilla:SetScript("OnClick", function() PW:SetEnabled(false) end)
     self.vanillaBtn = vanilla
 
+    -- Toggle « Manquantes » : bascule la liste de gauche entre les recettes APPRISES (défaut) et celles
+    -- qui MANQUENT au perso, avec leur source (formateur/butin/quête…). Alimenté par le pont MTSL ;
+    -- masqué si l'addon n'est pas là (dépendance molle) et hors mode plein (n'a de sens que sur ton métier).
+    local missing = Skin.MakeGoldButton(f, 110, 18, L["Manquantes"])
+    missing:SetPoint("TOPRIGHT", vanilla, "BOTTOMRIGHT", 0, -4)
+    missing:SetScript("OnClick", function() PW:_ToggleMissing() end)
+    missing:SetScript("OnEnter", function(b)
+        GameTooltip:SetOwner(b, "ANCHOR_BOTTOMLEFT")
+        GameTooltip:SetText(PW.missingMode and L["Masque les recettes non apprises — clic pour revenir."]
+            or L["Affiche AUSSI les recettes non apprises (en rouge) et où les obtenir."], 1, 1, 1, 1, true)
+        GameTooltip:Show()
+    end)
+    missing:SetScript("OnLeave", GameTooltip_Hide)
+    missing:Hide()
+    self.missingBtn = missing
+
     -- Toggle « Chercher du travail » (LFW) : signale au royaume que tu cherches du travail dans le métier
     -- OUVERT (donc forcément le tien). Masqué hors vue pleine (reroll/compact = pas ton perso courant).
     local lfw = Skin.MakeGoldButton(f, 150, 18, L["Chercher du travail"])
@@ -113,6 +129,30 @@ function PW:_ToggleLFW()
     if not (D and D.SetLFW and self.profKey) or self.rerollKey then return end
     if D.MyLFW and D:MyLFW() == self.profKey then D:SetLFW(nil) else D:SetLFW(self.profKey) end
     self:_SyncLFWBtn()
+end
+
+-- Bascule liste apprises <-> manquantes. Réinitialise la sélection (une recette d'un mode n'existe pas
+-- dans l'autre) puis rafraîchit liste + détail. Sans effet si MTSL absent.
+function PW:_ToggleMissing()
+    if not (COC.MTSL and COC.MTSL:IsAvailable()) or self.rerollKey then return end
+    self.missingMode = not self.missingMode
+    self.selectedKey, self.selectedIndex = nil, nil
+    self:_SyncMissingBtn()
+    if self.RefreshRecipes then self:RefreshRecipes() end
+    if self.RefreshDetail  then self:RefreshDetail()  end
+end
+
+-- Le bouton « Manquantes » n'apparaît qu'en VUE PLEINE d'un métier À MOI et si MTSL est chargé. Libellé
+-- enrichi du nombre de recettes manquantes. Désarme le mode si le contexte ne s'y prête plus (reroll…).
+function PW:_SyncMissingBtn()
+    local b = self.missingBtn; if not b then return end
+    local ok = COC.MTSL and COC.MTSL:IsAvailable()
+    local show = ok and self.profKey and not self.rerollKey and not self._compact and not self.docked
+    b:SetShown(show and true or false)
+    if not show then self.missingMode = false; return end
+    local n = COC.MTSL:MissingCount(self.profKey)
+    b:SetText(self.missingMode and L["‹ Apprises seules"] or string.format(L["Manquantes (%d)"], n))
+    if b.SetSelected then b:SetSelected(self.missingMode and true or false) end
 end
 
 -- Le bouton LFW n'a de sens qu'en VUE PLEINE d'un métier À MOI (pas reroll, pas compact/dock). État
@@ -253,6 +293,7 @@ function PW:_RefreshDock()
     local rank, maxRank = craft:OpenRank()
     self.rankFS:SetText((rank and maxRank) and string.format("|cFFE8B84B%d|r / %d", rank, maxRank) or "")
     self:_SyncLFWBtn()
+    self:_SyncMissingBtn()
     if self.RefreshOrders then self:RefreshOrders() end
 end
 
@@ -267,6 +308,7 @@ function PW:_DoRefresh()
     if self.docked then self:_RefreshDock(); return end
     local craft = COC.Craft
     local name = craft and craft:GetOpenProfessionInfo()
+    if not name then self.missingMode = false end   -- « manquantes » n'existe qu'en vue pleine de MON métier
     if name then                                   -- mode PLEIN : fenêtre métier native ouverte
         self.rerollKey = nil                        -- la native prime sur une vue reroll résiduelle
         self.profKey = craft:OpenProfessionKey()
@@ -298,6 +340,7 @@ function PW:_DoRefresh()
         return
     end
     self:_SyncLFWBtn()
+    self:_SyncMissingBtn()
     if self.RefreshOrders then self:RefreshOrders() end
 end
 

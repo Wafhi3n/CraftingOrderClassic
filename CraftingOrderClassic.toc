@@ -6,6 +6,7 @@
 ## X-Category: Auction & Economy
 ## X-Website: https://github.com/Wafhi3n/CraftingOrderClassic
 ## SavedVariables: CraftingOrderClassicDB
+## OptionalDeps: MissingTradeSkillsList, LazyGoldClassic
 
 # Infra partagée CraftLink (embarquée via LibStub) : catalogue de recettes + registre + transports.
 # MÊME instance que Guild Economy au runtime (LibStub dédoublonne). Source : repo CraftLink,
@@ -34,11 +35,15 @@ CraftingOrderClassic_UI.lua
 CraftingOrderClassic_UI_Post.lua
 CraftingOrderClassic_UI_Post_Artisans.lua
 CraftingOrderClassic_UI_Post_Categories.lua
+CraftingOrderClassic_UI_Post_LazyGold.lua
 CraftingOrderClassic_UI_Gather.lua
+CraftingOrderClassic_UI_Gather_Categories.lua
 CraftingOrderClassic_UI_Artisans.lua
 CraftingOrderClassic_UI_Artisans_Groups.lua
+CraftingOrderClassic_UI_Artisans_Icons.lua
 CraftingOrderClassic_UI_Artisans_Muted.lua
 CraftingOrderClassic_UI_MyArtisans.lua
+CraftingOrderClassic_UI_MyArtisans_LazyGold.lua
 CraftingOrderClassic_UI_Help.lua
 CraftingOrderClassic_UI_News.lua
 CraftingOrderClassic_Social.lua
@@ -47,10 +52,19 @@ CraftingOrderClassic_Social_Roster.lua
 CraftingOrderClassic_Minimap.lua
 CraftingOrderClassic_Nameplate.lua
 CraftingOrderClassic_ProfOrders.lua
+# Sous-catégories de recettes : le moteur d'abord, les tables de données ensuite (elles s'y enregistrent).
+CraftingOrderClassic_RecipeCats.lua
+CraftingOrderClassic_RecipeCats_Group.lua
+CraftingOrderClassic_RecipeCats_Alchemy.lua
+CraftingOrderClassic_RecipeCats_Gathering.lua
+CraftingOrderClassic_RecipeCats_Enchanting.lua
 CraftingOrderClassic_Craft.lua
+CraftingOrderClassic_MTSL.lua
 CraftingOrderClassic_ProfWindow.lua
 CraftingOrderClassic_ProfWindow_Recipes.lua
 CraftingOrderClassic_ProfWindow_Detail.lua
+CraftingOrderClassic_ProfWindow_Info.lua
+CraftingOrderClassic_LazyGold.lua
 CraftingOrderClassic_ProfWindow_Orders.lua
 CraftingOrderClassic_ProfWindow_Reroll.lua
 Directory.lua

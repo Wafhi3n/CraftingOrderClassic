@@ -163,6 +163,11 @@ function PW:_OrdCard(i)
     c.mutedText:SetWordWrap(false); Skin.ApplyShadow(c.mutedText); c.mutedText:Hide()
     c.unmute = Skin.MakeGoldButton(c, 72, 18, L["Réafficher"]); c.unmute:SetPoint("RIGHT", -6, 0); c.unmute:Hide()
     c.mutedText:SetPoint("RIGHT", c.unmute, "LEFT", -6, 0)
+    -- Ligne « dois-je accepter ? » (Lazy Gold) : sous le panneau composants, au-dessus des actions.
+    c.lgLine = c:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+    c.lgLine:SetPoint("TOPLEFT", c.reagPanel, "BOTTOMLEFT", 0, -3)
+    c.lgLine:SetPoint("RIGHT", c, "RIGHT", -8, 0)
+    c.lgLine:SetJustifyH("LEFT"); c.lgLine:SetWordWrap(false); Skin.ApplyShadow(c.lgLine); c.lgLine:Hide()
     c:EnableMouse(true); Skin.WireItemTooltip(c)
     self.ordCards[i] = c; return c
 end
@@ -227,6 +232,29 @@ function PW:_FillReagPanel(card, o)
     return h
 end
 
+-- « Dois-je accepter cette commande ? » — les deux chiffres que Lazy Gold sait établir :
+--   * Valeur HV de la marchandise (× qté) : ce que ça vaut si je la vendais moi-même ;
+--   * Réactifs À MA CHARGE : le coût HV des composants que l'acheteur NE fournit PAS.
+-- On NE calcule PAS de « profit net » : o.price est du TEXTE LIBRE saisi par l'acheteur (« 15po »,
+-- « 2 stacks de fer », « on verra »…) — le parser serait un devin. L'artisan compare lui-même le prix
+-- proposé (affiché juste au-dessus) à ces deux repères. Renvoie la hauteur consommée (0 = rien).
+function PW:_FillOrderProfit(card, o, hasPanel)
+    local LG = COC.LazyGold
+    if not (LG and LG:IsAvailable() and hasPanel) then card.lgLine:Hide(); return 0 end
+    local list = orderReagents(o)
+    local mine = 0
+    for _, rg in ipairs(list or {}) do
+        if not rg[3] then mine = mine + (LG:ItemValue(rg[1]) or 0) * (rg[2] or 1) end   -- non fourni = à moi
+    end
+    local val = (LG:ItemValue(o.itemID) or 0) * (o.qty or 1)
+    if val <= 0 and mine <= 0 then card.lgLine:Hide(); return 0 end
+    local parts = {}
+    if val > 0 then parts[#parts + 1] = "|cFFE8B84B" .. L["Valeur HV"] .. ":|r " .. GetCoinTextureString(val) end
+    if mine > 0 then parts[#parts + 1] = "|cFFE8B84B" .. L["À ma charge"] .. ":|r " .. GetCoinTextureString(mine) end
+    card.lgLine:SetText(table.concat(parts, "   ")); card.lgLine:Show()
+    return 16
+end
+
 -- Ligne repliée d'une commande en sourdine : masque tout le contenu normal de la carte, affiche
 -- juste le demandeur/objet et un bouton pour la réafficher (retire l'id de COC.db.muted).
 function PW:_FillMutedRow(card, it)
@@ -234,6 +262,7 @@ function PW:_FillMutedRow(card, it)
     local nm = (c and c:ItemName(o.itemID, o.itemName)) or (o.spellID and c and c:RecipeName(o.spellID)) or ("item:" .. (o.itemID or 0))
     card.dot:Hide(); card.invite:Hide(); card.age:Hide(); card.badge:Hide(); card.item:Hide(); card.price:Hide()
     card.reagPanel:Hide(); card.act:Hide(); card.refuse:Hide(); card.whisper:Hide(); card.who:Hide()
+    card.lgLine:Hide()
     card.mutedLabel:Show(); card.mutedText:Show(); card.unmute:Show()
     card.mutedText:SetText("|cFF999999" .. (o.buyer or "?") .. " — " .. (nm:match("^item:") and L["Chargement…"] or nm) .. "|r")
     card.unmute:SetScript("OnClick", function()
@@ -266,7 +295,8 @@ function PW:_FillCard(card, it)
     local price = o.price and ("|cFFFFDD00" .. o.price .. "|r") or ("|cFF888888" .. L["Don / gratuit"] .. "|r")
     card.price:SetText("|cFFCCCCCC" .. qty .. "|r  " .. price)
     local panelH = self:_FillReagPanel(card, o)
-    card:SetHeight((panelH > 0) and (72 + panelH) or CARD_COMPACT)   -- 72 = haut + rangée d'actions
+    local lgH    = self:_FillOrderProfit(card, o, panelH > 0)
+    card:SetHeight((panelH > 0) and (72 + panelH + lgH) or CARD_COMPACT)   -- 72 = haut + rangée d'actions
     self:_CardActions(card, it)
     card:Show()
 end

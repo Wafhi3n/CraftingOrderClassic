@@ -30,6 +30,7 @@ function PW:_BuildReagentRow(parent, i)
 end
 
 function PW:_BuildDetail(col)
+    self.detColFrame = col   -- réutilisé par le panneau d'INFO en sections (cf. _ProfWindow_Info.lua)
     local iconBig = col:CreateTexture(nil, "ARTWORK")
     iconBig:SetSize(34, 34); iconBig:SetPoint("TOPLEFT", 12, -10); iconBig:SetTexCoord(0.07, 0.93, 0.07, 0.93); iconBig:Hide()
     self.detIcon = iconBig
@@ -102,6 +103,8 @@ function PW:_ClearDetail()
     self.detIcon:Hide()
     self.detNameFS:SetText("|cFF888888" .. L["Sélectionne une recette."] .. "|r")
     self.detMakesFS:SetText("")
+    if self._HideInfoPanel then self:_HideInfoPanel() end
+    self.detReagHdr:Show()
     for _, r in ipairs(self.detReagRows) do r:Hide() end
     -- Ré-affiche les boutons hors mode reroll (une visite en vue reroll a pu les masquer) — sinon ils
     -- restaient invisibles jusqu'à la prochaine sélection. En reroll : lecture seule, on les laisse cachés.
@@ -172,29 +175,37 @@ function PW:_SyncNativeCraftSelection(e)
     end
 end
 
-function PW:RefreshDetail()
-    if not self.detNameFS then return end
-    local e = self:GetSelectedRecipe()
-    if not e then return self:_ClearDetail() end
+-- Détail d'une recette MANQUANTE : pas de réactifs ni de bouton Créer (on ne l'a pas apprise). À la
+-- place, un panneau d'INFO en SECTIONS empilées (cf. _ProfWindow_Info.lua) — d'abord « Où l'obtenir »
+-- (pont MTSL : niveau, prix, appris de, vendeur/butin + PNJ/zone/coords), et de la place pour d'autres
+-- sections fournies par de futurs addons enregistrés.
+function PW:_ShowMissingDetail(e)
+    self.detIcon:SetTexture(e.icon or "Interface\\Icons\\INV_Scroll_03"); self.detIcon:Show()
+    self.detNameFS:SetText((e.name or "?") .. "  |cFF888888(" .. L["niveau"] .. " " .. (e.level or 0) .. ")|r")
+    self.detMakesFS:SetText("|cFFFF8855" .. L["Non apprise"] .. "|r")
+    self.detReagHdr:Hide()
+    for _, r in ipairs(self.detReagRows) do r:Hide() end
+    self:_RenderInfoPanel(e)
 
-    self.detIcon:SetTexture(e.icon or "Interface\\Icons\\INV_Misc_QuestionMark"); self.detIcon:Show()
-    self.detNameFS:SetText(e.link or e.name or "?")
+    -- Aucun craft possible : on masque Créer/Créer tout/Qté (differé en combat pour le bouton sécurisé).
+    self:_SetCreateShown(false, false)
+    self.detAllBtn:Hide(); self.detQtyBox:Hide(); self.detQtyLbl:Hide()
+end
 
-    if (e.numMade or 1) > 1 or (e.numMadeMax or 1) > (e.numMade or 1) then
-        local mx = e.numMadeMax or e.numMade
-        local made = (mx > e.numMade) and (e.numMade .. "-" .. mx) or tostring(e.numMade)
-        self.detMakesFS:SetText("|cFF888888" .. L["Produit "] .. made .. "|r")
-    else
-        self.detMakesFS:SetText("")
-    end
-
-    -- Réactifs : catalogue (mode reroll, « à fournir » sans have) sinon fenêtre native (have/need).
+-- Remplit les lignes de réactifs (have/need, ou « à fournir » sans have en mode reroll). Extrait de
+-- RefreshDetail (anti-monolithe). Restaure aussi l'en-tête + la largeur du libellé que le détail
+-- « manquante » a pu changer.
+function PW:_FillReagentRows(e)
+    self.detReagHdr:Show(); self.detReagHdr:SetText("|cFFE8B84B" .. L["Réactifs :"] .. "|r")
     local reags = self.rerollKey and self:_RerollReagents(e.index) or COC.Craft:Reagents(e.index)
+    local nReag = 0
     for i, row in ipairs(self.detReagRows) do
         local rg = reags[i]
         if rg then
+            nReag = i
             row.reagLink = rg.link
             row.icon:SetTexture(rg.texture or "Interface\\Icons\\INV_Misc_QuestionMark")
+            row.nameFS:SetWidth(140)   -- restaure la largeur réactif (le détail « manquante » la passe à 230)
             row.nameFS:SetText(rg.name or "?")
             if rg.readonly then                       -- reroll : quantité requise seule (sacs inconnus)
                 row.cntFS:SetText(string.format("|cFF888888x%d|r", rg.need or 0))
@@ -208,6 +219,29 @@ function PW:RefreshDetail()
             row:Hide()
         end
     end
+    -- Sections d'info SOUS les réactifs (ex. « Rentabilité » Lazy Gold). REAG_H = hauteur d'une ligne
+    -- réactif ; on démarre juste sous la dernière + une petite marge. Vide (0 ligne) = rien ne s'affiche.
+    if self._RenderInfoPanel then self:_RenderInfoPanel(e, -70 - nReag * REAG_H - 12) end
+end
+
+function PW:RefreshDetail()
+    if not self.detNameFS then return end
+    local e = self:GetSelectedRecipe()
+    if not e then return self:_ClearDetail() end
+    if e.isMissing then return self:_ShowMissingDetail(e) end
+
+    self.detIcon:SetTexture(e.icon or "Interface\\Icons\\INV_Misc_QuestionMark"); self.detIcon:Show()
+    self.detNameFS:SetText(e.link or e.name or "?")
+
+    if (e.numMade or 1) > 1 or (e.numMadeMax or 1) > (e.numMade or 1) then
+        local mx = e.numMadeMax or e.numMade
+        local made = (mx > e.numMade) and (e.numMade .. "-" .. mx) or tostring(e.numMade)
+        self.detMakesFS:SetText("|cFF888888" .. L["Produit "] .. made .. "|r")
+    else
+        self.detMakesFS:SetText("")
+    end
+
+    self:_FillReagentRows(e)
 
     -- Vue reroll = LECTURE SEULE : aucun bouton créer (on n'est pas sur ce perso). Le Hide() EST la
     -- protection (un bouton caché n'est pas cliquable) et le désarmement de l'attribut sécurisé évite

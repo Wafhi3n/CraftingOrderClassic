@@ -25,11 +25,22 @@ end
 -- Cœur PUR. Itère les persos du royaume (union des clés myChars ∪ knownRecipes ∪ mySkillsByChar),
 -- agrège par métier (skill ∪ recipes, hors secondary), main en tête. Retourne une liste triée par
 -- clé de métier (le tri par LIBELLÉ localisé reste côté UI). `main`/`realm` injectés (aucune API WoW).
-local function aggregate(myChars, knownRecipes, mySkillsByChar, realm, main, secondary)
+-- `factions` (clé perso → "Horde"/"Alliance") + `myFaction` : filtre de FACTION. On ne peut ni
+-- s'envoyer du courrier ni échanger entre factions → un reroll d'en face n'est pas un artisan
+-- exploitable, et le mélanger fausse la vue. Un perso de faction INCONNUE (stampé avant l'ajout du
+-- champ) est CONSERVÉ : il se rangera à son prochain login. `myFaction` nil → aucun filtrage
+-- (tests headless, ou API indisponible).
+local function aggregate(myChars, knownRecipes, mySkillsByChar, realm, main, secondary, factions, myFaction)
     knownRecipes, mySkillsByChar, secondary = knownRecipes or {}, mySkillsByChar or {}, secondary or {}
-    -- 1) ensemble des persos du royaume (short → clé complète)
+    factions = factions or {}
+    -- 1) ensemble des persos du royaume (short → clé complète), faction adverse écartée
     local chars = {}
-    local function note(key) local s = charOfRealm(key, realm); if s then chars[s] = key end end
+    local function note(key)
+        local s = charOfRealm(key, realm); if not s then return end
+        local f = factions[key]
+        if myFaction and f and f ~= myFaction then return end
+        chars[s] = key
+    end
     for key in pairs(myChars or {}) do note(key) end
     for key in pairs(knownRecipes) do note(key) end
     for key in pairs(mySkillsByChar) do note(key) end
@@ -81,7 +92,14 @@ function Dir:AggregateMyProfs()
     local db = COC.db
     if not db then return {} end
     local main = db.altMain or me()
-    return aggregate(db.myChars, db.knownRecipes, db.mySkillsByChar, myRealm(), main, COC.SECONDARY_PROF or {})
+    local myFaction = UnitFactionGroup and UnitFactionGroup("player")
+    if myFaction ~= "Horde" and myFaction ~= "Alliance" then myFaction = nil end
+    -- Secondaires INCLUS ici (secondary = {}), contrairement aux vues réseau : la Cuisine et la Pêche
+    -- rapportent de l'or (Lazy Gold les valorise), et cette vue est justement là pour dire quel perso
+    -- du compte peut se faire des sous. Le filtre SECONDARY_PROF reste en vigueur ailleurs (on ne passe
+    -- pas commande de Cuisine à un inconnu).
+    return aggregate(db.myChars, db.knownRecipes, db.mySkillsByChar, myRealm(), main,
+        {}, db.myCharFaction, myFaction)
 end
 
 -- Cœur PUR. Une entrée par (perso ≠ `cur`, métier connu) du royaume — pour le menu « Mes métiers »

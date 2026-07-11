@@ -59,24 +59,38 @@ end
 COC.SectionOf = sectionOf
 function UI:_PostSection(itemID) return sectionOf(itemID) end
 
--- Trie la liste filtrée par (section, prêt, nom), construit la liste d'AFFICHAGE plate (en-têtes de
--- section + plans interleavés, hauteurs homogènes PLH) puis fenêtre le pool virtualisé. Appelé par
--- RefreshPostPlans. Le rendu réel (positionnement + remplissage) est dans _RenderPostPlanWindow.
+-- État de repliage des en-têtes, MÉMORISÉ PAR MÉTIER (durée de session).
+function UI:_PostCollapseTable()
+    self.postCollapsed = self.postCollapsed or {}
+    local k = self.postProf or "?"
+    self.postCollapsed[k] = self.postCollapsed[k] or {}
+    return self.postCollapsed[k]
+end
+
+function UI:TogglePostSection(ckey)
+    if not ckey then return end
+    local col = self:_PostCollapseTable()
+    col[ckey] = (not col[ckey]) or nil
+    self:RefreshPostPlans()
+end
+
+-- Construit la liste d'AFFICHAGE plate (en-têtes de section, de sous-catégorie, et plans interleavés
+-- — hauteurs homogènes PLH) puis fenêtre le pool virtualisé. Appelé par RefreshPostPlans. Le rendu
+-- réel (positionnement + remplissage) est dans _RenderPostPlanWindow.
+-- Le regroupement lui-même (sections, sous-catégories, tri par niveau ↓, repliage) est délégué à
+-- COC.RecipeCats:BuildDisplay — MÊME moteur que la vue métier, donc mêmes catégories des deux côtés.
+-- Le « prêt » (P2) reste prioritaire, mais à l'intérieur de SA sous-catégorie : le regroupement prime.
+-- Pendant une RECHERCHE le repliage est ignoré, sinon un résultat pourrait rester invisible.
 function UI:_RenderPostPlanRows(list)
-    for _, item in ipairs(list) do
-        item.section, item.secOrder = sectionOf(item.e.itemID)
-    end
-    table.sort(list, function(a, b)
-        if a.secOrder ~= b.secOrder then return a.secOrder < b.secOrder end
-        if a.section  ~= b.section  then return a.section  < b.section  end
-        if a.ready    ~= b.ready    then return a.ready end   -- « prêt » en tête de SA section (P2)
-        return a.name < b.name
-    end)
-    local disp, lastSec = {}, nil
-    for _, item in ipairs(list) do
-        if item.section ~= lastSec then disp[#disp + 1] = { isHeader = true, label = item.section }; lastSec = item.section end
-        disp[#disp + 1] = item
-    end
+    local searching = (self.postSearch or "") ~= ""
+    -- Tri par rentabilité (Lazy Gold) : liste À PLAT, sans sections — on veut le classement global du
+    -- plus rentable au moins. Sinon, regroupement normal.
+    local disp = self:_PostProfitFlat(list) or COC.RecipeCats:BuildDisplay(self.postProf, list, {
+        itemID    = function(it) return it.e and it.e.itemID end,
+        name      = function(it) return it.name or "" end,
+        before    = function(a, b) if a.ready ~= b.ready then return a.ready end end,
+        collapsed = searching and nil or self:_PostCollapseTable(),
+    })
     self.postPlanDisplay = disp
     self.postPlanContent:SetHeight(math.max(#disp * PLH, 10))
     -- Clamp du scroll si la liste a rétréci (nouveau filtre/recherche) → pas de vide en bas. Le hook
@@ -113,21 +127,39 @@ end
 
 -- Remplit une ligne du pool : soit un EN-TÊTE de section (libellé doré + filet, non interactif),
 -- soit un PLAN (badge de rareté, nom, marqueur « [Prêt] », surbrillance de sélection, tooltip objet).
+-- En-tête : chevron +/-, libellé (doré pour une section, bronze pour une sous-catégorie indentée) et
+-- compte. Cliquable → replie/déplie (cf. OnClick de _PostPlanRow).
+function UI:_FillPostPlanHeader(row, item)
+    row:EnableMouse(true)
+    row.badge:Hide(); row.name:Hide()
+    if row.profit then row.profit:Hide() end   -- ligne recyclée : sinon le montant du plan précédent reste
+    row.tipItemID, row.tipSpellID = nil, nil
+    local sub  = (item.depth == 2)
+    local open = not self:_PostCollapseTable()[item.ckey] or (self.postSearch or "") ~= ""
+    row.expand:SetTexture(open and "Interface\\Buttons\\UI-MinusButton-Up" or "Interface\\Buttons\\UI-PlusButton-Up")
+    row.expand:ClearAllPoints(); row.expand:SetPoint("LEFT", sub and 14 or 2, 0); row.expand:Show()
+    local label = item.label or ""
+    if item.count and item.count > 0 then label = label .. string.format(" |cFF888888(%d)|r", item.count) end
+    row.hdr:ClearAllPoints(); row.hdr:SetPoint("LEFT", row.expand, "RIGHT", 2, 0)
+    row.hdr:SetText(label); row.hdr:Show()
+    if sub then row.hdr:SetTextColor(0.79, 0.64, 0.15) else row.hdr:SetTextColor(Skin.unpack(Skin.color.gold)) end
+    row.hdrLine:SetShown(not sub)   -- le filet ne souligne que les sections, sinon la liste est zébrée
+end
+
 function UI:_FillPostPlanRow(row, item)
-    if item.isHeader then
-        row:EnableMouse(false)
-        row.badge:Hide(); row.name:Hide()
-        row.hdr:SetText(item.label); row.hdr:Show(); row.hdrLine:Show()
-        row.tipItemID, row.tipSpellID = nil, nil
-        return
-    end
-    row:EnableMouse(true); row.hdr:Hide(); row.hdrLine:Hide()
+    if item.isHeader then return self:_FillPostPlanHeader(row, item) end
+    row:EnableMouse(true); row.hdr:Hide(); row.hdrLine:Hide(); row.expand:Hide()
     local e = item.e
     local r, g, b = Skin.RarityColor(e.itemID)
+    -- Les plans d'une sous-catégorie sont décalés sous leur en-tête.
+    local indent = item._sub and 14 or 0
+    row.badge:ClearAllPoints(); row.badge:SetPoint("LEFT", 2 + indent, 0)
+    row.name:ClearAllPoints(); row.name:SetPoint("LEFT", 20 + indent, 0)
     row.badge:Paint(r, g, b, Skin.FirstChar(item.name), Skin.Icon(e.itemID, e.spellID)); row.badge:Show()
     local disp = item.name:match("^item:") and "|cFF777777" .. L["Chargement…"] .. "|r" or item.name
     if item.ready then disp = "|cFF33DD33" .. L["[Prêt]"] .. "|r " .. disp end
     row.name:SetText(disp); row.name:Show()
     row.name:SetTextColor(e == self.postEntry and 1 or r, e == self.postEntry and 0.85 or g, e == self.postEntry and 0.27 or b)
+    self:_FillPostPlanProfit(row, item)   -- rentabilité Lazy Gold (rétrécit le nom si présente)
     row.tipItemID, row.tipSpellID = e.itemID, e.spellID
 end

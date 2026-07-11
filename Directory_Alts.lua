@@ -29,10 +29,19 @@ local RATE_WINDOW, RATE_MAX = 300, 10      -- réception : 10 msgs ALT max / 5 m
 -- ------------------------------------------------------------------
 -- Trace du passage de CHAQUE perso du compte (clé « Nom-Royaume », format _MyKnownStore).
 -- Stampé à chaque login, même sans opt-in : nourrit IsMyChar (visibilité/alertes locales).
+-- On estampille AUSSI la FACTION du perso : un reroll d'en face n'est PAS un artisan exploitable
+-- (le courrier et l'échange sont bloqués entre factions en Classic/TBC/WotLK), et le mélanger aux
+-- autres dans « Mes artisans » donnerait une liste de plans qu'on ne peut pas se faire livrer.
+-- Les persos vus AVANT cette version n'ont pas de faction : ils restent visibles jusqu'à leur
+-- prochain login, où ils se rangent tout seuls (pas de purge, pas de perte de données).
 function COC:StampMyChar()
     if not self.db then return end
+    local key = me() .. "-" .. myRealm()
     self.db.myChars = self.db.myChars or {}
-    self.db.myChars[me() .. "-" .. myRealm()] = time()
+    self.db.myChars[key] = time()
+    self.db.myCharFaction = self.db.myCharFaction or {}
+    local f = UnitFactionGroup and UnitFactionGroup("player")
+    if f == "Horde" or f == "Alliance" then self.db.myCharFaction[key] = f end
 end
 
 -- Ce nom court est-il un perso de MON compte (même royaume) ? Lit myChars + les partitions
