@@ -97,3 +97,23 @@ function Dir:OnSkill(sender, message)
     end
     if COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end
 end
+
+-- « Bonjour » DIRIGÉ, niveaux de métier COLLÉS ("HI|SK|…" si j'ai des métiers, sinon "HI" nu) : l'autre
+-- apprend mes métiers DÈS le hello, sans round-trip AnnounceTo séparé → moins de transactions, et plus
+-- de « Croisé en ligne, 0 métier ». Un client v≤1.15 ignore le corps du HI → rétro-compatible.
+function Dir:_HelloPayload()
+    local sk = self:_SkillPayload()
+    return sk and ("HI|" .. sk) or "HI"
+end
+
+-- Réponse d'annuaire throttlée PAR CIBLE (60 s, comme DiscoverPlayer) : un pair qui me spamme de HI/PING ne
+-- peut plus me faire rediffuser tout mon profil (SK+RK×métiers+CD+ALT) à chaque message ; un PING+HI groupé
+-- (vieux client) ne déclenche qu'UNE annonce (throttle partagé OnPing/OnHello). 1re sollicitation = plein.
+function Dir:_AnnounceToThrottled(target)
+    if not target then return end
+    self._lastAnnTo = self._lastAnnTo or {}
+    local t = (GetTime and GetTime()) or 0
+    if (self._lastAnnTo[target] or 0) + 60 > t then return end
+    self._lastAnnTo[target] = t
+    self:AnnounceTo(target)
+end

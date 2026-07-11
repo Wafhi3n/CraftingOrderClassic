@@ -1,5 +1,41 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## Unreleased — Your orders are yours
+
+Order ids were guessable. If someone worked out the id of an order you'd posted, they could rewrite it:
+change the buyer, the price, the quantity, who it was addressed to. That's closed. Only the person who
+posted an order can change it now. Orders still get passed along between players the way they always have,
+which is how they reach people when the hidden channel is quiet, but relaying an order no longer lets you
+rewrite it.
+
+Someone could also post junk orders under your name and trip everyone else's spam detector until you got
+muted across the realm. The spam counter now only counts orders a player actually posted themselves, not
+ones another player relayed for them. That fixes the mirror image of the same bug, where a busy buyer whose
+open orders got relayed in one burst was getting muted for it through no fault of their own.
+
+"X declined your order" could be replayed as many times as someone felt like sending it. It fires once now,
+on an actual refusal, and never from someone you've muted. The "you can craft this" nudge had the same hole
+and got the same treatment.
+
+The profession window was showing orders it had no business showing. An order addressed to one specific
+person was visible to everyone who had that profession. It isn't anymore. Expired orders, and orders from
+people you've muted, are out of that list too.
+
+Your delivered count could be padded by someone else. A buyer confirming a delivery gets to name the
+crafter, and nothing checked that the crafter had ever taken the order. You only get credit for orders you
+actually accepted.
+
+Saying hello to another artisan now carries your professions with it, instead of kicking off a round of
+back-and-forth. Crossing paths with someone costs about half the messages it used to, and it clears up
+artisans who turned up in your directory with no professions listed.
+
+Last one, under the hood. Addon traffic is limited to your realm and the realms connected to it. A character
+with the same name as one of your contacts, sitting on a far-off realm you can't even trade with, can't act
+as them.
+
+Unrelated, but it ships with this. Flag yourself as looking for work, then go AFK, and you stop showing as
+available. No point in someone whispering you when you're not at the keyboard.
+
 ## v1.15.0 — Looking for work, and a few fixes
 
 You can now flag yourself as looking for work. Open a profession and hit "Look for work": the whole realm

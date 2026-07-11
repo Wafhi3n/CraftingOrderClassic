@@ -278,11 +278,26 @@ function PW:RefreshOrders()
     if not self.ordContent then return end
     local prof, relTab = self.profKey, self.ordRelTab or "all"
     local muted = (COC.db and COC.db.muted) or {}
+    local O, Mod, now = COC.Orders, COC.Moderation, time()
+    local ttl = (O and O.ORDER_TTL) or (6 * 3600)
     local function keep(name) return relTab == "all" or relationOf(name) == relTab end
+    -- La vue métier appliquait le seul filtre de RELATION : elle montrait donc aussi les commandes NOMMÉES
+    -- pour un TIERS (fuite d'info sur une commande privée) et les commandes OUVERTES expirées. On applique
+    -- ici les MÊMES règles que le Carnet (Orders:All) : routage VisibleTo + TTL.
+    local function shown(o)
+        if O and O.VisibleTo and not O:VisibleTo(o) then return false end
+        return not (o.status == "open" and (now - (o.ts or now)) > ttl)
+    end
+    -- Sourdine : par ID d'ordre (db.muted) OU par JOUEUR (Moderation) — un acheteur muté ne doit pas
+    -- continuer à remplir la vue métier. Les deux sont repliés en bas, pas supprimés.
+    local function isMuted(o)
+        return (muted[o.id] or (Mod and Mod.IsMuted and Mod:IsMuted(o.buyer))) and true or false
+    end
     local list, mutedList, pending, accepted, mutedN = {}, {}, 0, 0, 0
     for _, o in pairs((COC.db and COC.db.orders) or {}) do
-        if o.profession == prof and o.status ~= "cancelled" and o.status ~= "done" and keep(o.buyer) then
-            if muted[o.id] then
+        if o.profession == prof and o.status ~= "cancelled" and o.status ~= "done"
+           and keep(o.buyer) and shown(o) then
+            if isMuted(o) then
                 mutedN = mutedN + 1
                 mutedList[#mutedList + 1] = { o = o, kind = "order", muted = true }
             else

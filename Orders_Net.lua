@@ -140,31 +140,45 @@ end
 function Orders:_OnNew(message, distribution, sender)
     local f = Codec.Decode(message)
     if not f or not f.id or f.id == "" then return end
-    if distribution == "CHANNEL" and sender and f.buyer ~= sender then
+    if distribution == "CHANNEL" and sender and not samePlayer(sender, f.buyer) then
         if COC.Trace then COC.Trace:Log("recv", string.format(
             "canal : NEW usurpé (%s prétend poster pour %s) — rejeté", tostring(sender), tostring(f.buyer))) end
-        return
+        return                                             -- reroll VÉRIFIÉ du buyer accepté (RebroadcastMine cross-perso)
     end
     local id, buyer, kind, oid, qty, prof, price, recipient, byStack, prov =
         f.id, f.buyer, f.kind, f.oid, f.qty, f.prof, f.price, f.recipient, f.byStack, f.prov
     local existed = COC.db.orders[id] ~= nil   -- déjà connue ? (anti-spam sur re-broadcast)
     local o = COC.db.orders[id] or {}
-    o.id, o.buyer, o.kind = id, buyer, (kind ~= "" and kind) or "item"
-    if o.kind == "enchant" then o.spellID = tonumber(oid) else o.itemID = tonumber(oid) end
-    o.qty        = tonumber(qty) or 1
-    o.profession = (prof ~= "" and prof) or nil
-    o.price      = (price ~= "" and price) or nil
-    o.recipient  = (recipient and recipient ~= "" and recipient) or "Tous"
-    o.byStack    = byStack == "1"
-    if prov and prov ~= "" then                       -- réactifs fournis par l'acheteur (CSV itemID)
-        local t = {}; for d in prov:gmatch("%d+") do t[#t + 1] = tonumber(d) end
-        o.provided = t
+    -- Anti-usurpation : le relais mesh (OnArtisanOnline) pousse LÉGITIMEMENT les commandes d'autrui (sender≠
+    -- buyer) → autorisé à CRÉER. Mais une commande DÉJÀ connue n'est MUTÉE que par son acheteur EN CACHE :
+    -- sinon un tiers, via un id devinable « Nom-seq », écraserait buyer/prix/qty/recipient d'autrui. Un relais
+    -- redondant d'une commande connue tombe ici sans effet — on continue vers l'alerte (idempotente, o.alerted).
+    if not existed or (sender and samePlayer(sender, o.buyer)) then
+        o.id, o.buyer, o.kind = id, buyer, (kind ~= "" and kind) or "item"
+        if o.kind == "enchant" then o.spellID = tonumber(oid) else o.itemID = tonumber(oid) end
+        o.qty        = tonumber(qty) or 1
+        o.profession = (prof ~= "" and prof) or nil
+        o.price      = (price ~= "" and price) or nil
+        o.recipient  = (recipient and recipient ~= "" and recipient) or "Tous"
+        o.byStack    = byStack == "1"
+        if prov and prov ~= "" then                       -- réactifs fournis par l'acheteur (CSV itemID)
+            local t = {}; for d in prov:gmatch("%d+") do t[#t + 1] = tonumber(d) end
+            o.provided = t
+        end
+        o.viaAddon   = true   -- reçue par le canal addon → l'auteur a l'addon (pas de whisper de pub)
+        o.status     = o.status or "open"
+        o.ts         = o.ts or time()
+        COC.db.orders[id] = o
+    elseif COC.Trace then
+        COC.Trace:Log("recv", string.format("NEW ignoré : %s ≠ acheteur en cache %s (id=%s)",
+            tostring(sender), tostring(o.buyer), tostring(id)))
     end
-    o.viaAddon   = true   -- reçue par le canal addon → l'auteur a l'addon (pas de whisper de pub)
-    o.status     = o.status or "open"
-    o.ts         = o.ts or time()
-    COC.db.orders[id] = o
-    if not existed and not myChar(o.buyer) and COC.Moderation then COC.Moderation:NotePost(o.buyer) end   -- anti-spam (pas sur mes rerolls)
+    -- NotePost (anti-spam) SEULEMENT si l'émetteur EST l'acheteur : un relais mesh (sender≠buyer) ne compte pas
+    -- la commande d'autrui contre lui (faux positif : 25 relais en rafale mutaient un acheteur légitime), et un
+    -- buyer FORGÉ (sender≠buyer prétendu) ne peut plus « framer » une victime jusqu'au mute. Jamais mes rerolls.
+    if not existed and sender and samePlayer(sender, o.buyer) and not myChar(o.buyer) and COC.Moderation then
+        COC.Moderation:NotePost(o.buyer)
+    end
     -- Garde d'alerte : `o.alerted` (PAS `existed`). Le gate métier du canal-texte (_ShouldAlert) refuse
     -- parfois une 1re réception CHANNEL sans pour autant que l'ordre ait eu sa chance d'alerter — s'il
     -- arrive ENSUITE en whisper (fiable, non filtré par métier), il doit encore pouvoir alerter. Si on
@@ -222,19 +236,23 @@ function Orders:_OnCycle(action, message, sender)
             if myChar(o.buyer) then self:AlertDelivered(o) end
         end
     elseif action == "DONE" then
-        -- Acheteur → crafteur : confirmation de réception. Idempotent (DONE arrive en global ET whisper) :
-        -- réputation créditée à la 1re transition vers « terminée », et seulement si le crafteur est
-        -- un perso de MON compte (la rep db.delivered est par compte — sinon elle se perdait quand un
-        -- autre perso que l'accepteur recevait le DONE). SEUL l'acheteur (ou son reroll vérifié) confirme.
-        if o.status ~= "done" and samePlayer(sender, o.buyer) then
-            o.acceptedBy = (f.crafter ~= "" and f.crafter) or o.acceptedBy   -- attesté par l'acheteur : qui créditer
-            o.status = "done"
-            if myChar(o.acceptedBy) then
-                COC.db.delivered = (COC.db.delivered or 0) + 1   -- réputation : créditée à la confirmation acheteur
-                if COC.Directory then COC.Directory:AnnounceSkills() end
-                pmsg(string.format(L["réception confirmée par %s ! crafts livrés au total : %d"], o.buyer or "?", COC.db.delivered))
-            end
-        end
+        self:_OnDone(o, f, sender)
+    end
+end
+
+-- DONE (acheteur → crafteur) : confirmation de réception, idempotente (arrive en global ET whisper). SEUL
+-- l'acheteur (ou son reroll vérifié) confirme. La rep (db.delivered, par compte) n'est créditée QUE si CE
+-- perso a réellement accepté l'ordre AVANT le DONE (o.acceptedBy établi par son propre Accept, statut
+-- accepted/delivered) — sinon un acheteur malveillant force le crédit d'un tiers en le nommant `crafter`.
+function Orders:_OnDone(o, f, sender)
+    if o.status == "done" or not samePlayer(sender, o.buyer) then return end
+    local iCrafted = myChar(o.acceptedBy) and (o.status == "accepted" or o.status == "delivered")
+    o.acceptedBy = (f.crafter ~= "" and f.crafter) or o.acceptedBy   -- attesté par l'acheteur (affichage)
+    o.status = "done"
+    if iCrafted then
+        COC.db.delivered = (COC.db.delivered or 0) + 1   -- réputation : créditée à la confirmation acheteur
+        if COC.Directory then COC.Directory:AnnounceSkills() end
+        pmsg(string.format(L["réception confirmée par %s ! crafts livrés au total : %d"], o.buyer or "?", COC.db.delivered))
     end
 end
 
@@ -244,12 +262,17 @@ function Orders:_OnNack(message, sender)
     local f = Codec.Decode(message); local o = f and f.id and COC.db.orders[f.id]
     local who = sender or (f and f.who)
     if not (o and who and who ~= "") then return end
+    -- TRANSITION réelle ? Un NACK sans effet (id au hasard, tiers non lié, ordre déjà « declined ») ne doit
+    -- RIEN faire — sinon il suffit de rejouer le même NACK pour spammer « X a refusé ta commande » en boucle.
+    local moved = false
     if o.acceptedBy and samePlayer(who, o.acceptedBy) then
-        o.status = "open"; o.acceptedBy = nil                   -- l'artisan (ou son reroll vérifié) se désiste → réouverte
-    elseif myChar(o.buyer) and (o.recipient == who or samePlayer(who, o.recipient)) then
-        o.status = "declined"; o.declinedBy = who               -- commande nommée refusée (par le perso ou son reroll)
+        o.status = "open"; o.acceptedBy = nil; moved = true      -- l'artisan (ou son reroll vérifié) se désiste → réouverte
+    elseif o.status ~= "declined" and myChar(o.buyer)
+       and (o.recipient == who or samePlayer(who, o.recipient)) then
+        o.status = "declined"; o.declinedBy = who; moved = true  -- commande nommée refusée (par le perso ou son reroll)
     end
-    if myChar(o.buyer) then
+    -- Notifier l'acheteur SEULEMENT sur transition réelle, et jamais de la part d'un joueur mis en sourdine.
+    if moved and myChar(o.buyer) and not (COC.Moderation and COC.Moderation.IsMuted and COC.Moderation:IsMuted(who)) then
         local txt = string.format(L["%s a refusé ta commande : %s"], who, self:OrderName(o))
         pmsg(txt)
         if o.status == "declined" and COC.UI and COC.UI.Toast then

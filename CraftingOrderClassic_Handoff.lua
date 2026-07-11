@@ -170,6 +170,14 @@ end
 -- Nom d'objet async (GetItemInfo différé) → on retente ~3 s avant d'alerter, sinon « item:2459 ».
 function Handoff:AlertCapable(o, tries)
     local O = COC.Orders; if not O then return end
+    -- 1er appel SEULEMENT (`tries` nil ; les retries internes passent tries>=1) → garde anti-boucle : un SUGG
+    -- est REJOUABLE (rien n'empêche un pair d'en renvoyer 50), sans dédup chaque copie refait toast+son. Même
+    -- patron que o._rerollAlertDone. Et aucune alerte de la part d'un acheteur mis en sourdine.
+    if not tries then
+        if o._capableAlerted then return end
+        if COC.Moderation and COC.Moderation.IsMuted and COC.Moderation:IsMuted(o.buyer) then return end
+        o._capableAlerted = true
+    end
     local nm = O:OrderName(o)
     if (nm:match("^item:") or nm:match("^spell:")) and (tries or 0) < 10 then
         if o.itemID and GetItemInfo then GetItemInfo(o.itemID) end

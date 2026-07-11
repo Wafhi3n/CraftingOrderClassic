@@ -18,6 +18,7 @@ local CraftLink = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
 local Codec     = COC.OrdersCodec   -- sérialisation ORD| (Orders_Codec.lua, chargé avant)
 
 local ORDER_TTL  = 6 * 3600     -- 6 h : au-delà, une commande OUVERTE est tenue pour expirée (cachée/élaguée)
+Orders.ORDER_TTL = ORDER_TTL    -- exposé : la vue métier (ProfWindow_Orders) applique le MÊME TTL que le Carnet
 local REBROADCAST = 2 * 3600    -- 2 h : ré-émission périodique de MES commandes ouvertes (anti-oubli réseau)
 local DONE_RETENTION = 7 * 86400 -- 7 j (depuis la création) : au-delà, une commande TERMINÉE est purgée du cache
 
@@ -384,6 +385,12 @@ end
 -- canal caché est muet. Plafonné (anti-burst) ; la dédup par id côté récepteur évite les boucles.
 function Orders:OnArtisanOnline(who)
     if not (who and CraftLink) then return end
+    -- Cooldown PAR CIBLE : un flapping join/leave du canal caché (ou un re-log rapide) refaisait rejouer
+    -- jusqu'à 25 whispers À CHAQUE événement. 60 s couvre le flapping sans gêner un vrai retour en ligne.
+    self._lastPush = self._lastPush or {}
+    local t = (GetTime and GetTime()) or 0
+    if (self._lastPush[who] or 0) + 60 > t then return end
+    self._lastPush[who] = t
     local sent = 0
     for _, o in pairs(COC.db.orders or {}) do
         if sent < 25 and self:_RelayMatch(o, who) then

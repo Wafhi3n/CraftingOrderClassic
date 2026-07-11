@@ -194,14 +194,16 @@ function Dir:_Touch(name)
     return r
 end
 
--- HI reçu, DIRIGÉ (whisper) → je réponds à l'émetteur ET le pingue en retour (DiscoverPlayer,
--- throttlé) : sinon l'échange est à SENS UNIQUE (il apprend mes métiers, jamais l'inverse) —
--- symptôme observé : « Croisé » en ligne sans métiers. GLOBAL → réponse jittée (anti-burst).
-function Dir:OnHello(sender, _, distribution)
+-- HI reçu → j'ingère les métiers EMBARQUÉS (SK collé : "HI|SK|…", cf. _HelloPayload) puis, si DIRIGÉ,
+-- je réponds mon profil (throttlé par cible) ET le pingue en retour pour SES recettes (DiscoverPlayer).
+-- Sinon l'échange serait à SENS UNIQUE (symptôme : « Croisé » en ligne sans métiers). GLOBAL → Announce jittée.
+function Dir:OnHello(sender, message, distribution)
     if not CraftLink then return end
     self:_Touch(sender)
+    local body = message and message:match("^HI|(.+)$")               -- métiers embarqués dans le hello ?
+    if body and body:find("^SK") then self:OnSkill(sender, body) end
     if distribution == "WHISPER" then
-        self:AnnounceTo(sender)
+        self:_AnnounceToThrottled(sender)
         self:DiscoverPlayer(sender)
         if self.RelayPartnersTo then self:RelayPartnersTo(sender) end   -- fiches de mes partenaires hors ligne
     elseif C_Timer then
@@ -209,14 +211,14 @@ function Dir:OnHello(sender, _, distribution)
     end
 end
 
--- PING reçu → PONG sur la MÊME portée (whisper si dirigé, sinon yell). Dirigé → j'envoie aussi mes
--- métiers ET je pingue en retour pour connaître les siens (cf. OnHello).
+-- PING reçu → PONG sur la MÊME portée (whisper si dirigé, sinon yell). Dirigé → profil (throttlé par
+-- cible : un PING+HI groupé ne déclenche qu'UNE annonce, cf. _AnnounceToThrottled) + ping retour.
 function Dir:OnPing(sender, _, distribution)
     if not CraftLink then return end
     self:_Touch(sender)
     if distribution == "WHISPER" and sender then
         CraftLink:Send("PONG", "whisper", sender)
-        self:AnnounceTo(sender)
+        self:_AnnounceToThrottled(sender)
         self:DiscoverPlayer(sender)
         if self.RelayPartnersTo then self:RelayPartnersTo(sender) end   -- fiches de mes partenaires hors ligne
     else
@@ -259,19 +261,18 @@ function Dir:AnnounceTo(target)
     if self.AnnounceAlts then self:AnnounceAlts("whisper", target) end   -- opt-in : no-op sinon
 end
 
--- Découverte DIRIGÉE d'un joueur (croisement / ajout manuel) : on lui chuchote PING + HI. S'il a
--- l'addon, il répond (PONG + son profil) → il atterrit dans Croisés/Met avec ses métiers. S'il ne
--- l'a pas, rien (les addon-messages whisper sont invisibles pour lui). Throttlé par nom (anti-spam).
+-- Découverte DIRIGÉE d'un joueur (croisement / ajout manuel) : on lui chuchote UN hello porteur de mes
+-- métiers (HI|SK, cf. _HelloPayload). S'il a l'addon, il répond (son profil) → il atterrit dans Croisés/Met
+-- avec ses métiers. S'il ne l'a pas, rien (whisper addon invisible). Throttlé par nom (anti-spam).
 function Dir:DiscoverPlayer(name)
     name = shortName(name)
     if not (CraftLink and name and name ~= "") then return end
     if name == shortName(UnitName and UnitName("player") or "") then return end
     self._lastPing = self._lastPing or {}
     local t = now()
-    if (self._lastPing[name] or 0) + 60 > t then return end   -- 1 ping / 60 s / joueur
+    if (self._lastPing[name] or 0) + 60 > t then return end   -- 1 hello / 60 s / joueur
     self._lastPing[name] = t
-    CraftLink:Send("PING", "whisper", name)
-    CraftLink:Send("HI",   "whisper", name)
+    CraftLink:Send(self:_HelloPayload(), "whisper", name)   -- HI + SK : 1 message (au lieu de PING+HI)
 end
 
 -- Balise TEXTE reçue sur le canal : un porteur (peut-être INCONNU) annonce sa présence. C'est le SEUL
