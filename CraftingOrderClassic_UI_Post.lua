@@ -385,6 +385,7 @@ end
 -- commission cohérente avec le marché. Vide si Lazy Gold absent ou prix produit inconnu.
 function UI:_RefreshPostPriceHint(e)
     local hint = self.postPriceHint; if not hint then return end
+    if not e then hint:SetText(""); return end   -- bascule « 123 » sans plan sélectionné
     local LG = COC.LazyGold
     local val = LG and e.itemID and LG:ItemValue(e.itemID)
     if not val then hint:SetText(""); return end

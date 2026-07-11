@@ -16,6 +16,14 @@ local BODY_W = 780
 local function versionsRecent()
     return {
         {
+            v = "v1.16.0", title = L["Recettes triées, et où est l'or"],
+            lines = {
+                L["Fini le fourre-tout « Consommable » : les recettes sont regroupées par type (potions de soin, de mana, élixirs, flacons, transmutations…) et triées du plus haut niveau au plus bas. Une potion qui rend vie ET mana apparaît sous les deux. Le même classement s'applique partout — Commande, Mes artisans, et les métiers de récolte (minerais, herbes, cuirs, poissons)."],
+                L["Si tu as Lazy Gold, chaque recette affiche sa rentabilité (pièces, étoiles au-delà de mille pièces d'or ; rien pour une perte). La pièce d'or au-dessus de la liste trie par profit, le bouton « 123 » bascule en valeurs exactes. L'onglet Commande a les deux boutons, plus la valeur HV et le coût des réactifs sur chaque commande entrante."],
+                L["Dans l'annuaire, les métiers passent en icônes : un artisan avec un plan vraiment rentable a un contour doré, le survol nomme le plan, le clic ouvre la Commande déjà ciblée. « Mes artisans » gagne « Tous les plans du royaume » : tous tes persos (même faction) fusionnés et triés par profit — d'un coup d'œil, quel reroll fait des sous. Et si tu as MissingTradeSkillsList, un bouton montre tes recettes non apprises en rouge, avec leur source au clic."],
+            },
+        },
+        {
             v = "v1.15.1", title = L["Tes commandes n'appartiennent qu'à toi"],
             lines = {
                 L["Les identifiants de commande étaient devinables : n'importe qui pouvait réécrire la tienne (acheteur, prix, quantité). C'est fermé : seul son auteur peut la modifier. Le relais entre joueurs, lui, continue de fonctionner — c'est comme ça qu'une commande atteint quelqu'un que le canal n'a jamais touché."],
@@ -50,13 +58,6 @@ local function versionsRecent()
             },
         },
         {
-            v = "v1.12.0", title = L["Les recettes de la Saison de la Découverte"],
-            lines = {
-                L["304 recettes de la Saison de la Découverte entrent au catalogue : 80 en Travail du cuir, 65 en Forge, 57 en Couture, 48 en Enchantement, 29 en Ingénierie, 16 en Alchimie, plus la Cuisine, le Secourisme et le Minage. Elles apparaissent dans l'onglet Commande, avec leurs réactifs et leur palier d'apprentissage."],
-                L["Elles ne se chargent que sur un royaume Saison de la Découverte. Sur un royaume Era classique, rien ne change : l'addon voit exactement le même jeu de recettes qu'avant, et les recettes que tes amis t'ont déjà partagées restent lisibles."],
-            },
-        },
-        {
             v = "v1.11.0", title = L["Annuler une commande publique atteint tout le royaume"],
             lines = {
                 L["Une commande publique voyage sur le canal du royaume depuis la v1.10.0, mais pas son annulation : un artisan que tu n'as jamais croisé la voyait « ouverte » pendant six heures, l'acceptait, et farmait les réactifs pour rien. L'annulation part désormais sur le même canal."],
@@ -75,6 +76,13 @@ end
 
 local function versionsOlder()
     return {
+        {
+            v = "v1.12.0", title = L["Les recettes de la Saison de la Découverte"],
+            lines = {
+                L["304 recettes de la Saison de la Découverte entrent au catalogue : 80 en Travail du cuir, 65 en Forge, 57 en Couture, 48 en Enchantement, 29 en Ingénierie, 16 en Alchimie, plus la Cuisine, le Secourisme et le Minage. Elles apparaissent dans l'onglet Commande, avec leurs réactifs et leur palier d'apprentissage."],
+                L["Elles ne se chargent que sur un royaume Saison de la Découverte. Sur un royaume Era classique, rien ne change : l'addon voit exactement le même jeu de recettes qu'avant, et les recettes que tes amis t'ont déjà partagées restent lisibles."],
+            },
+        },
         {
             v = "v1.10.1", title = L["Corrections : qui reçoit les alertes de commandes"],
             lines = {
@@ -109,6 +117,11 @@ local function versionsOlder()
                 L["Ce nouvel onglet « Nouveautés » affiche les notes de version directement en jeu."],
             },
         },
+    }
+end
+
+local function versionsOldest()
+    return {
         {
             v = "v1.5.0", title = L["Repérer les crafteurs sans l'addon + passe de performance"],
             lines = {
@@ -132,6 +145,7 @@ end
 local function versions()
     local out = versionsRecent()
     for _, e in ipairs(versionsOlder()) do out[#out + 1] = e end
+    for _, e in ipairs(versionsOldest()) do out[#out + 1] = e end
     return out
 end
 
