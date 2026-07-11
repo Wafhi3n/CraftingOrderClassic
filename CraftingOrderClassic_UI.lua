@@ -29,6 +29,12 @@ function UI:Build()
     -- dropdown — cf. UI_Post.lua). No-op ailleurs ; ShowTab masque la flèche hors de cet onglet.
     Skin.SetPortraitClickable(f, function() if UI.activeTab == "post" and UI._ToggleProfFlyout then UI:_ToggleProfFlyout() end end,
         L["Cliquer pour changer de métier"])
+    -- Contexte dans la barre de titre, À DROITE du portrait : nom du métier sur l'onglet Commande
+    -- (le titre central reste « Crafting & Gathering Order » ; libellés de métier courts, pas de
+    -- collision). Vide ailleurs. Alimenté par UI:_SyncMainPortrait.
+    self.headerContext = f:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    self.headerContext:SetPoint("TOPLEFT", f, "TOPLEFT", 64, -20); self.headerContext:SetJustifyH("LEFT")
+    self.headerContext:SetTextColor(Skin.unpack(Skin.color.goldHi)); Skin.ApplyShadow(self.headerContext)
 
     local status = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     status:SetPoint("BOTTOMLEFT", 16, 14); status:SetJustifyH("LEFT")
@@ -402,8 +408,11 @@ end
 -- (c'était le « délai » observé).
 function UI:_SyncMainPortrait()
     if not self.frame then return end
-    Skin.SetWindowPortrait(self.frame,
-        (self.activeTab == "post" and Skin.ProfIcon(self.postProf)) or Skin.tex.scroll)
+    local onPost = (self.activeTab == "post")
+    Skin.SetWindowPortrait(self.frame, (onPost and Skin.ProfIcon(self.postProf)) or Skin.tex.scroll)
+    if self.headerContext then
+        self.headerContext:SetText(onPost and self.postProf and Skin.ProfLabel(self.postProf) or "")
+    end
 end
 
 function UI:Toggle()

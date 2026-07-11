@@ -84,15 +84,11 @@ local GATHER_ONLY = COC.GATHER_ONLY   -- source partagée (cf. CraftingOrderClas
 -- =========================================================================
 -- Panneau gauche : dropdown métier + liste des plans
 -- =========================================================================
--- Le CHOIX du métier se fait désormais au clic sur le PORTRAIT de la fenêtre (Skin.SetPortraitClickable,
--- câblé dans UI.lua ; flèche d'affordance visible seulement sur cet onglet) — le gros bouton dropdown
--- qui occupait sa propre rangée est retiré, rendant sa hauteur à la liste. Ce qui reste ici est purement
--- INFORMATIF : le nom du métier actuellement affiché (le portrait porte déjà son icône).
+-- Le CHOIX du métier se fait au clic sur le PORTRAIT de la fenêtre (Skin.SetPortraitClickable, câblé
+-- dans UI.lua ; flèche d'affordance sur cet onglet). Le NOM du métier s'affiche dans la barre de titre
+-- à droite du portrait (UI:_SyncMainPortrait) — plus de label dans le panneau : la liste des plans
+-- démarre tout en haut.
 function UI:_BuildPostLeft(panel)
-    local lbl = panel:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    lbl:SetPoint("TOPLEFT", 12, -84); lbl:SetJustifyH("LEFT"); Skin.ApplyShadow(lbl)
-    self.postProfLabel = lbl
-
     -- Flyout (hors hiérarchie du panel pour passer au-dessus) — ancré sous le PORTRAIT (cf.
     -- _ToggleProfFlyout), plus sous un bouton du panneau qui n'existe plus.
     local fly = CreateFrame("Frame", "COCProfFlyout", UIParent, "BackdropTemplate")
@@ -109,17 +105,17 @@ function UI:_BuildPostLeft(panel)
 
     self:_BuildPostPlanFilters(panel)
 
-    -- Gros bouton dropdown retiré (choix de métier → portrait) + filtres compactés sur une rangée :
-    -- ~44 px regagnés au total ici, rendus à la LISTE DES PLANS plus bas.
-    sep1px(panel, 12, SEP - 2, -128)
+    -- Dropdown métier retiré (→ portrait) + nom métier dans l'en-tête + filtres sur une rangée en HAUT :
+    -- la liste des plans démarre juste sous la barre de titre.
+    sep1px(panel, 12, SEP - 2, -108)
 
     local lhdr = panel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    lhdr:SetPoint("TOPLEFT", 14, -134); lhdr:SetText(L["LISTE DES PLANS"])
+    lhdr:SetPoint("TOPLEFT", 14, -114); lhdr:SetText(L["LISTE DES PLANS"])
     lhdr:SetTextColor(Skin.unpack(Skin.color.textMuted))
     self.postPlanHdr = lhdr   -- annoté dynamiquement quand un artisan filtre la liste (cf. RefreshPostPlans)
 
     local pscroll = CreateFrame("ScrollFrame", "COCPostPlanScroll", panel, "UIPanelScrollFrameTemplate")
-    pscroll:SetPoint("TOPLEFT", 12, -148); pscroll:SetPoint("BOTTOMLEFT", 12, 22); pscroll:SetWidth(LSW)
+    pscroll:SetPoint("TOPLEFT", 12, -128); pscroll:SetPoint("BOTTOMLEFT", 12, 22); pscroll:SetWidth(LSW)
     local pc = CreateFrame("Frame", nil, pscroll); pc:SetSize(LW - 22, 10); pscroll:SetScrollChild(pc)
     pscroll:HookScript("OnVerticalScroll", function() UI:_RenderPostPlanWindow() end)
     self.postPlanScroll = pscroll; self.postPlanContent = pc
@@ -137,18 +133,27 @@ end
 function UI:_BuildPostPlanFilters(panel)
     self.postQualityIdx = 1
     local qBtn = Skin.MakeGoldButton(panel, 104, 18, "")
-    qBtn:SetPoint("TOPLEFT", 12, -104); self.postQualityBtn = qBtn
+    qBtn:SetPoint("TOPLEFT", 12, -84); self.postQualityBtn = qBtn
     qBtn:SetScript("OnClick", function()
         UI.postQualityIdx = (UI.postQualityIdx % #QUALITY_STEPS) + 1
         UI:_RefreshQualityBtn(); UI:RefreshPostPlans()
     end)
     self:_RefreshQualityBtn()
 
-    -- Icône réactifs (RÉTRÉCIT le champ recherche de 20 px pour lui faire une place, sans toucher
-    -- au reste de la grille : chercher un plan reste possible pendant que le filtre reste visible).
+    -- Recherche PUIS icône réactifs À SA DROITE, dans la zone GAUCHE (l'icône était ancrée TOPRIGHT du
+    -- panel = coin droit de la FENÊTRE → elle « se baladait » en haut à droite ; corrigé).
+    local srch = CreateFrame("EditBox", nil, panel, "InputBoxTemplate")
+    srch:SetSize(150, 16); srch:SetPoint("TOPLEFT", 116, -85); srch:SetAutoFocus(false)
+    local hint = Skin.SearchHint(panel, srch, L["Rechercher un plan"])
+    srch:SetScript("OnTextChanged", function(b)
+        hint:SetShown(b:GetText() == "")
+        UI.postSearch = b:GetText():lower(); UI:RefreshPostPlans()
+    end)
+    srch:SetScript("OnEscapePressed", function(b) b:ClearFocus() end)
+
     self.postReagFilter = false
     local rBtn = Skin.MakeIconButton(panel, 20, Skin.tex.crate)
-    rBtn:SetPoint("TOPRIGHT", -22, -103); self.postReagFilterBtn = rBtn
+    rBtn:SetPoint("LEFT", srch, "RIGHT", 6, 0); self.postReagFilterBtn = rBtn
     rBtn:SetScript("OnClick", function()
         UI.postReagFilter = not UI.postReagFilter
         UI:_RefreshReagFilterBtn(); UI:RefreshPostPlans()
@@ -162,15 +167,6 @@ function UI:_BuildPostPlanFilters(panel)
     end)
     rBtn:SetScript("OnLeave", GameTooltip_Hide)
     self:_RefreshReagFilterBtn()
-
-    local srch = CreateFrame("EditBox", nil, panel, "InputBoxTemplate")
-    srch:SetSize(LW - 134, 16); srch:SetPoint("TOPLEFT", 116, -105); srch:SetAutoFocus(false)
-    local hint = Skin.SearchHint(panel, srch, L["Rechercher un plan"])
-    srch:SetScript("OnTextChanged", function(b)
-        hint:SetShown(b:GetText() == "")
-        UI.postSearch = b:GetText():lower(); UI:RefreshPostPlans()
-    end)
-    srch:SetScript("OnEscapePressed", function(b) b:ClearFocus() end)
 end
 
 function UI:_ToggleProfFlyout()
@@ -226,14 +222,15 @@ function UI:_BuildPostRight(panel)
 
     sep1px(panel, RX, REDGE, -300)
 
-    -- Commission g/s/c + Qté
+    -- Commission g/s/c + Qté. Rangée descendue de ~4 px (-308 → -312) pour respirer sous le séparateur
+    -- (-300) au lieu d'y être collée. Label et champs alignés sur la même ligne.
     local comLbl = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    comLbl:SetPoint("TOPLEFT", RX, -308); comLbl:SetText("|cFFE8B84B" .. L["Commission"] .. "|r"); Skin.ApplyShadow(comLbl)
-    self.postGold, self.postSilver, self.postCopper = Skin.MakeMoneyRow(panel, RX + 92, -306)
+    comLbl:SetPoint("TOPLEFT", RX, -312); comLbl:SetText("|cFFE8B84B" .. L["Commission"] .. "|r"); Skin.ApplyShadow(comLbl)
+    self.postGold, self.postSilver, self.postCopper = Skin.MakeMoneyRow(panel, RX + 92, -310)
     local qLbl = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    qLbl:SetPoint("TOPLEFT", RX + 330, -308); qLbl:SetText(L["Qté"]); Skin.ApplyShadow(qLbl)
+    qLbl:SetPoint("TOPLEFT", RX + 330, -312); qLbl:SetText(L["Qté"]); Skin.ApplyShadow(qLbl)
     self.postQty = CreateFrame("EditBox", nil, panel, "InputBoxTemplate")
-    self.postQty:SetSize(40, 16); self.postQty:SetPoint("TOPLEFT", RX + 366, -306)
+    self.postQty:SetSize(40, 16); self.postQty:SetPoint("TOPLEFT", RX + 366, -310)
     self.postQty:SetAutoFocus(false); self.postQty:SetNumeric(true); self.postQty:SetText("1")
     self.postQty:SetScript("OnEscapePressed", function(b) b:ClearFocus() end)
 
@@ -266,8 +263,8 @@ function UI:_RefreshProfDropdown()
     local profs = {}
     for _, p in ipairs(all) do if not GATHER_ONLY[p] then profs[#profs + 1] = p end end
     if (not self.postProf or GATHER_ONLY[self.postProf]) and profs[1] then self.postProf = profs[1] end
-    local p = self.postProf or "—"; local lbl = Skin.ProfLabel(p)
-    self.postProfLabel:SetText(lbl)   -- l'icône, elle, est portée par le portrait (cf. UI:Refresh)
+    -- Nom + icône du métier : portés par l'en-tête/portrait (UI:_SyncMainPortrait), plus par le panneau.
+    UI:_SyncMainPortrait()
     -- Peuplement du flyout
     local fly, frows = self.postProfFlyout, self.postProfFlyRows
     local h = 0

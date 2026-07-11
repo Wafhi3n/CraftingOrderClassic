@@ -56,7 +56,8 @@ function UI:_BuildPostArtisanSection(panel)
     local srcDefs = { {id="guild", label=L["Guilde"]}, {id="friend", label=L["Amis"]}, {id="added", label=L["Ajoutés"]}, {id="recent", label=L["Annuaire"]} }
     self.postSrcBtns = {}
     for i, d in ipairs(srcDefs) do
-        local b = Skin.MakeGoldButton(panel, 58, 20, d.label); b:SetPoint("TOPLEFT", RX + (i-1)*62, -337)
+        -- -345 (pas -337) : passe SOUS le séparateur à -338 au lieu d'être coupé par lui.
+        local b = Skin.MakeGoldButton(panel, 58, 20, d.label); b:SetPoint("TOPLEFT", RX + (i-1)*62, -345)
         b:SetScript("OnClick", function()
             UI.postSource = d.id; UI.postTarget = d.id   -- cibler TOUTE cette liste
             UI:_RefreshPostSrcTabs(); UI:RefreshPostArtisans(); UI:RefreshPostPlans()
@@ -65,7 +66,7 @@ function UI:_BuildPostArtisanSection(panel)
     end
     self.postSource = "guild"; self.postTarget = "all"; self:_RefreshPostSrcTabs()
 
-    local diffBtn = Skin.MakeGoldButton(panel, 124, 20, L["Diffuser à tous"]); diffBtn:SetPoint("TOPRIGHT", -22, -337)
+    local diffBtn = Skin.MakeGoldButton(panel, 124, 20, L["Diffuser à tous"]); diffBtn:SetPoint("TOPRIGHT", -22, -345)
     local diffIc = diffBtn:CreateTexture(nil, "OVERLAY"); diffIc:SetSize(14, 14)
     diffIc:SetPoint("LEFT", 5, 0); diffIc:SetTexture(Skin.tex.broadcast)
     diffBtn.text:ClearAllPoints(); diffBtn.text:SetPoint("LEFT", 22, 0); self.postDiffBtn = diffBtn
@@ -75,7 +76,8 @@ function UI:_BuildPostArtisanSection(panel)
     end)
 
     -- Ligne « Toute la guilde / Tous les amis » épinglée en tête + liste (cf. UI:_BuildAllRowAndScroll).
-    self:_BuildAllRowAndScroll(panel, "COCPostArtScroll", "post", -360)
+    -- -370 : sous les boutons source descendus à -345 (fin ~-365).
+    self:_BuildAllRowAndScroll(panel, "COCPostArtScroll", "post", -370)
 
     local artLbl = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     artLbl:SetPoint("TOPLEFT", RX, -495); artLbl:SetText("|cFFE8B84B" .. L["Destinataire :"] .. "|r"); Skin.ApplyShadow(artLbl)
