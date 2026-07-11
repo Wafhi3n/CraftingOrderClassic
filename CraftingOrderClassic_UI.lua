@@ -32,8 +32,8 @@ function UI:Build()
     -- Contexte dans la barre de titre, À DROITE du portrait : nom du métier sur l'onglet Commande
     -- (le titre central reste « Crafting & Gathering Order » ; libellés de métier courts, pas de
     -- collision). Vide ailleurs. Alimenté par UI:_SyncMainPortrait.
-    self.headerContext = f:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    self.headerContext:SetPoint("TOPLEFT", f, "TOPLEFT", 64, -20); self.headerContext:SetJustifyH("LEFT")
+    self.headerContext = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    self.headerContext:SetPoint("LEFT", f, "TOPLEFT", 66, -14); self.headerContext:SetJustifyH("LEFT")
     self.headerContext:SetTextColor(Skin.unpack(Skin.color.goldHi)); Skin.ApplyShadow(self.headerContext)
 
     local status = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")

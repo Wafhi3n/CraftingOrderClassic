@@ -222,15 +222,15 @@ function UI:_BuildPostRight(panel)
 
     sep1px(panel, RX, REDGE, -300)
 
-    -- Commission g/s/c + Qté. Rangée descendue de ~4 px (-308 → -312) pour respirer sous le séparateur
-    -- (-300) au lieu d'y être collée. Label et champs alignés sur la même ligne.
+    -- Commission g/s/c + Qté. ⚠️ NE PAS descendre cette rangée : la zone (-300..-338) est juste, le
+    -- repère de prix (postPriceHint, -324) suit de près → un décalage vers le bas le PIÉTINE (vécu).
     local comLbl = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    comLbl:SetPoint("TOPLEFT", RX, -312); comLbl:SetText("|cFFE8B84B" .. L["Commission"] .. "|r"); Skin.ApplyShadow(comLbl)
-    self.postGold, self.postSilver, self.postCopper = Skin.MakeMoneyRow(panel, RX + 92, -310)
+    comLbl:SetPoint("TOPLEFT", RX, -306); comLbl:SetText("|cFFE8B84B" .. L["Commission"] .. "|r"); Skin.ApplyShadow(comLbl)
+    self.postGold, self.postSilver, self.postCopper = Skin.MakeMoneyRow(panel, RX + 92, -304)
     local qLbl = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    qLbl:SetPoint("TOPLEFT", RX + 330, -312); qLbl:SetText(L["Qté"]); Skin.ApplyShadow(qLbl)
+    qLbl:SetPoint("TOPLEFT", RX + 330, -306); qLbl:SetText(L["Qté"]); Skin.ApplyShadow(qLbl)
     self.postQty = CreateFrame("EditBox", nil, panel, "InputBoxTemplate")
-    self.postQty:SetSize(40, 16); self.postQty:SetPoint("TOPLEFT", RX + 366, -310)
+    self.postQty:SetSize(40, 16); self.postQty:SetPoint("TOPLEFT", RX + 366, -304)
     self.postQty:SetAutoFocus(false); self.postQty:SetNumeric(true); self.postQty:SetText("1")
     self.postQty:SetScript("OnEscapePressed", function(b) b:ClearFocus() end)
 
