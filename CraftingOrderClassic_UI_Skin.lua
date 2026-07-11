@@ -356,15 +356,19 @@ function Skin.SkinFrameBackdrop(f)
     f:SetBackdropBorderColor(1, 1, 1, 1)
 end
 
+-- Puits encastré, look NATIF (équivalent backdrop d'InsetFrameTemplate — on ne peut pas ré-hériter un
+-- template sur une frame déjà créée, SkinWell recevant la frame de l'appelant). Bordure NEUTRE : le
+-- liseré doré « tavern » est retiré au profit du gris Blizzard, pour s'accorder au cadre natif.
 function Skin.SkinWell(f)
     if not f.SetBackdrop then Mixin(f, BackdropTemplateMixin) end
     f:SetBackdrop({
-        bgFile   = "Interface\\ChatFrame\\ChatFrameBackground",
+        bgFile   = "Interface\\Tooltips\\UI-Tooltip-Background",
         edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+        tile = true, tileSize = 16,
         edgeSize = 12, insets = { left = 3, right = 3, top = 3, bottom = 3 },
     })
-    f:SetBackdropColor(Skin.color.void[1], Skin.color.void[2], Skin.color.void[3], 0.85)
-    f:SetBackdropBorderColor(Skin.color.goldOre[1], Skin.color.goldOre[2], Skin.color.goldOre[3], 0.7)
+    f:SetBackdropColor(0.05, 0.05, 0.06, 0.90)
+    f:SetBackdropBorderColor(0.50, 0.50, 0.50, 0.90)
 end
 
 function Skin.MakeSeparator(parent, offsetY)
@@ -375,45 +379,36 @@ function Skin.MakeSeparator(parent, offsetY)
     return sep
 end
 
--- Bouton or « maison » (échappe aux re-skins externes rouges). Expose SetText/SetSelected.
+-- Bouton NATIF Blizzard (UIPanelButtonTemplate) — reskin natif COC (cf. ButtonFrameTemplate dans _UI).
+-- Le nom `MakeGoldButton` est CONSERVÉ : ~35 appelants en dépendent, le renommer ne changerait rien
+-- de visible et ferait un diff bruyant. Contrat préservé mot pour mot :
+--   • `b.text` : le FontString du bouton — les appelants le RE-ANCRENT (ClearAllPoints/SetPoint),
+--     le MESURENT (GetStringWidth) et le RECOLORENT. On expose donc le FontString natif.
+--   • `b:SetText` / `b:GetFontString` : natifs (le template les fournit).
+--   • `b:SetSelected(on)` : état « enfoncé » natif (SetButtonState PUSHED verrouillé + LockHighlight).
+--     Le bouton reste CLIQUABLE — on ne l'ampute pas via Disable(), contrairement aux onglets natifs.
+--   • `template` optionnel : bouton SÉCURISÉ ("SecureActionButtonTemplate") pour rediriger un clic
+--     vers une fonction PROTÉGÉE de Blizzard (DoCraft des enchantements). NE JAMAIS RETIRER —
+--     sans lui, les enchanteurs ne peuvent plus lancer un craft (cf. ProfWindow_Detail:_WireCreateButton).
+-- La surbrillance au survol vient désormais de la HighlightTexture du template : ce constructeur ne
+-- pose PLUS d'OnEnter/OnLeave. Les appelants qui les chaînaient doivent tester le nil (makeProfPill).
 function Skin.MakeGoldButton(parent, w, h, text, template)
-    local small = (h <= 16)
-    -- `template` optionnel : permet un bouton sécurisé ("SecureActionButtonTemplate") pour rediriger
-    -- un clic vers une fonction protégée de Blizzard (ex. DoCraft des enchantements).
-    local b = CreateFrame("Button", nil, parent, template and (template .. ", BackdropTemplate") or "BackdropTemplate")
+    local b = CreateFrame("Button", nil, parent,
+        template and ("UIPanelButtonTemplate, " .. template) or "UIPanelButtonTemplate")
     b:SetSize(w, h)
-    b:SetBackdrop({
-        bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
-        edgeFile = "Interface\\Buttons\\WHITE8X8",
-        edgeSize = 1, insets = { left = 1, right = 1, top = 1, bottom = 1 },
-    })
-    local fs = b:CreateFontString(nil, "OVERLAY", small and "GameFontNormalSmall" or "GameFontNormal")
-    fs:SetPoint("CENTER"); Skin.ApplyShadow(fs)
-    if text then fs:SetText(text) end
-    b.text = fs
-    b.selected = false
-    b.SetText = function(self, t) self.text:SetText(t) end
-    b.GetFontString = function(self) return self.text end
-    local function rest(self)
-        if self.selected then
-            self:SetBackdropColor(unpackc(Skin.color.stoneHi))
-            self:SetBackdropBorderColor(unpackc(Skin.color.goldHi))
-            self.text:SetTextColor(unpackc(Skin.color.goldHi))
-        else
-            self:SetBackdropColor(unpackc(Skin.color.stone))
-            self:SetBackdropBorderColor(unpackc(Skin.color.border))
-            self.text:SetTextColor(unpackc(Skin.color.gold))
-        end
+    if h <= 16 then   -- petits boutons (filtres, pills) : la police normale déborderait
+        b:SetNormalFontObject("GameFontNormalSmall")
+        b:SetHighlightFontObject("GameFontHighlightSmall")
+        b:SetDisabledFontObject("GameFontDisableSmall")
     end
-    b.SetSelected = function(self, on) self.selected = on; rest(self) end
-    b:SetScript("OnEnter", function(self)
-        self:SetBackdropColor(unpackc(Skin.color.stoneHi))
-        self:SetBackdropBorderColor(unpackc(Skin.color.goldHi))
-        self.text:SetTextColor(unpackc(Skin.color.goldHi))
-    end)
-    b:SetScript("OnLeave", rest)
-    b:SetScript("OnMouseDown", function(self) self:SetBackdropColor(unpackc(Skin.color.void)) end)
-    b:SetScript("OnMouseUp", rest)
-    rest(b)
+    if text then b:SetText(text) end
+    b.text = b:GetFontString()
+    Skin.ApplyShadow(b.text)
+    b.selected = false
+    b.SetSelected = function(self, on)
+        self.selected = on and true or false
+        if self.selected then self:SetButtonState("PUSHED", true); self:LockHighlight()
+        else self:SetButtonState("NORMAL"); self:UnlockHighlight() end
+    end
     return b
 end

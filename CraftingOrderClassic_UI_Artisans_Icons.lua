@@ -20,7 +20,9 @@ local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
 -- =========================================================================
 -- Un bouton doré carré portant l'icône du métier. Le libellé passe en tooltip : on récupère la
 -- largeur des 10 pills texte (« Blacksmithing », « Leatherworking »… débordaient sur 2 rangées).
--- MakeGoldButton pose déjà OnEnter/OnLeave (surbrillance) : on les CHAÎNE, on ne les écrase pas.
+-- On CHAÎNE les scripts de survol éventuels au lieu de les écraser. Depuis le passage au bouton NATIF
+-- (UIPanelButtonTemplate), la surbrillance est une HighlightTexture et MakeGoldButton ne pose plus
+-- d'OnEnter/OnLeave → hoverIn/hoverOut peuvent être nil : on les appelle sous garde.
 local function makeProfPill(panel, key)
     local b = Skin.MakeGoldButton(panel, 24, 24, "")
     local tex = b:CreateTexture(nil, "ARTWORK")
@@ -30,12 +32,12 @@ local function makeProfPill(panel, key)
     b.icon = tex
     local hoverIn, hoverOut = b:GetScript("OnEnter"), b:GetScript("OnLeave")
     b:SetScript("OnEnter", function(self)
-        hoverIn(self)
+        if hoverIn then hoverIn(self) end
         GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
         GameTooltip:SetText(Skin.ProfLabel(key), 1, 1, 1)
         GameTooltip:Show()
     end)
-    b:SetScript("OnLeave", function(self) hoverOut(self); GameTooltip:Hide() end)
+    b:SetScript("OnLeave", function(self) if hoverOut then hoverOut(self) end; GameTooltip:Hide() end)
     return b
 end
 
