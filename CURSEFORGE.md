@@ -24,6 +24,9 @@ between total strangers as long as they've got the addon too.
 - Check every profession on your whole account at once in the My Artisans tab (new in 1.9).
 - Season of Discovery recipes are built in, on SoD realms only, so seasonal crafts show up on the board like any other (new in 1.12).
 - Keep the board clean: mute a spammer (with a reason, or just for an hour), or trust a busy friend so they're never auto-muted (new in 1.13).
+- Recipes sorted into real categories instead of one flat "Consumable" pile, everywhere they show up (new in 1.16).
+- If you run Lazy Gold, every recipe shows what it'd earn you, and you can sort the list by profit (new in 1.16).
+- If you run MissingTradeSkillsList, flip the recipe list to show what you haven't learned yet, in red, and click one to see where it drops (new in 1.16).
 
 ## Order from your Friends and Guild list
 
@@ -120,6 +123,34 @@ There's an optional three-column profession window: a searchable, difficulty-col
 reagents with have/need counts and Create / Create All, and the live orders for that profession right
 alongside. One click swaps to the Blizzard window and back. Enchanting works too, which takes a little
 doing in Classic since its craft function is protected.
+
+The recipe list is sorted the way you'd actually look for things. Vanilla dumps every potion you know
+under one "Consumable" heading in no particular order; here they're split into healing potions, mana
+potions, elixirs of strength, flasks, transmutes and so on, each run from the highest rank down. A
+potion that restores both health and mana sits under both headings. The same grouping carries over to
+the Order tab, the My Artisans tab, and the gathering professions, where ores, herbs, leathers and fish
+get the same treatment.
+
+If you've got Lazy Gold installed, the addon reads its prices. Each recipe picks up a small coin next to
+it showing what crafting it would earn, a silver coin for small change up through gold coins and then
+stars once you're past a thousand gold a craft. A recipe that loses money shows nothing, since the point
+is to spot what pays. Click the gold coin above the list and it re-sorts by profit, highest first, with
+the categories dropped so you get one straight ranking. The "123" button next to it swaps the coin
+picture for the exact figure in gold, silver and copper. The Order tab carries both buttons, and every
+incoming order there tells you what the goods sell for at auction against what the reagents you'd supply
+would cost, so you can see whether the commission is worth taking.
+
+In the Artisans directory each profession shows as its icon rather than its name. A crafter sitting on a
+genuinely profitable plan gets a gold border on that profession, and hovering it names the plan and the
+gold. Click the icon and you land in the Order tab aimed at that crafter and that profession, their
+recipe list already narrowed to what they can make. My Artisans works the same way for your own
+characters and adds an "All realm crafts" view that merges every profession on the account into one
+profit-ranked list, so a glance tells you which alt is sitting on money. Cooking and Fishing are in
+there too, along with the essences, dusts and shards an enchanter pulls from disenchanting.
+
+If you run MissingTradeSkillsList, a button above the list folds in the recipes you haven't learned,
+drawn in red beside the ones you have. Click one and the middle panel tells you where it comes from,
+the vendor, drop or quest, with the NPC and its coordinates.
 
 ## Season of Discovery
 
