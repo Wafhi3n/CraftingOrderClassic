@@ -163,9 +163,15 @@ local function orderActionFor(o)
     return nil
 end
 
--- Marge intérieure commune : décale TOUT le contenu d'un panneau vers l'intérieur d'un coup
--- (jeu sous les onglets + respiration contre la bordure dorée), sans retoucher chaque coordonnée.
-local PAD_X, PAD_TOP, PAD_BOT = 8, 12, 8
+-- Marge intérieure commune : décale TOUT le contenu d'un panneau d'un coup, sans retoucher chaque
+-- coordonnée. LEVIER CENTRAL du haut de page : les 7 onglets s'ancrent ici, donc PAD_TOP règle d'un
+-- seul geste la hauteur du « band » vide sous la barre de titre. Avec l'ancien chrome (wordmark +
+-- onglets EN HAUT), ce band réservait ~80 px ; ce chrome est parti (titre natif, onglets en bas) → on
+-- REMONTE le contenu (PAD_TOP négatif : le panneau démarre 6 px au-dessus du cadre, ses enfants
+-- retombent dans le marbre). Garde-fou : le contenu le plus HAUT de tous les onglets est à −74
+-- (Aide/Nouveautés) → avec PAD_TOP=−6 il atterrit à f−68, soit 8 px sous le sommet de l'inset (f−60) :
+-- reste dans le marbre, jamais dans la barre de titre. Ne pas descendre PAD_TOP sous −8 sans re-auditer.
+local PAD_X, PAD_TOP, PAD_BOT = 8, -6, 8
 local function insetPanel(panel, f)
     panel:ClearAllPoints()
     panel:SetPoint("TOPLEFT", f, "TOPLEFT", PAD_X, -PAD_TOP)
@@ -380,16 +386,24 @@ function UI:Refresh()
         self.tabBar:SetText("orders", L["Carnet"] .. " (" .. c .. ")")   -- re-mesure la largeur (kit)
     end
     if self.orderFilterBtns then self:_RefreshOrderFilterTabs() end
-    -- Portrait dynamique : métier choisi sur l'onglet Commande, parchemin par défaut ailleurs
-    -- (même mécanisme que PW:_SyncPortrait sur la vue métier — icônes de sort 64×64, chemin heureux).
-    Skin.SetWindowPortrait(self.frame,
-        (self.activeTab == "post" and Skin.ProfIcon(self.postProf)) or Skin.tex.scroll)
+    self:_SyncMainPortrait()
     local CraftLink = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
     local D = COC.Directory
     self.status:SetText(string.format("|c%s" .. L["réseau"] .. "|r %s  ·  %d " .. L["en ligne"] .. "  ·  %d " .. L["artisan(s)"],
         Skin.hex.muted,
         (CraftLink and CraftLink:IsNetworkReady()) and ("|cFF33DD33" .. L["canal rejoint"] .. "|r") or "|cFFFFCC00…|r",
         D and D:CountOnline() or 0, D and D:CountKnownCrafters() or 0))
+end
+
+-- Portrait dynamique : icône du métier choisi sur l'onglet Commande, parchemin par défaut ailleurs
+-- (même mécanisme que PW:_SyncPortrait — icônes de sort 64×64, chemin heureux de SetWindowPortrait).
+-- Helper LÉGER, appelable directement au clic (sélection de métier dans le flyout) SANS déclencher un
+-- UI:Refresh complet → le médaillon change instantanément, plus au prochain refresh réseau/onglet
+-- (c'était le « délai » observé).
+function UI:_SyncMainPortrait()
+    if not self.frame then return end
+    Skin.SetWindowPortrait(self.frame,
+        (self.activeTab == "post" and Skin.ProfIcon(self.postProf)) or Skin.tex.scroll)
 end
 
 function UI:Toggle()

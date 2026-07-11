@@ -14,71 +14,42 @@ local COC  = CraftingOrderClassic
 local Skin = COC.UI.Skin
 
 -- =========================================================================
--- Bouton : look NATIF Blizzard, mais SANS hériter d'UIPanelButtonTemplate.
+-- Bouton : hérite du template NATIF `UIPanelButtonTemplate`.
 -- =========================================================================
--- On repeint à la main le 3-tranches d'UIPanelButtonTemplate —
--- `UI-DialogBox-goldbutton-{up,down,disabled}-{left,middle,right}` — clés `_l`/`_m`/`_r`.
--- ⚠️ Cet art est NATIVEMENT ROUGE (mesuré : up-middle = RGB moyen ~(104,23,8) ; le « gold » du nom
--- désigne le liseré) — d'où les boutons rouges partout dans le client 1.15, y compris chez Blizzard
--- (« Quitter » de la fenêtre de métier). L'hypothèse historique « un re-skin externe les peint en
--- rouge » était FAUSSE. On garde néanmoins la peinture à la main : contrôle par tranche (permet un
--- futur SetDesaturated+SetVertexColor or — TODO en attente de décision) + immunité aux vrais skinners.
-local BTN = "Interface\\Buttons\\UI-DialogBox-goldbutton-"
-
-local function btnPaint(b, state)   -- state = "up" | "down" | "disabled"
-    b._l:SetTexture(BTN .. state .. "-left")
-    b._m:SetTexture(BTN .. state .. "-middle")
-    b._r:SetTexture(BTN .. state .. "-right")
-end
-
--- Repos = l'état RÉEL du bouton (désactivé > sélectionné > normal).
-local function btnRest(b)
-    if not b:IsEnabled() then return btnPaint(b, "disabled") end
-    btnPaint(b, b.selected and "down" or "up")
-end
-
--- Caps latéraux : 32 px en natif. Sur les petits boutons (pills 24 px, filtres), gauche+droite (64)
--- dépasseraient la largeur → on borne à w/3. Recalculé à CHAQUE redimensionnement : plusieurs
--- appelants créent le bouton étroit puis l'élargissent après avoir mesuré leur texte (GetStringWidth).
-local function btnSide(b)
-    local s = math.min(32, math.max(4, math.floor((b:GetWidth() or 12) / 3)))
-    b._l:SetWidth(s); b._r:SetWidth(s)
-end
-
--- Contrat (≈35 appelants, hérité du bouton or « maison ») : `b.text` (FontString que les appelants
--- ré-ancrent / mesurent / recolorent), `b:SetText` / `b:GetFontString` (natifs via SetFontString),
--- `b:SetSelected(on)` (rendu « enfoncé », reste CLIQUABLE — pas de Disable, contrairement aux onglets).
--- `template` optionnel = bouton SÉCURISÉ ("SecureActionButtonTemplate") pour rediriger un clic vers une
--- fonction PROTÉGÉE de Blizzard (DoCraft des enchantements). NE JAMAIS RETIRER.
--- Pas d'OnEnter/OnLeave ici (surbrillance = couche HIGHLIGHT auto) → chaîner sous garde nil.
+-- On a d'abord tenté de REPEINDRE le 3-tranches à la main (croyant devoir « échapper » à un addon de
+-- re-skin qui peignait les boutons en ROUGE). MESURE À L'APPUI (PIL) : l'art natif `UI-DialogBox-
+-- goldbutton-*` EST rouge (up-middle ≈ RGB (104,23,8), le « gold » du nom = le liseré), et le
+-- « Quitter » de la fenêtre de métier Blizzard est rouge pour la MÊME raison → aucun skinner, la
+-- théorie était fausse. Le repaint manuel, lui, cassait le rendu : caps latéraux de largeur FIXE en
+-- natif (Left 64 / Right 32, SEUL le middle s'étire — cf. UIPanelGoldButtonTemplate), que je
+-- redimensionnais à w/3 → bords « plats/écrasés ». D'où le RETOUR au template natif, qui gère caps,
+-- états (up/down/disabled) et survol tout seul, correctement à toute largeur.
+-- Le SEUL correctif nécessaire : le template ancre son texte `BOTTOM, 0, 12` (calibré pour h=32) → sur
+-- nos boutons de 16–24 px il monte trop haut. On le RE-ANCRE au CENTRE.
+-- Contrat conservé (≈35 appelants) : `b.text` (FontString natif, ré-ancrable/mesurable/recolorable),
+-- `b:SetText`/`b:GetFontString` (natifs), `b:SetSelected(on)` (enfoncé natif, reste CLIQUABLE),
+-- `template` = variante SÉCURISÉE ("SecureActionButtonTemplate", DoCraft protégé) — NE JAMAIS RETIRER.
+-- Doré plus tard (si le user tranche) : SetDesaturated(true)+SetVertexColor(or) sur b.Left/Middle/Right.
 function Skin.MakeGoldButton(parent, w, h, text, template)
-    local b = CreateFrame("Button", nil, parent, template)
+    local b = CreateFrame("Button", nil, parent,
+        template and ("UIPanelButtonTemplate, " .. template) or "UIPanelButtonTemplate")
     b:SetSize(w, h)
-    local l = b:CreateTexture(nil, "BACKGROUND"); l:SetPoint("TOPLEFT"); l:SetPoint("BOTTOMLEFT")
-    local r = b:CreateTexture(nil, "BACKGROUND"); r:SetPoint("TOPRIGHT"); r:SetPoint("BOTTOMRIGHT")
-    local m = b:CreateTexture(nil, "BACKGROUND")
-    m:SetPoint("TOPLEFT", l, "TOPRIGHT"); m:SetPoint("BOTTOMRIGHT", r, "BOTTOMLEFT")
-    b._l, b._m, b._r = l, m, r
-
-    local hi = b:CreateTexture(nil, "HIGHLIGHT")   -- surbrillance native (couche HIGHLIGHT = auto au survol)
-    hi:SetTexture("Interface\\Buttons\\UI-Panel-Button-Highlight")
-    hi:SetTexCoord(0, 0.625, 0, 0.6875); hi:SetBlendMode("ADD")
-    hi:SetPoint("TOPLEFT", 2, -1); hi:SetPoint("BOTTOMRIGHT", -2, 1)
-
-    local fs = b:CreateFontString(nil, "OVERLAY", (h <= 16) and "GameFontNormalSmall" or "GameFontNormal")
-    fs:SetPoint("CENTER"); Skin.ApplyShadow(fs)
-    b:SetFontString(fs)   -- → SetText / GetFontString natifs
-    b.text = fs
+    if h <= 16 then
+        b:SetNormalFontObject("GameFontNormalSmall")
+        b:SetHighlightFontObject("GameFontHighlightSmall")
+        b:SetDisabledFontObject("GameFontDisableSmall")
+    end
     if text then b:SetText(text) end
-
+    local fs = b:GetFontString()
+    fs:ClearAllPoints(); fs:SetPoint("CENTER", 0, 0)   -- re-centre (le template ancre BOTTOM+12, calibré h=32)
+    Skin.ApplyShadow(fs)
+    b.text = fs
     b.selected = false
-    b.SetSelected = function(self, on) self.selected = on and true or false; btnRest(self) end
-    b:SetScript("OnMouseDown", function(self) if self:IsEnabled() then btnPaint(self, "down") end end)
-    b:SetScript("OnMouseUp", btnRest)
-    b:SetScript("OnEnable", btnRest)
-    b:SetScript("OnDisable", btnRest)
-    b:SetScript("OnSizeChanged", btnSide)
-    btnSide(b); btnRest(b)
+    b.SetSelected = function(self, on)
+        self.selected = on and true or false
+        if self.selected then self:SetButtonState("PUSHED", true); self:LockHighlight()
+        else self:SetButtonState("NORMAL"); self:UnlockHighlight() end
+    end
     return b
 end
 
