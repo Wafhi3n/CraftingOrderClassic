@@ -107,14 +107,18 @@ end
 -- métier de récolte sans recette n'apparaît que via le skill). Filtre les secondaires (Cooking,
 -- First Aid, Fishing) pour afficher SEULEMENT les métiers primaires. Tri par nom de perso puis clé
 -- de métier (libellé localisé côté UI).
-local function rerollEntries(knownRecipes, mySkillsByChar, realm, cur, secondary)
+-- `factions`/`myFaction` : même filtre que aggregate() (cf. Mes artisans) — un reroll d'en face n'est
+-- pas quelqu'un à qui « passer commande », il n'a rien à faire dans ce menu.
+local function rerollEntries(knownRecipes, mySkillsByChar, realm, cur, secondary, factions, myFaction)
     knownRecipes, mySkillsByChar = knownRecipes or {}, mySkillsByChar or {}
     secondary = secondary or {}
+    factions = factions or {}
     local out = {}
     local function scan(store)
         for key, byProf in pairs(store) do
             local short = charOfRealm(key, realm)
-            if short and short ~= cur then
+            local f = factions[key]
+            if short and short ~= cur and not (myFaction and f and f ~= myFaction) then
                 for prof in pairs(byProf) do
                     if not secondary[prof] then
                         out[short .. "|" .. prof] = { name = short, key = key, prof = prof }
@@ -142,7 +146,10 @@ Dir._RerollProfEntries = rerollEntries   -- exposé pour tests/test_myartisans.l
 function Dir:RerollProfEntries()
     local db = COC.db
     if not db then return {} end
-    return rerollEntries(db.knownRecipes, db.mySkillsByChar, myRealm(), me(), COC.SECONDARY_PROF or {})
+    local myFaction = UnitFactionGroup and UnitFactionGroup("player")
+    if myFaction ~= "Horde" and myFaction ~= "Alliance" then myFaction = nil end
+    return rerollEntries(db.knownRecipes, db.mySkillsByChar, myRealm(), me(),
+        COC.SECONDARY_PROF or {}, db.myCharFaction, myFaction)
 end
 
 -- Purge conservatrice des partitions de skill orphelines (perso supprimé en jeu) : clé absente à

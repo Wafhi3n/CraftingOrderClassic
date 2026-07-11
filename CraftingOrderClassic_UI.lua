@@ -96,12 +96,15 @@ function UI:BuildTabs(f)
         { id = "news",      label = L["Nouveautés"]  },
     }
     -- 7 onglets : largeur/pas resserrés (118/122 → 112/115) + libellé en petite police pour tenir
-    -- dans le cadre (868) même avec le libellé le plus long (deDE « Meine Handwerker »). Dernier
-    -- bouton : 12 + 6×115 + 112 = 814 < 868.
+    -- dans le cadre (868) même avec le libellé le plus long (deDE « Meine Handwerker »).
+    -- startX centre la barre (largeur totale 802) dans le cadre au lieu d'une marge gauche fixe.
+    local tabWidth, tabStep = 112, 115
+    local barWidth = (#defs - 1) * tabStep + tabWidth
+    local startX = (f:GetWidth() - barWidth) / 2
     for i, d in ipairs(defs) do
-        local b = Skin.MakeGoldButton(f, 112, 24, d.label)
+        local b = Skin.MakeGoldButton(f, tabWidth, 24, d.label)
         b.text:SetFontObject("GameFontNormalSmall")   -- 7 onglets serrés : évite le débordement multilingue
-        b:SetPoint("TOPLEFT", 12 + (i - 1) * 115, -54)
+        b:SetPoint("TOPLEFT", startX + (i - 1) * tabStep, -54)
         b:SetScript("OnClick", function() UI:ShowTab(d.id) end)
         self.tabs[d.id] = b
     end

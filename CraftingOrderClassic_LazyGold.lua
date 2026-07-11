@@ -193,15 +193,65 @@ function LG:BestProfitFor(profKey, rank)
     return e and e.profit or nil
 end
 
--- Nom de l'objet produit par le meilleur plan (« Iron Buckle »), ou nil.
-function LG:BestPlanName(profKey, rank)
-    local e = self:BestPlanFor(profKey, rank)
-    local lib = e and LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
+-- Nom de l'objet produit par un plan { profit, sid } (« Iron Buckle »), ou nil.
+function LG:PlanName(profKey, plan)
+    local lib = plan and LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
     if not lib then return nil end
-    local itemID = lib.RecipeProduct and lib:RecipeProduct(profKey, e.sid)
-    local nm = itemID and lib:ItemName(itemID) or lib:RecipeName(e.sid)
+    local itemID = lib.RecipeProduct and lib:RecipeProduct(profKey, plan.sid)
+    local nm = itemID and lib:ItemName(itemID) or lib:RecipeName(plan.sid)
     if not nm or nm:match("^item:") or nm:match("^spell:") then return nil end
     return nm
+end
+
+-- Nom du meilleur plan ATTEIGNABLE à un rang (approximation, cf. BestPlanFor). Conservé pour les
+-- appelants qui n'ont pas de fiche artisan (rang seul) — préférer BestKnownPlanFor + PlanName quand
+-- une fiche `r` est disponible : plus honnête (ne nomme que ce que l'artisan a RÉELLEMENT appris).
+function LG:BestPlanName(profKey, rank)
+    return self:PlanName(profKey, self:BestPlanFor(profKey, rank))
+end
+
+-- ---------------------------------------------------------------------------
+-- Meilleur plan RÉELLEMENT connu d'un artisan (pas seulement « atteignable à son niveau »). En
+-- Classic, une recette dépasse un palier de compétence ne veut pas dire qu'on l'a apprise : elle
+-- peut nécessiter un PNJ, un butin ou une quête à part. BestPlanFor (rang seul) peut donc nommer un
+-- plan que l'artisan ne sait PAS fabriquer. Ici on décode le bitmask EXACT de ses recettes connues
+-- (mêmes données que le filtre « connus » de l'onglet Commande, cf. _TargetArtisanFilter) et on ne
+-- regarde que celles-là. Cache par (métier, bitmask) — pas par rang — car deux artisans de même
+-- niveau peuvent avoir appris des recettes différentes.
+local knownBestCache = {}   -- [profKey.."|"..hex] = { at, best = {profit, sid} | nil }
+
+local function buildBestKnown(profKey, hex)
+    local lib = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
+    local known = lib and lib.DecodeKnown and lib:DecodeKnown(profKey, hex)
+    if not known then return nil end
+    local best
+    for sid in pairs(known) do
+        local p = LG:CraftProfit(profKey, sid, nil)
+        if p and p.profit and p.profit > 0 and (not best or p.profit > best.profit) then
+            best = { profit = p.profit, sid = sid }
+        end
+    end
+    return best
+end
+
+-- `r` = fiche roster de l'artisan (r.recipes[profKey] = bitmask hex, r.recipeDV = version des
+-- données au moment de la diffusion). Renvoie nil si le bitmask exact n'est pas dispo pour ce
+-- métier (fiche relayée, jamais croisé en direct) ou périmé (DataVersion a changé depuis) — dans
+-- ce cas l'appelant doit retomber sur BestPlanFor(profKey, rank), une approximation moins fiable
+-- mais toujours disponible.
+function LG:BestKnownPlanFor(profKey, r)
+    if not (self:IsAvailable() and profKey and r) then return nil end
+    local lib = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
+    local hex = r.recipes and r.recipes[profKey]
+    if not (hex and hex ~= "" and lib and lib.DataVersion and r.recipeDV == lib:DataVersion()) then return nil end
+    local now = GetTime and GetTime() or 0
+    local k = profKey .. "|" .. hex
+    local c = knownBestCache[k]
+    if not c or (now - c.at) > CACHE_TTL then
+        c = { at = now, best = buildBestKnown(profKey, hex) }
+        knownBestCache[k] = c
+    end
+    return c.best
 end
 
 -- Seuil de mise en avant (configurable) : par défaut 10 po. Les paliers en découlent (×10, ×100).
@@ -210,16 +260,17 @@ function LG:MinProfit()
     return (db and tonumber(db.lgMinProfit)) or (10 * 10000)
 end
 
--- Palier de mise en avant d'un profit : 0 = rien, 2 = or (≥ seuil ×10), 3 = or + halo (≥ ×100).
--- Avec le défaut (seuil 10 po) : rien sous 100 po, doré à 100 po, doré + halo à 1000 po.
--- Le palier ARGENT a été RETIRÉ : à ce niveau de profit presque tous les métiers s'allumaient, la mise
--- en avant ne distinguait plus rien. On ne garde que le doré, qui reste un vrai signal.
+-- Palier de mise en avant d'un profit : 0 = rien, 2 = or (≥ seuil), 3 = or + halo (≥ seuil ×100).
+-- Avec le défaut (seuil 10 po) : doré dès 10 po, doré + halo à 1000 po.
+-- On allume dès qu'il y a un plan LUCRATIF (≥ seuil), pas seulement l'élite : un métier avec un plan à
+-- 30 po est utile à voir, même s'il n'est pas le plus rentable du roster. Le seuil de base (db.lgMinProfit)
+-- filtre le bruit — le monter éteint les petits profits. La COULEUR reste toujours dorée (pas d'argent).
 -- (Les numéros 2/3 sont conservés — TIER_COLOR et les vues sont indexées dessus.)
 function LG:HighlightTier(profit)
     if not profit or profit <= 0 then return 0 end
     local m = self:MinProfit()
     if profit >= m * 100 then return 3 end
-    if profit >= m * 10  then return 2 end
+    if profit >= m       then return 2 end
     return 0
 end
 

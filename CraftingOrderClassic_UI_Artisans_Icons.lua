@@ -88,14 +88,19 @@ end
 -- Mise en avant du métier RENTABLE : contour doré (+ halo au palier du haut) et icône EN COULEUR,
 -- pendant que les métiers non rentables sont DÉSATURÉS. C'est le contraste qui porte l'information :
 -- un coup d'œil sur la colonne suffit à repérer chez qui il y a de l'or à faire.
--- Le palier vient du meilleur plan atteignable AU NIVEAU de cet artisan (LazyGold:BestProfitFor) :
--- doré ≥ 100 po, doré + halo ≥ 1000 po (seuil de base configurable, db.lgMinProfit).
--- Lazy Gold absent → aucune désaturation : sans prix, on n'a rien à dire, on n'éteint rien.
-function UI:_SetArtProfitBorder(ic, item)
+-- Le palier vient du meilleur plan RÉELLEMENT connu de cet artisan (LazyGold:BestKnownPlanFor, décodé
+-- depuis son bitmask exact de recettes) ; si ce bitmask n'est pas disponible pour ce métier (fiche
+-- relayée, jamais croisé en direct), on retombe sur l'approximation par NIVEAU (BestPlanFor) — moins
+-- fiable : elle peut désigner une recette que l'artisan n'a pas apprise (PNJ/butin/quête à part),
+-- même si son niveau de métier suffirait. Seuils : doré ≥ 10 po, doré + halo ≥ 1000 po (seuil de
+-- base configurable, db.lgMinProfit). Lazy Gold absent → aucune désaturation.
+-- `r` = fiche roster de l'artisan (nil si indisponible → on saute direct à l'approximation).
+function UI:_SetArtProfitBorder(ic, item, r)
     local LG = COC.LazyGold
     if not (LG and ic.border) then return end
     local on = LG:IsAvailable()
-    local best = on and LG:BestProfitFor(item.key, item.sv and item.sv[1]) or nil
+    local plan = on and (LG:BestKnownPlanFor(item.key, r) or LG:BestPlanFor(item.key, item.sv and item.sv[1])) or nil
+    local best = plan and plan.profit
     local tier = LG:HighlightTier(best)
     ic.tex:SetDesaturated(on and tier == 0)
     ic.tex:SetAlpha((on and tier == 0) and 0.55 or 1)
@@ -114,7 +119,7 @@ function UI:_SetArtProfitBorder(ic, item)
         ic.glow:SetShown(tier >= 3)   -- halo réservé au palier du haut
     end
     -- On NOMME le plan quand on le peut : « 599 po » ne dit pas quoi commander, « Iron Buckle — 599 po » si.
-    local nm = LG:BestPlanName(item.key, item.sv and item.sv[1])
+    local nm = LG:PlanName(item.key, plan)
     ic.tipProfit = L["Meilleur plan"] .. " : " .. (nm and (nm .. " — ") or "") .. GetCoinTextureString(best)
 end
 
@@ -172,13 +177,13 @@ function UI:_SetArtProfIcons(row, list, r, name)
         ic.tipLabel = Skin.ProfLabel(item.key)
         ic.profKey  = item.key
         ic.owner    = item.who or name
-        self:_SetArtProfitBorder(ic, item)
+        local rr = item.r or r                       -- fusion : rentabilité/CD viennent du PORTEUR, pas de la vitrine
+        self:_SetArtProfitBorder(ic, item, rr)
         local sub = item.sv and ((item.sv[1] or "?") .. "/" .. (item.sv[2] or "?"))
             or (item.est ~= nil and ((item.est > 0) and string.format(L["%d+ · vu crafter"], item.est) or L["vu crafter (sans l'addon)"]))
             or nil
         if item.who then sub = (sub and (sub .. " — ") or "") .. item.who end   -- ligne fusionnée : PORTEUR du métier
         ic.tipSub = sub
-        local rr = item.r or r                       -- fusion : les CD viennent du PORTEUR, pas de la vitrine
         local So = COC.Social
         ic.tipCds = (rr and So and So.CooldownLines) and So:CooldownLines(rr, 3, item.key) or nil
         ic:Show()
