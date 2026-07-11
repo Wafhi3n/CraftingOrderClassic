@@ -177,6 +177,7 @@ local en = {
     ["(cocher = je fournis)"] = "(check = I provide)", ["Commission"] = "Commission", ["Qté"] = "Qty",
     ["Destinataire :"] = "Recipient:", ["Diffuser à tous"] = "Broadcast to all", ["Poster"] = "Post",
     ["Choisis un métier puis un plan."] = "Pick a profession then a recipe.",
+    ["Cliquer pour changer de métier"] = "Click to change profession",
     ["Rechercher un plan"] = "Search a recipe", ["Qualité : "] = "Quality: ",
     ["Sélection : "] = "Selection: ", ["Commande postée !"] = "Order posted!",
     -- Filtre réactifs en poche (P2) — icône + tooltip

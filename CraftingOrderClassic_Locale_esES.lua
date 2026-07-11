@@ -164,6 +164,7 @@ local es = {
     ["(cocher = je fournis)"] = "(marcar = yo aporto)", ["Commission"] = "Comisión", ["Qté"] = "Cant.",
     ["Destinataire :"] = "Destinatario:", ["Diffuser à tous"] = "Difundir a todos", ["Poster"] = "Publicar",
     ["Choisis un métier puis un plan."] = "Elige una profesión y luego una receta.",
+    ["Cliquer pour changer de métier"] = "Clic para cambiar de profesión",
     ["Rechercher un plan"] = "Buscar una receta", ["Qualité : "] = "Calidad: ",
     ["Sélection : "] = "Selección: ", ["Commande postée !"] = "¡Pedido publicado!",
     ["Réactifs : j'ai tout — clic pour tout montrer."] = "Reactivos: lo tengo todo — clic para mostrar todo.",

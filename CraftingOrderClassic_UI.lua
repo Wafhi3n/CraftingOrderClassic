@@ -25,6 +25,11 @@ function UI:Build()
     })
     self.frame = f
 
+    -- Portrait cliquable : sur l'onglet Commande, ouvre le choix de métier (remplace le gros bouton
+    -- dropdown — cf. UI_Post.lua). No-op ailleurs ; ShowTab masque la flèche hors de cet onglet.
+    Skin.SetPortraitClickable(f, function() if UI.activeTab == "post" and UI._ToggleProfFlyout then UI:_ToggleProfFlyout() end end,
+        L["Cliquer pour changer de métier"])
+
     local status = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     status:SetPoint("BOTTOMLEFT", 16, 14); status:SetJustifyH("LEFT")
     Skin.ApplyShadow(status); self.status = status
@@ -90,6 +95,8 @@ function UI:ShowTab(id)
     if self.myArtisansPanel then self.myArtisansPanel:SetShown(id == "myartisans") end
     if self.helpPanel   then self.helpPanel:SetShown(id == "help")    end
     if self.newsPanel   then self.newsPanel:SetShown(id == "news")    end
+    -- Affordance du portrait cliquable (flèche) : visible seulement là où le clic fait quelque chose.
+    if self.frame._portraitArrow then self.frame._portraitArrow:SetShown(id == "post") end
     self:Refresh()
 end
 

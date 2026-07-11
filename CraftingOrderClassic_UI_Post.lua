@@ -84,21 +84,17 @@ local GATHER_ONLY = COC.GATHER_ONLY   -- source partagée (cf. CraftingOrderClas
 -- =========================================================================
 -- Panneau gauche : dropdown métier + liste des plans
 -- =========================================================================
+-- Le CHOIX du métier se fait désormais au clic sur le PORTRAIT de la fenêtre (Skin.SetPortraitClickable,
+-- câblé dans UI.lua ; flèche d'affordance visible seulement sur cet onglet) — le gros bouton dropdown
+-- qui occupait sa propre rangée est retiré, rendant sa hauteur à la liste. Ce qui reste ici est purement
+-- INFORMATIF : le nom du métier actuellement affiché (le portrait porte déjà son icône).
 function UI:_BuildPostLeft(panel)
-    local hdrLbl = panel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    hdrLbl:SetPoint("TOPLEFT", 14, -80); hdrLbl:SetText(L["MÉTIER"])
-    hdrLbl:SetTextColor(Skin.unpack(Skin.color.textMuted))
+    local lbl = panel:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    lbl:SetPoint("TOPLEFT", 12, -84); lbl:SetJustifyH("LEFT"); Skin.ApplyShadow(lbl)
+    self.postProfLabel = lbl
 
-    local pBtn = Skin.MakeGoldButton(panel, LW, 22, "—"); pBtn:SetPoint("TOPLEFT", 12, -98)
-    -- L'icône du métier est DANS le dropdown, collée au nom du métier sélectionné.
-    self.postProfBadge = Skin.MakeBadge(pBtn, 16); self.postProfBadge:SetPoint("LEFT", 5, 0)
-    pBtn.text:SetJustifyH("LEFT"); pBtn.text:ClearAllPoints(); pBtn.text:SetPoint("LEFT", 26, 0)
-    local arrow = pBtn:CreateTexture(nil, "OVERLAY")
-    arrow:SetSize(16, 16); arrow:SetPoint("RIGHT", -3, 0); arrow:SetTexture(Skin.tex.arrowDown)
-    self.postProfBtn = pBtn
-    pBtn:SetScript("OnClick", function() UI:_ToggleProfFlyout() end)
-
-    -- Flyout (hors hiérarchie du panel pour passer au-dessus)
+    -- Flyout (hors hiérarchie du panel pour passer au-dessus) — ancré sous le PORTRAIT (cf.
+    -- _ToggleProfFlyout), plus sous un bouton du panneau qui n'existe plus.
     local fly = CreateFrame("Frame", "COCProfFlyout", UIParent, "BackdropTemplate")
     fly:SetSize(LW, 10); fly:SetFrameStrata("DIALOG"); fly:Hide(); Skin.SkinWell(fly)
     self.postProfFlyout = fly; self.postProfFlyRows = {}
@@ -113,17 +109,17 @@ function UI:_BuildPostLeft(panel)
 
     self:_BuildPostPlanFilters(panel)
 
-    -- Filtres compactés sur UNE rangée (cf. _BuildPostPlanFilters) : ~20 px regagnés ici, rendus à la
-    -- LISTE DES PLANS plus bas (pscroll) plutôt qu'à une rangée de filtre qui n'en avait pas besoin.
-    sep1px(panel, 12, SEP - 2, -152)
+    -- Gros bouton dropdown retiré (choix de métier → portrait) + filtres compactés sur une rangée :
+    -- ~44 px regagnés au total ici, rendus à la LISTE DES PLANS plus bas.
+    sep1px(panel, 12, SEP - 2, -128)
 
     local lhdr = panel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    lhdr:SetPoint("TOPLEFT", 14, -158); lhdr:SetText(L["LISTE DES PLANS"])
+    lhdr:SetPoint("TOPLEFT", 14, -134); lhdr:SetText(L["LISTE DES PLANS"])
     lhdr:SetTextColor(Skin.unpack(Skin.color.textMuted))
     self.postPlanHdr = lhdr   -- annoté dynamiquement quand un artisan filtre la liste (cf. RefreshPostPlans)
 
     local pscroll = CreateFrame("ScrollFrame", "COCPostPlanScroll", panel, "UIPanelScrollFrameTemplate")
-    pscroll:SetPoint("TOPLEFT", 12, -172); pscroll:SetPoint("BOTTOMLEFT", 12, 22); pscroll:SetWidth(LSW)
+    pscroll:SetPoint("TOPLEFT", 12, -148); pscroll:SetPoint("BOTTOMLEFT", 12, 22); pscroll:SetWidth(LSW)
     local pc = CreateFrame("Frame", nil, pscroll); pc:SetSize(LW - 22, 10); pscroll:SetScrollChild(pc)
     pscroll:HookScript("OnVerticalScroll", function() UI:_RenderPostPlanWindow() end)
     self.postPlanScroll = pscroll; self.postPlanContent = pc
@@ -141,7 +137,7 @@ end
 function UI:_BuildPostPlanFilters(panel)
     self.postQualityIdx = 1
     local qBtn = Skin.MakeGoldButton(panel, 104, 18, "")
-    qBtn:SetPoint("TOPLEFT", 12, -128); self.postQualityBtn = qBtn
+    qBtn:SetPoint("TOPLEFT", 12, -104); self.postQualityBtn = qBtn
     qBtn:SetScript("OnClick", function()
         UI.postQualityIdx = (UI.postQualityIdx % #QUALITY_STEPS) + 1
         UI:_RefreshQualityBtn(); UI:RefreshPostPlans()
@@ -152,7 +148,7 @@ function UI:_BuildPostPlanFilters(panel)
     -- au reste de la grille : chercher un plan reste possible pendant que le filtre reste visible).
     self.postReagFilter = false
     local rBtn = Skin.MakeIconButton(panel, 20, Skin.tex.crate)
-    rBtn:SetPoint("TOPRIGHT", -22, -127); self.postReagFilterBtn = rBtn
+    rBtn:SetPoint("TOPRIGHT", -22, -103); self.postReagFilterBtn = rBtn
     rBtn:SetScript("OnClick", function()
         UI.postReagFilter = not UI.postReagFilter
         UI:_RefreshReagFilterBtn(); UI:RefreshPostPlans()
@@ -168,7 +164,7 @@ function UI:_BuildPostPlanFilters(panel)
     self:_RefreshReagFilterBtn()
 
     local srch = CreateFrame("EditBox", nil, panel, "InputBoxTemplate")
-    srch:SetSize(LW - 134, 16); srch:SetPoint("TOPLEFT", 116, -129); srch:SetAutoFocus(false)
+    srch:SetSize(LW - 134, 16); srch:SetPoint("TOPLEFT", 116, -105); srch:SetAutoFocus(false)
     local hint = Skin.SearchHint(panel, srch, L["Rechercher un plan"])
     srch:SetScript("OnTextChanged", function(b)
         hint:SetShown(b:GetText() == "")
@@ -180,7 +176,8 @@ end
 function UI:_ToggleProfFlyout()
     local fly = self.postProfFlyout; if not fly then return end
     if fly:IsShown() then fly:Hide(); return end
-    fly:ClearAllPoints(); fly:SetPoint("TOPLEFT", self.postProfBtn, "BOTTOMLEFT", 0, -2); fly:Show()
+    -- Ancré sous le PORTRAIT (déclencheur du choix de métier), pas sous un bouton du panneau.
+    fly:ClearAllPoints(); fly:SetPoint("TOPLEFT", self.frame.portrait, "BOTTOMLEFT", -6, -6); fly:Show()
 end
 
 function UI:_RefreshQualityBtn()
@@ -270,8 +267,7 @@ function UI:_RefreshProfDropdown()
     for _, p in ipairs(all) do if not GATHER_ONLY[p] then profs[#profs + 1] = p end end
     if (not self.postProf or GATHER_ONLY[self.postProf]) and profs[1] then self.postProf = profs[1] end
     local p = self.postProf or "—"; local lbl = Skin.ProfLabel(p)
-    self.postProfBtn:SetText(lbl)
-    self.postProfBadge:Paint(Skin.color.gold[1], Skin.color.gold[2], Skin.color.gold[3], Skin.FirstChar(lbl), Skin.ProfIcon(p))
+    self.postProfLabel:SetText(lbl)   -- l'icône, elle, est portée par le portrait (cf. UI:Refresh)
     -- Peuplement du flyout
     local fly, frows = self.postProfFlyout, self.postProfFlyRows
     local h = 0

@@ -163,6 +163,7 @@ local de = {
     ["(cocher = je fournis)"] = "(anhaken = ich stelle bereit)", ["Commission"] = "Provision", ["Qté"] = "Anz.",
     ["Destinataire :"] = "Empfänger:", ["Diffuser à tous"] = "An alle senden", ["Poster"] = "Erstellen",
     ["Choisis un métier puis un plan."] = "Wähle einen Beruf, dann ein Rezept.",
+    ["Cliquer pour changer de métier"] = "Klicken, um den Beruf zu wechseln",
     ["Rechercher un plan"] = "Rezept suchen", ["Qualité : "] = "Qualität: ",
     ["Sélection : "] = "Auswahl: ", ["Commande postée !"] = "Auftrag erstellt!",
     ["Réactifs : j'ai tout — clic pour tout montrer."] = "Materialien: alles vorhanden — Klick, um alle anzuzeigen.",

@@ -135,6 +135,36 @@ function Skin.SetWindowPortrait(f, tex)
     if f.portrait.SetMask then f.portrait:SetMask("Interface\\CharacterFrame\\TempPortraitAlphaMask") end
 end
 
+-- Rend le médaillon CLIQUABLE, avec une petite flèche d'affordance (sinon un rond ne se devine pas
+-- cliquable). Idempotent : un 2ᵉ appel ne recrée rien, il re-câble juste le handler/tooltip — utile
+-- pour un déclencheur dont le comportement dépend de l'onglet actif. `f.portrait` fait l'objet exact
+-- du clic (SetAllPoints) : couvre le médaillon sans mordre sur le reste de la barre de titre.
+-- Renvoie (bouton, flèche) — la flèche s'expose pour que l'appelant la masque hors contexte (ex. un
+-- onglet où le clic ne fait rien) via `arrow:SetShown(bool)`.
+function Skin.SetPortraitClickable(f, onClick, tooltipText)
+    if not (f and f.portrait) then return end
+    local btn, arrow = f._portraitBtn, f._portraitArrow
+    if not btn then
+        btn = CreateFrame("Button", nil, f)
+        btn:SetAllPoints(f.portrait)
+        btn:SetFrameLevel(f:GetFrameLevel() + 10)
+        local hi = btn:CreateTexture(nil, "HIGHLIGHT")
+        hi:SetAllPoints(); hi:SetColorTexture(1, 1, 1, 0.18)
+        arrow = f:CreateTexture(nil, "OVERLAY")
+        arrow:SetSize(14, 14); arrow:SetTexture(Skin.tex.arrowDown)
+        arrow:SetPoint("BOTTOMRIGHT", f.portrait, "BOTTOMRIGHT", 3, -1)
+        f._portraitBtn, f._portraitArrow = btn, arrow
+    end
+    btn:SetScript("OnClick", onClick)
+    btn:SetScript("OnEnter", tooltipText and function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_BOTTOM")
+        GameTooltip:SetText(tooltipText, 1, 1, 1)
+        GameTooltip:Show()
+    end or nil)
+    btn:SetScript("OnLeave", tooltipText and GameTooltip_Hide or nil)
+    return btn, arrow
+end
+
 -- =========================================================================
 -- Onglets natifs en bas de cadre (style fiche de personnage).
 -- =========================================================================
