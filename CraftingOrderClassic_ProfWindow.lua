@@ -63,20 +63,19 @@ function PW:RestoreNative() restore(_G.TradeSkillFrame, "trade"); restore(_G.Cra
 -- Construction du shell
 -- ------------------------------------------------------------------
 function PW:_BuildHeader(f)
-    local mark = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    mark:SetPoint("TOPLEFT", 14, -12); mark:SetText("Crafting Order")
-    mark:SetTextColor(Skin.unpack(Skin.color.goldOre)); Skin.ApplyShadow(mark)
-
-    local title = f:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-    title:SetPoint("TOP", 0, -12); title:SetTextColor(Skin.unpack(Skin.color.goldHi)); Skin.ApplyShadow(title)
-    self.titleFS = title
+    -- Titre = la barre native (f.TitleText, alimentée par les refresh via self.titleFS — champ conservé,
+    -- les 4 sites d'écriture n'ont pas bougé). Le rang s'affiche EN LIGNE à droite du titre, dans la
+    -- barre. L'ancien wordmark « Crafting Order » du coin est retiré (portrait + titre portent l'identité).
+    self.titleFS = f.TitleText
 
     local rank = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    rank:SetPoint("TOP", title, "BOTTOM", 0, -2); rank:SetTextColor(Skin.unpack(Skin.color.text))
+    rank:SetPoint("LEFT", f.TitleText, "RIGHT", 8, 0); rank:SetTextColor(Skin.unpack(Skin.color.text))
     Skin.ApplyShadow(rank); self.rankFS = rank
 
+    -- Rangée de contrôles SOUS la barre de titre (y −28..−48, HEADER_H = 56 inchangé). À gauche, x = 64 :
+    -- le médaillon du portrait déborde dans le cadre (~58 px de large jusqu'à y ≈ −53) → on le contourne.
     local vanilla = Skin.MakeGoldButton(f, 96, 20, L["Vue Blizzard"])
-    vanilla:SetPoint("TOPRIGHT", -36, -12)
+    vanilla:SetPoint("TOPRIGHT", -36, -28)
     vanilla:SetScript("OnClick", function() PW:SetEnabled(false) end)
     self.vanillaBtn = vanilla
 
@@ -84,7 +83,7 @@ function PW:_BuildHeader(f)
     -- qui MANQUENT au perso, avec leur source (formateur/butin/quête…). Alimenté par le pont MTSL ;
     -- masqué si l'addon n'est pas là (dépendance molle) et hors mode plein (n'a de sens que sur ton métier).
     local missing = Skin.MakeGoldButton(f, 110, 18, L["Manquantes"])
-    missing:SetPoint("TOPRIGHT", vanilla, "BOTTOMRIGHT", 0, -4)
+    missing:SetPoint("RIGHT", vanilla, "LEFT", -6, 0)
     missing:SetScript("OnClick", function() PW:_ToggleMissing() end)
     missing:SetScript("OnEnter", function(b)
         GameTooltip:SetOwner(b, "ANCHOR_BOTTOMLEFT")
@@ -99,7 +98,7 @@ function PW:_BuildHeader(f)
     -- Toggle « Chercher du travail » (LFW) : signale au royaume que tu cherches du travail dans le métier
     -- OUVERT (donc forcément le tien). Masqué hors vue pleine (reroll/compact = pas ton perso courant).
     local lfw = Skin.MakeGoldButton(f, 150, 18, L["Chercher du travail"])
-    lfw:SetPoint("TOPLEFT", 12, -32)
+    lfw:SetPoint("TOPLEFT", 64, -30)
     lfw:SetScript("OnClick", function() PW:_ToggleLFW() end)
     lfw:SetScript("OnEnter", function(b)
         local D = COC.Directory; local on = D and D.MyLFW and D:MyLFW() == PW.profKey
@@ -112,15 +111,13 @@ function PW:_BuildHeader(f)
     lfw:Hide()   -- caché jusqu'au 1er _SyncLFWBtn (évite un flash en vue reroll/compact)
     self.lfwBtn = lfw
 
-    local close = CreateFrame("Button", nil, f, "UIPanelCloseButton")
-    close:SetPoint("TOPRIGHT", -6, -6)
-    close:SetScript("OnClick", function()
-        if PW.docked then PW:CloseDock(); return end   -- dock : referme juste le panneau, garde la native ouverte
-        if COC.Craft and COC.Craft:IsCraftOpen() then if CloseCraft then CloseCraft() end
-        elseif CloseTradeSkill then CloseTradeSkill() end
-        PW:Hide()
-    end)
+    -- (Bouton fermer : le natif de MakeWindow porte la logique dock/CloseCraft via opts.onClose.)
     Skin.MakeSeparator(f, -(self.HEADER_H - 2))
+end
+
+-- Le médaillon suit le métier affiché (icônes de sort 64×64 → chemin heureux de SetWindowPortrait).
+function PW:_SyncPortrait()
+    Skin.SetWindowPortrait(self.frame, Skin.ProfIcon(self.profKey) or Skin.tex.scroll)
 end
 
 -- Bascule mon statut LFW pour le métier OUVERT (mien). Ignoré hors vue pleine (reroll = pas mon perso).
@@ -180,23 +177,19 @@ end
 
 function PW:Build()
     if self.frame then return end
-    local f = CreateFrame("Frame", "CraftingOrderProfWindow", UIParent, "BackdropTemplate")
-    f:SetSize(self.FRAME_W, self.FRAME_H)
-    local pos = COC.db and COC.db.profWinPos               -- position persistée (drag) ou centre par défaut
-    if pos then f:SetPoint(pos[1], UIParent, pos[2], pos[3], pos[4]) else f:SetPoint("CENTER") end
-    f:SetMovable(true); f:EnableMouse(true); f:RegisterForDrag("LeftButton")
-    f:SetScript("OnDragStart", f.StartMoving)
-    f:SetScript("OnDragStop", function(fr)
-        fr:StopMovingOrSizing()
-        local p, _, rp, x, y = fr:GetPoint()
-        if COC.db then COC.db.profWinPos = { p, rp, x, y } end
-    end)
-    f:SetClampedToScreen(true); f:SetFrameStrata("HIGH")
-    -- Empilement propre avec la fenêtre principale (même strata) : un clic la remonte AU-DESSUS d'un
-    -- bloc, et Raise à l'ouverture met la dernière ouverte devant. Cf. CraftingOrderClassicWindow.
-    f:SetToplevel(true)
-    f:SetScript("OnShow", function(fr) fr:Raise() end)
-    Skin.SkinFrameBackdrop(f); f:Hide()
+    -- Chrome Blizzard natif via le kit (drag + clamp + strata + SetToplevel/Raise gérés là-bas).
+    -- Le bouton fermer natif porte NOTRE logique : dock → on referme juste le panneau (la native reste
+    -- ouverte) ; sinon on ferme la session de craft native avec la fenêtre.
+    local f = Skin.MakeWindow("CraftingOrderProfWindow", self.FRAME_W, self.FRAME_H, {
+        pos = COC.db and COC.db.profWinPos,                -- position persistée (drag) ou centre par défaut
+        onMoved = function(p, rp, x, y) if COC.db then COC.db.profWinPos = { p, rp, x, y } end end,
+        onClose = function()
+            if PW.docked then PW:CloseDock(); return end
+            if COC.Craft and COC.Craft:IsCraftOpen() then if CloseCraft then CloseCraft() end
+            elseif CloseTradeSkill then CloseTradeSkill() end
+            PW:Hide()
+        end,
+    })
     self.frame = f
     self:_BuildHeader(f)
 
@@ -292,6 +285,7 @@ function PW:_RefreshDock()
     self.titleFS:SetText(name)
     local rank, maxRank = craft:OpenRank()
     self.rankFS:SetText((rank and maxRank) and string.format("|cFFE8B84B%d|r / %d", rank, maxRank) or "")
+    self:_SyncPortrait()
     self:_SyncLFWBtn()
     self:_SyncMissingBtn()
     if self.RefreshOrders then self:RefreshOrders() end
@@ -339,6 +333,7 @@ function PW:_DoRefresh()
     else
         return
     end
+    self:_SyncPortrait()
     self:_SyncLFWBtn()
     self:_SyncMissingBtn()
     if self.RefreshOrders then self:RefreshOrders() end

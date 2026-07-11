@@ -16,14 +16,13 @@ local Skin = COC.UI.Skin
 -- =========================================================================
 -- Bouton : look NATIF Blizzard, mais SANS hériter d'UIPanelButtonTemplate.
 -- =========================================================================
--- Pourquoi ne pas hériter du template : un addon d'interface tiers re-skinne (chez le user : en ROUGE)
--- TOUT ce qui hérite d'UIPanelButtonTemplate — y compris les boutons de Blizzard eux-mêmes (le
--- « Quitter » de la fenêtre de métier native vire au rouge). C'était la raison d'être du bouton or
--- « maison » d'origine (« échappe aux re-skins externes »). On veut les DEUX : l'apparence du jeu ET
--- l'immunité au re-skin. Solution : on REPEINT à la main le 3-tranches natif —
--- `UI-DialogBox-goldbutton-{up,down,disabled}-{left,middle,right}`, qui est littéralement l'art
--- d'UIPanelButtonTemplate — sans le template, et sans les clés `Left`/`Middle`/`Right` sur lesquelles
--- les skinners s'accrochent (nommées `_l`/`_m`/`_r` ici).
+-- On repeint à la main le 3-tranches d'UIPanelButtonTemplate —
+-- `UI-DialogBox-goldbutton-{up,down,disabled}-{left,middle,right}` — clés `_l`/`_m`/`_r`.
+-- ⚠️ Cet art est NATIVEMENT ROUGE (mesuré : up-middle = RGB moyen ~(104,23,8) ; le « gold » du nom
+-- désigne le liseré) — d'où les boutons rouges partout dans le client 1.15, y compris chez Blizzard
+-- (« Quitter » de la fenêtre de métier). L'hypothèse historique « un re-skin externe les peint en
+-- rouge » était FAUSSE. On garde néanmoins la peinture à la main : contrôle par tranche (permet un
+-- futur SetDesaturated+SetVertexColor or — TODO en attente de décision) + immunité aux vrais skinners.
 local BTN = "Interface\\Buttons\\UI-DialogBox-goldbutton-"
 
 local function btnPaint(b, state)   -- state = "up" | "down" | "disabled"
