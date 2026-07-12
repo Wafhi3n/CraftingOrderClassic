@@ -22,8 +22,8 @@
 | `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 137 |
 | `CraftingOrderClassic_Elemental.lua` | pseudo-« métier » de récolte « Élémentaire ». | 61 |
 | `CraftingOrderClassic_UI_Skin.lua` | tokens + helpers SÉMANTIQUES du skin (métiers, statuts, rareté, quantités, icônes natives) et petits widgets d'affichage. | 379 |
-| `CraftingOrderClassic_UI_Skin_Native.lua` | kit de chrome Blizzard NATIF (le « framework » UI de COC). | 297 |
-| `CraftingOrderClassic_UI.lua` | fenêtre principale (chrome Blizzard natif, kit UI_Skin_Native). | 424 |
+| `CraftingOrderClassic_UI_Skin_Native.lua` | kit de chrome Blizzard NATIF (le « framework » UI de COC). | 298 |
+| `CraftingOrderClassic_UI.lua` | fenêtre principale (chrome Blizzard natif, kit UI_Skin_Native). | 427 |
 | `CraftingOrderClassic_UI_Post.lua` | onglet « Commande » : sélection de plan (gauche) + réactifs « je fournis » / commission g-s-c / ciblage artisan (droite). | 474 |
 | `CraftingOrderClassic_UI_Post_Artisans.lua` | onglet « Commande », section droite basse : boutons source, liste des artisans, ciblage (@Nom), libellé destinataire, bouton Poster. | 178 |
 | `CraftingOrderClassic_UI_Post_Categories.lua` | onglet « Commande », panneau gauche : regroupe la LISTE DES PLANS en sections type fenêtre native (emplacement puis type pour les équipements, type pour les armes, catégorie pour le reste). | 165 |
@@ -268,11 +268,17 @@
 
 **`Skin.MakeTabs(f, defs, onSelect, opts)`**
 
-> Onglets natifs en bas de cadre (style fiche de personnage).
-> CharacterFrameTabButtonTemplate : textures old-school garanties en Era — PAS PanelTabButtonTemplate,
-> basé atlas et incompatible avec PanelTemplates_SelectTab (clés *Active vs *Disabled). Le template
-> câble en dur son OnClick sur CharacterFrame et son OnShow sur CharacterFrame_TabBoundsCheck → on
-> REMPLACE les deux. Il exige un NOM GLOBAL (TabResize/SelectTab résolvent `_G[name.."Middle"]`…).
+> Onglets EN HAUT (rangée de pills sous la barre de titre, style « Amis/Ignorés » du volet Social).
+> Historique (à ne PAS refaire) : les onglets vivaient EN BAS via `CharacterFrameTabButtonTemplate`
+> (art « fiche de personnage »). Ce template est dessiné pour PENDRE SOUS le cadre (bord plat en
+> haut flush contre la bordure du cadre, forme de patte en bas) — posé à `f,"BOTTOMLEFT"` il dépasse
+> donc du bas de LA FENÊTRE, sur l'écran de jeu. Conséquence vécue : recouvert par toute fenêtre
+> Blizzard ancrée plus bas (ex. le volet Amis) → demande user « mets les onglets au-dessus comme
+> pour le Social » (2026-07-12). Repeindre ce même art en haut l'aurait affiché à l'envers (art
+> orienté) → **on change de brique**, pas d'orientation : rangée de `MakeGoldButton` (3-tranches
+> natif, sans orientation, `SetSelected` déjà fiable) EN HAUT, à l'intérieur du marbre juste sous
+> l'inset (f-60), comme les pilules Amis/Ignorés du petit volet Social. La fenêtre appelante DOIT
+> réserver la bande (cf. PAD_TOP dans UI.lua, levier central) — MakeTabs ne fait QUE poser la rangée.
 > defs = { {id=, label=} } ; onSelect(id) au clic. Renvoie `bar` : .buttons[id], :Select(id),
 > :SetText(id, text) — TOUJOURS passer par bar:SetText (re-mesure la largeur, ex. « Carnet (3) »).
 

@@ -138,37 +138,38 @@ function Skin.SetPortraitClickable(f, onClick, tooltipText)
 end
 
 -- =========================================================================
--- Onglets natifs en bas de cadre (style fiche de personnage).
+-- Onglets EN HAUT (rangée de pills sous la barre de titre, style « Amis/Ignorés » du volet Social).
 -- =========================================================================
--- CharacterFrameTabButtonTemplate : textures old-school garanties en Era — PAS PanelTabButtonTemplate,
--- basé atlas et incompatible avec PanelTemplates_SelectTab (clés *Active vs *Disabled). Le template
--- câble en dur son OnClick sur CharacterFrame et son OnShow sur CharacterFrame_TabBoundsCheck → on
--- REMPLACE les deux. Il exige un NOM GLOBAL (TabResize/SelectTab résolvent `_G[name.."Middle"]`…).
+-- Historique (à ne PAS refaire) : les onglets vivaient EN BAS via `CharacterFrameTabButtonTemplate`
+-- (art « fiche de personnage »). Ce template est dessiné pour PENDRE SOUS le cadre (bord plat en
+-- haut flush contre la bordure du cadre, forme de patte en bas) — posé à `f,"BOTTOMLEFT"` il dépasse
+-- donc du bas de LA FENÊTRE, sur l'écran de jeu. Conséquence vécue : recouvert par toute fenêtre
+-- Blizzard ancrée plus bas (ex. le volet Amis) → demande user « mets les onglets au-dessus comme
+-- pour le Social » (2026-07-12). Repeindre ce même art en haut l'aurait affiché à l'envers (art
+-- orienté) → **on change de brique**, pas d'orientation : rangée de `MakeGoldButton` (3-tranches
+-- natif, sans orientation, `SetSelected` déjà fiable) EN HAUT, à l'intérieur du marbre juste sous
+-- l'inset (f-60), comme les pilules Amis/Ignorés du petit volet Social. La fenêtre appelante DOIT
+-- réserver la bande (cf. PAD_TOP dans UI.lua, levier central) — MakeTabs ne fait QUE poser la rangée.
 -- defs = { {id=, label=} } ; onSelect(id) au clic. Renvoie `bar` : .buttons[id], :Select(id),
 -- :SetText(id, text) — TOUJOURS passer par bar:SetText (re-mesure la largeur, ex. « Carnet (3) »).
 function Skin.MakeTabs(f, defs, onSelect, opts)
-    local maxW = (opts and opts.maxTabWidth) or 120
-    f.maxTabWidth = maxW   -- lu par l'OnEvent du template (DISPLAY_SIZE_CHANGED) : sinon repli à 88
+    local h = (opts and opts.tabHeight) or 20
+    local y = (opts and opts.tabY) or -64
     local bar, prev = { buttons = {} }, nil
-    for i, d in ipairs(defs) do
-        local b = CreateFrame("Button", (f:GetName() or "COCWin") .. "Tab" .. i, f,
-            "CharacterFrameTabButtonTemplate")
-        b:SetText(d.label)
-        PanelTemplates_TabResize(b, 0, nil, 40, maxW)
-        if prev then b:SetPoint("LEFT", prev, "RIGHT", -16, 0)
-        else b:SetPoint("TOPLEFT", f, "BOTTOMLEFT", 12, 2) end
-        b:SetScript("OnShow", function(tab) PanelTemplates_TabResize(tab, 0, nil, 40, maxW) end)
+    for _, d in ipairs(defs) do
+        local b = Skin.MakeGoldButton(f, 10, h, d.label)
+        b:SetWidth(b.text:GetStringWidth() + 20)
+        if prev then b:SetPoint("LEFT", prev, "RIGHT", 4, 0)
+        else b:SetPoint("TOPLEFT", f, "TOPLEFT", 12, y) end
         b:SetScript("OnClick", function() onSelect(d.id) end)
         bar.buttons[d.id] = b; prev = b
     end
     function bar:Select(id)
-        for tid, b in pairs(self.buttons) do
-            if tid == id then PanelTemplates_SelectTab(b) else PanelTemplates_DeselectTab(b) end
-        end
+        for tid, b in pairs(self.buttons) do b:SetSelected(tid == id) end
     end
     function bar:SetText(id, text)
         local b = self.buttons[id]; if not b then return end
-        b:SetText(text); PanelTemplates_TabResize(b, 0, nil, 40, maxW)
+        b:SetText(text); b:SetWidth(b.text:GetStringWidth() + 20)
     end
     return bar
 end

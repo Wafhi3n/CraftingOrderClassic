@@ -20,7 +20,9 @@ function UI:Build()
     -- Chrome Blizzard natif via le kit (CraftingOrderClassic_UI_Skin_Native.lua) : barre de titre +
     -- portrait + bouton fermer + panneau encastré marbre (f.Inset). Le langage couleur (statuts
     -- d'ordre / rareté d'objet) reste INTOUCHÉ ; seul le chrome change.
-    local f = Skin.MakeWindow("CraftingOrderClassicWindow", 868, 600, {
+    -- 630 (pas 600) : les 30 px en plus compensent EXACTEMENT la bande réservée en haut pour les
+    -- onglets (cf. PAD_TOP plus bas) — la hauteur UTILE de chaque panneau ne change pas.
+    local f = Skin.MakeWindow("CraftingOrderClassicWindow", 868, 630, {
         title = "Crafting & Gathering Order", portrait = Skin.tex.scroll,
     })
     self.frame = f
@@ -172,14 +174,15 @@ local function orderActionFor(o)
 end
 
 -- Marge intérieure commune : décale TOUT le contenu d'un panneau d'un coup, sans retoucher chaque
--- coordonnée. LEVIER CENTRAL du haut de page : les 7 onglets s'ancrent ici, donc PAD_TOP règle d'un
--- seul geste la hauteur du « band » vide sous la barre de titre. Avec l'ancien chrome (wordmark +
--- onglets EN HAUT), ce band réservait ~80 px ; ce chrome est parti (titre natif, onglets en bas) → on
--- REMONTE le contenu (PAD_TOP négatif : le panneau démarre 6 px au-dessus du cadre, ses enfants
--- retombent dans le marbre). Garde-fou : le contenu le plus HAUT de tous les onglets est à −74
--- (Aide/Nouveautés) → avec PAD_TOP=−6 il atterrit à f−68, soit 8 px sous le sommet de l'inset (f−60) :
--- reste dans le marbre, jamais dans la barre de titre. Ne pas descendre PAD_TOP sous −8 sans re-auditer.
-local PAD_X, PAD_TOP, PAD_BOT = 8, -6, 8
+-- coordonnée. LEVIER CENTRAL du haut de page : la rangée d'onglets (kit MakeTabs, en haut du cadre
+-- depuis le 2026-07-12, cf. demande user « comme pour le Social ») vit à f-64..f-84 (hors du panel) ;
+-- PAD_TOP réserve la bande EN DESSOUS pour que rien ne recouvre les pilules. Le contenu le plus HAUT
+-- de tous les onglets est à −74 (Aide/Nouveautés) : avec PAD_TOP=24 il atterrit à f−98, soit 14 px
+-- sous le bas des onglets (f−84) — jamais de collision. La fenêtre (MakeWindow) est agrandie de
+-- +30 px (600→630) pour EXACTEMENT compenser cette bande : la hauteur UTILE de chaque panneau (donc
+-- tous les offsets bas-ancrés : Poster, commission…) est inchangée. Ne pas descendre PAD_TOP sous 24
+-- sans re-auditer la collision avec le contenu à −74, ni faire varier l'un sans l'autre (fenêtre/PAD_TOP).
+local PAD_X, PAD_TOP, PAD_BOT = 8, 24, 8
 local function insetPanel(panel, f)
     panel:ClearAllPoints()
     panel:SetPoint("TOPLEFT", f, "TOPLEFT", PAD_X, -PAD_TOP)
