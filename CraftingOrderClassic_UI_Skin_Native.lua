@@ -6,9 +6,10 @@
 -- Tout vit dans la même table `Skin` : les appelants ne savent pas quel fichier définit quoi.
 --
 -- API : MakeWindow (fenêtre ButtonFrameTemplate complète) · SetWindowPortrait · SetPortraitClickable
--- (médaillon-déclencheur + flèche) · MakeTabs (onglets bas natifs) · MakeGoldButton (bouton 3-tranches
+-- (médaillon-déclencheur + flèche) · MakeTabs (languettes natives TabButtonTemplate, en haut) · MakeGoldButton (bouton 3-tranches
 -- natif, anti-reskin, variante sécurisée) · MakeFlatRow (ligne de liste/flyout plate) · MakeIconButton
--- (carré à icône, filtres/pills) · MakeFlyout (dropdown maison : puits + closer + pool de lignes).
+-- (carré à icône, filtres/pills) · MakeFilterButton (bande de filtre style hôtel des ventes) · MakeFlyout
+-- (dropdown maison : puits + closer + pool de lignes).
 -- INTOUCHABLE ici aussi : le langage couleur (statuts d'ordre, rareté) n'est jamais recoloré.
 
 local COC  = CraftingOrderClassic
@@ -138,38 +139,44 @@ function Skin.SetPortraitClickable(f, onClick, tooltipText)
 end
 
 -- =========================================================================
--- Onglets EN HAUT (rangée de pills sous la barre de titre, style « Amis/Ignorés » du volet Social).
+-- Onglets EN HAUT, dans le marbre — vraies LANGUETTES natives (style « Amis/Ignorés » du volet Social).
 -- =========================================================================
--- Historique (à ne PAS refaire) : les onglets vivaient EN BAS via `CharacterFrameTabButtonTemplate`
--- (art « fiche de personnage »). Ce template est dessiné pour PENDRE SOUS le cadre (bord plat en
--- haut flush contre la bordure du cadre, forme de patte en bas) — posé à `f,"BOTTOMLEFT"` il dépasse
--- donc du bas de LA FENÊTRE, sur l'écran de jeu. Conséquence vécue : recouvert par toute fenêtre
--- Blizzard ancrée plus bas (ex. le volet Amis) → demande user « mets les onglets au-dessus comme
--- pour le Social » (2026-07-12). Repeindre ce même art en haut l'aurait affiché à l'envers (art
--- orienté) → **on change de brique**, pas d'orientation : rangée de `MakeGoldButton` (3-tranches
--- natif, sans orientation, `SetSelected` déjà fiable) EN HAUT, à l'intérieur du marbre juste sous
--- l'inset (f-60), comme les pilules Amis/Ignorés du petit volet Social. La fenêtre appelante DOIT
--- réserver la bande (cf. PAD_TOP dans UI.lua, levier central) — MakeTabs ne fait QUE poser la rangée.
--- defs = { {id=, label=} } ; onSelect(id) au clic. Renvoie `bar` : .buttons[id], :Select(id),
--- :SetText(id, text) — TOUJOURS passer par bar:SetText (re-mesure la largeur, ex. « Carnet (3) »).
+-- Deux itérations à NE PAS refaire :
+--   (1) EN BAS via `CharacterFrameTabButtonTemplate` (art « fiche de perso ») — dessiné pour PENDRE
+--       SOUS le cadre : posé en `BOTTOMLEFT` il dépassait de la FENÊTRE, recouvert par toute fenêtre
+--       Blizzard ancrée plus bas (vécu : le volet Amis).
+--   (2) EN HAUT mais en `MakeGoldButton` (3-tranches) → ça faisait des BOUTONS ROUGES, pas des
+--       onglets : « ça fait pas du tout comme la liste d'Amis » (user, capture à l'appui).
+-- Le volet Amis utilise `TabButtonTemplate` (les onglets Amis/Ignorés) : art GRIS `HelpFrameTab-*`
+-- (Inactive/Active), forme de languette dont le corps est DANS la zone de contenu et le bas ouvert se
+-- fond dans le marbre — EXACTEMENT le rendu demandé. On HÉRITE ce template natif (pas de re-peinture,
+-- pas de XML maison : `CreateFrame(..., "TabButtonTemplate")` réutilise le template XML de Blizzard
+-- tel quel — cf. note « pourquoi pas de XML » dans la skill). Contraintes du template : sélection via
+-- `PanelTemplates_SelectTab/DeselectTab` (montre l'art Actif + désactive le clic sur l'onglet ACTIF,
+-- comportement d'onglet voulu) → EXIGE un NOM GLOBAL (les helpers résolvent `_G[name.."Left"]`…), et
+-- re-`TabResize` après chaque SetText (aucun reflow). Placé à f-62 (2 px sous le sommet de l'inset
+-- f-60) : le corps de la languette vit dans le marbre. La fenêtre appelante réserve la bande sous les
+-- onglets (cf. PAD_TOP dans UI.lua). Contrat `bar` inchangé : .buttons[id], :Select(id), :SetText(id,txt).
 function Skin.MakeTabs(f, defs, onSelect, opts)
-    local h = (opts and opts.tabHeight) or 20
-    local y = (opts and opts.tabY) or -64
+    local y = (opts and opts.tabY) or -62
     local bar, prev = { buttons = {} }, nil
-    for _, d in ipairs(defs) do
-        local b = Skin.MakeGoldButton(f, 10, h, d.label)
-        b:SetWidth(b.text:GetStringWidth() + 20)
-        if prev then b:SetPoint("LEFT", prev, "RIGHT", 4, 0)
-        else b:SetPoint("TOPLEFT", f, "TOPLEFT", 12, y) end
+    for i, d in ipairs(defs) do
+        local b = CreateFrame("Button", (f:GetName() or "COCWin") .. "Tab" .. i, f, "TabButtonTemplate")
+        b:SetText(d.label)
+        PanelTemplates_TabResize(b, 0)
+        if prev then b:SetPoint("LEFT", prev, "RIGHT", -4, 0)
+        else b:SetPoint("TOPLEFT", f, "TOPLEFT", 10, y) end
         b:SetScript("OnClick", function() onSelect(d.id) end)
         bar.buttons[d.id] = b; prev = b
     end
     function bar:Select(id)
-        for tid, b in pairs(self.buttons) do b:SetSelected(tid == id) end
+        for tid, b in pairs(self.buttons) do
+            if tid == id then PanelTemplates_SelectTab(b) else PanelTemplates_DeselectTab(b) end
+        end
     end
     function bar:SetText(id, text)
         local b = self.buttons[id]; if not b then return end
-        b:SetText(text); b:SetWidth(b.text:GetStringWidth() + 20)
+        b:SetText(text); PanelTemplates_TabResize(b, 0)
     end
     return bar
 end
@@ -294,5 +301,40 @@ function Skin.MakeIconButton(parent, size, tex)
     end
     b.SetSelected = function(self, on) self.selected = on and true or false; rest(self) end
     rest(b)
+    return b
+end
+
+-- =========================================================================
+-- Bande de filtre verticale, style « catégories » de l'hôtel des ventes.
+-- =========================================================================
+-- Réplique fidèle de `AuctionClassButtonTemplate` (Blizzard_AuctionUITemplates.xml, HdV classique) :
+-- fond plat `UI-AuctionFrame-FilterBg` (bande sombre étirable) + survol/sélection par le highlight
+-- doré natif de l'onglet perso (`UI-Character-Tab-Highlight`, ADD). La SÉLECTION = `LockHighlight`,
+-- exactement comme l'HdV (AuctionFrameFilter_OnClick verrouille le highlight du bouton actif) — donc
+-- AUCUN bleu : l'effet bleu vu ailleurs venait d'une texture de highlight étrangère, pas de l'HdV.
+-- Contrat aligné sur MakeGoldButton pour drop-in dans une sidebar : `b.text` (libellé gauche,
+-- ré-ancrable/mesurable), `b:SetText`, `b:SetSelected(on)` (verrou doré, reste CLIQUABLE).
+-- ⚠️ `UI-AuctionFrame-FilterBg` est de l'art PEINT figé (ancien monde), pas une tuile native : à
+-- réserver aux listes de filtres facettés type HdV — ne pas en faire le chrome général (cf. skill).
+function Skin.MakeFilterButton(parent, w, h, text)
+    local b = CreateFrame("Button", nil, parent)
+    b:SetSize(w, h or 20)
+    local bg = b:CreateTexture(nil, "BACKGROUND"); bg:SetAllPoints()
+    bg:SetTexture("Interface\\AuctionFrame\\UI-AuctionFrame-FilterBg")
+    bg:SetTexCoord(0, 0.53125, 0, 0.625)   -- sous-région exacte du template HdV
+    b.bg = bg
+    local hi = b:CreateTexture(nil, "HIGHLIGHT"); hi:SetAllPoints()
+    hi:SetTexture("Interface\\PaperDollInfoFrame\\UI-Character-Tab-Highlight"); hi:SetBlendMode("ADD")
+    b:SetNormalFontObject("GameFontNormalSmallLeft")
+    b:SetHighlightFontObject("GameFontHighlightSmallLeft")
+    if text then b:SetText(text) end
+    local fs = b:GetFontString()
+    fs:ClearAllPoints(); fs:SetPoint("LEFT", 8, 0); fs:SetJustifyH("LEFT"); Skin.ApplyShadow(fs)
+    b.text = fs
+    b.selected = false
+    b.SetSelected = function(self, on)
+        self.selected = on and true or false
+        if self.selected then self:LockHighlight() else self:UnlockHighlight() end
+    end
     return b
 end
