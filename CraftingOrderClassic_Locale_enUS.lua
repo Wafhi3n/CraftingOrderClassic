@@ -195,7 +195,7 @@ local en = {
     ["Toute la guilde"] = "Whole guild", ["Tous les amis"] = "All friends",
     ["Tous les ajoutés"] = "All added", ["Tous les croisés"] = "All met",
     -- Récolte (Gather)
-    ["MÉTIER DE RÉCOLTE"] = "GATHERING PROFESSION", ["Rechercher une ressource"] = "Search a resource",
+    ["Rechercher une ressource"] = "Search a resource",
     ["LISTE DES RESSOURCES"] = "RESOURCE LIST", ["Demande de récolte — quantité voulue"] = "Gather request — wanted quantity",
     ["stacks"] = "stacks", ["pile"] = "stack", ["piles"] = "stacks",
     ["Récolteur :"] = "Gatherer:", ["Prix proposé"] = "Price offered",

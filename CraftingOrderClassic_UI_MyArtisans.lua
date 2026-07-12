@@ -102,15 +102,7 @@ function UI:_BuildMyArtHeader(panel)
     mainBtn:SetScript("OnClick", function() UI:_ToggleMyArtMainFlyout() end)
     self.myArtMainBtn = mainBtn
 
-    local fly = CreateFrame("Frame", "COCMyArtMainFlyout", UIParent, "BackdropTemplate")
-    fly:SetSize(190, 10); fly:SetFrameStrata("DIALOG"); fly:Hide(); Skin.SkinWell(fly)
-    self.myArtMainFlyout = fly; self.myArtMainFlyRows = {}
-    local closer = CreateFrame("Button", nil, UIParent)
-    closer:SetAllPoints(); closer:SetFrameStrata("DIALOG"); closer:Hide()
-    fly:SetFrameLevel(closer:GetFrameLevel() + 1)
-    closer:SetScript("OnClick", function() fly:Hide(); closer:Hide() end)
-    fly:SetScript("OnShow", function() closer:Show() end)
-    fly:SetScript("OnHide", function() closer:Hide() end)
+    self.myArtMainFlyout = Skin.MakeFlyout("COCMyArtMainFlyout", 190)
 
     sep1px(panel, 12, -100, 822, 1)
 end
@@ -122,26 +114,17 @@ function UI:_ToggleMyArtMainFlyout()
     if fly:IsShown() then fly:Hide(); return end
     local D = COC.Directory
     local names = (D and D._MyAltNames and D:_MyAltNames()) or {}
-    local n = 0
-    for _, nm in ipairs(names) do
-        n = n + 1
-        local row = self.myArtMainFlyRows[n]
-        if not row then
-            row = Skin.MakeFlatRow(fly, 182, 18)
-            row:SetPoint("TOPLEFT", 4, -4 - (n - 1) * 20)
-            self.myArtMainFlyRows[n] = row
-        end
+    if not names[1] then return end
+    for n, nm in ipairs(names) do
+        local row = fly:Row(n)
         row:SetText(nm)
         row:SetScript("OnClick", function()
             if D and D.AltsCmd then D:AltsCmd("main " .. nm) end
             fly:Hide(); UI:RefreshMyArtisans()
         end)
-        row:Show()
     end
-    for i = n + 1, #self.myArtMainFlyRows do self.myArtMainFlyRows[i]:Hide() end
-    if n == 0 then return end
-    fly:SetHeight(n * 20 + 8)
-    fly:ClearAllPoints(); fly:SetPoint("TOPRIGHT", self.myArtMainBtn, "BOTTOMRIGHT", 0, -2); fly:Show()
+    fly:SetCount(#names)
+    fly:ToggleAt("TOPRIGHT", self.myArtMainBtn, "BOTTOMRIGHT", 0, -2)
 end
 
 -- Recale le bandeau sur l'état réel (coche + libellé vitrine) — le bouton vitrine n'a de sens que

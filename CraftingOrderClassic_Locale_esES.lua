@@ -176,7 +176,7 @@ local es = {
     ["Ajoutés"] = "Añadidos", ["fournis"] = "aportados", ["Chargement…"] = "Cargando…",
     ["Toute la guilde"] = "Toda la hermandad", ["Tous les amis"] = "Todos los amigos",
     ["Tous les ajoutés"] = "Todos los añadidos", ["Tous les croisés"] = "Todos los vistos",
-    ["MÉTIER DE RÉCOLTE"] = "PROFESIÓN DE RECOLECCIÓN", ["Rechercher une ressource"] = "Buscar un recurso",
+    ["Rechercher une ressource"] = "Buscar un recurso",
     ["LISTE DES RESSOURCES"] = "LISTA DE RECURSOS", ["Demande de récolte — quantité voulue"] = "Solicitud de recolección — cantidad deseada",
     ["stacks"] = "montones", ["pile"] = "montón", ["piles"] = "montones",
     ["Récolteur :"] = "Recolector:", ["Prix proposé"] = "Precio ofrecido",

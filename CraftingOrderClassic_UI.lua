@@ -25,12 +25,14 @@ function UI:Build()
     })
     self.frame = f
 
-    -- Portrait cliquable : sur l'onglet Commande, ouvre le choix de métier (remplace le gros bouton
-    -- dropdown — cf. UI_Post.lua). No-op ailleurs ; ShowTab masque la flèche hors de cet onglet.
-    Skin.SetPortraitClickable(f, function() if UI.activeTab == "post" and UI._ToggleProfFlyout then UI:_ToggleProfFlyout() end end,
-        L["Cliquer pour changer de métier"])
-    -- Contexte dans la barre de titre, À DROITE du portrait : nom du métier sur l'onglet Commande
-    -- (le titre central reste « Crafting & Gathering Order » ; libellés de métier courts, pas de
+    -- Portrait cliquable : ouvre le choix de métier de l'onglet actif — Commande OU Récolte (remplace
+    -- les gros boutons dropdown des panneaux). No-op ailleurs ; ShowTab masque la flèche hors contexte.
+    Skin.SetPortraitClickable(f, function()
+        if UI.activeTab == "post" then UI:_ToggleProfFlyout()
+        elseif UI.activeTab == "gather" then UI:_ToggleGatherFlyout() end
+    end, L["Cliquer pour changer de métier"])
+    -- Contexte dans la barre de titre, À DROITE du portrait : nom du métier sur les onglets Commande/
+    -- Récolte (le titre central reste « Crafting & Gathering Order » ; libellés courts, pas de
     -- collision). Vide ailleurs. Alimenté par UI:_SyncMainPortrait.
     self.headerContext = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     self.headerContext:SetPoint("LEFT", f, "TOPLEFT", 66, -14); self.headerContext:SetJustifyH("LEFT")
@@ -102,7 +104,7 @@ function UI:ShowTab(id)
     if self.helpPanel   then self.helpPanel:SetShown(id == "help")    end
     if self.newsPanel   then self.newsPanel:SetShown(id == "news")    end
     -- Affordance du portrait cliquable (flèche) : visible seulement là où le clic fait quelque chose.
-    if self.frame._portraitArrow then self.frame._portraitArrow:SetShown(id == "post") end
+    if self.frame._portraitArrow then self.frame._portraitArrow:SetShown(id == "post" or id == "gather") end
     self:Refresh()
 end
 
@@ -401,17 +403,18 @@ function UI:Refresh()
         D and D:CountOnline() or 0, D and D:CountKnownCrafters() or 0))
 end
 
--- Portrait dynamique : icône du métier choisi sur l'onglet Commande, parchemin par défaut ailleurs
--- (même mécanisme que PW:_SyncPortrait — icônes de sort 64×64, chemin heureux de SetWindowPortrait).
--- Helper LÉGER, appelable directement au clic (sélection de métier dans le flyout) SANS déclencher un
--- UI:Refresh complet → le médaillon change instantanément, plus au prochain refresh réseau/onglet
--- (c'était le « délai » observé).
+-- Portrait dynamique : icône du métier choisi sur les onglets Commande/Récolte, parchemin par défaut
+-- ailleurs (même mécanisme que PW:_SyncPortrait — icônes de sort 64×64, chemin heureux de
+-- SetWindowPortrait). Helper LÉGER, appelable directement au clic (sélection de métier dans le flyout)
+-- SANS déclencher un UI:Refresh complet → le médaillon change instantanément, plus au prochain refresh
+-- réseau/onglet (c'était le « délai » observé).
 function UI:_SyncMainPortrait()
     if not self.frame then return end
-    local onPost = (self.activeTab == "post")
-    Skin.SetWindowPortrait(self.frame, (onPost and Skin.ProfIcon(self.postProf)) or Skin.tex.scroll)
+    local prof = (self.activeTab == "post" and self.postProf)
+              or (self.activeTab == "gather" and self.gatherProf) or nil
+    Skin.SetWindowPortrait(self.frame, (prof and Skin.ProfIcon(prof)) or Skin.tex.scroll)
     if self.headerContext then
-        self.headerContext:SetText(onPost and self.postProf and Skin.ProfLabel(self.postProf) or "")
+        self.headerContext:SetText(prof and Skin.ProfLabel(prof) or "")
     end
 end
 

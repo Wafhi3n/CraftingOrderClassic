@@ -123,15 +123,8 @@ end
 
 function UI:_PostArtRow(i)
     local r = self.postArtRows[i]; if r then return r end
-    r = CreateFrame("Button", nil, self.postArtContent); r:SetSize(RW - 22, ARH); r:SetPoint("TOPLEFT", 0, -(i-1)*ARH)
-    local hi = r:CreateTexture(nil, "HIGHLIGHT"); hi:SetAllPoints(); hi:SetColorTexture(Skin.unpack(Skin.color.rowHover))
-    local st = r:CreateTexture(nil, "BACKGROUND"); st:SetAllPoints()
-    st:SetColorTexture(Skin.color.tabActive[1], Skin.color.tabActive[2], Skin.color.tabActive[3], 0.30)
-    st:Hide(); r.selTex = st
-    r.dot  = Skin.MakeStatusIcon(r, 14); r.dot:SetPoint("LEFT", 4, 0)
-    r.name = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    r.name:SetPoint("LEFT", 18, 0); r.name:SetWidth(RW - 100); r.name:SetJustifyH("LEFT"); Skin.ApplyShadow(r.name)
-    r.src  = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall"); r.src:SetPoint("RIGHT", -4, 0); Skin.ApplyShadow(r.src)
+    r = Skin.MakeArtisanRow(self.postArtContent, RW - 22, ARH)   -- pastille + nom + source (kit)
+    r:SetPoint("TOPLEFT", 0, -(i-1)*ARH)
     self.postArtRows[i] = r; return r
 end
 

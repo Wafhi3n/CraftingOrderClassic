@@ -56,25 +56,20 @@ end
 -- qui n'a pas de fenêtre en jeu). Liste MES métiers depuis l'annuaire (Directory.mySkills).
 -- ------------------------------------------------------------------
 function UI:_BuildProfMenu()
-    local m = CreateFrame("Frame", "CraftingOrderProfMenu", UIParent, "BackdropTemplate")
-    m:SetSize(184, 40); m:SetFrameStrata("DIALOG"); Skin.SkinWell(m); m:Hide(); m.rows = {}
+    local m = Skin.MakeFlyout("CraftingOrderProfMenu", 184, { rowW = 164 })
     m.title = m:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     m.title:SetPoint("TOPLEFT", 10, -8); Skin.ApplyShadow(m.title)
-    local closer = CreateFrame("Button", nil, UIParent)
-    closer:SetAllPoints(); closer:SetFrameStrata("DIALOG"); closer:Hide()
-    m:SetFrameLevel(closer:GetFrameLevel() + 1)
-    closer:SetScript("OnClick", function() m:Hide() end)
-    m:SetScript("OnShow", function() closer:Show() end); m:SetScript("OnHide", function() closer:Hide() end)
     self.profMenu = m
     return m
 end
 
+-- Ligne du pool du kit + icône de métier (fillMenuRow ré-ancre .text et repositionne selon le cas).
 function UI:_ProfMenuRow(m, i)
-    local r = m.rows[i]; if r then return r end
-    r = Skin.MakeFlatRow(m, 164, 20)   -- ligne de menu plate (fillMenuRow ré-ancre .text selon le cas)
-    r.text:SetPoint("LEFT", 26, 0)
-    r.ic = r:CreateTexture(nil, "OVERLAY"); r.ic:SetSize(16, 16); r.ic:SetPoint("LEFT", 5, 0)
-    m.rows[i] = r; return r
+    local r = m:Row(i)
+    if not r.ic then
+        r.ic = r:CreateTexture(nil, "OVERLAY"); r.ic:SetSize(16, 16); r.ic:SetPoint("LEFT", 5, 0)
+    end
+    return r
 end
 
 -- Configure une ligne du pool : header de section (doré, sans icône, non cliquable) ou entrée
@@ -118,8 +113,8 @@ function UI:ToggleProfMenu()
             y = y - 22
         end
     end
-    for j = i + 1, #m.rows do m.rows[j]:Hide() end
+    m:SetCount(i)
     m:SetWidth(rerolls[1] and 220 or 184)             -- élargi pour « Métier — Nom »
-    m:SetHeight(math.max(-y + 6, 40))
-    m:ClearAllPoints(); m:SetPoint("TOPRIGHT", self.minimapBtn or Minimap, "BOTTOMLEFT", 0, 0); m:Show()
+    m:SetHeight(math.max(-y + 6, 40))                 -- hauteur custom (titre + sections) : écrase SetCount
+    m:ToggleAt("TOPRIGHT", self.minimapBtn or Minimap, "BOTTOMLEFT", 0, 0)
 end

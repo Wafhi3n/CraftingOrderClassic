@@ -50,31 +50,14 @@ end
 -- =========================================================================
 -- Panneau gauche : dropdown métier de récolte + liste des ressources
 -- =========================================================================
+-- Même réagencement que l'onglet Commande : le CHOIX du métier se fait au clic sur le PORTRAIT de la
+-- fenêtre (flèche d'affordance, câblé dans UI.lua), le NOM vit dans la barre de titre — plus de gros
+-- bouton dropdown ni de label : recherche + pills d'extension compactes en haut, le reste à la LISTE.
 function UI:_BuildGatherLeft(panel)
-    local hdr = panel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    hdr:SetPoint("TOPLEFT", 14, -80); hdr:SetText(L["MÉTIER DE RÉCOLTE"])
-    hdr:SetTextColor(Skin.unpack(Skin.color.textMuted))
-
-    local gBtn = Skin.MakeGoldButton(panel, LW, 22, "—"); gBtn:SetPoint("TOPLEFT", 12, -98)
-    self.gatherProfBadge = Skin.MakeBadge(gBtn, 16); self.gatherProfBadge:SetPoint("LEFT", 5, 0)
-    gBtn.text:SetJustifyH("LEFT"); gBtn.text:ClearAllPoints(); gBtn.text:SetPoint("LEFT", 26, 0)
-    local arrow = gBtn:CreateTexture(nil, "OVERLAY")
-    arrow:SetSize(16, 16); arrow:SetPoint("RIGHT", -3, 0); arrow:SetTexture(Skin.tex.arrowDown)
-    self.gatherProfBtn = gBtn
-    gBtn:SetScript("OnClick", function() UI:_ToggleGatherFlyout() end)
-
-    local fly = CreateFrame("Frame", "COCGatherFlyout", UIParent, "BackdropTemplate")
-    fly:SetSize(LW, 10); fly:SetFrameStrata("DIALOG"); fly:Hide(); Skin.SkinWell(fly)
-    self.gatherProfFlyout = fly; self.gatherProfFlyRows = {}
-    local closer = CreateFrame("Button", nil, UIParent)
-    closer:SetAllPoints(); closer:SetFrameStrata("DIALOG"); closer:Hide()
-    fly:SetFrameLevel(closer:GetFrameLevel() + 1)
-    closer:SetScript("OnClick", function() fly:Hide(); closer:Hide() end)
-    fly:SetScript("OnShow", function() closer:Show() end)
-    fly:SetScript("OnHide", function() closer:Hide() end)
+    self.gatherProfFlyout = Skin.MakeFlyout("COCGatherFlyout", LW)
 
     local srch = CreateFrame("EditBox", nil, panel, "InputBoxTemplate")
-    srch:SetSize(LW, 16); srch:SetPoint("TOPLEFT", 12, -129); srch:SetAutoFocus(false)
+    srch:SetSize(LW, 16); srch:SetPoint("TOPLEFT", 12, -85); srch:SetAutoFocus(false)
     local hint = Skin.SearchHint(panel, srch, L["Rechercher une ressource"])
     srch:SetScript("OnTextChanged", function(b)
         hint:SetShown(b:GetText() == "")
@@ -90,28 +73,29 @@ function UI:_BuildGatherLeft(panel)
     for _, d in ipairs(verDefs) do
         local b = Skin.MakeGoldButton(panel, 10, 16, d[2])
         b:SetWidth(b.text:GetStringWidth() + 14)
-        b:SetPoint("TOPLEFT", vx, -150)
+        b:SetPoint("TOPLEFT", vx, -106)
         b:SetScript("OnClick", function() UI.gatherExp = d[1]; UI:_RefreshGatherVerPills(); UI:RefreshGatherList() end)
         self.gatherVerPills[#self.gatherVerPills + 1] = { btn = b, exp = d[1] }
         vx = vx + b:GetWidth() + 4
     end
 
-    sep1px(panel, 12, SEP - 2, -172)
+    sep1px(panel, 12, SEP - 2, -128)
 
     local lhdr = panel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    lhdr:SetPoint("TOPLEFT", 14, -178); lhdr:SetText(L["LISTE DES RESSOURCES"])
+    lhdr:SetPoint("TOPLEFT", 14, -134); lhdr:SetText(L["LISTE DES RESSOURCES"])
     lhdr:SetTextColor(Skin.unpack(Skin.color.textMuted))
 
     local gscroll = CreateFrame("ScrollFrame", "COCGatherListScroll", panel, "UIPanelScrollFrameTemplate")
-    gscroll:SetPoint("TOPLEFT", 12, -192); gscroll:SetPoint("BOTTOMLEFT", 12, 22); gscroll:SetWidth(LSW)
+    gscroll:SetPoint("TOPLEFT", 12, -148); gscroll:SetPoint("BOTTOMLEFT", 12, 22); gscroll:SetWidth(LSW)
     local gc = CreateFrame("Frame", nil, gscroll); gc:SetSize(LW - 22, 10); gscroll:SetScrollChild(gc)
     self.gatherListContent = gc; self.gatherListRows = {}
 end
 
 function UI:_ToggleGatherFlyout()
-    local fly = self.gatherProfFlyout; if not fly then return end
-    if fly:IsShown() then fly:Hide(); return end
-    fly:ClearAllPoints(); fly:SetPoint("TOPLEFT", self.gatherProfBtn, "BOTTOMLEFT", 0, -2); fly:Show()
+    -- Ancré sous le PORTRAIT (déclencheur du choix de métier), comme l'onglet Commande.
+    if self.gatherProfFlyout then
+        self.gatherProfFlyout:ToggleAt("TOPLEFT", self.frame.portrait, "BOTTOMLEFT", -6, -6)
+    end
 end
 
 -- =========================================================================
@@ -259,27 +243,19 @@ function UI:_RefreshGatherDropdown()
     avail[#avail + 1] = "Elemental"
     if not self.gatherProf and avail[1] then self.gatherProf = avail[1] end
     self:_RefreshGatherVerPills()
-    local lbl = Skin.ProfLabel(self.gatherProf or "—")
-    self.gatherProfBtn:SetText(lbl)
-    self.gatherProfBadge:Paint(Skin.color.gold[1], Skin.color.gold[2], Skin.color.gold[3], Skin.FirstChar(lbl), Skin.ProfIcon(self.gatherProf))
-    local fly, frows = self.gatherProfFlyout, self.gatherProfFlyRows
-    local h = 0
+    -- Nom + icône du métier : portés par l'en-tête/portrait (UI:_SyncMainPortrait), plus par le panneau.
+    self:_SyncMainPortrait()
+    local fly = self.gatherProfFlyout
     for i, prof in ipairs(avail) do
-        local r = frows[i]
-        if not r then
-            r = Skin.MakeFlatRow(fly, LW - 4, 20); r:SetPoint("TOPLEFT", 2, -2 - (i-1)*20)
-            frows[i] = r
-        end
+        local r = fly:Row(i)
         r:SetText(Skin.ProfLabel(prof)); r:SetSelected(prof == self.gatherProf)
         r:SetScript("OnClick", function()
             UI.gatherProf = prof; UI.gatherEntry = nil
             UI:_RefreshGatherDropdown(); UI:RefreshGatherList()
             UI:_RefreshGatherDetail(); UI:_RefreshGatherArtisans(); fly:Hide()
         end)
-        r:Show(); h = h + 20
     end
-    for i = #avail + 1, #frows do frows[i]:Hide() end
-    fly:SetHeight(h + 4)
+    fly:SetCount(#avail)
 end
 
 function UI:RefreshGatherList()
@@ -426,15 +402,8 @@ end
 
 function UI:_GatherArtRow(i)
     local r = self.gatherArtRows[i]; if r then return r end
-    r = CreateFrame("Button", nil, self.gatherArtContent); r:SetSize(RW - 22, ARH); r:SetPoint("TOPLEFT", 0, -(i-1)*ARH)
-    local hi = r:CreateTexture(nil, "HIGHLIGHT"); hi:SetAllPoints(); hi:SetColorTexture(Skin.unpack(Skin.color.rowHover))
-    local st = r:CreateTexture(nil, "BACKGROUND"); st:SetAllPoints()
-    st:SetColorTexture(Skin.color.tabActive[1], Skin.color.tabActive[2], Skin.color.tabActive[3], 0.30)
-    st:Hide(); r.selTex = st
-    r.dot  = Skin.MakeStatusIcon(r, 14); r.dot:SetPoint("LEFT", 4, 0)
-    r.name = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    r.name:SetPoint("LEFT", 18, 0); r.name:SetWidth(RW - 100); r.name:SetJustifyH("LEFT"); Skin.ApplyShadow(r.name)
-    r.src  = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall"); r.src:SetPoint("RIGHT", -4, 0); Skin.ApplyShadow(r.src)
+    r = Skin.MakeArtisanRow(self.gatherArtContent, RW - 22, ARH)   -- pastille + nom + source (kit)
+    r:SetPoint("TOPLEFT", 0, -(i-1)*ARH)
     self.gatherArtRows[i] = r; return r
 end
 

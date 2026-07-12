@@ -89,19 +89,9 @@ local GATHER_ONLY = COC.GATHER_ONLY   -- source partagée (cf. CraftingOrderClas
 -- à droite du portrait (UI:_SyncMainPortrait) — plus de label dans le panneau : la liste des plans
 -- démarre tout en haut.
 function UI:_BuildPostLeft(panel)
-    -- Flyout (hors hiérarchie du panel pour passer au-dessus) — ancré sous le PORTRAIT (cf.
-    -- _ToggleProfFlyout), plus sous un bouton du panneau qui n'existe plus.
-    local fly = CreateFrame("Frame", "COCProfFlyout", UIParent, "BackdropTemplate")
-    fly:SetSize(LW, 10); fly:SetFrameStrata("DIALOG"); fly:Hide(); Skin.SkinWell(fly)
-    self.postProfFlyout = fly; self.postProfFlyRows = {}
-
-    -- Fermer flyout sur clic ailleurs
-    local closer = CreateFrame("Button", nil, UIParent)
-    closer:SetAllPoints(); closer:SetFrameStrata("DIALOG"); closer:Hide()
-    fly:SetFrameLevel(closer:GetFrameLevel() + 1)
-    closer:SetScript("OnClick", function() fly:Hide(); closer:Hide() end)
-    fly:SetScript("OnShow",     function() closer:Show() end)
-    fly:SetScript("OnHide",     function() closer:Hide() end)
+    -- Flyout du choix de métier (kit) — ancré sous le PORTRAIT (cf. _ToggleProfFlyout), plus sous
+    -- un bouton du panneau qui n'existe plus.
+    self.postProfFlyout = Skin.MakeFlyout("COCProfFlyout", LW)
 
     self:_BuildPostPlanFilters(panel)
 
@@ -170,10 +160,10 @@ function UI:_BuildPostPlanFilters(panel)
 end
 
 function UI:_ToggleProfFlyout()
-    local fly = self.postProfFlyout; if not fly then return end
-    if fly:IsShown() then fly:Hide(); return end
     -- Ancré sous le PORTRAIT (déclencheur du choix de métier), pas sous un bouton du panneau.
-    fly:ClearAllPoints(); fly:SetPoint("TOPLEFT", self.frame.portrait, "BOTTOMLEFT", -6, -6); fly:Show()
+    if self.postProfFlyout then
+        self.postProfFlyout:ToggleAt("TOPLEFT", self.frame.portrait, "BOTTOMLEFT", -6, -6)
+    end
 end
 
 function UI:_RefreshQualityBtn()
@@ -265,15 +255,10 @@ function UI:_RefreshProfDropdown()
     if (not self.postProf or GATHER_ONLY[self.postProf]) and profs[1] then self.postProf = profs[1] end
     -- Nom + icône du métier : portés par l'en-tête/portrait (UI:_SyncMainPortrait), plus par le panneau.
     UI:_SyncMainPortrait()
-    -- Peuplement du flyout
-    local fly, frows = self.postProfFlyout, self.postProfFlyRows
-    local h = 0
+    -- Peuplement du flyout (pool du kit)
+    local fly = self.postProfFlyout
     for i, prof in ipairs(profs) do
-        local r = frows[i]
-        if not r then
-            r = Skin.MakeFlatRow(fly, LW - 4, 20); r:SetPoint("TOPLEFT", 2, -2 - (i-1)*20)
-            frows[i] = r
-        end
+        local r = fly:Row(i)
         r:SetText(Skin.ProfLabel(prof)); r:SetSelected(prof == self.postProf)
         r:SetScript("OnClick", function()
             UI.postProf = prof; UI.postEntry = nil; UI:_RefreshProfDropdown()
@@ -281,10 +266,8 @@ function UI:_RefreshProfDropdown()
             UI:RefreshPostPlans(); UI:RefreshPostPlanDetail(); UI:RefreshPostArtisans()
             fly:Hide()
         end)
-        r:Show(); h = h + 20
     end
-    for i = #profs + 1, #frows do frows[i]:Hide() end
-    fly:SetHeight(h + 4)
+    fly:SetCount(#profs)
 end
 
 function UI:RefreshPostPlans()

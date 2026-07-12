@@ -175,7 +175,7 @@ local de = {
     ["Ajoutés"] = "Hinzugefügt", ["fournis"] = "bereitgestellt", ["Chargement…"] = "Lädt…",
     ["Toute la guilde"] = "Ganze Gilde", ["Tous les amis"] = "Alle Freunde",
     ["Tous les ajoutés"] = "Alle Hinzugefügten", ["Tous les croisés"] = "Alle Getroffenen",
-    ["MÉTIER DE RÉCOLTE"] = "SAMMELBERUF", ["Rechercher une ressource"] = "Ressource suchen",
+    ["Rechercher une ressource"] = "Ressource suchen",
     ["LISTE DES RESSOURCES"] = "RESSOURCENLISTE", ["Demande de récolte — quantité voulue"] = "Sammelanfrage — gewünschte Menge",
     ["stacks"] = "Stapel", ["pile"] = "Stapel", ["piles"] = "Stapel",
     ["Récolteur :"] = "Sammler:", ["Prix proposé"] = "Gebotener Preis",

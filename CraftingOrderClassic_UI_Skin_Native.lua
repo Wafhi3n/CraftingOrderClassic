@@ -5,9 +5,10 @@
 -- décision « COC seulement » 2026-07-11) — on promouvra en lib partagée si un 2ᵉ client apparaît.
 -- Tout vit dans la même table `Skin` : les appelants ne savent pas quel fichier définit quoi.
 --
--- API : MakeWindow (fenêtre ButtonFrameTemplate complète) · SetWindowPortrait · MakeTabs (onglets bas
--- natifs) · MakeGoldButton (bouton 3-tranches natif, anti-reskin, variante sécurisée) · MakeFlatRow
--- (ligne de liste/flyout plate) · MakeIconButton (carré à icône, filtres/pills).
+-- API : MakeWindow (fenêtre ButtonFrameTemplate complète) · SetWindowPortrait · SetPortraitClickable
+-- (médaillon-déclencheur + flèche) · MakeTabs (onglets bas natifs) · MakeGoldButton (bouton 3-tranches
+-- natif, anti-reskin, variante sécurisée) · MakeFlatRow (ligne de liste/flyout plate) · MakeIconButton
+-- (carré à icône, filtres/pills) · MakeFlyout (dropdown maison : puits + closer + pool de lignes).
 -- INTOUCHABLE ici aussi : le langage couleur (statuts d'ordre, rareté) n'est jamais recoloré.
 
 local COC  = CraftingOrderClassic
@@ -192,6 +193,77 @@ function Skin.MakeFlatRow(parent, w, h)
     row.SetText = function(self, t) self.text:SetText(t) end   -- les appelants écrivent sur le BOUTON
     row.SetSelected = function(self, on) self.selTex:SetShown(on and true or false) end
     return row
+end
+
+-- =========================================================================
+-- Ligne « personne » des listes d'artisans/récolteurs (pastille + nom + source).
+-- =========================================================================
+-- Constructeur partagé Commande/Récolte (il était dupliqué dans les deux) : pastille de présence à
+-- gauche, nom extensible, étiquette source alignée à droite, surbrillance au survol + texture de
+-- sélection. Contrat : .dot (MakeStatusIcon), .name, .src (FontStrings), .selTex (:SetShown(on)).
+-- L'appelant garde le peuplement (grouping rerolls, filtre métier…) — ici que la GÉOMÉTRIE.
+function Skin.MakeArtisanRow(parent, w, h)
+    local r = CreateFrame("Button", nil, parent)
+    r:SetSize(w, h)
+    local hi = r:CreateTexture(nil, "HIGHLIGHT"); hi:SetAllPoints()
+    hi:SetColorTexture(Skin.unpack(Skin.color.rowHover))
+    local st = r:CreateTexture(nil, "BACKGROUND"); st:SetAllPoints()
+    st:SetColorTexture(Skin.color.tabActive[1], Skin.color.tabActive[2], Skin.color.tabActive[3], 0.30)
+    st:Hide(); r.selTex = st
+    r.dot  = Skin.MakeStatusIcon(r, 14); r.dot:SetPoint("LEFT", 4, 0)
+    r.name = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    r.name:SetPoint("LEFT", 18, 0); r.name:SetWidth(w - 78); r.name:SetJustifyH("LEFT"); Skin.ApplyShadow(r.name)
+    r.src  = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    r.src:SetPoint("RIGHT", -4, 0); Skin.ApplyShadow(r.src)
+    return r
+end
+
+-- =========================================================================
+-- Flyout : dropdown/menu léger maison (puits + closer + pool de lignes).
+-- =========================================================================
+-- Le pattern « puits DIALOG + bouton plein écran qui ferme au clic ailleurs » était dupliqué 4×
+-- (métier Commande, métier Récolte, vitrine Mes artisans, menu minimap) → UNE primitive. Le closer
+-- est UN NIVEAU SOUS le flyout dans la même strate : un clic dans le flyout agit, un clic n'importe
+-- où ailleurs ferme. Il vit sur UIParent (hors hiérarchie du panneau appelant) pour passer au-dessus.
+-- Contrat : fly.rows (pool) · fly:Row(i) (ligne MakeFlatRow poolée, empilée, :Show()-ée) ·
+-- fly:SetCount(n) (masque le surplus + hauteur au contenu) · fly:ToggleAt(point, rel, relPoint, x, y)
+-- (ferme si ouvert, sinon ancre + ouvre — renvoie true si désormais visible).
+-- opts : rowStep (défaut 20) · rowH (= rowStep) · rowW (= w − 2·pad) · pad (2).
+-- Un menu à géométrie libre (titres de section, hauteur custom) peut ré-ancrer les lignes du pool et
+-- écraser la hauteur APRÈS SetCount — cf. le menu minimap.
+function Skin.MakeFlyout(name, w, opts)
+    opts = opts or {}
+    local pad  = opts.pad or 2
+    local step = opts.rowStep or 20
+    local rowH, rowW = opts.rowH or step, opts.rowW or (w - 2 * pad)
+    local fly = CreateFrame("Frame", name, UIParent, "BackdropTemplate")
+    fly:SetSize(w, 10); fly:SetFrameStrata("DIALOG"); fly:Hide(); Skin.SkinWell(fly)
+    local closer = CreateFrame("Button", nil, UIParent)
+    closer:SetAllPoints(); closer:SetFrameStrata("DIALOG"); closer:Hide()
+    fly:SetFrameLevel(closer:GetFrameLevel() + 1)
+    closer:SetScript("OnClick", function() fly:Hide() end)   -- OnHide masque le closer
+    fly:SetScript("OnShow", function() closer:Show() end)
+    fly:SetScript("OnHide", function() closer:Hide() end)
+    fly.rows = {}
+    function fly:Row(i)
+        local r = self.rows[i]
+        if not r then
+            r = Skin.MakeFlatRow(self, rowW, rowH)
+            r:SetPoint("TOPLEFT", pad, -pad - (i - 1) * step)
+            self.rows[i] = r
+        end
+        r:Show(); return r
+    end
+    function fly:SetCount(n)
+        for i = n + 1, #self.rows do self.rows[i]:Hide() end
+        self:SetHeight(math.max(n * step + 2 * pad, 24))
+    end
+    function fly:ToggleAt(point, rel, relPoint, x, y)
+        if self:IsShown() then self:Hide(); return false end
+        self:ClearAllPoints(); self:SetPoint(point, rel, relPoint, x, y); self:Show()
+        return true
+    end
+    return fly
 end
 
 -- =========================================================================
