@@ -96,9 +96,8 @@ function UI:BuildArtisansTab(f)
     local srcDefs = { {id="all",label=L["Tous"]}, {id="guild",label=L["Guilde"]}, {id="friend",label=L["Amis"]}, {id="added",label=L["Ajoutés"]}, {id="recent",label=L["Annuaire"]}, {id="muted",label=L["En sourdine"]}, {id="confed",label=L["Confédération"]} }
     self.artSrcBtns = {}
     for i, d in ipairs(srcDefs) do
-        local b = Skin.MakeGoldButton(panel, 190, 28, d.label)
-        b:SetPoint("TOPLEFT", 12, -96 - (i - 1) * 32)
-        b.text:ClearAllPoints(); b.text:SetPoint("LEFT", 10, 0); b.text:SetJustifyH("LEFT")
+        local b = Skin.MakeFilterButton(panel, 190, 24, d.label)   -- bande de filtre style HdV (verrou doré, pas de bleu)
+        b:SetPoint("TOPLEFT", 12, -96 - (i - 1) * 26)
         local cnt = b:CreateFontString(nil, "OVERLAY", "GameFontNormal")
         cnt:SetPoint("RIGHT", -10, 0); Skin.ApplyShadow(cnt); b.count = cnt
         b:SetScript("OnClick", function() UI.artSource = d.id; UI:_RefreshArtSrcTabs(); UI:RefreshArtisans() end)
@@ -358,7 +357,7 @@ end
 function UI:_ArtRow(i)
     local r = self.artListRows[i]; if r then return r end
     r = CreateFrame("Button", nil, self.artListContent); r:SetSize(ARW - 54, ARH); r:SetPoint("TOPLEFT", 0, -(i - 1) * ARH)
-    local hi = r:CreateTexture(nil, "HIGHLIGHT"); hi:SetAllPoints(); hi:SetColorTexture(Skin.unpack(Skin.color.rowHover))
+    Skin.PersonHighlight(r)   -- surbrillance bleue native (liste d'Amis) — homogène avec Commande/Récolte
     r.dot   = Skin.MakeStatusIcon(r, 14); r.dot:SetPoint("LEFT", 6, 0)
     r.name  = r:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     r.name:SetPoint("TOPLEFT", 22, -5); r.name:SetWidth(150); r.name:SetJustifyH("LEFT"); Skin.ApplyShadow(r.name)

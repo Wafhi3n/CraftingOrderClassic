@@ -22,7 +22,7 @@
 | `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 137 |
 | `CraftingOrderClassic_Elemental.lua` | pseudo-« métier » de récolte « Élémentaire ». | 61 |
 | `CraftingOrderClassic_UI_Skin.lua` | tokens + helpers SÉMANTIQUES du skin (métiers, statuts, rareté, quantités, icônes natives) et petits widgets d'affichage. | 379 |
-| `CraftingOrderClassic_UI_Skin_Native.lua` | kit de chrome Blizzard NATIF (le « framework » UI de COC). | 346 |
+| `CraftingOrderClassic_UI_Skin_Native.lua` | kit de chrome Blizzard NATIF (le « framework » UI de COC). | 357 |
 | `CraftingOrderClassic_UI.lua` | fenêtre principale (chrome Blizzard natif, kit UI_Skin_Native). | 428 |
 | `CraftingOrderClassic_UI_Post.lua` | onglet « Commande » : sélection de plan (gauche) + réactifs « je fournis » / commission g-s-c / ciblage artisan (droite). | 474 |
 | `CraftingOrderClassic_UI_Post_Artisans.lua` | onglet « Commande », section droite basse : boutons source, liste des artisans, ciblage (@Nom), libellé destinataire, bouton Poster. | 178 |
@@ -298,13 +298,22 @@
 > Le bouton doré n'est PAS fait pour ça (l'ancien MakeGoldButton servait aussi de ligne, faute de
 > mieux). Contrat : .text (ré-ancrable), .selTex, :SetSelected(on). Surbrillance auto (HIGHLIGHT).
 
-**`Skin.MakeArtisanRow(parent, w, h)`**
+**`Skin.PersonHighlight(row)`**
 
 > Ligne « personne » des listes d'artisans/récolteurs (pastille + nom + source).
 > Constructeur partagé Commande/Récolte (il était dupliqué dans les deux) : pastille de présence à
 > gauche, nom extensible, étiquette source alignée à droite, surbrillance au survol + texture de
 > sélection. Contrat : .dot (MakeStatusIcon), .name, .src (FontStrings), .selTex (:SetShown(on)).
 > L'appelant garde le peuplement (grouping rerolls, filtre métier…) — ici que la GÉOMÉTRIE.
+> Surbrillance de ligne « façon liste d'Amis » (réutilise le chrome natif du volet Social). La ligne
+> d'ami (FriendsFrameButtonTemplate) n'utilise PAS un aplat gris mais la BARRE `UI-QuestLogTitleHighlight`
+> en mode ADD, teintée en BLEU (SetVertexColor 0.243/0.570/1 — valeur exacte du OnLoad Blizzard) →
+> lueur bleue au survol, le marqueur visuel emblématique des listes de personnes du jeu. Ajoute la
+> couche HIGHLIGHT (auto au survol) + rend une texture de SÉLECTION (bleu léger, masquée) pour
+> :SetSelected. À utiliser partout où on liste des PERSONNES (artisans, récolteurs) pour l'homogénéité.
+
+**`Skin.MakeArtisanRow(parent, w, h)`**
+
 
 **`Skin.MakeFlyout(name, w, opts)`**
 
@@ -461,7 +470,7 @@
 > (dropdown maison : puits + closer + pool de lignes).
 > INTOUCHABLE ici aussi : le langage couleur (statuts d'ordre, rareté) n'est jamais recoloré.
 
-**API** : `Skin.MakeGoldButton(parent, w, h, text, template)` · `Skin.MakeWindow(name, w, h, opts)` · `Skin.SetWindowPortrait(f, tex)` · `Skin.SetPortraitClickable(f, onClick, tooltipText)` · `Skin.MakeTabs(f, defs, onSelect, opts)` · `Skin.MakeFlatRow(parent, w, h)` · `Skin.MakeArtisanRow(parent, w, h)` · `Skin.MakeFlyout(name, w, opts)` · `Skin.MakeIconButton(parent, size, tex)` · `Skin.MakeFilterButton(parent, w, h, text)`
+**API** : `Skin.MakeGoldButton(parent, w, h, text, template)` · `Skin.MakeWindow(name, w, h, opts)` · `Skin.SetWindowPortrait(f, tex)` · `Skin.SetPortraitClickable(f, onClick, tooltipText)` · `Skin.MakeTabs(f, defs, onSelect, opts)` · `Skin.MakeFlatRow(parent, w, h)` · `Skin.PersonHighlight(row)` · `Skin.MakeArtisanRow(parent, w, h)` · `Skin.MakeFlyout(name, w, opts)` · `Skin.MakeIconButton(parent, size, tex)` · `Skin.MakeFilterButton(parent, w, h, text)`
 
 ### `CraftingOrderClassic_UI.lua`
 > CraftingOrderClassic_UI.lua — fenêtre principale (chrome Blizzard natif, kit UI_Skin_Native).

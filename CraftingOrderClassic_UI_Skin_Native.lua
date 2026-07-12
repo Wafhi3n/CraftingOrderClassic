@@ -164,7 +164,7 @@ end
 -- réserve la bande dessous (PAD_TOP, UI.lua). Contrat `bar` inchangé : .buttons[id], :Select, :SetText.
 function Skin.MakeTabs(f, defs, onSelect, opts)
     local x = (opts and opts.tabX) or 62
-    local y = (opts and opts.tabY) or -34
+    local y = (opts and opts.tabY) or -28
     local bar, prev = { buttons = {} }, nil
     for i, d in ipairs(defs) do
         local b = CreateFrame("Button", (f:GetName() or "COCWin") .. "Tab" .. i, f, "TabButtonTemplate")
@@ -216,14 +216,25 @@ end
 -- gauche, nom extensible, étiquette source alignée à droite, surbrillance au survol + texture de
 -- sélection. Contrat : .dot (MakeStatusIcon), .name, .src (FontStrings), .selTex (:SetShown(on)).
 -- L'appelant garde le peuplement (grouping rerolls, filtre métier…) — ici que la GÉOMÉTRIE.
+-- Surbrillance de ligne « façon liste d'Amis » (réutilise le chrome natif du volet Social). La ligne
+-- d'ami (FriendsFrameButtonTemplate) n'utilise PAS un aplat gris mais la BARRE `UI-QuestLogTitleHighlight`
+-- en mode ADD, teintée en BLEU (SetVertexColor 0.243/0.570/1 — valeur exacte du OnLoad Blizzard) →
+-- lueur bleue au survol, le marqueur visuel emblématique des listes de personnes du jeu. Ajoute la
+-- couche HIGHLIGHT (auto au survol) + rend une texture de SÉLECTION (bleu léger, masquée) pour
+-- :SetSelected. À utiliser partout où on liste des PERSONNES (artisans, récolteurs) pour l'homogénéité.
+function Skin.PersonHighlight(row)
+    local hi = row:CreateTexture(nil, "HIGHLIGHT"); hi:SetAllPoints()
+    hi:SetTexture("Interface\\QuestFrame\\UI-QuestLogTitleHighlight")
+    hi:SetBlendMode("ADD"); hi:SetVertexColor(0.243, 0.570, 1)
+    local sel = row:CreateTexture(nil, "BACKGROUND"); sel:SetAllPoints()
+    sel:SetColorTexture(0.243, 0.570, 1, 0.22); sel:Hide()
+    return sel
+end
+
 function Skin.MakeArtisanRow(parent, w, h)
     local r = CreateFrame("Button", nil, parent)
     r:SetSize(w, h)
-    local hi = r:CreateTexture(nil, "HIGHLIGHT"); hi:SetAllPoints()
-    hi:SetColorTexture(Skin.unpack(Skin.color.rowHover))
-    local st = r:CreateTexture(nil, "BACKGROUND"); st:SetAllPoints()
-    st:SetColorTexture(Skin.color.tabActive[1], Skin.color.tabActive[2], Skin.color.tabActive[3], 0.30)
-    st:Hide(); r.selTex = st
+    r.selTex = Skin.PersonHighlight(r)   -- surbrillance bleue native (liste d'Amis)
     r.dot  = Skin.MakeStatusIcon(r, 14); r.dot:SetPoint("LEFT", 4, 0)
     r.name = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     r.name:SetPoint("LEFT", 18, 0); r.name:SetWidth(w - 78); r.name:SetJustifyH("LEFT"); Skin.ApplyShadow(r.name)
