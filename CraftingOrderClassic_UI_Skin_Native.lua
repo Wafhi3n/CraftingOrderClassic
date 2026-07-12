@@ -154,18 +154,24 @@ end
 -- tel quel — cf. note « pourquoi pas de XML » dans la skill). Contraintes du template : sélection via
 -- `PanelTemplates_SelectTab/DeselectTab` (montre l'art Actif + désactive le clic sur l'onglet ACTIF,
 -- comportement d'onglet voulu) → EXIGE un NOM GLOBAL (les helpers résolvent `_G[name.."Left"]`…), et
--- re-`TabResize` après chaque SetText (aucun reflow). Placé à f-62 (2 px sous le sommet de l'inset
--- f-60) : le corps de la languette vit dans le marbre. La fenêtre appelante réserve la bande sous les
--- onglets (cf. PAD_TOP dans UI.lua). Contrat `bar` inchangé : .buttons[id], :Select(id), :SetText(id,txt).
+-- re-`TabResize` après chaque SetText (aucun reflow).
+-- PLACEMENT (mesuré sur PortraitFrameTemplate) : la barre de titre GRISE occupe f0..f−21, puis la tuile
+-- ROCK va de f−21 à l'inset (f−60) ; le PORTRAIT (61×61 en −6,8) déborde jusqu'à x≈55 / y≈−53. Le volet
+-- Amis pose ses languettes SUR cette bande grise → on fait pareil : à DROITE du portrait (défaut tabX=62,
+-- il dégage le bord droit du portrait x≈54) et dans le rock SOUS le titre (défaut tabY=−34, sous la tuile
+-- de titre −21 et le nom de métier de l'en-tête −14). Le corps de la languette vit donc DANS le gris,
+-- son bas ouvert plonge vers le contenu — le rendu « onglets sur la barre grise » demandé. La fenêtre
+-- réserve la bande dessous (PAD_TOP, UI.lua). Contrat `bar` inchangé : .buttons[id], :Select, :SetText.
 function Skin.MakeTabs(f, defs, onSelect, opts)
-    local y = (opts and opts.tabY) or -62
+    local x = (opts and opts.tabX) or 62
+    local y = (opts and opts.tabY) or -34
     local bar, prev = { buttons = {} }, nil
     for i, d in ipairs(defs) do
         local b = CreateFrame("Button", (f:GetName() or "COCWin") .. "Tab" .. i, f, "TabButtonTemplate")
         b:SetText(d.label)
         PanelTemplates_TabResize(b, 0)
         if prev then b:SetPoint("LEFT", prev, "RIGHT", -4, 0)
-        else b:SetPoint("TOPLEFT", f, "TOPLEFT", 10, y) end
+        else b:SetPoint("TOPLEFT", f, "TOPLEFT", x, y) end
         b:SetScript("OnClick", function() onSelect(d.id) end)
         bar.buttons[d.id] = b; prev = b
     end

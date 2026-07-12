@@ -22,7 +22,7 @@
 | `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 137 |
 | `CraftingOrderClassic_Elemental.lua` | pseudo-« métier » de récolte « Élémentaire ». | 61 |
 | `CraftingOrderClassic_UI_Skin.lua` | tokens + helpers SÉMANTIQUES du skin (métiers, statuts, rareté, quantités, icônes natives) et petits widgets d'affichage. | 379 |
-| `CraftingOrderClassic_UI_Skin_Native.lua` | kit de chrome Blizzard NATIF (le « framework » UI de COC). | 340 |
+| `CraftingOrderClassic_UI_Skin_Native.lua` | kit de chrome Blizzard NATIF (le « framework » UI de COC). | 346 |
 | `CraftingOrderClassic_UI.lua` | fenêtre principale (chrome Blizzard natif, kit UI_Skin_Native). | 428 |
 | `CraftingOrderClassic_UI_Post.lua` | onglet « Commande » : sélection de plan (gauche) + réactifs « je fournis » / commission g-s-c / ciblage artisan (droite). | 474 |
 | `CraftingOrderClassic_UI_Post_Artisans.lua` | onglet « Commande », section droite basse : boutons source, liste des artisans, ciblage (@Nom), libellé destinataire, bouton Poster. | 178 |
@@ -282,9 +282,14 @@
 > tel quel — cf. note « pourquoi pas de XML » dans la skill). Contraintes du template : sélection via
 > `PanelTemplates_SelectTab/DeselectTab` (montre l'art Actif + désactive le clic sur l'onglet ACTIF,
 > comportement d'onglet voulu) → EXIGE un NOM GLOBAL (les helpers résolvent `_G[name.."Left"]`…), et
-> re-`TabResize` après chaque SetText (aucun reflow). Placé à f-62 (2 px sous le sommet de l'inset
-> f-60) : le corps de la languette vit dans le marbre. La fenêtre appelante réserve la bande sous les
-> onglets (cf. PAD_TOP dans UI.lua). Contrat `bar` inchangé : .buttons[id], :Select(id), :SetText(id,txt).
+> re-`TabResize` après chaque SetText (aucun reflow).
+> PLACEMENT (mesuré sur PortraitFrameTemplate) : la barre de titre GRISE occupe f0..f−21, puis la tuile
+> ROCK va de f−21 à l'inset (f−60) ; le PORTRAIT (61×61 en −6,8) déborde jusqu'à x≈55 / y≈−53. Le volet
+> Amis pose ses languettes SUR cette bande grise → on fait pareil : à DROITE du portrait (défaut tabX=62,
+> il dégage le bord droit du portrait x≈54) et dans le rock SOUS le titre (défaut tabY=−34, sous la tuile
+> de titre −21 et le nom de métier de l'en-tête −14). Le corps de la languette vit donc DANS le gris,
+> son bas ouvert plonge vers le contenu — le rendu « onglets sur la barre grise » demandé. La fenêtre
+> réserve la bande dessous (PAD_TOP, UI.lua). Contrat `bar` inchangé : .buttons[id], :Select, :SetText.
 
 **`Skin.MakeFlatRow(parent, w, h)`**
 
