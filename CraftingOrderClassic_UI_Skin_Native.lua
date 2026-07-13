@@ -9,7 +9,13 @@
 -- (médaillon-déclencheur + flèche) · MakeTabs (languettes natives TabButtonTemplate, en haut) · MakeGoldButton (bouton 3-tranches
 -- natif, anti-reskin, variante sécurisée) · MakeFlatRow (ligne de liste/flyout plate) · MakeIconButton
 -- (carré à icône, filtres/pills) · MakeFilterButton (bande de filtre style hôtel des ventes) · MakeFlyout
--- (dropdown maison : puits + closer + pool de lignes).
+-- (dropdown maison : puits + closer + pool de lignes) · MakeDropdown (dropdown NATIF UIDropDownMenu,
+-- le sélecteur gris de l'HdV) · MakeCheckButton (case à cocher NATIVE, style « Objets utilisables »
+-- de l'HdV) · FieldLabel (légende de champ style HdV). Les primitives de SECTIONS (MakeInset,
+-- MakeDivider, MakeDividerV) vivent dans _UI_Skin_Sections.lua (même table Skin, anti-monolithe).
+-- MakeFlyout vs MakeDropdown : le premier est un MENU maison (géométrie libre, lignes riches : métiers,
+-- menu minimap) ; le second est le SÉLECTEUR natif (une valeur parmi N, coche, look HdV) — préférer
+-- MakeDropdown dès qu'il s'agit de choisir UNE valeur dans une liste courte.
 -- INTOUCHABLE ici aussi : le langage couleur (statuts d'ordre, rareté) n'est jamais recoloré.
 
 local COC  = CraftingOrderClassic
@@ -89,8 +95,21 @@ function Skin.MakeWindow(name, w, h, opts)
     if f.SetTitle and opts.title then f:SetTitle(opts.title) end
     if opts.portrait then Skin.SetWindowPortrait(f, opts.portrait) end
     if opts.onClose and f.CloseButton then f.CloseButton:SetScript("OnClick", opts.onClose) end
-    -- Pas de barre de boutons en bas → le marbre descend jusqu'en bas (guardé : fonction du template).
-    if ButtonFrameTemplate_HideButtonBar then ButtonFrameTemplate_HideButtonBar(f) end
+    -- BARRE D'ACTIONS native du template (opts.buttonBar) : ButtonFrameTemplate embarque une bande à
+    -- boutons en bas de cadre (BtnCornerLeft/Right + tuile ButtonBottomBorder, le marbre s'arrêtant
+    -- 26 px au-dessus du bas — SharedUIPanelTemplates.xml:765). C'est LE bloc « Destinataire + Poster »
+    -- demandé par le user (maquette GIMP à l'appui) : zéro asset, le client assemble les pièces.
+    -- `f.ActionBar` = frame posée sur la bande, à ancrer par le contenu (les onglets y posent un
+    -- conteneur parenté à LEUR panneau : il se masque avec l'onglet). Sans l'option, comportement
+    -- historique : la barre est retirée et le marbre descend jusqu'en bas.
+    if opts.buttonBar then
+        local bar = CreateFrame("Frame", nil, f)
+        bar:SetPoint("TOPLEFT", f.Inset, "BOTTOMLEFT", 0, 0)
+        bar:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -6, 4)
+        f.ActionBar = bar
+    elseif ButtonFrameTemplate_HideButtonBar then
+        ButtonFrameTemplate_HideButtonBar(f)
+    end
     f:Hide()
     return f
 end
@@ -319,6 +338,96 @@ function Skin.MakeIconButton(parent, size, tex)
     b.SetSelected = function(self, on) self.selected = on and true or false; rest(self) end
     rest(b)
     return b
+end
+
+-- =========================================================================
+-- Dropdown natif (UIDropDownMenuTemplate) — le sélecteur gris de l'hôtel des ventes.
+-- =========================================================================
+-- Le widget EXACT du filtre « Rareté » de l'HdV : 3-tranches `CharacterCreate-LabelFrame` + flèche
+-- dorée + liste déroulante à coches. On l'HÉRITE (cf. skill, piège n°9 : hériter le template XML natif,
+-- ne pas en peindre un faux) — il existe bien en Era (SharedXML/Classic/UIDropDownMenuTemplates.xml:220)
+-- et gère seul le survol, la coche de l'entrée active et la fermeture au clic ailleurs.
+-- ⚠️ DEUX contraintes du template, toutes deux payées d'avance ici :
+--  · il EXIGE un nom GLOBAL : ses tranches sont `$parentLeft/Middle/Right` et TOUS les helpers
+--    UIDropDownMenu_* repassent par `frame:GetName()` → d'où `name` en 1er argument (comme MakeFlyout).
+--  · son art porte une MARGE TRANSPARENTE (~15 px à gauche) et le cadre visible est centré dans les
+--    32 px de haut de la frame : ancrer la frame « à x,y » ne pose donc PAS le bord visible à x,y.
+--    D'où `:SetPointVisual`, qui prend les coordonnées du bord VISIBLE voulu et applique la compense.
+-- Contrat : `dd:SetValue(v)` (coche + libellé) · `dd.value` · `items` = liste `{ {value=…, text=…}, … }`
+-- ou FONCTION qui la rend (ré-évaluée à chaque ouverture : libellés localisés/dynamiques) ·
+-- `opts.onSelect(v)` · `opts.label` (préfixe collé devant le libellé, ex. « Qualité : »).
+-- NB : ne jamais utiliser `false` comme `value` (UIDropDownMenu_SetSelectedValue le traite comme
+-- « pas de sélection ») — passer par un index ou 0, cf. le filtre qualité de l'onglet Commande.
+local DD_INSET_X, DD_INSET_Y = 15, 2   -- marge transparente de l'art (gauche / haut) — affinés en jeu
+function Skin.MakeDropdown(name, parent, w, items, opts)
+    opts = opts or {}
+    local dd = CreateFrame("Frame", name, parent, "UIDropDownMenuTemplate")
+    local function list() return (type(items) == "function") and items() or items end
+    -- Valeur absente de la liste (liste pas encore peuplée : rerolls pas encore scannés au 1er affichage)
+    -- → on affiche la valeur brute plutôt qu'un libellé VIDE, qui ferait croire à un sélecteur cassé.
+    local function textFor(v)
+        for _, it in ipairs(list()) do if it.value == v then return it.text or "" end end
+        return (type(v) == "string") and v or ""
+    end
+    function dd:SetValue(v)
+        self.value = v
+        UIDropDownMenu_SetSelectedValue(self, v)
+        UIDropDownMenu_SetText(self, (opts.label or "") .. textFor(v))
+    end
+    UIDropDownMenu_Initialize(dd, function(_, level)
+        for _, it in ipairs(list()) do
+            local info = UIDropDownMenu_CreateInfo()
+            info.text, info.value = it.text, it.value
+            info.checked = (it.value == dd.value)
+            info.func = function()
+                dd:SetValue(it.value)
+                if opts.onSelect then opts.onSelect(it.value) end
+                CloseDropDownMenus()
+            end
+            UIDropDownMenu_AddButton(info, level)
+        end
+    end)
+    UIDropDownMenu_SetWidth(dd, w)
+    UIDropDownMenu_JustifyText(dd, "LEFT")
+    -- Ancre le bord VISIBLE du cadre (et non la frame, cf. marge transparente ci-dessus). Le SIGNE de la
+    -- compense dépend du bord ancré : à GAUCHE il faut reculer la frame (−), à DROITE l'avancer (+) —
+    -- sinon un dropdown ancré TOPRIGHT part 15 px trop à gauche (vécu : la vitrine de « Mes artisans »).
+    function dd:SetPointVisual(point, rel, relPoint, x, y)
+        local dx = point:find("RIGHT") and DD_INSET_X or -DD_INSET_X
+        self:SetPoint(point, rel, relPoint, (x or 0) + dx, (y or 0) + DD_INSET_Y)
+    end
+    return dd
+end
+
+-- Case à cocher NATIVE (`UICheckButtonTemplate`, SharedUIPanelTemplates.xml:413) — le widget des
+-- filtres « Objets utilisables » / « Afficher sur le personnage » du browse de l'HdV.
+-- À ne pas confondre avec `Skin.MakeCheck` (Skin.lua) : celle-ci est une simple TEXTURE d'affichage
+-- (état non cliquable, posée dans une ligne de liste) ; ici c'est un vrai bouton cliquable avec
+-- survol/pressé/coche natifs. Le template fait 32×32 (calibré pour les panneaux Blizzard) → on le
+-- réduit, et le libellé natif (parentKey `Text`) est ré-ancré à droite de la boîte.
+-- Contrat : `c.text` (FontString) · `c:SetChecked/GetChecked` (natifs) · `c.Text` (alias natif).
+function Skin.MakeCheckButton(parent, text, size)
+    size = size or 20
+    local c = CreateFrame("CheckButton", nil, parent, "UICheckButtonTemplate")
+    c:SetSize(size, size)
+    local fs = c.Text or c.text
+    fs:ClearAllPoints(); fs:SetPoint("LEFT", c, "RIGHT", 2, 0)
+    fs:SetFontObject("GameFontHighlightSmall")   -- police des libellés de filtre de l'HdV
+    if text then fs:SetText(text) end
+    Skin.ApplyShadow(fs)
+    c.text = fs
+    return c
+end
+
+-- (Blocs de section & séparateurs — MakeInset, MakeDivider, MakeDividerV — : voir
+-- CraftingOrderClassic_UI_Skin_Sections.lua, même table Skin, découpé pour l'anti-monolithe.)
+
+-- Légende de champ style HdV (« NOM », « RARETÉ » au-dessus de leur champ). Police EXACTE de l'HdV :
+-- `GameFontHighlightSmall` (cf. BrowseNameText, Blizzard_AuctionUI.xml:126).
+function Skin.FieldLabel(parent, text, x, y)
+    local fs = parent:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    fs:SetPoint("TOPLEFT", x, y); fs:SetText(text); Skin.ApplyShadow(fs)
+    return fs
 end
 
 -- =========================================================================

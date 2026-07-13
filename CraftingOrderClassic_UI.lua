@@ -24,6 +24,7 @@ function UI:Build()
     -- languettes d'onglets (cf. PAD_TOP plus bas) — la hauteur UTILE de chaque panneau ne change pas.
     local f = Skin.MakeWindow("CraftingOrderClassicWindow", 868, 606, {
         title = "Crafting & Gathering Order", portrait = Skin.tex.scroll,
+        buttonBar = true,   -- barre d'actions native en bas (Destinataire/Poster de l'onglet Commande)
     })
     self.frame = f
 
@@ -33,15 +34,26 @@ function UI:Build()
         if UI.activeTab == "post" then UI:_ToggleProfFlyout()
         elseif UI.activeTab == "gather" then UI:_ToggleGatherFlyout() end
     end, L["Cliquer pour changer de métier"])
-    -- Contexte dans la barre de titre, À DROITE du portrait : nom du métier sur les onglets Commande/
-    -- Récolte (le titre central reste « Crafting & Gathering Order » ; libellés courts, pas de
-    -- collision). Vide ailleurs. Alimenté par UI:_SyncMainPortrait.
-    self.headerContext = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    self.headerContext:SetPoint("LEFT", f, "TOPLEFT", 66, -14); self.headerContext:SetJustifyH("LEFT")
-    self.headerContext:SetTextColor(Skin.unpack(Skin.color.goldHi)); Skin.ApplyShadow(self.headerContext)
+    -- JAUGE DE COMPÉTENCE dans la barre de titre, à DROITE du portrait (demande user : « comme la vue
+    -- métier ») : une barre bleue native portant le NOM DU MÉTIER + le niveau (rang/max) de l'artisan
+    -- CIBLÉ. Remplace l'ancien libellé texte du métier et l'annotation « <artisan> : connu » qui vivait
+    -- dans la liste des plans. Le titre central reste « Crafting & Gathering Order ». Vide (masquée) hors
+    -- onglets Commande/Récolte. Alimentée par UI:_SyncHeaderSkill (métier ← _SyncMainPortrait, cible ←
+    -- _UpdateArtisanLabel). RÉGLAGES (position/taille/couleur) : ICI. Contenu : _SyncHeaderSkill.
+    local skill = CreateFrame("StatusBar", nil, f, "BackdropTemplate")
+    skill:SetSize(200, 15); skill:SetPoint("CENTER", f, "TOPLEFT", 434, -31)
+    skill:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
+    skill:SetStatusBarColor(0.20, 0.42, 0.90)   -- bleu « compétence » (iso barre de métier native)
+    skill:SetBackdrop({ bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
+        edgeFile = "Interface\\Buttons\\WHITE8X8", edgeSize = 1 })
+    skill:SetBackdropColor(0, 0, 0, 0.5); skill:SetBackdropBorderColor(0, 0, 0, 0.8)
+    skill:SetMinMaxValues(0, 1); skill:SetValue(0)
+    skill.text = skill:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    skill.text:SetPoint("CENTER"); Skin.ApplyShadow(skill.text)
+    self.headerSkill = skill
 
     local status = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    status:SetPoint("BOTTOMLEFT", 16, 14); status:SetJustifyH("LEFT")
+    status:SetPoint("BOTTOMLEFT", 16, 10); status:SetJustifyH("LEFT")
     Skin.ApplyShadow(status); self.status = status
 
     self:BuildTabs(f)
@@ -125,13 +137,16 @@ local ALL_SRC_LABEL = {
 
 -- kind = "post" | "gather" ; top = Y de la ligne épinglée. Construit la ligne + le ScrollFrame (4
 -- lignes visibles) juste en dessous, et renseigne self.<kind>AllRow / <kind>ArtContent / <kind>ArtRows.
-function UI:_BuildAllRowAndScroll(panel, scrollName, kind, top)
-    local row = Skin.MakeFlatRow(panel, ALL_RW - 22, ALL_ARH)
-    row:SetPoint("TOPLEFT", ALL_RX, top)
+-- `panel` peut être un PANNEAU (Récolte : coordonnées absolues, x/w = ALL_RX/ALL_RW par défaut) ou une
+-- SECTION (Commande, blocs natifs : on passe alors x = marge du bloc et w = largeur utile du bloc).
+function UI:_BuildAllRowAndScroll(panel, scrollName, kind, top, x, w)
+    x, w = x or ALL_RX, w or ALL_RW
+    local row = Skin.MakeFlatRow(panel, w - 22, ALL_ARH)
+    row:SetPoint("TOPLEFT", x, top)
     local ic = row:CreateTexture(nil, "OVERLAY"); ic:SetSize(14, 14); ic:SetPoint("LEFT", 5, 0); ic:SetTexture(Skin.tex.broadcast)
     row.label = row.text   -- alias historique (_RefreshAllRow) ; ré-ancré après l'icône
     row.label:ClearAllPoints(); row.label:SetPoint("LEFT", 24, 0)
-    row.label:SetWidth(ALL_RW - 60); row.label:SetTextColor(Skin.unpack(Skin.color.gold))
+    row.label:SetWidth(w - 60); row.label:SetTextColor(Skin.unpack(Skin.color.gold))
     row:SetScript("OnClick", function()
         if kind == "post" then UI.postTarget = UI.postSource; UI:RefreshPostArtisans(); UI:RefreshPostPlans()
         else UI.gatherTarget = UI.gatherSrc; UI:_RefreshGatherArtisans() end
@@ -139,8 +154,8 @@ function UI:_BuildAllRowAndScroll(panel, scrollName, kind, top)
     self[kind .. "AllRow"] = row
 
     local scroll = CreateFrame("ScrollFrame", scrollName, panel, "UIPanelScrollFrameTemplate")
-    scroll:SetPoint("TOPLEFT", ALL_RX, top - ALL_ARH - 2); scroll:SetSize(ALL_RW, 4 * ALL_ARH)
-    local content = CreateFrame("Frame", nil, scroll); content:SetSize(ALL_RW - 22, 10); scroll:SetScrollChild(content)
+    scroll:SetPoint("TOPLEFT", x, top - ALL_ARH - 2); scroll:SetSize(w, 4 * ALL_ARH)
+    local content = CreateFrame("Frame", nil, scroll); content:SetSize(w - 22, 10); scroll:SetScrollChild(content)
     self[kind .. "ArtContent"] = content; self[kind .. "ArtRows"] = {}
 end
 
@@ -196,16 +211,21 @@ function UI:BuildOrdersTab(f)
 
     -- Carnet = MES commandes : En cours (ouvertes/acceptées) / Archivées (livrées/annulées) +
     -- la file Entrantes (demandes captées dans /commerce et /guilde de joueurs sans l'addon).
-    self.orderFilter = "active"; self.orderFilterBtns = {}
-    -- Entrantes (/commerce, /guilde) sont désormais dans la VUE MÉTIER, plus dans le Carnet.
-    local fdefs = { {id="active",label=L["En cours"]}, {id="archived",label=L["Archivées"]}, {id="handoff",label=L["Confiées"]} }
-    local fx = 12
-    for _, d in ipairs(fdefs) do
-        local w = 78
-        local b = Skin.MakeGoldButton(panel, w, 20, d.label); b:SetPoint("TOPLEFT", fx, -74)
-        b:SetScript("OnClick", function() UI.orderFilter = d.id; UI:_RefreshOrderFilterTabs(); UI:RefreshOrders() end)
-        self.orderFilterBtns[d.id] = b; fx = fx + w + 6
-    end
+    -- Trois boutons rouges côte à côte AVANT (demande user 2026-07-12) → UN dropdown natif : ce sont
+    -- trois VUES EXCLUSIVES du même carnet (une valeur parmi N), pas trois actions — c'est exactement
+    -- le contrat du sélecteur gris de l'HdV (Skin.MakeDropdown). Bonus : la rangée libérée rend sa
+    -- largeur au tableau. Entrantes (/commerce, /guilde) vivent dans la VUE MÉTIER, plus ici.
+    self.orderFilter = "active"
+    local fdefs = {
+        { value = "active",   text = L["En cours"] },
+        { value = "archived", text = L["Archivées"] },
+        { value = "handoff",  text = L["Confiées"] },
+    }
+    local dd = Skin.MakeDropdown("COCLedgerFilterDD", panel, 100, fdefs, {
+        onSelect = function(v) UI.orderFilter = v; UI:RefreshOrders() end,
+    })
+    dd:SetPointVisual("TOPLEFT", panel, "TOPLEFT", 12, -72)
+    self.orderFilterDD = dd
     self:_RefreshOrderFilterTabs()
 
     -- En-tête de colonnes (libellés gris, alignés sur les colonnes des lignes)
@@ -225,8 +245,9 @@ function UI:BuildOrdersTab(f)
     self.ordersContent = content; self.orderRows = {}
 end
 
+-- Reflète l'état `orderFilter` dans le dropdown (libellé + coche). Nom conservé : ~2 appelants.
 function UI:_RefreshOrderFilterTabs()
-    for id, b in pairs(self.orderFilterBtns or {}) do b:SetSelected(id == self.orderFilter) end
+    if self.orderFilterDD then self.orderFilterDD:SetValue(self.orderFilter or "active") end
 end
 
 function UI:_OrderRow(i)
@@ -397,7 +418,7 @@ function UI:Refresh()
         end
         self.tabBar:SetText("orders", L["Carnet"] .. " (" .. c .. ")")   -- re-mesure la largeur (kit)
     end
-    if self.orderFilterBtns then self:_RefreshOrderFilterTabs() end
+    self:_RefreshOrderFilterTabs()
     self:_SyncMainPortrait()
     local CraftLink = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
     local D = COC.Directory
@@ -417,8 +438,38 @@ function UI:_SyncMainPortrait()
     local prof = (self.activeTab == "post" and self.postProf)
               or (self.activeTab == "gather" and self.gatherProf) or nil
     Skin.SetWindowPortrait(self.frame, (prof and Skin.ProfIcon(prof)) or Skin.tex.scroll)
-    if self.headerContext then
-        self.headerContext:SetText(prof and Skin.ProfLabel(prof) or "")
+    self:_SyncHeaderSkill(prof)
+end
+
+-- Jauge de compétence du header (cf. sa création dans BuildMainWindow). Affiche le NOM DU MÉTIER
+-- toujours ; la barre bleue se REMPLIT au niveau (rang/max) de l'artisan CIBLÉ quand la cible est un
+-- @Nom dont on a le SK pour ce métier — sinon nom seul, barre vide. `prof` optionnel (sinon recalculé).
+function UI:_SyncHeaderSkill(prof)
+    local bar = self.headerSkill; if not bar then return end
+    prof = prof or (self.activeTab == "post" and self.postProf)
+                or (self.activeTab == "gather" and self.gatherProf) or nil
+    if not prof then bar:Hide(); return end
+    bar:Show()
+    local rank, maxr
+    local t = (self.activeTab == "post" and self.postTarget)
+           or (self.activeTab == "gather" and self.gatherTarget)
+    if t and t:sub(1, 1) == "@" then
+        local D = COC.Directory
+        local r = D and D.roster and D.roster[t:sub(2)]
+        local sk = r and r.skill and r.skill[prof]
+        if sk then rank, maxr = sk[1], sk[2] end
+    end
+    -- Suffixe = repère du filtrage de la liste des plans (« connu / à portée », vert — posé par
+    -- RefreshPostPlans quand un artisan cible la liste) : même bandeau que le nom/niveau, plus de
+    -- texte flottant sur la liste.
+    local mode = (self.activeTab == "post") and self.postArtMode
+    local tail = mode and ("  |cFF33DD33· " .. mode .. "|r") or ""
+    if rank and maxr and maxr > 0 then
+        bar:SetMinMaxValues(0, maxr); bar:SetValue(rank)
+        bar.text:SetText(Skin.ProfLabel(prof) .. "   |cFFFFFFFF" .. rank .. " / " .. maxr .. "|r" .. tail)
+    else
+        bar:SetMinMaxValues(0, 1); bar:SetValue(0)
+        bar.text:SetText(Skin.ProfLabel(prof) .. tail)
     end
 end
 

@@ -16,10 +16,11 @@ COC.ProfWindow = PW
 
 local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true) end
 
-PW.FRAME_W, PW.FRAME_H = 792, 500
+PW.FRAME_W, PW.FRAME_H = 792, 500   -- FRAME_W = repli : SURCHARGÉ par la SPEC (x2 + 10, cf. _Layout)
 PW.HEADER_H = 56
-PW.COL_W = { 236, 252, 252 }
-PW.GAP, PW.PAD = 10, 14
+PW.PAD = 14
+-- (Colonnes : SPEC déclarative dans _ProfWindow_Layout.lua — zones via PW:Sec(id), frontières
+--  verticales posées par le générateur. Les ex-COL_W/GAP vivent dans la SPEC.)
 
 local GATHER = { Mining = true, Herbalism = true, Skinning = true, Fishing = true }
 
@@ -70,15 +71,15 @@ function PW:_BuildHeader(f)
     -- Rangée de contrôles SOUS la barre de titre (y −28..−48, HEADER_H = 56 inchangé). À gauche, x = 64 :
     -- le médaillon du portrait déborde dans le cadre (~58 px de large jusqu'à y ≈ −53) → on le contourne.
     local vanilla = Skin.MakeGoldButton(f, 96, 20, L["Vue Blizzard"])
-    vanilla:SetPoint("TOPRIGHT", -36, -28)
+    vanilla:SetPoint("TOPRIGHT", -24, -1 )
     vanilla:SetScript("OnClick", function() PW:SetEnabled(false) end)
     self.vanillaBtn = vanilla
 
     -- Toggle « Manquantes » : bascule la liste de gauche entre les recettes APPRISES (défaut) et celles
     -- qui MANQUENT au perso, avec leur source (formateur/butin/quête…). Alimenté par le pont MTSL ;
     -- masqué si l'addon n'est pas là (dépendance molle) et hors mode plein (n'a de sens que sur ton métier).
-    local missing = Skin.MakeGoldButton(f, 110, 18, L["Manquantes"])
-    missing:SetPoint("RIGHT", vanilla, "LEFT", -6, 0)
+    local missing = Skin.MakeGoldButton(f, 110, 20, L["Manquantes"])
+    missing:SetPoint("RIGHT", vanilla, "LEFT", 0, 0)
     missing:SetScript("OnClick", function() PW:_ToggleMissing() end)
     missing:SetScript("OnEnter", function(b)
         GameTooltip:SetOwner(b, "ANCHOR_BOTTOMLEFT")
@@ -93,7 +94,7 @@ function PW:_BuildHeader(f)
     -- Toggle « Chercher du travail » (LFW) : signale au royaume que tu cherches du travail dans le métier
     -- OUVERT (donc forcément le tien). Masqué hors vue pleine (reroll/compact = pas ton perso courant).
     local lfw = Skin.MakeGoldButton(f, 150, 18, L["Chercher du travail"])
-    lfw:SetPoint("TOPLEFT", 64, -30)
+    lfw:SetPoint("TOPLEFT", 56, -1)
     lfw:SetScript("OnClick", function() PW:_ToggleLFW() end)
     lfw:SetScript("OnEnter", function(b)
         local D = COC.Directory; local on = D and D.MyLFW and D:MyLFW() == PW.profKey
@@ -166,19 +167,6 @@ function PW:_SyncLFWBtn()
     if show then b:SetSelected(D.MyLFW and D:MyLFW() == self.profKey and true or false) end
 end
 
-function PW:_BuildColumn(f, width, leftAnchor)
-    local col = CreateFrame("Frame", nil, f)
-    col:SetWidth(width)
-    -- y = -HEADER_H UNIQUEMENT pour la 1re colonne (ancrée à la frame, sous l'en-tête). Les colonnes
-    -- suivantes s'ancrent au bord droit de la précédente (déjà sous l'en-tête) avec y = 0 : sinon
-    -- chaque colonne descend d'un cran (effet « escalier » → la colonne Commandes finissait 2×HEADER_H
-    -- trop bas, d'où l'impression de tailles différentes).
-    col:SetPoint("TOPLEFT", leftAnchor.frame, leftAnchor.point, leftAnchor.x, leftAnchor.y or 0)
-    col:SetPoint("BOTTOM", f, "BOTTOM", 0, self.PAD)
-    if Skin.SkinWell then Skin.SkinWell(col) end
-    return col
-end
-
 function PW:Build()
     if self.frame then return end
     -- Chrome Blizzard natif via le kit (drag + clamp + strata + SetToplevel/Raise gérés là-bas).
@@ -197,9 +185,10 @@ function PW:Build()
     self.frame = f
     self:_BuildHeader(f)
 
-    local recCol = self:_BuildColumn(f, self.COL_W[1], { frame = f,      point = "TOPLEFT",  x = self.PAD, y = -self.HEADER_H })
-    local detCol = self:_BuildColumn(f, self.COL_W[2], { frame = recCol, point = "TOPRIGHT", x = self.GAP })
-    local ordCol = self:_BuildColumn(f, self.COL_W[3], { frame = detCol, point = "TOPRIGHT", x = self.GAP })
+    -- Colonnes = zones de la SPEC (cf. _ProfWindow_Layout.lua) : une surface, frontières calculées —
+    -- plus de puits par colonne ni d'ancrages en chaîne (l'« escalier » est impossible par construction).
+    self:_BuildSections(f)
+    local recCol, detCol, ordCol = self:Sec("recipes"), self:Sec("detail"), self:Sec("orders")
     self.recCol, self.detCol, self.ordCol = recCol, detCol, ordCol
 
     if self._BuildRecipes then self:_BuildRecipes(recCol) end
@@ -342,24 +331,29 @@ function PW:_DoRefresh()
 end
 
 -- Bascule PLEIN (3 colonnes, fenêtre native) ↔ COMPACT (colonne Commandes seule, ouvert par clé).
+-- Compact : on masque le PANNEAU de sections (colonnes + frontières dessinées) et on RE-PARENTE la
+-- zone Commandes sur la fenêtre rétrécie — une zone est une frame ordinaire, son contenu la suit.
+-- Retour plein : la zone regagne sa place SPEC via les constantes ORD_* dérivées (Layout).
 function PW:_ApplyMode(compact)
     if self._compact == compact then return end
     self._compact = compact
-    if self.recCol then self.recCol:SetShown(not compact) end
-    if self.detCol then self.detCol:SetShown(not compact) end
+    if self._PlaceOrdTabs then self:_PlaceOrdTabs(compact) end   -- onglets de relation : suivent le mode
     self.ordCol:ClearAllPoints()
     if compact then
         self.frame:SetWidth(300)
-        self.ordCol:SetPoint("TOPLEFT", self.frame, "TOPLEFT", self.PAD, -self.HEADER_H)
+        if self.secPanel then self.secPanel:Hide() end
+        self.ordCol:SetParent(self.frame)
+        -- Même bande d'onglets qu'en vue pleine : 60 = sommet du marbre, ORD_TOP (négatif) = la bande.
+        self.ordCol:SetPoint("TOPLEFT", self.frame, "TOPLEFT", self.PAD, -(60 - PW.ORD_TOP))
         self.ordCol:SetPoint("BOTTOM", self.frame, "BOTTOM", 0, self.PAD)
         self.ordCol:SetWidth(300 - 2 * self.PAD)
     else
-        -- Même ancrage que _BuildColumn pour la colonne Commandes : sous l'en-tête, au bord droit de
-        -- la colonne Détail (y = 0, PAS de double offset d'en-tête → fini l'escalier).
         self.frame:SetWidth(self.FRAME_W)
-        self.ordCol:SetPoint("TOPLEFT", self.detCol, "TOPRIGHT", self.GAP, 0)
-        self.ordCol:SetPoint("BOTTOM", self.frame, "BOTTOM", 0, self.PAD)
-        self.ordCol:SetWidth(self.COL_W[3])
+        if self.secPanel then self.secPanel:Show() end
+        self.ordCol:SetParent(self.secPanel)
+        self.ordCol:SetPoint("TOPLEFT", self.secPanel, "TOPLEFT", PW.ORD_X, PW.ORD_TOP)
+        self.ordCol:SetPoint("BOTTOMLEFT", self.secPanel, "BOTTOMLEFT", PW.ORD_X, PW.ORD_BOTTOM)
+        self.ordCol:SetWidth(PW.ORD_W)
     end
 end
 

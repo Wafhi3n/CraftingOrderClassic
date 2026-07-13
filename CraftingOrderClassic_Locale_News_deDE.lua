@@ -8,6 +8,10 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "Neues",
+    -- v1.17.0
+    ["L'interface passe au style natif de WoW"] = "Das Fenster passt jetzt zum Spiel",
+    ["La fenêtre n'a plus son habillage doré maison : elle emprunte le cadre du jeu (barre de titre, portrait rond, onglets, boutons). Elle se fond dans l'interface au lieu de ressembler à un addon posé par-dessus, et rien n'a bougé de ce que tu connais."] = "Das Fenster hat seine eigene goldene Optik gegen den Rahmen des Spiels getauscht (Titelleiste, rundes Porträt, Reiter oben, Schaltflächen). Es wirkt jetzt wie ein Teil der Oberfläche statt wie ein aufgesetztes Addon, und nichts hat sich verschoben, was du neu lernen müsstest.",
+    ["La vue métier est refaite, avec une colonne Commandes en liste : une ligne par commande (demandeur, objet voulu, prix), et le clic ouvre la carte complète (composants fournis, coût des réactifs, Accepter / Refuser / Chuchoter) avec une croix pour revenir à la liste. Et les sous-catégories de récolte (Peaux, Écailles, Herbes, Poissons) sont enfin traduites hors client français."] = "Das Berufsfenster wurde neu gebaut, mit der Auftragsspalte als Liste: eine Zeile pro Auftrag (Besteller, gewünschter Gegenstand, Preis), und ein Klick öffnet die vollständige Karte (bereitgestellte Komponenten, Reagenzienkosten, Annehmen / Ablehnen / Flüstern) mit einer Schließen-Schaltfläche zurück zur Liste. Und die Sammelberuf-Unterkategorien (Felle, Schuppen, Kräuter, Fische) sind außerhalb eines französischen Clients endlich übersetzt.",
     -- v1.15.1
     ["Tes commandes n'appartiennent qu'à toi"] = "Deine Aufträge gehören nur dir",
     ["Recettes triées, et où est l'or"] = "Sortierte Rezepte, und wo das Gold ist",

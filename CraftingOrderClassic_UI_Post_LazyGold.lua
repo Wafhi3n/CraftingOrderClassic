@@ -30,8 +30,11 @@ local function makeToolBtn(panel, tipFn, onClick)
     return b
 end
 
-function UI:_BuildPostLGBar(panel, anchor)
-    local sortBtn = makeToolBtn(panel, function()
+-- `sec` = le SLOT « AH_Filter » de la bande de filtres (SPEC) : les deux outils Lazy Gold (tri
+-- rentabilité + « 123 » valeurs exactes) y sont ancrés en RIGHT → centrés verticalement par
+-- construction. Cachés si Lazy Gold est absent (cf. _Sync).
+function UI:_BuildPostLGBar(sec)
+    local sortBtn = makeToolBtn(sec, function()
         return UI.postSortProfit and L["Tri par rentabilité — clic pour A-Z."]
             or L["Trier par rentabilité (Lazy Gold)."]
     end, function()
@@ -39,13 +42,14 @@ function UI:_BuildPostLGBar(panel, anchor)
         UI.postSortProfit = not UI.postSortProfit
         UI:_SyncPostLGBar(); UI:RefreshPostPlans()
     end)
-    sortBtn:SetPoint("BOTTOMRIGHT", anchor, "TOPRIGHT", 0, 2)
+    sortBtn:SetPoint("RIGHT", sec, "RIGHT", -4, 0)
     local coin = sortBtn:CreateTexture(nil, "ARTWORK")
     coin:SetTexture("Interface\\MoneyFrame\\UI-GoldIcon"); coin:SetSize(13, 13); coin:SetPoint("CENTER")
     sortBtn.coin = coin
     self.postSortBtn = sortBtn
 
-    local exactBtn = makeToolBtn(panel, function()
+    -- (bug payé : `panel` traînait ici après le passage aux slots → parent nil, bouton jamais rendu)
+    local exactBtn = makeToolBtn(sec, function()
         local g = COC.LazyGold
         return (g and g:ExactMode()) and L["Valeurs exactes — clic pour l'affichage compact."]
             or L["Afficher les valeurs exactes (po/pa/pc)."]
@@ -74,6 +78,24 @@ function UI:_SyncPostLGBar()
         self.postExactBtn.onBG:SetShown(ex and true or false)
         self.postExactBtn.num:SetTextColor(ex and 1 or 0.55, ex and 0.82 or 0.55, ex and 0.29 or 0.55)
     end
+end
+
+-- =========================================================================
+-- Repère de prix (zone commission)
+-- =========================================================================
+-- « Valeur HV: Xg · Réactifs: Yg » sous la commission : aide à fixer un prix cohérent avec le
+-- marché. Vide si Lazy Gold absent ou prix produit inconnu. (Déplacé de _UI_Post.lua — c'est du
+-- pur Lazy Gold, et le fichier hôte frôlait le plafond anti-monolithe.)
+function UI:_RefreshPostPriceHint(e)
+    local hint = self.postPriceHint; if not hint then return end
+    if not e then hint:SetText(""); return end   -- bascule « 123 » sans plan sélectionné
+    local g = COC.LazyGold
+    local val = g and e.itemID and g:ItemValue(e.itemID)
+    if not val then hint:SetText(""); return end
+    local txt = "|cFFE8B84B" .. L["Valeur HV"] .. ":|r " .. GetCoinTextureString(val)
+    local p = e.spellID and g:CraftProfit(self.postProf, e.spellID, 1)
+    if p and p.cost > 0 then txt = txt .. "   |cFFE8B84B" .. L["Réactifs"] .. ":|r " .. GetCoinTextureString(p.cost) end
+    hint:SetText(txt)
 end
 
 -- =========================================================================

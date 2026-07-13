@@ -9,8 +9,6 @@ local UI   = COC.UI
 local Skin = UI.Skin
 local L    = COC.L
 
-local ARX  = 220                 -- x zone droite (aligné sur _UI_Artisans.lua)
-local ARW  = 846 - ARX
 local ARI  = 22                  -- pas horizontal entre icônes de métier
 
 local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true) end
@@ -35,26 +33,30 @@ local function makeProfPill(panel, key)
     return b
 end
 
-function UI:_BuildArtPills(panel)
+-- Pills dans la BANDE « profFilter » de la SPEC (ancres LEFT → centrées verticalement). La bande fait
+-- UNE rangée : si les pills venaient à déborder (jamais vu : 10 icônes ≈ 300 px pour ~600 utiles), le
+-- repli les enroule sur une 2ᵉ ligne qui dépasserait sous la bande — élargir la fenêtre plutôt.
+function UI:_BuildArtPills()
+    local band = self:ArtSec("profFilter")
     local c = CL(); local profs = c and c:Professions() or {}
     local defs = { "Tous" }
     for _, p in ipairs(profs) do   -- primaires seulement : pas de pill Cuisine/Secours/Pêche
         if not (COC.SECONDARY_PROF and COC.SECONDARY_PROF[p]) then defs[#defs + 1] = p end
     end
-    local x, y, rowH = 72, 0, 28   -- x départ : dégage « Profession : » en entier (rogné à 50)
-    local maxW = ARW - 4
+    local x, y, rowH = 72, 0, 28   -- x départ : dégage le libellé « Métier : » en entier
+    local bw = band:GetWidth(); local maxW = (bw > 1 and bw or 600) - 4
     for _, key in ipairs(defs) do
         local b, w
         if key == "Tous" then       -- « Tous » = sentinelle (pas un métier) → reste en texte
-            b = Skin.MakeGoldButton(panel, 10, 24, L["Tous"])
+            b = Skin.MakeGoldButton(band, 10, 24, L["Tous"])
             w = b.text:GetStringWidth() + 16
         else
-            b = makeProfPill(panel, key)
+            b = makeProfPill(band, key)
             w = 24
         end
         b:SetWidth(w)
         if x + w > maxW then x = 0; y = y + rowH end
-        b:SetPoint("TOPLEFT", ARX + x, -92 - y)
+        b:SetPoint("LEFT", x, -y)
         b:SetScript("OnClick", function()
             -- NB : surtout pas l'idiome `cond and nil or key` (Lua : `true and nil or key` == key).
             if key == "Tous" then UI.artProfFilter = nil else UI.artProfFilter = key end
@@ -63,10 +65,6 @@ function UI:_BuildArtPills(panel)
         self.artPills[#self.artPills + 1] = { btn = b, key = key }
         x = x + w + 4
     end
-    -- Recale le haut de la liste sous la dernière rangée de pills.
-    self.artScroll:ClearAllPoints()
-    self.artScroll:SetPoint("TOPLEFT", ARX, -(92 + y + 32))
-    self.artScroll:SetPoint("BOTTOMRIGHT", -42, 22)
     self:_RefreshArtPills()
 end
 

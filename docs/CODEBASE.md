@@ -1,10 +1,10 @@
 # CraftingOrderClassic — carte du code
 
-> **GÉNÉRÉ** le 2026-07-12 (v1.16.0) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
+> **GÉNÉRÉ** le 2026-07-13 (v1.17.0) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
-71 modules + 4 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
+78 modules + 4 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
 
 ## Modules (ordre de chargement)
 
@@ -14,30 +14,36 @@
 | `CraftingOrderClassic_Trace.lua` | trace réseau PERSISTÉE, lisible hors-jeu. | 79 |
 | `CraftingOrderClassic_Migrations.lua` | versionnage du schéma SavedVariables. | 40 |
 | `CraftingOrderClassic_Locale.lua` | socle de localisation du CHROME de l'UI. | 12 |
-| `CraftingOrderClassic_Locale_enUS.lua` | overlay ANGLAIS (enUS/enGB). | 466 |
-| `CraftingOrderClassic_Locale_deDE.lua` | overlay ALLEMAND (deDE). | 434 |
-| `CraftingOrderClassic_Locale_esES.lua` | overlay ESPAGNOL (esES/esMX). | 435 |
-| `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 140 |
-| `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 137 |
-| `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 137 |
+| `CraftingOrderClassic_Locale_enUS.lua` | overlay ANGLAIS (enUS/enGB). | 475 |
+| `CraftingOrderClassic_Locale_deDE.lua` | overlay ALLEMAND (deDE). | 443 |
+| `CraftingOrderClassic_Locale_esES.lua` | overlay ESPAGNOL (esES/esMX). | 444 |
+| `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 144 |
+| `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 141 |
+| `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 141 |
 | `CraftingOrderClassic_Elemental.lua` | pseudo-« métier » de récolte « Élémentaire ». | 61 |
 | `CraftingOrderClassic_UI_Skin.lua` | tokens + helpers SÉMANTIQUES du skin (métiers, statuts, rareté, quantités, icônes natives) et petits widgets d'affichage. | 379 |
-| `CraftingOrderClassic_UI_Skin_Native.lua` | kit de chrome Blizzard NATIF (le « framework » UI de COC). | 357 |
-| `CraftingOrderClassic_UI.lua` | fenêtre principale (chrome Blizzard natif, kit UI_Skin_Native). | 428 |
-| `CraftingOrderClassic_UI_Post.lua` | onglet « Commande » : sélection de plan (gauche) + réactifs « je fournis » / commission g-s-c / ciblage artisan (droite). | 474 |
-| `CraftingOrderClassic_UI_Post_Artisans.lua` | onglet « Commande », section droite basse : boutons source, liste des artisans, ciblage (@Nom), libellé destinataire, bouton Poster. | 178 |
+| `CraftingOrderClassic_UI_Skin_Native.lua` | kit de chrome Blizzard NATIF (le « framework » UI de COC). | 466 |
+| `CraftingOrderClassic_UI_Skin_Sections.lua` | kit de chrome natif, volet SECTIONS : comment on découpe l'intérieur d'une fenêtre en blocs et en zones. | 247 |
+| `CraftingOrderClassic_UI.lua` | fenêtre principale (chrome Blizzard natif, kit UI_Skin_Native). | 479 |
+| `CraftingOrderClassic_UI_Post_Layout.lua` | GÉOMÉTRIE de l'onglet « Commande » : colonnes, zones, séparateurs. | 121 |
+| `CraftingOrderClassic_UI_Post.lua` | onglet « Commande » : sélection de plan (gauche) + réactifs « je fournis » / commission g-s-c / ciblage artisan (droite). | 360 |
+| `CraftingOrderClassic_UI_Post_Detail.lua` | onglet « Commande », PANNEAU DROIT : en-tête du plan sélectionné (icône + cadre doré + nom + niveau), liste des réactifs « je fournis », et la rangée commission. | 178 |
+| `CraftingOrderClassic_UI_Post_Artisans.lua` | onglet « Commande », section droite basse : boutons source, liste des artisans, ciblage (@Nom), libellé destinataire, bouton Poster. | 219 |
 | `CraftingOrderClassic_UI_Post_Categories.lua` | onglet « Commande », panneau gauche : regroupe la LISTE DES PLANS en sections type fenêtre native (emplacement puis type pour les équipements, type pour les armes, catégorie pour le reste). | 165 |
-| `CraftingOrderClassic_UI_Post_LazyGold.lua` | onglet « Commande » : couche Lazy Gold (lecture seule). | 128 |
-| `CraftingOrderClassic_UI_Gather.lua` | onglet « Récolte » : ressources de récolte (minéraux, herbes, cuirs, poissons) + demande de quantité + prix par pile + ciblage récolteur. | 454 |
+| `CraftingOrderClassic_UI_Post_LazyGold.lua` | onglet « Commande » : couche Lazy Gold (lecture seule). | 150 |
+| `CraftingOrderClassic_UI_Gather_Layout.lua` | GÉOMÉTRIE de l'onglet « Récolte » : la SPEC (structure éditable, cf. | 61 |
+| `CraftingOrderClassic_UI_Gather.lua` | onglet « Récolte » : ressources de récolte (minéraux, herbes, cuirs, poissons) + demande de quantité + prix par pile + ciblage récolteur. | 499 |
 | `CraftingOrderClassic_UI_Gather_Categories.lua` | onglet « Récolte », panneau gauche : repliage des en-têtes et remplissage des lignes (en-tête de section/sous-catégorie, ou ressource). | 65 |
-| `CraftingOrderClassic_UI_Artisans.lua` | onglet « Artisans » : annuaire social. | 384 |
+| `CraftingOrderClassic_UI_Artisans_Layout.lua` | GÉOMÉTRIE de l'onglet « Artisans » (annuaire social). | 39 |
+| `CraftingOrderClassic_UI_Artisans.lua` | onglet « Artisans » : annuaire social. | 386 |
 | `CraftingOrderClassic_UI_Artisans_Groups.lua` | fusion « une ligne par JOUEUR » (rerolls). | 199 |
-| `CraftingOrderClassic_UI_Artisans_Icons.lua` | onglet « Artisans » : tout ce qui est ICÔNE de métier. | 188 |
-| `CraftingOrderClassic_UI_Artisans_Muted.lua` | panel « En sourdine » de l'onglet Artisans. | 82 |
-| `CraftingOrderClassic_UI_MyArtisans.lua` | onglet « Mes artisans » : vue agrégée des métiers du COMPTE (tous mes rerolls du royaume), en mode « connu ». | 426 |
+| `CraftingOrderClassic_UI_Artisans_Icons.lua` | onglet « Artisans » : tout ce qui est ICÔNE de métier. | 186 |
+| `CraftingOrderClassic_UI_Artisans_Muted.lua` | panel « En sourdine » de l'onglet Artisans. | 86 |
+| `CraftingOrderClassic_UI_MyArtisans_Layout.lua` | GÉOMÉTRIE de l'onglet « Mes artisans ». | 48 |
+| `CraftingOrderClassic_UI_MyArtisans.lua` | onglet « Mes artisans » : vue agrégée des métiers du COMPTE (tous mes rerolls du royaume), en mode « connu ». | 433 |
 | `CraftingOrderClassic_UI_MyArtisans_LazyGold.lua` | onglet « Mes artisans » : couche Lazy Gold. | 134 |
 | `CraftingOrderClassic_UI_Help.lua` | onglet Aide : page unique défilante qui explique les autres onglets (Carnet/Commande/Récolte/Artisans), la Vue Métier et le réseau. | 163 |
-| `CraftingOrderClassic_UI_News.lua` | onglet « Nouveautés » : notes de version (changelog) affichées EN JEU, version par version, la plus récente en tête. | 185 |
+| `CraftingOrderClassic_UI_News.lua` | onglet « Nouveautés » : notes de version (changelog) affichées EN JEU, version par version, la plus récente en tête. | 192 |
 | `CraftingOrderClassic_Social.lua` | couche sociale passive (socle). | 368 |
 | `CraftingOrderClassic_Social_Menu.lua` | entrées « Crafting Order » du menu contextuel joueur. | 101 |
 | `CraftingOrderClassic_Social_Roster.lua` | affichage des métiers sur les fenêtres NATIVES. | 130 |
@@ -51,12 +57,13 @@
 | `CraftingOrderClassic_RecipeCats_Enchanting.lua` | sous-catégories de l'ENCHANTEMENT. | 52 |
 | `CraftingOrderClassic_Craft.lua` | socle de lecture LIVE de la fenêtre métier (migration de la fenêtre custom depuis Guild Economy / TradeScanner_Craft.lua). | 168 |
 | `CraftingOrderClassic_MTSL.lua` | pont LECTURE SEULE vers l'addon « Missing TradeSkills List » (MTSL). | 227 |
-| `CraftingOrderClassic_ProfWindow.lua` | fenêtre métier custom 3 colonnes (migration depuis Guild Economy) : Recettes \| Détail+Craft \| Commandes du métier. | 488 |
-| `CraftingOrderClassic_ProfWindow_Recipes.lua` | colonne GAUCHE : liste de recettes virtualisée (scroll), recherche, couleur par difficulté, sélection, badge « demandé » (nb de commandes ouvertes pour l'objet). | 376 |
-| `CraftingOrderClassic_ProfWindow_Detail.lua` | colonne CENTRE : détail de la recette sélectionnée (icône, réactifs have/need) + boutons Créer / Créer tout. | 283 |
+| `CraftingOrderClassic_ProfWindow.lua` | fenêtre métier custom 3 colonnes (migration depuis Guild Economy) : Recettes \| Détail+Craft \| Commandes du métier. | 482 |
+| `CraftingOrderClassic_ProfWindow_Layout.lua` | GÉOMÉTRIE de la vue métier (fenêtre 3 colonnes). | 62 |
+| `CraftingOrderClassic_ProfWindow_Recipes.lua` | colonne GAUCHE : liste de recettes virtualisée (scroll), recherche, couleur par difficulté, sélection, badge « demandé » (nb de commandes ouvertes pour l'objet). | 393 |
+| `CraftingOrderClassic_ProfWindow_Detail.lua` | colonne CENTRE : détail de la recette sélectionnée (icône, réactifs have/need) + boutons Créer / Créer tout. | 287 |
 | `CraftingOrderClassic_ProfWindow_Info.lua` | PANNEAU D'INFO en SECTIONS pour la colonne centrale de la vue métier. | 132 |
 | `CraftingOrderClassic_LazyGold.lua` | pont LECTURE SEULE vers l'addon « Lazy Gold Classic » (LG). | 312 |
-| `CraftingOrderClassic_ProfWindow_Orders.lua` | colonne « Commandes » de la vue métier (cabine de l'artisan). | 364 |
+| `CraftingOrderClassic_ProfWindow_Orders.lua` | colonne « Commandes » de la vue métier (cabine de l'artisan). | 499 |
 | `CraftingOrderClassic_ProfWindow_Reroll.lua` | vue métier LECTURE SEULE d'un REROLL. | 90 |
 | `Directory.lua` | Crafting Order - Classic — Directory : l'annuaire des GENS (présence + qui peut crafter quoi). | 495 |
 | `Directory_Confed.lua` | source « confédération » (GreenWall) de l'annuaire, DISPLAY-ONLY. | 51 |
@@ -335,6 +342,24 @@
 > Icône native encadrée d'un liseré 1 px — même famille visuelle que Skin.MakeBadge. Contrat :
 > .icon (texture, désaturable par l'appelant), :SetSelected(on) = liseré doré vif.
 
+**`Skin.MakeDropdown(name, parent, w, items, opts)`**
+
+
+**`Skin.MakeCheckButton(parent, text, size)`**
+
+> Case à cocher NATIVE (`UICheckButtonTemplate`, SharedUIPanelTemplates.xml:413) — le widget des
+> filtres « Objets utilisables » / « Afficher sur le personnage » du browse de l'HdV.
+> À ne pas confondre avec `Skin.MakeCheck` (Skin.lua) : celle-ci est une simple TEXTURE d'affichage
+> (état non cliquable, posée dans une ligne de liste) ; ici c'est un vrai bouton cliquable avec
+> survol/pressé/coche natifs. Le template fait 32×32 (calibré pour les panneaux Blizzard) → on le
+> réduit, et le libellé natif (parentKey `Text`) est ré-ancré à droite de la boîte.
+> Contrat : `c.text` (FontString) · `c:SetChecked/GetChecked` (natifs) · `c.Text` (alias natif).
+
+**`Skin.FieldLabel(parent, text, x, y)`**
+
+> Légende de champ style HdV (« NOM », « RARETÉ » au-dessus de leur champ). Police EXACTE de l'HdV :
+> `GameFontHighlightSmall` (cf. BrowseNameText, Blizzard_AuctionUI.xml:126).
+
 **`Skin.MakeFilterButton(parent, w, h, text)`**
 
 > Bande de filtre verticale, style « catégories » de l'hôtel des ventes.
@@ -347,6 +372,49 @@
 > ré-ancrable/mesurable), `b:SetText`, `b:SetSelected(on)` (verrou doré, reste CLIQUABLE).
 > ⚠️ `UI-AuctionFrame-FilterBg` est de l'art PEINT figé (ancien monde), pas une tuile native : à
 > réserver aux listes de filtres facettés type HdV — ne pas en faire le chrome général (cf. skill).
+
+### `CraftingOrderClassic_UI_Skin_Sections.lua`
+
+**`Skin.MakeInset(parent, x1, y1, x2, y2, opts)`**
+
+> Bloc de section encastré (« InsetFrameTemplate ») — le puits marbré des fenêtres Blizzard.
+> MÊME template que le panneau de contenu de MakeWindow (`f.Inset`) : fond marbre tuilé + bordure
+> NineSlice, qui s'adapte à toute taille. Blizzard l'IMBRIQUE dans une même fenêtre pour délimiter des
+> blocs distincts — la fenêtre des Canaux crée `LeftInset` (liste) et `RightInset` (roster) côte à côte
+> (ChannelFrame.xml:58 et :72). Aucun art à produire.
+> PARENTER LE CONTENU AU BLOC est le bon réflexe (et ce que fait Blizzard) : le template porte
+> `useParentLevel="true"`, le bloc reste donc au NIVEAU de son parent → ses enfants gardent exactement
+> le niveau qu'ils auraient eu en enfants directs du panneau, et le marbre (couche BACKGROUND) passe
+> sous eux. Bénéfice : les offsets du contenu deviennent RELATIFS au bloc, donc le contenu ne peut plus
+> dériver de sa bordure, et déplacer une section ne demande plus de re-piquer chaque coordonnée.
+> Cf. _UI_Post_Layout.lua (la géométrie déclarative de l'onglet Commande).
+> Rect en coordonnées du PANNEAU (comme tout le layout COC) : (x1,y1) coin haut-gauche, (x2,y2) coin
+> bas-droit, y négatifs. `y2 = nil` → le bloc descend jusqu'au BAS du panneau (marge `opts.bottom`).
+> `opts.thin` = variante `InsetFrameTemplate3` (bordure fine « champ de saisie », fond sombre) pour un
+> bloc discret plutôt qu'un vrai puits marbré.
+
+**`Skin.MakeDivider(parent, x1, x2, y, heavy, opts)`**
+
+> opts (art lourd seulement) : `capL = false` / `capR = false` = couper le pommeau de ce bout
+> (le TexCoord démarre/finit dans le fût) — pour un bout qui BUTE dans une barre croisée.
+
+**`Skin.MakeDividerV(parent, x, top, bottom, heavy)`**
+
+> Variante VERTICALE (séparation de deux colonnes). Il n'existe pas d'art natif vertical → on PIVOTE
+> l'art horizontal de 90° via la forme à 8 arguments de SetTexCoord (UL, LL, UR, LR : le bord gauche
+> de l'art devient le haut ; même recadrage sur la zone peinte). Centré sur `x` ; `top` s'ancre au
+> bord HAUT du parent (y négatif), `bottom` à son bord BAS (y positif).
+
+**`Skin.ScrollTrack(scrollName)`**
+
+> Fond « groove » derrière la scrollbar d'un ScrollFrame (`UIPanelScrollFrameTemplate`) : sans lui, le
+> rail de la barre laisse voir le marbre nu (le fond « manque », demande user). Texture sombre parentée
+> à la BARRE elle-même, couche BACKGROUND → le curseur et les flèches (niveau supérieur) restent
+> au-dessus. Les 14 px rognés en haut/bas dégagent les boutons ▲▼. `scrollName` = le nom GLOBAL du
+> ScrollFrame (la barre est `<nom>ScrollBar`, convention du template). Réutilisable (toute liste COC).
+
+**`Skin.MakeSections(panel, spec)`**
+
 
 ## Détail par module (en-tête + API publique)
 
@@ -467,10 +535,31 @@
 > (médaillon-déclencheur + flèche) · MakeTabs (languettes natives TabButtonTemplate, en haut) · MakeGoldButton (bouton 3-tranches
 > natif, anti-reskin, variante sécurisée) · MakeFlatRow (ligne de liste/flyout plate) · MakeIconButton
 > (carré à icône, filtres/pills) · MakeFilterButton (bande de filtre style hôtel des ventes) · MakeFlyout
-> (dropdown maison : puits + closer + pool de lignes).
+> (dropdown maison : puits + closer + pool de lignes) · MakeDropdown (dropdown NATIF UIDropDownMenu,
+> le sélecteur gris de l'HdV) · MakeCheckButton (case à cocher NATIVE, style « Objets utilisables »
+> de l'HdV) · FieldLabel (légende de champ style HdV). Les primitives de SECTIONS (MakeInset,
+> MakeDivider, MakeDividerV) vivent dans _UI_Skin_Sections.lua (même table Skin, anti-monolithe).
+> MakeFlyout vs MakeDropdown : le premier est un MENU maison (géométrie libre, lignes riches : métiers,
+> menu minimap) ; le second est le SÉLECTEUR natif (une valeur parmi N, coche, look HdV) — préférer
+> MakeDropdown dès qu'il s'agit de choisir UNE valeur dans une liste courte.
 > INTOUCHABLE ici aussi : le langage couleur (statuts d'ordre, rareté) n'est jamais recoloré.
 
-**API** : `Skin.MakeGoldButton(parent, w, h, text, template)` · `Skin.MakeWindow(name, w, h, opts)` · `Skin.SetWindowPortrait(f, tex)` · `Skin.SetPortraitClickable(f, onClick, tooltipText)` · `Skin.MakeTabs(f, defs, onSelect, opts)` · `Skin.MakeFlatRow(parent, w, h)` · `Skin.PersonHighlight(row)` · `Skin.MakeArtisanRow(parent, w, h)` · `Skin.MakeFlyout(name, w, opts)` · `Skin.MakeIconButton(parent, size, tex)` · `Skin.MakeFilterButton(parent, w, h, text)`
+**API** : `Skin.MakeGoldButton(parent, w, h, text, template)` · `Skin.MakeWindow(name, w, h, opts)` · `Skin.SetWindowPortrait(f, tex)` · `Skin.SetPortraitClickable(f, onClick, tooltipText)` · `Skin.MakeTabs(f, defs, onSelect, opts)` · `Skin.MakeFlatRow(parent, w, h)` · `Skin.PersonHighlight(row)` · `Skin.MakeArtisanRow(parent, w, h)` · `Skin.MakeFlyout(name, w, opts)` · `Skin.MakeIconButton(parent, size, tex)` · `Skin.MakeDropdown(name, parent, w, items, opts)` · `Skin.MakeCheckButton(parent, text, size)` · `Skin.FieldLabel(parent, text, x, y)` · `Skin.MakeFilterButton(parent, w, h, text)`
+
+### `CraftingOrderClassic_UI_Skin_Sections.lua`
+> CraftingOrderClassic_UI_Skin_Sections.lua — kit de chrome natif, volet SECTIONS : comment on
+> découpe l'intérieur d'une fenêtre en blocs et en zones. Même table `Skin` que _UI_Skin.lua /
+> _UI_Skin_Native.lua (découpé de Native pour l'anti-monolithe : les appelants ne voient pas la
+> frontière entre fichiers).
+> 
+> LE MODÈLE BLIZZARD, en deux échelles (les deux observées dans la source, cf. commentaires) :
+>   · BLOCS FRANCHEMENT SÉPARÉS → un `MakeInset` chacun (fenêtre des Canaux : deux insets, un gap).
+>     La bordure NineSlice d'un inset a une ÉPAISSEUR : deux insets accolés = deux bordures dos à dos,
+>     un jeu inévitable — ne JAMAIS coller deux insets (payé sur l'onglet Commande, 1ʳᵉ passe).
+>   · SECTIONS SOLIDAIRES d'un même bloc → UNE surface, et des FILETS fins à l'intérieur
+>     (`MakeDivider`/`MakeDividerV`) — le modèle de la liste d'Amis, pointé par le user.
+
+**API** : `Skin.MakeInset(parent, x1, y1, x2, y2, opts)` · `Skin.MakeDivider(parent, x1, x2, y, heavy, opts)` · `Skin.MakeDividerV(parent, x, top, bottom, heavy)` · `Skin.ScrollTrack(scrollName)` · `Skin.MakeSections(panel, spec)`
 
 ### `CraftingOrderClassic_UI.lua`
 > CraftingOrderClassic_UI.lua — fenêtre principale (chrome Blizzard natif, kit UI_Skin_Native).
@@ -479,11 +568,51 @@
 
 **API** : `UI:Build()` · `UI:BuildTabs(f)` · `UI:ShowTab(id)` · `UI:BuildOrdersTab(f)` · `UI:Toast(text, icon)` · `UI:RefreshOrders()` · `UI:RefreshHandoff()` · `UI:RefreshSoon()` · `UI:Refresh()` · `UI:Toggle()`
 
+### `CraftingOrderClassic_UI_Post_Layout.lua`
+> CraftingOrderClassic_UI_Post_Layout.lua — GÉOMÉTRIE de l'onglet « Commande » : colonnes, zones,
+> séparateurs. Chargé AVANT _UI_Post.lua (cf. les 3 .toc) : les autres fichiers de l'onglet lisent
+> `UI.POST` au chargement et se parentent aux zones via `UI:PostSec(id)`.
+> 
+> PRINCIPE (refactor 2026-07-12) : le contenu d'une zone est ENFANT de sa zone, en offsets RELATIFS
+> (« PAD sous le bord ») — plus de coordonnées absolues de panneau recopiées entre fichiers. Déplacer /
+> redimensionner une section = éditer UNE hauteur dans COLUMNS ci-dessous, rien d'autre.
+> 
+> MODÈLE VISUEL (3ᵉ passe, la bonne — cf. liste d'Amis, pointée par le user) : UNE SEULE SURFACE, le
+> marbre `f.Inset` que MakeWindow fournit déjà, et des FILETS fins gravés aux jointures — PAS un puits
+> par section. Historique payé :
+>   · 1ʳᵉ passe, un inset par section accolés → les bordures NineSlice ont une épaisseur, deux blocs
+>     voisins = deux bordures dos à dos, du jeu partout ;
+>   · 2ᵉ passe, deux puits (un par colonne) → mieux, mais encore des doubles bordures aux frontières
+>     et l'ornement DialogBox-Divider trop massif en interne ;
+>   · 3ᵉ passe : zéro inset ajouté, filets `Skin.MakeDivider`/`MakeDividerV` (l'art de la liste
+>     d'Amis) sur les jointures CALCULÉES. Le jeu est impossible par construction : une jointure n'est
+>     pas un espace entre deux cadres, c'est une ligne posée sur un bord partagé.
+> `Skin.MakeInset` reste la bonne brique pour des blocs FRANCHEMENT séparés (modèle « Canaux ») —
+> simplement pas pour des sections jointives.
+
+**API** : `UI:PostSec(id)`
+
 ### `CraftingOrderClassic_UI_Post.lua`
 > CraftingOrderClassic_UI_Post.lua — onglet « Commande » : sélection de plan (gauche) +
 > réactifs « je fournis » / commission g-s-c / ciblage artisan (droite). Chargé après _UI.lua.
+> GÉOMÉTRIE : les blocs de section et les métriques vivent dans _UI_Post_Layout.lua (chargé avant).
+> Ici, chaque zone se parente à SON bloc (`UI:PostSec(id)`) et s'ancre en coordonnées RELATIVES au
+> bloc — plus aucun offset absolu de panneau (cf. l'en-tête du fichier Layout pour le pourquoi).
 
-**API** : `UI:BuildPostTab(f)` · `UI:RefreshPost()` · `UI:RefreshPostPlans()` · `UI:RefreshPostPlanDetail()` · `UI:RefreshPostReagents()` · `UI:SelectPostPlan(entry)` · `UI:DoPostOrder()`
+**API** : `UI:BuildPostTab(f)` · `UI:RefreshPost()` · `UI:RefreshPostPlans()` · `UI:SelectPostPlan(entry)` · `UI:DoPostOrder()`
+
+### `CraftingOrderClassic_UI_Post_Detail.lua`
+> CraftingOrderClassic_UI_Post_Detail.lua — onglet « Commande », PANNEAU DROIT : en-tête du plan
+> sélectionné (icône + cadre doré + nom + niveau), liste des réactifs « je fournis », et la rangée
+> commission. Sorti de _UI_Post.lua (anti-monolithe : le fichier hôte butait sur les 500 lignes).
+> Chargé APRÈS _UI_Post_Layout.lua (lit UI.POST) ; ses méthodes sont appelées par _BuildPostRight
+> (_UI_Post.lua) et par les refresh de l'onglet — tout est méthode de COC.UI, donc inter-fichiers.
+> 
+> GÉOMÉTRIE : chaque morceau se parente à SA sous-zone SPEC (cf. _UI_Post_Layout.lua, nœud "detail") :
+>   ItemSelected = cols{ craftIcon, craftText, providePill } · reagentsList = rows{ reagHeader, reagBody }.
+> Ajouter du padding à l'un = éditer la SPEC, rien ici. Le CONTENU (textes, widgets) vit ici.
+
+**API** : `UI:RefreshPostPlanDetail()` · `UI:RefreshPostReagents()`
 
 ### `CraftingOrderClassic_UI_Post_Artisans.lua`
 > CraftingOrderClassic_UI_Post_Artisans.lua — onglet « Commande », section droite basse :
@@ -511,10 +640,24 @@
 >   * tri par rentabilité : liste à PLAT (les sections disparaissent), du plus rentable au moins.
 > Tout est masqué/inerte si Lazy Gold n'est pas installé — COC reste autonome.
 
+### `CraftingOrderClassic_UI_Gather_Layout.lua`
+> CraftingOrderClassic_UI_Gather_Layout.lua — GÉOMÉTRIE de l'onglet « Récolte » : la SPEC (structure
+> éditable, cf. l'onglet Commande qui a VALIDÉ le modèle 2026-07-12) + les métriques dérivées.
+> Chargé AVANT _UI_Gather.lua (cf. les 3 .toc). Même contrat que _UI_Post_Layout.lua :
+>   · la SPEC déclare la STRUCTURE (zones, tailles, pads) — le CONTENU vit dans les builders ;
+>   · pad/padL/padR/padT/padB réglables par nœud ; un écart = spacer explicite `{ h = n, sep = false }` ;
+>   · les listes LISENT la largeur de leur zone (GetWidth au build) → régler la SPEC suffit.
+> Miroir de l'onglet Commande : mêmes colonnes (gauche 333 / droite), mêmes ids quand la zone joue le
+> même rôle (filters/srch, detail/ItemSelected, price, scope) — on apprend UNE grammaire, pas deux.
+
+**API** : `UI:GatherSec(id)`
+
 ### `CraftingOrderClassic_UI_Gather.lua`
 > CraftingOrderClassic_UI_Gather.lua — onglet « Récolte » : ressources de récolte (minéraux,
 > herbes, cuirs, poissons) + demande de quantité + prix par pile + ciblage récolteur.
-> Structure calquée sur _UI_Post.lua (même layout gauche/droite). Chargé après _UI_Post.lua.
+> GÉOMÉTRIE : SPEC déclarative dans _UI_Gather_Layout.lua (chargé avant) — zones via UI:GatherSec(id),
+> contenu en offsets RELATIFS à sa zone, largeurs LUES sur les zones. Même modèle que l'onglet
+> Commande (validé 2026-07-12) : éditer la SPEC suffit pour bouger/padder les blocs.
 
 **API** : `UI:BuildGatherTab(f)` · `UI:RefreshGather()` · `UI:RefreshGatherList()` · `UI:SelectGatherItem(entry)` · `UI:DoGatherOrder()`
 
@@ -530,6 +673,17 @@
 > fait foi (voir le contrat dans _RecipeCats.lua).
 
 **API** : `UI:ToggleGatherSection(ckey)`
+
+### `CraftingOrderClassic_UI_Artisans_Layout.lua`
+> CraftingOrderClassic_UI_Artisans_Layout.lua — GÉOMÉTRIE de l'onglet « Artisans » (annuaire social).
+> Chargé AVANT _UI_Artisans.lua (cf. les 3 .toc). Même contrat que les Layouts Commande/Récolte :
+> SPEC = structure éditable (zones, tailles, pads), contenu dans les builders, largeurs LUES sur les
+> zones. Deux colonnes : SIDEBAR (sources + ajout de joueur) · zone principale (bande de filtre
+> métier + liste des artisans avec sa gouttière de scrollbar).
+> Le panneau « En sourdine » (UI_Artisans_Muted) est un MODE de la zone liste : il se superpose aux
+> mêmes zones (profFilter/artisansList), le basculement reste piloté par _ShowMutedMode.
+
+**API** : `UI:ArtSec(id)`
 
 ### `CraftingOrderClassic_UI_Artisans.lua`
 > CraftingOrderClassic_UI_Artisans.lua — onglet « Artisans » : annuaire social.
@@ -566,6 +720,16 @@
 > _ShowMutedMode. Vit dans le MÊME panel que la liste d'artisans ; chargé après UI_Artisans.lua.
 
 **API** : `UI:RefreshMuted()`
+
+### `CraftingOrderClassic_UI_MyArtisans_Layout.lua`
+> CraftingOrderClassic_UI_MyArtisans_Layout.lua — GÉOMÉTRIE de l'onglet « Mes artisans ».
+> Chargé AVANT _UI_MyArtisans.lua (cf. les 3 .toc). Même contrat que les autres Layouts : SPEC =
+> structure éditable, contenu dans les builders, largeurs LUES sur les zones.
+> Particularité : un BANDEAU pleine largeur (opt-in de partage + vitrine) au-dessus des deux
+> colonnes → la racine est UNE colonne, et le découpage gauche│droite est un nœud `cols` interne
+> (`major = true` sur la colonne recettes = jointure verticale LOURDE, l'équivalent de la frontière).
+
+**API** : `UI:MyArtSec(id)`
 
 ### `CraftingOrderClassic_UI_MyArtisans.lua`
 > CraftingOrderClassic_UI_MyArtisans.lua — onglet « Mes artisans » : vue agrégée des métiers du
@@ -797,6 +961,20 @@
 
 **API** : `PW.CanFulfill(o)` · `PW:NeutralizeNative()` · `PW:RestoreNative()` · `PW:Build()` · `PW:EnsureNativeToggle(frame, key)` · `PW:OpenDock(nativeFrame)` · `PW:CloseDock()` · `PW:Hide()` · `PW:OpenFor(profKey)` · `PW:Refresh()` · `PW:IsEnabled()` · `PW:SetEnabled(on)` · `PW:OnProfessionShow()` · `PW:OnProfessionClose()`
 
+### `CraftingOrderClassic_ProfWindow_Layout.lua`
+> CraftingOrderClassic_ProfWindow_Layout.lua — GÉOMÉTRIE de la vue métier (fenêtre 3 colonnes).
+> Chargé APRÈS ProfWindow.lua (la table PW doit exister), AVANT les modules de colonnes. Même contrat
+> que les Layouts d'onglets : SPEC = structure éditable, contenu dans _Recipes/_Detail/_Orders.
+> Les 3 anciens « puits » (SkinWell par colonne) deviennent le modèle UNE SURFACE + frontières
+> verticales lourdes calculées — le même langage que la fenêtre principale.
+> 
+> MODES : la SPEC décrit la vue PLEINE (3 colonnes). Le mode COMPACT/DOCK (colonne Commandes seule,
+> fenêtre 300 px) masque le panneau de sections et RE-PARENTE la zone « orders » sur la fenêtre ;
+> le retour en vue pleine la re-parente au panneau avec les constantes ORD_* dérivées d'ici
+> (cf. PW:_ApplyMode). Éditer la SPEC suffit : ORD_* suivent.
+
+**API** : `PW:Sec(id)`
+
 ### `CraftingOrderClassic_ProfWindow_Recipes.lua`
 > CraftingOrderClassic_ProfWindow_Recipes.lua — colonne GAUCHE : liste de recettes virtualisée
 > (scroll), recherche, couleur par difficulté, sélection, badge « demandé » (nb de commandes
@@ -848,10 +1026,11 @@
 
 ### `CraftingOrderClassic_ProfWindow_Orders.lua`
 > CraftingOrderClassic_ProfWindow_Orders.lua — colonne « Commandes » de la vue métier (cabine de
-> l'artisan). Cartes par demandeur avec onglets de relation (Guilde / Amis / Croisés / Tous),
-> marqueur « je sais faire » (✓/✗ en TEXTURE), prix, résumé des composants fournis, et actions
-> ACCEPTER / LIVRER + CHUCHOTER ; clic droit = sourdine (ordre) / ignorer (entrante). Inclut les
-> demandes captées (/commerce, /guilde). Sorti de _ProfWindow.lua (anti-monolithe).
+> l'artisan). DEUX vues : LISTE (une ligne par commande : demandeur + prix + âge, sans bouton ;
+> une ligne sourdine cliquée se réaffiche) et SÉLECTIONNÉE (clic sur une ligne → la carte complète
+> remplit la colonne : composants fournis, repères Lazy Gold, ACCEPTER / REFUSER / CHUCHOTER ;
+> croix en haut à droite = retour liste). Onglets de relation (Tous / Guilde / Amis / Annuaire) au
+> header. Inclut les demandes captées (/commerce, /guilde). Sorti de _ProfWindow.lua (anti-monolithe).
 
 **API** : `PW:RefreshOrders()`
 

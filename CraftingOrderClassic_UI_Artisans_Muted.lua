@@ -11,20 +11,23 @@ local UI   = COC.UI
 local Skin = UI.Skin
 local L    = COC.L
 
-local ARX = 220              -- x zone droite (identique à UI_Artisans)
-local RW  = 846 - ARX - 54   -- largeur utile (sous la scrollbar), même calcul que la liste d'artisans
 local MRH = 40               -- hauteur d'une ligne mutée
 
--- Construit l'en-tête + la liste défilable, cachés par défaut. Appelé depuis BuildArtisansTab.
-function UI:_BuildMutedList(panel)
-    local hdr = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    hdr:SetPoint("TOPLEFT", ARX, -98); Skin.ApplyShadow(hdr)
+-- Construit l'en-tête + la liste défilable, cachés par défaut. Appelé depuis BuildArtisansTab (APRÈS
+-- les sections) : l'en-tête vit dans la bande « profFilter », la liste dans « artisansList » — le mode
+-- muted SUPERPOSE ses widgets aux mêmes zones que la liste d'artisans (bascule via _ShowMutedMode).
+function UI:_BuildMutedList()
+    local band = self:ArtSec("profFilter")
+    local hdr = band:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    hdr:SetPoint("LEFT", 4, 0); Skin.ApplyShadow(hdr)
     hdr:SetText("|cFF888888" .. L["Joueurs en sourdine — aucune notification de leur part."] .. "|r")
     hdr:Hide(); self.mutedHdr = hdr
 
-    local scroll = CreateFrame("ScrollFrame", "COCMutedScroll", panel, "UIPanelScrollFrameTemplate")
-    scroll:SetPoint("TOPLEFT", ARX, -118); scroll:SetPoint("BOTTOMRIGHT", -42, 22)
-    local c = CreateFrame("Frame", nil, scroll); c:SetSize(RW, 10); scroll:SetScrollChild(c)
+    local lz = self:ArtSec("artisansList")
+    self.mutedW = self.artListW or (lz:GetWidth() - 6)   -- même largeur que la liste d'artisans
+    local scroll = CreateFrame("ScrollFrame", "COCMutedScroll", lz, "UIPanelScrollFrameTemplate")
+    scroll:SetPoint("TOPLEFT", 0, 0); scroll:SetPoint("BOTTOMLEFT", 0, 0); scroll:SetWidth(self.mutedW)
+    local c = CreateFrame("Frame", nil, scroll); c:SetSize(self.mutedW, 10); scroll:SetScrollChild(c)
     scroll:Hide()
     self.mutedScroll = scroll; self.mutedContent = c; self.mutedRows = {}
 end
@@ -41,13 +44,14 @@ end
 
 function UI:_MutedRow(i)
     local r = self.mutedRows[i]; if r then return r end
+    local rw = self.mutedW or 560   -- largeur de la zone artisansList (lue au build)
     r = CreateFrame("Frame", nil, self.mutedContent)
-    r:SetSize(RW, MRH); r:SetPoint("TOPLEFT", 0, -(i - 1) * MRH)
+    r:SetSize(rw, MRH); r:SetPoint("TOPLEFT", 0, -(i - 1) * MRH)
     local hi = r:CreateTexture(nil, "HIGHLIGHT"); hi:SetAllPoints(); hi:SetColorTexture(Skin.unpack(Skin.color.rowHover))
     r.name = r:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     r.name:SetPoint("TOPLEFT", 8, -5); r.name:SetWidth(260); r.name:SetJustifyH("LEFT"); Skin.ApplyShadow(r.name)
     r.sub = r:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    r.sub:SetPoint("TOPLEFT", 8, -22); r.sub:SetWidth(RW - 130); r.sub:SetJustifyH("LEFT"); Skin.ApplyShadow(r.sub)
+    r.sub:SetPoint("TOPLEFT", 8, -22); r.sub:SetWidth(rw - 130); r.sub:SetJustifyH("LEFT"); Skin.ApplyShadow(r.sub)
     r.unmute = Skin.MakeGoldButton(r, 96, 22, L["Rétablir"]); r.unmute:SetPoint("RIGHT", -8, 0)
     self.mutedRows[i] = r; return r
 end

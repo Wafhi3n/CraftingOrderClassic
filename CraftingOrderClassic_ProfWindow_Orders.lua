@@ -1,8 +1,9 @@
 -- CraftingOrderClassic_ProfWindow_Orders.lua — colonne « Commandes » de la vue métier (cabine de
--- l'artisan). Cartes par demandeur avec onglets de relation (Guilde / Amis / Croisés / Tous),
--- marqueur « je sais faire » (✓/✗ en TEXTURE), prix, résumé des composants fournis, et actions
--- ACCEPTER / LIVRER + CHUCHOTER ; clic droit = sourdine (ordre) / ignorer (entrante). Inclut les
--- demandes captées (/commerce, /guilde). Sorti de _ProfWindow.lua (anti-monolithe).
+-- l'artisan). DEUX vues : LISTE (une ligne par commande : demandeur + prix + âge, sans bouton ;
+-- une ligne sourdine cliquée se réaffiche) et SÉLECTIONNÉE (clic sur une ligne → la carte complète
+-- remplit la colonne : composants fournis, repères Lazy Gold, ACCEPTER / REFUSER / CHUCHOTER ;
+-- croix en haut à droite = retour liste). Onglets de relation (Tous / Guilde / Amis / Annuaire) au
+-- header. Inclut les demandes captées (/commerce, /guilde). Sorti de _ProfWindow.lua (anti-monolithe).
 
 local COC  = CraftingOrderClassic
 local UI   = COC.UI
@@ -12,12 +13,26 @@ local PW   = COC.ProfWindow
 
 local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true) end
 
-local CARD_W       = 232
-local CARD_COMPACT = 84      -- carte sans plan connu (objet seul / récolte) : hauteur fixe
-local CARD_MUTED   = 22      -- ligne repliée d'une commande en sourdine (label + bouton Réafficher)
-local REAG_RH      = 14      -- hauteur d'une ligne de réactif dans le panneau « composants »
-local MAX_REAG     = 8       -- plafond d'affichage (au-delà : tronqué ; rare en Classic)
-local PANEL_HDR    = 16      -- hauteur de l'en-tête du panneau « COMPOSANTS FOURNIS »
+local CARD_W     = 280
+local ROW_H      = 22        -- ligne de la vue LISTE (une commande = une ligne)
+local REAG_RH    = 50      -- hauteur d'une ligne de réactif dans le panneau « composants »
+local MAX_REAG   = 8         -- plafond d'affichage (au-delà : tronqué ; rare en Classic)
+local PANEL_HDR  = 16        -- hauteur de l'en-tête du panneau « COMPOSANTS FOURNIS »
+
+-- Mini-SPEC de la CARTE de commande — même grammaire que les vues (h / bg / pad éditables ici).
+-- Trois zones : en-tête (demandeur + âge + inviter), corps FLEX (objet, prix, composants, Lazy Gold),
+-- pied (Accepter / Refuser / Chuchoter). Le flex est ancré haut ET bas → quand la carte change de
+-- hauteur (panneau composants variable), le pied reste collé en bas tout seul.
+local CARD_HDR, CARD_FOOT = 20, 24
+local CARD_COMPACT = CARD_HDR + 26 + CARD_FOOT   -- carte sans plan connu (objet seul / récolte)
+local CARD = {
+    x1 = 0, x2 = CARD_W, sepInset = 6 ,
+    { top = 0, bottom = 0, left = 2,
+        { id = "hdr",  h = CARD_HDR, bg = true },
+        { id = "body" },
+        { id = "foot", h = CARD_FOOT , bg = true},
+    },
+}
 local REL = {
     { id = "all",    label = L["Tous"]    },
     { id = "guild",  label = L["Guilde"]  },
@@ -61,33 +76,61 @@ local function orderReagents(o)
     return out, nProv, #reag
 end
 
+-- Nom lisible du PRODUIT d'une commande (repli « item:ID » tant que le client charge l'objet).
+local function orderItemName(o, c)
+    return (c and c:ItemName(o.itemID, o.itemName))
+        or (o.spellID and c and c:RecipeName(o.spellID))
+        or ("item:" .. (o.itemID or 0))
+end
+
 -- ------------------------------------------------------------------
--- Construction (en-tête + onglets de relation + scroll de cartes)
+-- Construction (onglets de relation + en-tête + scroll de cartes)
 -- ------------------------------------------------------------------
+-- Onglets de RELATION (Tous / Guilde / Amis / Annuaire) : languettes NATIVES (MakeTabs — le rendu
+-- du volet Amis), posées au niveau du header AU-DESSUS de la colonne Commandes ; la SPEC lui réserve
+-- la bande dessous (orders.top, cf. _ProfWindow_Layout.lua). Parentés à la FENÊTRE, pas à la
+-- colonne : ils survivent au re-parentage compact/dock, seul leur X change (_PlaceOrdTabs).
+function PW:_BuildRelTabs()
+    self.ordRelTabs = Skin.MakeTabs(self.frame, REL, function(id)
+        PW.ordRelTab = id; PW:_RefreshRelTabs(); PW:RefreshOrders()
+    end)
+    self:_PlaceOrdTabs(self._compact)
+end
+
+-- Vue pleine : au-dessus de la colonne Commandes (4 = offset du panneau de sections dans la fenêtre,
+-- ORD_X = frontière détail|commandes). Compact/dock (fenêtre 300 px) : bord gauche. −62 = 2 px sous
+-- le sommet du marbre (même placement que les onglets de la fenêtre principale).
+function PW:_PlaceOrdTabs(compact)
+    local first = self.ordRelTabs and self.ordRelTabs.buttons[REL[1].id]
+    if not first then return end
+    first:ClearAllPoints()
+    first:SetPoint("TOPLEFT", self.frame, "TOPLEFT", compact and 10 or (4 + PW.ORD_X + 8), -28)
+end
+
+-- Zones SPEC de la colonne (cf. _ProfWindow_Layout.lua) : ordBody (en-tête + scroll liste/carte) /
+-- ordFoot (bande pied : récap par statut). Les zones sont ENFANTS de la zone « orders » → elles
+-- suivent le re-parentage compact/dock sans rien faire.
 function PW:_BuildOrders(col)
     self.ordRelTab = self.ordRelTab or "all"
-    local hdr = col:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    hdr:SetPoint("TOPLEFT", 8, -6); hdr:SetText("|cFFE8B84B" .. L["Commandes"] .. "|r"); self.ordHdr = hdr
-    self.ordRelBtns = {}
-    local x = 6
-    for _, d in ipairs(REL) do
-        local b = Skin.MakeGoldButton(col, 54, 16, d.label); b:SetPoint("TOPLEFT", x, -26)
-        b:SetScript("OnClick", function() PW.ordRelTab = d.id; PW:_RefreshRelTabs(); PW:RefreshOrders() end)
-        self.ordRelBtns[d.id] = b; x = x + 56
-    end
+    self:_BuildRelTabs()
     self:_RefreshRelTabs()
-    local scroll = CreateFrame("ScrollFrame", "CraftingOrderProfWinOrdScroll", col, "UIPanelScrollFrameTemplate")
-    scroll:SetPoint("TOPLEFT", 6, -48); scroll:SetPoint("BOTTOMRIGHT", -24, 22)   -- 22 px : place pour le pied
+    local bz = self:Sec("ordBody") or col
+    local hdr = bz:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    hdr:SetPoint("TOPLEFT", 8, -6); hdr:SetText("|cFFE8B84B" .. L["Commandes"] .. "|r"); self.ordHdr = hdr
+    local scroll = CreateFrame("ScrollFrame", "CraftingOrderProfWinOrdScroll", bz, "UIPanelScrollFrameTemplate")
+    scroll:SetPoint("TOPLEFT", 6, -26); scroll:SetPoint("BOTTOMRIGHT", -24, 0)
     local content = CreateFrame("Frame", nil, scroll); content:SetSize(CARD_W, 10); scroll:SetScrollChild(content)
-    self.ordContent = content; self.ordCards = {}
+    self.ordScroll, self.ordContent = scroll, content
+    self.ordCards, self.ordRows = {}, {}
     -- Pied de colonne : récap par statut (en attente · acceptées · sourdine), filtré métier+relation.
-    local foot = col:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    foot:SetPoint("BOTTOMLEFT", 8, 6); foot:SetPoint("BOTTOMRIGHT", -8, 6)
+    local fz = self:Sec("ordFoot") or col
+    local foot = fz:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+    foot:SetPoint("LEFT", 8, 0); foot:SetPoint("RIGHT", -8, 0)
     foot:SetJustifyH("CENTER"); Skin.ApplyShadow(foot); self.ordFoot = foot
 end
 
 function PW:_RefreshRelTabs()
-    for id, b in pairs(self.ordRelBtns or {}) do b:SetSelected(id == self.ordRelTab) end
+    if self.ordRelTabs then self.ordRelTabs:Select(self.ordRelTab or "all") end
 end
 
 function PW:_Age(ts)
@@ -102,9 +145,10 @@ end
 -- ------------------------------------------------------------------
 -- Panneau « composants » de la carte : en-tête X/Y + pool de lignes réactif (coche fournie / À FOURNIR).
 -- Hauteur ajustée au remplissage (cf. _FillReagPanel) ; masqué quand le plan est inconnu.
-local function buildReagPanel(c)
-    local p = CreateFrame("Frame", nil, c, "BackdropTemplate")
-    p:SetPoint("TOPLEFT", 8, -44); p:SetPoint("RIGHT", c, "RIGHT", -8, 0); Skin.SkinWell(p)
+-- `bz` = zone CORPS de la carte (le panneau vit sous la rangée objet/prix, à −26).
+local function buildReagPanel(c, bz)
+    local p = CreateFrame("Frame", nil, bz, "BackdropTemplate")
+    p:SetPoint("TOPLEFT", 8, -26); p:SetPoint("RIGHT", bz, "RIGHT", -8, 0); Skin.SkinWell(p)
     p.hdr = p:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
     p.hdr:SetPoint("TOPLEFT", 6, -3); p.hdr:SetPoint("RIGHT", -6, 0); p.hdr:SetJustifyH("LEFT"); Skin.ApplyShadow(p.hdr)
     p.rows = {}
@@ -122,17 +166,19 @@ local function buildReagPanel(c)
     p:Hide(); c.reagPanel = p
 end
 
-function PW:_OrdCard(i)
-    local c = self.ordCards[i]; if c then return c end
-    c = CreateFrame("Frame", nil, self.ordContent, "BackdropTemplate")
-    c:SetSize(CARD_W, CARD_COMPACT); c:SetPoint("TOPLEFT", 0, 0); Skin.SkinWell(c)
-    c.dot = Skin.MakeStatusIcon(c, 12); c.dot:SetPoint("TOPLEFT", 8, -7)
-    c.who = c:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+-- EN-TÊTE de la carte : pastille de présence + demandeur à gauche ; à droite, la CROIX de retour à
+-- la vue liste (la carte n'apparaît qu'en vue sélectionnée), puis « Inviter » et l'âge.
+local function buildCardHeader(c, hz)
+    c.dot = Skin.MakeStatusIcon(hz, 12); c.dot:SetPoint("LEFT", 8, 0)
+    c.who = hz:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     c.who:SetPoint("LEFT", c.dot, "RIGHT", 4, 0); Skin.ApplyShadow(c.who)
-    -- Bouton « Inviter en groupe » (coin haut-droit ; visible si l'acheteur est en ligne) → l'artisan
-    -- l'invite pour lui remettre les composants / la marchandise via l'échange.
-    c.invite = CreateFrame("Button", nil, c)
-    c.invite:SetSize(16, 16); c.invite:SetPoint("TOPRIGHT", -8, -6)
+    c.closeSel = CreateFrame("Button", nil, hz, "UIPanelCloseButton")
+    c.closeSel:SetSize(24, 24); c.closeSel:SetPoint("RIGHT", 2, 0)
+    c.closeSel:SetScript("OnClick", function() PW.ordSelected = nil; PW:RefreshOrders() end)
+    -- Bouton « Inviter en groupe » (visible si l'acheteur est en ligne) → l'artisan l'invite pour
+    -- lui remettre les composants / la marchandise via l'échange.
+    c.invite = CreateFrame("Button", nil, hz)
+    c.invite:SetSize(16, 16); c.invite:SetPoint("RIGHT", -24, 0)
     c.invite:SetNormalTexture("Interface\\Buttons\\UI-PlusButton-Up")
     c.invite:SetPushedTexture("Interface\\Buttons\\UI-PlusButton-Down")
     c.invite:SetHighlightTexture("Interface\\Buttons\\UI-PlusButton-Hilight")
@@ -140,34 +186,39 @@ function PW:_OrdCard(i)
         GameTooltip:SetOwner(b, "ANCHOR_RIGHT"); GameTooltip:SetText(L["Inviter en groupe"], 1, 1, 1); GameTooltip:Show()
     end)
     c.invite:SetScript("OnLeave", GameTooltip_Hide)
-    c.age = c:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    c.age:SetPoint("TOPRIGHT", c.invite, "TOPLEFT", -4, 0); Skin.ApplyShadow(c.age)
-    c.badge = Skin.MakeBadge(c, 16); c.badge:SetPoint("TOPLEFT", 8, -25)
-    c.item = c:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    c.age = hz:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+    c.age:SetPoint("RIGHT", c.invite, "LEFT", -4, 0); Skin.ApplyShadow(c.age)
+end
+
+-- CORPS de la carte : rangée objet (badge + nom + prix) puis panneau composants + ligne Lazy Gold.
+local function buildCardBody(c, bz)
+    c.badge = Skin.MakeBadge(bz, 16); c.badge:SetPoint("TOPLEFT", 8, -4)
+    c.item = bz:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     c.item:SetPoint("LEFT", c.badge, "RIGHT", 4, 0); c.item:SetWidth(140); c.item:SetJustifyH("LEFT"); Skin.ApplyShadow(c.item)
-    c.price = c:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    c.price:SetPoint("TOPRIGHT", -8, -27); Skin.ApplyShadow(c.price)
-    buildReagPanel(c)
-    -- 3 boutons compacts (≈208 px) qui tiennent dans la largeur VISIBLE de la colonne (scroll ~222 px) :
-    -- Accepter / Refuser / Chuchoter, ancrés en chaîne (Refuser caché → Chuchoter glisse à gauche).
-    c.act = Skin.MakeGoldButton(c, 66, 18, L["Accepter"]); c.act:SetPoint("BOTTOMLEFT", 8, 6)
-    c.refuse = Skin.MakeGoldButton(c, 54, 18, L["Refuser"]); c.refuse:SetPoint("LEFT", c.act, "RIGHT", 4, 0)
-    c.whisper = Skin.MakeGoldButton(c, 72, 18, L["Chuchoter"]); c.whisper:SetPoint("LEFT", c.refuse, "RIGHT", 4, 0)
-    -- Ligne repliée (commande en sourdine) : label + demandeur/objet + bouton « Réafficher ». Occupe
-    -- la carte entière (pool réutilisé) quand la commande est masquée ; cf. _FillCard branche muted.
-    c.mutedLabel = c:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    c.mutedLabel:SetPoint("LEFT", 8, 0); Skin.ApplyShadow(c.mutedLabel)
-    c.mutedLabel:SetText(L["Sourdine"]); c.mutedLabel:Hide()
-    c.mutedText = c:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    c.mutedText:SetPoint("LEFT", c.mutedLabel, "RIGHT", 6, 0); c.mutedText:SetJustifyH("LEFT")
-    c.mutedText:SetWordWrap(false); Skin.ApplyShadow(c.mutedText); c.mutedText:Hide()
-    c.unmute = Skin.MakeGoldButton(c, 72, 18, L["Réafficher"]); c.unmute:SetPoint("RIGHT", -6, 0); c.unmute:Hide()
-    c.mutedText:SetPoint("RIGHT", c.unmute, "LEFT", -6, 0)
-    -- Ligne « dois-je accepter ? » (Lazy Gold) : sous le panneau composants, au-dessus des actions.
-    c.lgLine = c:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+    c.price = bz:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    c.price:SetPoint("TOPRIGHT", -8, -6); Skin.ApplyShadow(c.price)
+    buildReagPanel(c, bz)
+    -- Ligne « dois-je accepter ? » (Lazy Gold) : sous le panneau composants, au-dessus du pied.
+    c.lgLine = bz:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
     c.lgLine:SetPoint("TOPLEFT", c.reagPanel, "BOTTOMLEFT", 0, -3)
-    c.lgLine:SetPoint("RIGHT", c, "RIGHT", -8, 0)
+    c.lgLine:SetPoint("RIGHT", bz, "RIGHT", -8, 0)
     c.lgLine:SetJustifyH("LEFT"); c.lgLine:SetWordWrap(false); Skin.ApplyShadow(c.lgLine); c.lgLine:Hide()
+end
+
+function PW:_OrdCard(i)
+    local c = self.ordCards[i]; if c then return c end
+    c = CreateFrame("Frame", nil, self.ordContent, "BackdropTemplate")
+    c:SetSize(CARD_W, CARD_COMPACT); c:SetPoint("TOPLEFT", 0, 0); Skin.SkinWell(c)
+    -- Zones de la mini-SPEC sur une frame hôte dédiée (isole le découpage du puits de fond).
+    local host = CreateFrame("Frame", nil, c); host:SetAllPoints(); c.zones = host
+    local z = Skin.MakeSections(host, CARD)
+    buildCardHeader(c, z.hdr)
+    buildCardBody(c, z.body)
+    -- PIED : 3 boutons compacts (≈208 px) qui tiennent dans la largeur VISIBLE de la colonne
+    -- (scroll ~222 px) : Accepter / Refuser / Chuchoter (Refuser caché → Chuchoter glisse à gauche).
+    c.act = Skin.MakeGoldButton(z.foot, 66, 18, L["Accepter"]); c.act:SetPoint("LEFT", 8, 0)
+    c.refuse = Skin.MakeGoldButton(z.foot, 54, 18, L["Refuser"]); c.refuse:SetPoint("LEFT", c.act, "RIGHT", 4, 0)
+    c.whisper = Skin.MakeGoldButton(z.foot, 72, 18, L["Chuchoter"]); c.whisper:SetPoint("LEFT", c.refuse, "RIGHT", 4, 0)
     c:EnableMouse(true); Skin.WireItemTooltip(c)
     self.ordCards[i] = c; return c
 end
@@ -232,12 +283,10 @@ function PW:_FillReagPanel(card, o)
     return h
 end
 
--- « Dois-je accepter cette commande ? » — les deux chiffres que Lazy Gold sait établir :
---   * Valeur HV de la marchandise (× qté) : ce que ça vaut si je la vendais moi-même ;
---   * Réactifs À MA CHARGE : le coût HV des composants que l'acheteur NE fournit PAS.
--- On NE calcule PAS de « profit net » : o.price est du TEXTE LIBRE saisi par l'acheteur (« 15po »,
--- « 2 stacks de fer », « on verra »…) — le parser serait un devin. L'artisan compare lui-même le prix
--- proposé (affiché juste au-dessus) à ces deux repères. Renvoie la hauteur consommée (0 = rien).
+-- « Dois-je accepter ? » — les deux repères Lazy Gold : Valeur HV de la marchandise (× qté) et
+-- Réactifs À MA CHARGE (coût HV des composants NON fournis). PAS de « profit net » : o.price est du
+-- TEXTE LIBRE (« 15po », « 2 stacks de fer »…), le parser serait un devin — l'artisan compare lui-même
+-- le prix proposé à ces repères. Renvoie la hauteur consommée (0 = rien).
 function PW:_FillOrderProfit(card, o, hasPanel)
     local LG = COC.LazyGold
     if not (LG and LG:IsAvailable() and hasPanel) then card.lgLine:Hide(); return 0 end
@@ -255,29 +304,75 @@ function PW:_FillOrderProfit(card, o, hasPanel)
     return 16
 end
 
--- Ligne repliée d'une commande en sourdine : masque tout le contenu normal de la carte, affiche
--- juste le demandeur/objet et un bouton pour la réafficher (retire l'id de COC.db.muted).
-function PW:_FillMutedRow(card, it)
-    local o = it.o; local c = CL()
-    local nm = (c and c:ItemName(o.itemID, o.itemName)) or (o.spellID and c and c:RecipeName(o.spellID)) or ("item:" .. (o.itemID or 0))
-    card.dot:Hide(); card.invite:Hide(); card.age:Hide(); card.badge:Hide(); card.item:Hide(); card.price:Hide()
-    card.reagPanel:Hide(); card.act:Hide(); card.refuse:Hide(); card.whisper:Hide(); card.who:Hide()
-    card.lgLine:Hide()
-    card.mutedLabel:Show(); card.mutedText:Show(); card.unmute:Show()
-    card.mutedText:SetText("|cFF999999" .. (o.buyer or "?") .. " — " .. (nm:match("^item:") and L["Chargement…"] or nm) .. "|r")
-    card.unmute:SetScript("OnClick", function()
-        if COC.db and COC.db.muted then COC.db.muted[o.id] = nil end
+-- ------------------------------------------------------------------
+-- Vue LISTE : une commande = une ligne (pastille + demandeur | prix | âge), SANS bouton — le clic
+-- SÉLECTIONNE (la carte complète remplit alors la colonne). Une commande en sourdine s'affiche en
+-- ligne grisée « Réafficher » : la cliquer la sort de la sourdine (remplace l'ancien bouton).
+-- ------------------------------------------------------------------
+function PW:_OrdRow(i)
+    local r = self.ordRows[i]; if r then return r end
+    r = CreateFrame("Button", nil, self.ordContent)
+    r:SetHeight(ROW_H)
+    Skin.PersonHighlight(r)
+    r.dot = Skin.MakeStatusIcon(r, 10); r.dot:SetPoint("LEFT", 4, 0)
+    r.name = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    r.name:SetPoint("LEFT", r.dot, "RIGHT", 4, 0); r.name:SetJustifyH("LEFT")
+    r.name:SetWordWrap(false); Skin.ApplyShadow(r.name)
+    -- Item VOULU : badge + nom à la suite du demandeur ; survol = tooltip de l'objet (WireItemTooltip).
+    r.badge = Skin.MakeBadge(r, 14); r.badge:SetPoint("LEFT", r.name, "RIGHT", 6, 0)
+    r.item = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    r.item:SetPoint("LEFT", r.badge, "RIGHT", 3, 0); r.item:SetJustifyH("LEFT")
+    r.item:SetWordWrap(false); Skin.ApplyShadow(r.item)
+    r.age = r:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+    r.age:SetPoint("RIGHT", -4, 0); Skin.ApplyShadow(r.age)
+    r.money = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    r.money:SetPoint("RIGHT", r.age, "LEFT", -8, 0); Skin.ApplyShadow(r.money)
+    r.item:SetPoint("RIGHT", r.money, "LEFT", -6, 0)   -- l'item se rétrécit avant le prix
+    r:SetScript("OnClick", function(b)
+        local it = b.it; if not it then return end
+        if it.muted then
+            if COC.db and COC.db.muted then COC.db.muted[it.o.id] = nil end
+        else
+            PW.ordSelected = it.o.id
+        end
         PW:RefreshOrders()
     end)
-    card:SetHeight(CARD_MUTED); card:Show()
+    Skin.WireItemTooltip(r)   -- survol → tooltip de l'objet (lit r.tipItemID / r.tipSpellID)
+    self.ordRows[i] = r; return r
+end
+
+function PW:_FillOrdRow(row, it)
+    local o = it.o; local c = CL()
+    row.it = it
+    local online = COC.Directory and COC.Directory.online and COC.Directory.online[o.buyer]
+    row.dot:SetOnline(online and true or false)
+    if it.muted then
+        row.name:SetText("|cFF777777" .. (o.buyer or "?") .. " — " .. L["Sourdine"] .. "|r")
+        row.money:SetText("|cFF888888" .. L["Réafficher"] .. "|r")
+        row.age:SetText("")
+        row.badge:Hide(); row.item:Hide()
+        row.tipItemID, row.tipSpellID = nil, nil   -- pas de tooltip sur une ligne repliée
+        row:Show(); return
+    end
+    local rel = relationOf(o.buyer) or "recent"
+    local tag = (it.kind == "inbound") and (" |T" .. Skin.tex.dotYellow .. ":10|t") or ""
+    row.name:SetText("|c" .. (REL_COL[rel] or "FFFFFFFF") .. (o.buyer or "?") .. "|r" .. tag)
+    local nm = orderItemName(o, c)
+    local rr, gg, bb = Skin.RarityColor(o.itemID)
+    row.badge:Paint(rr, gg, bb, Skin.FirstChar(nm), Skin.Icon(o.itemID, o.spellID) or Skin.tex.unknown)
+    row.badge:Show()
+    row.item:SetText(nm:match("^item:") and L["Chargement…"] or nm); row.item:SetTextColor(rr, gg, bb)
+    row.item:Show()
+    row.tipItemID, row.tipSpellID = o.itemID, o.spellID
+    local price = o.price and ("|cFFFFDD00" .. o.price .. "|r") or ("|cFF888888" .. L["Don / gratuit"] .. "|r")
+    row.money:SetText("|cFFCCCCCC" .. Skin.QtyText(o) .. "|r  " .. price)
+    row.age:SetText("|cFF777777" .. self:_Age(o.ts) .. "|r")
+    row:Show()
 end
 
 function PW:_FillCard(card, it)
-    if it.muted then self:_FillMutedRow(card, it); return end
-    card.mutedLabel:Hide(); card.mutedText:Hide(); card.unmute:Hide()
-    card.dot:Show(); card.badge:Show(); card.item:Show(); card.price:Show(); card.who:Show(); card.age:Show()
     local o, kind = it.o, it.kind; local c = CL()
-    local nm = (c and c:ItemName(o.itemID, o.itemName)) or (o.spellID and c and c:RecipeName(o.spellID)) or ("item:" .. (o.itemID or 0))
+    local nm = orderItemName(o, c)
     local rr, gg, bb = Skin.RarityColor(o.itemID)
     card.tipItemID = o.itemID
     card.badge:Paint(rr, gg, bb, Skin.FirstChar(nm), Skin.Icon(o.itemID, o.spellID) or Skin.tex.unknown)
@@ -296,7 +391,10 @@ function PW:_FillCard(card, it)
     card.price:SetText("|cFFCCCCCC" .. qty .. "|r  " .. price)
     local panelH = self:_FillReagPanel(card, o)
     local lgH    = self:_FillOrderProfit(card, o, panelH > 0)
-    card:SetHeight((panelH > 0) and (72 + panelH + lgH) or CARD_COMPACT)   -- 72 = haut + rangée d'actions
+    -- Hauteur = zones fixes (SPEC) + corps mesuré : 26 = rangée objet ; +4 = respiration sous le
+    -- panneau composants. Le pied reste ancré en bas par construction (flex de la mini-SPEC).
+    local bodyH = (panelH > 0) and (26 + panelH + lgH + 4) or 26
+    card:SetHeight(CARD_HDR + bodyH + CARD_FOOT)
     self:_CardActions(card, it)
     card:Show()
 end
@@ -304,8 +402,9 @@ end
 -- ------------------------------------------------------------------
 -- Rafraîchissement : collecte (carnet + entrantes) filtrée par métier ouvert + relation.
 -- ------------------------------------------------------------------
-function PW:RefreshOrders()
-    if not self.ordContent then return end
+-- Collecte les commandes du métier : visibles triées récentes d'abord, puis les sourdines repliées
+-- en bas. Renvoie (liste, en attente, acceptées, nb sourdines).
+function PW:_CollectOrders()
     local prof, relTab = self.profKey, self.ordRelTab or "all"
     local muted = (COC.db and COC.db.muted) or {}
     local O, Mod, now = COC.Orders, COC.Moderation, time()
@@ -346,19 +445,55 @@ function PW:RefreshOrders()
     table.sort(mutedList, function(a, b) return (a.o.ts or 0) > (b.o.ts or 0) end)
     -- Visibles d'abord, puis les commandes en sourdine repliées en bas (cf. mockup Vue Métier).
     for _, it in ipairs(mutedList) do list[#list + 1] = it end
-    local n, y = 0, 0   -- cartes à hauteur variable (panneau composants) → empilage cumulatif
-    for _, it in ipairs(list) do
-        n = n + 1
-        local card = self:_OrdCard(n); self:_FillCard(card, it)
-        card:ClearAllPoints(); card:SetPoint("TOPLEFT", 0, -y)
-        y = y + card:GetHeight() + 4
+    return list, pending, accepted, mutedN
+end
+
+function PW:RefreshOrders()
+    if not self.ordContent then return end
+    local list, pending, accepted, mutedN = self:_CollectOrders()
+    -- La largeur de contenu suit le viewport (mode compact plus étroit → les lignes suivent).
+    local sw = self.ordScroll and self.ordScroll:GetWidth() or 0
+    if sw > 0 then self.ordContent:SetWidth(sw) end
+    -- Vue SÉLECTIONNÉE si la commande cliquée est toujours visible (mutée/expirée/refusée → liste).
+    local sel
+    if self.ordSelected then
+        for _, it in ipairs(list) do
+            if not it.muted and it.o.id == self.ordSelected then sel = it; break end
+        end
+        if not sel then self.ordSelected = nil end
     end
-    for i = n + 1, #self.ordCards do self.ordCards[i]:Hide() end
-    self.ordContent:SetHeight(math.max(y, 10))
+    if sel then self:_RenderOrdSelected(sel) else self:_RenderOrdList(list) end
     Skin.AutoHideScroll("CraftingOrderProfWinOrdScroll", self.ordContent)
-    self.ordHdr:SetText("|cFFE8B84B" .. L["Commandes"] .. "|r |cFF888888(" .. n .. ")|r")
+    self.ordHdr:SetText("|cFFE8B84B" .. L["Commandes"] .. "|r |cFF888888(" .. #list .. ")|r")
     if self.ordFoot then
         self.ordFoot:SetText(string.format("|cFFFFCC00%d|r %s · |cFF33CCFF%d|r %s · |cFF888888%d|r %s",
             pending, L["en attente"], accepted, L["acceptées"], mutedN, L["en sourdine"]))
     end
+end
+
+-- Rend la vue LISTE : une ligne par commande, pleine largeur, hauteur fixe.
+function PW:_RenderOrdList(list)
+    for _, c in ipairs(self.ordCards) do c:Hide() end
+    local n = 0
+    for _, it in ipairs(list) do
+        n = n + 1
+        local row = self:_OrdRow(n); self:_FillOrdRow(row, it)
+        row:ClearAllPoints()
+        row:SetPoint("TOPLEFT", 0, -(n - 1) * ROW_H)
+        row:SetPoint("RIGHT", self.ordContent, "RIGHT", 0, 0)
+    end
+    for i = n + 1, #self.ordRows do self.ordRows[i]:Hide() end
+    self.ordContent:SetHeight(math.max(n * ROW_H, 10))
+end
+
+-- Rend la vue SÉLECTIONNÉE : la carte complète remplit la colonne (au moins le viewport ; plus si
+-- le panneau composants déborde → le scroll reprend). Croix de l'en-tête = retour liste.
+function PW:_RenderOrdSelected(it)
+    for _, r in ipairs(self.ordRows) do r:Hide() end
+    for i = 2, #self.ordCards do self.ordCards[i]:Hide() end
+    local card = self:_OrdCard(1); self:_FillCard(card, it)
+    card:ClearAllPoints(); card:SetPoint("TOPLEFT", 0, 0)
+    local vh = self.ordScroll and self.ordScroll:GetHeight() or 0
+    if card:GetHeight() < vh then card:SetHeight(vh) end
+    self.ordContent:SetHeight(card:GetHeight())
 end
