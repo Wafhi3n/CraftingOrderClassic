@@ -1,7 +1,9 @@
--- CraftingOrderClassic_UI_Skin.lua — Thème « tavern doré » (design system Guild Economy / CraftLink).
--- Palette mappée 1:1 depuis tokens/colors.css (direction warm tavern). Skin PROPRE à cet addon
--- (pas de dépendance à Guild Economy). INTOUCHABLE : le langage couleur des offres et la rareté
--- d'objet ne sont jamais recolorés ; ce module ne touche que le chrome (surfaces, cadre, onglets).
+-- CraftingOrderClassic_UI_Skin.lua — tokens + helpers SÉMANTIQUES du skin (métiers, statuts, rareté,
+-- quantités, icônes natives) et petits widgets d'affichage. Les CONSTRUCTEURS de chrome Blizzard
+-- natif vivent dans CraftingOrderClassic_UI_Skin_Native.lua (même table `Skin`) — voir la skill
+-- projet `coc-native-ui`. La palette « tavern » résiduelle ne sert plus qu'aux ACCENTS texte/lignes
+-- (or des libellés, hover, sélection) ; le chrome (cadre, onglets, boutons) est natif.
+-- INTOUCHABLE : le langage couleur des statuts d'ordre et la rareté d'objet ne sont jamais recolorés.
 
 CraftingOrderClassic.UI = CraftingOrderClassic.UI or {}
 local Skin = {}
@@ -237,6 +239,8 @@ Skin.tex = {
     dnd     = "Interface\\FriendsFrame\\StatusIcon-DnD",
     broadcast = "Interface\\FriendsFrame\\BroadcastIcon",
     workorder = "Interface\\GossipFrame\\WorkOrderGossipIcon",
+    scroll    = "Interface\\Icons\\INV_Scroll_03",           -- parchemin 64×64 : portrait par défaut de la fenêtre
+                                                             -- (workorder = gossip ~16 px : flou + refusé par SetPortraitToTexture)
     crate     = "Interface\\Icons\\INV_Crate_03",   -- récolte « par stack »
     partner   = "Interface\\Icons\\INV_Misc_Gift_01",   -- drapeau « partenaire » (priorité alertes de don)
     unknown   = "Interface\\Icons\\INV_Misc_QuestionMark",   -- repli « rien de sélectionné »
@@ -331,31 +335,27 @@ function Skin.ApplyShadow(fs)
     return fs
 end
 
-local wordmarkFont
-function Skin.WordmarkFont()
-    if not wordmarkFont then
-        wordmarkFont = CreateFont("CraftingOrderWordmarkFont")
-        if not wordmarkFont:SetFont("Fonts\\MORPHEUS.ttf", 22, "") then
-            wordmarkFont:SetFontObject("GameFontNormalLarge")
-        end
-        wordmarkFont:SetTextColor(unpackc(Skin.color.goldHi))
-        wordmarkFont:SetShadowColor(0, 0, 0, 1); wordmarkFont:SetShadowOffset(1, -1)
-    end
-    return wordmarkFont
-end
-
+-- Cadre doré sur fond ROCHE natif (la tuile 256² des fenêtres Blizzard) — utilisé par le Toast et le
+-- socle des panneaux compagnons (Trade/Mail). Bordure UI-DialogBox-Gold-Border = art natif de dialogue.
 function Skin.SkinFrameBackdrop(f)
     if not f.SetBackdrop then Mixin(f, BackdropTemplateMixin) end
     f:SetBackdrop({
-        bgFile   = "Interface\\ChatFrame\\ChatFrameBackground",
+        bgFile   = "Interface\\FrameGeneral\\UI-Background-Rock",
         edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Gold-Border",
-        tile = true, tileSize = 16, edgeSize = 32,
+        tile = true, tileSize = 256, edgeSize = 32,
         insets = { left = 11, right = 12, top = 12, bottom = 11 },
     })
-    f:SetBackdropColor(Skin.color.panel[1], Skin.color.panel[2], Skin.color.panel[3], 1)
+    f:SetBackdropColor(1, 1, 1, 1)   -- la teinte MULTIPLIE la texture : blanc = roche telle quelle
     f:SetBackdropBorderColor(1, 1, 1, 1)
 end
 
+-- Puits encastré, look NATIF (équivalent backdrop d'InsetFrameTemplate — on ne peut pas ré-hériter un
+-- template sur une frame déjà créée, SkinWell recevant la frame de l'appelant). Bordure NEUTRE : le
+-- liseré doré « tavern » est retiré au profit du gris Blizzard, pour s'accorder au cadre natif.
+-- ⚠️ bgFile = ChatFrameBackground (PAS UI-Tooltip-Background, testé et rendu quasi TRANSPARENT sur les
+-- flyouts malgré l'alpha 0.90 demandé — vécu sur le dropdown métier de l'onglet Commande, cause exacte
+-- non identifiée mais reproductible). ChatFrameBackground est le bg solide déjà éprouvé par MakeBadge/
+-- l'ancien SkinFrameBackdrop dans cette codebase : s'en tenir à des textures dont l'opacité est vérifiée.
 function Skin.SkinWell(f)
     if not f.SetBackdrop then Mixin(f, BackdropTemplateMixin) end
     f:SetBackdrop({
@@ -363,8 +363,8 @@ function Skin.SkinWell(f)
         edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
         edgeSize = 12, insets = { left = 3, right = 3, top = 3, bottom = 3 },
     })
-    f:SetBackdropColor(Skin.color.void[1], Skin.color.void[2], Skin.color.void[3], 0.85)
-    f:SetBackdropBorderColor(Skin.color.goldOre[1], Skin.color.goldOre[2], Skin.color.goldOre[3], 0.7)
+    f:SetBackdropColor(0.05, 0.05, 0.06, 0.95)
+    f:SetBackdropBorderColor(0.50, 0.50, 0.50, 0.90)
 end
 
 function Skin.MakeSeparator(parent, offsetY)
@@ -375,45 +375,5 @@ function Skin.MakeSeparator(parent, offsetY)
     return sep
 end
 
--- Bouton or « maison » (échappe aux re-skins externes rouges). Expose SetText/SetSelected.
-function Skin.MakeGoldButton(parent, w, h, text, template)
-    local small = (h <= 16)
-    -- `template` optionnel : permet un bouton sécurisé ("SecureActionButtonTemplate") pour rediriger
-    -- un clic vers une fonction protégée de Blizzard (ex. DoCraft des enchantements).
-    local b = CreateFrame("Button", nil, parent, template and (template .. ", BackdropTemplate") or "BackdropTemplate")
-    b:SetSize(w, h)
-    b:SetBackdrop({
-        bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
-        edgeFile = "Interface\\Buttons\\WHITE8X8",
-        edgeSize = 1, insets = { left = 1, right = 1, top = 1, bottom = 1 },
-    })
-    local fs = b:CreateFontString(nil, "OVERLAY", small and "GameFontNormalSmall" or "GameFontNormal")
-    fs:SetPoint("CENTER"); Skin.ApplyShadow(fs)
-    if text then fs:SetText(text) end
-    b.text = fs
-    b.selected = false
-    b.SetText = function(self, t) self.text:SetText(t) end
-    b.GetFontString = function(self) return self.text end
-    local function rest(self)
-        if self.selected then
-            self:SetBackdropColor(unpackc(Skin.color.stoneHi))
-            self:SetBackdropBorderColor(unpackc(Skin.color.goldHi))
-            self.text:SetTextColor(unpackc(Skin.color.goldHi))
-        else
-            self:SetBackdropColor(unpackc(Skin.color.stone))
-            self:SetBackdropBorderColor(unpackc(Skin.color.border))
-            self.text:SetTextColor(unpackc(Skin.color.gold))
-        end
-    end
-    b.SetSelected = function(self, on) self.selected = on; rest(self) end
-    b:SetScript("OnEnter", function(self)
-        self:SetBackdropColor(unpackc(Skin.color.stoneHi))
-        self:SetBackdropBorderColor(unpackc(Skin.color.goldHi))
-        self.text:SetTextColor(unpackc(Skin.color.goldHi))
-    end)
-    b:SetScript("OnLeave", rest)
-    b:SetScript("OnMouseDown", function(self) self:SetBackdropColor(unpackc(Skin.color.void)) end)
-    b:SetScript("OnMouseUp", rest)
-    rest(b)
-    return b
-end
+-- (Les CONSTRUCTEURS de chrome natif — MakeGoldButton, MakeWindow, MakeTabs, MakeFlatRow,
+-- MakeIconButton — vivent dans CraftingOrderClassic_UI_Skin_Native.lua, même table `Skin`.)

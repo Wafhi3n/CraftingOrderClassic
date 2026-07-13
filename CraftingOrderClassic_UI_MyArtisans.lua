@@ -12,17 +12,9 @@ local L    = COC.L
 local PLH = 34    -- hauteur ligne métier (gauche)
 local RLH = 18    -- hauteur ligne recette (droite)
 
-local SEP   = 300
-local LW    = SEP - 14
-local RX    = SEP + 8
-local RW    = 818 - RX
+local M = UI.MYART   -- métriques dérivées de la SPEC — cf. _UI_MyArtisans_Layout.lua
 
 local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true) end
-local function sep1px(parent, x, y, w, h)
-    local s = parent:CreateTexture(nil, "ARTWORK")
-    s:SetColorTexture(Skin.color.separator[1], Skin.color.separator[2], Skin.color.separator[3], 0.5)
-    s:SetSize(w, h); s:SetPoint("TOPLEFT", x, y); return s
-end
 
 -- =========================================================================
 -- Construction
@@ -32,56 +24,74 @@ function UI:BuildMyArtisansTab(f)
     self.myArtisansPanel = panel
     self.myArtSelProf = nil
 
-    self:_BuildMyArtHeader(panel)          -- bandeau : activer le partage + choix de la vitrine
-    sep1px(panel, SEP, -110, 1, 466)
+    self:_BuildMyArtSections(panel)   -- bandeau + colonnes + filets : la SPEC (Layout)
+    self:_BuildMyArtHeader()          -- bandeau : activer le partage + choix de la vitrine
 
-    local lhdr = panel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    lhdr:SetPoint("TOPLEFT", 14, -108); lhdr:SetText(L["MÉTIERS DU COMPTE"])
-    lhdr:SetTextColor(Skin.unpack(Skin.color.textMuted))
-
-    -- « Tous les plans du royaume » : au-dessus de la liste des métiers, car c'est une ALTERNATIVE à
-    -- la sélection d'un métier (on sort du découpage par métier), pas une option de la vue de droite.
-    local allBtn = Skin.MakeGoldButton(panel, LW - 22, 20, L["Tous les plans du royaume"])
-    allBtn:SetPoint("TOPLEFT", 12, -124); self.myArtAllBtn = allBtn
+    -- « Tous les plans du royaume » (zone allRealm) : ALTERNATIVE à la sélection d'un métier
+    -- (on sort du découpage par métier), pas une option de la vue de droite.
+    local az = self:MyArtSec("allRealm")
+    local azw = az:GetWidth(); if azw <= 1 then azw = 300 end
+    local allBtn = Skin.MakeGoldButton(az, azw - 36, 20, L["Tous les plans du royaume"])
+    allBtn:SetPoint("LEFT", 12, 0); self.myArtAllBtn = allBtn
     allBtn:SetScript("OnClick", function()
         if not (COC.LazyGold and COC.LazyGold:IsAvailable()) then return end
         UI.myArtAllProfs = not UI.myArtAllProfs
         UI:RefreshMyArtisans()
     end)
 
-    local lscroll = CreateFrame("ScrollFrame", "COCMyArtProfScroll", panel, "UIPanelScrollFrameTemplate")
-    lscroll:SetPoint("TOPLEFT", 12, -150); lscroll:SetPoint("BOTTOMLEFT", 12, 22); lscroll:SetWidth(LW - 22)
-    local lc = CreateFrame("Frame", nil, lscroll); lc:SetSize(LW - 24, 10); lscroll:SetScrollChild(lc)
+    -- Liste des métiers du compte : largeur LUE sur la zone (−6 = scrollbar dans la gouttière).
+    local pz = self:MyArtSec("profsList")
+    local pw = pz:GetWidth(); if pw <= 1 then pw = M.LEFT_W end
+    self.myArtProfW = pw - 6
+    local lscroll = CreateFrame("ScrollFrame", "COCMyArtProfScroll", pz, "UIPanelScrollFrameTemplate")
+    lscroll:SetPoint("TOPLEFT", M.PAD, 0); lscroll:SetPoint("BOTTOMLEFT", M.PAD, M.PAD)
+    lscroll:SetWidth(self.myArtProfW)
+    local lc = CreateFrame("Frame", nil, lscroll); lc:SetSize(self.myArtProfW, 10); lscroll:SetScrollChild(lc)
     self.myArtProfContent = lc; self.myArtProfRows = {}
+    Skin.ScrollTrack("COCMyArtProfScroll")
 
-    local rhdr = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    rhdr:SetPoint("TOPLEFT", RX, -108); Skin.ApplyShadow(rhdr); self.myArtDetailHdr = rhdr
+    self:_BuildMyArtRight()   -- colonne recettes : bande d'outils + liste (ses zones)
+end
+
+-- Colonne recettes : bande d'outils (titre · Manquantes · Lazy Gold) + liste, dans leurs zones.
+function UI:_BuildMyArtRight()
+    local tz = self:MyArtSec("recTitle")
+    local rhdr = tz:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    rhdr:SetPoint("LEFT", 4, 0); Skin.ApplyShadow(rhdr); self.myArtDetailHdr = rhdr
 
     -- Bascule « recettes manquantes » : mêmes codes que la vue métier. Le manquant est calculé ICI à
     -- partir du catalogue CraftLink moins ce que le reroll connaît — surtout PAS via MTSL, dont les
     -- MISSING_SKILLS ne valent que pour le perso CONNECTÉ (faux pour un reroll).
     self.myArtMissing = false
-    local mBtn = Skin.MakeGoldButton(panel, 110, 18, "")
-    mBtn:SetPoint("TOPRIGHT", -30, -106); self.myArtMissBtn = mBtn
+    local bz = self:MyArtSec("recButtons")
+    local mBtn = Skin.MakeGoldButton(bz, 110, 18, "")
+    mBtn:SetPoint("RIGHT", -4, 0); self.myArtMissBtn = mBtn
     mBtn:SetScript("OnClick", function()
         UI.myArtMissing = not UI.myArtMissing
         UI:RefreshMyArtisans()
     end)
 
-    -- Barre Lazy Gold (pièce / « 123 » / « Tout le royaume »), à gauche du bouton Manquantes.
-    self:_BuildMyArtLGBar(panel, mBtn)
+    -- Barre Lazy Gold (pièce / « 123 »), à gauche du bouton Manquantes (même slot).
+    self:_BuildMyArtLGBar(bz, mBtn)
 
-    local rscroll = CreateFrame("ScrollFrame", "COCMyArtRecScroll", panel, "UIPanelScrollFrameTemplate")
-    rscroll:SetPoint("TOPLEFT", RX, -128); rscroll:SetPoint("BOTTOMRIGHT", -30, 22)
-    local rc = CreateFrame("Frame", nil, rscroll); rc:SetSize(RW - 24, 10); rscroll:SetScrollChild(rc)
+    -- Liste des recettes : largeur LUE sur la zone.
+    local rz = self:MyArtSec("recList")
+    local rw = rz:GetWidth(); if rw <= 1 then rw = M.WIDE_W end
+    self.myArtRecW = rw - 6
+    local rscroll = CreateFrame("ScrollFrame", "COCMyArtRecScroll", rz, "UIPanelScrollFrameTemplate")
+    rscroll:SetPoint("TOPLEFT", M.PAD, 0); rscroll:SetPoint("BOTTOMLEFT", M.PAD, M.PAD)
+    rscroll:SetWidth(self.myArtRecW)
+    local rc = CreateFrame("Frame", nil, rscroll); rc:SetSize(self.myArtRecW, 10); rscroll:SetScrollChild(rc)
     self.myArtRecContent = rc; self.myArtRecRows = {}
+    Skin.ScrollTrack("COCMyArtRecScroll")
 end
 
--- Bandeau haut : case à cocher opt-in « partager mes rerolls » (délègue à Dir:AltsCmd on/off, qui
--- gère défaut du main + annonce/dissolution) + bouton « Vitrine : Nom » ouvrant un flyout des persos
--- du compte pour choisir le perso principal. Toute la logique réseau/sécurité reste dans Directory_Alts.
-function UI:_BuildMyArtHeader(panel)
-    local chk = CreateFrame("Button", nil, panel); chk:SetPoint("TOPLEFT", 14, -74)
+-- Bandeau haut (zone « shareBar » de la SPEC, bande grise) : case à cocher opt-in « partager mes
+-- rerolls » dans son slot (LEFT → centrée), sélecteur « Vitrine » dans le sien (RIGHT). Toute la
+-- logique réseau/sécurité reste dans Directory_Alts. Le filet sous le bandeau vient du générateur.
+function UI:_BuildMyArtHeader()
+    local so = self:MyArtSec("shareOptIn")
+    local chk = CreateFrame("Button", nil, so); chk:SetPoint("LEFT", 14, 0)
     local box = Skin.MakeCheck(chk, 16); box:SetPoint("LEFT", 0, 0)
     local fs = chk:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     fs:SetPoint("LEFT", box, "RIGHT", 5, 0); fs:SetText(L["Partager mes rerolls sur le réseau"])
@@ -95,54 +105,30 @@ function UI:_BuildMyArtHeader(panel)
     end)
     self.myArtEnableBox = box
 
-    local mainBtn = Skin.MakeGoldButton(panel, 190, 20, "—"); mainBtn:SetPoint("TOPRIGHT", -30, -73)
-    mainBtn.text:ClearAllPoints(); mainBtn.text:SetPoint("LEFT", 8, 0); mainBtn.text:SetJustifyH("LEFT")
-    local arrow = mainBtn:CreateTexture(nil, "OVERLAY"); arrow:SetSize(14, 14)
-    arrow:SetPoint("RIGHT", -4, 0); arrow:SetTexture(Skin.tex.arrowDown)
-    mainBtn:SetScript("OnClick", function() UI:_ToggleMyArtMainFlyout() end)
-    self.myArtMainBtn = mainBtn
-
-    local fly = CreateFrame("Frame", "COCMyArtMainFlyout", UIParent, "BackdropTemplate")
-    fly:SetSize(190, 10); fly:SetFrameStrata("DIALOG"); fly:Hide(); Skin.SkinWell(fly)
-    self.myArtMainFlyout = fly; self.myArtMainFlyRows = {}
-    local closer = CreateFrame("Button", nil, UIParent)
-    closer:SetAllPoints(); closer:SetFrameStrata("DIALOG"); closer:Hide()
-    fly:SetFrameLevel(closer:GetFrameLevel() + 1)
-    closer:SetScript("OnClick", function() fly:Hide(); closer:Hide() end)
-    fly:SetScript("OnShow", function() closer:Show() end)
-    fly:SetScript("OnHide", function() closer:Hide() end)
-
-    sep1px(panel, 12, -100, 822, 1)
-end
-
--- Ouvre/ferme le flyout de choix du perso principal (vitrine). Liste = mes persos du royaume
--- (Dir:_MyAltNames) ; clic → Dir:AltsCmd("main X") (revalide que c'est bien un de mes persos).
-function UI:_ToggleMyArtMainFlyout()
-    local fly = self.myArtMainFlyout; if not fly then return end
-    if fly:IsShown() then fly:Hide(); return end
-    local D = COC.Directory
-    local names = (D and D._MyAltNames and D:_MyAltNames()) or {}
-    local n = 0
-    for _, nm in ipairs(names) do
-        n = n + 1
-        local row = self.myArtMainFlyRows[n]
-        if not row then
-            row = Skin.MakeGoldButton(fly, 182, 18, "")
-            row:SetPoint("TOPLEFT", 4, -4 - (n - 1) * 20)
-            row.text:ClearAllPoints(); row.text:SetPoint("LEFT", 6, 0); row.text:SetJustifyH("LEFT")
-            self.myArtMainFlyRows[n] = row
+    -- Vitrine : c'était un FAUX dropdown (bouton rouge + flèche collée à la main + flyout maison) alors
+    -- que c'est le cas d'école du vrai widget — UNE valeur (mon perso vitrine) parmi mes persos du
+    -- royaume. Passé au SÉLECTEUR NATIF (demande user 2026-07-12) : coche sur l'entrée active offerte.
+    -- La liste est une FONCTION : mes persos changent (nouveau reroll scanné) entre deux ouvertures.
+    local sc = self:MyArtSec("showcase")
+    self.myArtMainLbl = Skin.FieldLabel(sc, L["Vitrine"], 0, 0)
+    self.myArtMainLbl:ClearAllPoints()
+    local dd = Skin.MakeDropdown("COCMyArtMainDD", sc, 150, function()
+        local D = COC.Directory
+        local out = {}
+        for i, nm in ipairs((D and D._MyAltNames and D:_MyAltNames()) or {}) do
+            out[i] = { value = nm, text = nm }
         end
-        row:SetText(nm)
-        row:SetScript("OnClick", function()
-            if D and D.AltsCmd then D:AltsCmd("main " .. nm) end
-            fly:Hide(); UI:RefreshMyArtisans()
-        end)
-        row:Show()
-    end
-    for i = n + 1, #self.myArtMainFlyRows do self.myArtMainFlyRows[i]:Hide() end
-    if n == 0 then return end
-    fly:SetHeight(n * 20 + 8)
-    fly:ClearAllPoints(); fly:SetPoint("TOPRIGHT", self.myArtMainBtn, "BOTTOMRIGHT", 0, -2); fly:Show()
+        return out
+    end, {
+        onSelect = function(nm)
+            local D = COC.Directory
+            if D and D.AltsCmd then D:AltsCmd("main " .. nm) end   -- revalide que c'est bien un de mes persos
+            UI:RefreshMyArtisans()
+        end,
+    })
+    dd:SetPointVisual("RIGHT", sc, "RIGHT", -8, -2)
+    self.myArtMainLbl:SetPoint("RIGHT", dd, "LEFT", 8, -2)   -- +8/−2 : compense la marge de l'art du dropdown
+    self.myArtMainDD = dd
 end
 
 -- Recale le bandeau sur l'état réel (coche + libellé vitrine) — le bouton vitrine n'a de sens que
@@ -150,11 +136,12 @@ end
 function UI:_SyncMyArtHeader()
     local on = COC.db and COC.db.altsEnabled
     if self.myArtEnableBox then self.myArtEnableBox:SetChecked(on and true or false) end
-    if self.myArtMainBtn then
-        self.myArtMainBtn:SetShown(on and true or false)
-        self.myArtMainBtn:SetText(string.format(L["Vitrine : %s"], (COC.db and COC.db.altMain) or "?"))
+    -- La vitrine n'a de sens que si le partage est actif → dropdown ET sa légende masqués sinon.
+    if self.myArtMainDD then
+        self.myArtMainDD:SetShown(on and true or false)
+        self.myArtMainDD:SetValue((COC.db and COC.db.altMain) or "?")
     end
-    if not on and self.myArtMainFlyout then self.myArtMainFlyout:Hide() end
+    if self.myArtMainLbl then self.myArtMainLbl:SetShown(on and true or false) end
 end
 
 -- =========================================================================
@@ -163,16 +150,17 @@ end
 function UI:_MyArtProfRow(i)
     local r = self.myArtProfRows[i]; if r then return r end
     local lc = self.myArtProfContent
-    r = CreateFrame("Button", nil, lc); r:SetSize(LW - 24, PLH); r:SetPoint("TOPLEFT", 0, -(i - 1) * PLH)
+    local rw = self.myArtProfW or M.LEFT_W   -- largeur de la zone profsList (lue au build)
+    r = CreateFrame("Button", nil, lc); r:SetSize(rw, PLH); r:SetPoint("TOPLEFT", 0, -(i - 1) * PLH)
     local hi = r:CreateTexture(nil, "HIGHLIGHT"); hi:SetAllPoints(); hi:SetColorTexture(Skin.unpack(Skin.color.rowHover))
     local st = r:CreateTexture(nil, "BACKGROUND"); st:SetAllPoints()
     st:SetColorTexture(Skin.color.tabActive[1], Skin.color.tabActive[2], Skin.color.tabActive[3], 0.30)
     st:Hide(); r.selTex = st
     r.badge = Skin.MakeBadge(r, 22); r.badge:SetPoint("LEFT", 6, 0)
     r.name = r:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    r.name:SetPoint("TOPLEFT", 34, -5); r.name:SetWidth(LW - 70); r.name:SetJustifyH("LEFT"); Skin.ApplyShadow(r.name)
+    r.name:SetPoint("TOPLEFT", 34, -5); r.name:SetWidth(rw - 46); r.name:SetJustifyH("LEFT"); Skin.ApplyShadow(r.name)
     r.sub = r:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    r.sub:SetPoint("TOPLEFT", 34, -19); r.sub:SetWidth(LW - 70); r.sub:SetJustifyH("LEFT"); Skin.ApplyShadow(r.sub)
+    r.sub:SetPoint("TOPLEFT", 34, -19); r.sub:SetWidth(rw - 46); r.sub:SetJustifyH("LEFT"); Skin.ApplyShadow(r.sub)
     self.myArtProfRows[i] = r; return r
 end
 
@@ -203,7 +191,8 @@ end
 -- recette (icône + nom + niveau requis + porteurs), ou ligne de cooldown (icône horloge + label).
 function UI:_MyArtRecRow(i)
     local r = self.myArtRecRows[i]; if r then return r end
-    r = CreateFrame("Frame", nil, self.myArtRecContent); r:SetSize(RW - 24, RLH); r:SetPoint("TOPLEFT", 0, -(i - 1) * RLH)
+    local rw = self.myArtRecW or M.WIDE_W   -- largeur de la zone recList (lue au build)
+    r = CreateFrame("Frame", nil, self.myArtRecContent); r:SetSize(rw, RLH); r:SetPoint("TOPLEFT", 0, -(i - 1) * RLH)
     r.icon = r:CreateTexture(nil, "ARTWORK"); r.icon:SetSize(14, 14); r.icon:SetPoint("LEFT", 2, 0)
     r.icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
     r.name = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
@@ -223,7 +212,7 @@ end
 local function anchorName(row, x, reserve)
     row.name:ClearAllPoints()
     row.name:SetPoint("LEFT", x, 0)
-    row.name:SetWidth(math.max(20, RW - 24 - x - 126 - (reserve or 0)))
+    row.name:SetWidth(math.max(20, (UI.myArtRecW or M.WIDE_W) - x - 126 - (reserve or 0)))
 end
 
 -- Profit Lazy Gold d'une ligne (mémorisé le temps du refresh). Renvoie la largeur consommée, pour

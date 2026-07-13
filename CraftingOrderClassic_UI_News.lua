@@ -16,6 +16,13 @@ local BODY_W = 780
 local function versionsRecent()
     return {
         {
+            v = "v1.17.0", title = L["L'interface passe au style natif de WoW"],
+            lines = {
+                L["La fenêtre n'a plus son habillage doré maison : elle emprunte le cadre du jeu (barre de titre, portrait rond, onglets, boutons). Elle se fond dans l'interface au lieu de ressembler à un addon posé par-dessus, et rien n'a bougé de ce que tu connais."],
+                L["La vue métier est refaite, avec une colonne Commandes en liste : une ligne par commande (demandeur, objet voulu, prix), et le clic ouvre la carte complète (composants fournis, coût des réactifs, Accepter / Refuser / Chuchoter) avec une croix pour revenir à la liste. Et les sous-catégories de récolte (Peaux, Écailles, Herbes, Poissons) sont enfin traduites hors client français."],
+            },
+        },
+        {
             v = "v1.16.0", title = L["Recettes triées, et où est l'or"],
             lines = {
                 L["Fini le fourre-tout « Consommable » : les recettes sont regroupées par type (potions de soin, de mana, élixirs, flacons, transmutations…) et triées du plus haut niveau au plus bas. Une potion qui rend vie ET mana apparaît sous les deux. Le même classement s'applique partout — Commande, Mes artisans, et les métiers de récolte (minerais, herbes, cuirs, poissons)."],
@@ -57,6 +64,11 @@ local function versionsRecent()
                 L["|cFFFFFFFF/co channel off|r quitte maintenant vraiment le canal. Il se contentait d'empêcher de le rejoindre au login suivant : tes commandes continuaient de partir au royaume pendant toute la session."],
             },
         },
+    }
+end
+
+local function versionsOlder()
+    return {
         {
             v = "v1.11.0", title = L["Annuler une commande publique atteint tout le royaume"],
             lines = {
@@ -71,11 +83,6 @@ local function versionsRecent()
                 L["Sélectionner une recette pendant un combat ne provoque plus d'erreur bloquée : le bouton « Créer » est un bouton sécurisé, que le jeu interdit de masquer en plein combat. L'addon attend maintenant la fin du combat pour l'afficher ou le masquer."],
             },
         },
-    }
-end
-
-local function versionsOlder()
-    return {
         {
             v = "v1.12.0", title = L["Les recettes de la Saison de la Découverte"],
             lines = {

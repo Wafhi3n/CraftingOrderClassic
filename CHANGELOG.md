@@ -1,5 +1,20 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.17.0 — The window looks like WoW now
+
+The addon window used to wear its own gold-and-wood skin. It now borrows the game's own frame instead:
+the title bar, the round portrait, the tabs across the top, the buttons. It reads as part of the interface
+rather than something bolted on top, and nothing moved that you'd have to relearn.
+
+The profession window got the same treatment and a rebuilt orders column. Orders show as one line each
+now, the requester, the item they want and the price, so a busy profession fits on screen. Click a line
+and its full card fills the column, with the components they've supplied, what the reagents would cost you,
+and Accept / Decline / Whisper. The close button at the top takes you back to the list. The middle and
+right columns picked up proper footers, and the whole layout is driven by one description you can nudge.
+
+Fixed: the gathering sub-headings (Hides, Scales, Herbs, Fish) were stuck in French on a non-French client.
+They translate now, in English, German and Spanish.
+
 ## v1.16.0 — Sorted recipes, and where the gold is
 
 Vanilla's profession window puts every potion you know under one heading called "Consumable", in whatever

@@ -7,11 +7,8 @@ local UI   = COC.UI
 local Skin = UI.Skin
 local L    = COC.L
 
-local ARH    = 40              -- hauteur ligne artisan
-local ASEP   = 212             -- x séparateur sidebar/liste
-local ARX    = 220             -- x zone droite
-local AREDGE = 846
-local ARW    = AREDGE - ARX
+local ARH = 40              -- hauteur ligne artisan
+local A   = UI.ART          -- métriques dérivées de la SPEC — cf. _UI_Artisans_Layout.lua
 
 local SRC_TAG = { guild = L["GUILDE"], friend = L["AMIS"], added = L["AJOUTÉ"], recent = L["CROISÉ"], confed = L["CONFÉDÉRÉ"] }
 
@@ -80,25 +77,22 @@ function UI:BuildArtisansTab(f)
     self.artProfFilter = nil
     self.artPillsBuilt = false
 
-    local vs = panel:CreateTexture(nil, "ARTWORK")
-    vs:SetColorTexture(Skin.color.separator[1], Skin.color.separator[2], Skin.color.separator[3], 0.5)
-    vs:SetSize(1, 470); vs:SetPoint("TOPLEFT", ASEP, -78)
+    self:_BuildArtSections(panel)   -- blocs + filets + frontière sidebar│liste : la SPEC (Layout)
 
-    -- Sidebar : SOURCE
-    local srcHdr = panel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    srcHdr:SetPoint("TOPLEFT", 14, -80); srcHdr:SetText(L["SOURCE"])
+    -- Sidebar : SOURCE (en-tête + boutons de filtre empilés dans la zone « sources »)
+    local sz = self:ArtSec("sources")
+    local srcHdr = sz:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+    srcHdr:SetPoint("TOPLEFT", 14, -6); srcHdr:SetText(L["SOURCE"])
     srcHdr:SetTextColor(Skin.unpack(Skin.color.textMuted))
 
-    -- « Confédération » (confed) : bucket EN PLUS, masqué si GreenWall absent (cf. RefreshArtisans). Placé
-    -- en dernier → le masquer ne laisse aucun trou dans la sidebar.
-    -- « confed » reste EN DERNIER (masqué hors GreenWall → aucun trou). « muted » = panneau de gestion
-    -- des mis en sourdine (données = COC.db.mutedPlayers, pas le roster ; cf. UI_Artisans_Muted.lua).
+    -- « Confédération » (confed) : bucket EN PLUS, masqué si GreenWall absent (cf. RefreshArtisans),
+    -- EN DERNIER → le masquer ne laisse aucun trou. « muted » = panneau de gestion des mis en
+    -- sourdine (données = COC.db.mutedPlayers, pas le roster ; cf. UI_Artisans_Muted.lua).
     local srcDefs = { {id="all",label=L["Tous"]}, {id="guild",label=L["Guilde"]}, {id="friend",label=L["Amis"]}, {id="added",label=L["Ajoutés"]}, {id="recent",label=L["Annuaire"]}, {id="muted",label=L["En sourdine"]}, {id="confed",label=L["Confédération"]} }
     self.artSrcBtns = {}
     for i, d in ipairs(srcDefs) do
-        local b = Skin.MakeGoldButton(panel, 190, 28, d.label)
-        b:SetPoint("TOPLEFT", 12, -96 - (i - 1) * 32)
-        b.text:ClearAllPoints(); b.text:SetPoint("LEFT", 10, 0); b.text:SetJustifyH("LEFT")
+        local b = Skin.MakeFilterButton(sz, 190, 24, d.label)   -- bande de filtre style HdV (verrou doré, pas de bleu)
+        b:SetPoint("TOPLEFT", 12, -22 - (i - 1) * 26)
         local cnt = b:CreateFontString(nil, "OVERLAY", "GameFontNormal")
         cnt:SetPoint("RIGHT", -10, 0); Skin.ApplyShadow(cnt); b.count = cnt
         b:SetScript("OnClick", function() UI.artSource = d.id; UI:_RefreshArtSrcTabs(); UI:RefreshArtisans() end)
@@ -106,47 +100,53 @@ function UI:BuildArtisansTab(f)
     end
     self:_RefreshArtSrcTabs()
 
-    self:_BuildArtisanAddScan(panel)   -- ajout manuel d'un joueur + bouton « Scanner la faction »
+    self:_BuildArtisanAddScan(self:ArtSec("addPlayer"))   -- cluster bas de la sidebar (sa zone)
 
-    -- Zone droite : libellé Métier + pills (construits paresseusement), puis liste
-    self.artPillHdr = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    self.artPillHdr:SetPoint("TOPLEFT", ARX, -98); self.artPillHdr:SetText("|cFF888888" .. L["Métier :"] .. "|r"); Skin.ApplyShadow(self.artPillHdr)
+    -- Bande de filtre métier : libellé + pills (construits paresseusement dans la zone, cf. Icons)
+    local band = self:ArtSec("profFilter")
+    self.artPillHdr = band:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    self.artPillHdr:SetPoint("LEFT", A.PAD + 4, 0); self.artPillHdr:SetText("|cFF888888" .. L["Métier :"] .. "|r"); Skin.ApplyShadow(self.artPillHdr)
     self.artPills = {}
 
-    local ascroll = CreateFrame("ScrollFrame", "COCArtScroll", panel, "UIPanelScrollFrameTemplate")
-    ascroll:SetPoint("TOPLEFT", ARX, -150); ascroll:SetPoint("BOTTOMRIGHT", -42, 22)
-    -- Largeur < zone visible du scroll (sinon les lignes passent SOUS la scrollbar → boutons masqués).
-    local ac = CreateFrame("Frame", nil, ascroll); ac:SetSize(ARW - 54, 10); ascroll:SetScrollChild(ac)
+    -- Liste des artisans : largeur LUE sur la zone (SPEC pilote pad/gouttière ; −6 = la scrollbar
+    -- déborde dans la gouttière). Les lignes suivent (cf. _ArtRow).
+    local lz = self:ArtSec("artisansList")
+    local w = lz:GetWidth(); if w <= 1 then w = A.WIDE_W end
+    self.artListW = w - 6
+    local ascroll = CreateFrame("ScrollFrame", "COCArtScroll", lz, "UIPanelScrollFrameTemplate")
+    ascroll:SetPoint("TOPLEFT", A.PAD, 0); ascroll:SetPoint("BOTTOMLEFT", A.PAD, A.PAD)
+    ascroll:SetWidth(self.artListW)
+    local ac = CreateFrame("Frame", nil, ascroll); ac:SetSize(self.artListW, 10); ascroll:SetScrollChild(ac)
     self.artScroll = ascroll; self.artListContent = ac; self.artListRows = {}
+    Skin.ScrollTrack("COCArtScroll")   -- rail sombre derrière la scrollbar (iso Commande/Récolte)
 
-    if self._BuildMutedList then self:_BuildMutedList(panel) end   -- panneau « En sourdine » (superposé, caché)
+    if self._BuildMutedList then self:_BuildMutedList() end   -- panneau « En sourdine » (superposé aux zones, caché)
 end
 
--- Cluster bas-gauche « remplir l'annuaire » : champ d'ajout manuel + bouton « Scanner la faction »
--- (brique Dead Faction : /who recense les EN LIGNE et pingue chaque nom en HELLO → les porteurs
--- remontent dans l'Annuaire ; UNE tranche par clic car SendWho = hardware event, cf. Directory_WhoScan).
-function UI:_BuildArtisanAddScan(panel)
-    local addHdr = panel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    addHdr:SetPoint("BOTTOMLEFT", 14, 86); addHdr:SetText(L["AJOUTER UN JOUEUR"])
+-- Cluster « remplir l'annuaire » (zone « addPlayer » de la SPEC, en bas de sidebar) : champ d'ajout
+-- manuel + « Rafraîchir l'annuaire » + toggle de repérage — offsets RELATIFS au bas de la zone.
+function UI:_BuildArtisanAddScan(sec)
+    local addHdr = sec:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+    addHdr:SetPoint("BOTTOMLEFT", 14, 66); addHdr:SetText(L["AJOUTER UN JOUEUR"])
     addHdr:SetTextColor(Skin.unpack(Skin.color.textMuted))
-    local addBox = CreateFrame("EditBox", nil, panel, "InputBoxTemplate")
-    addBox:SetSize(150, 20); addBox:SetPoint("BOTTOMLEFT", 16, 60); addBox:SetAutoFocus(false)
+    local addBox = CreateFrame("EditBox", nil, sec, "InputBoxTemplate")
+    addBox:SetSize(150, 20); addBox:SetPoint("BOTTOMLEFT", 16, 40); addBox:SetAutoFocus(false)
     addBox:SetScript("OnEscapePressed", function(b) b:ClearFocus() end)
     addBox:SetScript("OnEnterPressed", function(b) UI:_AddArtisan(b:GetText()); b:SetText(""); b:ClearFocus() end)
-    local ghost = panel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+    local ghost = sec:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
     ghost:SetPoint("LEFT", addBox, "LEFT", 4, 0); ghost:SetText(L["Nom du personnage"])
     addBox:SetScript("OnTextChanged", function(b) ghost:SetShown(b:GetText() == "") end)
-    local addBtn = Skin.MakeGoldButton(panel, 26, 20, "+")
+    local addBtn = Skin.MakeGoldButton(sec, 26, 20, "+")
     addBtn:SetPoint("LEFT", addBox, "RIGHT", 6, 0)
     addBtn:SetScript("OnClick", function() UI:_AddArtisan(addBox:GetText()); addBox:SetText("") end)
 
-    local refreshBtn = Skin.MakeGoldButton(panel, 190, 24, L["Rafraîchir l'annuaire"])
-    refreshBtn:SetPoint("BOTTOMLEFT", 16, 112)
+    local refreshBtn = Skin.MakeGoldButton(sec, 190, 24, L["Rafraîchir l'annuaire"])
+    refreshBtn:SetPoint("BOTTOMLEFT", 16, 92)
     refreshBtn:SetScript("OnClick", function() UI:_RefreshDirectory() end)
     self.artRefreshBtn = refreshBtn
 
     -- Toggle « détecter les crafteurs autour » (opt-in, en ville only) — cf. Directory_LootScan.
-    self.artScanChk = makeToggle(panel, 16, 36, L["Repérer les crafteurs autour (en ville)"],
+    self.artScanChk = makeToggle(sec, 16, 16, L["Repérer les crafteurs autour (en ville)"],
         function() return COC.Directory and COC.Directory:CrafterScanEnabled() end,
         function(nv) if COC.Directory then COC.Directory:SetCrafterScan(nv) end end)
 end
@@ -223,7 +223,7 @@ end
 -- =========================================================================
 function UI:RefreshArtisans()
     local panel = self.artisansPanel; if not panel then return end
-    if not self.artPillsBuilt then self:_BuildArtPills(panel); self.artPillsBuilt = true end
+    if not self.artPillsBuilt then self:_BuildArtPills(); self.artPillsBuilt = true end
     self:_SyncCrafterScanChk()
     local D = COC.Directory
     self:_SyncConfedTab()   -- montre/masque le bucket « Confédération » selon GreenWall (display-only)
@@ -357,15 +357,16 @@ end
 
 function UI:_ArtRow(i)
     local r = self.artListRows[i]; if r then return r end
-    r = CreateFrame("Button", nil, self.artListContent); r:SetSize(ARW - 54, ARH); r:SetPoint("TOPLEFT", 0, -(i - 1) * ARH)
-    local hi = r:CreateTexture(nil, "HIGHLIGHT"); hi:SetAllPoints(); hi:SetColorTexture(Skin.unpack(Skin.color.rowHover))
+    local rw = self.artListW or A.WIDE_W   -- largeur de la zone artisansList (lue au build)
+    r = CreateFrame("Button", nil, self.artListContent); r:SetSize(rw, ARH); r:SetPoint("TOPLEFT", 0, -(i - 1) * ARH)
+    Skin.PersonHighlight(r)   -- surbrillance bleue native (liste d'Amis) — homogène avec Commande/Récolte
     r.dot   = Skin.MakeStatusIcon(r, 14); r.dot:SetPoint("LEFT", 6, 0)
     r.name  = r:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     r.name:SetPoint("TOPLEFT", 22, -5); r.name:SetWidth(150); r.name:SetJustifyH("LEFT"); Skin.ApplyShadow(r.name)
     r.sub   = r:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
     r.sub:SetPoint("TOPLEFT", 22, -22); r.sub:SetWidth(150); r.sub:SetJustifyH("LEFT"); Skin.ApplyShadow(r.sub)
     r.profsFrame = CreateFrame("Frame", nil, r)
-    r.profsFrame:SetPoint("LEFT", 180, 0); r.profsFrame:SetSize(ARW - 360, ARH)   -- resserré : place à l'étoile partenaire
+    r.profsFrame:SetPoint("LEFT", 180, 0); r.profsFrame:SetSize(rw - 306, ARH)   -- resserré : place à l'étoile partenaire
     r.profIconPool = {}
     r.src   = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall"); r.src:SetPoint("RIGHT", -116, 0); Skin.ApplyShadow(r.src)
     -- Toggle « Partenaire » (drapeau explicite priorisé dans l'alerte de don) : icône pleine = partenaire,

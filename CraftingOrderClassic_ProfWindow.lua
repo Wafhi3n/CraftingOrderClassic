@@ -16,10 +16,11 @@ COC.ProfWindow = PW
 
 local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true) end
 
-PW.FRAME_W, PW.FRAME_H = 792, 500
+PW.FRAME_W, PW.FRAME_H = 792, 500   -- FRAME_W = repli : SURCHARGÉ par la SPEC (x2 + 10, cf. _Layout)
 PW.HEADER_H = 56
-PW.COL_W = { 236, 252, 252 }
-PW.GAP, PW.PAD = 10, 14
+PW.PAD = 14
+-- (Colonnes : SPEC déclarative dans _ProfWindow_Layout.lua — zones via PW:Sec(id), frontières
+--  verticales posées par le générateur. Les ex-COL_W/GAP vivent dans la SPEC.)
 
 local GATHER = { Mining = true, Herbalism = true, Skinning = true, Fishing = true }
 
@@ -63,28 +64,22 @@ function PW:RestoreNative() restore(_G.TradeSkillFrame, "trade"); restore(_G.Cra
 -- Construction du shell
 -- ------------------------------------------------------------------
 function PW:_BuildHeader(f)
-    local mark = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    mark:SetPoint("TOPLEFT", 14, -12); mark:SetText("Crafting Order")
-    mark:SetTextColor(Skin.unpack(Skin.color.goldOre)); Skin.ApplyShadow(mark)
+    -- Titre = la barre native (f.TitleText, alimentée via self.titleFS). L'ancien wordmark « Crafting
+    -- Order » du coin est retiré (portrait + titre portent l'identité).
+    self.titleFS = f.TitleText
 
-    local title = f:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
-    title:SetPoint("TOP", 0, -12); title:SetTextColor(Skin.unpack(Skin.color.goldHi)); Skin.ApplyShadow(title)
-    self.titleFS = title
-
-    local rank = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    rank:SetPoint("TOP", title, "BOTTOM", 0, -2); rank:SetTextColor(Skin.unpack(Skin.color.text))
-    Skin.ApplyShadow(rank); self.rankFS = rank
-
+    -- Rangée de contrôles SOUS la barre de titre (y −28..−48, HEADER_H = 56 inchangé). À gauche, x = 64 :
+    -- le médaillon du portrait déborde dans le cadre (~58 px de large jusqu'à y ≈ −53) → on le contourne.
     local vanilla = Skin.MakeGoldButton(f, 96, 20, L["Vue Blizzard"])
-    vanilla:SetPoint("TOPRIGHT", -36, -12)
+    vanilla:SetPoint("TOPRIGHT", -24, -1 )
     vanilla:SetScript("OnClick", function() PW:SetEnabled(false) end)
     self.vanillaBtn = vanilla
 
     -- Toggle « Manquantes » : bascule la liste de gauche entre les recettes APPRISES (défaut) et celles
     -- qui MANQUENT au perso, avec leur source (formateur/butin/quête…). Alimenté par le pont MTSL ;
     -- masqué si l'addon n'est pas là (dépendance molle) et hors mode plein (n'a de sens que sur ton métier).
-    local missing = Skin.MakeGoldButton(f, 110, 18, L["Manquantes"])
-    missing:SetPoint("TOPRIGHT", vanilla, "BOTTOMRIGHT", 0, -4)
+    local missing = Skin.MakeGoldButton(f, 110, 20, L["Manquantes"])
+    missing:SetPoint("RIGHT", vanilla, "LEFT", 0, 0)
     missing:SetScript("OnClick", function() PW:_ToggleMissing() end)
     missing:SetScript("OnEnter", function(b)
         GameTooltip:SetOwner(b, "ANCHOR_BOTTOMLEFT")
@@ -99,7 +94,7 @@ function PW:_BuildHeader(f)
     -- Toggle « Chercher du travail » (LFW) : signale au royaume que tu cherches du travail dans le métier
     -- OUVERT (donc forcément le tien). Masqué hors vue pleine (reroll/compact = pas ton perso courant).
     local lfw = Skin.MakeGoldButton(f, 150, 18, L["Chercher du travail"])
-    lfw:SetPoint("TOPLEFT", 12, -32)
+    lfw:SetPoint("TOPLEFT", 56, -1)
     lfw:SetScript("OnClick", function() PW:_ToggleLFW() end)
     lfw:SetScript("OnEnter", function(b)
         local D = COC.Directory; local on = D and D.MyLFW and D:MyLFW() == PW.profKey
@@ -112,15 +107,22 @@ function PW:_BuildHeader(f)
     lfw:Hide()   -- caché jusqu'au 1er _SyncLFWBtn (évite un flash en vue reroll/compact)
     self.lfwBtn = lfw
 
-    local close = CreateFrame("Button", nil, f, "UIPanelCloseButton")
-    close:SetPoint("TOPRIGHT", -6, -6)
-    close:SetScript("OnClick", function()
-        if PW.docked then PW:CloseDock(); return end   -- dock : referme juste le panneau, garde la native ouverte
-        if COC.Craft and COC.Craft:IsCraftOpen() then if CloseCraft then CloseCraft() end
-        elseif CloseTradeSkill then CloseTradeSkill() end
-        PW:Hide()
-    end)
+    -- (Bouton fermer : le natif de MakeWindow porte la logique dock/CloseCraft via opts.onClose.)
     Skin.MakeSeparator(f, -(self.HEADER_H - 2))
+end
+
+-- Le médaillon suit le métier affiché (icônes de sort 64×64 → chemin heureux de SetWindowPortrait).
+function PW:_SyncPortrait()
+    Skin.SetWindowPortrait(self.frame, Skin.ProfIcon(self.profKey) or Skin.tex.scroll)
+end
+
+-- ⚠️ Titre + rang dans UNE SEULE chaîne (jamais deux FontStrings séparées). `f.TitleText` natif a ses
+-- ancres LEFT/RIGHT FIXÉES sur le CADRE (PortraitFrameTemplate : x=60 / x=-60), pas sur l'étendue
+-- réelle du texte affiché — ancrer un 2ᵉ FontString sur son bord RIGHT le colle donc TOUJOURS près du
+-- bouton fermer, quelle que soit la longueur du titre (vécu : « 250 » collé au X). En les fusionnant,
+-- le rang hérite du centrage natif du titre et suit son étendue réelle.
+function PW:_SetTitle(label, suffix)
+    self.titleFS:SetText(suffix and (label .. "  " .. suffix) or label)
 end
 
 -- Bascule mon statut LFW pour le métier OUVERT (mien). Ignoré hors vue pleine (reroll = pas mon perso).
@@ -165,44 +167,28 @@ function PW:_SyncLFWBtn()
     if show then b:SetSelected(D.MyLFW and D:MyLFW() == self.profKey and true or false) end
 end
 
-function PW:_BuildColumn(f, width, leftAnchor)
-    local col = CreateFrame("Frame", nil, f)
-    col:SetWidth(width)
-    -- y = -HEADER_H UNIQUEMENT pour la 1re colonne (ancrée à la frame, sous l'en-tête). Les colonnes
-    -- suivantes s'ancrent au bord droit de la précédente (déjà sous l'en-tête) avec y = 0 : sinon
-    -- chaque colonne descend d'un cran (effet « escalier » → la colonne Commandes finissait 2×HEADER_H
-    -- trop bas, d'où l'impression de tailles différentes).
-    col:SetPoint("TOPLEFT", leftAnchor.frame, leftAnchor.point, leftAnchor.x, leftAnchor.y or 0)
-    col:SetPoint("BOTTOM", f, "BOTTOM", 0, self.PAD)
-    if Skin.SkinWell then Skin.SkinWell(col) end
-    return col
-end
-
 function PW:Build()
     if self.frame then return end
-    local f = CreateFrame("Frame", "CraftingOrderProfWindow", UIParent, "BackdropTemplate")
-    f:SetSize(self.FRAME_W, self.FRAME_H)
-    local pos = COC.db and COC.db.profWinPos               -- position persistée (drag) ou centre par défaut
-    if pos then f:SetPoint(pos[1], UIParent, pos[2], pos[3], pos[4]) else f:SetPoint("CENTER") end
-    f:SetMovable(true); f:EnableMouse(true); f:RegisterForDrag("LeftButton")
-    f:SetScript("OnDragStart", f.StartMoving)
-    f:SetScript("OnDragStop", function(fr)
-        fr:StopMovingOrSizing()
-        local p, _, rp, x, y = fr:GetPoint()
-        if COC.db then COC.db.profWinPos = { p, rp, x, y } end
-    end)
-    f:SetClampedToScreen(true); f:SetFrameStrata("HIGH")
-    -- Empilement propre avec la fenêtre principale (même strata) : un clic la remonte AU-DESSUS d'un
-    -- bloc, et Raise à l'ouverture met la dernière ouverte devant. Cf. CraftingOrderClassicWindow.
-    f:SetToplevel(true)
-    f:SetScript("OnShow", function(fr) fr:Raise() end)
-    Skin.SkinFrameBackdrop(f); f:Hide()
+    -- Chrome Blizzard natif via le kit (drag + clamp + strata + SetToplevel/Raise gérés là-bas).
+    -- Le bouton fermer natif porte NOTRE logique : dock → on referme juste le panneau (la native reste
+    -- ouverte) ; sinon on ferme la session de craft native avec la fenêtre.
+    local f = Skin.MakeWindow("CraftingOrderProfWindow", self.FRAME_W, self.FRAME_H, {
+        pos = COC.db and COC.db.profWinPos,                -- position persistée (drag) ou centre par défaut
+        onMoved = function(p, rp, x, y) if COC.db then COC.db.profWinPos = { p, rp, x, y } end end,
+        onClose = function()
+            if PW.docked then PW:CloseDock(); return end
+            if COC.Craft and COC.Craft:IsCraftOpen() then if CloseCraft then CloseCraft() end
+            elseif CloseTradeSkill then CloseTradeSkill() end
+            PW:Hide()
+        end,
+    })
     self.frame = f
     self:_BuildHeader(f)
 
-    local recCol = self:_BuildColumn(f, self.COL_W[1], { frame = f,      point = "TOPLEFT",  x = self.PAD, y = -self.HEADER_H })
-    local detCol = self:_BuildColumn(f, self.COL_W[2], { frame = recCol, point = "TOPRIGHT", x = self.GAP })
-    local ordCol = self:_BuildColumn(f, self.COL_W[3], { frame = detCol, point = "TOPRIGHT", x = self.GAP })
+    -- Colonnes = zones de la SPEC (cf. _ProfWindow_Layout.lua) : une surface, frontières calculées —
+    -- plus de puits par colonne ni d'ancrages en chaîne (l'« escalier » est impossible par construction).
+    self:_BuildSections(f)
+    local recCol, detCol, ordCol = self:Sec("recipes"), self:Sec("detail"), self:Sec("orders")
     self.recCol, self.detCol, self.ordCol = recCol, detCol, ordCol
 
     if self._BuildRecipes then self:_BuildRecipes(recCol) end
@@ -289,9 +275,9 @@ function PW:_RefreshDock()
     local name = craft and craft:GetOpenProfessionInfo()
     if not name then self:CloseDock(); return end
     self.profKey = craft:OpenProfessionKey()
-    self.titleFS:SetText(name)
     local rank, maxRank = craft:OpenRank()
-    self.rankFS:SetText((rank and maxRank) and string.format("|cFFE8B84B%d|r / %d", rank, maxRank) or "")
+    self:_SetTitle(name, (rank and maxRank) and string.format("|cFFE8B84B%d|r / %d", rank, maxRank) or nil)
+    self:_SyncPortrait()
     self:_SyncLFWBtn()
     self:_SyncMissingBtn()
     if self.RefreshOrders then self:RefreshOrders() end
@@ -312,57 +298,62 @@ function PW:_DoRefresh()
     if name then                                   -- mode PLEIN : fenêtre métier native ouverte
         self.rerollKey = nil                        -- la native prime sur une vue reroll résiduelle
         self.profKey = craft:OpenProfessionKey()
-        self.titleFS:SetText(name)
         local rank, maxRank = craft:OpenRank()
-        self.rankFS:SetText((rank and maxRank) and string.format("|cFFE8B84B%d|r / %d", rank, maxRank) or "")
+        self:_SetTitle(name, (rank and maxRank) and string.format("|cFFE8B84B%d|r / %d", rank, maxRank) or nil)
         self.recipes = craft:ReadRecipes() or {}
         self:_ApplyMode(false)
         if self.RefreshRecipes then self:RefreshRecipes() end
         if self.RefreshDetail  then self:RefreshDetail()  end
     elseif self.rerollKey then                     -- mode REROLL : lecture seule, recettes depuis le cache
         self.profKey = self.standaloneKey
-        self.titleFS:SetText(Skin.ProfLabel(self.profKey) .. "  |cFF888888"
-            .. string.format(L["%s — lecture seule"], self.rerollName or "?") .. "|r")
+        local label = Skin.ProfLabel(self.profKey) .. "  |cFF888888"
+            .. string.format(L["%s — lecture seule"], self.rerollName or "?") .. "|r"
         local mc = COC.db and COC.db.mySkillsByChar and COC.db.mySkillsByChar[self.rerollKey]
         local sk = mc and mc[self.profKey]
-        self.rankFS:SetText(sk and string.format("|cFFE8B84B%d|r / %d", sk[1], sk[2]) or "|cFF888888?|r")
+        self:_SetTitle(label, sk and string.format("|cFFE8B84B%d|r / %d", sk[1], sk[2]) or "|cFF888888?|r")
         self.recipes = self:_RerollRecipeList()
         self:_ApplyMode(false)
         if self.RefreshRecipes then self:RefreshRecipes() end
         if self.RefreshDetail  then self:RefreshDetail()  end
     elseif self.standaloneKey then                 -- mode COMPACT : ouvert par clé (récolte / menu minimap)
         self.profKey = self.standaloneKey
-        self.titleFS:SetText(Skin.ProfLabel(self.profKey))
         local D = COC.Directory; local sk = D and D.mySkills and D.mySkills[self.profKey]
-        self.rankFS:SetText(sk and string.format("|cFFE8B84B%d|r / %d", sk[1], sk[2]) or "")
+        self:_SetTitle(Skin.ProfLabel(self.profKey),
+            sk and string.format("|cFFE8B84B%d|r / %d", sk[1], sk[2]) or nil)
         self:_ApplyMode(true)
     else
         return
     end
+    self:_SyncPortrait()
     self:_SyncLFWBtn()
     self:_SyncMissingBtn()
     if self.RefreshOrders then self:RefreshOrders() end
 end
 
 -- Bascule PLEIN (3 colonnes, fenêtre native) ↔ COMPACT (colonne Commandes seule, ouvert par clé).
+-- Compact : on masque le PANNEAU de sections (colonnes + frontières dessinées) et on RE-PARENTE la
+-- zone Commandes sur la fenêtre rétrécie — une zone est une frame ordinaire, son contenu la suit.
+-- Retour plein : la zone regagne sa place SPEC via les constantes ORD_* dérivées (Layout).
 function PW:_ApplyMode(compact)
     if self._compact == compact then return end
     self._compact = compact
-    if self.recCol then self.recCol:SetShown(not compact) end
-    if self.detCol then self.detCol:SetShown(not compact) end
+    if self._PlaceOrdTabs then self:_PlaceOrdTabs(compact) end   -- onglets de relation : suivent le mode
     self.ordCol:ClearAllPoints()
     if compact then
         self.frame:SetWidth(300)
-        self.ordCol:SetPoint("TOPLEFT", self.frame, "TOPLEFT", self.PAD, -self.HEADER_H)
+        if self.secPanel then self.secPanel:Hide() end
+        self.ordCol:SetParent(self.frame)
+        -- Même bande d'onglets qu'en vue pleine : 60 = sommet du marbre, ORD_TOP (négatif) = la bande.
+        self.ordCol:SetPoint("TOPLEFT", self.frame, "TOPLEFT", self.PAD, -(60 - PW.ORD_TOP))
         self.ordCol:SetPoint("BOTTOM", self.frame, "BOTTOM", 0, self.PAD)
         self.ordCol:SetWidth(300 - 2 * self.PAD)
     else
-        -- Même ancrage que _BuildColumn pour la colonne Commandes : sous l'en-tête, au bord droit de
-        -- la colonne Détail (y = 0, PAS de double offset d'en-tête → fini l'escalier).
         self.frame:SetWidth(self.FRAME_W)
-        self.ordCol:SetPoint("TOPLEFT", self.detCol, "TOPRIGHT", self.GAP, 0)
-        self.ordCol:SetPoint("BOTTOM", self.frame, "BOTTOM", 0, self.PAD)
-        self.ordCol:SetWidth(self.COL_W[3])
+        if self.secPanel then self.secPanel:Show() end
+        self.ordCol:SetParent(self.secPanel)
+        self.ordCol:SetPoint("TOPLEFT", self.secPanel, "TOPLEFT", PW.ORD_X, PW.ORD_TOP)
+        self.ordCol:SetPoint("BOTTOMLEFT", self.secPanel, "BOTTOMLEFT", PW.ORD_X, PW.ORD_BOTTOM)
+        self.ordCol:SetWidth(PW.ORD_W)
     end
 end
 

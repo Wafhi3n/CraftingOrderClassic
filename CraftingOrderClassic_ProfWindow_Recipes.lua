@@ -2,21 +2,23 @@
 -- (scroll), recherche, couleur par difficulté, sélection, badge « demandé » (nb de commandes
 -- ouvertes pour l'objet). Port de TradeScanner_ProfWindow_Recipes.lua adapté à COC.Craft.
 
-local COC = CraftingOrderClassic
-local PW  = COC.ProfWindow
-local L   = COC.L
+local COC  = CraftingOrderClassic
+local PW   = COC.ProfWindow
+local Skin = COC.UI.Skin
+local L    = COC.L
 
 -- ROW_H = hauteur d'une ligne ; VISIBLE = taille du POOL de lignes physiques réutilisées.
 -- INVARIANT : VISIBLE doit être ≥ au nb de lignes que le viewport peut afficher, sinon les
 -- derniers items sont INatteignables (le scroll max = n - viewportRows ; le plus grand index
 -- rendu = maxOff + VISIBLE ; s'il est < n, la queue de liste ne s'affiche jamais).
--- Viewport recettes ≈ 398 px (col 430 - 26 haut - 6 bas) / 16 ≈ 25 lignes → 26 avec marge.
+-- Viewport recettes = zone recList ≈ 352 px (col 402 − 24 recHeader − 26 recFilters) / 16 ≈ 22
+-- lignes → 26 garde une marge confortable. RE-VÉRIFIER si les h de la SPEC recettes grossissent.
 -- (bug 2026-07-01 : à 23, Bolt of Woolen/Linen Cloth manquaient en bas de la Couture.)
 local ROW_H, VISIBLE = 16, 26
 
 function PW:_BuildRecipeRow(parent, i)
     local row = CreateFrame("Button", nil, parent)
-    row:SetSize(196, ROW_H); row:SetPoint("TOPLEFT", 0, -(i - 1) * ROW_H)
+    row:SetSize(self.recListW or 196, ROW_H); row:SetPoint("TOPLEFT", 0, -(i - 1) * ROW_H)
     local sel = row:CreateTexture(nil, "BACKGROUND"); sel:SetAllPoints()
     sel:SetColorTexture(0.91, 0.72, 0.29, 0.22); sel:Hide(); row.sel = sel
     local hi = row:CreateTexture(nil, "HIGHLIGHT"); hi:SetAllPoints(); hi:SetColorTexture(0.25, 0.45, 0.85, 0.25)
@@ -60,13 +62,22 @@ local function makeToolBtn(col, tipFn, onClick)
     return b
 end
 
+-- Zones SPEC de la colonne (cf. _ProfWindow_Layout.lua) : recHeader (bande titre) / recFilters en
+-- SLOTS (recTools = boutons Lazy Gold, recSearch = la recherche REMPLIT son slot) / recList +
+-- recGutter (scrollbar). Ancres LEFT/RIGHT dans les bandes = centrage vertical gratuit ; largeur de
+-- liste MESURÉE sur la zone.
 function PW:_BuildRecipes(col)
-    local hdr = col:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    hdr:SetPoint("TOPLEFT", 8, -6); hdr:SetText("|cFFE8B84B" .. L["Recettes"] .. "|r")
+    local hz = self:Sec("recHeader") or col
+    local tz = self:Sec("recTools") or self:Sec("recFilters") or col
+    local sz = self:Sec("recSearch") or self:Sec("recFilters") or col
+    local hdr = hz:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    hdr:SetPoint("LEFT", 8, 0); hdr:SetText("|cFFE8B84B" .. L["Recettes"] .. "|r")
     self.recHdr = hdr
 
-    local search = CreateFrame("EditBox", nil, col, "InputBoxTemplate")
-    search:SetSize(92, 16); search:SetPoint("TOPRIGHT", -10, -6); search:SetAutoFocus(false)
+    -- 8 px à gauche : l'art d'InputBoxTemplate déborde de ~5 px avant le rect de saisie.
+    local search = CreateFrame("EditBox", nil, sz, "InputBoxTemplate")
+    search:SetHeight(16); search:SetPoint("LEFT", 8, 0); search:SetPoint("RIGHT", -10, 0)
+    search:SetAutoFocus(false)
     search:SetScript("OnTextChanged", function(b) PW.recipeSearch = (b:GetText() or ""):lower(); PW:RefreshRecipes() end)
     search:SetScript("OnEscapePressed", function(b) b:SetText(""); b:ClearFocus() end)
     self.recipeSearchBox = search
@@ -75,28 +86,34 @@ function PW:_BuildRecipes(col)
     -- n'est pas installé (cf. _SyncSortHeader) : ni tri ni valeurs sans données de prix.
     --   pièce d'or  → tri par rentabilité : liste à PLAT du plus rentable au moins (plus de catégories)
     --   « 123 »     → valeurs EXACTES (po/pa/pc) au lieu de l'indicateur compact en paliers de pièces
-    local sortBtn = makeToolBtn(col, function()
+    local sortBtn = makeToolBtn(tz, function()
         return PW.recipeSortProfit and L["Tri par rentabilité — clic pour A-Z."]
             or L["Trier par rentabilité (Lazy Gold)."]
     end, function() PW:_ToggleRecipeSort() end)
-    sortBtn:SetPoint("RIGHT", search, "LEFT", -6, 0)
+    sortBtn:SetPoint("LEFT", 24, 0)
     local coin = sortBtn:CreateTexture(nil, "ARTWORK")
     coin:SetTexture("Interface\\MoneyFrame\\UI-GoldIcon"); coin:SetSize(14, 14); coin:SetPoint("CENTER")
     sortBtn.coin = coin
     self.recSortBtn = sortBtn
 
-    local exactBtn = makeToolBtn(col, function()
+    local exactBtn = makeToolBtn(tz, function()
         return (COC.LazyGold and COC.LazyGold:ExactMode()) and L["Valeurs exactes — clic pour l'affichage compact."]
             or L["Afficher les valeurs exactes (po/pa/pc)."]
     end, function() PW:_ToggleProfitExact() end)
-    exactBtn:SetPoint("RIGHT", sortBtn, "LEFT", -2, 0)
+    exactBtn:SetPoint("LEFT", 2, 0)
     local num = exactBtn:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
     num:SetPoint("CENTER"); num:SetText("123"); exactBtn.num = num
     self.recExactBtn = exactBtn
 
-    local scroll = CreateFrame("ScrollFrame", "CraftingOrderProfWinRecScroll", col, "UIPanelScrollFrameTemplate")
-    scroll:SetPoint("TOPLEFT", 6, -26); scroll:SetPoint("BOTTOMRIGHT", -24, 6)
-    local content = CreateFrame("Frame", nil, scroll); content:SetSize(196, VISIBLE * ROW_H); scroll:SetScrollChild(content)
+    -- Liste dans sa zone, scrollbar dans la gouttière (le −6 laisse respirer le bord, la barre
+    -- déborde dans les 22 px de recGutter — même patron que toutes les listes converties).
+    local lz = self:Sec("recList") or col
+    local w = lz:GetWidth()
+    self.recListW = ((w and w > 0) and w or 218) - 6
+    local scroll = CreateFrame("ScrollFrame", "CraftingOrderProfWinRecScroll", lz, "UIPanelScrollFrameTemplate")
+    scroll:SetPoint("TOPLEFT", 6, 0); scroll:SetPoint("BOTTOMRIGHT", 0, 0)
+    Skin.ScrollTrack("CraftingOrderProfWinRecScroll")
+    local content = CreateFrame("Frame", nil, scroll); content:SetSize(self.recListW, VISIBLE * ROW_H); scroll:SetScrollChild(content)
     scroll:HookScript("OnVerticalScroll", function() PW:RenderRecipes() end)
     self.recScroll, self.recContent = scroll, content
     self.recRows = {}

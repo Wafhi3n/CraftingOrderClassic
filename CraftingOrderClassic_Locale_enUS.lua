@@ -12,7 +12,6 @@ local L = COC.L
 local en = {
     -- Onglets / fenêtre
     ["Carnet"] = "Ledger", ["Commande"] = "Order", ["Récolte"] = "Gather", ["Artisans"] = "Artisans",
-    ["Classic · canal global"] = "Classic · global channel",
     -- En-têtes de colonnes (Carnet)
     ["COMMANDE"] = "ORDER", ["QTÉ"] = "QTY", ["PRIX PROPOSÉ"] = "PRICE OFFERED",
     ["MÉTIER"] = "PROFESSION", ["STATUT"] = "STATUS",
@@ -36,7 +35,7 @@ local en = {
     ["Aucun métier. Ouvre ta fenêtre métier sur chaque perso une fois."] =
         "No professions. Open your profession window on each character once.",
     ["Partager mes rerolls sur le réseau"] = "Share my alts on the network",
-    ["Vitrine : %s"] = "Front: %s",
+    ["Vitrine"] = "Front",
     ["Rerolls"] = "Alts",
     ["%s — lecture seule"] = "%s — read-only",
     ["Pas de recettes connues (métier de récolte ?)."] = "No known recipes (gathering profession?).",
@@ -177,11 +176,14 @@ local en = {
     ["LISTE DES PLANS"] = "RECIPE LIST", ["JE FOURNIS"] = "I PROVIDE", ["Réactifs"] = "Reagents",
     ["(cocher = je fournis)"] = "(check = I provide)", ["Commission"] = "Commission", ["Qté"] = "Qty",
     ["Destinataire :"] = "Recipient:", ["Diffuser à tous"] = "Broadcast to all", ["Poster"] = "Post",
+    ["La commande sera visible par tout le monde (cible « Tous »)."] = "The order will be broadcast to everyone (target: \"All\").",
     ["Choisis un métier puis un plan."] = "Pick a profession then a recipe.",
-    ["Rechercher un plan"] = "Search a recipe", ["Qualité : "] = "Quality: ",
+    ["Cliquer pour changer de métier"] = "Click to change profession",
+    ["Rechercher"] = "Search",
     ["Sélection : "] = "Selection: ", ["Commande postée !"] = "Order posted!",
-    -- Filtre réactifs en poche (P2)
-    ["Réactifs : j'ai tout"] = "Reagents: I have it all", ["Réactifs : "] = "Reagents: ",
+    -- Filtre réactifs en poche (P2) — icône + tooltip
+    ["Réactifs en main"] = "Reagents in hand",
+    ["Ne montrer que les plans dont j'ai déjà tous les réactifs."] = "Only show recipes I already have all the reagents for.",
     ["[Prêt]"] = "[Ready]",
     -- Sections de la liste des plans (en-têtes) : les noms d'emplacement/type/catégorie viennent
     -- des globales client (déjà localisées) ; seule cette catégorie de repli a besoin d'une clé.
@@ -194,7 +196,7 @@ local en = {
     ["Toute la guilde"] = "Whole guild", ["Tous les amis"] = "All friends",
     ["Tous les ajoutés"] = "All added", ["Tous les croisés"] = "All met",
     -- Récolte (Gather)
-    ["MÉTIER DE RÉCOLTE"] = "GATHERING PROFESSION", ["Rechercher une ressource"] = "Search a resource",
+    ["Rechercher une ressource"] = "Search a resource",
     ["LISTE DES RESSOURCES"] = "RESOURCE LIST", ["Demande de récolte — quantité voulue"] = "Gather request — wanted quantity",
     ["stacks"] = "stacks", ["pile"] = "stack", ["piles"] = "stacks",
     ["Récolteur :"] = "Gatherer:", ["Prix proposé"] = "Price offered",
@@ -202,6 +204,8 @@ local en = {
     ["Aucune ressource sélectionnée."] = "No resource selected.", ["par stack"] = "per stack", ["à l'unité"] = "per unit",
     ["Commande de récolte postée !"] = "Gather order posted!", ["Choisis d'abord une ressource."] = "Pick a resource first.",
     ["Toutes"] = "All",
+    -- Légendes de la rangée de filtres style HdV (onglet Commande) : mots courts, au-dessus du champ.
+    ["Nom"] = "Name", ["Qualité"] = "Quality",
     ["Objet |cFFE8B84Bélémentaire|r (farmé sur les mobs, pas de métier). Diffusé à tous. Quantité et prix |cFFE8B84B%s.|r"] =
         "|cFFE8B84BElemental|r item (farmed off mobs, no profession). Broadcast to all. Quantity and price |cFFE8B84B%s.|r",
     ["Diffusée aux récolteurs ayant |cFFE8B84B%s.|r Quantité et prix proposé |cFFE8B84B%s.|r"] =
@@ -414,6 +418,12 @@ local en = {
     ["Transmutations"] = "Transmutes",
     ["Minerais"] = "Ores",
     ["Cuirs"] = "Leather",
+    -- ⚠️ Clés DYNAMIQUES (L[group.name] dans RecipeCats) : le checker ne les voit pas — tenir cette
+    -- liste alignée sur les `name =` des _RecipeCats_*.lua à chaque régénération (bug live sosh13).
+    ["Peaux"] = "Hides",
+    ["Écailles"] = "Scales",
+    ["Herbes"] = "Herbs",
+    ["Poissons"] = "Fish",
     ["Éclats"] = "Shards",
     ["Essences"] = "Essences",
     ["Poussières"] = "Dusts",

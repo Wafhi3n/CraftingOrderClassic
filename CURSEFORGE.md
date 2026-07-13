@@ -12,7 +12,7 @@ between total strangers as long as they've got the addon too.
 
 ## What it does
 
-- Post craft and gather orders from a tavern-styled window, or straight from chat with `/co post`.
+- Post craft and gather orders from the addon window, or straight from chat with `/co post`.
 - Send an order to everyone, your guild, your friends, or one named player. A named order gets pushed to that person the moment they log in.
 - Get a toast, a chat line and a sound when an order is meant for you. `/co notify` sets how much of that you want.
 - Browse the Artisans directory: who can make what, who's online, their skill levels, and how you know them.
@@ -27,6 +27,7 @@ between total strangers as long as they've got the addon too.
 - Recipes sorted into real categories instead of one flat "Consumable" pile, everywhere they show up (new in 1.16).
 - If you run Lazy Gold, every recipe shows what it'd earn you, and you can sort the list by profit (new in 1.16).
 - If you run MissingTradeSkillsList, flip the recipe list to show what you haven't learned yet, in red, and click one to see where it drops (new in 1.16).
+- The window uses the game's own frame style now, not a custom skin, so it reads as part of the interface (new in 1.17).
 
 ## Order from your Friends and Guild list
 

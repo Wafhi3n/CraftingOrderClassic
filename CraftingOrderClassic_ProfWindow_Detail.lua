@@ -29,29 +29,33 @@ function PW:_BuildReagentRow(parent, i)
     row:Hide(); return row
 end
 
+-- Zones SPEC de la colonne (cf. _ProfWindow_Layout.lua) : detBody (contenu) / detFoot (bande pied :
+-- Qté + Créer tout + Créer, ancrés LEFT/RIGHT = centrés verticalement dans la bande).
 function PW:_BuildDetail(col)
-    self.detColFrame = col   -- réutilisé par le panneau d'INFO en sections (cf. _ProfWindow_Info.lua)
-    local iconBig = col:CreateTexture(nil, "ARTWORK")
+    local body = self:Sec("detBody") or col
+    local fz   = self:Sec("detFoot") or col
+    self.detColFrame = body   -- réutilisé par le panneau d'INFO en sections (cf. _ProfWindow_Info.lua)
+    local iconBig = body:CreateTexture(nil, "ARTWORK")
     iconBig:SetSize(34, 34); iconBig:SetPoint("TOPLEFT", 12, -10); iconBig:SetTexCoord(0.07, 0.93, 0.07, 0.93); iconBig:Hide()
     self.detIcon = iconBig
     -- Une Texture ne reçoit pas la souris : bouton invisible par-dessus pour le tooltip de l'objet produit.
-    local iconBtn = CreateFrame("Button", nil, col); iconBtn:SetAllPoints(iconBig)
+    local iconBtn = CreateFrame("Button", nil, body); iconBtn:SetAllPoints(iconBig)
     iconBtn:SetScript("OnEnter", function(r) PW:_ProductTooltip(r) end)
     iconBtn:SetScript("OnLeave", GameTooltip_Hide)
     self.detIconBtn = iconBtn
 
-    local nameFS = col:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    local nameFS = body:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     nameFS:SetPoint("TOPLEFT", iconBig, "TOPRIGHT", 8, -2); nameFS:SetPoint("RIGHT", -10, 0)
     nameFS:SetJustifyH("LEFT"); nameFS:SetText("|cFF888888" .. L["Sélectionne une recette."] .. "|r"); self.detNameFS = nameFS
 
-    local makesFS = col:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    local makesFS = body:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     makesFS:SetPoint("TOPLEFT", iconBig, "BOTTOMRIGHT", 8, -2); makesFS:SetTextColor(Skin.unpack(Skin.color.textMuted)); self.detMakesFS = makesFS
 
-    local reagHdr = col:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    local reagHdr = body:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     reagHdr:SetPoint("TOPLEFT", 12, -52); reagHdr:SetText("|cFFE8B84B" .. L["Réactifs :"] .. "|r"); self.detReagHdr = reagHdr
 
-    local rContainer = CreateFrame("Frame", nil, col)
-    rContainer:SetPoint("TOPLEFT", 0, -70); rContainer:SetPoint("RIGHT", col, "RIGHT", 0, 0); rContainer:SetHeight(MAX_REAG * REAG_H)
+    local rContainer = CreateFrame("Frame", nil, body)
+    rContainer:SetPoint("TOPLEFT", 0, -70); rContainer:SetPoint("RIGHT", body, "RIGHT", 0, 0); rContainer:SetHeight(MAX_REAG * REAG_H)
     self.detReagRows = {}
     for i = 1, MAX_REAG do self.detReagRows[i] = self:_BuildReagentRow(rContainer, i) end
 
@@ -59,30 +63,31 @@ function PW:_BuildDetail(col)
     -- donc SÉCURISÉ et redirige le clic vers le bouton natif de Blizzard quand un Craft (enchant) est
     -- ouvert (cf. _WireCreateButton). Métier normal → DoTradeSkill n'est pas protégé : on crafte en
     -- PostClick. On ne pose PAS de OnClick (le template sécurisé s'en sert pour la redirection).
-    local createBtn = Skin.MakeGoldButton(col, 72, 22, L["Créer"], "SecureActionButtonTemplate")
-    createBtn:SetPoint("BOTTOMRIGHT", -10, 12)
+    local createBtn = Skin.MakeGoldButton(fz, 72, 22, L["Créer"], "SecureActionButtonTemplate")
+    createBtn:SetPoint("RIGHT", -10, 0)
     createBtn:RegisterForClicks("AnyUp")
-    createBtn:SetScript("PreClick", function()
-        if COC.Craft:IsCraftOpen() then
-            local e = PW:GetSelectedRecipe()
-            if e and SelectCraft then SelectCraft(e.index) end   -- le bouton natif craftera CETTE recette
-        end
-    end)
+    -- ⚠️ AUCUN SelectCraft au PreClick (prouvé en jeu : le bouton natif « Enchant » marche au 1er clic ;
+    -- notre redirection demandait un spam). Cause : Blizzard DÉSACTIVE CraftCreateButton à CHAQUE
+    -- CRAFT_UPDATE (`Blizzard_CraftUI.lua`), et SelectCraft() FIRE CRAFT_UPDATE. Un SelectCraft au
+    -- PreClick re-désactivait donc le bouton natif juste AVANT que le clic sécurisé ne lui soit redirigé
+    -- → clic dans le vide. La sélection native est DÉJÀ alignée à l'affichage de la recette
+    -- (RefreshDetail → _SyncNativeCraftSelection), donc le PreClick est inutile : on le supprime, le
+    -- bouton natif reste ACTIVÉ, le 1er clic crafte. (PostClick reste pour le métier normal, DoTradeSkill.)
     createBtn:SetScript("PostClick", function()
         if not COC.Craft:IsCraftOpen() then PW:_CraftSelected(false) end   -- TradeSkill : DoTradeSkill
     end)
     self.detCreateBtn = createBtn
 
-    local allBtn = Skin.MakeGoldButton(col, 86, 22, L["Créer tout"])
-    allBtn:SetPoint("BOTTOMRIGHT", createBtn, "BOTTOMLEFT", -6, 0)
+    local allBtn = Skin.MakeGoldButton(fz, 86, 22, L["Créer tout"])
+    allBtn:SetPoint("RIGHT", createBtn, "LEFT", -6, 0)
     allBtn:SetScript("OnClick", function() PW:_CraftSelected(true) end); self.detAllBtn = allBtn
 
-    local qtyBox = CreateFrame("EditBox", nil, col, "InputBoxTemplate")
+    local qtyBox = CreateFrame("EditBox", nil, fz, "InputBoxTemplate")
     qtyBox:SetSize(38, 18); qtyBox:SetPoint("RIGHT", allBtn, "LEFT", -12, 0)
     qtyBox:SetAutoFocus(false); qtyBox:SetNumeric(true); qtyBox:SetText("1")
     qtyBox:SetScript("OnEscapePressed", function(b) b:ClearFocus() end); self.detQtyBox = qtyBox
 
-    local qtyLbl = col:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    local qtyLbl = fz:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     qtyLbl:SetPoint("RIGHT", qtyBox, "LEFT", -4, 0); qtyLbl:SetText(L["Qté"]); self.detQtyLbl = qtyLbl
 end
 

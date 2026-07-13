@@ -11,6 +11,10 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "What's New",
+    -- v1.17.0
+    ["L'interface passe au style natif de WoW"] = "The window matches the game now",
+    ["La fenêtre n'a plus son habillage doré maison : elle emprunte le cadre du jeu (barre de titre, portrait rond, onglets, boutons). Elle se fond dans l'interface au lieu de ressembler à un addon posé par-dessus, et rien n'a bougé de ce que tu connais."] = "The window dropped its custom gold skin for the game's own frame (title bar, round portrait, tabs across the top, buttons). It reads as part of the interface instead of something bolted on top, and nothing moved that you'd have to relearn.",
+    ["La vue métier est refaite, avec une colonne Commandes en liste : une ligne par commande (demandeur, objet voulu, prix), et le clic ouvre la carte complète (composants fournis, coût des réactifs, Accepter / Refuser / Chuchoter) avec une croix pour revenir à la liste. Et les sous-catégories de récolte (Peaux, Écailles, Herbes, Poissons) sont enfin traduites hors client français."] = "The profession window was rebuilt, with the orders column as a list: one line per order (requester, the item they want, price), and clicking opens the full card (supplied components, reagent cost, Accept / Decline / Whisper) with a close button back to the list. And the gathering sub-headings (Hides, Scales, Herbs, Fish) are finally translated outside a French client.",
     -- v1.15.1
     ["Tes commandes n'appartiennent qu'à toi"] = "Your orders are yours",
     ["Recettes triées, et où est l'or"] = "Sorted recipes, and where the gold is",

@@ -10,7 +10,6 @@ local L = COC.L
 local de = {
     -- Onglets / fenêtre
     ["Carnet"] = "Auftragsbuch", ["Commande"] = "Bestellen", ["Récolte"] = "Sammeln", ["Artisans"] = "Handwerker",
-    ["Classic · canal global"] = "Classic · globaler Kanal",
     -- En-têtes de colonnes (Carnet)
     ["COMMANDE"] = "AUFTRAG", ["QTÉ"] = "ANZ.", ["PRIX PROPOSÉ"] = "GEBOTENER PREIS",
     ["MÉTIER"] = "BERUF", ["STATUT"] = "STATUS",
@@ -34,7 +33,7 @@ local de = {
     ["Aucun métier. Ouvre ta fenêtre métier sur chaque perso une fois."] =
         "Keine Berufe. Öffne das Berufsfenster auf jedem Charakter einmal.",
     ["Partager mes rerolls sur le réseau"] = "Meine Twinks im Netzwerk teilen",
-    ["Vitrine : %s"] = "Aushängeschild: %s",
+    ["Vitrine"] = "Aushängeschild",
     ["Rerolls"] = "Twinks",
     ["%s — lecture seule"] = "%s — schreibgeschützt",
     ["Pas de recettes connues (métier de récolte ?)."] = "Keine bekannten Rezepte (Sammelberuf?).",
@@ -163,10 +162,13 @@ local de = {
     ["LISTE DES PLANS"] = "REZEPTLISTE", ["JE FOURNIS"] = "ICH STELLE", ["Réactifs"] = "Materialien",
     ["(cocher = je fournis)"] = "(anhaken = ich stelle bereit)", ["Commission"] = "Provision", ["Qté"] = "Anz.",
     ["Destinataire :"] = "Empfänger:", ["Diffuser à tous"] = "An alle senden", ["Poster"] = "Erstellen",
+    ["La commande sera visible par tout le monde (cible « Tous »)."] = "Der Auftrag wird an alle gesendet (Ziel: \"Alle\").",
     ["Choisis un métier puis un plan."] = "Wähle einen Beruf, dann ein Rezept.",
-    ["Rechercher un plan"] = "Rezept suchen", ["Qualité : "] = "Qualität: ",
+    ["Cliquer pour changer de métier"] = "Klicken, um den Beruf zu wechseln",
+    ["Rechercher"] = "Rezept suchen",
     ["Sélection : "] = "Auswahl: ", ["Commande postée !"] = "Auftrag erstellt!",
-    ["Réactifs : j'ai tout"] = "Materialien: alles vorhanden", ["Réactifs : "] = "Materialien: ",
+    ["Réactifs en main"] = "Materialien vorhanden",
+    ["Ne montrer que les plans dont j'ai déjà tous les réactifs."] = "Nur Rezepte anzeigen, für die ich bereits alle Materialien habe.",
     ["[Prêt]"] = "[Bereit]",
     ["Autres"] = "Sonstige",
     ["connus"] = "bekannt", ["niv. %d"] = "Stufe %d",
@@ -174,7 +176,7 @@ local de = {
     ["Ajoutés"] = "Hinzugefügt", ["fournis"] = "bereitgestellt", ["Chargement…"] = "Lädt…",
     ["Toute la guilde"] = "Ganze Gilde", ["Tous les amis"] = "Alle Freunde",
     ["Tous les ajoutés"] = "Alle Hinzugefügten", ["Tous les croisés"] = "Alle Getroffenen",
-    ["MÉTIER DE RÉCOLTE"] = "SAMMELBERUF", ["Rechercher une ressource"] = "Ressource suchen",
+    ["Rechercher une ressource"] = "Ressource suchen",
     ["LISTE DES RESSOURCES"] = "RESSOURCENLISTE", ["Demande de récolte — quantité voulue"] = "Sammelanfrage — gewünschte Menge",
     ["stacks"] = "Stapel", ["pile"] = "Stapel", ["piles"] = "Stapel",
     ["Récolteur :"] = "Sammler:", ["Prix proposé"] = "Gebotener Preis",
@@ -182,6 +184,8 @@ local de = {
     ["Aucune ressource sélectionnée."] = "Keine Ressource ausgewählt.", ["par stack"] = "pro Stapel", ["à l'unité"] = "pro Stück",
     ["Commande de récolte postée !"] = "Sammelauftrag erstellt!", ["Choisis d'abord une ressource."] = "Wähle zuerst eine Ressource.",
     ["Toutes"] = "Alle",
+    -- Légendes de la rangée de filtres style HdV (onglet Commande) : mots courts, au-dessus du champ.
+    ["Nom"] = "Name", ["Qualité"] = "Qualität",
     ["Objet |cFFE8B84Bélémentaire|r (farmé sur les mobs, pas de métier). Diffusé à tous. Quantité et prix |cFFE8B84B%s.|r"] =
         "|cFFE8B84BElementar|r-Gegenstand (von Gegnern gefarmt, kein Beruf). An alle gesendet. Menge und Preis |cFFE8B84B%s.|r",
     ["Diffusée aux récolteurs ayant |cFFE8B84B%s.|r Quantité et prix proposé |cFFE8B84B%s.|r"] =
@@ -386,6 +390,12 @@ local de = {
     ["Éclats"] = "Splitter",
     ["Essences"] = "Essenzen",
     ["Poussières"] = "Staub",
+    -- ⚠️ Clés DYNAMIQUES (L[group.name] dans RecipeCats) : le checker ne les voit pas — tenir cette
+    -- liste alignée sur les `name =` des _RecipeCats_*.lua à chaque régénération (bug live sosh13).
+    ["Peaux"] = "Felle",
+    ["Écailles"] = "Schuppen",
+    ["Herbes"] = "Kräuter",
+    ["Poissons"] = "Fische",
 
     -- Pont MissingTradeSkillsList (recettes manquantes + source)
     ["Manquantes"] = "Fehlende",

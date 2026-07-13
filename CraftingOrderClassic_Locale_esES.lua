@@ -11,7 +11,6 @@ local L = COC.L
 local es = {
     -- Onglets / fenêtre
     ["Carnet"] = "Libro", ["Commande"] = "Pedir", ["Récolte"] = "Recolectar", ["Artisans"] = "Artesanos",
-    ["Classic · canal global"] = "Classic · canal global",
     -- En-têtes de colonnes (Carnet)
     ["COMMANDE"] = "PEDIDO", ["QTÉ"] = "CANT.", ["PRIX PROPOSÉ"] = "PRECIO OFRECIDO",
     ["MÉTIER"] = "PROFESIÓN", ["STATUT"] = "ESTADO",
@@ -35,7 +34,7 @@ local es = {
     ["Aucun métier. Ouvre ta fenêtre métier sur chaque perso une fois."] =
         "Sin profesiones. Abre la ventana de profesión en cada personaje una vez.",
     ["Partager mes rerolls sur le réseau"] = "Compartir mis alters en la red",
-    ["Vitrine : %s"] = "Escaparate: %s",
+    ["Vitrine"] = "Escaparate",
     ["Rerolls"] = "Alters",
     ["%s — lecture seule"] = "%s — solo lectura",
     ["Pas de recettes connues (métier de récolte ?)."] = "Sin recetas conocidas (¿profesión de recolección?).",
@@ -164,10 +163,13 @@ local es = {
     ["LISTE DES PLANS"] = "LISTA DE RECETAS", ["JE FOURNIS"] = "YO APORTO", ["Réactifs"] = "Reactivos",
     ["(cocher = je fournis)"] = "(marcar = yo aporto)", ["Commission"] = "Comisión", ["Qté"] = "Cant.",
     ["Destinataire :"] = "Destinatario:", ["Diffuser à tous"] = "Difundir a todos", ["Poster"] = "Publicar",
+    ["La commande sera visible par tout le monde (cible « Tous »)."] = "El pedido se difundirá a todos (destino: \"Todos\").",
     ["Choisis un métier puis un plan."] = "Elige una profesión y luego una receta.",
-    ["Rechercher un plan"] = "Buscar una receta", ["Qualité : "] = "Calidad: ",
+    ["Cliquer pour changer de métier"] = "Clic para cambiar de profesión",
+    ["Rechercher"] = "Buscar una receta",
     ["Sélection : "] = "Selección: ", ["Commande postée !"] = "¡Pedido publicado!",
-    ["Réactifs : j'ai tout"] = "Reactivos: lo tengo todo", ["Réactifs : "] = "Reactivos: ",
+    ["Réactifs en main"] = "Reactivos a mano",
+    ["Ne montrer que les plans dont j'ai déjà tous les réactifs."] = "Mostrar solo las recetas para las que ya tengo todos los reactivos.",
     ["[Prêt]"] = "[Listo]",
     ["Autres"] = "Otros",
     ["connus"] = "conocidas", ["niv. %d"] = "niv. %d",
@@ -175,7 +177,7 @@ local es = {
     ["Ajoutés"] = "Añadidos", ["fournis"] = "aportados", ["Chargement…"] = "Cargando…",
     ["Toute la guilde"] = "Toda la hermandad", ["Tous les amis"] = "Todos los amigos",
     ["Tous les ajoutés"] = "Todos los añadidos", ["Tous les croisés"] = "Todos los vistos",
-    ["MÉTIER DE RÉCOLTE"] = "PROFESIÓN DE RECOLECCIÓN", ["Rechercher une ressource"] = "Buscar un recurso",
+    ["Rechercher une ressource"] = "Buscar un recurso",
     ["LISTE DES RESSOURCES"] = "LISTA DE RECURSOS", ["Demande de récolte — quantité voulue"] = "Solicitud de recolección — cantidad deseada",
     ["stacks"] = "montones", ["pile"] = "montón", ["piles"] = "montones",
     ["Récolteur :"] = "Recolector:", ["Prix proposé"] = "Precio ofrecido",
@@ -183,6 +185,8 @@ local es = {
     ["Aucune ressource sélectionnée."] = "Ningún recurso seleccionado.", ["par stack"] = "por montón", ["à l'unité"] = "por unidad",
     ["Commande de récolte postée !"] = "¡Pedido de recolección publicado!", ["Choisis d'abord une ressource."] = "Elige primero un recurso.",
     ["Toutes"] = "Todas",
+    -- Légendes de la rangée de filtres style HdV (onglet Commande) : mots courts, au-dessus du champ.
+    ["Nom"] = "Nombre", ["Qualité"] = "Calidad",
     ["Objet |cFFE8B84Bélémentaire|r (farmé sur les mobs, pas de métier). Diffusé à tous. Quantité et prix |cFFE8B84B%s.|r"] =
         "Objeto |cFFE8B84Belemental|r (obtenido de las criaturas, sin profesión). Difundido a todos. Cantidad y precio |cFFE8B84B%s.|r",
     ["Diffusée aux récolteurs ayant |cFFE8B84B%s.|r Quantité et prix proposé |cFFE8B84B%s.|r"] =
@@ -387,6 +391,12 @@ local es = {
     ["Éclats"] = "Esquirlas",
     ["Essences"] = "Esencias",
     ["Poussières"] = "Polvo",
+    -- ⚠️ Clés DYNAMIQUES (L[group.name] dans RecipeCats) : le checker ne les voit pas — tenir cette
+    -- liste alignée sur les `name =` des _RecipeCats_*.lua à chaque régénération (bug live sosh13).
+    ["Peaux"] = "Pieles",
+    ["Écailles"] = "Escamas",
+    ["Herbes"] = "Hierbas",
+    ["Poissons"] = "Peces",
 
     -- Pont MissingTradeSkillsList (recettes manquantes + source)
     ["Manquantes"] = "Faltantes",

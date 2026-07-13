@@ -7,11 +7,8 @@ local UI   = COC.UI
 local Skin = UI.Skin
 local L    = COC.L
 
-local ARH = 26    -- hauteur ligne artisan (= locale de _UI_Post.lua, layout identique)
-local SEP = 308
-local RX  = SEP + 8
-local REDGE = 846
-local RW  = 818 - RX
+local ARH = 26    -- hauteur ligne artisan (= ALL_ARH de _UI.lua : même pool de lignes)
+local P   = UI.POST   -- métriques/blocs de l'onglet — cf. _UI_Post_Layout.lua
 
 local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true) end
 
@@ -53,46 +50,90 @@ function UI:_TargetArtisanFilter(prof)
 end
 
 function UI:_BuildPostArtisanSection(panel)
-    local srcDefs = { {id="guild", label=L["Guilde"]}, {id="friend", label=L["Amis"]}, {id="added", label=L["Ajoutés"]}, {id="recent", label=L["Annuaire"]} }
-    self.postSrcBtns = {}
-    for i, d in ipairs(srcDefs) do
-        local b = Skin.MakeGoldButton(panel, 58, 20, d.label); b:SetPoint("TOPLEFT", RX + (i-1)*62, -337)
-        b:SetScript("OnClick", function()
-            UI.postSource = d.id; UI.postTarget = d.id   -- cibler TOUTE cette liste
-            UI:_RefreshPostSrcTabs(); UI:RefreshPostArtisans(); UI:RefreshPostPlans()
-        end)
-        self.postSrcBtns[d.id] = b
-    end
+    -- PORTÉE : quatre boutons rouges côte à côte AVANT → un DROPDOWN natif (demande user 2026-07-12).
+    -- Même raisonnement que le Carnet : ce sont 4 valeurs EXCLUSIVES (où je cherche l'artisan), pas
+    -- 4 actions. La rangée libérée rend sa largeur au bouton « Diffuser à tous », qui RESTE un bouton :
+    -- lui n'est pas une portée mais une CIBLE (postTarget = "all") — deux verbes différents, deux widgets.
+    -- Comportement inchangé : choisir une portée cible AUSSI toute cette liste (postTarget = source).
+    local srcDefs = {
+        { value = "guild",  text = L["Guilde"] },
+        { value = "friend", text = L["Amis"] },
+        { value = "added",  text = L["Ajoutés"] },
+        { value = "recent", text = L["Annuaire"] },
+    }
+    -- Portée + « Diffuser à tous » : leur PROPRE zone (« scope »), juste au-dessus de la liste qu'elles
+    -- pilotent — la rangée de commandes d'une liste, comme les filtres au-dessus du browse de l'HdV.
+    local scope = self:PostSec("scope")
+    local srcDD = Skin.MakeDropdown("COCPostSrcDD", scope, 96, srcDefs, {
+        onSelect = function(v)
+            UI.postSource = v; UI.postTarget = v   -- cibler TOUTE cette liste
+            UI:RefreshPostArtisans(); UI:RefreshPostPlans()
+        end,
+    })
+    srcDD:SetPointVisual("TOPLEFT", scope, "TOPLEFT", P.PAD, -4)
+    self.postSrcDD = srcDD
     self.postSource = "guild"; self.postTarget = "all"; self:_RefreshPostSrcTabs()
 
-    local diffBtn = Skin.MakeGoldButton(panel, 124, 20, L["Diffuser à tous"]); diffBtn:SetPoint("TOPRIGHT", -22, -337)
-    local diffIc = diffBtn:CreateTexture(nil, "OVERLAY"); diffIc:SetSize(14, 14)
-    diffIc:SetPoint("LEFT", 5, 0); diffIc:SetTexture(Skin.tex.broadcast)
-    diffBtn.text:ClearAllPoints(); diffBtn.text:SetPoint("LEFT", 22, 0); self.postDiffBtn = diffBtn
+    -- « Diffuser à tous » = BOUTON-ICÔNE (la bulle bleue du volet Social, pointée par le user) + un
+    -- vrai tooltip d'explication — le libellé long vivait mal dans la bande. Le liseré doré
+    -- (SetSelected) reflète « cible = Tous » (synchro dans RefreshPostArtisans). L'icône sociale n'a
+    -- pas de bordure cuite dedans → on annule le rognage 8 % du kit (pensé pour les icônes d'objets).
+    local diffBtn = Skin.MakeIconButton(scope, 22, Skin.tex.broadcast)
+    diffBtn.icon:SetTexCoord(0, 1, 0, 1)
+    diffBtn:SetPoint("RIGHT", -P.PAD - 4, 0)
+    self.postDiffBtn = diffBtn
     -- Sélectionne la cible « Tous » (diffusion globale) ; on poste ensuite via « Poster » (iso Récolte).
     diffBtn:SetScript("OnClick", function()
         UI.postTarget = "all"; UI:RefreshPostArtisans(); UI:RefreshPostPlans()
     end)
+    diffBtn:SetScript("OnEnter", function(b)
+        GameTooltip:SetOwner(b, "ANCHOR_BOTTOMLEFT")
+        GameTooltip:SetText(L["Diffuser à tous"], 1, 1, 1)
+        GameTooltip:AddLine(L["La commande sera visible par tout le monde (cible « Tous »)."],
+            nil, nil, nil, true)
+        GameTooltip:Show()
+    end)
+    diffBtn:SetScript("OnLeave", GameTooltip_Hide)
 
-    -- Ligne « Toute la guilde / Tous les amis » épinglée en tête + liste (cf. UI:_BuildAllRowAndScroll).
-    self:_BuildAllRowAndScroll(panel, "COCPostArtScroll", "post", -360)
+    -- Ligne « Toute la guilde / Tous les amis » épinglée en tête + liste, DANS la zone artisans (parent =
+    -- la zone, offsets relatifs à son bord — cf. _BuildAllRowAndScroll, dont le x est paramétrable).
+    -- Largeur LUE sur la zone (SPEC pilote le pad) : la ligne épinglée, le scroll et les rangées
+    -- suivent tes réglages de « artisans » dans la SPEC — plus de constante WIDE_W recopiée.
+    local az = self:PostSec("artisans")
+    local aw = az:GetWidth(); if aw <= 1 then aw = P.WIDE_W end
+    self.postArtW = aw
+    self:_BuildAllRowAndScroll(az, "COCPostArtScroll", "post", -P.PAD, P.PAD, aw)
 
-    local artLbl = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    artLbl:SetPoint("TOPLEFT", RX, -495); artLbl:SetText("|cFFE8B84B" .. L["Destinataire :"] .. "|r"); Skin.ApplyShadow(artLbl)
-    self.postArtisanName = panel:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    self.postArtisanName:SetPoint("LEFT", artLbl, "RIGHT", 6, 0); Skin.ApplyShadow(self.postArtisanName)
+    self:_BuildPostActionBar(panel, self:PostSec("artisans"))
+end
+
+-- BARRE D'ACTIONS (croquis + maquette GIMP user : « Destinataire » et « Poster » = UN objet, la
+-- barre à boutons native du bas de fenêtre). Conteneur parenté au PANNEAU (il se masque avec
+-- l'onglet) mais ANCRÉ sur la bande native `f.ActionBar` (MakeWindow, opts.buttonBar). Contenu
+-- aligné à droite : [Destinataire : X] [Poster] — la gauche de la bande reste à la ligne réseau.
+function UI:_BuildPostActionBar(panel, sec)
+    local bar = CreateFrame("Frame", nil, panel)
+    bar:SetAllPoints(self.frame.ActionBar)
+    local posterBtn = Skin.MakeGoldButton(bar, 82, 20, L["Poster"]); posterBtn:SetPoint("RIGHT", -8, 0)
+    posterBtn:SetScript("OnClick", function() UI:DoPostOrder() end)
+    self.postArtisanName = bar:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    self.postArtisanName:SetPoint("RIGHT", posterBtn, "LEFT", -14, 0); Skin.ApplyShadow(self.postArtisanName)
+    local artLbl = bar:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    artLbl:SetPoint("RIGHT", self.postArtisanName, "LEFT", -6, 0)
+    artLbl:SetText("|cFFE8B84B" .. L["Destinataire :"] .. "|r"); Skin.ApplyShadow(artLbl)
     self:_UpdateArtisanLabel()
 
-    local posterBtn = Skin.MakeGoldButton(panel, 82, 24, L["Poster"]); posterBtn:SetPoint("BOTTOMRIGHT", -22, 36)
-    posterBtn:SetScript("OnClick", function() UI:DoPostOrder() end)
-
-    self.postSelLbl = panel:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    self.postSelLbl:SetPoint("BOTTOMLEFT", RX, 40); self.postSelLbl:SetWidth(RW - 100); self.postSelLbl:SetJustifyH("LEFT")
+    -- Statut/aide (« Choisis un métier puis un plan. ») : en bas de la SECTION artisans, plus dans la
+    -- barre — c'est un message de l'onglet, pas une action de la fenêtre.
+    self.postSelLbl = sec:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+    self.postSelLbl:SetPoint("BOTTOMLEFT", P.PAD, 6); self.postSelLbl:SetWidth((self.postArtW or P.WIDE_W) - 20)
+    self.postSelLbl:SetJustifyH("LEFT")
     self.postSelLbl:SetText("|cFF888888" .. L["Choisis un métier puis un plan."] .. "|r")
 end
 
+-- Reflète la portée courante dans le dropdown (libellé + coche). Nom conservé : plusieurs appelants.
 function UI:_RefreshPostSrcTabs()
-    for id, b in pairs(self.postSrcBtns or {}) do b:SetSelected(id == self.postSource) end
+    if self.postSrcDD then self.postSrcDD:SetValue(self.postSource or "guild") end
 end
 
 function UI:RefreshPostArtisans()
@@ -117,19 +158,13 @@ function UI:RefreshPostArtisans()
     self.postArtContent:SetHeight(math.max(n * ARH, 10))
     Skin.AutoHideScroll("COCPostArtScroll", self.postArtContent)
     self:_RefreshAllRow("post"); self:_UpdateArtisanLabel()
+    if self.postDiffBtn then self.postDiffBtn:SetSelected((self.postTarget or "all") == "all") end
 end
 
 function UI:_PostArtRow(i)
     local r = self.postArtRows[i]; if r then return r end
-    r = CreateFrame("Button", nil, self.postArtContent); r:SetSize(RW - 22, ARH); r:SetPoint("TOPLEFT", 0, -(i-1)*ARH)
-    local hi = r:CreateTexture(nil, "HIGHLIGHT"); hi:SetAllPoints(); hi:SetColorTexture(Skin.unpack(Skin.color.rowHover))
-    local st = r:CreateTexture(nil, "BACKGROUND"); st:SetAllPoints()
-    st:SetColorTexture(Skin.color.tabActive[1], Skin.color.tabActive[2], Skin.color.tabActive[3], 0.30)
-    st:Hide(); r.selTex = st
-    r.dot  = Skin.MakeStatusIcon(r, 14); r.dot:SetPoint("LEFT", 4, 0)
-    r.name = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    r.name:SetPoint("LEFT", 18, 0); r.name:SetWidth(RW - 100); r.name:SetJustifyH("LEFT"); Skin.ApplyShadow(r.name)
-    r.src  = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall"); r.src:SetPoint("RIGHT", -4, 0); Skin.ApplyShadow(r.src)
+    r = Skin.MakeArtisanRow(self.postArtContent, (self.postArtW or P.WIDE_W) - 22, ARH)   -- pastille + nom + source (kit)
+    r:SetPoint("TOPLEFT", 0, -(i-1)*ARH)
     self.postArtRows[i] = r; return r
 end
 
@@ -152,6 +187,7 @@ function UI:_UpdateArtisanLabel()
         -- Affichage localisé ; la VALEUR canonique (FR) sert au réseau (cf. _PostTargetLabel / DoPostOrder).
         self.postArtisanName:SetText("|c" .. col .. L[self:_PostTargetLabel()] .. "|r")
     end
+    self:_SyncHeaderSkill()   -- la cible a pu changer → la jauge du header suit (niveau de l'artisan visé)
 end
 
 -- =========================================================================
