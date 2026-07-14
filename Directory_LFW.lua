@@ -52,12 +52,14 @@ function Dir:OnLFW(sender, message)
     if COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end
 end
 
--- Diffuse MON statut au royaume (canal-texte). Le clic/slash fournit le hardware event ; sinon la file
--- CraftLink draine au prochain input (TRANSPORT_REV 8). Verbe de DONNÉES → pas de balise requise.
+-- Diffuse MON statut au royaume (canal-texte). Émetteurs = OnNetworkReady (login) et le ticker : AUCUN
+-- n'est sous hardware event → on ENFILE (QueueText) au lieu de tenter un envoi immédiat. Un SendChatMessage
+-- hors input déclencherait ADDON_ACTION_BLOCKED (que le pcall n'attrape pas → popup d'erreur au login).
+-- La file draine au prochain clic/touche. Verbe de DONNÉES → pas de balise requise.
 function Dir:_BroadcastLFW()
-    local c = CL(); if not (c and c.BroadcastText) then return end
+    local c = CL(); if not (c and c.QueueText) then return end
     local db = COC.db and COC.db.lfw
-    if db and db.prof then c:BroadcastText("LFW|on|" .. db.prof) else c:BroadcastText("LFW|off") end
+    if db and db.prof then c:QueueText("LFW|on|" .. db.prof) else c:QueueText("LFW|off") end
 end
 
 -- Ma clé de métier LFW (ou nil).

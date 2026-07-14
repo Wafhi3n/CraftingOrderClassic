@@ -11,6 +11,10 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "What's New",
+    -- v1.17.1
+    ["Correctif : erreur au login en « Chercher du travail »"] = "Fixed a login error while looking for work",
+    ["Si tu avais activé « Chercher du travail », te connecter ou faire /reload pouvait déclencher une erreur rouge : l'addon annonçait ta disponibilité avant que le jeu n'autorise un addon à parler sur le canal. L'annonce attend maintenant ton prochain clic ou ta prochaine touche — plus d'erreur, et les autres te voient toujours dispo."] =
+        "If you had \"Look for work\" on, connecting or reloading could throw a red error: the addon announced your availability before the game lets an addon talk on the channel. The announcement now waits for your next click or keypress — no more error, and others still see you're available.",
     -- v1.17.0
     ["L'interface passe au style natif de WoW"] = "The window matches the game now",
     ["La fenêtre n'a plus son habillage doré maison : elle emprunte le cadre du jeu (barre de titre, portrait rond, onglets, boutons). Elle se fond dans l'interface au lieu de ressembler à un addon posé par-dessus, et rien n'a bougé de ce que tu connais."] = "The window dropped its custom gold skin for the game's own frame (title bar, round portrait, tabs across the top, buttons). It reads as part of the interface instead of something bolted on top, and nothing moved that you'd have to relearn.",

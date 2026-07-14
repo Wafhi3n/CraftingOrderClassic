@@ -1,5 +1,13 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.17.1 — Fixed a login error while looking for work
+
+If you had "Look for work" turned on, connecting or reloading could throw a red error. The addon was
+announcing your availability the instant the hidden channel came up — before the game lets an addon talk
+on a channel — so the game blocked the call and your error display caught it. The announcement now waits
+for your next click or keypress, the way the rest of the channel traffic already does. No more error, and
+other players still see you're available.
+
 ## v1.17.0 — The window looks like WoW now
 
 The addon window used to wear its own gold-and-wood skin. It now borrows the game's own frame instead:

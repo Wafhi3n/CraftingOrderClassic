@@ -16,6 +16,12 @@ local BODY_W = 780
 local function versionsRecent()
     return {
         {
+            v = "v1.17.1", title = L["Correctif : erreur au login en « Chercher du travail »"],
+            lines = {
+                L["Si tu avais activé « Chercher du travail », te connecter ou faire /reload pouvait déclencher une erreur rouge : l'addon annonçait ta disponibilité avant que le jeu n'autorise un addon à parler sur le canal. L'annonce attend maintenant ton prochain clic ou ta prochaine touche — plus d'erreur, et les autres te voient toujours dispo."],
+            },
+        },
+        {
             v = "v1.17.0", title = L["L'interface passe au style natif de WoW"],
             lines = {
                 L["La fenêtre n'a plus son habillage doré maison : elle emprunte le cadre du jeu (barre de titre, portrait rond, onglets, boutons). Elle se fond dans l'interface au lieu de ressembler à un addon posé par-dessus, et rien n'a bougé de ce que tu connais."],

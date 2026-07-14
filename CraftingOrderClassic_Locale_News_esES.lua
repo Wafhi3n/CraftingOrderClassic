@@ -8,6 +8,10 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "Novedades",
+    -- v1.17.1
+    ["Correctif : erreur au login en « Chercher du travail »"] = "Corregido: error al conectar con «Buscar trabajo»",
+    ["Si tu avais activé « Chercher du travail », te connecter ou faire /reload pouvait déclencher une erreur rouge : l'addon annonçait ta disponibilité avant que le jeu n'autorise un addon à parler sur le canal. L'annonce attend maintenant ton prochain clic ou ta prochaine touche — plus d'erreur, et les autres te voient toujours dispo."] =
+        "Si tenías activado «Buscar trabajo», conectarte o hacer /reload podía provocar un error rojo: el addon anunciaba tu disponibilidad antes de que el juego permita a un addon hablar en el canal. El anuncio ahora espera a tu siguiente clic o tecla — sin más errores, y los demás siguen viéndote disponible.",
     -- v1.17.0
     ["L'interface passe au style natif de WoW"] = "La ventana ahora combina con el juego",
     ["La fenêtre n'a plus son habillage doré maison : elle emprunte le cadre du jeu (barre de titre, portrait rond, onglets, boutons). Elle se fond dans l'interface au lieu de ressembler à un addon posé par-dessus, et rien n'a bougé de ce que tu connais."] = "La ventana ha cambiado su aspecto dorado propio por el marco del juego (barra de título, retrato redondo, pestañas arriba, botones). Ahora se integra en la interfaz en vez de parecer un addon añadido por encima, y nada se ha movido de lo que ya conoces.",
