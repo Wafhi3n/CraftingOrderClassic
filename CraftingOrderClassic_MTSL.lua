@@ -226,12 +226,3 @@ function MTSL:MinSkill(profKey, spellID)
     local sk = indexOf(mprof)[spellID]
     return sk and sk.min_skill or nil
 end
-
--- Nombre de recettes manquantes (pour le libellé du bouton). 0 si indisponible.
-function MTSL:MissingCount(profKey)
-    if not self:IsAvailable() then return 0 end
-    local mprof = mtslProf(profKey)
-    local player = _G.MTSL_CURRENT_PLAYER
-    local ts = mprof and player and player.TRADESKILLS and player.TRADESKILLS[mprof]
-    return (ts and ts.MISSING_SKILLS) and #ts.MISSING_SKILLS or 0
-end

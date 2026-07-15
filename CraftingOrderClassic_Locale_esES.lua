@@ -251,7 +251,7 @@ local es = {
     ["Marquer comme partenaire"] = "Marcar como socio", ["Retirer des partenaires"] = "Quitar de socios",
     -- Búsqueda de trabajo (LFW) : /co lfw
     ["[Dispo]"] = "[Busca]",
-    ["Chercher du travail"] = "Buscar trabajo",
+    ["Chercher du travail"] = "Buscar trabajo", ["scan LFW du chat : |cFF33DD33activé|r"] = "escaneo LFW del chat: |cFF33DD33activado|r", ["scan LFW du chat : |cFFFFCC00désactivé|r"] = "escaneo LFW del chat: |cFFFFCC00desactivado|r", ["propose : %s"] = "ofrece: %s", ["Proposer cette recette (recherche de travail)"] = "Ofrecer esta receta (buscar trabajo)", ["Maximum %d recettes proposées."] = "Máximo %d recetas ofrecidas.",
     ["Tu cherches du travail — clic pour arrêter."] = "Estás buscando trabajo — clic para parar.",
     ["Signale au royaume que tu cherches du travail dans ce métier."] = "Avisa al reino que buscas trabajo en esta profesión.",
     ["recherche de travail : |cFF33DD33%s|r — /co lfw off pour arrêter"] = "buscando trabajo: |cFF33DD33%s|r — /co lfw off para parar",
@@ -464,6 +464,15 @@ local es = {
     ["Filtre matériaux actif — clic pour tout afficher."] = "Filtro de materiales activo — clic para mostrar todo.",
     ["N'afficher que les recettes qui font monter la compétence (masque le gris)."] = "Mostrar solo las recetas que suben la habilidad (oculta el gris).",
     ["Filtre progression actif — clic pour tout afficher."] = "Filtro de progreso activo — clic para mostrar todo.",
+    -- Diffuser les réactifs (liste de courses)
+    ["Diffuser les réactifs"] = "Difundir los reactivos",
+    ["Diffuser les réactifs dans un canal"] = "Difundir los reactivos en un canal",
+    ["Canal : "] = "Canal: ",
+    ["Dire"] = "Decir", ["Groupe"] = "Grupo", ["Raid"] = "Banda", ["Envoyer"] = "Enviar",
+    ["Réactifs pour %s :"] = "Reactivos para %s:",
+    ["Réactifs pour %s (%d) :"] = "Reactivos para %s (%d):",
+    ["choisis un canal valide."] = "elige un canal válido.",
+    ["aucun réactif à diffuser."] = "no hay reactivos que difundir.", ["Diffuser"] = "Difundir",
 }
 for k, v in pairs(es) do L[k] = v end
 

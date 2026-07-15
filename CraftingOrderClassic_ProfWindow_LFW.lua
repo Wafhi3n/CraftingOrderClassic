@@ -222,7 +222,8 @@ function PW:_EditLFWOffer(fn)
     if not (D and D.SetLFWOffer and self.profKey) then return end
     local o = D:MyLFWOffer(self.profKey) or {}
     fn(o)
-    if not (o.basics or o.skillUpOnly or (o.fee and o.fee > 0) or (o.items and #o.items > 0)) then o = nil end
+    if not (o.basics or o.skillUpOnly or (o.fee and o.fee > 0)
+            or (o.items and #o.items > 0) or (o.recipes and #o.recipes > 0)) then o = nil end
     D:SetLFWOffer(self.profKey, o)
     self:_RefreshLFWList()
 end
@@ -242,6 +243,30 @@ function PW:_ToggleLFWItem(itemID)
         return
     end
     self:_EditLFWOffer(function(oo) oo.items = oo.items or {}; oo.items[#oo.items + 1] = itemID end)
+end
+
+-- Coche/décoche une RECETTE proposée (colonne de cases de la liste, cf. ProfWindow_Recipes). Clé = spellID
+-- de la recette (résolu en nom par GetSpellInfo chez le récepteur). Au-delà du cap (ligne réseau LFR), on
+-- refuse avec un toast. Repeint la liste de recettes pour refléter la case. No-op hors mon métier / en reroll.
+function PW:_ToggleLFWRecipe(entry)
+    local sid = entry and entry.spellID
+    if not (sid and self.profKey) or self.rerollKey then return end
+    local D = COC.Directory
+    local cap = (D and D.OFFER_MAX_RECIPES) or 12
+    local o = (D and D:MyLFWOffer(self.profKey)) or {}
+    for i, v in ipairs(o.recipes or {}) do
+        if v == sid then
+            self:_EditLFWOffer(function(oo) table.remove(oo.recipes, i); if #oo.recipes == 0 then oo.recipes = nil end end)
+            if self.RefreshRecipes then self:RefreshRecipes() end
+            return
+        end
+    end
+    if #(o.recipes or {}) >= cap then
+        if UI.Toast then UI:Toast(string.format(L["Maximum %d recettes proposées."], cap)) end
+        return
+    end
+    self:_EditLFWOffer(function(oo) oo.recipes = oo.recipes or {}; oo.recipes[#oo.recipes + 1] = sid end)
+    if self.RefreshRecipes then self:RefreshRecipes() end
 end
 
 -- ------------------------------------------------------------------

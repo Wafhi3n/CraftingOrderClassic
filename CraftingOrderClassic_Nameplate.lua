@@ -11,6 +11,8 @@ local COC = CraftingOrderClassic
 local NP  = {}
 COC.Nameplate = NP
 
+local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true) end
+
 -- Historique du gate : on a longtemps cru que ce module exigeait l'UI moderne des plaques (1.15.9,
 -- build 11509) et il s'auto-désactivait sous ce seuil. Test manuel en jeu sur SoD live (Era 1.15.8,
 -- tocversion 11508) le 2026-07-14 : il fonctionne SANS erreur → gate de build RETIRÉ. Seule garde
@@ -42,6 +44,14 @@ local function ensureIcon(plate)
     bag:SetSize(10, 10); bag:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT", -4, -3)
     bag:SetTexture("Interface\\Icons\\INV_Misc_Bag_08"); bag:SetTexCoord(0.08, 0.92, 0.08, 0.92); bag:Hide()
     f.bag = bag
+    -- Nom de la 1re recette PROPOSÉE (+N si plusieurs), à DROITE du cadre. Fond translucide pour rester
+    -- lisible sur tout décor. Display-only ; la liste complète est dans le tooltip au survol du JOUEUR.
+    local rbg = f:CreateTexture(nil, "BACKGROUND")
+    rbg:SetColorTexture(0, 0, 0, 0.55); rbg:Hide()
+    local rfs = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    rfs:SetPoint("LEFT", f, "RIGHT", 4, 0); rfs:SetJustifyH("LEFT"); rfs:SetWordWrap(false); rfs:Hide()
+    rbg:SetPoint("TOPLEFT", rfs, "TOPLEFT", -3, 2); rbg:SetPoint("BOTTOMRIGHT", rfs, "BOTTOMRIGHT", 3, -2)
+    f.recipeFS, f.recipeBg = rfs, rbg
     plate.cocLFW = f
     return f
 end
@@ -65,6 +75,17 @@ function NP:_Apply(unit)
         local o = e.offer
         ic.coin:SetShown((o and o.fee and o.fee > 0) and true or false)
         ic.bag:SetShown((o and (o.basics or (o.items and #o.items > 0))) and true or false)
+        -- Recettes proposées (verbe LFR) : 1re en clair + « +N » si d'autres. Nom résolu par GetSpellInfo
+        -- (via CraftLink) → lisible même si CE joueur n'a pas la recette apprise.
+        local recs = e.recipes
+        if recs and #recs > 0 then
+            local c = CL()
+            local label = (c and c.RecipeName and c:RecipeName(recs[1])) or ("spell:" .. recs[1])
+            if #recs > 1 then label = label .. "  |cFFAAAAAA+" .. (#recs - 1) .. "|r" end
+            ic.recipeFS:SetText(label); ic.recipeFS:Show(); ic.recipeBg:Show()
+        else
+            ic.recipeFS:Hide(); ic.recipeBg:Hide()
+        end
         ic:Show()
     elseif plate.cocLFW then
         plate.cocLFW:Hide()

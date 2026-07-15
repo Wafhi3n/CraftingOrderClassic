@@ -22,6 +22,19 @@ function PW:_BuildRecipeRow(parent, i)
     local sel = row:CreateTexture(nil, "BACKGROUND"); sel:SetAllPoints()
     sel:SetColorTexture(0.91, 0.72, 0.29, 0.22); sel:Hide(); row.sel = sel
     local hi = row:CreateTexture(nil, "HIGHLIGHT"); hi:SetAllPoints(); hi:SetColorTexture(0.25, 0.45, 0.85, 0.25)
+    -- Case « proposer cette recette » (LFW) : petit Button DÉDIÉ à gauche → un clic sur la case coche l'offre
+    -- SANS déclencher l'OnClick de la ligne (sélection/repli). Visible seulement en mode LFW (cf. _FillRecipeRow).
+    local chk = CreateFrame("Button", nil, row)
+    chk:SetSize(ROW_H, ROW_H)
+    chk.box = Skin.MakeCheck(chk, 13); chk.box:SetPoint("CENTER", chk, "CENTER", 0, 0)
+    chk:SetScript("OnClick", function() PW:_ToggleLFWRecipe(row.entry) end)
+    chk:SetScript("OnEnter", function(s)
+        GameTooltip:SetOwner(s, "ANCHOR_RIGHT")
+        GameTooltip:SetText(L["Proposer cette recette (recherche de travail)"], 1, 1, 1, 1, true)
+        GameTooltip:Show()
+    end)
+    chk:SetScript("OnLeave", GameTooltip_Hide)
+    chk:Hide(); row.lfwChk = chk
     -- Chevron +/- des en-têtes : TEXTURE native (la police rend « ▾ » en tofu, cf. Skin).
     local expand = row:CreateTexture(nil, "ARTWORK")
     expand:SetSize(ROW_H - 2, ROW_H - 2); expand:Hide(); row.expand = expand
@@ -155,12 +168,46 @@ end
 -- les manquantes s'intercalent dans leurs sous-catégories, par niveau, et seront peintes en ROUGE
 -- (cf. _FillRecipeRow). Les manquantes n'ont pas d'index d'API → sélectionnées par spellID (entryKey).
 -- Le mode n'a de sens que sur SON propre métier ouvert : désarmé hors mode plein (cf. ProfWindow).
+-- Set des recettes DÉJÀ apprises, indexé par spellID PUIS par objet produit (repli si le spellID
+-- |Henchant: est absent). Base de la dédup des fausses-manquantes MTSL (cf. _ActiveRecipes / MissingCount).
+function PW:_KnownRecipeSet()
+    local known = {}
+    for _, r in ipairs(self.recipes or {}) do
+        if not r.isHeader then
+            if r.spellID then known["s" .. r.spellID] = true end
+            if r.itemID  then known["i" .. r.itemID]  = true end
+        end
+    end
+    return known
+end
+
+-- true si la « manquante » MTSL m est en réalité DÉJÀ apprise (présente dans le set known). MTSL laisse
+-- parfois de tels faux manquants dans MISSING_SKILLS (calcul pas rafraîchi, ou matching de sa base raté
+-- sur l'Anniversary/TBC) → sans ce filtre la recette s'affiche EN DOUBLE : apprise + rouge « (niv. X) ».
+local function knownAlready(known, m)
+    return (m.spellID and known["s" .. m.spellID]) or (m.itemID and known["i" .. m.itemID]) or false
+end
+
 function PW:_ActiveRecipes()
     if not (self.missingMode and COC.MTSL) then return self.recipes or {} end
-    local out = {}
+    local out, known = {}, self:_KnownRecipeSet()
     for _, r in ipairs(self.recipes or {}) do out[#out + 1] = r end
-    for _, m in ipairs(COC.MTSL:MissingRecipes(self.profKey) or {}) do out[#out + 1] = m end
+    for _, m in ipairs(COC.MTSL:MissingRecipes(self.profKey) or {}) do
+        if not knownAlready(known, m) then out[#out + 1] = m end
+    end
     return out
+end
+
+-- Nombre RÉEL de recettes manquantes APRÈS dédup (le MissingCount brut de MTSL compte les faux manquants
+-- déjà appris → le libellé « Manquantes (N) » surestimerait). Chemin froid (bascule/refresh), jamais au
+-- scroll. 0 si MTSL absent / métier inconnu.
+function PW:MissingCount()
+    if not (COC.MTSL and COC.MTSL:IsAvailable() and self.profKey) then return 0 end
+    local known, n = self:_KnownRecipeSet(), 0
+    for _, m in ipairs(COC.MTSL:MissingRecipes(self.profKey) or {}) do
+        if not knownAlready(known, m) then n = n + 1 end
+    end
+    return n
 end
 
 -- Rang de tri « progression » : orange (point garanti) < jaune < vert < gris ; inconnu entre gris et
@@ -218,6 +265,18 @@ end
 function PW:RefreshRecipes()
     if not self.recScroll then return end
     self._profitCache = {}   -- invalidé à chaque refresh (prix Auctionator ont pu changer)
+    -- Mode « colonne de cases » : actif quand je CHERCHE du travail dans le métier ouvert (le mien, hors
+    -- reroll). Pré-calcule l'ensemble des spellID déjà proposés pour cocher les lignes en O(1) au rendu.
+    local D = COC.Directory
+    self.lfwSelectMode = (not self.rerollKey) and D and D.MyLFW and D:MyLFW() == self.profKey and true or false
+    self._lfwOfferSet = nil
+    if self.lfwSelectMode then
+        local o = D:MyLFWOffer(self.profKey)
+        if o and o.recipes then
+            self._lfwOfferSet = {}
+            for _, sid in ipairs(o.recipes) do self._lfwOfferSet[sid] = true end
+        end
+    end
     self:_SyncSortHeader()   -- affiche/masque le bouton de tri selon la présence de Lazy Gold
     self:_SyncFilterButtons()
     self.wantedMap = self:_ComputeWantedMap()
@@ -254,6 +313,7 @@ end
 function PW:_FillHeaderRow(row, e)
     row.tipLink, row.tipItemID = nil, nil   -- en-tête : pas d'objet à linker (ligne recyclée)
     row.icon:Hide(); row.badge:Hide(); row.sel:Hide(); row.profit:Hide(); row.niv:Hide()   -- sinon fantôme sur l'en-tête recyclé
+    if row.lfwChk then row.lfwChk:Hide() end   -- pas de case sur un en-tête (ligne recyclée depuis une recette)
     local open = not self:_CollapseTable()[e.ckey] or (self.recipeSearch or "") ~= ""
     row.expand:SetTexture(open and "Interface\\Buttons\\UI-MinusButton-Up" or "Interface\\Buttons\\UI-PlusButton-Up")
     row.expand:ClearAllPoints()
@@ -271,9 +331,20 @@ function PW:_FillRecipeRow(row, e)
     if e.isHeader then return self:_FillHeaderRow(row, e) end
     row.tipLink, row.tipItemID = e.link, e.itemID   -- shift-clic → lien (enchant via link, manquante via itemID)
     row.expand:Hide()
+    -- Case LFW à l'extrême gauche (seulement mes recettes APPRISES : une manquante n'a pas de spellID à
+    -- proposer). Quand elle est là, l'icône se décale de sa largeur pour ne pas la recouvrir.
+    local base = e._sub and 22 or 1
+    local showChk = self.lfwSelectMode and e.spellID and not e.isMissing
+    if showChk then
+        row.lfwChk:ClearAllPoints(); row.lfwChk:SetPoint("LEFT", row, "LEFT", base, 0)
+        row.lfwChk.box:SetChecked(self._lfwOfferSet and self._lfwOfferSet[e.spellID] or false)
+        row.lfwChk:Show()
+    else
+        row.lfwChk:Hide()
+    end
     row.icon:Show(); row.icon:SetTexture(e.icon or "Interface\\Icons\\INV_Misc_QuestionMark")
     row.icon:ClearAllPoints()
-    row.icon:SetPoint("LEFT", row, "LEFT", e._sub and 22 or 1, 0)   -- décalé sous sa sous-catégorie
+    row.icon:SetPoint("LEFT", row, "LEFT", base + (showChk and ROW_H or 0), 0)   -- décalé sous sa sous-catégorie (et après la case LFW)
     row.nameFS:ClearAllPoints()
     row.nameFS:SetPoint("LEFT", row.icon, "RIGHT", 4, 0); row.nameFS:SetPoint("RIGHT", -2, 0)
     local r, g, b = COC.Craft:DifficultyColor(e.difficulty)

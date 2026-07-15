@@ -316,6 +316,7 @@ function COC:Slash(msg)
     elseif cmd == "spam" then if COC.Moderation then COC.Moderation:SpamCmd(rest) end
     elseif cmd == "alts" or cmd == "rerolls" then if D and D.AltsCmd then D:AltsCmd(rest) end
     elseif cmd == "lfw" then if D and D.LFWCmd then D:LFWCmd(rest) end
+    elseif cmd == "lfwchat" then if COC.LFWChat then COC.LFWChat:Cmd(rest) end
     elseif cmd == "beacon" then COC:BeaconDiag()
     elseif cmd == "gwroster" or cmd == "confed" then COC:GreenWallDiag()
     elseif cmd == "wipe"   then COC:WipeRoster()

@@ -8,6 +8,14 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "Novedades",
+    -- v1.19.0
+    ["Propose des recettes précises, diffuse tes réactifs, et le LFW marche même sans l'addon"] = "Recetas en tu oferta, un botón para compartir, y LFW sin el complemento",
+    ["« Chercher du travail » propose maintenant des recettes précises, pas seulement des réactifs : coche des plans dans la liste et qui te consulte voit « propose : Bouclier de fer, Gilet de mailles de cuivre » à côté de ce que tu fournis déjà."] =
+        "«Buscar trabajo» ahora te deja indicar recetas concretas, no solo reactivos. Marca planos en la lista de recetas y quien consulte tu oferta ve «ofrece: Escudo de hierro, Chaleco de malla de cobre» junto a los materiales que ya aportas.",
+    ["Un bouton « Diffuser » envoie la liste de réactifs d'une recette ou d'une commande dans un canal au choix (guilde, dire, groupe/raid, un canal numéroté), avec le lien de chaque objet — une liste de courses en un clic, depuis la vue métier, la carte de commande ou le panneau de publication."] =
+        "Un botón «Compartir» envía la lista de reactivos de una receta o un encargo a un canal a elegir (gremio, decir, grupo/banda, un canal numerado), con el enlace de cada objeto — una lista de la compra con un clic, desde la ventana de profesión, la ficha del encargo o el panel de publicación.",
+    ["Le LFW marche même sans l'addon : tape « LFW enchantement » en Commerce ou Général et tu apparais comme dispo, avec la même icône de plaque qu'un joueur qui a Crafting Order. Plus une correction : une recette déjà apprise ne s'affichait plus en double avec MissingTradeSkillsList."] =
+        "Buscar trabajo funciona incluso sin el complemento: escribe «LFW encantamiento» en Comercio o General y apareces como disponible, con el mismo icono de placa que alguien con Crafting Order. Además, una corrección: una receta ya aprendida dejaba de aparecer duplicada con MissingTradeSkillsList.",
     -- v1.18.0
     ["Chercher du travail : dis ce que tu offres, et trie par progression"] = "Buscar trabajo, ahora con oferta, y ordenar por lo que te sube de nivel",
     ["« Chercher du travail » ne se contente plus de te signaler dispo. Clique l'engrenage à côté du bouton et dis ce que tu proposes : tu fournis les composants de base, tu fournis tel réactif précis, une commission fixe par craft, ou seulement les plans qui te font gagner un point de compétence. Ça s'affiche sur ta ligne [Dispo] et dans l'infobulle au-dessus de ta tête, avec une pièce s'il y a une commission et un sac si tu fournis des compos."] =

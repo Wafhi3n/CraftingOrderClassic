@@ -42,7 +42,14 @@ local function buildReagPanel(c, bz)
     local p = CreateFrame("Frame", nil, bz, "BackdropTemplate")
     p:SetPoint("TOPLEFT", 8, -26); p:SetPoint("RIGHT", bz, "RIGHT", -8, 0); Skin.SkinWell(p)
     p.hdr = p:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    p.hdr:SetPoint("TOPLEFT", 6, -3); p.hdr:SetPoint("RIGHT", -6, 0); p.hdr:SetJustifyH("LEFT"); Skin.ApplyShadow(p.hdr)
+    p.hdr:SetPoint("TOPLEFT", 6, -3); p.hdr:SetPoint("RIGHT", -24, 0); p.hdr:SetJustifyH("LEFT"); Skin.ApplyShadow(p.hdr)
+    -- Bouton « diffuser les réactifs » (liste de courses) dans l'en-tête du panneau, à droite du compteur.
+    p.share = Skin.MakeIconButton(p, 15, "Interface\\ChatFrame\\UI-ChatIcon-ArmoryChat")
+    p.share:SetPoint("TOPRIGHT", -4, -2)
+    p.share:SetScript("OnEnter", function(b)
+        GameTooltip:SetOwner(b, "ANCHOR_LEFT"); GameTooltip:SetText(L["Diffuser les réactifs dans un canal"], 1, 1, 1); GameTooltip:Show()
+    end)
+    p.share:SetScript("OnLeave", GameTooltip_Hide)
     p.rows = {}
     for j = 1, MAX_REAG do
         local r = CreateFrame("Frame", nil, p)
@@ -173,6 +180,13 @@ function PW:_FillReagPanel(card, o)
         row:Show()
     end
     for j = n + 1, MAX_REAG do p.rows[j]:Hide() end
+    if p.share then
+        p.share:SetScript("OnClick", function()
+            local items = {}   -- seulement « À FOURNIR » (compos NON fournis par l'acheteur) = la vraie liste de courses
+            for _, rg in ipairs(list) do if not rg[3] then items[#items + 1] = { id = rg[1], qty = rg[2] } end end
+            if COC.ShareReagents then COC.ShareReagents:Open(PW:_OrderItemName(o, c), items) end
+        end)
+    end
     local h = PANEL_HDR + n * REAG_RH + 6
     p:SetHeight(h); p:Show()
     return h

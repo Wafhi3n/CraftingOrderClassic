@@ -58,8 +58,15 @@ function UI:_BuildPostDetail()
     self.postReagHdr:SetPoint("LEFT", P.PAD, 0)
     self.postReagHdr:SetText("|cFFE8B84B" .. L["Réactifs"] .. "|r |cFF888888" .. L["(cocher = je fournis)"] .. "|r")
     Skin.ApplyShadow(self.postReagHdr)
+    -- Bouton « Diffuser » (liste de courses) : envoie les réactifs du plan dans un canal, avec leurs liens.
+    self.postShareBtn = Skin.MakeGoldButton(hz, 82, 18, L["Diffuser"])
+    self.postShareBtn:SetPoint("RIGHT", -P.PAD - 2, 0)
+    self.postShareBtn:SetScript("OnEnter", function(b)
+        GameTooltip:SetOwner(b, "ANCHOR_LEFT"); GameTooltip:SetText(L["Diffuser les réactifs dans un canal"], 1, 1, 1); GameTooltip:Show()
+    end)
+    self.postShareBtn:SetScript("OnLeave", GameTooltip_Hide); self.postShareBtn:Hide()
     self.postBQCount = hz:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    self.postBQCount:SetPoint("RIGHT", -P.PAD - 2, 0)
+    self.postBQCount:SetPoint("RIGHT", self.postShareBtn, "LEFT", -8, 0)
     self.postBQCount:SetTextColor(Skin.unpack(Skin.color.textMuted)); Skin.ApplyShadow(self.postBQCount)
 
     -- LISTE des réactifs (slot corps flex) : largeur LUE sur la zone (tu pilotes pad/gouttière depuis
@@ -107,6 +114,7 @@ function UI:RefreshPostPlanDetail()
         self.postPlanBadge:Hide(); self.postPlanName:SetText("|cFF888888" .. L["Aucun plan sélectionné."] .. "|r")
         if self.postPlanSub then self.postPlanSub:SetText("") end
         self.postReagHdr:SetShown(false); self.postBQCount:SetText("")
+        if self.postShareBtn then self.postShareBtn:Hide() end
         for i = 1, #self.postReagRows do self.postReagRows[i]:Hide() end
         self.postReagContent:SetHeight(10)
         Skin.AutoHideScroll("COCPostReagScroll", self.postReagContent)   -- sinon scrollbar fantôme
@@ -151,6 +159,14 @@ function UI:RefreshPostReagents()
     self.postReagContent:SetHeight(math.max(#reag * RRH, 10))
     Skin.AutoHideScroll("COCPostReagScroll", self.postReagContent)
     self.postReagHdr:SetShown(self.postEntry ~= nil)
+    if self.postShareBtn then
+        self.postShareBtn:SetShown(#reag > 0)
+        self.postShareBtn:SetScript("OnClick", function()
+            local items = {}
+            for _, rg in ipairs(reag) do items[#items + 1] = { id = rg[1], qty = rg[2] } end
+            if COC.ShareReagents then COC.ShareReagents:Open(entryName(self.postEntry), items) end
+        end)
+    end
     self:_UpdateProvidedCount()
 end
 

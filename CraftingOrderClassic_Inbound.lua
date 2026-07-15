@@ -17,7 +17,9 @@ local MAX_IN   = 60
 -- Mots-clés « demande d'achat / de craft » (FR + EN). STEM = sous-chaîne (conjugaisons : achat,
 -- achète, cherchent, crafting…) ; TOKEN = mot ENTIER requis pour les sigles courts ambigus
 -- (sinon « ACH » ⊂ « eACH », « LF » ⊂ « woLF », « ISO » ⊂ « comparISOn »).
-local KW_REQ_STEM  = { "ACHAT", "ACHET", "CHERCHE", "RECHERCHE", "BESOIN", "FABRIQU", "RECETTE", "ENCHANT", "CRAFT", "BUY", "NEED" }
+-- NB accents : string.upper ne touche pas l'UTF-8 → « ACHÈTE » ne contient PAS le stem « ACHET »
+-- (le È coupe la sous-chaîne). D'où les variantes accentuées ACHÈT / RECHERCH ci-dessous.
+local KW_REQ_STEM  = { "ACHAT", "ACHET", "ACHÈT", "CHERCHE", "RECHERCHE", "RECHERCH", "BESOIN", "FABRIQU", "RECETTE", "ENCHANT", "CRAFT", "BUY", "NEED" }
 local KW_REQ_TOKEN = { "WTB", "WTC", "ISO", "LF", "B>" }
 -- Mots-clés « OFFRE » (vente OU service d'artisan) : si présents → ce n'est PAS une demande, on
 -- ignore. WTS = vendre ; LFW = « looking for work » (un ARTISAN qui propose ses services, pas un

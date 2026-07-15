@@ -133,7 +133,7 @@ function PW:_ToggleLFW()
     local D = COC.Directory
     if not (D and D.SetLFW and self.profKey) or self.rerollKey then return end
     if D.MyLFW and D:MyLFW() == self.profKey then D:SetLFW(nil) else D:SetLFW(self.profKey) end
-    self:_SyncLFWBtn()
+    self:_SyncLFWBtn(); if self.RefreshRecipes then self:RefreshRecipes() end   -- + colonne de cases « proposer »
 end
 
 -- Bascule liste apprises <-> manquantes. Réinitialise la sélection (une recette d'un mode n'existe pas
@@ -155,7 +155,7 @@ function PW:_SyncMissingBtn()
     local show = ok and self.profKey and not self.rerollKey and not self._compact and not self.docked
     b:SetShown(show and true or false)
     if not show then self.missingMode = false; return end
-    local n = COC.MTSL:MissingCount(self.profKey)
+    local n = self:MissingCount()   -- compte DÉDUPÉ (écarte les faux manquants MTSL déjà appris)
     b:SetText(self.missingMode and L["‹ Apprises seules"] or string.format(L["Manquantes (%d)"], n))
     if b.SetSelected then b:SetSelected(self.missingMode and true or false) end
 end

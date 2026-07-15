@@ -250,7 +250,7 @@ local de = {
     ["Marquer comme partenaire"] = "Als Partner markieren", ["Retirer des partenaires"] = "Aus Partnern entfernen",
     -- Arbeitssuche (LFW) : /co lfw
     ["[Dispo]"] = "[Sucht]",
-    ["Chercher du travail"] = "Arbeit suchen",
+    ["Chercher du travail"] = "Arbeit suchen", ["scan LFW du chat : |cFF33DD33activé|r"] = "Chat-LFW-Scan: |cFF33DD33an|r", ["scan LFW du chat : |cFFFFCC00désactivé|r"] = "Chat-LFW-Scan: |cFFFFCC00aus|r", ["propose : %s"] = "bietet an: %s", ["Proposer cette recette (recherche de travail)"] = "Dieses Rezept anbieten (Arbeit suchen)", ["Maximum %d recettes proposées."] = "Höchstens %d angebotene Rezepte.",
     ["Tu cherches du travail — clic pour arrêter."] = "Du suchst Arbeit — Klick zum Beenden.",
     ["Signale au royaume que tu cherches du travail dans ce métier."] = "Sag dem Realm, dass du in diesem Beruf Arbeit suchst.",
     ["recherche de travail : |cFF33DD33%s|r — /co lfw off pour arrêter"] = "Arbeit gesucht: |cFF33DD33%s|r — /co lfw off zum Beenden",
@@ -463,6 +463,15 @@ local de = {
     ["Filtre matériaux actif — clic pour tout afficher."] = "Materialfilter aktiv — Klick zeigt alle.",
     ["N'afficher que les recettes qui font monter la compétence (masque le gris)."] = "Nur Rezepte anzeigen, die den Beruf steigern (blendet Grau aus).",
     ["Filtre progression actif — clic pour tout afficher."] = "Fortschrittsfilter aktiv — Klick zeigt alle.",
+    -- Diffuser les réactifs (liste de courses)
+    ["Diffuser les réactifs"] = "Reagenzien ansagen",
+    ["Diffuser les réactifs dans un canal"] = "Die Reagenzien in einem Kanal ansagen",
+    ["Canal : "] = "Kanal: ",
+    ["Dire"] = "Sagen", ["Groupe"] = "Gruppe", ["Raid"] = "Schlachtzug", ["Envoyer"] = "Senden",
+    ["Réactifs pour %s :"] = "Reagenzien für %s:",
+    ["Réactifs pour %s (%d) :"] = "Reagenzien für %s (%d):",
+    ["choisis un canal valide."] = "wähle einen gültigen Kanal.",
+    ["aucun réactif à diffuser."] = "keine Reagenzien zum Ansagen.", ["Diffuser"] = "Ansagen",
 }
 for k, v in pairs(de) do L[k] = v end
 

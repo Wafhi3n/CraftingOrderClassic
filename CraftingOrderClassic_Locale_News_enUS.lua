@@ -11,6 +11,14 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "What's New",
+    -- v1.19.0
+    ["Propose des recettes précises, diffuse tes réactifs, et le LFW marche même sans l'addon"] = "Recipes in your offer, a share button, and LFW without the addon",
+    ["« Chercher du travail » propose maintenant des recettes précises, pas seulement des réactifs : coche des plans dans la liste et qui te consulte voit « propose : Bouclier de fer, Gilet de mailles de cuivre » à côté de ce que tu fournis déjà."] =
+        "\"Look for work\" now lets you name exact recipes, not just reagents. Check off plans in the recipe list and whoever's browsing your offer sees \"offers: Iron Buckler, Copper Chain Vest\" next to whatever mats you're already listing.",
+    ["Un bouton « Diffuser » envoie la liste de réactifs d'une recette ou d'une commande dans un canal au choix (guilde, dire, groupe/raid, un canal numéroté), avec le lien de chaque objet — une liste de courses en un clic, depuis la vue métier, la carte de commande ou le panneau de publication."] =
+        "A \"Share\" button sends a recipe's or an order's reagent list to a channel of your choice (guild, say, party/raid, a numbered channel), with a link for every item — a shopping list in one click, from the profession window, the order card, or the posting panel.",
+    ["Le LFW marche même sans l'addon : tape « LFW enchantement » en Commerce ou Général et tu apparais comme dispo, avec la même icône de plaque qu'un joueur qui a Crafting Order. Plus une correction : une recette déjà apprise ne s'affichait plus en double avec MissingTradeSkillsList."] =
+        "Look for work works even without the addon: type \"LFW enchanting\" in Trade or General and you show up as available, same nameplate icon as anyone running Crafting Order. Plus a fix: a recipe you'd already learned no longer got listed twice with MissingTradeSkillsList.",
     -- v1.18.0
     ["Chercher du travail : dis ce que tu offres, et trie par progression"] = "Look for work, now with an offer, and sort by what levels you",
     ["« Chercher du travail » ne se contente plus de te signaler dispo. Clique l'engrenage à côté du bouton et dis ce que tu proposes : tu fournis les composants de base, tu fournis tel réactif précis, une commission fixe par craft, ou seulement les plans qui te font gagner un point de compétence. Ça s'affiche sur ta ligne [Dispo] et dans l'infobulle au-dessus de ta tête, avec une pièce s'il y a une commission et un sac si tu fournis des compos."] =

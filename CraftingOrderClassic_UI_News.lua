@@ -16,6 +16,14 @@ local BODY_W = 780
 local function versionsRecent()
     return {
         {
+            v = "v1.19.0", title = L["Propose des recettes précises, diffuse tes réactifs, et le LFW marche même sans l'addon"],
+            lines = {
+                L["« Chercher du travail » propose maintenant des recettes précises, pas seulement des réactifs : coche des plans dans la liste et qui te consulte voit « propose : Bouclier de fer, Gilet de mailles de cuivre » à côté de ce que tu fournis déjà."],
+                L["Un bouton « Diffuser » envoie la liste de réactifs d'une recette ou d'une commande dans un canal au choix (guilde, dire, groupe/raid, un canal numéroté), avec le lien de chaque objet — une liste de courses en un clic, depuis la vue métier, la carte de commande ou le panneau de publication."],
+                L["Le LFW marche même sans l'addon : tape « LFW enchantement » en Commerce ou Général et tu apparais comme dispo, avec la même icône de plaque qu'un joueur qui a Crafting Order. Plus une correction : une recette déjà apprise ne s'affichait plus en double avec MissingTradeSkillsList."],
+            },
+        },
+        {
             v = "v1.18.0", title = L["Chercher du travail : dis ce que tu offres, et trie par progression"],
             lines = {
                 L["« Chercher du travail » ne se contente plus de te signaler dispo. Clique l'engrenage à côté du bouton et dis ce que tu proposes : tu fournis les composants de base, tu fournis tel réactif précis, une commission fixe par craft, ou seulement les plans qui te font gagner un point de compétence. Ça s'affiche sur ta ligne [Dispo] et dans l'infobulle au-dessus de ta tête, avec une pièce s'il y a une commission et un sac si tu fournis des compos."],
@@ -59,6 +67,11 @@ local function versionsRecent()
                 L["Au passage : les deux fenêtres ne s'emmêlent plus (un clic la ramène au premier plan), l'annuaire a un bouton partenaire et se limite à ta faction (pas d'échange cross-faction sur Classic), et un artisan ne s'affiche plus avec un métier qui n'est pas le sien."],
             },
         },
+    }
+end
+
+local function versionsOlder()
+    return {
         {
             v = "v1.14.0", title = L["Un panneau pour gérer les mis en sourdine"],
             lines = {
@@ -71,11 +84,6 @@ local function versionsRecent()
                 L["Un mute porte désormais une raison et une date, et peut être temporaire : |cFFFFFFFF/co mute Bob 1h spammeur|r se lève tout seul au bout d'une heure (|cFFFFFFFF/co mute|r seul liste les mutés avec raison et temps restant). Et |cFFFFFFFF/co trust <nom>|r marque un joueur de confiance, jamais mis en sourdine automatiquement — le mute manuel restant toujours possible."],
             },
         },
-    }
-end
-
-local function versionsOlder()
-    return {
         {
             v = "v1.11.0", title = L["Annuler une commande publique atteint tout le royaume"],
             lines = {
@@ -113,6 +121,11 @@ local function versionsOlder()
                 L["Nouvel onglet « Mes artisans » : tous les métiers de ton compte sur le royaume en une vue, comme un seul perso — niveau, recettes connues par catégorie, cooldowns en tête, et quel perso porte chaque recette."],
             },
         },
+    }
+end
+
+local function versionsOldest()
+    return {
         {
             v = "v1.8.0", title = L["Sous le capot : mises à jour plus sûres"],
             lines = {
@@ -131,11 +144,6 @@ local function versionsOlder()
                 L["Ce nouvel onglet « Nouveautés » affiche les notes de version directement en jeu."],
             },
         },
-    }
-end
-
-local function versionsOldest()
-    return {
         {
             v = "v1.5.0", title = L["Repérer les crafteurs sans l'addon + passe de performance"],
             lines = {

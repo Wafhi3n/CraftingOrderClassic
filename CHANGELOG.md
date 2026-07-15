@@ -1,5 +1,21 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.19.0 — Recipes in your offer, a share button, and LFW without the addon
+
+Looking for work now lets you name exact recipes, not just reagents. Check off plans in the recipe
+list and whoever's browsing your offer sees "offers: Iron Buckler, Copper Chain Vest" next to whatever
+mats you're already listing.
+
+Reagents get a "Share" button in the profession window, the order card, and the posting panel. Pick a
+channel (guild, say, party/raid, a numbered channel) and it drops the reagent list with item links, a
+shopping list in one click.
+
+LFW works even without the addon: type "LFW enchanting" in Trade or General and you show up as
+available, same nameplate icon and directory line as anyone running Crafting Order.
+
+Fixed a MissingTradeSkillsList integration bug where a recipe you'd already learned could get listed
+twice, once as learned and once as missing.
+
 ## v1.18.0 — Look for work, now with an offer, and sort by what levels you
 
 "Look for work" used to just flag you as available. Now it carries an offer. Open a profession, click

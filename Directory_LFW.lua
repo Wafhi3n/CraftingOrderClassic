@@ -31,10 +31,12 @@ local LFW_TTL     = 20 * 60    -- durée de vie côté récepteur SANS rafraîch
                                -- d'émettre (parti, ou FULL AFK — cf. ticker) sort du radar au bout de ça.
 local LFW_REFRESH =  8 * 60    -- ré-émission tant que présent ET NON AFK (< TTL) : maintient le LFW frais.
 
-local OFFER_MAX_ITEMS = 15         -- cap composants fournis : ligne LFO ≈ 135 chars, sous la limite canal
+local OFFER_MAX_ITEMS   = 15       -- cap composants fournis : ligne LFO ≈ 135 chars, sous la limite canal
+local OFFER_MAX_RECIPES = 12       -- cap recettes proposées : ligne LFR ≈ 100 chars ; la plaque n'en montre qu'1 (+N)
 local OFFER_MAX_FEE   = 9999999    -- cap commission (cuivre) : 999g 99s 99c, borne encode ET décode
 local OFFER_DEBOUNCE  = 5          -- s : regroupe les changements de config avant re-diffusion
-Dir.OFFER_MAX_ITEMS = OFFER_MAX_ITEMS   -- exposé : le panneau de config (ProfWindow_LFW) montre « n/15 »
+Dir.OFFER_MAX_ITEMS   = OFFER_MAX_ITEMS     -- exposé : le panneau de config (ProfWindow_LFW) montre « n/15 »
+Dir.OFFER_MAX_RECIPES = OFFER_MAX_RECIPES   -- exposé : la colonne de cases (ProfWindow_Recipes) borne la sélection
 
 Dir.lfw = Dir.lfw or {}         -- RUNTIME : [nom court] = { prof = <clé>, expiry = <time> } (AUTRES joueurs)
 
@@ -96,6 +98,50 @@ function Dir:OnLFO(sender, message)
     if COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end
 end
 
+-- Réception LFR|<prof>|<spellID,…> : les RECETTES précises que l'artisan propose (verbe séparé de LFO, même
+-- raison — étendre LFO casserait le pattern ancré des vieux clients ; un verbe inconnu est ignoré proprement).
+-- Identifiant = spellID de la RECETTE (résolu en NOM par GetSpellInfo chez tout récepteur, même non-apprise).
+-- Stocké sur e.recipes (frère de e.offer) → LFO et LFR ont des champs DISJOINTS sur l'entrée : ni l'ordre
+-- d'arrivée ni la perte d'une des deux lignes ne s'écrasent l'un l'autre. Clé par SENDER (sûr). Cap au décodage.
+function Dir:OnLFR(sender, message)
+    if not sender or sender == me() then return end
+    local prof, ids = message:match("^LFR|([%a ]+)|?([%d,]*)$")
+    if not prof or prof == "" then return end
+    local list = {}
+    for id in (ids or ""):gmatch("%d+") do
+        local n = tonumber(id)
+        if n and n > 0 and #list < OFFER_MAX_RECIPES then list[#list + 1] = n end
+    end
+    self.lfw = self.lfw or {}
+    local e = self.lfw[sender]
+    if not (e and e.prof == prof) then e = { prof = prof }; self.lfw[sender] = e end
+    e.expiry  = time() + LFW_TTL           -- un LFR seul vaut LFW-on (robuste à la perte du LFW|on)
+    e.recipes = (#list > 0) and list or nil
+    if COC.Nameplate and COC.Nameplate.Refresh then COC.Nameplate:Refresh(sender) end
+    if COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end
+end
+
+-- Prospect LFW vu dans le CHAT (joueur SANS l'addon, cf. LFWChat). Display-only : entrée annuaire (source
+-- classée guilde/ami sinon « recent » ; craftSeen = métier connu SANS niveau → « vu (sans l'addon) ») +
+-- statut LFW (badge [Dispo] + nameplate, même TTL), marqué viaChat. NE marque PAS online (non-porteur) et ne
+-- pousse aucune commande (le protocole lui est indisponible). Un vrai LFW addon (OnLFW) écrase ensuite proprement.
+function Dir:NoteChatLFW(name, prof)
+    if not (name and prof) or name == me() then return end
+    self.roster = self.roster or {}
+    local r = self.roster[name]; if not r then r = {}; self.roster[name] = r end
+    if self._ApplySource then self:_ApplySource(name, r) end
+    r.faction = self._MyFaction and self:_MyFaction() or r.faction
+    r.lastSeen = time(); r.viaChat = true
+    r.craftSeen = r.craftSeen or {}
+    if r.craftSeen[prof] == nil then r.craftSeen[prof] = 0 end   -- 0 = connu sans l'addon, niveau inconnu
+    self.lfw = self.lfw or {}
+    local e = self.lfw[name]
+    if not (e and e.prof == prof) then e = { prof = prof }; self.lfw[name] = e end
+    e.expiry = time() + LFW_TTL; e.viaChat = true
+    if COC.Nameplate and COC.Nameplate.Refresh then COC.Nameplate:Refresh(name) end
+    if COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end
+end
+
 -- Encode MON offre en ligne LFO (nil si l'offre est vide → rien à diffuser). Pur, iso-fil (testé headless).
 -- Caps appliqués aussi à l'ÉMISSION : la ligne reste courte quel que soit l'état de la config.
 function Dir:_EncodeLFO(profKey, o)
@@ -111,6 +157,19 @@ function Dir:_EncodeLFO(profKey, o)
     return string.format("LFO|%s|%s|%d|%s", profKey, flags == "" and "-" or flags, fee, table.concat(ids, ","))
 end
 
+-- Encode MES recettes proposées en ligne LFR (nil si aucune → rien à diffuser). Pur, iso-fil (testé headless).
+-- Cap appliqué à l'ÉMISSION : la ligne reste courte quel que soit l'état de la config.
+function Dir:_EncodeLFR(profKey, o)
+    if not (profKey and o and o.recipes and #o.recipes > 0) then return nil end
+    local ids = {}
+    for i, id in ipairs(o.recipes) do
+        if i > OFFER_MAX_RECIPES then break end
+        ids[#ids + 1] = tostring(id)
+    end
+    if #ids == 0 then return nil end
+    return string.format("LFR|%s|%s", profKey, table.concat(ids, ","))
+end
+
 -- Diffuse MON statut au royaume (canal-texte). Émetteurs = OnNetworkReady (login) et le ticker : AUCUN
 -- n'est sous hardware event → on ENFILE (QueueText) au lieu de tenter un envoi immédiat. Un SendChatMessage
 -- hors input déclencherait ADDON_ACTION_BLOCKED (que le pcall n'attrape pas → popup d'erreur au login).
@@ -123,6 +182,8 @@ function Dir:_BroadcastLFW()
         c:QueueText("LFW|on|" .. db.prof)
         local lfo = self:_EncodeLFO(db.prof, self:MyLFWOffer(db.prof))
         if lfo then c:QueueText(lfo) end
+        local lfr = self:_EncodeLFR(db.prof, self:MyLFWOffer(db.prof))
+        if lfr then c:QueueText(lfr) end
     else
         c:QueueText("LFW|off")
     end
@@ -158,11 +219,11 @@ end
 -- unique). nil si pas d'offre vivante. Noms d'objets au runtime (multilingue) ; « +N » = neutre.
 function Dir:LFWOfferLines(name)
     local e = self:LFWOf(name)
-    local o = e and e.offer
-    if not o then return nil end
+    if not e then return nil end
+    local o = e.offer
     local out = {}
-    if o.basics then out[#out + 1] = L["fournit les composants de base (marchand)"] end
-    if o.items and #o.items > 0 then
+    if o and o.basics then out[#out + 1] = L["fournit les composants de base (marchand)"] end
+    if o and o.items and #o.items > 0 then
         local c = CL()
         local names = {}
         for i = 1, math.min(3, #o.items) do
@@ -172,11 +233,22 @@ function Dir:LFWOfferLines(name)
         local extra = (#o.items > 3) and (" |cFF888888+" .. (#o.items - 3) .. "|r") or ""
         out[#out + 1] = string.format(L["fournit : %s"], table.concat(names, ", ") .. extra)
     end
-    if o.fee and o.fee > 0 then
+    if o and o.fee and o.fee > 0 then
         local money = (GetCoinTextureString and GetCoinTextureString(o.fee)) or tostring(o.fee)
         out[#out + 1] = string.format(L["commission : %s par craft"], money)
     end
-    if o.skillUpOnly then out[#out + 1] = L["composants fournis seulement si le plan fait progresser"] end
+    if o and o.skillUpOnly then out[#out + 1] = L["composants fournis seulement si le plan fait progresser"] end
+    -- Recettes proposées (verbe LFR, entrée e.recipes) : noms résolus au runtime par GetSpellInfo (via CraftLink).
+    if e.recipes and #e.recipes > 0 then
+        local c = CL()
+        local names = {}
+        for i = 1, math.min(3, #e.recipes) do
+            local sid = e.recipes[i]
+            names[#names + 1] = (c and c.RecipeName and c:RecipeName(sid)) or ("spell:" .. sid)
+        end
+        local extra = (#e.recipes > 3) and (" |cFF888888+" .. (#e.recipes - 3) .. "|r") or ""
+        out[#out + 1] = string.format(L["propose : %s"], table.concat(names, ", ") .. extra)
+    end
     return (#out > 0) and out or nil
 end
 
@@ -233,6 +305,7 @@ function Dir:StartLFW()
     local c = CL(); if not c then return end
     c:RegisterHandler("LFW", function(s, m) Dir:OnLFW(s, m) end)
     c:RegisterHandler("LFO", function(s, m) Dir:OnLFO(s, m) end)
+    c:RegisterHandler("LFR", function(s, m) Dir:OnLFR(s, m) end)
     if c.OnNetworkReady then
         c:OnNetworkReady(function()
             if COC.db and COC.db.lfw and COC.db.lfw.prof then Dir:_BroadcastLFW(); Dir:_StartLFWTicker() end

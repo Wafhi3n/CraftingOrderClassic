@@ -278,7 +278,7 @@ local en = {
     ["Marquer comme partenaire"] = "Mark as partner", ["Retirer des partenaires"] = "Remove from partners",
     -- Recherche de travail (LFW) : /co lfw
     ["[Dispo]"] = "[LFW]",
-    ["Chercher du travail"] = "Look for work",
+    ["Chercher du travail"] = "Look for work", ["scan LFW du chat : |cFF33DD33activé|r"] = "chat LFW scan: |cFF33DD33on|r", ["scan LFW du chat : |cFFFFCC00désactivé|r"] = "chat LFW scan: |cFFFFCC00off|r", ["propose : %s"] = "offers: %s", ["Proposer cette recette (recherche de travail)"] = "Offer this recipe (looking for work)", ["Maximum %d recettes proposées."] = "Up to %d offered recipes.",
     ["Tu cherches du travail — clic pour arrêter."] = "You're looking for work — click to stop.",
     ["Signale au royaume que tu cherches du travail dans ce métier."] = "Tell the realm you're looking for work in this profession.",
     ["recherche de travail : |cFF33DD33%s|r — /co lfw off pour arrêter"] = "looking for work: |cFF33DD33%s|r — /co lfw off to stop",
@@ -482,8 +482,6 @@ local en = {
     ["Meilleur plan"] = "Best plan",
     ["Tous les plans du royaume"] = "All realm crafts",
     ["%d métiers"] = "%d professions",
-    ["Manquantes"] = "Missing",
-    ["Manquantes (%d)"] = "Missing (%d)",
     ["À ma charge"] = "My share",
     ["Valeurs exactes — clic pour l'affichage compact."] = "Exact values — click for compact display.",
     ["Afficher les valeurs exactes (po/pa/pc)."] = "Show exact values (g/s/c).",
@@ -492,6 +490,9 @@ local en = {
     ["Tri par rentabilité — clic pour A-Z."] = "Sorted by profit — click for A-Z.",
     ["N'afficher que les recettes dont j'ai les matériaux."] = "Show only recipes you have the materials for.", ["Filtre matériaux actif — clic pour tout afficher."] = "Materials filter on — click to show all.",
     ["N'afficher que les recettes qui font monter la compétence (masque le gris)."] = "Show only recipes that raise your skill (hides grey).", ["Filtre progression actif — clic pour tout afficher."] = "Skill-up filter on — click to show all.",
+    ["Diffuser les réactifs"] = "Broadcast reagents", ["Diffuser les réactifs dans un canal"] = "Broadcast the reagents to a channel", ["Canal : "] = "Channel: ",  -- liste de courses
+    ["Dire"] = "Say", ["Groupe"] = "Party", ["Raid"] = "Raid", ["Envoyer"] = "Send", ["Réactifs pour %s :"] = "Reagents for %s:", ["Réactifs pour %s (%d) :"] = "Reagents for %s (%d):",
+    ["choisis un canal valide."] = "pick a valid channel.", ["aucun réactif à diffuser."] = "no reagents to broadcast.", ["Diffuser"] = "Broadcast",
 }
 
 for k, v in pairs(en) do L[k] = v end

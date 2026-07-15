@@ -56,11 +56,26 @@ function PW:_BuildDetail(col)
     local reagHdr = body:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     reagHdr:SetPoint("TOPLEFT", 12, -52); reagHdr:SetText("|cFFE8B84B" .. L["Réactifs :"] .. "|r"); self.detReagHdr = reagHdr
 
+    -- Bouton « Diffuser » (liste de courses) : ouvre la popup canal + envoie les liens des réactifs.
+    local shareBtn = Skin.MakeGoldButton(body, 82, 18, L["Diffuser"])
+    shareBtn:SetPoint("LEFT", reagHdr, "RIGHT", 14, 1)
+    shareBtn:SetScript("OnClick", function() PW:_ShareReagents() end)
+    shareBtn:SetScript("OnEnter", function(b)
+        GameTooltip:SetOwner(b, "ANCHOR_RIGHT"); GameTooltip:SetText(L["Diffuser les réactifs dans un canal"], 1, 1, 1); GameTooltip:Show()
+    end)
+    shareBtn:SetScript("OnLeave", GameTooltip_Hide)
+    shareBtn:Hide(); self.detShareBtn = shareBtn
+
     local rContainer = CreateFrame("Frame", nil, body)
     rContainer:SetPoint("TOPLEFT", 0, -70); rContainer:SetPoint("RIGHT", body, "RIGHT", 0, 0); rContainer:SetHeight(MAX_REAG * REAG_H)
     self.detReagRows = {}
     for i = 1, MAX_REAG do self.detReagRows[i] = self:_BuildReagentRow(rContainer, i) end
 
+    self:_BuildDetailFooter(fz)
+end
+
+-- Bande PIED du détail : Créer / Créer tout / Qté. Extrait de _BuildDetail (anti-monolithe).
+function PW:_BuildDetailFooter(fz)
     -- DoCraft (Enchantement) est PROTÉGÉE : un addon ne peut pas l'appeler. Le bouton « Créer » est
     -- donc SÉCURISÉ et redirige le clic vers le bouton natif de Blizzard quand un Craft (enchant) est
     -- ouvert (cf. _WireCreateButton). Métier normal → DoTradeSkill n'est pas protégé : on crafte en
@@ -113,6 +128,7 @@ function PW:_ClearDetail()
     self.detMakesFS:SetText("")
     if self._HideInfoPanel then self:_HideInfoPanel() end
     self.detReagHdr:Show()
+    if self.detShareBtn then self.detShareBtn:Hide() end
     for _, r in ipairs(self.detReagRows) do r:Hide() end
     -- Ré-affiche les boutons hors mode reroll (une visite en vue reroll a pu les masquer) — sinon ils
     -- restaient invisibles jusqu'à la prochaine sélection. En reroll : lecture seule, on les laisse cachés.
@@ -193,6 +209,7 @@ function PW:_ShowMissingDetail(e)
     self.detNameFS:SetText((e.name or "?") .. "  |cFF888888(" .. L["niveau"] .. " " .. (e.level or 0) .. ")|r")
     self.detMakesFS:SetText("|cFFFF8855" .. L["Non apprise"] .. "|r")
     self.detReagHdr:Hide()
+    if self.detShareBtn then self.detShareBtn:Hide() end
     for _, r in ipairs(self.detReagRows) do r:Hide() end
     self:_RenderInfoPanel(e)
 
@@ -229,9 +246,22 @@ function PW:_FillReagentRows(e)
             row:Hide()
         end
     end
+    if self.detShareBtn then self.detShareBtn:SetShown(nReag > 0) end
     -- Sections d'info SOUS les réactifs (ex. « Rentabilité » Lazy Gold). REAG_H = hauteur d'une ligne
     -- réactif ; on démarre juste sous la dernière + une petite marge. Vide (0 ligne) = rien ne s'affiche.
     if self._RenderInfoPanel then self:_RenderInfoPanel(e, -70 - nReag * REAG_H - 12) end
+end
+
+-- Diffuse les réactifs de la recette sélectionnée (liste de courses → popup canal). Utilise les mêmes
+-- réactifs que l'affichage : reroll = « à fournir » (lecture seule), sinon les réactifs du métier ouvert.
+function PW:_ShareReagents()
+    local e = self:GetSelectedRecipe(); if not e then return end
+    local reags = self.rerollKey and self:_RerollReagents(e.index) or COC.Craft:Reagents(e.index)
+    local items = {}
+    for _, rg in ipairs(reags or {}) do
+        items[#items + 1] = { link = rg.link, name = rg.name, qty = rg.need }
+    end
+    if COC.ShareReagents then COC.ShareReagents:Open(e.name or "?", items) end
 end
 
 function PW:RefreshDetail()
