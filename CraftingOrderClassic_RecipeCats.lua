@@ -45,10 +45,20 @@ local UNSORTED_ORDER = 999   -- « Divers » toujours en fin de section
 
 -- Déclare les sous-catégories d'un métier. profKey = clé canonique CraftLink (« Alchemy »), telle que
 -- rendue par Craft:OpenProfessionKey(). Appelé au chargement par les fichiers de données.
+-- APPEND si le métier a déjà des groupes : un même métier peut déclarer ses sous-catégories depuis
+-- PLUSIEURS fichiers (le Minage = « Minerais » côté récolte + « Lingots » côté fonte). Dédup par NOM
+-- de groupe → idempotent (une re-déclaration à chaud n'ajoute pas de doublon).
 function RC:Register(profKey, groups)
     if not (profKey and groups) then return end
-    defs[profKey] = groups
-    index[profKey] = nil   -- invalide l'index si on re-déclare (rechargement à chaud)
+    local existing = defs[profKey]
+    if existing then
+        local seen = {}
+        for _, g in ipairs(existing) do seen[g.name] = true end
+        for _, g in ipairs(groups) do if not seen[g.name] then existing[#existing + 1] = g end end
+    else
+        defs[profKey] = groups
+    end
+    index[profKey] = nil   -- invalide l'index (nouvelle déclaration ou ajout)
 end
 
 function RC:HasCategories(profKey)

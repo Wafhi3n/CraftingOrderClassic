@@ -1,4 +1,4 @@
--- Directory_LFW.lua — statut « recherche de travail » (Looking For Work).
+-- Directory_LFW.lua — statut « recherche de travail » (Looking For Work) + OFFRE par métier.
 --
 -- Un artisan se déclare dispo pour UN métier → diffusé au ROYAUME via le canal-texte (verbe LFW, réutilise
 -- l'infra canal v1.11.0, cf. balise/texte canal CraftLink). Les autres stockent { prof, expiry } EN RUNTIME
@@ -6,6 +6,14 @@
 -- construction : le stockage est clé par SENDER (émetteur réel, non falsifiable par le transport) → on ne
 -- peut déclarer QUE soi-même LFW. MON propre choix (COC.db.lfw.prof) PERSISTE et se ré-affirme au login +
 -- périodiquement (le récepteur applique un TTL, donc sans ré-émission je disparais de son radar).
+--
+-- OFFRE (v1.18) : détails par MÉTIER attachés au LFW — « je fournis les compos de base », liste de
+-- composants fournis, commission fixe par craft, restriction « seulement si le plan me fait progresser ».
+-- Config persistée dans COC.db.lfwOffer[profKey] (éditable même LFW éteint), diffusée par un verbe SÉPARÉ
+-- `LFO|<prof>|<flags>|<feeCopper>|<id1,id2,…>` : étendre LFW|on casserait les vieux clients (leur pattern
+-- avalerait les champs dans la clé métier), alors qu'un verbe inconnu est ignoré proprement par _Dispatch.
+-- Wire 100 % neutre en langue (IDs, cuivre, lettres). Un LFO seul VAUT LFW-on (robuste à la perte d'une
+-- ligne) ; l'offre reçue vit sur l'entrée Dir.lfw[sender].offer et meurt avec elle (même TTL).
 
 local COC = CraftingOrderClassic
 local Dir = COC.Directory
@@ -22,6 +30,11 @@ end
 local LFW_TTL     = 20 * 60    -- durée de vie côté récepteur SANS rafraîchissement : un joueur qui cesse
                                -- d'émettre (parti, ou FULL AFK — cf. ticker) sort du radar au bout de ça.
 local LFW_REFRESH =  8 * 60    -- ré-émission tant que présent ET NON AFK (< TTL) : maintient le LFW frais.
+
+local OFFER_MAX_ITEMS = 15         -- cap composants fournis : ligne LFO ≈ 135 chars, sous la limite canal
+local OFFER_MAX_FEE   = 9999999    -- cap commission (cuivre) : 999g 99s 99c, borne encode ET décode
+local OFFER_DEBOUNCE  = 5          -- s : regroupe les changements de config avant re-diffusion
+Dir.OFFER_MAX_ITEMS = OFFER_MAX_ITEMS   -- exposé : le panneau de config (ProfWindow_LFW) montre « n/15 »
 
 Dir.lfw = Dir.lfw or {}         -- RUNTIME : [nom court] = { prof = <clé>, expiry = <time> } (AUTRES joueurs)
 
@@ -52,18 +65,120 @@ function Dir:OnLFW(sender, message)
     if COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end
 end
 
+-- Réception LFO|<prof>|<flags>|<fee>|<ids> : l'OFFRE attachée au LFW d'un joueur. Validation stricte
+-- (flags whitelist B/S, fee et items CAPPÉS côté décodage : un émetteur trafiqué ne gonfle ni le fee ni
+-- la liste). Crée OU rafraîchit l'entrée LFW : les deux lignes partent en file FIFO mais une perte est
+-- possible — un LFO seul vaut donc LFW-on. Clé par SENDER, même sûreté que LFW.
+function Dir:OnLFO(sender, message)
+    if not sender or sender == me() then return end
+    -- ⚠️ profKey = lettres ET espaces : « First Aid » est une clé canonique valide — un `%a+` seul
+    -- casserait silencieusement toute offre Secourisme (bug attrapé en revue avant release).
+    local prof, flags, fee, items = message:match("^LFO|([%a ]+)|([%-A-Z]*)|(%d+)|?([%d,]*)$")
+    if not prof or prof == "" then return end
+    fee = math.min(tonumber(fee) or 0, OFFER_MAX_FEE)
+    local o = {}
+    if flags:find("B", 1, true) then o.basics = true end
+    if flags:find("S", 1, true) then o.skillUpOnly = true end
+    if fee > 0 then o.fee = fee end
+    for id in (items or ""):gmatch("%d+") do
+        local n = tonumber(id)
+        if n and n > 0 then
+            o.items = o.items or {}
+            if #o.items < OFFER_MAX_ITEMS then o.items[#o.items + 1] = n end
+        end
+    end
+    self.lfw = self.lfw or {}
+    local e = self.lfw[sender]
+    if not (e and e.prof == prof) then e = { prof = prof }; self.lfw[sender] = e end
+    e.expiry = time() + LFW_TTL
+    e.offer = (o.basics or o.skillUpOnly or o.fee or o.items) and o or nil
+    if COC.Nameplate and COC.Nameplate.Refresh then COC.Nameplate:Refresh(sender) end
+    if COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end
+end
+
+-- Encode MON offre en ligne LFO (nil si l'offre est vide → rien à diffuser). Pur, iso-fil (testé headless).
+-- Caps appliqués aussi à l'ÉMISSION : la ligne reste courte quel que soit l'état de la config.
+function Dir:_EncodeLFO(profKey, o)
+    if not (profKey and o) then return nil end
+    local flags = (o.basics and "B" or "") .. (o.skillUpOnly and "S" or "")
+    local fee = math.min(tonumber(o.fee) or 0, OFFER_MAX_FEE)
+    local ids = {}
+    for i, id in ipairs(o.items or {}) do
+        if i > OFFER_MAX_ITEMS then break end
+        ids[#ids + 1] = tostring(id)
+    end
+    if flags == "" and fee == 0 and #ids == 0 then return nil end
+    return string.format("LFO|%s|%s|%d|%s", profKey, flags == "" and "-" or flags, fee, table.concat(ids, ","))
+end
+
 -- Diffuse MON statut au royaume (canal-texte). Émetteurs = OnNetworkReady (login) et le ticker : AUCUN
 -- n'est sous hardware event → on ENFILE (QueueText) au lieu de tenter un envoi immédiat. Un SendChatMessage
 -- hors input déclencherait ADDON_ACTION_BLOCKED (que le pcall n'attrape pas → popup d'erreur au login).
--- La file draine au prochain clic/touche. Verbe de DONNÉES → pas de balise requise.
+-- La file draine au prochain clic/touche. Verbe de DONNÉES → pas de balise requise. L'offre du métier
+-- actif part juste derrière le LFW|on (même file FIFO) ; offre vide → pas de ligne LFO.
 function Dir:_BroadcastLFW()
     local c = CL(); if not (c and c.QueueText) then return end
     local db = COC.db and COC.db.lfw
-    if db and db.prof then c:QueueText("LFW|on|" .. db.prof) else c:QueueText("LFW|off") end
+    if db and db.prof then
+        c:QueueText("LFW|on|" .. db.prof)
+        local lfo = self:_EncodeLFO(db.prof, self:MyLFWOffer(db.prof))
+        if lfo then c:QueueText(lfo) end
+    else
+        c:QueueText("LFW|off")
+    end
 end
 
 -- Ma clé de métier LFW (ou nil).
 function Dir:MyLFW() return COC.db and COC.db.lfw and COC.db.lfw.prof or nil end
+
+-- MA config d'offre pour un métier (persistée, PAR métier — survit au changement de métier LFW actif).
+function Dir:MyLFWOffer(profKey)
+    local t = COC.db and COC.db.lfwOffer
+    return (t and profKey) and t[profKey] or nil
+end
+
+-- Enregistre MA config d'offre d'un métier (nil = effacer) + re-diffusion DÉBOUNCÉE si le LFW de CE
+-- métier est actif (le panneau sauve à chaque coche : sans débounce, chaque clic mettrait une ligne en
+-- file). Config d'un métier NON actif : on sauve sans rien diffuser (elle partira au prochain SetLFW).
+function Dir:SetLFWOffer(profKey, offer)
+    if not profKey then return end
+    COC.db = COC.db or {}
+    COC.db.lfwOffer = COC.db.lfwOffer or {}
+    COC.db.lfwOffer[profKey] = offer
+    if self:MyLFW() ~= profKey then return end
+    if not (C_Timer and C_Timer.NewTimer) then return end
+    if self._lfoDebounce then self._lfoDebounce:Cancel() end
+    self._lfoDebounce = C_Timer.NewTimer(OFFER_DEBOUNCE, function()
+        Dir._lfoDebounce = nil
+        if Dir:MyLFW() == profKey then Dir:_BroadcastLFW() end
+    end)
+end
+
+-- Lignes d'affichage de l'offre LFW d'un joueur, prêtes pour un tooltip (monde + annuaire = source
+-- unique). nil si pas d'offre vivante. Noms d'objets au runtime (multilingue) ; « +N » = neutre.
+function Dir:LFWOfferLines(name)
+    local e = self:LFWOf(name)
+    local o = e and e.offer
+    if not o then return nil end
+    local out = {}
+    if o.basics then out[#out + 1] = L["fournit les composants de base (marchand)"] end
+    if o.items and #o.items > 0 then
+        local c = CL()
+        local names = {}
+        for i = 1, math.min(3, #o.items) do
+            local id = o.items[i]
+            names[#names + 1] = (c and c.ItemName and c:ItemName(id)) or ("item:" .. id)
+        end
+        local extra = (#o.items > 3) and (" |cFF888888+" .. (#o.items - 3) .. "|r") or ""
+        out[#out + 1] = string.format(L["fournit : %s"], table.concat(names, ", ") .. extra)
+    end
+    if o.fee and o.fee > 0 then
+        local money = (GetCoinTextureString and GetCoinTextureString(o.fee)) or tostring(o.fee)
+        out[#out + 1] = string.format(L["commission : %s par craft"], money)
+    end
+    if o.skillUpOnly then out[#out + 1] = L["composants fournis seulement si le plan fait progresser"] end
+    return (#out > 0) and out or nil
+end
 
 -- Active (profKey) / désactive (nil) mon statut. Persiste + diffuse au royaume + (re)lance le ticker.
 function Dir:SetLFW(profKey)
@@ -112,10 +227,12 @@ function Dir:LFWCmd(arg)
     pmsg(string.format(L["recherche de travail : |cFF33DD33%s|r — visible au royaume"], profLabel(key)))
 end
 
--- Câblage : handler du verbe LFW + ré-affirmation à chaque (re)acquisition du canal. Appelé par Dir:Start.
+-- Câblage : handlers des verbes LFW + LFO + ré-affirmation à chaque (re)acquisition du canal. Appelé
+-- par Dir:Start. (Vieux clients : LFO = verbe inconnu, ignoré proprement par _Dispatch.)
 function Dir:StartLFW()
     local c = CL(); if not c then return end
     c:RegisterHandler("LFW", function(s, m) Dir:OnLFW(s, m) end)
+    c:RegisterHandler("LFO", function(s, m) Dir:OnLFO(s, m) end)
     if c.OnNetworkReady then
         c:OnNetworkReady(function()
             if COC.db and COC.db.lfw and COC.db.lfw.prof then Dir:_BroadcastLFW(); Dir:_StartLFWTicker() end

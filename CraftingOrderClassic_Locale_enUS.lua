@@ -286,6 +286,26 @@ local en = {
     ["recherche de travail arrêtée."] = "looking for work stopped.",
     ["tu n'as pas le métier %s — impossible de chercher du travail dessus."] = "you don't have %s — can't look for work in it.",
     ["recherche de travail : |cFF33DD33%s|r — visible au royaume"] = "looking for work: |cFF33DD33%s|r — visible across the realm",
+    -- Offre LFW (panneau de config par métier + tooltips + tris progression)
+    ["Configurer l'offre : composants fournis, commission…"] = "Set up your offer: provided reagents, fee…",
+    ["Recherche de travail — %s"] = "Looking for work — %s",
+    ["Je fournis les composants de base"] = "I provide the basic reagents",
+    ["(achetables chez un marchand)"] = "(the ones sold by vendors)",
+    ["Seulement si le plan me fait progresser"] = "Only if the recipe skills me up",
+    ["(restriction sur les composants fournis)"] = "(restricts the provided reagents)",
+    ["Commission fixe par craft :"] = "Flat fee per craft:",
+    ["Composants fournis (%d/%d)"] = "Provided reagents (%d/%d)",
+    ["Maximum %d composants fournis."] = "At most %d provided reagents.",
+    ["Cherche du travail : %s"] = "Looking for work: %s",
+    ["fournit les composants de base (marchand)"] = "provides the basic reagents (vendor)",
+    ["fournit : %s"] = "provides: %s",
+    ["commission : %s par craft"] = "fee: %s per craft",
+    ["composants fournis seulement si le plan fait progresser"] = "reagents provided only if the recipe skills them up",
+    ["Trier par montée de compétence (plans orange d'abord)."] = "Sort by skill-up (orange recipes first).",
+    ["Tri par montée de compétence — clic pour A-Z."] = "Sorted by skill-up — click for A-Z.",
+    ["Par progression"] = "By skill-up",
+    ["Trier : les commandes qui me font progresser d'abord."] = "Sort: orders that skill me up first.",
+    ["Progression d'abord — clic pour revenir aux récentes."] = "Skill-ups first — click to go back to most recent.",
     ["|cFF66CCFFamis/partenaires intéressés :|r %s (|cFFFFFFFF/co gift <nom>|r)"] =
         "|cFF66CCFFinterested friends/partners:|r %s (|cFFFFFFFF/co gift <name>|r)",
     ["proposer (chuchoter) le dernier plan looté à un ami/partenaire qui ne le connaît pas"] =
@@ -417,6 +437,7 @@ local en = {
     ["Huiles"] = "Oils",
     ["Transmutations"] = "Transmutes",
     ["Minerais"] = "Ores",
+    ["Lingots"] = "Bars",
     ["Cuirs"] = "Leather",
     -- ⚠️ Clés DYNAMIQUES (L[group.name] dans RecipeCats) : le checker ne les voit pas — tenir cette
     -- liste alignée sur les `name =` des _RecipeCats_*.lua à chaque régénération (bug live sosh13).
@@ -469,6 +490,8 @@ local en = {
     ["Clic : commander ce métier"] = "Click: order this profession",
     ["Trier par rentabilité (Lazy Gold)."] = "Sort by profitability (Lazy Gold).",
     ["Tri par rentabilité — clic pour A-Z."] = "Sorted by profit — click for A-Z.",
+    ["N'afficher que les recettes dont j'ai les matériaux."] = "Show only recipes you have the materials for.", ["Filtre matériaux actif — clic pour tout afficher."] = "Materials filter on — click to show all.",
+    ["N'afficher que les recettes qui font monter la compétence (masque le gris)."] = "Show only recipes that raise your skill (hides grey).", ["Filtre progression actif — clic pour tout afficher."] = "Skill-up filter on — click to show all.",
 }
 
 for k, v in pairs(en) do L[k] = v end

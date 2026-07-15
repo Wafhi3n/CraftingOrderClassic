@@ -18,7 +18,12 @@ local function closeOtherProfession(event)
 end
 
 -- SHOW : neutralise le natif (zéro flash), ferme l'autre métier, ouvre notre fenêtre custom.
+-- REPLI COMBAT : la fenêtre custom est protégée (interdite d'ouverture en combat, OnProfessionShow
+-- return alors sans rien afficher). Si on neutralisait quand même le natif, on finirait sur un écran
+-- VIDE (native masquée + custom non ouverte). En combat on laisse donc la fenêtre Blizzard native
+-- s'afficher telle quelle — repli natif. Sortie de combat → la prochaine ouverture rendra la custom.
 function ProfOrders:_OnShow(PW, event)
+    if InCombatLockdown and InCombatLockdown() then return end   -- repli natif : ne pas museler la fenêtre Blizzard
     local switched = closeOtherProfession(event)
     PW:NeutralizeNative()
     if switched and C_Timer then C_Timer.After(0.1, function() PW:OnProfessionShow() end)
@@ -26,9 +31,9 @@ function ProfOrders:_OnShow(PW, event)
 end
 
 -- Combat : la fenêtre métier custom ne se ferme pas au clic en combat (le natif est protégé) → on la
--- referme AUTOMATIQUEMENT à l'entrée en combat. On masque notre frame (toujours autorisé) et on tente
--- de fermer la session native. La garde InCombatLockdown de OnProfessionShow empêche toute
--- ré-ouverture intempestive tant que le combat dure.
+-- referme AUTOMATIQUEMENT à l'entrée en combat. PW:Hide escamote notre frame (Hide direct bloqué en
+-- combat par le bouton « Créer » sécurisé affiché) et on tente de fermer la session native. La garde
+-- InCombatLockdown de OnProfessionShow empêche toute ré-ouverture intempestive tant que le combat dure.
 function ProfOrders:_OnCombat()
     local PW = COC.ProfWindow
     if not (PW and PW.frame and PW.frame:IsShown()) then return end
@@ -42,9 +47,14 @@ function ProfOrders:Start()
     if not COC.db then return end
     local f = CreateFrame("Frame")
     for _, ev in ipairs({ "TRADE_SKILL_SHOW", "TRADE_SKILL_UPDATE", "TRADE_SKILL_CLOSE",
-                          "CRAFT_SHOW", "CRAFT_UPDATE", "CRAFT_CLOSE", "PLAYER_REGEN_DISABLED" }) do f:RegisterEvent(ev) end
+                          "CRAFT_SHOW", "CRAFT_UPDATE", "CRAFT_CLOSE",
+                          "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED" }) do f:RegisterEvent(ev) end
     f:SetScript("OnEvent", function(_, event)
         if event == "PLAYER_REGEN_DISABLED" then ProfOrders:_OnCombat(); return end
+        -- Fin de combat : on rejoue tout masquage de fenêtre différé (Hide protégé pendant le combat).
+        if event == "PLAYER_REGEN_ENABLED" then
+            local PW = COC.ProfWindow; if PW and PW._hidePending then PW:Hide() end; return
+        end
         local PW = COC.ProfWindow; if not PW then return end
         local craftEv = event:find("^CRAFT")
         local nativeFrame = craftEv and _G.CraftFrame or _G.TradeSkillFrame

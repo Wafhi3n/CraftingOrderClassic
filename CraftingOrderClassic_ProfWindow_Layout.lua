@@ -20,8 +20,9 @@ local SPEC = {
     { id = "recipes", w = 230, padR = 5, top = -4, bottom = 5,     -- colonne Recettes
         { id = "recHeader",  h = 24, bg = true },        -- en-tête « Recettes »
         { id = "recFilters", h = 26, dir = "cols",       -- barre d'outils en SLOTS :
-            { id = "recTools",  w = 48, sep = false },   --   « 123 » + pièce d'or (tri Lazy Gold)
-            { id = "recSearch", sep = false } },         --   la recherche REMPLIT le reste
+            { id = "recTools",  w = 70, sep = false },   --   « 123 » + pièce d'or (Lazy Gold) + ▲ progression
+            { id = "recSearch", sep = false },           --   la recherche REMPLIT le reste
+            { id = "recFilterToggles", w = 48, sep = false } }, -- filtres : sac « j'ai les matériaux » (+ palier)
         { dir = "cols", sep = false,
             { id = "recList" },                          -- liste virtualisée
             { id = "recGutter", w = 22, sep = false } }, -- gouttière scrollbar

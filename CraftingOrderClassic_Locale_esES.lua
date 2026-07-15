@@ -259,6 +259,26 @@ local es = {
     ["recherche de travail arrêtée."] = "búsqueda de trabajo detenida.",
     ["tu n'as pas le métier %s — impossible de chercher du travail dessus."] = "no tienes %s — no puedes buscar trabajo en ella.",
     ["recherche de travail : |cFF33DD33%s|r — visible au royaume"] = "buscando trabajo: |cFF33DD33%s|r — visible en todo el reino",
+    -- Offre LFW (panneau de config par métier + tooltips + tris progression)
+    ["Configurer l'offre : composants fournis, commission…"] = "Configura tu oferta: componentes aportados, comisión…",
+    ["Recherche de travail — %s"] = "Buscar trabajo — %s",
+    ["Je fournis les composants de base"] = "Aporto los componentes básicos",
+    ["(achetables chez un marchand)"] = "(los que venden los vendedores)",
+    ["Seulement si le plan me fait progresser"] = "Solo si la receta me sube la habilidad",
+    ["(restriction sur les composants fournis)"] = "(restricción sobre los componentes aportados)",
+    ["Commission fixe par craft :"] = "Comisión fija por fabricación:",
+    ["Composants fournis (%d/%d)"] = "Componentes aportados (%d/%d)",
+    ["Maximum %d composants fournis."] = "Como máximo %d componentes aportados.",
+    ["Cherche du travail : %s"] = "Busca trabajo: %s",
+    ["fournit les composants de base (marchand)"] = "aporta los componentes básicos (vendedor)",
+    ["fournit : %s"] = "aporta: %s",
+    ["commission : %s par craft"] = "comisión: %s por fabricación",
+    ["composants fournis seulement si le plan fait progresser"] = "componentes aportados solo si la receta sube la habilidad",
+    ["Trier par montée de compétence (plans orange d'abord)."] = "Ordenar por subida de habilidad (recetas naranjas primero).",
+    ["Tri par montée de compétence — clic pour A-Z."] = "Ordenado por subida de habilidad — clic para A-Z.",
+    ["Par progression"] = "Por subida",
+    ["Trier : les commandes qui me font progresser d'abord."] = "Ordenar: primero los pedidos que me suben la habilidad.",
+    ["Progression d'abord — clic pour revenir aux récentes."] = "Subidas primero — clic para volver a las recientes.",
     ["|cFF66CCFFamis/partenaires intéressés :|r %s (|cFFFFFFFF/co gift <nom>|r)"] =
         "|cFF66CCFFamigos/socios interesados:|r %s (|cFFFFFFFF/co gift <nombre>|r)",
     ["proposer (chuchoter) le dernier plan looté à un ami/partenaire qui ne le connaît pas"] =
@@ -387,6 +407,7 @@ local es = {
     ["Huiles"] = "Aceites",
     ["Transmutations"] = "Transmutaciones",
     ["Minerais"] = "Minerales",
+    ["Lingots"] = "Lingotes",
     ["Cuirs"] = "Cuero",
     ["Éclats"] = "Esquirlas",
     ["Essences"] = "Esencias",
@@ -439,6 +460,10 @@ local es = {
     ["Clic : commander ce métier"] = "Clic: encargar esta profesión",
     ["Trier par rentabilité (Lazy Gold)."] = "Ordenar por rentabilidad (Lazy Gold).",
     ["Tri par rentabilité — clic pour A-Z."] = "Ordenado por beneficio — clic para A-Z.",
+    ["N'afficher que les recettes dont j'ai les matériaux."] = "Mostrar solo las recetas para las que tienes materiales.",
+    ["Filtre matériaux actif — clic pour tout afficher."] = "Filtro de materiales activo — clic para mostrar todo.",
+    ["N'afficher que les recettes qui font monter la compétence (masque le gris)."] = "Mostrar solo las recetas que suben la habilidad (oculta el gris).",
+    ["Filtre progression actif — clic pour tout afficher."] = "Filtro de progreso activo — clic para mostrar todo.",
 }
 for k, v in pairs(es) do L[k] = v end
 

@@ -123,7 +123,7 @@ end
 function UI:_BuildGatherHeader()
     local iz = self:GatherSec("resIcon")
     self.gatherResBadge = Skin.MakeBadge(iz, 34); self.gatherResBadge:SetPoint("CENTER", 0, 0)
-    self.gatherResBadge:EnableMouse(true); Skin.WireItemTooltip(self.gatherResBadge)
+    self.gatherResBadge:EnableMouse(true); Skin.WireItemTooltip(self.gatherResBadge); Skin.WireItemLink(self.gatherResBadge)
     local ring = iz:CreateTexture(nil, "OVERLAY")
     ring:SetTexture("Interface\\Buttons\\UI-Quickslot2")
     ring:SetPoint("CENTER", self.gatherResBadge, "CENTER", 0, -0.5); ring:SetSize(52, 52)
@@ -313,10 +313,10 @@ function UI:RefreshGatherList()
             end
         end
     else
-        -- Récolte = gathers purs (sans spellID) présents dans le client courant (filtre cross-version).
+        -- Matières du client courant. Minage fusionné → on garde AUSSI ses lingots de fonte (à spellID).
         local list = self.gatherProf and c:ProfessionCatalogue(self.gatherProf) or {}
         for _, e in ipairs(list) do
-            if e.itemID and not e.spellID and not e.service and Skin.ItemExists(e.itemID) then
+            if e.itemID and not e.service and Skin.ItemExists(e.itemID) then
                 local nm = c:ItemName(e.itemID)
                 if not s or s == "" or nm:lower():find(s, 1, true) then
                     out[#out + 1] = { e = e, name = nm }
@@ -359,7 +359,7 @@ function UI:_GatherListRow(i)
     r.stack:SetPoint("RIGHT", -4, 0); Skin.ApplyShadow(r.stack)
     -- Chevron des en-têtes de section/sous-catégorie (cf. _UI_Gather_Categories.lua).
     r.expand = r:CreateTexture(nil, "ARTWORK"); r.expand:SetSize(14, 14); r.expand:Hide()
-    self.gatherListRows[i] = r; Skin.WireItemTooltip(r); return r
+    self.gatherListRows[i] = r; Skin.WireItemTooltip(r); Skin.WireItemLink(r); return r
 end
 
 function UI:SelectGatherItem(entry)

@@ -8,6 +8,14 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "Neues",
+    -- v1.18.0
+    ["Chercher du travail : dis ce que tu offres, et trie par progression"] = "Arbeit suchen, jetzt mit Angebot, und nach Fertigkeitsfortschritt sortieren",
+    ["« Chercher du travail » ne se contente plus de te signaler dispo. Clique l'engrenage à côté du bouton et dis ce que tu proposes : tu fournis les composants de base, tu fournis tel réactif précis, une commission fixe par craft, ou seulement les plans qui te font gagner un point de compétence. Ça s'affiche sur ta ligne [Dispo] et dans l'infobulle au-dessus de ta tête, avec une pièce s'il y a une commission et un sac si tu fournis des compos."] =
+        "„Arbeit suchen\" macht mehr, als dich nur als verfügbar zu markieren. Klick auf das Zahnrad neben dem Knopf und sag, was du anbietest: Du bringst die Grundreagenzien mit, du lieferst eine bestimmte Komponente, ein fester Aufschlag pro Herstellung, oder nur Aufträge, die dir einen Fertigkeitspunkt geben. Es erscheint in deiner [Dispo]-Zeile und im Tooltip über deinem Kopf, mit einer Münze bei Aufschlag und einer Tasche, wenn du Materialien stellst.",
+    ["L'icône « dispo » au-dessus de la plaque d'un artisan marche maintenant sur Era et Saison de la Découverte, plus seulement sur le client TBC. Active les plaques des amis (nameplateShowFriends) et l'icône du métier flotte au-dessus de qui cherche du travail à côté de toi."] =
+        "Das „Verfügbar\"-Symbol über der Namensplakette eines Handwerkers funktioniert jetzt auf Era und Season of Discovery, nicht mehr nur auf dem Burning-Crusade-Client. Schalte Freundes-Namensplaketten ein (nameplateShowFriends), und das Berufssymbol schwebt über jedem in deiner Nähe, der Arbeit sucht.",
+    ["Les recettes se trient par ce qui te fait encore progresser : un troisième bouton outil remonte en tête les plans qui donnent un point, d'orange à gris. Les commandes ont le même « ce qui me fait monter d'abord », avec un liseré de difficulté sur le côté de chaque ligne. Plus quelques corrections au passage."] =
+        "Rezepte lassen sich danach sortieren, was dich noch verbessert: Ein dritter Werkzeugknopf hebt die Pläne, die einen Fertigkeitspunkt geben, nach oben, von Orange zu Grau. Aufträge bekommen dasselbe „was mich zuerst verbessert\", mit einem Schwierigkeitsstreifen an der Seite jeder Zeile. Dazu ein paar Korrekturen nebenbei.",
     -- v1.17.1
     ["Correctif : erreur au login en « Chercher du travail »"] = "Behoben: Fehler beim Anmelden bei „Arbeit suchen\"",
     ["Si tu avais activé « Chercher du travail », te connecter ou faire /reload pouvait déclencher une erreur rouge : l'addon annonçait ta disponibilité avant que le jeu n'autorise un addon à parler sur le canal. L'annonce attend maintenant ton prochain clic ou ta prochaine touche — plus d'erreur, et les autres te voient toujours dispo."] =

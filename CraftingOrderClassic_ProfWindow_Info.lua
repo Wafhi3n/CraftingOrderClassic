@@ -123,9 +123,12 @@ end
 
 -- Section INTÉGRÉE : « Où l'obtenir » via le pont MTSL (formateur/vendeur/butin + PNJ, zone, coords).
 -- Nil si MTSL absent ou si la recette n'a pas de fiche → la section ne s'affiche simplement pas.
+-- UNIQUEMENT pour une recette NON apprise (isMissing) : « où l'obtenir » n'a aucun sens sur un plan qu'on
+-- possède déjà. NB : depuis que ReadRecipes capture le spellID des recettes APPRISES (pour le rang MTSL),
+-- ce garde `isMissing` est indispensable — sans lui la fiche source réapparaîtrait sur les recettes connues.
 PW:RegisterInfoSection(function(ctx)
     local M = COC.MTSL
-    if not (M and M:IsAvailable() and ctx.entry and ctx.entry.spellID) then return nil end
+    if not (M and M:IsAvailable() and ctx.entry and ctx.entry.isMissing and ctx.entry.spellID) then return nil end
     local d = M:SkillDetail(ctx.profKey, ctx.entry.spellID)
     if not (d and d.lines and #d.lines > 0) then return nil end
     return { title = L["Où l'obtenir"], lines = d.lines }

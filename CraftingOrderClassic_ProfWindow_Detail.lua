@@ -26,6 +26,7 @@ function PW:_BuildReagentRow(parent, i)
         if pcall(GameTooltip.SetHyperlink, GameTooltip, r.reagLink) then GameTooltip:Show() else GameTooltip:Hide() end
     end)
     row:SetScript("OnLeave", GameTooltip_Hide)
+    Skin.WireItemLink(row)   -- shift-clic → lien chat du réactif (tipLink posé au remplissage)
     row:Hide(); return row
 end
 
@@ -42,6 +43,7 @@ function PW:_BuildDetail(col)
     local iconBtn = CreateFrame("Button", nil, body); iconBtn:SetAllPoints(iconBig)
     iconBtn:SetScript("OnEnter", function(r) PW:_ProductTooltip(r) end)
     iconBtn:SetScript("OnLeave", GameTooltip_Hide)
+    Skin.WireItemLink(iconBtn)   -- shift-clic sur l'icône produit → lien chat
     self.detIconBtn = iconBtn
 
     local nameFS = body:CreateFontString(nil, "OVERLAY", "GameFontNormal")
@@ -106,6 +108,7 @@ end
 
 function PW:_ClearDetail()
     self.detIcon:Hide()
+    self.detIconBtn.tipLink, self.detIconBtn.tipItemID = nil, nil
     self.detNameFS:SetText("|cFF888888" .. L["Sélectionne une recette."] .. "|r")
     self.detMakesFS:SetText("")
     if self._HideInfoPanel then self:_HideInfoPanel() end
@@ -132,9 +135,9 @@ function PW:_SetCraftButtons(canCreate, canAll)
 end
 
 -- Le bouton « Créer » hérite de SecureActionButtonTemplate → il est PROTÉGÉ, donc Show/Hide DESSUS
--- lèvent ADDON_ACTION_BLOCKED en combat (la protection descend du parent vers l'enfant, jamais
--- l'inverse : masquer la FENÊTRE reste permis). On mémorise l'état voulu et on le rejoue à la sortie de
--- combat. En attendant, le bouton reste visible mais inoffensif : _SetCraftButtons le grise et
+-- lèvent ADDON_ACTION_BLOCKED en combat — et masquer la FENÊTRE qui l'héberge affiché le lève AUSSI
+-- (vu en jeu ; PW:Hide escamote alors via SetAlpha). On mémorise l'état voulu et on le rejoue à la
+-- sortie de combat. En attendant, le bouton reste visible mais inoffensif : _SetCraftButtons le grise et
 -- _CraftSelected refuse (numAvailable nil hors fenêtre native = 0 réactif).
 -- `wireCraft` nil = ne pas toucher à la redirection sécurisée.
 function PW:_SetCreateShown(shown, wireCraft)
@@ -186,6 +189,7 @@ end
 -- sections fournies par de futurs addons enregistrés.
 function PW:_ShowMissingDetail(e)
     self.detIcon:SetTexture(e.icon or "Interface\\Icons\\INV_Scroll_03"); self.detIcon:Show()
+    self.detIconBtn.tipLink, self.detIconBtn.tipItemID = nil, e.itemID   -- shift-clic → lien de l'objet produit
     self.detNameFS:SetText((e.name or "?") .. "  |cFF888888(" .. L["niveau"] .. " " .. (e.level or 0) .. ")|r")
     self.detMakesFS:SetText("|cFFFF8855" .. L["Non apprise"] .. "|r")
     self.detReagHdr:Hide()
@@ -209,6 +213,7 @@ function PW:_FillReagentRows(e)
         if rg then
             nReag = i
             row.reagLink = rg.link
+            row.tipLink = rg.link   -- shift-clic → lien chat (WireItemLink)
             row.icon:SetTexture(rg.texture or "Interface\\Icons\\INV_Misc_QuestionMark")
             row.nameFS:SetWidth(140)   -- restaure la largeur réactif (le détail « manquante » la passe à 230)
             row.nameFS:SetText(rg.name or "?")
@@ -237,6 +242,7 @@ function PW:RefreshDetail()
 
     self.detIcon:SetTexture(e.icon or "Interface\\Icons\\INV_Misc_QuestionMark"); self.detIcon:Show()
     self.detNameFS:SetText(e.link or e.name or "?")
+    self.detIconBtn.tipLink, self.detIconBtn.tipItemID = e.link, e.itemID   -- shift-clic → lien produit
 
     if (e.numMade or 1) > 1 or (e.numMadeMax or 1) > (e.numMade or 1) then
         local mx = e.numMadeMax or e.numMade

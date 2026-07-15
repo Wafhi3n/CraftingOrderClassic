@@ -11,6 +11,14 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "What's New",
+    -- v1.18.0
+    ["Chercher du travail : dis ce que tu offres, et trie par progression"] = "Look for work, now with an offer, and sort by what levels you",
+    ["« Chercher du travail » ne se contente plus de te signaler dispo. Clique l'engrenage à côté du bouton et dis ce que tu proposes : tu fournis les composants de base, tu fournis tel réactif précis, une commission fixe par craft, ou seulement les plans qui te font gagner un point de compétence. Ça s'affiche sur ta ligne [Dispo] et dans l'infobulle au-dessus de ta tête, avec une pièce s'il y a une commission et un sac si tu fournis des compos."] =
+        "\"Look for work\" does more than flag you as available. Click the gear next to the button and say what you're offering: you'll bring the basic reagents, you'll supply a specific component, a flat tip per craft, or only jobs that give you a skill point. It shows on your [Dispo] line and in the tooltip over your head, with a coin if there's a tip and a bag when you're providing mats.",
+    ["L'icône « dispo » au-dessus de la plaque d'un artisan marche maintenant sur Era et Saison de la Découverte, plus seulement sur le client TBC. Active les plaques des amis (nameplateShowFriends) et l'icône du métier flotte au-dessus de qui cherche du travail à côté de toi."] =
+        "The \"available\" icon over a crafter's nameplate works on Era and Season of Discovery now, not just the Burning Crusade client. Turn on friend nameplates (nameplateShowFriends) and the profession icon floats over anyone near you who's looking for work.",
+    ["Les recettes se trient par ce qui te fait encore progresser : un troisième bouton outil remonte en tête les plans qui donnent un point, d'orange à gris. Les commandes ont le même « ce qui me fait monter d'abord », avec un liseré de difficulté sur le côté de chaque ligne. Plus quelques corrections au passage."] =
+        "Recipes sort by what still levels you: a third tool button lifts the plans that give a skill point to the top, orange to grey. Orders get the same \"levels me first,\" with a difficulty tint down the side of each line. Plus a few fixes along the way.",
     -- v1.17.1
     ["Correctif : erreur au login en « Chercher du travail »"] = "Fixed a login error while looking for work",
     ["Si tu avais activé « Chercher du travail », te connecter ou faire /reload pouvait déclencher une erreur rouge : l'addon annonçait ta disponibilité avant que le jeu n'autorise un addon à parler sur le canal. L'annonce attend maintenant ton prochain clic ou ta prochaine touche — plus d'erreur, et les autres te voient toujours dispo."] =

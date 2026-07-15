@@ -202,7 +202,7 @@ function UI:_MyArtRecRow(i)
     r.profit:SetPoint("RIGHT", -6, 0); r.profit:SetJustifyH("RIGHT"); Skin.ApplyShadow(r.profit)
     r.who = r:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
     r.who:SetPoint("RIGHT", r.profit, "LEFT", -6, 0); r.who:SetJustifyH("RIGHT"); r.who:SetWidth(120); Skin.ApplyShadow(r.who)
-    r:EnableMouse(true); Skin.WireItemTooltip(r)   -- tooltip d'objet/sort (lit tipItemID/tipSpellID)
+    r:EnableMouse(true); Skin.WireItemTooltip(r); Skin.WireItemLink(r)   -- tooltip + shift-clic lien (tipItemID/tipSpellID)
     self.myArtRecRows[i] = r; return r
 end
 

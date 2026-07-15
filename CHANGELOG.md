@@ -1,5 +1,23 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.18.0 — Look for work, now with an offer, and sort by what levels you
+
+"Look for work" used to just flag you as available. Now it carries an offer. Open a profession, click
+the gear next to the button, and say what you're putting on the table: you'll bring the basic reagents,
+you'll supply a specific component, a flat tip per craft, or you only want jobs that give you a skill
+point. Whoever's browsing sees it on your line in the directory and in the tooltip over your head, with
+a coin when there's a tip and a bag when you're providing mats.
+
+The availability icon over a crafter's nameplate works on Era and Season of Discovery now, not only the
+Burning Crusade client. Turn on friend nameplates and the profession icon floats over anyone near you
+who's looking for work.
+
+Recipes can sort by what still levels you. A third tool button lifts the plans that give a skill point
+to the top of the list, orange down to grey, and orders get the same "levels me first" toggle with a
+difficulty tint down the side of each line.
+
+Plus a batch of smaller fixes across the profession window, orders, and gathering categories.
+
 ## v1.17.1 — Fixed a login error while looking for work
 
 If you had "Look for work" turned on, connecting or reloading could throw a red error. The addon was

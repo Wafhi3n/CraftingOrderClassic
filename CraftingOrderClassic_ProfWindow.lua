@@ -56,9 +56,9 @@ local function restore(frame, key)
     frame:SetAlpha(NATIVE[key].alpha or 1); frame:EnableMouse(NATIVE[key].mouse ~= false); NATIVE[key] = nil
 end
 function PW:NeutralizeNative()
-    detachUIPanels(); neutralize(_G.TradeSkillFrame, "trade"); neutralize(_G.CraftFrame, "craft")
+    detachUIPanels(); neutralize(_G.TradeSkillFrame, "trade"); neutralize(_G.CraftFrame, "craft"); if COC.Craft then COC.Craft:MuteNativeReagents(true) end
 end
-function PW:RestoreNative() restore(_G.TradeSkillFrame, "trade"); restore(_G.CraftFrame, "craft") end
+function PW:RestoreNative() restore(_G.TradeSkillFrame, "trade"); restore(_G.CraftFrame, "craft"); if COC.Craft then COC.Craft:MuteNativeReagents(false) end end
 
 -- ------------------------------------------------------------------
 -- Construction du shell
@@ -106,6 +106,9 @@ function PW:_BuildHeader(f)
     lfw:SetScript("OnLeave", GameTooltip_Hide)
     lfw:Hide()   -- caché jusqu'au 1er _SyncLFWBtn (évite un flash en vue reroll/compact)
     self.lfwBtn = lfw
+
+    -- Engrenage de config de l'OFFRE LFW (composants fournis, commission) — cf. _ProfWindow_LFW.lua.
+    if self._BuildLFWGear then self:_BuildLFWGear(f, lfw) end
 
     -- (Bouton fermer : le natif de MakeWindow porte la logique dock/CloseCraft via opts.onClose.)
     Skin.MakeSeparator(f, -(self.HEADER_H - 2))
@@ -165,6 +168,8 @@ function PW:_SyncLFWBtn()
     local show = self.profKey and not self.rerollKey and not self._compact and D and D.SetLFW
     b:SetShown(show and true or false)
     if show then b:SetSelected(D.MyLFW and D:MyLFW() == self.profKey and true or false) end
+    -- L'engrenage + le panneau de config suivent la même portée (et se repeignent au changement de métier).
+    if self._SyncLFWConfig then self:_SyncLFWConfig(show and true or false) end
 end
 
 function PW:Build()
@@ -286,7 +291,13 @@ end
 -- ------------------------------------------------------------------
 -- Refresh global (coalescé)
 -- ------------------------------------------------------------------
-function PW:Hide() if self.frame then self.frame:Hide() end end
+-- Bouton « Créer » sécurisé affiché → Hide() de la fenêtre lève ADDON_ACTION_BLOCKED en combat (vu en
+-- jeu). SetAlpha/EnableMouse non protégés : on escamote en combat, vrai Hide à la sortie (_hidePending).
+function PW:Hide()
+    if not self.frame then return end
+    local c = InCombatLockdown and InCombatLockdown(); self._hidePending = c or nil
+    self.frame:SetAlpha(c and 0 or 1); self.frame:EnableMouse(not c); if not c then self.frame:Hide() end
+end
 
 function PW:_DoRefresh()
     self._pending = false
@@ -365,6 +376,9 @@ end
 function PW:OpenFor(profKey)
     if not profKey then return end
     self.rerollKey = nil                              -- ouverture normale (perso courant) : sort du mode reroll
+    -- Minage : contrairement aux autres récoltes, il a une facette CRAFT (la FONTE : minerai → lingot).
+    -- On ouvre donc la vraie fenêtre de fonte (vue pleine 3 colonnes) plutôt que la vue compacte.
+    if profKey == "Mining" then return self:_OpenSmelting() end
     if not GATHER[profKey] then
         local craft = COC.Craft
         if craft and craft:GetOpenProfessionInfo() and craft:OpenProfessionKey() == profKey then
@@ -385,6 +399,9 @@ function PW:OpenFor(profKey)
     end
     self:_OpenCompact(profKey)
 end
+
+-- (PW:_OpenSmelting — ouverture de la FONTE, facette craft du Minage — vit dans _ProfWindow_Reroll.lua,
+--  avec les autres variantes d'ouverture, pour tenir ce fichier sous le plafond anti-monolithe.)
 
 -- Vue compacte autonome (colonne Commandes seule) : récolte, ou repli si la fenêtre native n'a pas pu
 -- s'ouvrir pour un métier craftable. Si une AUTRE fenêtre native est déjà ouverte (ex. : Travail du

@@ -88,3 +88,32 @@ function PW:RerollKnows(o)
     end
     return false
 end
+
+-- ------------------------------------------------------------------
+-- Ouverture de la FONTE (facette CRAFT du Minage) — appelée par PW:OpenFor("Mining").
+-- ------------------------------------------------------------------
+-- Le Minage a deux facettes : la RÉCOLTE (minerais, pas de fenêtre en jeu) et la FONTE (minerai →
+-- lingot), qui se lance par un SORT (2656) et affiche une fenêtre de CRAFT (CraftFrame, comme
+-- l'Enchantement). Grâce aux alias (Libs/CraftLink-1.0/Data/Smelting.lua), cette fenêtre se résout
+-- en « Mining » : la vue pleine 3 colonnes se monte via OnProfessionShow. Repli en vue compacte si la
+-- fenêtre ne s'ouvre pas (Minage non appris, combat…). Vit ici (et non dans ProfWindow.lua) pour tenir
+-- ce dernier sous le plafond anti-monolithe — avec les autres variantes d'ouverture (reroll).
+function PW:_OpenSmelting()
+    local craft = COC.Craft
+    if craft and craft:GetOpenProfessionInfo() and craft:OpenProfessionKey() == "Mining" then
+        self:OnProfessionShow(); return          -- déjà ouverte nativement → (ré)affiche la vue pleine
+    end
+    local spell = GetSpellInfo and GetSpellInfo(2656)   -- nom localisé du sort « Fonte »
+    if spell and spell ~= "" and CastSpellByName then
+        self.standaloneKey = nil
+        CastSpellByName(spell)                    -- ouvre la fenêtre de fonte → OnProfessionShow
+        if C_Timer and C_Timer.After then
+            C_Timer.After(0.4, function()
+                local c = COC.Craft
+                if not (c and c:GetOpenProfessionInfo()) then PW:_OpenCompact("Mining") end
+            end)
+        end
+        return
+    end
+    self:_OpenCompact("Mining")
+end

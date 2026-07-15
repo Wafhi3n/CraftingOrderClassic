@@ -241,11 +241,23 @@ local function OnUnitTooltip(tooltip)
     if not unit then return end
     local name = UnitName(unit)
     local summary = name and Social:ProfSummary(name)
-    if not summary then return end
+    local D = COC.Directory
+    local lfwE = name and D and D.LFWOf and D:LFWOf(name)
+    -- Un joueur LFW sans métiers connus (verbe canal reçu avant tout SK/RK) mérite quand même son bloc.
+    if not (summary or lfwE) then return end
     local sk = GetSkin()
     -- Marque addon = icône WorkOrder (le glyphe « ✓ » s'affichait en tofu dans la police WoW).
     local mark = sk and ("  |T" .. sk.tex.workorder .. ":14:14:0:0|t") or ""
-    tooltip:AddLine("|cFF33DD88CO-Classic|r" .. mark .. "  " .. summary, 1, 1, 1)
+    tooltip:AddLine("|cFF33DD88CO-Classic|r" .. mark .. (summary and ("  " .. summary) or ""), 1, 1, 1)
+    -- « Cherche du travail » + détails d'OFFRE (compos de base, composants fournis, commission,
+    -- restriction progression) — mêmes lignes que l'annuaire (source unique : Dir:LFWOfferLines).
+    if lfwE then
+        local profTxt = (sk and sk.ProfLabel and sk.ProfLabel(lfwE.prof)) or lfwE.prof
+        tooltip:AddLine("|cFF4CDB6E" .. string.format(COC.L["Cherche du travail : %s"], profTxt) .. "|r")
+        for _, ln in ipairs((D.LFWOfferLines and D:LFWOfferLines(name)) or {}) do
+            tooltip:AddLine("   " .. ln, 0.72, 0.90, 0.78)
+        end
+    end
     -- Cooldowns de recettes : 3 lignes max — vert = prête, orange = en cours de recharge.
     local rr = COC.Directory and COC.Directory.roster and COC.Directory.roster[name]
     for _, ln in ipairs((rr and Social:CooldownLines(rr, 3)) or {}) do

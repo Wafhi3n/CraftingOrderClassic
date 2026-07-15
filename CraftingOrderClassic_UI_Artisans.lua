@@ -287,8 +287,23 @@ function UI:_FillArtRow(row, a)
     row.dot:SetOnline(a.online and true or false)
     local pTag = a.r.isPartner and ("|cFFFFD100" .. L["[Partenaire]"] .. "|r ") or ""   -- texte, pas de glyphe tofu
     local D0 = COC.Directory
-    local lfwTag = (D0 and D0.LFWOf and D0:LFWOf(a.name)) and ("|cFF4CDB6E" .. L["[Dispo]"] .. "|r ") or ""
+    local lfwE = D0 and D0.LFWOf and D0:LFWOf(a.name)
+    local lfwTag = lfwE and ("|cFF4CDB6E" .. L["[Dispo]"] .. "|r ") or ""
     row.name:SetText(lfwTag .. pTag .. "|cFFFFFFFF" .. a.name .. "|r")
+    -- Tooltip d'OFFRE sur la ligne [Dispo] : métier cherché + détails (mêmes lignes que le tooltip
+    -- monde, source unique Dir:LFWOfferLines). Posé ICI et purgé en tête de fill : lignes poolées.
+    if lfwE then
+        row:SetScript("OnEnter", function(rw)
+            GameTooltip:SetOwner(rw, "ANCHOR_RIGHT")
+            GameTooltip:SetText("|cFF4CDB6E" .. string.format(L["Cherche du travail : %s"],
+                Skin.ProfLabel(lfwE.prof) or lfwE.prof) .. "|r")
+            for _, ln in ipairs((D0.LFWOfferLines and D0:LFWOfferLines(a.name)) or {}) do
+                GameTooltip:AddLine(ln, 0.72, 0.90, 0.78, true)
+            end
+            GameTooltip:Show()
+        end)
+        row:SetScript("OnLeave", GameTooltip_Hide)
+    end
     -- « relayé » = fiche servie par un partenaire pendant que l'artisan est HORS LIGNE, sans aucune
     -- donnée directe ; « non-porteur » = vu crafter ET aucune vraie donnée réseau reçue de lui (s'il
     -- finit par diffuser ses SK/RK, on repasse en artisan normal même si le flag nonAddon traîne).

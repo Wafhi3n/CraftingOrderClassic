@@ -217,6 +217,16 @@ function MTSL:MissingRecipes(profKey)
     return out
 end
 
+-- Rang de compétence REQUIS d'une recette, par spellID, via l'index MTSL. nil si MTSL absent, métier
+-- inconnu ou recette hors base. Sert à afficher « (niv. X) » sur les recettes APPRISES (les manquantes
+-- portent déjà leur niveau via MissingRecipes). Même index paresseux que MissingRecipes → coût nul.
+function MTSL:MinSkill(profKey, spellID)
+    if not (self:IsAvailable() and spellID) then return nil end
+    local mprof = mtslProf(profKey); if not mprof then return nil end
+    local sk = indexOf(mprof)[spellID]
+    return sk and sk.min_skill or nil
+end
+
 -- Nombre de recettes manquantes (pour le libellé du bouton). 0 si indisponible.
 function MTSL:MissingCount(profKey)
     if not self:IsAvailable() then return 0 end

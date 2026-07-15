@@ -8,6 +8,14 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "Novedades",
+    -- v1.18.0
+    ["Chercher du travail : dis ce que tu offres, et trie par progression"] = "Buscar trabajo, ahora con oferta, y ordenar por lo que te sube de nivel",
+    ["« Chercher du travail » ne se contente plus de te signaler dispo. Clique l'engrenage à côté du bouton et dis ce que tu proposes : tu fournis les composants de base, tu fournis tel réactif précis, une commission fixe par craft, ou seulement les plans qui te font gagner un point de compétence. Ça s'affiche sur ta ligne [Dispo] et dans l'infobulle au-dessus de ta tête, avec une pièce s'il y a une commission et un sac si tu fournis des compos."] =
+        "«Buscar trabajo» hace más que marcarte como disponible. Pulsa el engranaje junto al botón y di qué ofreces: pones los componentes básicos, aportas un reactivo concreto, una comisión fija por objeto, o solo los planos que te dan un punto de habilidad. Aparece en tu línea [Dispo] y en la información sobre tu cabeza, con una moneda si hay comisión y una bolsa si aportas materiales.",
+    ["L'icône « dispo » au-dessus de la plaque d'un artisan marche maintenant sur Era et Saison de la Découverte, plus seulement sur le client TBC. Active les plaques des amis (nameplateShowFriends) et l'icône du métier flotte au-dessus de qui cherche du travail à côté de toi."] =
+        "El icono de «disponible» sobre la placa de un artesano ya funciona en Era y Temporada del Descubrimiento, no solo en el cliente de Burning Crusade. Activa las placas de amigos (nameplateShowFriends) y el icono de profesión flota sobre quien busca trabajo cerca de ti.",
+    ["Les recettes se trient par ce qui te fait encore progresser : un troisième bouton outil remonte en tête les plans qui donnent un point, d'orange à gris. Les commandes ont le même « ce qui me fait monter d'abord », avec un liseré de difficulté sur le côté de chaque ligne. Plus quelques corrections au passage."] =
+        "Las recetas se ordenan por lo que aún te sube de nivel: un tercer botón de herramienta sube los planos que dan un punto de habilidad, de naranja a gris. Los encargos tienen el mismo «lo que me sube primero», con un ribete de dificultad en el lateral de cada línea. Además de unas cuantas correcciones de paso.",
     -- v1.17.1
     ["Correctif : erreur au login en « Chercher du travail »"] = "Corregido: error al conectar con «Buscar trabajo»",
     ["Si tu avais activé « Chercher du travail », te connecter ou faire /reload pouvait déclencher une erreur rouge : l'addon annonçait ta disponibilité avant que le jeu n'autorise un addon à parler sur le canal. L'annonce attend maintenant ton prochain clic ou ta prochaine touche — plus d'erreur, et les autres te voient toujours dispo."] =

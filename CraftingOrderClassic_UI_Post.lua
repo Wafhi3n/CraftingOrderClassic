@@ -252,7 +252,10 @@ function UI:RefreshPostPlans()
         -- vivent dans l'onglet Récolte. On masque les objets liés (non échangeables) et ceux absents du
         -- client (autre extension).
         local isDisen = (not e.spellID) and disen and e.itemID and disen[e.itemID] ~= nil
-        if (e.spellID or isDisen) and Skin.ItemExists(e.itemID) and not (e.itemID and isSoulbound(e.itemID))
+        -- Minage fusionné : ses MINERAIS bruts (récolte, sans spellID) sont commandables ici en plus de
+        -- ses lingots de fonte — l'onglet Commande et l'onglet Récolte montrent tous deux l'ensemble.
+        local isOre = (not e.spellID) and (not isDisen) and e.itemID and self.postProf == "Mining"
+        if (e.spellID or isDisen or isOre) and Skin.ItemExists(e.itemID) and not (e.itemID and isSoulbound(e.itemID))
             and (not artFilter or not e.spellID or artFilter(e.spellID)) then
             local okq = true
             if qmin and e.itemID then local q = select(3, GetItemInfo(e.itemID)); okq = q ~= nil and q >= qmin end
@@ -304,7 +307,7 @@ function UI:_PostPlanRow(i)
         if it.isHeader then UI:TogglePostSection(it.ckey)
         elseif it.e then UI:SelectPostPlan(it.e) end
     end)
-    self.postPlanRows[i] = r; Skin.WireItemTooltip(r); return r
+    self.postPlanRows[i] = r; Skin.WireItemTooltip(r); Skin.WireItemLink(r); return r
 end
 
 -- (RefreshPostPlanDetail / RefreshPostReagents / _PostReagRow / _UpdateProvidedCount :

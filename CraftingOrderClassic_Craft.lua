@@ -57,6 +57,7 @@ local TRADESKILL_API = {
     getNumReag  = function(i) return (GetTradeSkillNumReagents and GetTradeSkillNumReagents(i)) or 0 end,
     getReagInfo = function(i, j) return GetTradeSkillReagentInfo(i, j) end,
     getReagLink = function(i, j) return GetTradeSkillReagentItemLink and GetTradeSkillReagentItemLink(i, j) end,
+    getRecipeLink = function(i) return GetTradeSkillRecipeLink and GetTradeSkillRecipeLink(i) end,  -- lien SORT recette (|Henchant:)
     craft       = function(i, n) if DoTradeSkill then DoTradeSkill(i, n or 1) end end,
 }
 local CRAFT_API = {
@@ -72,6 +73,7 @@ local CRAFT_API = {
     getNumReag  = function(i) return (GetCraftNumReagents and GetCraftNumReagents(i)) or 0 end,
     getReagInfo = function(i, j) return GetCraftReagentInfo(i, j) end,
     getReagLink = function(i, j) return GetCraftReagentItemLink and GetCraftReagentItemLink(i, j) end,
+    getRecipeLink = function(i) return GetCraftItemLink and GetCraftItemLink(i) end,  -- l'enchant EST le sort (|Henchant:)
     craft       = function(_)
         -- DoCraft est une fonction PROTÉGÉE en Classic Era : un addon ne peut PAS l'appeler (même
         -- depuis un clic) après avoir neutralisé l'UI native. Le craft d'enchantement passe donc par
@@ -135,9 +137,13 @@ function Craft:ReadRecipes()
             else
                 local link   = api.getLink(i)
                 local itemID = link and tonumber(link:match("|Hitem:(%d+)")) or nil
+                -- spellID de la RECETTE (pas de l'objet produit) : lien |Henchant: → sert au rang requis
+                -- MTSL (« niv. X ») et au linkage chat de la recette elle-même. Peut être nil (API absente).
+                local recLink = api.getRecipeLink and api.getRecipeLink(i)
+                local spellID = recLink and tonumber(recLink:match("|Henchant:(%d+)")) or nil
                 local mn, mx = api.getNumMade(i)
                 out[#out + 1] = {
-                    index = i, name = name, link = link, itemID = itemID,
+                    index = i, name = name, link = link, itemID = itemID, spellID = spellID,
                     icon = api.getIcon(i), difficulty = skillType,
                     numAvailable = numAvailable or 0, numMade = mn or 1, numMadeMax = mx or mn or 1,
                 }
@@ -158,6 +164,18 @@ function Craft:Reagents(index)
                           link = api.getReagLink(index, j) }
     end
     return out
+end
+
+-- Coupe (mute=true) ou rend (mute=false) la souris aux boutons de RÉACTIFS natifs (CraftReagentN /
+-- TradeSkillReagentN). Ils restent cliquables même à alpha 0 (EnableMouse(false) sur le parent ne
+-- descend PAS aux enfants) : posés sous notre fenêtre custom, leur OnEnter natif tire SetCraftItem/
+-- SetTradeSkillItem sur une sélection devenue OBSOLÈTE (recette précédente à plus de réactifs) →
+-- « Invalid craft item ». On les mute à la neutralisation, on les rend en vue Blizzard (au natif ils
+-- sont toujours cliquables → restore inconditionnel, rien à mémoriser).
+function Craft:MuteNativeReagents(mute)
+    for _, p in ipairs({ "CraftReagent", "TradeSkillReagent" }) do
+        for i = 1, 8 do local b = _G[p .. i]; if b then b:EnableMouse(not mute) end end
+    end
 end
 
 -- Déclenche le craft (DoTradeSkill répété, ou DoCraft simple).

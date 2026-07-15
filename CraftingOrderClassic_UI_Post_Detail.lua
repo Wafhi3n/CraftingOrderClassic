@@ -31,7 +31,7 @@ function UI:_BuildPostDetail()
     -- l'encadre sans la masquer (centre transparent). Tooltip d'objet au survol de l'icône.
     local iz = self:PostSec("craftIcon")
     self.postPlanBadge = Skin.MakeBadge(iz, 34); self.postPlanBadge:SetPoint("CENTER", 0, 0)
-    self.postPlanBadge:EnableMouse(true); Skin.WireItemTooltip(self.postPlanBadge)
+    self.postPlanBadge:EnableMouse(true); Skin.WireItemTooltip(self.postPlanBadge); Skin.WireItemLink(self.postPlanBadge)
     local ring = iz:CreateTexture(nil, "OVERLAY")
     ring:SetTexture("Interface\\Buttons\\UI-Quickslot2")
     ring:SetPoint("CENTER", self.postPlanBadge, "CENTER", 0, -0.5); ring:SetSize(52, 52)
@@ -168,7 +168,7 @@ function UI:_PostReagRow(i)
     r.name:SetPoint("LEFT", 24, 0); r.name:SetWidth(w - 114); r.name:SetJustifyH("LEFT"); Skin.ApplyShadow(r.name)
     r.qty   = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall"); r.qty:SetPoint("RIGHT", -22, 0); Skin.ApplyShadow(r.qty)
     r.check = Skin.MakeCheck(r, 18); r.check:SetPoint("RIGHT", -4, 0)
-    self.postReagRows[i] = r; Skin.WireItemTooltip(r); return r
+    self.postReagRows[i] = r; Skin.WireItemTooltip(r); Skin.WireItemLink(r); return r
 end
 
 function UI:_UpdateProvidedCount()

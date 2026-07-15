@@ -11,6 +11,10 @@ local COC = CraftingOrderClassic
 local NP  = {}
 COC.Nameplate = NP
 
+-- Historique du gate : on a longtemps cru que ce module exigeait l'UI moderne des plaques (1.15.9,
+-- build 11509) et il s'auto-désactivait sous ce seuil. Test manuel en jeu sur SoD live (Era 1.15.8,
+-- tocversion 11508) le 2026-07-14 : il fonctionne SANS erreur → gate de build RETIRÉ. Seule garde
+-- restante : C_NamePlate présent (no-op sinon). ⚠️ À re-vérifier quand même sur la vraie UI 1.15.9.
 local function secure() return (issecure and issecure()) or false end
 local function plateFor(unit)
     return (unit and C_NamePlate and C_NamePlate.GetNamePlateForUnit
@@ -18,6 +22,9 @@ local function plateFor(unit)
 end
 
 -- Icône attachée à une plaque (créée à la demande, mémorisée SUR la plaque → réutilisée d'un unit à l'autre).
+-- Mini-marqueurs d'OFFRE accrochés au cadre 22 px : pièce (commission demandée) et sac (fournit des
+-- composants — de base ou listés). Display-only, textures VÉRIFIÉES dans l'export Classic ; détails
+-- au survol du JOUEUR (tooltip monde) — la plaque reste sans souris (ne pas gêner le clic-cible).
 local function ensureIcon(plate)
     if plate.cocLFW then return plate.cocLFW end
     local f = CreateFrame("Frame", nil, plate)
@@ -27,6 +34,14 @@ local function ensureIcon(plate)
     bg:SetColorTexture(0, 0, 0, 0.55)
     local tex = f:CreateTexture(nil, "OVERLAY"); tex:SetAllPoints(); tex:SetTexCoord(0.08, 0.92, 0.08, 0.92)
     f.tex = tex
+    local coin = f:CreateTexture(nil, "OVERLAY", nil, 1)
+    coin:SetSize(10, 10); coin:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", 4, -3)
+    coin:SetTexture("Interface\\MoneyFrame\\UI-GoldIcon"); coin:Hide()
+    f.coin = coin
+    local bag = f:CreateTexture(nil, "OVERLAY", nil, 1)
+    bag:SetSize(10, 10); bag:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT", -4, -3)
+    bag:SetTexture("Interface\\Icons\\INV_Misc_Bag_08"); bag:SetTexCoord(0.08, 0.92, 0.08, 0.92); bag:Hide()
+    f.bag = bag
     plate.cocLFW = f
     return f
 end
@@ -47,6 +62,9 @@ function NP:_Apply(unit)
         local S = COC.UI and COC.UI.Skin
         local ic = ensureIcon(plate)
         ic.tex:SetTexture((S and S.ProfIcon and S.ProfIcon(e.prof)) or "Interface\\Icons\\INV_Misc_QuestionMark")
+        local o = e.offer
+        ic.coin:SetShown((o and o.fee and o.fee > 0) and true or false)
+        ic.bag:SetShown((o and (o.basics or (o.items and #o.items > 0))) and true or false)
         ic:Show()
     elseif plate.cocLFW then
         plate.cocLFW:Hide()

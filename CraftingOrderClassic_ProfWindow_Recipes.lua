@@ -35,35 +35,21 @@ function PW:_BuildRecipeRow(parent, i)
     profit:SetPoint("RIGHT", -2, 0); profit:Hide(); row.profit = profit
     local badge = row:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     badge:SetPoint("RIGHT", -2, 0); badge:Hide(); row.badge = badge
+    -- Rang requis (MTSL), à DROITE et SEULEMENT sous le filtre « montée de compétence » (cf. _FillRecipeRight).
+    local niv = row:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    niv:SetPoint("RIGHT", -2, 0); niv:Hide(); row.niv = niv
     row:SetScript("OnClick", function(r)
         local e = r.entry; if not e then return end
         if e.isHeader then PW:ToggleRecipeSection(e.ckey) else PW:SelectRecipe(e) end
     end)
     row:SetScript("OnEnter", function(r) PW:_RecipeTooltip(r) end)
     row:SetScript("OnLeave", GameTooltip_Hide)
+    Skin.WireItemLink(row)   -- shift-clic → lien chat (tipLink/tipItemID posés au remplissage)
     row:Hide(); return row
 end
 
--- Petit bouton bascule de la barre d'outils Recettes : fond doré quand actif, survol, tooltip DYNAMIQUE
--- (tipFn est évalué au survol, pas à la construction — le libellé dépend de l'état courant).
-local function makeToolBtn(col, tipFn, onClick)
-    local b = CreateFrame("Button", nil, col)
-    b:SetSize(20, 20)
-    local on = b:CreateTexture(nil, "BACKGROUND")
-    on:SetAllPoints(); on:SetColorTexture(0.91, 0.72, 0.29, 0.30); on:Hide(); b.onBG = on
-    b:SetHighlightTexture("Interface\\Buttons\\ButtonHilight-Square", "ADD")
-    b:SetScript("OnClick", onClick)
-    b:SetScript("OnEnter", function(s)
-        GameTooltip:SetOwner(s, "ANCHOR_BOTTOMLEFT")
-        GameTooltip:SetText(tipFn(), 1, 1, 1, 1, true)
-        GameTooltip:Show()
-    end)
-    b:SetScript("OnLeave", GameTooltip_Hide)
-    return b
-end
-
 -- Zones SPEC de la colonne (cf. _ProfWindow_Layout.lua) : recHeader (bande titre) / recFilters en
--- SLOTS (recTools = boutons Lazy Gold, recSearch = la recherche REMPLIT son slot) / recList +
+-- SLOTS (recTools = boutons de tri, recSearch = la recherche REMPLIT son slot) / recList +
 -- recGutter (scrollbar). Ancres LEFT/RIGHT dans les bandes = centrage vertical gratuit ; largeur de
 -- liste MESURÉE sur la zone.
 function PW:_BuildRecipes(col)
@@ -82,28 +68,9 @@ function PW:_BuildRecipes(col)
     search:SetScript("OnEscapePressed", function(b) b:SetText(""); b:ClearFocus() end)
     self.recipeSearchBox = search
 
-    -- Barre d'outils Lazy Gold, à gauche de la recherche. Les deux boutons sont MASQUÉS si Lazy Gold
-    -- n'est pas installé (cf. _SyncSortHeader) : ni tri ni valeurs sans données de prix.
-    --   pièce d'or  → tri par rentabilité : liste à PLAT du plus rentable au moins (plus de catégories)
-    --   « 123 »     → valeurs EXACTES (po/pa/pc) au lieu de l'indicateur compact en paliers de pièces
-    local sortBtn = makeToolBtn(tz, function()
-        return PW.recipeSortProfit and L["Tri par rentabilité — clic pour A-Z."]
-            or L["Trier par rentabilité (Lazy Gold)."]
-    end, function() PW:_ToggleRecipeSort() end)
-    sortBtn:SetPoint("LEFT", 24, 0)
-    local coin = sortBtn:CreateTexture(nil, "ARTWORK")
-    coin:SetTexture("Interface\\MoneyFrame\\UI-GoldIcon"); coin:SetSize(14, 14); coin:SetPoint("CENTER")
-    sortBtn.coin = coin
-    self.recSortBtn = sortBtn
-
-    local exactBtn = makeToolBtn(tz, function()
-        return (COC.LazyGold and COC.LazyGold:ExactMode()) and L["Valeurs exactes — clic pour l'affichage compact."]
-            or L["Afficher les valeurs exactes (po/pa/pc)."]
-    end, function() PW:_ToggleProfitExact() end)
-    exactBtn:SetPoint("LEFT", 2, 0)
-    local num = exactBtn:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
-    num:SetPoint("CENTER"); num:SetText("123"); exactBtn.num = num
-    self.recExactBtn = exactBtn
+    self:_BuildRecipeTools(tz)
+    local ftz = self:Sec("recFilterToggles")
+    if ftz then self:_BuildRecipeFilters(ftz) end
 
     -- Liste dans sa zone, scrollbar dans la gouttière (le −6 laisse respirer le bord, la barre
     -- déborde dans les 22 px de recGutter — même patron que toutes les listes converties).
@@ -196,53 +163,26 @@ function PW:_ActiveRecipes()
     return out
 end
 
--- Bascule le tri par rentabilité (sans effet si Lazy Gold absent). Met à jour l'en-tête + rafraîchit.
-function PW:_ToggleRecipeSort()
-    if not (COC.LazyGold and COC.LazyGold:IsAvailable()) then return end
-    self.recipeSortProfit = not self.recipeSortProfit
-    self:_SyncSortHeader()
-    self:RefreshRecipes()
-end
-
--- Bascule l'affichage compact ↔ valeurs exactes (po/pa/pc). Préférence PERSISTÉE (db.lgExactProfit) :
--- c'est un confort de lecture, il doit survivre au /reload.
-function PW:_ToggleProfitExact()
-    local LG = COC.LazyGold
-    if not (LG and LG:IsAvailable()) then return end
-    LG:SetExactMode(not LG:ExactMode())
-    self:_SyncSortHeader()
-    self:RefreshRecipes()
-end
-
--- Reflète l'état des deux boutons (fond doré = actif) + le libellé de l'en-tête. Boutons masqués si
--- Lazy Gold est absent — inutile de proposer un tri ou des prix sans données.
-function PW:_SyncSortHeader()
-    local LG = COC.LazyGold
-    local ok = LG and LG:IsAvailable()
-    local on = self.recipeSortProfit and ok
-    if self.recSortBtn then
-        self.recSortBtn:SetShown(ok and true or false)
-        if self.recSortBtn.onBG then self.recSortBtn.onBG:SetShown(on and true or false) end
-        if self.recSortBtn.coin then self.recSortBtn.coin:SetDesaturated(not on) end
-    end
-    if self.recExactBtn then
-        local ex = ok and LG:ExactMode()
-        self.recExactBtn:SetShown(ok and true or false)
-        self.recExactBtn.onBG:SetShown(ex and true or false)
-        self.recExactBtn.num:SetTextColor(ex and 1 or 0.55, ex and 0.82 or 0.55, ex and 0.29 or 0.55)
-    end
-    if self.recHdr then
-        self.recHdr:SetText("|cFFE8B84B" .. (on and L["Par rentabilité"] or L["Recettes"]) .. "|r")
-    end
+-- Rang de tri « progression » : orange (point garanti) < jaune < vert < gris ; inconnu entre gris et
+-- manquantes ; les MANQUANTES ferment la marche (pas craftables, donc aucun point à en tirer).
+local DIFF_RANK = { optimal = 1, medium = 2, easy = 3, trivial = 4 }
+local function levelRank(e)
+    if e.isMissing then return 6 end
+    return DIFF_RANK[e.difficulty] or 5
 end
 
 function PW:_RecipeDisplayList()
     local raw, search = self:_ActiveRecipes(), self.recipeSearch
     self._active = raw   -- mémorisé pour GetSelectedRecipe (résolution par clé, cf. entryKey)
     local sortProfit = self.recipeSortProfit and COC.LazyGold and COC.LazyGold:IsAvailable()
+    local haveMats = self.recipeHaveMats   -- ne garder que les recettes craftables MAINTENANT (mats en sac)
+    local skillUp  = self.recipeSkillUp    -- masquer le palier gris (trivial) : ne reste que ce qui progresse
     local items = {}
     for _, r in ipairs(raw) do
-        if not r.isHeader and (not search or search == "" or (r.name and r.name:lower():find(search, 1, true))) then
+        if not r.isHeader
+            and (not search or search == "" or (r.name and r.name:lower():find(search, 1, true)))
+            and (not haveMats or (r.numAvailable or 0) > 0)
+            and (not skillUp or r.difficulty ~= "trivial") then
             if sortProfit then r._profit = self:_RowProfit(r) end   -- pré-calc (mémorisé) pour le tri
             items[#items + 1] = r
         end
@@ -258,6 +198,16 @@ function PW:_RecipeDisplayList()
         end)
         return items
     end
+    -- Tri « progression » : même principe à PLAT — d'abord ce qui rapporte un point de compétence à
+    -- coup sûr (orange), puis jaune/vert, gris en fin. À rang égal : A-Z.
+    if self.recipeSortLevel then
+        table.sort(items, function(a, b)
+            local ra, rb = levelRank(a), levelRank(b)
+            if ra ~= rb then return ra < rb end
+            return (a.name or "") < (b.name or "")
+        end)
+        return items
+    end
     return COC.RecipeCats:BuildDisplay(self.profKey, items, {
         itemID    = function(r) return r.itemID end,
         name      = function(r) return r.name or "" end,
@@ -269,6 +219,7 @@ function PW:RefreshRecipes()
     if not self.recScroll then return end
     self._profitCache = {}   -- invalidé à chaque refresh (prix Auctionator ont pu changer)
     self:_SyncSortHeader()   -- affiche/masque le bouton de tri selon la présence de Lazy Gold
+    self:_SyncFilterButtons()
     self.wantedMap = self:_ComputeWantedMap()
     self.recDisplay = self:_RecipeDisplayList()
     local n = #self.recDisplay
@@ -301,7 +252,8 @@ end
 -- En-tête : chevron +/- (texture native), libellé doré (section) ou bronze (sous-catégorie, indentée),
 -- et compte d'éléments. Cliquable → replie/déplie (voir OnClick du pool).
 function PW:_FillHeaderRow(row, e)
-    row.icon:Hide(); row.badge:Hide(); row.sel:Hide(); row.profit:Hide()   -- profit:Hide → sinon fantôme sur l'en-tête recyclé
+    row.tipLink, row.tipItemID = nil, nil   -- en-tête : pas d'objet à linker (ligne recyclée)
+    row.icon:Hide(); row.badge:Hide(); row.sel:Hide(); row.profit:Hide(); row.niv:Hide()   -- sinon fantôme sur l'en-tête recyclé
     local open = not self:_CollapseTable()[e.ckey] or (self.recipeSearch or "") ~= ""
     row.expand:SetTexture(open and "Interface\\Buttons\\UI-MinusButton-Up" or "Interface\\Buttons\\UI-PlusButton-Up")
     row.expand:ClearAllPoints()
@@ -317,6 +269,7 @@ end
 
 function PW:_FillRecipeRow(row, e)
     if e.isHeader then return self:_FillHeaderRow(row, e) end
+    row.tipLink, row.tipItemID = e.link, e.itemID   -- shift-clic → lien (enchant via link, manquante via itemID)
     row.expand:Hide()
     row.icon:Show(); row.icon:SetTexture(e.icon or "Interface\\Icons\\INV_Misc_QuestionMark")
     row.icon:ClearAllPoints()
@@ -350,15 +303,25 @@ function PW:_RowProfit(e)
     return v or nil
 end
 
--- Zone DROITE d'une ligne : profit (le plus à droite) + badge « demandé » à sa gauche. Rétrécit le nom
--- jusqu'au premier élément présent pour éviter le chevauchement.
+-- Zone DROITE d'une ligne : niv requis (filtre skill-up) → profit → badge « demandé », de droite à
+-- gauche. Rétrécit le nom jusqu'au premier élément présent pour éviter le chevauchement.
 function PW:_FillRecipeRight(row, e)
+    -- Rang requis MTSL à l'extrême droite, UNIQUEMENT sous le filtre « montée de compétence » (le seul
+    -- contexte où le niveau de skill est pertinent). Nil sans MTSL / hors base / recette manquante.
+    local anchor
+    local ms = self.recipeSkillUp and not e.isMissing and COC.MTSL and e.spellID and COC.MTSL:MinSkill(self.profKey, e.spellID)
+    if ms then row.niv:SetText("|cFF9AC0E8" .. ms .. "|r"); row.niv:Show(); anchor = row.niv else row.niv:Hide() end
     local prof = self:_RowProfit(e)
     -- Indicateur COMPACT (paliers de pièces) par défaut : la liste reste lisible. Le bouton « 123 »
     -- passe aux valeurs exactes en po/pa/pc (LG:ProfitText arbitre). Une perte n'affiche rien.
     local tier = prof and COC.LazyGold:ProfitText(prof) or ""
-    if tier ~= "" then row.profit:SetText(tier); row.profit:Show() else row.profit:Hide() end
-    local anchor = row.profit:IsShown() and row.profit or nil
+    if tier ~= "" then
+        row.profit:ClearAllPoints()
+        if anchor then row.profit:SetPoint("RIGHT", anchor, "LEFT", -4, 0) else row.profit:SetPoint("RIGHT", -2, 0) end
+        row.profit:SetText(tier); row.profit:Show(); anchor = row.profit
+    else
+        row.profit:Hide()
+    end
     local w = self.wantedMap and e.itemID and self.wantedMap[e.itemID]
     if w and w.count and w.count > 0 then
         row.badge:ClearAllPoints()

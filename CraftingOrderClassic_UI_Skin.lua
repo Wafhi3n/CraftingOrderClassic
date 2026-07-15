@@ -294,6 +294,35 @@ function Skin.WireItemTooltip(row)
     row:SetScript("OnLeave", GameTooltip_Hide)
 end
 
+-- Résout un HYPERLIEN de chat COMPLET (|H…|h, insérable) depuis ce qu'une ligne porte déjà : un lien
+-- EXACT (recette/réactif/enchant) d'abord, sinon l'objet par itemID, sinon le sort par spellID. Le lien
+-- d'objet reconstruit reste valide même si GetItemInfo n'a pas encore le nom en cache (le client résout
+-- l'objet par son id ; le texte entre crochets n'est que cosmétique) — mais en pratique l'objet est déjà
+-- en cache puisque la ligne l'affiche (icône + nom).
+function Skin.ChatLinkFor(link, itemID, spellID)
+    if link and link:find("|H", 1, true) then return link end
+    if itemID then
+        local _, il = GetItemInfo(itemID)
+        return il or ("|cffffffff|Hitem:" .. itemID .. "|h[" .. itemID .. "]|h|r")
+    end
+    if spellID and GetSpellLink then return GetSpellLink(spellID) end
+    return nil
+end
+
+-- Shift-clic (CHATLINK) sur une ligne → insère le lien dans le chat, comme un objet d'un sac ou de l'HdV.
+-- À appeler UNE fois dans le constructeur de ligne, en COMPLÉMENT de WireItemTooltip : lit les mêmes
+-- champs (tipItemID/tipSpellID) + un tipLink optionnel (lien exact déjà connu, ex. enchant). HookScript
+-- sur OnMouseUp → coexiste avec un OnClick de sélection (le clic SANS shift n'est pas intercepté) ;
+-- HandleModifiedItemClick vérifie lui-même le modificateur et ne fait rien si aucun chat n'est ouvert
+-- (comportement natif). La frame doit recevoir la souris (EnableMouse(true) ; les Button l'ont déjà).
+function Skin.WireItemLink(row)
+    row:HookScript("OnMouseUp", function(self, button)
+        if button ~= "LeftButton" or not IsModifiedClick("CHATLINK") then return end
+        local link = Skin.ChatLinkFor(self.tipLink, self.tipItemID, self.tipSpellID)
+        if link then HandleModifiedItemClick(link) end
+    end)
+end
+
 -- Pastille de présence : texture statut du jeu, avec méthode SetOnline(bool/nil). nil = masquée.
 function Skin.MakeStatusIcon(parent, size)
     size = size or 14

@@ -62,11 +62,15 @@ COC.RecipeCats:Register("Mining", {
         36909,  -- Cobalt Ore (72)
         23425,  -- Adamantite Ore (65)
         23424,  -- Fel Iron Ore (60)
+        11370,  -- Dark Iron Ore (50)
         10620,  -- Thorium Ore (50)
         3858,   -- Mithril Ore (40)
+        7911,   -- Truesilver Ore (40)
         2772,   -- Iron Ore (30)
+        2776,   -- Gold Ore (25)
         2771,   -- Tin Ore (20)
         2770,   -- Copper Ore (10)
+        2775,   -- Silver Ore (10)
       } },
 })
 
