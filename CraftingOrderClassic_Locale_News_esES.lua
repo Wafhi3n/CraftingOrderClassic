@@ -8,6 +8,10 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "Novedades",
+    -- v1.19.1
+    ["Correctif : l'icône « dispo » remarche sur la nouvelle UI des plaques"] = "Corrección: el icono de disponibilidad vuelve a funcionar en la nueva interfaz de placas",
+    ["Sur le client TBC (et bientôt Era/Saison de la Découverte à la 1.15.9), l'icône « recherche de travail » au-dessus de la plaque d'un artisan cessait de s'afficher quand son statut changeait : la nouvelle interface de plaques a renommé un champ interne que l'addon lisait. Corrigé. Elle reste invisible en instance (donjon, raid) : le jeu verrouille les plaques amies aux addons là-bas, rien à faire de notre côté."] =
+        "En el cliente de TBC (y pronto en Era/Temporada del Descubrimiento con el parche 1.15.9), el icono de «buscar trabajo» sobre la placa de un artesano dejaba de mostrarse cuando cambiaba su estado: la nueva interfaz de placas renombró un campo interno que leía el complemento. Corregido. Sigue sin verse dentro de una instancia (mazmorra, banda): el juego bloquea las placas amistosas a los complementos ahí, no hay nada que podamos hacer al respecto.",
     -- v1.19.0
     ["Propose des recettes précises, diffuse tes réactifs, et le LFW marche même sans l'addon"] = "Recetas en tu oferta, un botón para compartir, y LFW sin el complemento",
     ["« Chercher du travail » propose maintenant des recettes précises, pas seulement des réactifs : coche des plans dans la liste et qui te consulte voit « propose : Bouclier de fer, Gilet de mailles de cuivre » à côté de ce que tu fournis déjà."] =

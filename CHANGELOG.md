@@ -1,5 +1,15 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.19.1 — Nameplate badge fix for the modern nameplate UI
+
+The "looking for work" badge over a crafter's nameplate stopped refreshing on the TBC 2.5.6 client:
+the new nameplate driver renamed the field the addon read to find the unit behind a plate, so the
+badge never repainted when someone's status changed. Fixed. Era and Season of Discovery get the same
+driver with patch 1.15.9, so this was heading their way too.
+
+One thing that's still true on the new UI and won't change: friendly nameplates inside an instance
+(dungeon, raid) are locked out for addons. No badge there, nothing we can do about it.
+
 ## v1.19.0 — Recipes in your offer, a share button, and LFW without the addon
 
 Looking for work now lets you name exact recipes, not just reagents. Check off plans in the recipe

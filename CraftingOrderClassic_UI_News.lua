@@ -16,6 +16,12 @@ local BODY_W = 780
 local function versionsRecent()
     return {
         {
+            v = "v1.19.1", title = L["Correctif : l'icône « dispo » remarche sur la nouvelle UI des plaques"],
+            lines = {
+                L["Sur le client TBC (et bientôt Era/Saison de la Découverte à la 1.15.9), l'icône « recherche de travail » au-dessus de la plaque d'un artisan cessait de s'afficher quand son statut changeait : la nouvelle interface de plaques a renommé un champ interne que l'addon lisait. Corrigé. Elle reste invisible en instance (donjon, raid) : le jeu verrouille les plaques amies aux addons là-bas, rien à faire de notre côté."],
+            },
+        },
+        {
             v = "v1.19.0", title = L["Propose des recettes précises, diffuse tes réactifs, et le LFW marche même sans l'addon"],
             lines = {
                 L["« Chercher du travail » propose maintenant des recettes précises, pas seulement des réactifs : coche des plans dans la liste et qui te consulte voit « propose : Bouclier de fer, Gilet de mailles de cuivre » à côté de ce que tu fournis déjà."],
@@ -60,6 +66,11 @@ local function versionsRecent()
                 L["La vue métier n'affiche plus les commandes privées destinées à quelqu'un d'autre, ni les expirées. Ton compteur de crafts livrés ne peut plus être gonflé par un tiers. Et croiser un artisan coûte deux fois moins de messages : le bonjour porte maintenant tes métiers, ce qui règle aussi les artisans qui s'affichaient sans aucun métier."],
             },
         },
+    }
+end
+
+local function versionsOlder()
+    return {
         {
             v = "v1.15.0", title = L["Recherche de travail : signale que tu es dispo"],
             lines = {
@@ -67,11 +78,6 @@ local function versionsRecent()
                 L["Au passage : les deux fenêtres ne s'emmêlent plus (un clic la ramène au premier plan), l'annuaire a un bouton partenaire et se limite à ta faction (pas d'échange cross-faction sur Classic), et un artisan ne s'affiche plus avec un métier qui n'est pas le sien."],
             },
         },
-    }
-end
-
-local function versionsOlder()
-    return {
         {
             v = "v1.14.0", title = L["Un panneau pour gérer les mis en sourdine"],
             lines = {

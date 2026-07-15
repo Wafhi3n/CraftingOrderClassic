@@ -5,7 +5,10 @@
 -- GetNamePlates / frame.namePlateUnitToken (API vérifiée dans la source Classic Era). Purement DÉCORATIF
 -- (aucune frame protégée touchée), no-op si les plaques sont désactivées (C_NamePlate absent).
 -- ⚠️ Les artisans LFW sont en général AMIS/même faction → visible seulement si les plaques AMIES sont
--- activées (CVar nameplateShowFriends).
+-- activées (CVar nameplateShowFriends). ⚠️ Sur l'UI MODERNE (TBC 2.5.6, Era 1.15.9+), les plaques amies
+-- en INSTANCE (donjon/raid) sont « forbidden » côté C++ : invisibles pour le code addon insécure (ni
+-- GetNamePlates ni NAME_PLATE_UNIT_ADDED) → pas de badge en instance, par design Blizzard, aucune parade.
+-- Vérifié en jeu 2026-07-15 (Monastère : rien en instance, badge OK dans le hall monde-ouvert).
 
 local COC = CraftingOrderClassic
 local NP  = {}
@@ -94,10 +97,15 @@ end
 
 -- Le statut LFW d'un NOM a changé (OnLFW) → repeint la plaque visible de ce joueur. Le nom n'étant pas
 -- résolu en unit ici, on balaie les plaques présentes (peu nombreuses à l'écran).
+-- ⚠️ Le token d'unit est posé sur la frame par le DRIVER Blizzard, dont le nom de champ DIFFÈRE selon l'UI :
+-- ancien driver (Era/SoD ≤ 1.15.8) = `plate.namePlateUnitToken` ; UI moderne (TBC 2.5.6, Era 1.15.9+,
+-- Blizzard_NamePlateBase:SetUnit) = `plate.unitToken`. Lire les DEUX, sinon Refresh est un no-op silencieux
+-- sur l'UI moderne (diagnostiqué en jeu sur TBC 2.5.6 le 2026-07-15 : /cocm lfw ne peignait aucune plaque).
 function NP:Refresh(name)
     if not (C_NamePlate and C_NamePlate.GetNamePlates) then return end
     for _, p in ipairs(C_NamePlate.GetNamePlates(secure()) or {}) do
-        if p.namePlateUnitToken then self:_Apply(p.namePlateUnitToken) end
+        local unit = p.namePlateUnitToken or p.unitToken
+        if unit then self:_Apply(unit) end
     end
 end
 

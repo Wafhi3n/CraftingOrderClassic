@@ -11,6 +11,10 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "What's New",
+    -- v1.19.1
+    ["Correctif : l'icône « dispo » remarche sur la nouvelle UI des plaques"] = "Fix: the availability badge works again on the newer nameplate UI",
+    ["Sur le client TBC (et bientôt Era/Saison de la Découverte à la 1.15.9), l'icône « recherche de travail » au-dessus de la plaque d'un artisan cessait de s'afficher quand son statut changeait : la nouvelle interface de plaques a renommé un champ interne que l'addon lisait. Corrigé. Elle reste invisible en instance (donjon, raid) : le jeu verrouille les plaques amies aux addons là-bas, rien à faire de notre côté."] =
+        "On the TBC client (and soon Era/Season of Discovery with patch 1.15.9), the \"looking for work\" badge over a crafter's nameplate stopped showing up when their status changed: the newer nameplate UI renamed an internal field the addon was reading. Fixed. It still won't show inside an instance (dungeon, raid): the game locks friendly nameplates away from addons there, nothing we can do about that one.",
     -- v1.19.0
     ["Propose des recettes précises, diffuse tes réactifs, et le LFW marche même sans l'addon"] = "Recipes in your offer, a share button, and LFW without the addon",
     ["« Chercher du travail » propose maintenant des recettes précises, pas seulement des réactifs : coche des plans dans la liste et qui te consulte voit « propose : Bouclier de fer, Gilet de mailles de cuivre » à côté de ce que tu fournis déjà."] =

@@ -8,6 +8,10 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "Neues",
+    -- v1.19.1
+    ["Correctif : l'icône « dispo » remarche sur la nouvelle UI des plaques"] = "Fehlerbehebung: Das Verfügbarkeits-Symbol funktioniert wieder mit der neuen Namensschild-UI",
+    ["Sur le client TBC (et bientôt Era/Saison de la Découverte à la 1.15.9), l'icône « recherche de travail » au-dessus de la plaque d'un artisan cessait de s'afficher quand son statut changeait : la nouvelle interface de plaques a renommé un champ interne que l'addon lisait. Corrigé. Elle reste invisible en instance (donjon, raid) : le jeu verrouille les plaques amies aux addons là-bas, rien à faire de notre côté."] =
+        "Auf dem TBC-Client (und bald auf Era/Season of Discovery mit Patch 1.15.9) zeigte das „Arbeit suchen\"-Symbol über dem Namensschild eines Handwerkers nicht mehr an, wenn sich dessen Status änderte: Die neue Namensschild-Oberfläche hat ein internes Feld umbenannt, das das Addon ausgelesen hat. Behoben. In Instanzen (Dungeon, Schlachtzug) bleibt es unsichtbar: Das Spiel sperrt Addons dort von befreundeten Namensschildern aus, daran können wir nichts ändern.",
     -- v1.19.0
     ["Propose des recettes précises, diffuse tes réactifs, et le LFW marche même sans l'addon"] = "Rezepte im Angebot, ein Teilen-Knopf, und Arbeit suchen auch ohne Addon",
     ["« Chercher du travail » propose maintenant des recettes précises, pas seulement des réactifs : coche des plans dans la liste et qui te consulte voit « propose : Bouclier de fer, Gilet de mailles de cuivre » à côté de ce que tu fournis déjà."] =

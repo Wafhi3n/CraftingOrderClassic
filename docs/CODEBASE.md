@@ -1,6 +1,6 @@
 # CraftingOrderClassic — carte du code
 
-> **GÉNÉRÉ** le 2026-07-15 (v1.18.0) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
+> **GÉNÉRÉ** le 2026-07-15 (v1.19.1) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
@@ -17,9 +17,9 @@
 | `CraftingOrderClassic_Locale_enUS.lua` | overlay ANGLAIS (enUS/enGB). | 499 |
 | `CraftingOrderClassic_Locale_deDE.lua` | overlay ALLEMAND (deDE). | 477 |
 | `CraftingOrderClassic_Locale_esES.lua` | overlay ESPAGNOL (esES/esMX). | 478 |
-| `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 156 |
-| `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 153 |
-| `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 153 |
+| `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 168 |
+| `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 165 |
+| `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 165 |
 | `CraftingOrderClassic_Elemental.lua` | pseudo-« métier » de récolte « Élémentaire ». | 61 |
 | `CraftingOrderClassic_UI_Skin.lua` | tokens + helpers SÉMANTIQUES du skin (métiers, statuts, rareté, quantités, icônes natives) et petits widgets d'affichage. | 408 |
 | `CraftingOrderClassic_UI_Skin_Native.lua` | kit de chrome Blizzard NATIF (le « framework » UI de COC). | 466 |
@@ -44,12 +44,12 @@
 | `CraftingOrderClassic_UI_MyArtisans.lua` | onglet « Mes artisans » : vue agrégée des métiers du COMPTE (tous mes rerolls du royaume), en mode « connu ». | 433 |
 | `CraftingOrderClassic_UI_MyArtisans_LazyGold.lua` | onglet « Mes artisans » : couche Lazy Gold. | 134 |
 | `CraftingOrderClassic_UI_Help.lua` | onglet Aide : page unique défilante qui explique les autres onglets (Carnet/Commande/Récolte/Artisans), la Vue Métier et le réseau. | 163 |
-| `CraftingOrderClassic_UI_News.lua` | onglet « Nouveautés » : notes de version (changelog) affichées EN JEU, version par version, la plus récente en tête. | 199 |
+| `CraftingOrderClassic_UI_News.lua` | onglet « Nouveautés » : notes de version (changelog) affichées EN JEU, version par version, la plus récente en tête. | 213 |
 | `CraftingOrderClassic_Social.lua` | couche sociale passive (socle). | 380 |
 | `CraftingOrderClassic_Social_Menu.lua` | entrées « Crafting Order » du menu contextuel joueur. | 101 |
 | `CraftingOrderClassic_Social_Roster.lua` | affichage des métiers sur les fenêtres NATIVES. | 130 |
 | `CraftingOrderClassic_Minimap.lua` | bouton minimap (toggle du carnet). | 120 |
-| `CraftingOrderClassic_Nameplate.lua` | icône « recherche de travail » (LFW) sur les plaques. | 113 |
+| `CraftingOrderClassic_Nameplate.lua` | icône « recherche de travail » (LFW) sur les plaques. | 121 |
 | `CraftingOrderClassic_ProfOrders.lua` | COORDINATEUR d'événements de la fenêtre métier. | 82 |
 | `CraftingOrderClassic_RecipeCats.lua` | SOUS-CATÉGORIES de recettes (moteur + registre). | 113 |
 | `CraftingOrderClassic_RecipeCats_Group.lua` | REGROUPEMENT partagé : transforme une liste plate d'entrées (recettes, plans, ressources…) en liste d'AFFICHAGE à deux niveaux :      Section (COC.SectionOf)  >  Sous-catégorie (COC.RecipeCats)  >  les objets, triés  Écrit une fois ici parce que QUATRE listes en ont besoin et qu'elles n'ont pas la même structure de ligne : vue métier (recettes de l'API), onglet Commande (plans du catalogue), Mes artisans (recettes connues), onglet Récolte (ressources). | 104 |
@@ -844,7 +844,10 @@
 > GetNamePlates / frame.namePlateUnitToken (API vérifiée dans la source Classic Era). Purement DÉCORATIF
 > (aucune frame protégée touchée), no-op si les plaques sont désactivées (C_NamePlate absent).
 > ⚠️ Les artisans LFW sont en général AMIS/même faction → visible seulement si les plaques AMIES sont
-> activées (CVar nameplateShowFriends).
+> activées (CVar nameplateShowFriends). ⚠️ Sur l'UI MODERNE (TBC 2.5.6, Era 1.15.9+), les plaques amies
+> en INSTANCE (donjon/raid) sont « forbidden » côté C++ : invisibles pour le code addon insécure (ni
+> GetNamePlates ni NAME_PLATE_UNIT_ADDED) → pas de badge en instance, par design Blizzard, aucune parade.
+> Vérifié en jeu 2026-07-15 (Monastère : rien en instance, badge OK dans le hall monde-ouvert).
 
 **API** : `NP:Refresh(name)` · `NP:Start()`
 
