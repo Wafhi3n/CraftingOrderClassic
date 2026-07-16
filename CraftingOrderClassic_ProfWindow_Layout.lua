@@ -18,7 +18,9 @@ local PW   = COC.ProfWindow
 local SPEC = {
     x1 = 4, x2 = 800, vTop = 0, vBottom = 0,
     { id = "recipes", w = 230, padR = 5, top = -4, bottom = 5,     -- colonne Recettes
-        { id = "recHeader",  h = 24, bg = true },        -- en-tête « Recettes »
+        { id = "recHeader",  h = 24, bg = true, dir = "cols",   -- en-tête « Recettes » + slot bouton à droite
+            { id = "recTitle", sep = false },                   -- titre dynamique (flex, cf. _SyncSortHeader)
+            { id = "recHeaderTools", w = 24, sep = false } },   -- bouton « acquérables » (mode manquantes) — POSITION réglable ici
         { id = "recFilters", h = 26, dir = "cols",       -- barre d'outils en SLOTS :
             { id = "recTools",  w = 70, sep = false },   --   « 123 » + pièce d'or (Lazy Gold) + ▲ progression
             { id = "recSearch", sep = false },           --   la recherche REMPLIT le reste

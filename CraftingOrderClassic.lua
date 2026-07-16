@@ -361,6 +361,7 @@ f:SetScript("OnEvent", function(_, event, arg1)
         if COC.Inbound  then COC.Inbound:Start()  end      -- capture /commerce + /guilde (non-addon)
         if COC.ProfOrders then COC.ProfOrders:Start() end  -- overlay « commandes du métier » sur la fenêtre métier
         if COC.Nameplate then COC.Nameplate:Start() end    -- icône LFW (recherche de travail) sur les plaques
+        if COC.EnchantTrade then COC.EnchantTrade:Start() end  -- greffon enchant sur l'échange (objet en slot 7)
         if COC.UI and COC.UI.BuildMinimapButton then COC.UI:BuildMinimapButton() end
         if COC.Debug and C_Timer then C_Timer.After(1, function() COC.Debug:Reapply() end) end
         SLASH_CRAFTINGORDER1 = "/co"

@@ -184,3 +184,23 @@ function Craft:Do(index, count)
     if not api or not index then return end
     api.craft(index, count or 1)
 end
+
+-- Sélectionne la recette `index` de la fenêtre de Craft (enchant) ET ARME le bouton natif
+-- CraftCreateButton, de façon SYNCHRONE — le préalable de toute redirection sécurisée (DoCraft est
+-- protégé, la seule voie de craft est le clic redirigé vers le bouton natif ARMÉ).
+-- ⚠️ Correctif durement gagné (bug intermittent « Créer ne crafte pas », diagnostiqué EN JEU
+-- 2026-07-15) : `SelectCraft` N'ÉMET PAS de CRAFT_UPDATE (prouvé : armFires=15 → CU=0/SS=0), le
+-- handler natif qui active le bouton ne tournait donc jamais. `CraftFrame_SetSelection` sélectionne
+-- ET active le bouton elle-même (le code Blizzard l'appelle exactement ainsi dans CraftButton_OnClick).
+-- Activer le bouton n'est PAS protégé (seul DoCraft l'est). Ne JAMAIS appeler sur un en-tête (elle
+-- ferait Expand/Collapse) — les appelants filtrent les headers en amont.
+-- HELPER PARTAGÉ : PW:_SyncNativeCraftSelection (vue métier) et le panneau d'échange (_Enchant_Trade)
+-- passent tous deux ici — une future retouche du mécanisme ne peut plus en oublier un.
+function Craft:ArmNativeSelection(index)
+    if not index then return end
+    if _G.CraftFrame_SetSelection then
+        pcall(_G.CraftFrame_SetSelection, index)   -- sélectionne + arme (synchrone)
+    elseif SelectCraft then
+        SelectCraft(index)
+    end
+end

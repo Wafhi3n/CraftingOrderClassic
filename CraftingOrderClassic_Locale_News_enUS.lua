@@ -11,6 +11,16 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "What's New",
+    -- v1.20.0
+    ["Enchante en un clic, trié par emplacement, et depuis l'échange"] = "One-click enchants, sorted by slot, right from the trade window",
+    ["Le bouton « Créer » de l'Enchantement avait un vieux bug intermittent : parfois rien ne se passait, et resélectionner la recette finissait par le faire marcher. Cause trouvée : sélectionner une recette n'arme pas le bouton natif de Blizzard, notre clic sécurisé tombait donc sur un bouton désactivé. Corrigé — ça devrait marcher du premier coup, à chaque fois."] =
+        "The enchanting Create button had a long-standing intermittent bug: sometimes it just wouldn't fire, and re-selecting the recipe a few times eventually got it working. Root cause found: selecting a recipe doesn't actually arm Blizzard's native create button, so our secure click was landing on a disabled button. Fixed. Should just work now, every time.",
+    ["Les recettes d'enchantement ne s'entassent plus dans un fourre-tout « Autres/Divers » : elles se rangent par emplacement (Poignets, Torse, Main gauche…) puis par stat de base (Force, Esprit, Déviation), le nom raccourci à la stat seule puisque l'emplacement est déjà dans l'en-tête."] =
+        "Enchant recipes no longer pile up in a single Other/Misc bucket: they're grouped by slot (Wrist, Chest, Off-Hand...) then by base stat (Strength, Spirit, Deflection), with the name trimmed to just the stat since the slot's already in the header.",
+    ["Sélectionner un enchant d'équipement affiche un bouton « Enchanter équipé » à côté de Créer : un clic l'applique directement sur la pièce que tu portes, sans avoir à cibler."] =
+        "Selecting an equip-slot enchant now shows an \"Enchant equipped\" button next to Create: one click casts it on the item you're wearing in that slot, no manual targeting.",
+    ["Et quand quelqu'un te tend un objet à enchanter en échange, le poser dans la case « ne sera pas échangé » ouvre un petit panneau listant tes enchants pour cet emplacement, prêts à lancer sans fouiller ta fenêtre de métier (qui doit rester ouverte : le jeu ne renseigne tes recettes connues que pendant qu'elle l'est)."] =
+        "And when someone hands you gear to enchant over trade, dropping it in the \"will not be traded\" slot now pops a small panel listing every enchant you know for that slot, ready to cast without hunting through your profession window (which still needs to be open: the game only reports your known recipes while it's up).",
     -- v1.19.1
     ["Correctif : l'icône « dispo » remarche sur la nouvelle UI des plaques"] = "Fix: the availability badge works again on the newer nameplate UI",
     ["Sur le client TBC (et bientôt Era/Saison de la Découverte à la 1.15.9), l'icône « recherche de travail » au-dessus de la plaque d'un artisan cessait de s'afficher quand son statut changeait : la nouvelle interface de plaques a renommé un champ interne que l'addon lisait. Corrigé. Elle reste invisible en instance (donjon, raid) : le jeu verrouille les plaques amies aux addons là-bas, rien à faire de notre côté."] =
@@ -82,12 +92,7 @@ local news = {
     ["Modération : mutes avec raison, temporaires, liste de confiance"] = "Moderation: mutes with a reason, temporary mutes, a trust list",
     ["Un mute porte désormais une raison et une date, et peut être temporaire : |cFFFFFFFF/co mute Bob 1h spammeur|r se lève tout seul au bout d'une heure (|cFFFFFFFF/co mute|r seul liste les mutés avec raison et temps restant). Et |cFFFFFFFF/co trust <nom>|r marque un joueur de confiance, jamais mis en sourdine automatiquement — le mute manuel restant toujours possible."] =
         "A mute now carries a reason and a date, and can be temporary: |cFFFFFFFF/co mute Bob 1h spammer|r lifts itself after an hour (|cFFFFFFFF/co mute|r alone lists muted players with reason and time left). And |cFFFFFFFF/co trust <name>|r marks a player as trusted, never auto-muted — manual muting still available.",
-    -- Onglet Nouveautés — v1.12.1
-    ["Personne ne peut poster une commande en ton nom"] = "Nobody can post an order in your name",
-    ["Une commande arrivant par le canal du royaume était crue sur parole quant à son acheteur : un joueur pouvait publier de fausses commandes au nom d'autrui, et nourrir la détection de spam contre sa victime jusqu'à ce que tout le monde la mette en sourdine. Elles doivent désormais venir du joueur qui les a postées."] =
-        "An order arriving on the realm channel was trusted to name its own buyer: one player could publish fake orders under someone else's name, and feed the spam detector against that person until everyone muted them. Such orders must now come from the player who posted them.",
-    ["|cFFFFFFFF/co channel off|r quitte maintenant vraiment le canal. Il se contentait d'empêcher de le rejoindre au login suivant : tes commandes continuaient de partir au royaume pendant toute la session."] =
-        "|cFFFFFFFF/co channel off|r now really leaves the channel. It used to only stop rejoining at the next login: your orders kept going out to the realm for the rest of the session.",
+    -- (clés v1.12.1 retirées : version sortie de la fenêtre glissante de l'onglet Nouveautés)
     -- Onglet Nouveautés — v1.12.0
     ["Les recettes de la Saison de la Découverte"] = "Season of Discovery recipes",
     ["304 recettes de la Saison de la Découverte entrent au catalogue : 80 en Travail du cuir, 65 en Forge, 57 en Couture, 48 en Enchantement, 29 en Ingénierie, 16 en Alchimie, plus la Cuisine, le Secourisme et le Minage. Elles apparaissent dans l'onglet Commande, avec leurs réactifs et leur palier d'apprentissage."] =

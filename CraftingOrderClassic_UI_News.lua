@@ -16,6 +16,15 @@ local BODY_W = 780
 local function versionsRecent()
     return {
         {
+            v = "v1.20.0", title = L["Enchante en un clic, trié par emplacement, et depuis l'échange"],
+            lines = {
+                L["Le bouton « Créer » de l'Enchantement avait un vieux bug intermittent : parfois rien ne se passait, et resélectionner la recette finissait par le faire marcher. Cause trouvée : sélectionner une recette n'arme pas le bouton natif de Blizzard, notre clic sécurisé tombait donc sur un bouton désactivé. Corrigé — ça devrait marcher du premier coup, à chaque fois."],
+                L["Les recettes d'enchantement ne s'entassent plus dans un fourre-tout « Autres/Divers » : elles se rangent par emplacement (Poignets, Torse, Main gauche…) puis par stat de base (Force, Esprit, Déviation), le nom raccourci à la stat seule puisque l'emplacement est déjà dans l'en-tête."],
+                L["Sélectionner un enchant d'équipement affiche un bouton « Enchanter équipé » à côté de Créer : un clic l'applique directement sur la pièce que tu portes, sans avoir à cibler."],
+                L["Et quand quelqu'un te tend un objet à enchanter en échange, le poser dans la case « ne sera pas échangé » ouvre un petit panneau listant tes enchants pour cet emplacement, prêts à lancer sans fouiller ta fenêtre de métier (qui doit rester ouverte : le jeu ne renseigne tes recettes connues que pendant qu'elle l'est)."],
+            },
+        },
+        {
             v = "v1.19.1", title = L["Correctif : l'icône « dispo » remarche sur la nouvelle UI des plaques"],
             lines = {
                 L["Sur le client TBC (et bientôt Era/Saison de la Découverte à la 1.15.9), l'icône « recherche de travail » au-dessus de la plaque d'un artisan cessait de s'afficher quand son statut changeait : la nouvelle interface de plaques a renommé un champ interne que l'addon lisait. Corrigé. Elle reste invisible en instance (donjon, raid) : le jeu verrouille les plaques amies aux addons là-bas, rien à faire de notre côté."],
@@ -58,6 +67,11 @@ local function versionsRecent()
                 L["Dans l'annuaire, les métiers passent en icônes : un artisan avec un plan vraiment rentable a un contour doré, le survol nomme le plan, le clic ouvre la Commande déjà ciblée. « Mes artisans » gagne « Tous les plans du royaume » : tous tes persos (même faction) fusionnés et triés par profit — d'un coup d'œil, quel reroll fait des sous. Et si tu as MissingTradeSkillsList, un bouton montre tes recettes non apprises en rouge, avec leur source au clic."],
             },
         },
+    }
+end
+
+local function versionsOlder()
+    return {
         {
             v = "v1.15.1", title = L["Tes commandes n'appartiennent qu'à toi"],
             lines = {
@@ -66,11 +80,6 @@ local function versionsRecent()
                 L["La vue métier n'affiche plus les commandes privées destinées à quelqu'un d'autre, ni les expirées. Ton compteur de crafts livrés ne peut plus être gonflé par un tiers. Et croiser un artisan coûte deux fois moins de messages : le bonjour porte maintenant tes métiers, ce qui règle aussi les artisans qui s'affichaient sans aucun métier."],
             },
         },
-    }
-end
-
-local function versionsOlder()
-    return {
         {
             v = "v1.15.0", title = L["Recherche de travail : signale que tu es dispo"],
             lines = {
@@ -119,6 +128,11 @@ local function versionsOlder()
                 L["Démuter un joueur réarme la détection de spam le concernant ; revenir de la vue métier d'un reroll ne laisse plus les boutons Créer masqués ; et l'addon travaille nettement moins à chaque ligne de chat sur un royaume chargé."],
             },
         },
+    }
+end
+
+local function versionsOldest()
+    return {
         {
             v = "v1.9.0", title = L["Tes rerolls réunis : cooldowns partagés, une identité, l'onglet Mes artisans"],
             lines = {
@@ -127,11 +141,6 @@ local function versionsOlder()
                 L["Nouvel onglet « Mes artisans » : tous les métiers de ton compte sur le royaume en une vue, comme un seul perso — niveau, recettes connues par catégorie, cooldowns en tête, et quel perso porte chaque recette."],
             },
         },
-    }
-end
-
-local function versionsOldest()
-    return {
         {
             v = "v1.8.0", title = L["Sous le capot : mises à jour plus sûres"],
             lines = {

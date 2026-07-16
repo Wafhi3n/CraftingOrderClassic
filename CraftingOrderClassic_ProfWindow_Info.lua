@@ -131,5 +131,14 @@ PW:RegisterInfoSection(function(ctx)
     if not (M and M:IsAvailable() and ctx.entry and ctx.entry.isMissing and ctx.entry.spellID) then return nil end
     local d = M:SkillDetail(ctx.profKey, ctx.entry.spellID)
     if not (d and d.lines and #d.lines > 0) then return nil end
+    -- Prix HV de l'OBJET-RECETTE (parchemin/patron), quand Auctionator/Lazy Gold l'a déjà vu passer :
+    -- répond à « combien coûte cette recette à l'hôtel des ventes ». On lit le DERNIER prix connu (le pont
+    -- est en lecture seule — jamais de scan à la demande) ; rien pour une recette de formateur (pas d'objet)
+    -- ou qu'Auctionator n'a jamais croisée.
+    local LG = COC.LazyGold
+    if LG and LG:IsAvailable() and d.itemID then
+        local ah = LG:ItemValue(d.itemID)
+        if ah then d.lines[#d.lines + 1] = { label = L["Acheter à l'HV"], value = GetCoinTextureString(ah) } end
+    end
     return { title = L["Où l'obtenir"], lines = d.lines }
 end)

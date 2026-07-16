@@ -1,5 +1,26 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.20.0 — One-click enchants, sorted by slot, right from the trade window
+
+The enchanting "Create" button had a long-standing intermittent bug: sometimes it just wouldn't fire,
+and re-selecting the recipe a few times eventually got it working. Root cause found: selecting a recipe
+doesn't actually arm Blizzard's native create button, so our secure click was landing on a disabled
+button. Fixed by arming the recipe the same way the native window does. Should just work now, every time.
+
+Enchant recipes were dumped in a single "Other/Misc" bucket in the recipe list, a wall of identical
+"Enchant Bracer - ..." names. They're grouped by slot now (Wrist, Chest, Off-Hand...) and then by base
+stat (Strength, Spirit, Deflection), with the name trimmed to just the stat since the slot's already in
+the header. Grand Crusader, Superior Strength, that kind of naming spread across expansions all fold into
+their base stat correctly, Season of Discovery included.
+
+Selecting an equip-slot enchant now shows an "Enchant equipped" button next to Create: one click casts
+the enchant on the item you're wearing in that slot, no manual targeting.
+
+And when someone hands you gear to enchant over trade, dropping it in the "will not be traded" slot
+now pops a small panel listing every enchant you know for that slot, ready to cast without hunting
+through your profession window. That window still needs to be open, though: the game only reports your
+known recipes while it's up, addon or not.
+
 ## v1.19.1 — Nameplate badge fix for the modern nameplate UI
 
 The "looking for work" badge over a crafter's nameplate stopped refreshing on the TBC 2.5.6 client:

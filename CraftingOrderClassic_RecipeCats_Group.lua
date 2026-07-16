@@ -25,12 +25,26 @@ function RC.KeySection(sec) return "S\1" .. tostring(sec) end
 function RC.KeySub(sec, sub) return "B\1" .. tostring(sec) .. "\1" .. tostring(sub) end
 
 -- Une VUE = l'entrée d'origine + son classement. Une entrée par sous-catégorie d'appartenance.
-local function viewsOf(profKey, entries, getItemID)
+-- `opts.section` (optionnel) permet à un appelant de classer une entrée SANS objet produit, que
+-- COC.SectionOf ne peut pas voir (un enchantement est un SERVICE : pas d'itemID → « Autres/Divers »).
+-- Il rend `sec, order, flat` ; `flat` = pas de sous-catégorie (l'entrée pend direct sous sa section).
+local function viewsOf(profKey, entries, opts)
+    local getItemID, getSection, getSub = opts.itemID, opts.section, opts.sub
     local out = {}
     for _, entry in ipairs(entries) do
         local itemID = getItemID(entry)
-        local sec, secOrder = COC.SectionOf(itemID)
-        local subs = RC:HasCategories(profKey) and RC:SubsOf(profKey, itemID) or nil
+        local sec, secOrder, flat
+        if getSection then sec, secOrder, flat = getSection(entry) end
+        if not sec then sec, secOrder = COC.SectionOf(itemID) end
+        secOrder = secOrder or 900   -- garde : un rang nil ferait planter le tri (comparaison avec nil)
+        local subs
+        if not flat then
+            if getSub then   -- sous-catégorie fournie par l'appelant (entrée SANS objet produit)
+                local sub, subOrder, tier = getSub(entry)
+                if sub then subs = { { sub = sub, order = subOrder or 0, tier = tier or 0 } } end
+            end
+            if not subs and RC:HasCategories(profKey) then subs = RC:SubsOf(profKey, itemID) end
+        end
         if subs then
             for _, s in ipairs(subs) do
                 out[#out + 1] = setmetatable(
@@ -93,12 +107,15 @@ end
 
 -- Point d'entrée unique.
 --   opts.itemID    (obligatoire) entrée → itemID de l'objet classé
+--   opts.section   (optionnel)   entrée → sec, order, flat : classe une entrée SANS itemID (enchants)
+--   opts.sub       (optionnel)   entrée → sub, order, tier : sous-catégorie fournie (idem), prioritaire
+--                                sur RC:SubsOf ; nil → repli sur le classement par itemID
 --   opts.name      (optionnel)   entrée → nom, pour le départage alphabétique
 --   opts.before    (optionnel)   comparateur prioritaire ; renvoie nil s'il ne tranche pas
 --   opts.collapsed (optionnel)   table d'état de repliage ; nil = tout déplié
 function RC:BuildDisplay(profKey, entries, opts)
     if not (entries and opts and opts.itemID) then return {} end
-    local views = viewsOf(profKey, entries, opts.itemID)
+    local views = viewsOf(profKey, entries, opts)
     sortViews(views, opts)
     return flatten(views, opts.collapsed)
 end

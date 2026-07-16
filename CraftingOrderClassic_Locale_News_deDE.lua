@@ -8,6 +8,16 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "Neues",
+    -- v1.20.0
+    ["Enchante en un clic, trié par emplacement, et depuis l'échange"] = "Verzaubern per Klick, sortiert nach Platz, direkt beim Tauschen",
+    ["Le bouton « Créer » de l'Enchantement avait un vieux bug intermittent : parfois rien ne se passait, et resélectionner la recette finissait par le faire marcher. Cause trouvée : sélectionner une recette n'arme pas le bouton natif de Blizzard, notre clic sécurisé tombait donc sur un bouton désactivé. Corrigé — ça devrait marcher du premier coup, à chaque fois."] =
+        "Der „Erstellen\"-Knopf beim Verzauberkunst hatte einen alten, unregelmäßigen Fehler: manchmal passierte einfach nichts, und das Rezept mehrmals neu auszuwählen brachte es irgendwann zum Laufen. Ursache gefunden: Ein Rezept auszuwählen aktiviert nicht den nativen Knopf von Blizzard, unser gesicherter Klick landete also auf einem deaktivierten Knopf. Behoben — sollte jetzt jedes Mal sofort funktionieren.",
+    ["Les recettes d'enchantement ne s'entassent plus dans un fourre-tout « Autres/Divers » : elles se rangent par emplacement (Poignets, Torse, Main gauche…) puis par stat de base (Force, Esprit, Déviation), le nom raccourci à la stat seule puisque l'emplacement est déjà dans l'en-tête."] =
+        "Verzauberungs-Rezepte landen nicht mehr alle im Sammelbecken „Sonstiges\": Sie sind jetzt nach Ausrüstungsplatz sortiert (Handgelenk, Brust, Waffenhand…), dann nach Basiswert (Stärke, Willenskraft, Abwehr), mit gekürztem Namen, da der Platz schon in der Überschrift steht.",
+    ["Sélectionner un enchant d'équipement affiche un bouton « Enchanter équipé » à côté de Créer : un clic l'applique directement sur la pièce que tu portes, sans avoir à cibler."] =
+        "Wählst du eine Verzauberung für einen Ausrüstungsplatz aus, erscheint neben „Erstellen\" ein Knopf „Ausgerüstetes verzaubern\": Ein Klick wendet sie direkt auf das getragene Teil an, ohne manuelles Zielen.",
+    ["Et quand quelqu'un te tend un objet à enchanter en échange, le poser dans la case « ne sera pas échangé » ouvre un petit panneau listant tes enchants pour cet emplacement, prêts à lancer sans fouiller ta fenêtre de métier (qui doit rester ouverte : le jeu ne renseigne tes recettes connues que pendant qu'elle l'est)."] =
+        "Und wenn dir jemand beim Tauschen etwas zum Verzaubern gibt: Es in das Feld „wird nicht getauscht\" zu legen, öffnet ein kleines Fenster mit allen deinen Verzauberungen für diesen Platz, einsatzbereit, ohne im Berufsfenster zu suchen (das aber geöffnet bleiben muss: Das Spiel gibt deine bekannten Rezepte nur preis, solange es offen ist).",
     -- v1.19.1
     ["Correctif : l'icône « dispo » remarche sur la nouvelle UI des plaques"] = "Fehlerbehebung: Das Verfügbarkeits-Symbol funktioniert wieder mit der neuen Namensschild-UI",
     ["Sur le client TBC (et bientôt Era/Saison de la Découverte à la 1.15.9), l'icône « recherche de travail » au-dessus de la plaque d'un artisan cessait de s'afficher quand son statut changeait : la nouvelle interface de plaques a renommé un champ interne que l'addon lisait. Corrigé. Elle reste invisible en instance (donjon, raid) : le jeu verrouille les plaques amies aux addons là-bas, rien à faire de notre côté."] =
@@ -79,12 +89,7 @@ local news = {
     ["Modération : mutes avec raison, temporaires, liste de confiance"] = "Moderation: Stummschaltungen mit Grund, temporär, Vertrauensliste",
     ["Un mute porte désormais une raison et une date, et peut être temporaire : |cFFFFFFFF/co mute Bob 1h spammeur|r se lève tout seul au bout d'une heure (|cFFFFFFFF/co mute|r seul liste les mutés avec raison et temps restant). Et |cFFFFFFFF/co trust <nom>|r marque un joueur de confiance, jamais mis en sourdine automatiquement — le mute manuel restant toujours possible."] =
         "Eine Stummschaltung trägt jetzt einen Grund und ein Datum und kann temporär sein: |cFFFFFFFF/co mute Bob 1h Spammer|r hebt sich nach einer Stunde selbst auf (|cFFFFFFFF/co mute|r allein listet die Stummgeschalteten mit Grund und Restzeit). Und |cFFFFFFFF/co trust <Name>|r markiert einen Spieler als vertrauenswürdig, nie automatisch stummgeschaltet — manuelles Stummschalten bleibt möglich.",
-    -- Onglet Nouveautés — v1.12.1
-    ["Personne ne peut poster une commande en ton nom"] = "Niemand kann einen Auftrag in deinem Namen aufgeben",
-    ["Une commande arrivant par le canal du royaume était crue sur parole quant à son acheteur : un joueur pouvait publier de fausses commandes au nom d'autrui, et nourrir la détection de spam contre sa victime jusqu'à ce que tout le monde la mette en sourdine. Elles doivent désormais venir du joueur qui les a postées."] =
-        "Einem über den Realm-Kanal eintreffenden Auftrag wurde sein Käufer aufs Wort geglaubt: ein Spieler konnte falsche Aufträge im Namen anderer veröffentlichen und die Spam-Erkennung gegen sein Opfer füttern, bis alle es stummschalteten. Solche Aufträge müssen nun vom Spieler kommen, der sie aufgegeben hat.",
-    ["|cFFFFFFFF/co channel off|r quitte maintenant vraiment le canal. Il se contentait d'empêcher de le rejoindre au login suivant : tes commandes continuaient de partir au royaume pendant toute la session."] =
-        "|cFFFFFFFF/co channel off|r verlässt den Kanal jetzt wirklich. Zuvor verhinderte es nur das erneute Beitreten beim nächsten Login: deine Aufträge gingen den Rest der Sitzung weiter an den Realm.",
+    -- (clés v1.12.1 retirées : version sortie de la fenêtre glissante de l'onglet Nouveautés)
     -- Onglet Nouveautés — v1.12.0
     ["Les recettes de la Saison de la Découverte"] = "Rezepte der Saison der Entdeckungen",
     ["304 recettes de la Saison de la Découverte entrent au catalogue : 80 en Travail du cuir, 65 en Forge, 57 en Couture, 48 en Enchantement, 29 en Ingénierie, 16 en Alchimie, plus la Cuisine, le Secourisme et le Minage. Elles apparaissent dans l'onglet Commande, avec leurs réactifs et leur palier d'apprentissage."] =

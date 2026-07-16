@@ -163,6 +163,14 @@ function Inbound:Add(e)
 end
 
 function Inbound:Alert(e)
+    -- scope "mine" = je ne veux entendre parler QUE de ce que je sais réellement crafter (recette
+    -- connue), pas juste du métier en général. Sinon un enchanteur/joaillier sans le plan/palier se
+    -- fait pinguer pour rien (retour terrain TBC 2026-07-16 : gemmes demandées sans avoir le plan).
+    -- L'entrée reste quand même dans le Carnet › Entrantes (utile pour la relayer à un ami capable).
+    if scanScope() == "mine" and not e.canCraft then
+        if COC.Trace then COC.Trace:Log("inbound", "silencé (recette non connue) : " .. tostring(e.itemName)) end
+        return
+    end
     -- Même discipline que les toasts P2P (Orders:_ShouldAlert) : « /co notify off » et les joueurs
     -- mutés ne déclenchent AUCUNE notif (chat/toast/son). L'entrée reste dans le Carnet › Entrantes.
     if COC.Moderation and COC.Moderation:IsMuted(e.buyer) then

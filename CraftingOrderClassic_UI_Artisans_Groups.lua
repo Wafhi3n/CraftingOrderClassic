@@ -32,8 +32,9 @@ function UI:_ArtisanGroups(memberOk)
             g = { leader = leader, members = {}, repMax = 0 }
             groups[leader] = g; order[#order + 1] = g
         end
-        local online = (D.online and D.online[name]) and true or false
-        local m = { name = name, r = r, online = online }
+        local pres   = (D.PresenceOf and D:PresenceOf(name)) or "offline"
+        local online = (pres == "online")
+        local m = { name = name, r = r, online = online, pres = pres }
         g.members[#g.members + 1] = m
         if name == leader then g.lead = m end
         if memberOk == nil or memberOk(r) then g.ok = true end
@@ -41,12 +42,16 @@ function UI:_ArtisanGroups(memberOk)
         if D.LFWOf and D:LFWOf(name) then g.anyLFW = true end   -- un perso du set cherche du travail (LFW)
         if (r.rep or 0) > g.repMax then g.repMax = r.rep end
         if online and (not g.onlineChar or name == leader) then g.onlineChar = name end
+        -- Perso du set connecté SANS l'addon : repli de présence quand aucun perso ne répond.
+        if pres == "game" and (not g.gameChar or name == leader) then g.gameChar = name end
       end
     end
     local list = {}
     for _, g in ipairs(order) do
         if g.ok then
             if not g.lead then g.lead = g.members[1]; g.leader = g.lead.name end   -- garde-fou
+            -- Rang de présence du set (tri de l'onglet) : joignable > connecté sans addon > hors ligne.
+            g.presRank = g.onlineChar and 2 or g.gameChar and 1 or 0
             table.sort(g.members, function(a, b)
                 if (a.name == g.leader) ~= (b.name == g.leader) then return a.name == g.leader end
                 if a.online ~= b.online then return a.online end
@@ -84,7 +89,8 @@ end
 -- rep max du set, icônes métier par porteur, tooltip de ligne listant les rerolls.
 function UI:_FillArtGroupRow(row, g)
     local lead = g.lead
-    row.dot:SetOnline(g.onlineChar ~= nil)
+    local pres = g.onlineChar and "online" or g.gameChar and "game" or "offline"
+    row.dot:SetPresence(pres)
     local pTag = g.anyPartner and ("|cFFFFD100" .. L["[Partenaire]"] .. "|r ") or ""
     local lfwTag = g.anyLFW and ("|cFF4CDB6E" .. L["[Dispo]"] .. "|r ") or ""   -- cherche du travail
     row.name:SetText(lfwTag .. pTag .. "|cFFFFFFFF" .. g.leader .. "|r |cFF888888+" .. (#g.members - 1) .. "|r")
@@ -92,7 +98,7 @@ function UI:_FillArtGroupRow(row, g)
     if g.onlineChar and g.onlineChar ~= g.leader then
         sub = string.format(L["En ligne via %s"], g.onlineChar)
     else
-        sub = (g.onlineChar and L["En ligne"] or L["Hors ligne"])
+        sub = (UI._PresLabel[pres] or L["Hors ligne"])
             .. " · " .. (lead.r.level and (L["niv "] .. lead.r.level) or L["niv ?"])
     end
     if g.repMax > 0 then sub = sub .. " · " .. string.format(L["%d livrés"], g.repMax) end
@@ -100,14 +106,16 @@ function UI:_FillArtGroupRow(row, g)
     -- 4e arg = repli si le métier n'a pas de porteur nommé (item.who) : le perso en ligne du set.
     UI:_SetArtProfIcons(row, UI:_GroupProfs(g), lead.r, g.onlineChar or g.leader)
     row.src:SetText("|cFF888888" .. (UI._SrcTag[lead.r.source or "recent"] or "") .. "|r")
-    self:_ArtRowButtons(row, { name = g.onlineChar or g.leader, online = g.onlineChar ~= nil, r = lead.r }, false, g.anyPartner)
+    -- Cible du /w : perso JOIGNABLE du set (avec addon, sinon en jeu sans addon), sinon le leader.
+    self:_ArtRowButtons(row, { name = g.onlineChar or g.gameChar or g.leader,
+        online = (g.onlineChar or g.gameChar) ~= nil, r = lead.r }, false, g.anyPartner)
     row:SetScript("OnEnter", function(self)
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
         GameTooltip:SetText(g.leader, 1, 1, 1)
         for _, m in ipairs(g.members) do
             if m.name ~= g.leader then
                 GameTooltip:AddLine(string.format(L["reroll : %s (%s)"], m.name,
-                    m.online and L["En ligne"] or L["Hors ligne"]), 0.7, 0.7, 0.7)
+                    UI._PresLabel[m.pres] or L["Hors ligne"]), 0.7, 0.7, 0.7)
             end
         end
         GameTooltip:Show()

@@ -211,4 +211,32 @@ CraftLink:ExtendProfession("Enchanting", {
         [241195] = 1231139,
         [242361] = 1232172,
     },
+
+    -- >>> gen_enchant_names.lua (généré — Wowhead classic ; ne pas éditer à la main)
+    -- Noms ANGLAIS canoniques des services sans objet (« Enchant <Slot> - <Effet> ») :
+    -- source robuste du classement par emplacement/stat, indépendante de la langue du client.
+    enchants = {
+        { id = 1231139, name = "Enchant 2H Weapon - Grand Arcanist" },
+        { id = 1232172, name = "Enchant 2H Weapon - Grand Inquisitor" },
+        { id = 1219580, name = "Enchant 2H Weapon - Spellblasting" },
+        { id = 1217203, name = "Enchant Bracer - Agility" },
+        { id = 1220624, name = "Enchant Bracer - Greater Spellpower" },
+        { id = 1217189, name = "Enchant Bracer - Spell Power" },
+        { id = 1213616, name = "Enchant Chest - Living Stats" },
+        { id = 435903, name = "Enchant Chest - Retricutioner" },
+        { id = 1219587, name = "Enchant Cloak - Agility" },
+        { id = 1213626, name = "Enchant Gloves - Arcane Power" },
+        { id = 1213622, name = "Enchant Gloves - Holy Power" },
+        { id = 1219586, name = "Enchant Gloves - Superior Strength" },
+        { id = 1219578, name = "Enchant Off-Hand - Excellent Spirit" },
+        { id = 1219577, name = "Enchant Off-Hand - Superior Intellect" },
+        { id = 1219579, name = "Enchant Off-Hand - Wisdom" },
+        { id = 1220623, name = "Enchant Shield - Critical Strike" },
+        { id = 1219581, name = "Enchant Shield - Excellent Stamina" },
+        { id = 463871, name = "Enchant Shield - Law of Nature" },
+        { id = 435481, name = "Enchant Weapon - Dismantle" },
+        { id = 1231128, name = "Enchant Weapon - Grand Crusader" },
+        { id = 1231164, name = "Enchant Weapon - Grand Sorceror" },
+    },
+    -- <<< gen_enchant_names.lua
 })

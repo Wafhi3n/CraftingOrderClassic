@@ -17,7 +17,7 @@
 -- partagent le mapping position <-> spellID, condition pour que les bitfields échangés
 -- (cf. CraftLink_Registry) soient interprétables.
 
-local MAJOR, MINOR = "CraftLink-1.0", 9   -- v9 : couches saisonnières additives (ActiveSeason + ExtendProfession, Data/SoD) (v8 : cooldowns de recettes ; v7 : gardes anti-clobber compagnons + cache ProfessionCatalogue)
+local MAJOR, MINOR = "CraftLink-1.0", 10   -- v10 : ExtendProfession fusionne aussi `enchants` (noms anglais canoniques TBC/SoD/Wrath, cf. tools/gen_enchant_names.lua) (v9 : couches saisonnières additives ; v8 : cooldowns de recettes ; v7 : gardes anti-clobber compagnons)
 local lib = LibStub:NewLibrary(MAJOR, MINOR)
 if not lib then return end  -- déjà chargé par un autre addon avec une version >= : on garde l'existante
 
@@ -130,6 +130,16 @@ function lib:ExtendProfession(name, def)
         if type(add) == "table" then
             local dst = base[key]; if not dst then dst = {}; base[key] = dst end
             for k, v in pairs(add) do if dst[k] == nil then dst[k] = v end end
+        end
+    end
+    -- `enchants` est une LISTE ({id, name}, noms anglais canoniques), pas une map : append avec
+    -- dédup par id — même discipline « la base d'abord, jamais écrasée » que les tables ci-dessus.
+    if type(def.enchants) == "table" then
+        local dst = base.enchants; if not dst then dst = {}; base.enchants = dst end
+        local have = {}
+        for _, e in ipairs(dst) do if e.id then have[e.id] = true end end
+        for _, e in ipairs(def.enchants) do
+            if e.id and e.name and not have[e.id] then have[e.id] = true; dst[#dst + 1] = e end
         end
     end
     self._catalogDirty = true

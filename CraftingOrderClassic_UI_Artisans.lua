@@ -12,6 +12,10 @@ local A   = UI.ART          -- métriques dérivées de la SPEC — cf. _UI_Arti
 
 local SRC_TAG = { guild = L["GUILDE"], friend = L["AMIS"], added = L["AJOUTÉ"], recent = L["CROISÉ"], confed = L["CONFÉDÉRÉ"] }
 
+-- Libellés des 3 états de présence (cf. Dir:PresenceOf). « sans addon » n'est pas cosmétique : il dit
+-- pourquoi ses métiers/niveaux peuvent être périmés et pourquoi une commande ne lui parviendra pas.
+local PRES_LABEL = { online = L["En ligne"], game = L["En ligne · sans addon"], offline = L["Hors ligne"] }
+
 local function trim(s) return s and s:gsub("^%s+", ""):gsub("%s+$", "") or "" end
 
 -- Case à cocher CLIQUABLE : Skin.MakeCheck ne renvoie qu'une texture, on la pose sur un Button + libellé.
@@ -66,6 +70,7 @@ local function profsList(r)
 end
 UI._ProfsList = profsList   -- partagé avec la couche de fusion (UI_Artisans_Groups.lua)
 UI._SrcTag    = SRC_TAG
+UI._PresLabel = PRES_LABEL
 
 -- =========================================================================
 -- Construction
@@ -256,7 +261,7 @@ function UI:RefreshArtisans()
     end)
     table.sort(list, function(a, b)
         if (a.anyPartner and true) ~= (b.anyPartner and true) then return a.anyPartner end   -- partenaires en tête
-        if (a.onlineChar ~= nil) ~= (b.onlineChar ~= nil) then return a.onlineChar ~= nil end
+        if a.presRank ~= b.presRank then return a.presRank > b.presRank end   -- joignable > sans addon > hors ligne
         if a.repMax ~= b.repMax then return a.repMax > b.repMax end   -- réputation max du set, décroissante
         return a.leader < b.leader
     end)
@@ -284,9 +289,10 @@ end
 -- sous-ligne « vu crafter » + tag « VU » au lieu de présence/niveau/réputation.
 function UI:_FillArtRow(row, a)
     row:SetScript("OnEnter", nil); row:SetScript("OnLeave", nil)   -- lignes poolées : purge le tooltip de groupe
-    row.dot:SetOnline(a.online and true or false)
-    local pTag = a.r.isPartner and ("|cFFFFD100" .. L["[Partenaire]"] .. "|r ") or ""   -- texte, pas de glyphe tofu
     local D0 = COC.Directory
+    local pres = (D0 and D0.PresenceOf and D0:PresenceOf(a.name)) or (a.online and "online" or "offline")
+    row.dot:SetPresence(pres)
+    local pTag = a.r.isPartner and ("|cFFFFD100" .. L["[Partenaire]"] .. "|r ") or ""   -- texte, pas de glyphe tofu
     local lfwE = D0 and D0.LFWOf and D0:LFWOf(a.name)
     local lfwTag = lfwE and ("|cFF4CDB6E" .. L["[Dispo]"] .. "|r ") or ""
     row.name:SetText(lfwTag .. pTag .. "|cFFFFFFFF" .. a.name .. "|r")
@@ -319,7 +325,7 @@ function UI:_FillArtRow(row, a)
     else
         local lvl = a.r.level and (L["niv "] .. a.r.level) or L["niv ?"]
         local rep = (a.r.rep and a.r.rep > 0) and (" · " .. string.format(L["%d livrés"], a.r.rep)) or ""
-        row.sub:SetText("|cFF888888" .. (a.online and L["En ligne"] or L["Hors ligne"]) .. " · " .. lvl .. rep .. "|r")
+        row.sub:SetText("|cFF888888" .. (PRES_LABEL[pres] or L["Hors ligne"]) .. " · " .. lvl .. rep .. "|r")
     end
     UI:_SetArtProfIcons(row, profsList(a.r), a.r, a.name)
     row.src:SetText("|cFF888888" .. (relayed and L["RELAIS"] or nonAddon and L["VU"]
@@ -340,15 +346,18 @@ end
 -- Toggle Partenaire toujours présent ; `partnerOn` (nil = lit a.r.isPartner) permet à la ligne
 -- FUSIONNÉE de refléter g.anyPartner (un reroll non-vitrine peut porter le drapeau).
 function UI:_ArtRowButtons(row, a, nonAddon, partnerOn)
+    local D = COC.Directory
     row.whisper:SetScript("OnClick", function() if ChatFrame_SendTell then ChatFrame_SendTell(a.name) end end)
-    row.whisper:SetShown(a.online == true or a.r.source ~= "added")
+    -- Présence 3 ÉTATS : « en ligne sans addon » (game) reste joignable par /w — le bouton suit la
+    -- pastille jaune. Caché seulement pour une entrée « ajoutée » réellement hors ligne.
+    local pres = (D and D.PresenceOf and D:PresenceOf(a.name)) or (a.online and "online" or "offline")
+    row.whisper:SetShown(pres ~= "offline" or a.r.source ~= "added")
     if partnerOn == nil then partnerOn = a.r.isPartner and true or false end
     row.partner._on = partnerOn
     row.partner.tex:SetDesaturated(not partnerOn)
     row.partner.tex:SetAlpha(partnerOn and 1 or 0.4)
     row.partner:SetScript("OnClick", function() UI:_TogglePartnerSet(a.name) end)
     row.partner:Show()
-    local D = COC.Directory
     local canFriend = nonAddon and not (D and D._friendSet and D._friendSet[a.name])
     if canFriend then
         row.whisper:ClearAllPoints(); row.whisper:SetPoint("RIGHT", -6, 9); row.whisper:SetHeight(18)

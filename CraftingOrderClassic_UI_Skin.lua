@@ -323,15 +323,23 @@ function Skin.WireItemLink(row)
     end)
 end
 
--- Pastille de présence : texture statut du jeu, avec méthode SetOnline(bool/nil). nil = masquée.
+-- Pastille de présence : texture statut du jeu.
+--   SetPresence(state) — les 3 états de l'annuaire (cf. Dir:PresenceOf) : "online" (vert, il répond
+--     en addon), "game" (jaune, connecté selon le jeu mais sans l'addon), "offline" (gris), nil = masquée.
+--   SetOnline(bool/nil) — raccourci binaire, pour les vues qui n'ont que la présence addon.
+local PRESENCE_TEX = { online = "online", game = "away", offline = "offline" }
 function Skin.MakeStatusIcon(parent, size)
     size = size or 14
     local t = parent:CreateTexture(nil, "OVERLAY")
     t:SetSize(size, size)
+    t.SetPresence = function(self, state)
+        if state == nil then self:Hide(); return end
+        self:SetTexture(Skin.tex[PRESENCE_TEX[state] or "offline"])
+        self:Show()
+    end
     t.SetOnline = function(self, state)
         if state == nil then self:Hide(); return end
-        self:SetTexture(state and Skin.tex.online or Skin.tex.offline)
-        self:Show()
+        self:SetPresence(state and "online" or "offline")
     end
     return t
 end

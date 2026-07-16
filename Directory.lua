@@ -58,15 +58,8 @@ end
 -- ------------------------------------------------------------------
 local function shortName(n) return n and (n:match("^([^%-]+)") or n) or n end
 
--- Amis Battle.net (BattleTag) en plus des amis « classiques » : sans ça, un ami ajouté uniquement
--- via BattleTag n'entre jamais dans l'onglet Amis même croisé et en ligne. `fn` reçoit chaque perso.
-local function forEachBNetWoWFriend(fn)
-    if not (BNGetNumFriends and BNGetFriendInfo) then return end
-    for i = 1, (BNGetNumFriends() or 0) do
-        local _, _, _, _, characterName, _, client, isOnline = BNGetFriendInfo(i)
-        if isOnline and characterName and client == (BNET_CLIENT_WOW or "WoW") then fn(characterName) end
-    end
-end
+-- Amis BNet, sweep des relations en ligne (DiscoverFriendsAndGuild) et requête de présence 3 états
+-- (Dir:PresenceOf, + la table Dir.onlineGame) → Directory_Presence.lua.
 
 function Dir:ScanRelations()
     self._guildSet, self._friendSet = {}, {}
@@ -82,7 +75,7 @@ function Dir:ScanRelations()
             if info and info.name then self._friendSet[shortName(info.name)] = true end
         end
     end
-    forEachBNetWoWFriend(function(n) self._friendSet[shortName(n)] = true end)
+    self:ForEachBNetWoWFriend(function(n) self._friendSet[shortName(n)] = true end)
     self:ReclassifyAll()
 end
 
@@ -297,35 +290,6 @@ end
 -- anti-monolithe). CaptureSkills / _SkillPayload / AnnounceSkills / OnSkill restent sur COC.Directory.
 -- ------------------------------------------------------------------
 
--- Découverte des amis + guildmates EN LIGNE par whisper (PING+HI) — fiable hors canal global et sans
--- ciblage mutuel. Au login (1er appel → prev vide) on ping TOUS les en-ligne ; ensuite, sur chaque
--- FRIENDLIST/GUILD_ROSTER_UPDATE, on ne ping QUE les nouveaux connectés (transition hors-ligne→en-ligne)
--- pour ne pas re-sonder en boucle les déjà-présents ni les non-porteurs. DiscoverPlayer reste throttlé
--- 60 s/nom en filet de sécurité. `_wasOnlineRel` = statut en-ligne (API jeu) du sweep précédent.
-function Dir:DiscoverFriendsAndGuild()
-    local prev, cur = self._wasOnlineRel or {}, {}
-    local function consider(name, online)
-        name = shortName(name)
-        if not (name and online) then return end
-        cur[name] = true
-        if not prev[name] then self:DiscoverPlayer(name) end   -- vient de se connecter
-    end
-    if C_FriendList and C_FriendList.GetNumFriends then
-        for i = 1, (C_FriendList.GetNumFriends() or 0) do
-            local info = C_FriendList.GetFriendInfoByIndex(i)
-            if info then consider(info.name, info.connected) end
-        end
-    end
-    if IsInGuild and IsInGuild() and GetNumGuildMembers then
-        for i = 1, (GetNumGuildMembers() or 0) do
-            local name, _, _, _, _, _, _, _, online = GetGuildRosterInfo(i)
-            consider(name, online)
-        end
-    end
-    forEachBNetWoWFriend(function(n) consider(n, true) end)
-    self._wasOnlineRel = cur
-end
-
 -- Sollicite l'annuaire (sur action utilisateur) : HI global + PING proximité + re-ping des connus.
 function Dir:Refresh()
     if not CraftLink then return end
@@ -442,7 +406,16 @@ function Dir:Start()
         -- Au login : ping whisper des AMIS et GUILDMATES en ligne → présence immédiate sans ciblage.
         C_Timer.After(6, function() Dir:DiscoverFriendsAndGuild() end)
         -- Maintien périodique : seulement les favoris ajoutés (petite liste, pas de spam réseau).
-        if C_Timer.NewTicker then C_Timer.NewTicker(45, function() Dir:RediscoverKnown() end) end
+        -- On redemande AUSSI le roster de guilde : sur Era il n'est interrogé qu'au login, et sans ça
+        -- Dir.onlineGame (pastille « en ligne sans addon ») garderait un guildmate déjà déconnecté.
+        -- Le GUILD_ROSTER_UPDATE qui suit relance ScanRelations + le sweep (débouncé 2 s) → pas de coût UI.
+        if C_Timer.NewTicker then
+            C_Timer.NewTicker(45, function()
+                Dir:RediscoverKnown()
+                if C_GuildInfo and C_GuildInfo.GuildRoster then C_GuildInfo.GuildRoster()
+                elseif GuildRoster then GuildRoster() end
+            end)
+        end
         -- NB : pas de balise sur timer (ADDON_ACTION_BLOCKED hors action joueur). La découverte
         -- d'INCONNUS passe par la balise émise au clic Poster / /co refresh (cf Dir:Refresh, DoPostOrder).
     end

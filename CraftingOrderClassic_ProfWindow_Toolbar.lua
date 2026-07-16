@@ -91,6 +91,23 @@ function PW:_BuildRecipeFilters(fz)
     self.recSkillUpBtn = upBtn
 end
 
+-- Bouton du filtre « acquérables », dans son PROPRE slot d'en-tête (recHeaderTools, à côté du titre
+-- « Recettes ») plutôt que dans la rangée de filtres déjà pleine — la position se règle dans la SPEC
+-- (_ProfWindow_Layout). Centré dans son slot ; VISIBLE seulement en mode manquantes (cf. _SyncFilterButtons).
+-- Ne garde que les manquantes obtenables tout de suite (formateur / vendeur / listées à l'HV). Icône
+-- parchemin (texture déjà validée dans l'addon).
+function PW:_BuildAcquireFilter(hz)
+    local acqBtn = makeToolBtn(hz, function()
+        return PW.recipeAcquirable and L["Filtre acquérables actif — clic pour tout afficher."]
+            or L["N'afficher que les recettes acquérables (formateur, vendeur ou HV)."]
+    end, function() PW:_ToggleAcquirable() end)
+    acqBtn:SetPoint("CENTER", 0, 0)
+    local scroll = acqBtn:CreateTexture(nil, "ARTWORK")
+    scroll:SetTexture("Interface\\Icons\\INV_Scroll_03"); scroll:SetSize(15, 15)
+    scroll:SetTexCoord(0.07, 0.93, 0.07, 0.93); scroll:SetPoint("CENTER"); acqBtn.gavel = scroll
+    self.recAcquireBtn = acqBtn
+end
+
 -- Bascule le tri par rentabilité (sans effet si Lazy Gold absent). Met à jour l'en-tête + rafraîchit.
 -- Exclusif avec le tri progression : un seul à-plat à la fois.
 function PW:_ToggleRecipeSort()
@@ -128,6 +145,11 @@ end
 
 function PW:_ToggleSkillUp()
     self.recipeSkillUp = not self.recipeSkillUp
+    self:RefreshRecipes()
+end
+
+function PW:_ToggleAcquirable()
+    self.recipeAcquirable = not self.recipeAcquirable
     self:RefreshRecipes()
 end
 
@@ -182,6 +204,18 @@ function PW:_SyncFilterButtons()
             if self.recSkillUpBtn.up then
                 self.recSkillUpBtn.up:SetVertexColor(on and 1 or 0.5, on and 0.55 or 0.5, on and 0.25 or 0.5)
             end
+        end
+    end
+    -- « Acquérables » : n'a de sens qu'en mode manquantes (il filtre des recettes à obtenir). Hors mode :
+    -- masqué ET désarmé, sinon il viderait la liste des recettes apprises au retour.
+    if self.recAcquireBtn then
+        local am = (not self.rerollKey) and self.missingMode and true or false
+        self.recAcquireBtn:SetShown(am)
+        if not am then self.recipeAcquirable = false
+        else
+            local on = self.recipeAcquirable and true or false
+            if self.recAcquireBtn.onBG then self.recAcquireBtn.onBG:SetShown(on) end
+            if self.recAcquireBtn.gavel then self.recAcquireBtn.gavel:SetDesaturated(not on) end
         end
     end
 end

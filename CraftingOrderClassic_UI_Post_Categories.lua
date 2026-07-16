@@ -17,6 +17,8 @@ local INSTANT = GetItemInfoInstant
 
 -- Ordre canonique des emplacements d'armure (token INVTYPE -> rang) : suit le paperdoll
 -- (tête → pieds), puis doigts/bijoux, bouclier/tenu. Sert de tri PRIMAIRE des sections.
+-- Exposé en COC.SLOT_ORDER : source UNIQUE du rang d'emplacement — _Enchant.lua en dérive l'ordre
+-- de ses sections d'enchants pour que les deux vues restent alignées sans copie à synchroniser.
 local SLOT_ORDER = {
     INVTYPE_HEAD = 1, INVTYPE_NECK = 2, INVTYPE_SHOULDER = 3, INVTYPE_CLOAK = 4,
     INVTYPE_CHEST = 5, INVTYPE_ROBE = 5, INVTYPE_BODY = 6, INVTYPE_TABARD = 7,
@@ -24,6 +26,7 @@ local SLOT_ORDER = {
     INVTYPE_FEET = 12, INVTYPE_FINGER = 13, INVTYPE_TRINKET = 14,
     INVTYPE_SHIELD = 15, INVTYPE_HOLDABLE = 16,
 }
+COC.SLOT_ORDER = SLOT_ORDER
 
 -- Sous-classes d'armure « à matériau » (Tissu/Cuir/Mailles/Plaques) : pour elles on suffixe le
 -- type après l'emplacement (« Torse · Plaques »), sinon l'emplacement seul suffit (bijoux, dos…).
@@ -85,8 +88,19 @@ function UI:_RenderPostPlanRows(list)
     local searching = (self.postSearch or "") ~= ""
     -- Tri par rentabilité (Lazy Gold) : liste À PLAT, sans sections — on veut le classement global du
     -- plus rentable au moins. Sinon, regroupement normal.
+    -- Enchantement : même classement EMPLACEMENT › STAT DE BASE que la vue métier (cf. ProfWindow_Recipes)
+    -- — un enchant est un SERVICE (aucun itemID) que COC.SectionOf rangerait en vrac sous « Autres ».
+    -- ⚠️ PAS de `X and X:f()` ici : `and` TRONQUE le multi-retour (cf. mémoire lua-and-truncates-multireturn).
     local disp = self:_PostProfitFlat(list) or COC.RecipeCats:BuildDisplay(self.postProf, list, {
         itemID    = function(it) return it.e and it.e.itemID end,
+        section   = function(it)
+            if not COC.Enchant then return end
+            return COC.Enchant:SectionFor(it.e and it.e.spellID)
+        end,
+        sub       = function(it)
+            if not COC.Enchant then return end
+            return COC.Enchant:StatFor(it.e and it.e.spellID)
+        end,
         name      = function(it) return it.name or "" end,
         before    = function(a, b) if a.ready ~= b.ready then return a.ready end end,
         collapsed = searching and nil or self:_PostCollapseTable(),
@@ -156,7 +170,10 @@ function UI:_FillPostPlanRow(row, item)
     row.badge:ClearAllPoints(); row.badge:SetPoint("LEFT", 2 + indent, 0)
     row.name:ClearAllPoints(); row.name:SetPoint("LEFT", 20 + indent, 0)
     row.badge:Paint(r, g, b, Skin.FirstChar(item.name), Skin.Icon(e.itemID, e.spellID)); row.badge:Show()
-    local disp = item.name:match("^item:") and "|cFF777777" .. L["Chargement…"] .. "|r" or item.name
+    -- Enchant d'équipement : la STAT seule — l'emplacement/stat de base est déjà porté par les 2 en-têtes
+    -- au-dessus (« Enchant Bracer - … » ×N devient juste « Superior Strength » sous Wrist › Strength).
+    local shortName = (COC.Enchant and COC.Enchant:ShortName(item.name, e.spellID)) or item.name
+    local disp = item.name:match("^item:") and "|cFF777777" .. L["Chargement…"] .. "|r" or shortName
     if item.ready then disp = "|cFF33DD33" .. L["[Prêt]"] .. "|r " .. disp end
     row.name:SetText(disp); row.name:Show()
     row.name:SetTextColor(e == self.postEntry and 1 or r, e == self.postEntry and 0.85 or g, e == self.postEntry and 0.27 or b)

@@ -9,6 +9,8 @@ if loc ~= "esES" and loc ~= "esMX" then return end
 local L = COC.L
 
 local es = {
+    ["Enchanter équipé"] = "Encantar equipado", ["Enchante directement la pièce équipée — sans cibler."] = "Encanta directamente la pieza equipada — sin apuntar.",
+    ["Enchanter cet objet"] = "Encantar este objeto", ["Ouvre ta fenêtre d'Enchantement."] = "Abre tu ventana de Encantamiento.", ["Aucun enchantement connu pour cet emplacement."] = "Ningún encantamiento conocido para esa ranura.",
     -- Onglets / fenêtre
     ["Carnet"] = "Libro", ["Commande"] = "Pedir", ["Récolte"] = "Recolectar", ["Artisans"] = "Artesanos",
     -- En-têtes de colonnes (Carnet)
@@ -29,7 +31,6 @@ local es = {
         "« Vistos » pasa a « Directorio ». El botón « Actualizar directorio » llama al canal: todos los usuarios en línea responden y se añaden.",
     -- Onglet « Mes artisans » (vue agrégée des métiers du compte — 100 % local)
     ["Mes artisans"] = "Mis artesanos",
-    ["MÉTIERS DU COMPTE"] = "PROFESIONES DE LA CUENTA",
     ["%d recettes"] = "%d recetas",
     ["Aucun métier. Ouvre ta fenêtre métier sur chaque perso une fois."] =
         "Sin profesiones. Abre la ventana de profesión en cada personaje una vez.",
@@ -160,14 +161,14 @@ local es = {
     ["Minage"] = "Minería", ["Dépeçage"] = "Desuello", ["Couture"] = "Sastrería",
     ["Joaillerie"] = "Joyería", ["Calligraphie"] = "Inscripción", ["Élémentaire"] = "Elemental",
     ["En attente"] = "Pendiente", ["Acceptée"] = "Aceptado", ["Livrée"] = "Entregado", ["Annulée"] = "Cancelado", ["Refusée"] = "Rechazado",
-    ["LISTE DES PLANS"] = "LISTA DE RECETAS", ["JE FOURNIS"] = "YO APORTO", ["Réactifs"] = "Reactivos",
+    ["JE FOURNIS"] = "YO APORTO", ["Réactifs"] = "Reactivos",
     ["(cocher = je fournis)"] = "(marcar = yo aporto)", ["Commission"] = "Comisión", ["Qté"] = "Cant.",
     ["Destinataire :"] = "Destinatario:", ["Diffuser à tous"] = "Difundir a todos", ["Poster"] = "Publicar",
     ["La commande sera visible par tout le monde (cible « Tous »)."] = "El pedido se difundirá a todos (destino: \"Todos\").",
     ["Choisis un métier puis un plan."] = "Elige una profesión y luego una receta.",
     ["Cliquer pour changer de métier"] = "Clic para cambiar de profesión",
     ["Rechercher"] = "Buscar una receta",
-    ["Sélection : "] = "Selección: ", ["Commande postée !"] = "¡Pedido publicado!",
+    ["Commande postée !"] = "¡Pedido publicado!",
     ["Réactifs en main"] = "Reactivos a mano",
     ["Ne montrer que les plans dont j'ai déjà tous les réactifs."] = "Mostrar solo las recetas para las que ya tengo todos los reactivos.",
     ["[Prêt]"] = "[Listo]",
@@ -178,7 +179,7 @@ local es = {
     ["Toute la guilde"] = "Toda la hermandad", ["Tous les amis"] = "Todos los amigos",
     ["Tous les ajoutés"] = "Todos los añadidos", ["Tous les croisés"] = "Todos los vistos",
     ["Rechercher une ressource"] = "Buscar un recurso",
-    ["LISTE DES RESSOURCES"] = "LISTA DE RECURSOS", ["Demande de récolte — quantité voulue"] = "Solicitud de recolección — cantidad deseada",
+    ["Demande de récolte — quantité voulue"] = "Solicitud de recolección — cantidad deseada",
     ["stacks"] = "montones", ["pile"] = "montón", ["piles"] = "montones",
     ["Récolteur :"] = "Recolector:", ["Prix proposé"] = "Precio ofrecido",
     ["Choisis un métier de récolte puis une ressource."] = "Elige una profesión de recolección y luego un recurso.",
@@ -186,14 +187,13 @@ local es = {
     ["Commande de récolte postée !"] = "¡Pedido de recolección publicado!", ["Choisis d'abord une ressource."] = "Elige primero un recurso.",
     ["Toutes"] = "Todas",
     -- Légendes de la rangée de filtres style HdV (onglet Commande) : mots courts, au-dessus du champ.
-    ["Nom"] = "Nombre", ["Qualité"] = "Calidad",
     ["Objet |cFFE8B84Bélémentaire|r (farmé sur les mobs, pas de métier). Diffusé à tous. Quantité et prix |cFFE8B84B%s.|r"] =
         "Objeto |cFFE8B84Belemental|r (obtenido de las criaturas, sin profesión). Difundido a todos. Cantidad y precio |cFFE8B84B%s.|r",
     ["Diffusée aux récolteurs ayant |cFFE8B84B%s.|r Quantité et prix proposé |cFFE8B84B%s.|r"] =
         "Difundido a recolectores con |cFFE8B84B%s|r. Cantidad y precio ofrecido |cFFE8B84B%s.|r",
     ["SOURCE"] = "FUENTE", ["AJOUTER UN JOUEUR"] = "AÑADIR UN JUGADOR", ["Nom du personnage"] = "Nombre del personaje",
     ["Métier :"] = "Profesión:", ["Chuchoter"] = "Susurrar", ["Aucun artisan dans cette source."] = "Ningún artesano en esta fuente.",
-    ["En ligne"] = "En línea", ["Hors ligne"] = "Desconectado", ["niv "] = "niv ", ["niv ?"] = "niv ?",
+    ["En ligne"] = "En línea", ["En ligne · sans addon"] = "En línea · sin addon", ["Hors ligne"] = "Desconectado", ["niv "] = "niv ", ["niv ?"] = "niv ?",
     ["GUILDE"] = "HERMANDAD", ["AMIS"] = "AMIGO", ["AJOUTÉ"] = "AÑADIDO", ["CROISÉ"] = "VISTO", ["CONFÉDÉRÉ"] = "CONFED.",
     ["Confédération"] = "Confederación",
     ["artisan ajouté : "] = "artesano añadido: ",
@@ -220,6 +220,7 @@ local es = {
     ["Créer"] = "Crear", ["Créer tout"] = "Crear todo", ["Vue Blizzard"] = "Vista Blizzard",
     ["Sélectionne une recette."] = "Selecciona una receta.", ["Produit "] = "Produce ",
     ["réactifs insuffisants."] = "reactivos insuficientes.",
+    ["Sélection changée en combat — réessaie après le combat."] = "La selección cambió en combate: inténtalo de nuevo tras el combate.",
     ["fenêtre métier custom |cFF33DD33activée|r — ouvre un métier. (Guild Economy laisse la main.)"] =
         "ventana de profesión propia |cFF33DD33activada|r — abre una profesión. (Guild Economy cede el paso.)",
     ["fenêtre métier custom |cFFFFCC00désactivée|r (vue Blizzard)."] =
@@ -379,7 +380,8 @@ local es = {
         "Pasa el cursor sobre un jugador (tooltip) para ver sus profesiones y su nivel de habilidad.",
     ["Clic droit sur un joueur (chat, groupe...) pour l'ajouter à ton annuaire — utile pour le retrouver même hors ligne."] =
         "Clic derecho en un jugador (chat, grupo...) para añadirlo a tu directorio — útil para reencontrarlo incluso desconectado.",
-    ["La pastille verte/grise indique s'il est en ligne."] = "El punto verde/gris indica si está en línea.",
+    ["Pastille verte : il a l'addon et répond. Jaune : en ligne sans l'addon. Grise : hors ligne."] =
+        "Punto verde: tiene el addon y responde. Amarillo: en línea sin el addon. Gris: desconectado.",
     ["Réseau, confidentialité & statuts"] = "Red, privacidad y estados",
     ["L'addon rejoint un canal dédié pour faire circuler le carnet entre joueurs de l'addon — aucun message lisible n'y est envoyé."] =
         "El addon se une a un canal dedicado para transmitir el libro entre usuarios del addon — no se envía ningún mensaje legible.",
@@ -452,8 +454,6 @@ local es = {
     ["Meilleur plan"] = "Mejor plan",
     ["Tous les plans du royaume"] = "Todos los planos del reino",
     ["%d métiers"] = "%d profesiones",
-    ["Manquantes"] = "Faltantes",
-    ["Manquantes (%d)"] = "Faltantes (%d)",
     ["À ma charge"] = "A mi cargo",
     ["Valeurs exactes — clic pour l'affichage compact."] = "Valores exactos — clic para vista compacta.",
     ["Afficher les valeurs exactes (po/pa/pc)."] = "Mostrar valores exactos (o/p/c).",
@@ -464,6 +464,9 @@ local es = {
     ["Filtre matériaux actif — clic pour tout afficher."] = "Filtro de materiales activo — clic para mostrar todo.",
     ["N'afficher que les recettes qui font monter la compétence (masque le gris)."] = "Mostrar solo las recetas que suben la habilidad (oculta el gris).",
     ["Filtre progression actif — clic pour tout afficher."] = "Filtro de progreso activo — clic para mostrar todo.",
+    ["N'afficher que les recettes acquérables (formateur, vendeur ou HV)."] = "Mostrar solo las recetas obtenibles (entrenador, vendedor o casa de subastas).",
+    ["Filtre acquérables actif — clic pour tout afficher."] = "Filtro de obtenibles activo — clic para mostrar todo.",
+    ["Acheter à l'HV"] = "Comprar en la casa de subastas",
     -- Diffuser les réactifs (liste de courses)
     ["Diffuser les réactifs"] = "Difundir los reactivos",
     ["Diffuser les réactifs dans un canal"] = "Difundir los reactivos en un canal",

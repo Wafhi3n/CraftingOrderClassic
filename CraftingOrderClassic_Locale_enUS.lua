@@ -10,6 +10,8 @@ if loc ~= "enUS" and loc ~= "enGB" then return end
 local L = COC.L
 
 local en = {
+    ["Enchanter équipé"] = "Enchant equipped", ["Enchante directement la pièce équipée — sans cibler."] = "Enchants the equipped item directly — no targeting.",
+    ["Enchanter cet objet"] = "Enchant this item", ["Ouvre ta fenêtre d'Enchantement."] = "Open your Enchanting window.", ["Aucun enchantement connu pour cet emplacement."] = "No known enchant for that slot.",
     -- Onglets / fenêtre
     ["Carnet"] = "Ledger", ["Commande"] = "Order", ["Récolte"] = "Gather", ["Artisans"] = "Artisans",
     -- En-têtes de colonnes (Carnet)
@@ -30,7 +32,6 @@ local en = {
         "\"Met\" is now \"Directory\". The \"Refresh directory\" button calls the channel: every online addon user answers and joins it.",
     -- Onglet « Mes artisans » (vue agrégée des métiers du compte — 100 % local)
     ["Mes artisans"] = "My Artisans",
-    ["MÉTIERS DU COMPTE"] = "ACCOUNT PROFESSIONS",
     ["%d recettes"] = "%d recipes",
     ["Aucun métier. Ouvre ta fenêtre métier sur chaque perso une fois."] =
         "No professions. Open your profession window on each character once.",
@@ -173,14 +174,14 @@ local en = {
     -- Statuts d'ordre
     ["En attente"] = "Pending", ["Acceptée"] = "Accepted", ["Livrée"] = "Delivered", ["Annulée"] = "Cancelled", ["Refusée"] = "Declined",
     -- Commande (Post)
-    ["LISTE DES PLANS"] = "RECIPE LIST", ["JE FOURNIS"] = "I PROVIDE", ["Réactifs"] = "Reagents",
+    ["JE FOURNIS"] = "I PROVIDE", ["Réactifs"] = "Reagents",
     ["(cocher = je fournis)"] = "(check = I provide)", ["Commission"] = "Commission", ["Qté"] = "Qty",
     ["Destinataire :"] = "Recipient:", ["Diffuser à tous"] = "Broadcast to all", ["Poster"] = "Post",
     ["La commande sera visible par tout le monde (cible « Tous »)."] = "The order will be broadcast to everyone (target: \"All\").",
     ["Choisis un métier puis un plan."] = "Pick a profession then a recipe.",
     ["Cliquer pour changer de métier"] = "Click to change profession",
     ["Rechercher"] = "Search",
-    ["Sélection : "] = "Selection: ", ["Commande postée !"] = "Order posted!",
+    ["Commande postée !"] = "Order posted!",
     -- Filtre réactifs en poche (P2) — icône + tooltip
     ["Réactifs en main"] = "Reagents in hand",
     ["Ne montrer que les plans dont j'ai déjà tous les réactifs."] = "Only show recipes I already have all the reagents for.",
@@ -197,7 +198,7 @@ local en = {
     ["Tous les ajoutés"] = "All added", ["Tous les croisés"] = "All met",
     -- Récolte (Gather)
     ["Rechercher une ressource"] = "Search a resource",
-    ["LISTE DES RESSOURCES"] = "RESOURCE LIST", ["Demande de récolte — quantité voulue"] = "Gather request — wanted quantity",
+    ["Demande de récolte — quantité voulue"] = "Gather request — wanted quantity",
     ["stacks"] = "stacks", ["pile"] = "stack", ["piles"] = "stacks",
     ["Récolteur :"] = "Gatherer:", ["Prix proposé"] = "Price offered",
     ["Choisis un métier de récolte puis une ressource."] = "Pick a gathering profession then a resource.",
@@ -205,7 +206,6 @@ local en = {
     ["Commande de récolte postée !"] = "Gather order posted!", ["Choisis d'abord une ressource."] = "Pick a resource first.",
     ["Toutes"] = "All",
     -- Légendes de la rangée de filtres style HdV (onglet Commande) : mots courts, au-dessus du champ.
-    ["Nom"] = "Name", ["Qualité"] = "Quality",
     ["Objet |cFFE8B84Bélémentaire|r (farmé sur les mobs, pas de métier). Diffusé à tous. Quantité et prix |cFFE8B84B%s.|r"] =
         "|cFFE8B84BElemental|r item (farmed off mobs, no profession). Broadcast to all. Quantity and price |cFFE8B84B%s.|r",
     ["Diffusée aux récolteurs ayant |cFFE8B84B%s.|r Quantité et prix proposé |cFFE8B84B%s.|r"] =
@@ -213,7 +213,7 @@ local en = {
     -- Artisans
     ["SOURCE"] = "SOURCE", ["AJOUTER UN JOUEUR"] = "ADD A PLAYER", ["Nom du personnage"] = "Character name",
     ["Métier :"] = "Profession:", ["Chuchoter"] = "Whisper", ["Aucun artisan dans cette source."] = "No crafter in this source.",
-    ["En ligne"] = "Online", ["Hors ligne"] = "Offline", ["niv "] = "lvl ", ["niv ?"] = "lvl ?",
+    ["En ligne"] = "Online", ["En ligne · sans addon"] = "Online · no addon", ["Hors ligne"] = "Offline", ["niv "] = "lvl ", ["niv ?"] = "lvl ?",
     ["GUILDE"] = "GUILD", ["AMIS"] = "FRIEND", ["AJOUTÉ"] = "ADDED", ["CROISÉ"] = "MET", ["CONFÉDÉRÉ"] = "CONFED",
     ["Confédération"] = "Confederation",
     ["artisan ajouté : "] = "crafter added: ",
@@ -243,6 +243,7 @@ local en = {
     ["Créer"] = "Create", ["Créer tout"] = "Create All", ["Vue Blizzard"] = "Blizzard view",
     ["Sélectionne une recette."] = "Select a recipe.", ["Produit "] = "Makes ",
     ["réactifs insuffisants."] = "not enough reagents.",
+    ["Sélection changée en combat — réessaie après le combat."] = "Selection changed in combat — try again after combat.",
     ["fenêtre métier custom |cFF33DD33activée|r — ouvre un métier. (Guild Economy laisse la main.)"] =
         "custom profession window |cFF33DD33enabled|r — open a profession. (Guild Economy stands down.)",
     ["fenêtre métier custom |cFFFFCC00désactivée|r (vue Blizzard)."] =
@@ -409,7 +410,7 @@ local en = {
         "Hover a player (tooltip) to see their professions and skill level.",
     ["Clic droit sur un joueur (chat, groupe...) pour l'ajouter à ton annuaire — utile pour le retrouver même hors ligne."] =
         "Right click a player (chat, party...) to add them to your directory — useful to find them again even offline.",
-    ["La pastille verte/grise indique s'il est en ligne."] = "The green/gray dot shows whether they're online.",
+    ["Pastille verte : il a l'addon et répond. Jaune : en ligne sans l'addon. Grise : hors ligne."] = "Green dot: has the addon and answers. Yellow: online without the addon. Gray: offline.",
     ["Réseau, confidentialité & statuts"] = "Network, privacy & statuses",
     ["L'addon rejoint un canal dédié pour faire circuler le carnet entre joueurs de l'addon — aucun message lisible n'y est envoyé."] =
         "The addon joins a dedicated channel to relay the ledger between addon users — no readable text is ever sent there.",
@@ -461,17 +462,15 @@ local en = {
     ["Où l'obtenir"] = "Where to get it",
     ["Niveau requis"] = "Required skill",
     ["Obtenu via"] = "Obtained via",
-    ["Prix"] = "Price",
-    ["Appris de"] = "Learned from",
-    ["Vendeur"] = "Vendor",
-    ["Vendu par"] = "Sold by",
-    ["Butin sur"] = "Drops from",
-    ["Formateurs"] = "Trainers",
-    ["Formateur"] = "Trainer",
-    ["Réputation"] = "Reputation",
-    ["Quête"] = "Quest",
-    ["Butin"] = "Drop",
+    ["Prix"] = "Price", ["Appris de"] = "Learned from",
+    ["Vendeur"] = "Vendor", ["Vendu par"] = "Sold by",
+    ["Butin sur"] = "Drops from", ["Formateurs"] = "Trainers",
+    ["Formateur"] = "Trainer", ["Réputation"] = "Reputation",
+    ["Quête"] = "Quest", ["Butin"] = "Drop",
     ["Source inconnue"] = "Unknown source",
+    ["Acheter à l'HV"] = "Buy at AH",
+    ["N'afficher que les recettes acquérables (formateur, vendeur ou HV)."] = "Show only obtainable recipes (trainer, vendor or AH).",
+    ["Filtre acquérables actif — clic pour tout afficher."] = "Obtainable filter active — click to show all.",
 
     -- Pont Lazy Gold (rentabilité)
     ["Rentabilité"] = "Profitability",

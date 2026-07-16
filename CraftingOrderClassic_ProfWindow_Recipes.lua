@@ -66,7 +66,7 @@ end
 -- recGutter (scrollbar). Ancres LEFT/RIGHT dans les bandes = centrage vertical gratuit ; largeur de
 -- liste MESURÉE sur la zone.
 function PW:_BuildRecipes(col)
-    local hz = self:Sec("recHeader") or col
+    local hz = self:Sec("recTitle") or self:Sec("recHeader") or col
     local tz = self:Sec("recTools") or self:Sec("recFilters") or col
     local sz = self:Sec("recSearch") or self:Sec("recFilters") or col
     local hdr = hz:CreateFontString(nil, "OVERLAY", "GameFontNormal")
@@ -84,6 +84,8 @@ function PW:_BuildRecipes(col)
     self:_BuildRecipeTools(tz)
     local ftz = self:Sec("recFilterToggles")
     if ftz then self:_BuildRecipeFilters(ftz) end
+    local htz = self:Sec("recHeaderTools")   -- bouton « acquérables » dans son slot d'en-tête (à côté du titre)
+    if htz and self._BuildAcquireFilter then self:_BuildAcquireFilter(htz) end
 
     -- Liste dans sa zone, scrollbar dans la gouttière (le −6 laisse respirer le bord, la barre
     -- déborde dans les 22 px de recGutter — même patron que toutes les listes converties).
@@ -218,18 +220,39 @@ local function levelRank(e)
     return DIFF_RANK[e.difficulty] or 5
 end
 
+-- true si la recette MANQUANTE `e` est ACQUÉRABLE tout de suite : apprise au formateur, vendue par un PNJ,
+-- ou dont l'objet-recette est actuellement price par Auctionator (donc listé à l'HV). Écarte butin/quête
+-- (« va la farmer »). N'a de sens que sur une manquante — une apprise n'est pas « à acquérir ». Utilisé
+-- SEULEMENT sous le filtre acquérables (mode manquantes) : coût nul le reste du temps.
+function PW:_IsAcquirable(e)
+    if not e.isMissing then return false end
+    local M = COC.MTSL
+    local kind = M and M:SourceKind(self.profKey, e.spellID) or "unknown"
+    if kind == "trainer" or kind == "vendor" then return true end
+    local LG = COC.LazyGold
+    if LG and LG:IsAvailable() then
+        local recItemID = M and M:RecipeItem(self.profKey, e.spellID)
+        if recItemID and LG:ItemValue(recItemID) then return true end
+    end
+    return false
+end
+
 function PW:_RecipeDisplayList()
     local raw, search = self:_ActiveRecipes(), self.recipeSearch
     self._active = raw   -- mémorisé pour GetSelectedRecipe (résolution par clé, cf. entryKey)
     local sortProfit = self.recipeSortProfit and COC.LazyGold and COC.LazyGold:IsAvailable()
     local haveMats = self.recipeHaveMats   -- ne garder que les recettes craftables MAINTENANT (mats en sac)
     local skillUp  = self.recipeSkillUp    -- masquer le palier gris (trivial) : ne reste que ce qui progresse
+    -- Filtre « acquérables » : n'a de sens qu'en mode manquantes (il ne garde QUE des manquantes achetables,
+    -- masquant même les apprises de l'union). Désarmé hors mode par _SyncFilterButtons.
+    local acquirable = self.missingMode and self.recipeAcquirable and COC.MTSL
     local items = {}
     for _, r in ipairs(raw) do
         if not r.isHeader
             and (not search or search == "" or (r.name and r.name:lower():find(search, 1, true)))
             and (not haveMats or (r.numAvailable or 0) > 0)
-            and (not skillUp or r.difficulty ~= "trivial") then
+            and (not skillUp or r.difficulty ~= "trivial")
+            and (not acquirable or self:_IsAcquirable(r)) then
             if sortProfit then r._profit = self:_RowProfit(r) end   -- pré-calc (mémorisé) pour le tri
             items[#items + 1] = r
         end
@@ -257,6 +280,17 @@ function PW:_RecipeDisplayList()
     end
     return COC.RecipeCats:BuildDisplay(self.profKey, items, {
         itemID    = function(r) return r.itemID end,
+        -- Enchantement : un enchant est un SERVICE (aucun objet produit → COC.SectionOf le rangerait en
+        -- « Autres/Divers », tous en vrac). On le classe EMPLACEMENT (section) › STAT DE BASE (sous-cat) ›
+        -- variantes triées par niveau. ⚠️ PAS de `X and X:f()` : `and` TRONQUE le multi-retour.
+        section   = function(r)
+            if not COC.Enchant then return end
+            return COC.Enchant:SectionFor(r.spellID)
+        end,
+        sub       = function(r)
+            if not COC.Enchant then return end
+            return COC.Enchant:StatFor(r.spellID)
+        end,
         name      = function(r) return r.name or "" end,
         collapsed = ((search or "") ~= "") and nil or self:_CollapseTable(),
     })
@@ -348,7 +382,9 @@ function PW:_FillRecipeRow(row, e)
     row.nameFS:ClearAllPoints()
     row.nameFS:SetPoint("LEFT", row.icon, "RIGHT", 4, 0); row.nameFS:SetPoint("RIGHT", -2, 0)
     local r, g, b = COC.Craft:DifficultyColor(e.difficulty)
-    local label = e.name or "?"
+    -- Enchant d'équipement : la STAT seule — l'emplacement est déjà porté par l'en-tête de section, et le
+    -- nom complet (« Enchant Bracer - … » ×20) se faisait tronquer dans la colonne. Autres : nom entier.
+    local label = (COC.Enchant and COC.Enchant:ShortName(e.name, e.spellID)) or e.name or "?"
     if e.isMissing then
         r, g, b = 0.92, 0.28, 0.28                         -- ROUGE : recette NON apprise (source au clic)
         label = label .. " |cFF884444(" .. L["niv."] .. " " .. (e.level or 0) .. ")|r"

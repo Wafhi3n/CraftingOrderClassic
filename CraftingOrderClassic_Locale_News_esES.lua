@@ -8,6 +8,16 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "Novedades",
+    -- v1.20.0
+    ["Enchante en un clic, trié par emplacement, et depuis l'échange"] = "Encanta con un clic, ordenado por ranura, y desde el intercambio",
+    ["Le bouton « Créer » de l'Enchantement avait un vieux bug intermittent : parfois rien ne se passait, et resélectionner la recette finissait par le faire marcher. Cause trouvée : sélectionner une recette n'arme pas le bouton natif de Blizzard, notre clic sécurisé tombait donc sur un bouton désactivé. Corrigé — ça devrait marcher du premier coup, à chaque fois."] =
+        "El botón «Crear» de Encantamiento tenía un viejo fallo intermitente: a veces no pasaba nada, y volver a seleccionar la receta varias veces acababa haciéndolo funcionar. Causa encontrada: seleccionar una receta no activa el botón nativo de Blizzard, así que nuestro clic seguro caía en un botón desactivado. Corregido: ahora debería funcionar a la primera, siempre.",
+    ["Les recettes d'enchantement ne s'entassent plus dans un fourre-tout « Autres/Divers » : elles se rangent par emplacement (Poignets, Torse, Main gauche…) puis par stat de base (Force, Esprit, Déviation), le nom raccourci à la stat seule puisque l'emplacement est déjà dans l'en-tête."] =
+        "Las recetas de encantamiento ya no se amontonan en un cajón «Otros/Varios»: se ordenan por ranura (muñecas, torso, mano izquierda…) y luego por estadística base (fuerza, espíritu, desviación), con el nombre recortado a solo la estadística ya que la ranura está en el encabezado.",
+    ["Sélectionner un enchant d'équipement affiche un bouton « Enchanter équipé » à côté de Créer : un clic l'applique directement sur la pièce que tu portes, sans avoir à cibler."] =
+        "Al seleccionar un encantamiento de equipo aparece un botón «Encantar equipado» junto a Crear: un clic lo aplica directamente sobre la pieza que llevas puesta, sin tener que apuntar.",
+    ["Et quand quelqu'un te tend un objet à enchanter en échange, le poser dans la case « ne sera pas échangé » ouvre un petit panneau listant tes enchants pour cet emplacement, prêts à lancer sans fouiller ta fenêtre de métier (qui doit rester ouverte : le jeu ne renseigne tes recettes connues que pendant qu'elle l'est)."] =
+        "Y cuando alguien te da un objeto para encantar en un intercambio, ponerlo en la casilla «no se intercambiará» abre un pequeño panel con tus encantamientos para esa ranura, listos para lanzar sin rebuscar en tu ventana de profesión (que debe seguir abierta: el juego solo informa de tus recetas conocidas mientras lo está).",
     -- v1.19.1
     ["Correctif : l'icône « dispo » remarche sur la nouvelle UI des plaques"] = "Corrección: el icono de disponibilidad vuelve a funcionar en la nueva interfaz de placas",
     ["Sur le client TBC (et bientôt Era/Saison de la Découverte à la 1.15.9), l'icône « recherche de travail » au-dessus de la plaque d'un artisan cessait de s'afficher quand son statut changeait : la nouvelle interface de plaques a renommé un champ interne que l'addon lisait. Corrigé. Elle reste invisible en instance (donjon, raid) : le jeu verrouille les plaques amies aux addons là-bas, rien à faire de notre côté."] =
@@ -79,12 +89,7 @@ local news = {
     ["Modération : mutes avec raison, temporaires, liste de confiance"] = "Moderación: silencios con motivo, temporales, lista de confianza",
     ["Un mute porte désormais une raison et une date, et peut être temporaire : |cFFFFFFFF/co mute Bob 1h spammeur|r se lève tout seul au bout d'une heure (|cFFFFFFFF/co mute|r seul liste les mutés avec raison et temps restant). Et |cFFFFFFFF/co trust <nom>|r marque un joueur de confiance, jamais mis en sourdine automatiquement — le mute manuel restant toujours possible."] =
         "Un silencio ahora lleva un motivo y una fecha, y puede ser temporal: |cFFFFFFFF/co mute Bob 1h spammer|r se levanta solo tras una hora (|cFFFFFFFF/co mute|r solo lista a los silenciados con motivo y tiempo restante). Y |cFFFFFFFF/co trust <nombre>|r marca a un jugador como de confianza, nunca silenciado automáticamente — el silencio manual sigue disponible.",
-    -- Onglet Nouveautés — v1.12.1
-    ["Personne ne peut poster une commande en ton nom"] = "Nadie puede publicar un pedido en tu nombre",
-    ["Une commande arrivant par le canal du royaume était crue sur parole quant à son acheteur : un joueur pouvait publier de fausses commandes au nom d'autrui, et nourrir la détection de spam contre sa victime jusqu'à ce que tout le monde la mette en sourdine. Elles doivent désormais venir du joueur qui les a postées."] =
-        "A un pedido que llegaba por el canal del reino se le creía su comprador sin más: un jugador podía publicar pedidos falsos en nombre de otro, y alimentar la detección de spam contra su víctima hasta que todos la silenciaran. Ahora deben venir del jugador que los publicó.",
-    ["|cFFFFFFFF/co channel off|r quitte maintenant vraiment le canal. Il se contentait d'empêcher de le rejoindre au login suivant : tes commandes continuaient de partir au royaume pendant toute la session."] =
-        "|cFFFFFFFF/co channel off|r ahora abandona de verdad el canal. Antes solo impedía volver a unirse en el siguiente inicio de sesión: tus pedidos seguían saliendo al reino durante toda la sesión.",
+    -- (clés v1.12.1 retirées : version sortie de la fenêtre glissante de l'onglet Nouveautés)
     -- Onglet Nouveautés — v1.12.0
     ["Les recettes de la Saison de la Découverte"] = "Recetas de la Temporada de Descubrimientos",
     ["304 recettes de la Saison de la Découverte entrent au catalogue : 80 en Travail du cuir, 65 en Forge, 57 en Couture, 48 en Enchantement, 29 en Ingénierie, 16 en Alchimie, plus la Cuisine, le Secourisme et le Minage. Elles apparaissent dans l'onglet Commande, avec leurs réactifs et leur palier d'apprentissage."] =

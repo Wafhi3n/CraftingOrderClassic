@@ -96,7 +96,7 @@ local function contentSocial()
                 L["L'onglet Artisans liste les joueurs connus par source : guilde, amis, ajoutés manuellement, croisés récemment."],
                 L["Survole un joueur (tooltip) pour voir ses métiers et son niveau de compétence."],
                 L["Clic droit sur un joueur (chat, groupe...) pour l'ajouter à ton annuaire — utile pour le retrouver même hors ligne."],
-                L["La pastille verte/grise indique s'il est en ligne."],
+                L["Pastille verte : il a l'addon et répond. Jaune : en ligne sans l'addon. Grise : hors ligne."],
             },
         },
         {

@@ -8,6 +8,8 @@ if (GetLocale and GetLocale() or "") ~= "deDE" then return end
 local L = COC.L
 
 local de = {
+    ["Enchanter équipé"] = "Ausgerüstetes verzaubern", ["Enchante directement la pièce équipée — sans cibler."] = "Verzaubert direkt das ausgerüstete Teil — ohne Zielauswahl.",
+    ["Enchanter cet objet"] = "Diesen Gegenstand verzaubern", ["Ouvre ta fenêtre d'Enchantement."] = "Öffne dein Verzauberkunst-Fenster.", ["Aucun enchantement connu pour cet emplacement."] = "Keine bekannte Verzauberung für diesen Platz.",
     -- Onglets / fenêtre
     ["Carnet"] = "Auftragsbuch", ["Commande"] = "Bestellen", ["Récolte"] = "Sammeln", ["Artisans"] = "Handwerker",
     -- En-têtes de colonnes (Carnet)
@@ -28,7 +30,6 @@ local de = {
         "« Getroffen » heißt jetzt « Verzeichnis ». Die Schaltfläche « Verzeichnis aktualisieren » ruft den Kanal auf: alle Online-Nutzer antworten und werden hinzugefügt.",
     -- Onglet « Mes artisans » (vue agrégée des métiers du compte — 100 % local)
     ["Mes artisans"] = "Meine Handwerker",
-    ["MÉTIERS DU COMPTE"] = "BERUFE DES ACCOUNTS",
     ["%d recettes"] = "%d Rezepte",
     ["Aucun métier. Ouvre ta fenêtre métier sur chaque perso une fois."] =
         "Keine Berufe. Öffne das Berufsfenster auf jedem Charakter einmal.",
@@ -159,14 +160,14 @@ local de = {
     ["Minage"] = "Bergbau", ["Dépeçage"] = "Kürschnerei", ["Couture"] = "Schneiderei",
     ["Joaillerie"] = "Juwelenschleifen", ["Calligraphie"] = "Inschriftenkunde", ["Élémentaire"] = "Elementar",
     ["En attente"] = "Ausstehend", ["Acceptée"] = "Angenommen", ["Livrée"] = "Geliefert", ["Annulée"] = "Abgebrochen", ["Refusée"] = "Abgelehnt",
-    ["LISTE DES PLANS"] = "REZEPTLISTE", ["JE FOURNIS"] = "ICH STELLE", ["Réactifs"] = "Materialien",
+    ["JE FOURNIS"] = "ICH STELLE", ["Réactifs"] = "Materialien",
     ["(cocher = je fournis)"] = "(anhaken = ich stelle bereit)", ["Commission"] = "Provision", ["Qté"] = "Anz.",
     ["Destinataire :"] = "Empfänger:", ["Diffuser à tous"] = "An alle senden", ["Poster"] = "Erstellen",
     ["La commande sera visible par tout le monde (cible « Tous »)."] = "Der Auftrag wird an alle gesendet (Ziel: \"Alle\").",
     ["Choisis un métier puis un plan."] = "Wähle einen Beruf, dann ein Rezept.",
     ["Cliquer pour changer de métier"] = "Klicken, um den Beruf zu wechseln",
     ["Rechercher"] = "Rezept suchen",
-    ["Sélection : "] = "Auswahl: ", ["Commande postée !"] = "Auftrag erstellt!",
+    ["Commande postée !"] = "Auftrag erstellt!",
     ["Réactifs en main"] = "Materialien vorhanden",
     ["Ne montrer que les plans dont j'ai déjà tous les réactifs."] = "Nur Rezepte anzeigen, für die ich bereits alle Materialien habe.",
     ["[Prêt]"] = "[Bereit]",
@@ -177,7 +178,7 @@ local de = {
     ["Toute la guilde"] = "Ganze Gilde", ["Tous les amis"] = "Alle Freunde",
     ["Tous les ajoutés"] = "Alle Hinzugefügten", ["Tous les croisés"] = "Alle Getroffenen",
     ["Rechercher une ressource"] = "Ressource suchen",
-    ["LISTE DES RESSOURCES"] = "RESSOURCENLISTE", ["Demande de récolte — quantité voulue"] = "Sammelanfrage — gewünschte Menge",
+    ["Demande de récolte — quantité voulue"] = "Sammelanfrage — gewünschte Menge",
     ["stacks"] = "Stapel", ["pile"] = "Stapel", ["piles"] = "Stapel",
     ["Récolteur :"] = "Sammler:", ["Prix proposé"] = "Gebotener Preis",
     ["Choisis un métier de récolte puis une ressource."] = "Wähle einen Sammelberuf, dann eine Ressource.",
@@ -185,14 +186,13 @@ local de = {
     ["Commande de récolte postée !"] = "Sammelauftrag erstellt!", ["Choisis d'abord une ressource."] = "Wähle zuerst eine Ressource.",
     ["Toutes"] = "Alle",
     -- Légendes de la rangée de filtres style HdV (onglet Commande) : mots courts, au-dessus du champ.
-    ["Nom"] = "Name", ["Qualité"] = "Qualität",
     ["Objet |cFFE8B84Bélémentaire|r (farmé sur les mobs, pas de métier). Diffusé à tous. Quantité et prix |cFFE8B84B%s.|r"] =
         "|cFFE8B84BElementar|r-Gegenstand (von Gegnern gefarmt, kein Beruf). An alle gesendet. Menge und Preis |cFFE8B84B%s.|r",
     ["Diffusée aux récolteurs ayant |cFFE8B84B%s.|r Quantité et prix proposé |cFFE8B84B%s.|r"] =
         "An Sammler mit |cFFE8B84B%s|r gesendet. Menge und gebotener Preis |cFFE8B84B%s.|r",
     ["SOURCE"] = "QUELLE", ["AJOUTER UN JOUEUR"] = "SPIELER HINZUFÜGEN", ["Nom du personnage"] = "Charaktername",
     ["Métier :"] = "Beruf:", ["Chuchoter"] = "Flüstern", ["Aucun artisan dans cette source."] = "Kein Handwerker in dieser Quelle.",
-    ["En ligne"] = "Online", ["Hors ligne"] = "Offline", ["niv "] = "Stufe ", ["niv ?"] = "Stufe ?",
+    ["En ligne"] = "Online", ["En ligne · sans addon"] = "Online · ohne Addon", ["Hors ligne"] = "Offline", ["niv "] = "Stufe ", ["niv ?"] = "Stufe ?",
     ["GUILDE"] = "GILDE", ["AMIS"] = "FREUND", ["AJOUTÉ"] = "HINZUGEFÜGT", ["CROISÉ"] = "GETROFFEN", ["CONFÉDÉRÉ"] = "KONFÖD.",
     ["Confédération"] = "Konföderation",
     ["artisan ajouté : "] = "Handwerker hinzugefügt: ",
@@ -219,6 +219,7 @@ local de = {
     ["Créer"] = "Herstellen", ["Créer tout"] = "Alle herstellen", ["Vue Blizzard"] = "Blizzard-Ansicht",
     ["Sélectionne une recette."] = "Wähle ein Rezept.", ["Produit "] = "Ergibt ",
     ["réactifs insuffisants."] = "nicht genug Materialien.",
+    ["Sélection changée en combat — réessaie après le combat."] = "Auswahl im Kampf geändert — versuche es nach dem Kampf erneut.",
     ["fenêtre métier custom |cFF33DD33activée|r — ouvre un métier. (Guild Economy laisse la main.)"] =
         "eigenes Berufsfenster |cFF33DD33aktiviert|r — öffne einen Beruf. (Guild Economy tritt zurück.)",
     ["fenêtre métier custom |cFFFFCC00désactivée|r (vue Blizzard)."] =
@@ -378,7 +379,8 @@ local de = {
         "Fahre über einen Spieler (Tooltip), um seine Berufe und seine Fertigkeitsstufe zu sehen.",
     ["Clic droit sur un joueur (chat, groupe...) pour l'ajouter à ton annuaire — utile pour le retrouver même hors ligne."] =
         "Rechtsklick auf einen Spieler (Chat, Gruppe...), um ihn deinem Verzeichnis hinzuzufügen — nützlich, um ihn auch offline wiederzufinden.",
-    ["La pastille verte/grise indique s'il est en ligne."] = "Der grüne/graue Punkt zeigt, ob er online ist.",
+    ["Pastille verte : il a l'addon et répond. Jaune : en ligne sans l'addon. Grise : hors ligne."] =
+        "Grüner Punkt: hat das Addon und antwortet. Gelb: online ohne Addon. Grau: offline.",
     ["Réseau, confidentialité & statuts"] = "Netzwerk, Privatsphäre & Status",
     ["L'addon rejoint un canal dédié pour faire circuler le carnet entre joueurs de l'addon — aucun message lisible n'y est envoyé."] =
         "Das Addon tritt einem eigenen Kanal bei, um das Auftragsbuch zwischen Addon-Nutzern zu übertragen — es wird kein lesbarer Text gesendet.",
@@ -419,8 +421,8 @@ local de = {
     ["Poissons"] = "Fische",
 
     -- Pont MissingTradeSkillsList (recettes manquantes + source)
-    ["Manquantes"] = "Fehlende",
-    ["Manquantes (%d)"] = "Fehlende (%d)",
+    ["Manquantes"] = "Fehlend",
+    ["Manquantes (%d)"] = "Fehlend (%d)",
     ["‹ Apprises seules"] = "‹ Nur gelernte",
     ["Masque les recettes non apprises — clic pour revenir."] = "Nicht gelernte Rezepte ausblenden — Klick zum Zurück.",
     ["Affiche AUSSI les recettes non apprises (en rouge) et où les obtenir."] = "Zeigt auch nicht gelernte Rezepte (in Rot) und wo du sie bekommst.",
@@ -451,8 +453,6 @@ local de = {
     ["Meilleur plan"] = "Bester Plan",
     ["Tous les plans du royaume"] = "Alle Realm-Pläne",
     ["%d métiers"] = "%d Berufe",
-    ["Manquantes"] = "Fehlend",
-    ["Manquantes (%d)"] = "Fehlend (%d)",
     ["À ma charge"] = "Mein Anteil",
     ["Valeurs exactes — clic pour l'affichage compact."] = "Exakte Werte — Klick für kompakte Anzeige.",
     ["Afficher les valeurs exactes (po/pa/pc)."] = "Exakte Werte anzeigen (G/S/K).",
@@ -463,6 +463,9 @@ local de = {
     ["Filtre matériaux actif — clic pour tout afficher."] = "Materialfilter aktiv — Klick zeigt alle.",
     ["N'afficher que les recettes qui font monter la compétence (masque le gris)."] = "Nur Rezepte anzeigen, die den Beruf steigern (blendet Grau aus).",
     ["Filtre progression actif — clic pour tout afficher."] = "Fortschrittsfilter aktiv — Klick zeigt alle.",
+    ["N'afficher que les recettes acquérables (formateur, vendeur ou HV)."] = "Nur beschaffbare Rezepte anzeigen (Lehrer, Händler oder AH).",
+    ["Filtre acquérables actif — clic pour tout afficher."] = "Beschaffbar-Filter aktiv — Klick zeigt alle.",
+    ["Acheter à l'HV"] = "Im AH kaufen",
     -- Diffuser les réactifs (liste de courses)
     ["Diffuser les réactifs"] = "Reagenzien ansagen",
     ["Diffuser les réactifs dans un canal"] = "Die Reagenzien in einem Kanal ansagen",

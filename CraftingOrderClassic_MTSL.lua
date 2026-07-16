@@ -226,3 +226,28 @@ function MTSL:MinSkill(profKey, spellID)
     local sk = indexOf(mprof)[spellID]
     return sk and sk.min_skill or nil
 end
+
+-- itemID de l'OBJET-RECETTE (parchemin/patron/plan) qui enseigne un plan, ou nil : recette de formateur
+-- (apprise sans objet) ou hors base CraftLink. Sert au pont prix HV (Lazy Gold, « Acheter à l'HV ») et
+-- au filtre « acquérables ». Repose sur taughtBy — indépendant du chargement de MTSL.
+function MTSL:RecipeItem(profKey, spellID)
+    return recipeItemFor(profKey, spellID)
+end
+
+-- Catégorie de SOURCE d'une recette, SANS résoudre les PNJ (le coûteux) : "trainer" | "vendor" | "drop"
+-- | "quest" | "unknown". Léger (index paresseux déjà chauds) → utilisable pour FILTRER toute la liste à
+-- chaque refresh. Le formateur se lit direct sur le skill ; sinon on classe l'objet-recette via items.lua.
+function MTSL:SourceKind(profKey, spellID)
+    if not (self:IsAvailable() and spellID) then return "unknown" end
+    local mprof = mtslProf(profKey); if not mprof then return "unknown" end
+    local sk = indexOf(mprof)[spellID]; if not sk then return "unknown" end
+    if sk.trainers then return "trainer" end
+    local recItemID = recipeItemFor(profKey, spellID)
+    local item = recItemID and itemsOf(mprof)[recItemID]
+    if item then
+        if item.vendors then return "vendor"
+        elseif item.drops then return "drop"
+        elseif item.quests then return "quest" end
+    end
+    return "unknown"
+end
