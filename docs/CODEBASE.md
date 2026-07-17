@@ -1,25 +1,28 @@
 # CraftingOrderClassic — carte du code
 
-> **GÉNÉRÉ** le 2026-07-16 (v1.20.0) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
+> **GÉNÉRÉ** le 2026-07-17 (v1.21.0) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
-87 modules + 4 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
+92 modules + 4 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
 
 ## Modules (ordre de chargement)
 
 | Fichier | Rôle | Lignes |
 |---|---|---|
-| `CraftingOrderClassic.lua` | Crafting Order - Classic — réseau GLOBAL et SOCIAL de commandes de craft. | 384 |
+| `CraftingOrderClassic.lua` | Crafting Order - Classic — réseau GLOBAL et SOCIAL de commandes de craft. | 390 |
 | `CraftingOrderClassic_Trace.lua` | trace réseau PERSISTÉE, lisible hors-jeu. | 79 |
 | `CraftingOrderClassic_Migrations.lua` | versionnage du schéma SavedVariables. | 40 |
 | `CraftingOrderClassic_Locale.lua` | socle de localisation du CHROME de l'UI. | 12 |
-| `CraftingOrderClassic_Locale_enUS.lua` | overlay ANGLAIS (enUS/enGB). | 498 |
-| `CraftingOrderClassic_Locale_deDE.lua` | overlay ALLEMAND (deDE). | 480 |
-| `CraftingOrderClassic_Locale_esES.lua` | overlay ESPAGNOL (esES/esMX). | 481 |
-| `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 173 |
-| `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 170 |
-| `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 170 |
+| `CraftingOrderClassic_Locale_enUS.lua` | overlay ANGLAIS (enUS/enGB). | 263 |
+| `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 255 |
+| `CraftingOrderClassic_Locale_deDE.lua` | overlay ALLEMAND (deDE). | 264 |
+| `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 239 |
+| `CraftingOrderClassic_Locale_esES.lua` | overlay ESPAGNOL (esES/esMX). | 265 |
+| `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 240 |
+| `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 186 |
+| `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 183 |
+| `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 183 |
 | `CraftingOrderClassic_Elemental.lua` | pseudo-« métier » de récolte « Élémentaire ». | 61 |
 | `CraftingOrderClassic_UI_Skin.lua` | tokens + helpers SÉMANTIQUES du skin (métiers, statuts, rareté, quantités, icônes natives) et petits widgets d'affichage. | 416 |
 | `CraftingOrderClassic_UI_Skin_Native.lua` | kit de chrome Blizzard NATIF (le « framework » UI de COC). | 466 |
@@ -27,10 +30,11 @@
 | `CraftingOrderClassic_ShareReagents.lua` | « liste de courses » : diffuser en un clic les réactifs d'une recette (vue métier) ou d'une commande (carte) dans un canal de discussion, avec le LIEN objet de chaque réactif. | 157 |
 | `CraftingOrderClassic_UI.lua` | fenêtre principale (chrome Blizzard natif, kit UI_Skin_Native). | 479 |
 | `CraftingOrderClassic_UI_Post_Layout.lua` | GÉOMÉTRIE de l'onglet « Commande » : colonnes, zones, séparateurs. | 121 |
-| `CraftingOrderClassic_UI_Post.lua` | onglet « Commande » : sélection de plan (gauche) + réactifs « je fournis » / commission g-s-c / ciblage artisan (droite). | 363 |
+| `CraftingOrderClassic_UI_Post.lua` | onglet « Commande » : sélection de plan (gauche) + réactifs « je fournis » / commission g-s-c / ciblage artisan (droite). | 373 |
 | `CraftingOrderClassic_UI_Post_Detail.lua` | onglet « Commande », PANNEAU DROIT : en-tête du plan sélectionné (icône + cadre doré + nom + niveau), liste des réactifs « je fournis », et la rangée commission. | 194 |
 | `CraftingOrderClassic_UI_Post_Artisans.lua` | onglet « Commande », section droite basse : boutons source, liste des artisans, ciblage (@Nom), libellé destinataire, bouton Poster. | 219 |
 | `CraftingOrderClassic_UI_Post_Categories.lua` | onglet « Commande », panneau gauche : regroupe la LISTE DES PLANS en sections type fenêtre native (emplacement puis type pour les équipements, type pour les armes, catégorie pour le reste). | 182 |
+| `CraftingOrderClassic_UI_Post_Paperdoll.lua` | onglet « Commande », vue SILHOUETTE de l'Enchantement. | 330 |
 | `CraftingOrderClassic_UI_Post_LazyGold.lua` | onglet « Commande » : couche Lazy Gold (lecture seule). | 150 |
 | `CraftingOrderClassic_UI_Gather_Layout.lua` | GÉOMÉTRIE de l'onglet « Récolte » : la SPEC (structure éditable, cf. | 61 |
 | `CraftingOrderClassic_UI_Gather.lua` | onglet « Récolte » : ressources de récolte (minéraux, herbes, cuirs, poissons) + demande de quantité + prix par pile + ciblage récolteur. | 499 |
@@ -44,7 +48,7 @@
 | `CraftingOrderClassic_UI_MyArtisans.lua` | onglet « Mes artisans » : vue agrégée des métiers du COMPTE (tous mes rerolls du royaume), en mode « connu ». | 433 |
 | `CraftingOrderClassic_UI_MyArtisans_LazyGold.lua` | onglet « Mes artisans » : couche Lazy Gold. | 134 |
 | `CraftingOrderClassic_UI_Help.lua` | onglet Aide : page unique défilante qui explique les autres onglets (Carnet/Commande/Récolte/Artisans), la Vue Métier et le réseau. | 163 |
-| `CraftingOrderClassic_UI_News.lua` | onglet « Nouveautés » : notes de version (changelog) affichées EN JEU, version par version, la plus récente en tête. | 222 |
+| `CraftingOrderClassic_UI_News.lua` | onglet « Nouveautés » : notes de version (changelog) affichées EN JEU, version par version, la plus récente en tête. | 241 |
 | `CraftingOrderClassic_Social.lua` | couche sociale passive (socle). | 380 |
 | `CraftingOrderClassic_Social_Menu.lua` | entrées « Crafting Order » du menu contextuel joueur. | 101 |
 | `CraftingOrderClassic_Social_Roster.lua` | affichage des métiers sur les fenêtres NATIVES. | 130 |
@@ -58,7 +62,7 @@
 | `CraftingOrderClassic_RecipeCats_Smelting.lua` | sous-catégorie « Lingots » du Minage (facette FONTE). | 39 |
 | `CraftingOrderClassic_RecipeCats_Enchanting.lua` | sous-catégories de l'ENCHANTEMENT. | 52 |
 | `CraftingOrderClassic_Craft.lua` | socle de lecture LIVE de la fenêtre métier (migration de la fenêtre custom depuis Guild Economy / TradeScanner_Craft.lua). | 206 |
-| `CraftingOrderClassic_Enchant.lua` | spécifique à l'Enchantement (API Craft). | 230 |
+| `CraftingOrderClassic_Enchant.lua` | spécifique à l'Enchantement (API Craft). | 326 |
 | `CraftingOrderClassic_MTSL.lua` | pont LECTURE SEULE vers l'addon « Missing TradeSkills List » (MTSL). | 253 |
 | `CraftingOrderClassic_ProfWindow.lua` | fenêtre métier custom 3 colonnes (migration depuis Guild Economy) : Recettes \| Détail+Craft \| Commandes du métier. | 499 |
 | `CraftingOrderClassic_ProfWindow_Layout.lua` | GÉOMÉTRIE de la vue métier (fenêtre 3 colonnes). | 65 |
@@ -88,13 +92,14 @@
 | `Orders.lua` | Crafting Order - Classic — Orders : carnet d'ordres GLOBAL (modèle + cycle + protocole). | 476 |
 | `Orders_Net.lua` | couche « fil réseau » du carnet d'ordres (protocole ORD\|). | 315 |
 | `CraftingOrderClassic_Inbound.lua` | couche réseau « passive » : capte les demandes de craft postées dans /commerce (Trade) et /guilde par des joueurs SANS l'addon, alerte le joueur, et les range dans une file « Entrantes » (acceptable / ignorable). | 247 |
-| `CraftingOrderClassic_Handoff.lua` | « garder une commande pour un ami capable ». | 271 |
+| `CraftingOrderClassic_Handoff.lua` | « garder une commande pour un ami capable ». | 281 |
 | `CraftingOrderClassic_Moderation.lua` | modération / anti-spam. | 333 |
 | `CraftingOrderClassic_LootAlert.lua` | alerte quand TU loots un objet-PLAN (recette/formule/ schéma/patron) catalogué par CraftLink, MAIS seulement s'il te CONCERNE : soit tu as le métier (candidat à l'apprendre), soit un AMI/PARTENAIRE de ton annuaire ne le connaît pas encore (candidat à un don — cf. | 155 |
 | `CraftingOrderClassic_Companion.lua` | socle des GREFFONS : panneaux compagnons accrochés aux fenêtres natives (échange, courrier) pour livrer une commande sans quitter le geste en cours. | 211 |
 | `CraftingOrderClassic_Companion_Mail.lua` | greffon COURRIER (scène B de la maquette) : panneau accroché à droite du compositeur d'envoi. | 177 |
 | `CraftingOrderClassic_Companion_Trade.lua` | greffon ÉCHANGE (scène A de la maquette) : panneau accroché SOUS la fenêtre d'échange native quand une commande nous lie au partenaire (dans les DEUX sens : je crafte pour lui = « vendeur », ou il crafte pour moi = « acheteur »). | 114 |
-| `CraftingOrderClassic_Enchant_Trade.lua` | greffon ENCHANTEMENT sur la fenêtre d'ÉCHANGE. | 161 |
+| `CraftingOrderClassic_Enchant_Trade.lua` | greffon ENCHANTEMENT sur la fenêtre d'ÉCHANGE. | 289 |
+| `CraftingOrderClassic_Enchant_Trade_Ask.lua` | greffon ÉCHANGE : « demande-lui la pièce ». | 159 |
 | `Debug.lua` | Crafting Order - Classic — Debug : mode solo pour "jouer" un réseau fictif. | 136 |
 | `CraftingOrderClassic_SelfTest.lua` | suite de tests IN-GAME (/cotest). | 180 |
 
@@ -500,17 +505,35 @@
 > il vit maintenant à côté de _Locale_deDE.lua / _Locale_esES.lua, même forme, même contrat.
 > Sur un client non-anglais : early-return, coût nul.
 
+### `CraftingOrderClassic_Locale_enUS_2.lua`
+> CraftingOrderClassic_Locale_enUS_2.lua — overlay enUS, 2/2. Clé FR → texte traduit.
+> Suite de _Locale_enUS.lua, scindé pour rester sous le plafond anti-monolithe (500 l/fichier).
+> Même contrat : chargé APRÈS _Locale.lua, table à plat fusionnée dans COC.L — les deux moitiés
+> sont indépendantes (aucun ordre requis entre elles). Client d'une autre langue : early-return.
+
 ### `CraftingOrderClassic_Locale_deDE.lua`
 > CraftingOrderClassic_Locale_deDE.lua — overlay ALLEMAND (deDE). Clé FR → texte DE.
 > Chargé APRÈS CraftingOrderClassic_Locale.lua (qui crée COC.L via setmetatable). Repli sur la clé FR
 > pour toute chaîne non traduite. Guillemets « » dans les valeurs → évite l'échappement Lua des ".
 > Sur un client non-deDE : early-return, coût nul.
 
+### `CraftingOrderClassic_Locale_deDE_2.lua`
+> CraftingOrderClassic_Locale_deDE_2.lua — overlay deDE, 2/2. Clé FR → texte traduit.
+> Suite de _Locale_deDE.lua, scindé pour rester sous le plafond anti-monolithe (500 l/fichier).
+> Même contrat : chargé APRÈS _Locale.lua, table à plat fusionnée dans COC.L — les deux moitiés
+> sont indépendantes (aucun ordre requis entre elles). Client d'une autre langue : early-return.
+
 ### `CraftingOrderClassic_Locale_esES.lua`
 > CraftingOrderClassic_Locale_esES.lua — overlay ESPAGNOL (esES/esMX). Clé FR → texte ES.
 > Chargé APRÈS CraftingOrderClassic_Locale.lua (qui crée COC.L via setmetatable). Repli sur la clé FR
 > pour toute chaîne non traduite. Guillemets « » dans les valeurs → évite l'échappement Lua des ".
 > Sur un client non-hispanophone : early-return, coût nul.
+
+### `CraftingOrderClassic_Locale_esES_2.lua`
+> CraftingOrderClassic_Locale_esES_2.lua — overlay esES, 2/2. Clé FR → texte traduit.
+> Suite de _Locale_esES.lua, scindé pour rester sous le plafond anti-monolithe (500 l/fichier).
+> Même contrat : chargé APRÈS _Locale.lua, table à plat fusionnée dans COC.L — les deux moitiés
+> sont indépendantes (aucun ordre requis entre elles). Client d'une autre langue : early-return.
 
 ### `CraftingOrderClassic_Locale_News_enUS.lua`
 > CraftingOrderClassic_Locale_News_enUS.lua — traductions de l'onglet « Nouveautés » (enUS/enGB).
@@ -669,6 +692,27 @@
 > SANS cache (contrairement à GetItemInfo pour le nom), donc le classement est fiable au 1er rendu.
 
 **API** : `UI:TogglePostSection(ckey)`
+
+### `CraftingOrderClassic_UI_Post_Paperdoll.lua`
+> CraftingOrderClassic_UI_Post_Paperdoll.lua — onglet « Commande », vue SILHOUETTE de l'Enchantement.
+> Choisir un enchant en cliquant l'EMPLACEMENT (comme sur son personnage) au lieu de fouiller ~300
+> plans : clic sur l'icône → menu des stats de cet emplacement → clic sur une stat → ses variantes,
+> de la plus forte à la plus faible. La sélection rejoint le flux NORMAL de l'onglet (SelectPostPlan
+> avec l'entrée du CATALOGUE) : réactifs, commission, ciblage d'artisan et Poster restent inchangés.
+> Chargé après _UI_Post_Categories.lua ; partage le namespace UI. NB : _Enchant.lua est chargé APRÈS
+> nous (cf. les 3 .toc) → ne toucher à COC.Enchant qu'au RUNTIME, jamais au chargement.
+> 
+> ALTERNATIVE à la liste, jamais un remplacement (d'où la bascule dans la bande de filtres) : les
+> produits de désenchantement (essences, poussières, éclats) et les huiles/baguettes n'ont pas
+> d'emplacement — ils n'existent pas ici et resteraient introuvables sans la liste.
+> 
+> Deux appuis natifs, donc zéro asset à livrer et zéro clé de locale pour le chrome d'emplacement :
+>   · `GetInventorySlotInfo(slotName)` rend le chemin de la TEXTURE en 2ᵉ retour (PaperDollFrame.lua:711) ;
+>   · `_G[strupper(slotName)]` rend son LIBELLÉ déjà localisé (PaperDollFrame.lua:873).
+> Ce que le métier sait enchanter se DÉRIVE du catalogue (Enchant:HasCatalogFor), jamais d'une liste
+> en dur : ça change d'une couche à l'autre, et ni la tête ni les épaules n'ont d'enchant nulle part
+> (arcanums/inscriptions = des OBJETS). Ces emplacements-là s'affichent DÉSATURÉS : la silhouette
+> reste lisible, et un emplacement mort se voit au lieu de manquer.
 
 ### `CraftingOrderClassic_UI_Post_LazyGold.lua`
 > CraftingOrderClassic_UI_Post_LazyGold.lua — onglet « Commande » : couche Lazy Gold (lecture seule).
@@ -988,7 +1032,7 @@
 > Emplacement (section) › Stat de base (sous-catégorie) › variantes triées par niveau.
 > API publique : Enchant:Parse · Enchant:SlotFor · Enchant:SectionFor · Enchant:StatFor · Enchant:ShortName.
 
-**API** : `Enchant:Parse(name)` · `Enchant:SlotFor(spellID)` · `Enchant:SectionFor(spellID)` · `Enchant:StatFor(spellID)` · `Enchant:CraftsForEquipLoc(equipLoc)` · `Enchant:ShortName(name, spellID)`
+**API** : `Enchant:Parse(name)` · `Enchant:SlotFor(spellID)` · `Enchant:SectionFor(spellID)` · `Enchant:StatFor(spellID)` · `Enchant:CraftsForEquipLoc(equipLoc, subclassID)` · `Enchant:HasCatalogFor(word)` · `Enchant:CatalogGroups(words)` · `Enchant:ShortName(name, spellID)`
 
 ### `CraftingOrderClassic_MTSL.lua`
 > CraftingOrderClassic_MTSL.lua — pont LECTURE SEULE vers l'addon « Missing TradeSkills List » (MTSL).
@@ -1441,6 +1485,10 @@
 > CraftingOrderClassic_Enchant_Trade.lua — greffon ENCHANTEMENT sur la fenêtre d'ÉCHANGE.
 > Quand le partenaire pose un objet dans l'emplacement « ne sera pas échangé » (TRADE_ENCHANT_SLOT),
 > on liste MES enchants applicables à CET emplacement — plus besoin de chercher dans toute la liste.
+> La liste est CLASSÉE par pertinence (cf. offerRank) : ce que ses RÉACTIFS posés dans l'échange
+> désignent d'abord, puis ce que mes sacs permettent, et seulement ensuite l'ordre catalogue (rang de
+> métier décroissant). Le surplus se parcourt à la MOLETTE — le classement rapproche la bonne recette,
+> il ne la garantit pas : rien ne doit rester hors d'atteinte.
 > Chaque ligne est un bouton SÉCURISÉ qui crafte l'enchant directement :
 >   PreClick → CraftFrame_SetSelection(index) : sélectionne ET ARME le bouton natif, de façon SYNCHRONE
 >   (⚠️ SelectCraft ne l'arme PAS : il n'émet aucun CRAFT_UPDATE — cf. _ProfWindow_Detail) ;
@@ -1452,6 +1500,40 @@
 > greffon Commandes (_Companion_Trade) qui vit SOUS la fenêtre d'échange.
 
 **API** : `ET.Update()` · `ET:Start()`
+
+### `CraftingOrderClassic_Enchant_Trade_Ask.lua`
+> CraftingOrderClassic_Enchant_Trade_Ask.lua — greffon ÉCHANGE : « demande-lui la pièce ».
+> L'ÉTAT VIDE de _Enchant_Trade : tant que le partenaire n'a rien posé dans l'emplacement « ne sera pas
+> échangé », l'enchanteur ne voyait RIEN (panel:Hide()) — or c'est précisément le moment où le client
+> débutant ignore que cet emplacement existe. On y met la silhouette : clic sur un emplacement → on lui
+> chuchote de poser CETTE pièce-là. C'est un bouton « explique l'emplacement d'enchant au débutant »,
+> pas de l'automatisation.
+> 
+> CHUCHOTEMENT, jamais /s : le destinataire est en face et il est le SEUL concerné — écrire en public
+> spammerait tout le district des enchanteurs à chaque clic, à rebours de la discipline anti-spam de COC
+> (_Moderation, /co mutes). ⚠️ Le message part dans NOTRE langue : on ne peut pas connaître la locale du
+> partenaire. Inévitable pour tout message inter-joueurs — ne pas « corriger ».
+> 
+> La silhouette (disposition + dérivation catalogue + désaturation des emplacements morts) est celle de
+> l'onglet Commande, réutilisée via COC.UI.DOLL — zéro clé de locale pour le chrome d'emplacement, et un
+> seul endroit à corriger quand une couche saisonnière bouge les emplacements enchantables.
+> 
+> ÉTAGE 2 (NON livré, délibérément) : si le partenaire porte COC, remplacer le chuchotement par une
+> invite chez lui + pose en un clic (PickupInventoryItem puis ClickTradeButton(TRADE_ENCHANT_SLOT)).
+> Contraintes à tenir le jour où on le fera : verrouiller en DUR sur l'emplacement 7 (viser 1..6 en
+> ferait un vecteur de VOL — le 7 est « ne sera pas échangé », donc rien n'y est volable), et EXIGER un
+> clic sur l'invite (déplacer l'arme équipée de quelqu'un sans son accord serait hostile). Ça demande un
+> verbe réseau + TRANSPORT_REV, donc un test 2 comptes — impossible aujourd'hui (cf. mémoire
+> coc-ptr-account-testing).
+> Pas d'étape de déséquipement à prévoir : une pièce PORTÉE se glisse directement dans l'emplacement 7
+> (retour user 2026-07-17), et `PickupInventoryItem` fait ce déséquipement implicitement. ⚠️ À ne pas
+> confondre avec « Enchanter équipé » (_ProfWindow_Detail), qui passe par l'attribut sécurisé
+> `target-slot` : là, l'objet ne bouge JAMAIS — mais c'est MON objet, pas celui d'en face.
+> ⚠️ Conséquence à assumer : l'objet quitte réellement le personnage du partenaire pendant l'échange
+> (il est sans arme le temps de l'enchant). Normal — c'est déjà le flux manuel — mais ça reste une
+> raison de plus d'EXIGER son clic : l'addon ne déséquipe personne tout seul.
+
+**API** : `Ask:Request(label)` · `Ask:Refresh()` · `Ask:Hide()` · `Ask:Update()`
 
 ### `Debug.lua`
 > Crafting Order - Classic — Debug : mode solo pour "jouer" un réseau fictif.

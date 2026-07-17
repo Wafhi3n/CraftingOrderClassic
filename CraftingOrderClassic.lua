@@ -275,6 +275,7 @@ function COC:Help()
     print("  |cFFFFFFFF/co lowlevel [N|off]|r — " .. L["seuil de mute auto des persos bas niveau (défaut 5)"])
     print("  |cFFFFFFFF/co spam [off|auto|<max> [fenêtre]]|r — " .. L["réglage anti-spam : seuil, fenêtre, mute auto vs popup"])
     print("  |cFFFFFFFF/co debug|r — |cFFFF8800" .. L["mode solo"] .. "|r : " .. L["injecte/retire un réseau fictif (artisans + commandes)"])
+    print("  |cFFFFFFFF/co verbose|r — |cFFFF8800" .. L["diag"] .. "|r : " .. L["affiche les messages d'info en coulisse (ex. « X peut faire une captée ») ; auto si COCMonitor est chargé"])
     print("  |cFFFFFFFF/co trace|r — |cFFFF8800" .. L["diag"] .. "|r : " .. L["journalise le réseau dans la SavedVariable (off | clear | dump)"])
     print("  |cFFFFFFFF/co gwroster|r — |cFFFF8800" .. L["diag"] .. "|r : " .. L["confédérés GreenWall repérés (SoD live only)"])
 end
@@ -321,6 +322,11 @@ function COC:Slash(msg)
     elseif cmd == "gwroster" or cmd == "confed" then COC:GreenWallDiag()
     elseif cmd == "wipe"   then COC:WipeRoster()
     elseif cmd == "debug"  then if COC.Debug then COC.Debug:Toggle() end
+    elseif cmd == "verbose" then
+        if COC.db then
+            COC.db.verbose = (not COC.db.verbose) or nil
+            p(COC.db.verbose and COC.L["messages verbeux : activés"] or COC.L["messages verbeux : désactivés"])
+        end
     elseif cmd == "socialdiag" or cmd == "sdiag" then if COC.Social then COC.Social:Diag(rest) end
     elseif cmd == "trace"  then if COC.Trace then COC.Trace:Cmd(rest) end
     elseif cmd == "help"   then COC:Help()

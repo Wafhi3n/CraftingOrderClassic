@@ -30,6 +30,15 @@ Handoff._noted = {}   -- [inboundId] = true : « X peut la faire » déjà annon
 local function me()  return (UnitName and UnitName("player")) or "?" end
 local function pmsg(m) print("|cFF33DD88Crafting Order|r " .. m) end
 
+-- L'annonce chat « X peut faire une captée » est du bruit en jeu normal (l'ordre est de toute façon
+-- poussé/gardé en coulisse). On ne l'affiche donc qu'en mode verbeux (/co verbose) ou quand l'addon
+-- de dev COCMonitor est chargé (contexte test/diag).
+local function verbose()
+    if COC.db and COC.db.verbose then return true end
+    local ial = (C_AddOns and C_AddOns.IsAddOnLoaded) or IsAddOnLoaded
+    return (ial and ial("COCMonitor")) and true or false
+end
+
 -- Relation « proche » : ami / guildmate / artisan ajouté à la main. Seuls ceux-là reçoivent un
 -- nudge personnel (les simples croisés voient l'ordre en silence via le maillage existant).
 function Handoff:_Related(r)
@@ -141,17 +150,18 @@ function Handoff:OnArtisanOnline(who)
     self:ForwardInboundTo(who)
 end
 
--- Une entrante vient d'être captée : si un ami connu sait la faire, me le signaler (une fois) et la
--- pousser aux capables DÉJÀ en ligne (les hors-ligne l'auront à leur connexion via OnArtisanOnline).
+-- Une entrante vient d'être captée : la pousser aux capables DÉJÀ en ligne (les hors-ligne l'auront à
+-- leur connexion via OnArtisanOnline). L'annonce chat « X peut la faire » n'est QUE du confort de diag
+-- (verbose()) : le push ci-dessous a lieu dans tous les cas, qu'on l'affiche ou non.
 function Handoff:NoteInbound(e)
     if not (e and CraftLink and COC.Directory) then return end
     local o = self:_SynthFromInbound(e)
     local list = self:CapableKnownList(o)
     if #list == 0 then return end
-    local names = {}
-    for _, a in ipairs(list) do names[#names + 1] = a.name end
-    if not self._noted[e.id] then
+    if verbose() and not self._noted[e.id] then
         self._noted[e.id] = true
+        local names = {}
+        for _, a in ipairs(list) do names[#names + 1] = a.name end
         local nm  = (CraftLink:ItemName(e.itemID, e.itemName)) or e.itemName or ("item:" .. e.itemID)
         local msg = string.format(L["%s peut faire une commande captée — gardée pour son passage : %s"],
             table.concat(names, ", "), nm)

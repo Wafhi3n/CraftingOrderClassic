@@ -16,10 +16,19 @@ local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
 
 -- Mot d'emplacement (anglais, tel qu'écrit dans « Enchant <Slot> - <Effet> ») → emplacement d'inventaire
 -- (résolu en id par GetInventorySlotInfo). Enchant d'arme → main droite par défaut ; bouclier → main gauche.
+-- ⚠️ Blizzard n'est pas régulier sur ces mots — relevé sur le catalogue complet (2026-07-16) :
+--   · « Bracer » (Vanilla/TBC/SoD) MAIS « Bracers » au pluriel en Wrath (9 recettes) ;
+--   · « Staff » (Wrath, 2 recettes) = un enchant de BÂTON, donc une arme à deux mains.
+-- Sans ces deux alias, 11 recettes Wrath tombaient en vrac dans « Autres » (et resteraient hors de la
+-- vue silhouette de l'onglet Commande, qui se dérive de cette table).
+-- « Head »/« Shoulder » : AUCUN enchant dans aucune couche (ce sont des arcanums/inscriptions, donc des
+-- OBJETS, pas des sorts d'enchanteur). Les entrées restent par prudence — le catalogue est seul juge.
 local SLOT_NAME = {
-    ["Bracer"]    = "WristSlot",   ["Boots"]  = "FeetSlot",  ["Chest"]    = "ChestSlot",
+    ["Bracer"]    = "WristSlot",   ["Bracers"] = "WristSlot",
+    ["Boots"]     = "FeetSlot",    ["Chest"]  = "ChestSlot",
     ["Cloak"]     = "BackSlot",    ["Gloves"] = "HandsSlot", ["Shield"]   = "SecondaryHandSlot",
     ["Weapon"]    = "MainHandSlot", ["2H Weapon"] = "MainHandSlot", ["Off-Hand"] = "SecondaryHandSlot",
+    ["Staff"]     = "MainHandSlot",
     ["Ring"]      = "Finger0Slot", ["Shoulder"] = "ShoulderSlot", ["Head"] = "HeadSlot",
 }
 
@@ -32,10 +41,15 @@ local SLOT_INVTYPE = {
     ["Head"]   = "INVTYPE_HEAD",  ["Shoulder"] = "INVTYPE_SHOULDER",
     ["Cloak"]  = "INVTYPE_CLOAK", ["Chest"]    = "INVTYPE_CHEST",
     ["Bracer"] = "INVTYPE_WRIST", ["Gloves"]   = "INVTYPE_HAND",
+    ["Bracers"] = "INVTYPE_WRIST",   -- variante Wrath (cf. SLOT_NAME) : MÊME section que « Bracer »
     ["Boots"]  = "INVTYPE_FEET",  ["Ring"]     = "INVTYPE_FINGER",
     ["Shield"] = "INVTYPE_SHIELD", ["Off-Hand"] = "INVTYPE_HOLDABLE",
 }
-local WEAPON_SECTION = { ["Weapon"] = { "INVTYPE_WEAPON", 20 }, ["2H Weapon"] = { "INVTYPE_2HWEAPON", 21 } }
+-- Un bâton EST une arme à deux mains → « Staff » partage la section (et le rang) de « 2H Weapon ».
+local WEAPON_SECTION = {
+    ["Weapon"] = { "INVTYPE_WEAPON", 20 },
+    ["2H Weapon"] = { "INVTYPE_2HWEAPON", 21 }, ["Staff"] = { "INVTYPE_2HWEAPON", 21 },
+}
 
 -- { token, rang } d'un mot d'emplacement — construit UNE fois, paresseusement (COC.SLOT_ORDER est
 -- posé par _UI_Post_Categories au chargement ; lazy = insensible à l'ordre exact du .toc).
@@ -178,8 +192,14 @@ end
 -- C'est une LISTE car une arme à DEUX MAINS accepte AUSSI les enchants « Weapon » génériques (mais une
 -- arme à 1 main n'accepte PAS les « 2H Weapon »). Emplacement absent = rien d'enchantable (Era n'a pas
 -- d'enchant d'arme à distance, de ceinture, de jambières…).
+-- ⚠️ Cette table doit lister les MÊMES alias que SLOT_NAME, sinon un mot connu du catalogue n'a aucun
+-- objet qui l'accepte : « Bracers » (pluriel Wrath) manquait ici → les 9 enchants de poignet de Wrath
+-- ne sortaient JAMAIS dans le greffon d'échange, alors qu'ils s'affichaient bien dans la silhouette de
+-- l'onglet Commande (qui, elle, liste ses mots à part). « Staff » n'y est volontairement PAS : voir
+-- STAFF_SUBCLASS plus bas.
 local EQUIP_WORDS = {
-    INVTYPE_WRIST    = { "Bracer" },  INVTYPE_HAND  = { "Gloves" }, INVTYPE_FEET  = { "Boots" },
+    INVTYPE_WRIST    = { "Bracer", "Bracers" },
+    INVTYPE_HAND  = { "Gloves" }, INVTYPE_FEET  = { "Boots" },
     INVTYPE_CHEST    = { "Chest" },   INVTYPE_ROBE  = { "Chest" },  INVTYPE_CLOAK = { "Cloak" },
     INVTYPE_SHIELD   = { "Shield" },  INVTYPE_FINGER = { "Ring" },  INVTYPE_HEAD  = { "Head" },
     INVTYPE_SHOULDER = { "Shoulder" },
@@ -190,14 +210,25 @@ local EQUIP_WORDS = {
     INVTYPE_2HWEAPON = { "2H Weapon", "Weapon" },
 }
 
+-- « Staff » (Wrath) enchante un BÂTON, pas n'importe quelle arme à deux mains : une hache à 2 mains ne
+-- l'accepte pas. Or l'INVTYPE ne les distingue pas — bâtons, haches et masses à 2 mains sont TOUS
+-- INVTYPE_2HWEAPON. Le seul discriminant est la SOUS-CLASSE d'objet (7ᵉ retour de GetItemInfoInstant).
+-- D'où le paramètre `subclassID` : sans lui on suggérerait « Enchant Staff » sur une hache, le joueur
+-- cliquerait, et le craft échouerait faute de cible valide. Repli sur la valeur numérique si `Enum`
+-- manque (le champ existe en Era/TBC/Wrath, mais la table n'a rien de garanti côté client).
+local STAFF_SUBCLASS = (Enum and Enum.ItemWeaponSubclass and Enum.ItemWeaponSubclass.Staff) or 10
+
 -- Mes enchants APPLICABLES à un objet d'emplacement `equipLoc`, lus dans la fenêtre de craft OUVERTE
 -- (l'API Craft ne répond que fenêtre ouverte → nil si elle est fermée, l'appelant le signale).
+-- `subclassID` (optionnel) = sous-classe de l'objet ciblé, seul moyen de reconnaître un bâton.
 -- Triés du plus haut niveau au plus bas (la meilleure version d'abord), puis par nom.
-function Enchant:CraftsForEquipLoc(equipLoc)
+function Enchant:CraftsForEquipLoc(equipLoc, subclassID)
     local words = EQUIP_WORDS[equipLoc or ""]
     if not (words and COC.Craft and COC.Craft:IsCraftOpen()) then return nil end
     local ok = {}
     for _, w in ipairs(words) do ok[w] = true end
+    -- Un bâton accepte EN PLUS sa propre famille (les enchants « 2H Weapon »/« Weapon » lui vont déjà).
+    if equipLoc == "INVTYPE_2HWEAPON" and subclassID == STAFF_SUBCLASS then ok["Staff"] = true end
     local c, out = CL(), {}
     for _, r in ipairs(COC.Craft:ReadRecipes() or {}) do
         if not r.isHeader and r.spellID and ok[slotWordOf(r.spellID) or ""] then
@@ -208,6 +239,71 @@ function Enchant:CraftsForEquipLoc(equipLoc)
     table.sort(out, function(a, b)
         if a._lvl ~= b._lvl then return a._lvl > b._lvl end
         return (a.name or "") < (b.name or "")
+    end)
+    return out
+end
+
+-- =========================================================================
+-- Vue CATALOGUE — sélection par emplacement HORS session de craft
+-- =========================================================================
+-- `CraftsForEquipLoc` ci-dessus est la vue de l'ARTISAN : elle lit MES crafts, donc exige la fenêtre
+-- d'Enchantement ouverte. Ce qui suit lit le CATALOGUE CraftLink, donc répond même quand on n'est PAS
+-- enchanteur — ce qu'exige l'onglet Commande (on commande justement ce qu'on ne sait pas faire).
+-- Aucune donnée nouvelle : `buildMaps()` dérive déjà ses maps du catalogue, on ne fait que les inverser.
+
+-- spellIDs du catalogue par mot d'emplacement — { [word] = { spellID, … } }. Construit UNE fois.
+local _spellsByWord
+local function spellsByWord()
+    if _spellsByWord then return _spellsByWord end
+    if not _wordBySpell then buildMaps() end
+    _spellsByWord = {}
+    for id, w in pairs(_wordBySpell) do
+        local t = _spellsByWord[w]
+        if not t then t = {}; _spellsByWord[w] = t end
+        t[#t + 1] = id
+    end
+    return _spellsByWord
+end
+
+-- Le catalogue de CETTE couche porte-t-il au moins un enchant pour ce mot d'emplacement ?
+-- ⚠️ Toute vue « par emplacement » DOIT se dériver d'ici, jamais d'une liste d'emplacements en dur :
+-- ce que le métier sait enchanter change d'une couche à l'autre (Wrath ajoute le bâton ; ni la tête ni
+-- les épaules n'ont d'enchant nulle part — ce sont des arcanums, donc des objets).
+function Enchant:HasCatalogFor(word)
+    local t = spellsByWord()[word]
+    return t ~= nil and #t > 0
+end
+
+-- Enchants du catalogue pour une LISTE de mots d'emplacement, groupés par STAT DE BASE :
+--   { { stat = <libellé localisé>, order = n, variants = { { spellID =, word =, tier = }, … } }, … }
+-- Les groupes sortent dans l'ordre de StatFor (alphabétique stable), et les variantes d'un groupe du
+-- plus haut rang de métier au plus bas (la meilleure d'abord), comme partout ailleurs dans l'addon.
+-- Une LISTE de mots car un emplacement de la silhouette en couvre parfois plusieurs (Bracer+Bracers,
+-- Weapon+2H Weapon+Staff). Le LIBELLÉ de variante reste à l'appelant : lui seul sait s'il doit
+-- distinguer les mots fusionnés sous une même icône (cf. _UI_Post_Paperdoll).
+function Enchant:CatalogGroups(words)
+    local by, groups = spellsByWord(), {}
+    for _, w in ipairs(words or {}) do
+        for _, id in ipairs(by[w] or {}) do
+            local label, order, tier = self:StatFor(id)
+            if label then
+                local g = groups[label]
+                if not g then g = { stat = label, order = order or 500, variants = {} }; groups[label] = g end
+                g.variants[#g.variants + 1] = { spellID = id, word = w, tier = tier or 0 }
+            end
+        end
+    end
+    local out = {}
+    for _, g in pairs(groups) do
+        table.sort(g.variants, function(a, b)
+            if a.tier ~= b.tier then return a.tier > b.tier end
+            return a.spellID < b.spellID          -- départage STABLE (deux variantes de même rang)
+        end)
+        out[#out + 1] = g
+    end
+    table.sort(out, function(a, b)
+        if a.order ~= b.order then return a.order < b.order end
+        return a.stat < b.stat
     end)
     return out
 end

@@ -110,6 +110,10 @@ function UI:_BuildPostLeft()
     -- Outils Lazy Gold (tri rentabilité + « 123 » valeurs exactes) : dans LEUR slot de la bande de
     -- filtres (id "AH_Filter" dans la SPEC) — ce sont des réglages d'affichage, avec les filtres.
     self:_BuildPostLGBar(self:PostSec("AH_Filter"))
+    -- Vue silhouette (Enchantement) : elle occupe LA MÊME zone que le scroll, montrée en alternance
+    -- (cf. _UI_Post_Paperdoll.lua). Construite ici, jamais affichée tant que le métier n'est pas
+    -- l'Enchantement ET que l'utilisateur ne l'a pas demandée.
+    self:_BuildPostDoll()
 end
 
 -- La rangée de filtres = des SLOTS de la SPEC (idée user : filters porte ses composants en colonnes).
@@ -130,6 +134,9 @@ function UI:_BuildPostPlanFilters()
         UI.postSearch = b:GetText():lower(); UI:RefreshPostPlans()
     end)
     srch:SetScript("OnEscapePressed", function(b) b:ClearFocus() end)
+    -- Bascule liste ↔ silhouette : elle se pose DANS ce slot, à droite (cf. _BuildPostDollToggle) —
+    -- d'où le passage de `srch`, dont le bord droit recule quand le bouton est visible.
+    self:_BuildPostDollToggle(sSlot, srch)
 
     -- Qualité : le sélecteur gris natif de l'HdV, dans son slot. Les valeurs sont les INDEX de
     -- QUALITY_STEPS, jamais `false` (UIDropDownMenu lit `false` comme « pas de sélection », cf.
@@ -276,6 +283,9 @@ function UI:RefreshPostPlans()
     -- Tri par section (emplacement/type) + rendu en-têtes+lignes : cf. _UI_Post_Categories.lua.
     -- Le « prêt » (P2) remonte en tête de SA section (plus en tête globale) : le regroupement prime.
     self:_RenderPostPlanRows(out)
+    -- Vue silhouette (Enchantement) : montre/cache le bon panneau et le déclencheur. La liste est
+    -- construite dans TOUS les cas — elle doit être à jour dès qu'on rebascule dessus.
+    self:_SyncPostDollView()
 end
 
 -- Ligne UNIFIÉE du pool virtualisé : rend soit un PLAN (badge + nom, cliquable) soit un EN-TÊTE de

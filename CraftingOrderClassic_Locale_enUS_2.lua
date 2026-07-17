@@ -1,0 +1,255 @@
+-- CraftingOrderClassic_Locale_enUS_2.lua — overlay enUS, 2/2. Clé FR → texte traduit.
+-- Suite de _Locale_enUS.lua, scindé pour rester sous le plafond anti-monolithe (500 l/fichier).
+-- Même contrat : chargé APRÈS _Locale.lua, table à plat fusionnée dans COC.L — les deux moitiés
+-- sont indépendantes (aucun ordre requis entre elles). Client d'une autre langue : early-return.
+
+local COC = CraftingOrderClassic
+local loc = GetLocale and GetLocale() or "enUS"
+if loc ~= "enUS" and loc ~= "enGB" then return end
+local L = COC.L
+
+local en2 = {
+    -- Minimap + menu métiers
+    ["Clic : ouvrir le carnet d'ordres"] = "Click: open the order ledger",
+    ["Clic droit : mes métiers"] = "Right click: my professions",
+    ["Mes métiers"] = "My professions", ["Aucun métier connu."] = "No known profession.",
+    ["Don / gratuit"] = "Free / gift",
+    -- Entrantes (alertes chat)
+    ["|cFFFF8800entrante|r |cFFFFFFFF%s|r (%s) : %s%s%s"] = "|cFFFF8800incoming|r |cFFFFFFFF%s|r (%s): %s%s%s",
+    ["   |cFF33DD33→ tu sais la crafter|r — Carnet › Entrantes"] = "   |cFF33DD33→ you can craft it|r — Ledger › Incoming",
+    ["|cFFFFCC00commande pour TOI|r de |cFFFFFFFF%s|r : %s%s%s"] = "|cFFFFCC00order for YOU|r from |cFFFFFFFF%s|r: %s%s%s",
+    ["ton artisan |cFFFFFFFF%s|r est en ligne."] = "your crafter |cFFFFFFFF%s|r is online.",
+    -- Alerte plan looté (CHAT_MSG_LOOT → CraftLink:RecipeFromPlanItem)
+    ["plan looté : |cFFFFFFFF%s|r — enseigne |cFFFFFFFF%s|r (%s) %s"] =
+        "recipe looted: |cFFFFFFFF%s|r — teaches |cFFFFFFFF%s|r (%s) %s",
+    ["|cFF888888(tu la connais déjà)|r"] = "|cFF888888(you already know it)|r",
+    ["|cFF33DD33(tu ne la connais pas encore !)|r"] = "|cFF33DD33(you don't know it yet!)|r",
+    ["alerte plan looté : |cFFFFFFFF%s|r — /co lootalert [on|off]"] =
+        "loot alert: |cFFFFFFFF%s|r — /co lootalert [on|off]",
+    ["alerte quand tu loots un plan connu de CraftLink (défaut : on)"] =
+        "alert when you loot a recipe known to CraftLink (default: on)",
+    -- Partenaires (P1) + proposer un don (/co gift)
+    ["Partenaire (basculer)"] = "Partner (toggle)",
+    ["[Partenaire]"] = "[Partner]",
+    ["|cFFFFFFFF%s|r marqué comme partenaire — priorité sur les alertes de don."] =
+        "|cFFFFFFFF%s|r marked as partner — prioritized in gift alerts.",
+    ["|cFFFFFFFF%s|r n'est plus marqué comme partenaire."] = "|cFFFFFFFF%s|r is no longer marked as partner.",
+    ["Marquer comme partenaire"] = "Mark as partner", ["Retirer des partenaires"] = "Remove from partners",
+    -- Recherche de travail (LFW) : /co lfw
+    ["[Dispo]"] = "[LFW]",
+    ["Chercher du travail"] = "Look for work", ["scan LFW du chat : |cFF33DD33activé|r"] = "chat LFW scan: |cFF33DD33on|r", ["scan LFW du chat : |cFFFFCC00désactivé|r"] = "chat LFW scan: |cFFFFCC00off|r", ["propose : %s"] = "offers: %s", ["Proposer cette recette (recherche de travail)"] = "Offer this recipe (looking for work)", ["Maximum %d recettes proposées."] = "Up to %d offered recipes.",
+    ["Tu cherches du travail — clic pour arrêter."] = "You're looking for work — click to stop.",
+    ["Signale au royaume que tu cherches du travail dans ce métier."] = "Tell the realm you're looking for work in this profession.",
+    ["recherche de travail : |cFF33DD33%s|r — /co lfw off pour arrêter"] = "looking for work: |cFF33DD33%s|r — /co lfw off to stop",
+    ["recherche de travail : |cFFFFCC00désactivée|r — /co lfw <métier>"] = "looking for work: |cFFFFCC00off|r — /co lfw <profession>",
+    ["recherche de travail arrêtée."] = "looking for work stopped.",
+    ["tu n'as pas le métier %s — impossible de chercher du travail dessus."] = "you don't have %s — can't look for work in it.",
+    ["recherche de travail : |cFF33DD33%s|r — visible au royaume"] = "looking for work: |cFF33DD33%s|r — visible across the realm",
+    -- Offre LFW (panneau de config par métier + tooltips + tris progression)
+    ["Configurer l'offre : composants fournis, commission…"] = "Set up your offer: provided reagents, fee…",
+    ["Recherche de travail — %s"] = "Looking for work — %s",
+    ["Je fournis les composants de base"] = "I provide the basic reagents",
+    ["(achetables chez un marchand)"] = "(the ones sold by vendors)",
+    ["Seulement si le plan me fait progresser"] = "Only if the recipe skills me up",
+    ["(restriction sur les composants fournis)"] = "(restricts the provided reagents)",
+    ["Commission fixe par craft :"] = "Flat fee per craft:",
+    ["Composants fournis (%d/%d)"] = "Provided reagents (%d/%d)",
+    ["Maximum %d composants fournis."] = "At most %d provided reagents.",
+    ["Cherche du travail : %s"] = "Looking for work: %s",
+    ["fournit les composants de base (marchand)"] = "provides the basic reagents (vendor)",
+    ["fournit : %s"] = "provides: %s",
+    ["commission : %s par craft"] = "fee: %s per craft",
+    ["composants fournis seulement si le plan fait progresser"] = "reagents provided only if the recipe skills them up",
+    ["Trier par montée de compétence (plans orange d'abord)."] = "Sort by skill-up (orange recipes first).",
+    ["Tri par montée de compétence — clic pour A-Z."] = "Sorted by skill-up — click for A-Z.",
+    ["Par progression"] = "By skill-up",
+    ["Trier : les commandes qui me font progresser d'abord."] = "Sort: orders that skill me up first.",
+    ["Progression d'abord — clic pour revenir aux récentes."] = "Skill-ups first — click to go back to most recent.",
+    ["|cFF66CCFFamis/partenaires intéressés :|r %s (|cFFFFFFFF/co gift <nom>|r)"] =
+        "|cFF66CCFFinterested friends/partners:|r %s (|cFFFFFFFF/co gift <name>|r)",
+    ["proposer (chuchoter) le dernier plan looté à un ami/partenaire qui ne le connaît pas"] =
+        "propose (whisper) the last looted recipe to a friend/partner who doesn't know it",
+    ["aucun plan looté en attente de don pour l'instant."] = "no looted recipe pending a gift right now.",
+    ["don en attente pour |cFFFFFFFF%s|r — amis/partenaires : %s (|cFFFFFFFF/co gift <nom>|r)"] =
+        "gift pending for |cFFFFFFFF%s|r — friends/partners: %s (|cFFFFFFFF/co gift <name>|r)",
+    ["|cFFFFFFFF%s|r n'est pas dans la liste des amis/partenaires en attente pour ce plan."] =
+        "|cFFFFFFFF%s|r isn't in the list of friends/partners waiting for this recipe.",
+    ["Salut ! J'ai looté %s (%s) — tu ne le connais pas encore, ça t'intéresse ?"] =
+        "Hey! I looted %s (%s) — you don't know it yet, are you interested?",
+    ["don proposé à |cFFFFFFFF%s|r pour %s."] = "gift proposed to |cFFFFFFFF%s|r for %s.",
+    -- Garder pour un ami capable (Handoff) : nudge crafteur + info posteur + file « Confiées »
+    ["|cFF66CCFFtu sais le faire|r — demandé par |cFFFFFFFF%s|r : %s%s%s"] =
+        "|cFF66CCFFyou can craft this|r — requested by |cFFFFFFFF%s|r: %s%s%s",
+    ["%s peut faire une commande captée — gardée pour son passage : %s"] =
+        "%s can craft a captured order — kept for their next login: %s",
+    ["Confiées"] = "Entrusted", ["Remis"] = "Sent",
+    ["Aucune commande confiée pour l'instant."] = "No entrusted orders yet.",
+    -- Canal global (custom CraftLinkNet) : statut, /co channel, popup d'info
+    ["canal : |cFFFFFFFF%s|r"] = "channel: |cFFFFFFFF%s|r",
+    ["canal : non rejoint — |cFFFFFFFF/co channel on|r pour réessayer"] =
+        "channel: not joined — |cFFFFFFFF/co channel on|r to retry",
+    ["auto-join du canal réseau désactivé — le carnet global ne fonctionnera plus (whisper/guilde restent actifs)."] =
+        "network channel auto-join disabled — the global ledger will stop working (whisper/guild stay active).",
+    ["canal réseau (re)rejoint."] = "network channel (re)joined.",
+    ["canal global actuel : |cFFFFFFFF%s|r. |cFFFFFFFF/co channel off|r pour le quitter, |cFFFFFFFF/co channel on|r pour le rejoindre."] =
+        "current global channel: |cFFFFFFFF%s|r. |cFFFFFFFF/co channel off|r to leave it, |cFFFFFFFF/co channel on|r to rejoin.",
+    ["(dés)activer le canal réseau global"] = "(de)activate the global network channel",
+    ["balise TEXTE émise=%s (canal idx=%s) — lance |cFFFFFFFF/co trace dump|r sur l'AUTRE perso et cherche |cFFFFFFFF[recv] beacon|r."] =
+        "TEXT beacon sent=%s (channel idx=%s) — run |cFFFFFFFF/co trace dump|r on the OTHER char and look for |cFFFFFFFF[recv] beacon|r.",
+    ["annuaire local vidé (diag) — exécute aussi |cFFFFFFFF/co wipe|r sur l'autre compte pour un test de découverte propre."] =
+        "local directory wiped (diag) — also run |cFFFFFFFF/co wipe|r on the other account for a clean discovery test.",
+    ["Crafting Order rejoint un canal dédié (|cFFFFD100%s|r) pour faire circuler le carnet de commandes entre joueurs de l'addon. Tu le verras dans ta liste de canaux ; aucun message lisible n'y est envoyé. Tu peux le quitter à tout moment — |cFFFFFFFF/co channel off|r."] =
+        "Crafting Order joins a dedicated channel (|cFFFFD100%s|r) to relay the order ledger between addon users. You'll see it in your channel list; no readable text is ever sent there. You can leave it anytime — |cFFFFFFFF/co channel off|r.",
+    -- Onglet Aide
+    ["Aide"] = "Help",
+    ["C'est quoi Crafting Order ?"] = "What is Crafting Order?",
+    ["Réseau GLOBAL et SOCIAL de commandes de craft — fonctionne sans guilde, entre tous les joueurs de l'addon."] =
+        "GLOBAL and SOCIAL crafting order network — works without a guild, across all addon users.",
+    ["Poste ce dont tu as besoin, ou consulte les commandes que tu peux honorer avec tes métiers."] =
+        "Post what you need, or check the orders you can fulfill with your professions.",
+    ["Ouvrir la fenêtre et commandes utiles"] = "Opening the window and useful commands",
+    ["Clic gauche sur l'icône minimap (ou |cFFFFFFFF/co|r) : ouvre cette fenêtre."] =
+        "Left click the minimap icon (or |cFFFFFFFF/co|r): opens this window.",
+    ["Clic droit sur l'icône minimap (ou |cFFFFFFFF/co métier|r) : ouvre la Vue Métier d'un de tes métiers."] =
+        "Right click the minimap icon (or |cFFFFFFFF/co métier|r): opens the Profession View for one of your professions.",
+    ["|cFFFFFFFF/co help|r dans le chat : liste complète des commandes slash."] =
+        "|cFFFFFFFF/co help|r in chat: full list of slash commands.",
+    ["|cFFFFFFFF/co channel off|r / |cFFFFFFFF/co channel on|r : quitter/rejoindre le canal réseau."] =
+        "|cFFFFFFFF/co channel off|r / |cFFFFFFFF/co channel on|r: leave/rejoin the network channel.",
+    ["Les 4 onglets de cette fenêtre"] = "The 4 tabs of this window",
+    ["|cFFE8B84BCarnet|r : tes commandes à toi (postées), en cours ou archivées."] =
+        "|cFFE8B84BLedger|r: your own posted orders, active or archived.",
+    ["|cFFE8B84BCommande|r : poster une demande de craft à faire réaliser par un artisan."] =
+        "|cFFE8B84BOrder|r: post a crafting request for a crafter to fulfill.",
+    ["|cFFE8B84BRécolte|r : poster une demande de matières à un récolteur (mine, herbe, peau, pêche)."] =
+        "|cFFE8B84BGather|r: post a materials request to a gatherer (mining, herbalism, skinning, fishing).",
+    ["|cFFE8B84BArtisans|r : l'annuaire — qui sait crafter quoi, en ligne ou non."] =
+        "|cFFE8B84BArtisans|r: the directory — who can craft what, online or not.",
+    ["Poster une commande de craft"] = "Posting a crafting order",
+    ["Onglet |cFFE8B84BCommande|r → choisis un métier puis un plan dans la liste."] =
+        "|cFFE8B84BOrder|r tab → pick a profession then a recipe from the list.",
+    ["Shift-clic un objet dans un sac ou un lien de chat pour le présélectionner s'il correspond à un plan."] =
+        "Shift-click an item in a bag or a chat link to preselect it if it matches a recipe.",
+    ["Coche les réactifs que TU fournis toi-même (le reste reste à la charge de l'artisan)."] =
+        "Check the reagents YOU provide yourself (the rest stays the crafter's responsibility).",
+    ["Choisis la quantité, la commission proposée, puis le destinataire (guilde, amis, un artisan précis, ou diffuser à tous)."] =
+        "Pick the quantity, the offered commission, then the recipient (guild, friends, a specific crafter, or broadcast to all).",
+    ["Clique |cFFE8B84BPoster|r : la commande apparaît dans ton Carnet et chez les artisans concernés."] =
+        "Click |cFFE8B84BPost|r: the order appears in your Ledger and for the relevant crafters.",
+    ["Poster une commande de récolte"] = "Posting a gathering order",
+    ["Onglet |cFFE8B84BRécolte|r → choisis un métier de récolte puis une ressource."] =
+        "|cFFE8B84BGather|r tab → pick a gathering profession then a resource.",
+    ["Choisis à l'unité ou par pile, la quantité voulue et le prix proposé, puis le destinataire."] =
+        "Pick per unit or per stack, the wanted quantity and the offered price, then the recipient.",
+    ["Fonctionne comme une commande de craft, mais ciblée sur les joueurs qui ont le métier de récolte, pas de recette à connaître."] =
+        "Works like a crafting order, but targets players with the gathering profession — no recipe required.",
+    ["Accepter / livrer une commande — la Vue Métier"] = "Accepting / delivering an order — the Profession View",
+    ["L'acceptation et la livraison ne se font PAS dans le Carnet : ouvre la |cFFE8B84BVue Métier|r du métier concerné (clic droit minimap, ou |cFFFFFFFF/co métier <nom>|r)."] =
+        "Accepting and delivering do NOT happen in the Ledger: open the |cFFE8B84BProfession View|r for the relevant profession (right click minimap, or |cFFFFFFFF/co métier <name>|r).",
+    ["La 3ᵉ colonne de la Vue Métier liste toutes les commandes de ce métier : accepte, crafte, puis livre."] =
+        "The 3rd column of the Profession View lists all orders for that profession: accept, craft, then deliver.",
+    ["Les demandes captées dans |cFFE8B84B/commerce|r et |cFFE8B84B/guilde|r de joueurs sans l'addon apparaissent aussi ici, marquées « entrante »."] =
+        "Requests captured from |cFFE8B84B/trade|r and |cFFE8B84B/guild|r chat of players without the addon also appear here, marked \"incoming\".",
+    ["Un artisan connu qui sait honorer une commande captée est notifié à sa prochaine connexion (voir « Confiées » dans le Carnet)."] =
+        "A known crafter able to fulfill a captured order is notified next time they log in (see \"Entrusted\" in the Ledger).",
+    ["Le Carnet en détail"] = "The Ledger in detail",
+    ["|cFFE8B84BEn cours|r : tes commandes ouvertes ou acceptées par un artisan."] =
+        "|cFFE8B84BActive|r: your orders that are open or accepted by a crafter.",
+    ["|cFFE8B84BArchivées|r : tes commandes livrées ou annulées."] =
+        "|cFFE8B84BArchived|r: your orders that are delivered or cancelled.",
+    ["|cFFE8B84BConfiées|r : commandes gardées pour un artisan connu capable de les honorer, en attendant qu'il se reconnecte."] =
+        "|cFFE8B84BEntrusted|r: orders kept for a known crafter able to fulfill them, waiting for them to log back in.",
+    ["Depuis le Carnet, tu peux annuler une commande tant qu'elle n'est pas livrée."] =
+        "From the Ledger, you can cancel an order as long as it isn't delivered.",
+    ["Annuaire & social"] = "Directory & social",
+    ["L'onglet Artisans liste les joueurs connus par source : guilde, amis, ajoutés manuellement, croisés récemment."] =
+        "The Artisans tab lists known players by source: guild, friends, manually added, recently met.",
+    ["Survole un joueur (tooltip) pour voir ses métiers et son niveau de compétence."] =
+        "Hover a player (tooltip) to see their professions and skill level.",
+    ["Clic droit sur un joueur (chat, groupe...) pour l'ajouter à ton annuaire — utile pour le retrouver même hors ligne."] =
+        "Right click a player (chat, party...) to add them to your directory — useful to find them again even offline.",
+    ["Pastille verte : il a l'addon et répond. Jaune : en ligne sans l'addon. Grise : hors ligne."] = "Green dot: has the addon and answers. Yellow: online without the addon. Gray: offline.",
+    ["Réseau, confidentialité & statuts"] = "Network, privacy & statuses",
+    ["L'addon rejoint un canal dédié pour faire circuler le carnet entre joueurs de l'addon — aucun message lisible n'y est envoyé."] =
+        "The addon joins a dedicated channel to relay the ledger between addon users — no readable text is ever sent there.",
+    ["|cFFFFFFFF/co channel off|r le quitte à tout moment (whisper et guilde restent actifs) ; |cFFFFFFFF/co channel on|r le rejoint."] =
+        "|cFFFFFFFF/co channel off|r leaves it anytime (whisper and guild stay active); |cFFFFFFFF/co channel on|r rejoins it.",
+    ["Statuts d'une commande : "] = "Order statuses: ",
+
+    -- Sous-catégories de recettes (vue métier) — voir _RecipeCats_*.lua
+    ["Divers"] = "Misc",
+    ["Potions de soin"] = "Healing Potions",
+    ["Potions de mana"] = "Mana Potions",
+    ["Flacons"] = "Flasks",
+    ["Élixirs de force"] = "Strength Elixirs",
+    ["Élixirs d'agilité"] = "Agility Elixirs",
+    ["Élixirs d'endurance"] = "Stamina Elixirs",
+    ["Élixirs de défense"] = "Defense Elixirs",
+    ["Élixirs d'esprit"] = "Intellect & Spirit Elixirs",
+    ["Élixirs de puissance des sorts"] = "Spell Power Elixirs",
+    ["Élixirs de puissance d'attaque"] = "Attack Power Elixirs",
+    ["Élixirs de vision"] = "Vision Elixirs",
+    ["Potions de protection"] = "Protection Potions",
+    ["Potions de combat"] = "Combat Potions",
+    ["Potions de régénération"] = "Regeneration Potions",
+    ["Potions utilitaires"] = "Utility Potions",
+    ["Huiles"] = "Oils",
+    ["Transmutations"] = "Transmutes",
+    ["Minerais"] = "Ores",
+    ["Lingots"] = "Bars",
+    ["Cuirs"] = "Leather",
+    -- ⚠️ Clés DYNAMIQUES (L[group.name] dans RecipeCats) : le checker ne les voit pas — tenir cette
+    -- liste alignée sur les `name =` des _RecipeCats_*.lua à chaque régénération (bug live sosh13).
+    ["Peaux"] = "Hides",
+    ["Écailles"] = "Scales",
+    ["Herbes"] = "Herbs",
+    ["Poissons"] = "Fish",
+    ["Éclats"] = "Shards",
+    ["Essences"] = "Essences",
+    ["Poussières"] = "Dusts",
+
+    -- Pont MissingTradeSkillsList (recettes manquantes + source)
+    ["Manquantes"] = "Missing",
+    ["Manquantes (%d)"] = "Missing (%d)",
+    ["‹ Apprises seules"] = "‹ Learned only",
+    ["Masque les recettes non apprises — clic pour revenir."] = "Hide unlearned recipes — click to go back.",
+    ["Affiche AUSSI les recettes non apprises (en rouge) et où les obtenir."] = "Also show unlearned recipes (in red) and where to get them.",
+    ["niveau"] = "level",
+    ["niv."] = "lv.",
+    ["Non apprise"] = "Not learned",
+    ["Où l'obtenir"] = "Where to get it",
+    ["Niveau requis"] = "Required skill",
+    ["Obtenu via"] = "Obtained via",
+    ["Prix"] = "Price", ["Appris de"] = "Learned from",
+    ["Vendeur"] = "Vendor", ["Vendu par"] = "Sold by",
+    ["Butin sur"] = "Drops from", ["Formateurs"] = "Trainers",
+    ["Formateur"] = "Trainer", ["Réputation"] = "Reputation",
+    ["Quête"] = "Quest", ["Butin"] = "Drop",
+    ["Source inconnue"] = "Unknown source",
+    ["Acheter à l'HV"] = "Buy at AH",
+    ["N'afficher que les recettes acquérables (formateur, vendeur ou HV)."] = "Show only obtainable recipes (trainer, vendor or AH).",
+    ["Filtre acquérables actif — clic pour tout afficher."] = "Obtainable filter active — click to show all.",
+
+    -- Pont Lazy Gold (rentabilité)
+    ["Rentabilité"] = "Profitability",
+    ["Vente HV"] = "AH sale",
+    ["Profit net"] = "Net profit",
+    ["Valeur HV"] = "AH value",
+    ["Par rentabilité"] = "By profit",
+    ["Meilleur plan"] = "Best plan",
+    ["Tous les plans du royaume"] = "All realm crafts",
+    ["%d métiers"] = "%d professions",
+    ["À ma charge"] = "My share",
+    ["Valeurs exactes — clic pour l'affichage compact."] = "Exact values — click for compact display.",
+    ["Afficher les valeurs exactes (po/pa/pc)."] = "Show exact values (g/s/c).",
+    ["Clic : commander ce métier"] = "Click: order this profession",
+    ["Trier par rentabilité (Lazy Gold)."] = "Sort by profitability (Lazy Gold).",
+    ["Tri par rentabilité — clic pour A-Z."] = "Sorted by profit — click for A-Z.",
+    ["N'afficher que les recettes dont j'ai les matériaux."] = "Show only recipes you have the materials for.", ["Filtre matériaux actif — clic pour tout afficher."] = "Materials filter on — click to show all.",
+    ["N'afficher que les recettes qui font monter la compétence (masque le gris)."] = "Show only recipes that raise your skill (hides grey).", ["Filtre progression actif — clic pour tout afficher."] = "Skill-up filter on — click to show all.",
+    ["Diffuser les réactifs"] = "Broadcast reagents", ["Diffuser les réactifs dans un canal"] = "Broadcast the reagents to a channel", ["Canal : "] = "Channel: ",  -- liste de courses
+    ["Dire"] = "Say", ["Groupe"] = "Party", ["Raid"] = "Raid", ["Envoyer"] = "Send", ["Réactifs pour %s :"] = "Reagents for %s:", ["Réactifs pour %s (%d) :"] = "Reagents for %s (%d):",
+    ["choisis un canal valide."] = "pick a valid channel.", ["aucun réactif à diffuser."] = "no reagents to broadcast.", ["Diffuser"] = "Broadcast",
+}
+
+for k, v in pairs(en2) do L[k] = v end

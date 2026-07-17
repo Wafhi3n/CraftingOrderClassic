@@ -1,5 +1,34 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.21.0 — Enchants by slot, and a trade panel that stops hiding things
+
+Picking an enchant meant scrolling some 300 plans with near-identical names. The Order tab has a
+character-silhouette view now: click the slot you want enchanted, get that slot's stats, pick a
+variant. Toggle it from the filter bar. The plan list stays for everything that has no slot, like
+oils, wands and disenchant products.
+
+The trade enchant panel had a worse problem than bad sorting. It only ever drew 8 rows, and the
+"+N more" line at the bottom wasn't clickable, so anything past the eighth entry was unreachable.
+Someone handed an enchanter the reagents for Fiery Weapon and the panel never offered it: at skill
+265 it sat below eight higher-rank variants and simply wasn't drawn. The list scrolls now, and it's
+ordered by what you're being asked for. Enchants whose reagents your partner just put on the table
+come first, then what your bags can already make, then everything else. Rows you can't craft yet stay
+greyed out, including the suggested one, because the game's create button is genuinely disabled until
+the trade goes through.
+
+When nothing's in the "will not be traded" slot yet, the panel no longer just vanishes. It shows the
+same silhouette with your trade partner's model in it, and clicking a slot whispers them to drop that
+piece in. Most people who hand you gear have no idea that slot exists.
+
+Two fixes while in there. Wrath's wrist and staff enchants never showed up in the trade panel, because
+the game spells them "Bracers" and "Staff" where every other expansion says "Bracer". Staff enchants
+only offer themselves on an actual staff now, not on any two-hander. And the panel no longer touches
+its buttons while you're in combat, which the game blocks outright: trade windows stay open when a mob
+jumps you, and the new scroll wheel made that easy to hit.
+
+One quieter thing: "X can craft that captured order" chat lines are off by default. The order still
+gets pushed to capable friends either way, so the message was noise. /co verbose brings it back.
+
 ## v1.20.0 — One-click enchants, sorted by slot, right from the trade window
 
 The enchanting "Create" button had a long-standing intermittent bug: sometimes it just wouldn't fire,

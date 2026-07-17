@@ -2,7 +2,7 @@
 ## Title: Crafting & Gathering Order - Classic
 ## Notes: Réseau global et social de commandes de craft ET de récolte (autonome — sans guilde). /co pour le statut.
 ## Author: Wafhi3n
-## Version: 1.20.0
+## Version: 1.21.0
 ## X-Category: Auction & Economy
 ## X-Website: https://github.com/Wafhi3n/CraftingOrderClassic
 ## SavedVariables: CraftingOrderClassicDB
@@ -19,8 +19,11 @@ CraftingOrderClassic_Trace.lua
 CraftingOrderClassic_Migrations.lua
 CraftingOrderClassic_Locale.lua
 CraftingOrderClassic_Locale_enUS.lua
+CraftingOrderClassic_Locale_enUS_2.lua
 CraftingOrderClassic_Locale_deDE.lua
+CraftingOrderClassic_Locale_deDE_2.lua
 CraftingOrderClassic_Locale_esES.lua
+CraftingOrderClassic_Locale_esES_2.lua
 CraftingOrderClassic_Locale_News_enUS.lua
 CraftingOrderClassic_Locale_News_deDE.lua
 CraftingOrderClassic_Locale_News_esES.lua
@@ -35,6 +38,7 @@ CraftingOrderClassic_UI_Post.lua
 CraftingOrderClassic_UI_Post_Detail.lua
 CraftingOrderClassic_UI_Post_Artisans.lua
 CraftingOrderClassic_UI_Post_Categories.lua
+CraftingOrderClassic_UI_Post_Paperdoll.lua
 CraftingOrderClassic_UI_Post_LazyGold.lua
 CraftingOrderClassic_UI_Gather_Layout.lua
 CraftingOrderClassic_UI_Gather.lua
@@ -100,5 +104,6 @@ CraftingOrderClassic_Companion.lua
 CraftingOrderClassic_Companion_Mail.lua
 CraftingOrderClassic_Companion_Trade.lua
 CraftingOrderClassic_Enchant_Trade.lua
+CraftingOrderClassic_Enchant_Trade_Ask.lua
 Debug.lua
 CraftingOrderClassic_SelfTest.lua

@@ -13,6 +13,24 @@ local BODY_W = 780
 -- Une entrée par version. Les lignes v1.4.0 REUTILISENT les clés déjà traduites de l'ancienne section
 -- « Nouveautés » de l'Aide (overlay enUS existant) → pas de doublon de traduction. Scindé en deux
 -- blocs (récent / plus ancien) concaténés par versions() : chaque bloc reste sous le seuil anti-monolithe.
+-- Bloc de TÊTE : la version courante, seule. Une 9ᵉ version dans versionsRecent la poussait à 66 lignes,
+-- au-dessus du plafond anti-monolithe (60 l./fonction) — d'où un bloc de plus, comme les 3 existants.
+-- À la prochaine release, verser cette entrée dans versionsRecent et repartir d'un bloc de tête vide.
+local function versionsLatest()
+    return {
+        {
+            v = "v1.21.0", title = L["L'enchant par emplacement, et un panneau d'échange qui ne cache plus rien"],
+            lines = {
+                L["Choisir un enchant demandait de fouiller des centaines de plans aux noms presque identiques. L'onglet Commande a maintenant une vue silhouette : clique l'emplacement à enchanter, tu obtiens ses stats, puis ses variantes de la plus forte à la plus faible. La bascule est dans la bande de filtres ; la liste reste pour tout ce qui n'a pas d'emplacement (huiles, baguettes, produits de désenchantement)."],
+                L["Le panneau d'enchant de l'échange n'affichait que 8 lignes, et le « +N autre(s) » du bas n'était pas cliquable : au-delà de la 8ᵉ place, un enchant était tout bonnement inatteignable — c'est ainsi qu'un enchanteur à qui on avait passé les réactifs ne se voyait jamais proposer la bonne recette, noyée sous les variantes de haut rang. La liste défile à la molette, et elle est classée par ce qu'on te demande : d'abord les enchants dont ton partenaire vient de poser les réactifs, puis ce que tes sacs permettent, puis le reste."],
+                L["Tant que la case « ne sera pas échangé » est vide, le panneau ne disparaît plus : il montre la même silhouette, avec le modèle de ton partenaire, et cliquer un emplacement lui chuchote d'y poser cette pièce. La plupart des gens qui te tendent un objet ignorent que cette case existe."],
+                L["Deux correctifs : les enchants de poignets et de bâton de Wrath n'apparaissaient jamais dans le panneau d'échange (le jeu les écrit « Bracers » et « Staff » là où les autres extensions disent « Bracer »), et un enchant de bâton ne se propose plus que sur un vrai bâton. Le panneau ne touche plus non plus à ses boutons pendant un combat, ce que le jeu interdit."],
+                L["Plus discret : les lignes de chat « X sait faire cette commande captée » sont désactivées par défaut — la commande est poussée aux amis capables dans tous les cas, le message n'était que du bruit. |cFFFFFFFF/co verbose|r les remet."],
+            },
+        },
+    }
+end
+
 local function versionsRecent()
     return {
         {
@@ -180,7 +198,8 @@ local function versionsOldest()
 end
 
 local function versions()
-    local out = versionsRecent()
+    local out = versionsLatest()
+    for _, e in ipairs(versionsRecent()) do out[#out + 1] = e end
     for _, e in ipairs(versionsOlder()) do out[#out + 1] = e end
     for _, e in ipairs(versionsOldest()) do out[#out + 1] = e end
     return out
