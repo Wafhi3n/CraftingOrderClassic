@@ -202,7 +202,11 @@ function MTSL:MissingRecipes(profKey)
     local out = {}
     for _, spellID in ipairs(ts.MISSING_SKILLS) do
         local sk = idx[spellID]
-        if sk then
+        -- Capacités hors liste de recettes (Prospection, Broyage, Fonte, Désenchantement…) : apprises au
+        -- formateur mais ABSENTES de la fenêtre de métier → la dédup par liste de recettes ne les voit pas
+        -- et MTSL les laisse dans MISSING_SKILLS. IsSpellKnown est le vrai signal « déjà appris » : garde
+        -- purement additif (vrai seulement pour un sort réellement connu → ne masque jamais un vrai manquant).
+        if sk and not (IsSpellKnown and IsSpellKnown(spellID)) then
             local itemID = lib and lib.RecipeProduct and lib:RecipeProduct(profKey, spellID) or nil
             -- Léger : on ne calcule PAS la fiche source ici (elle l'est à la sélection, cf. SkillDetail) —
             -- sinon on résoudrait PNJ/zones pour 100+ recettes à chaque rafraîchissement de liste.
@@ -250,4 +254,20 @@ function MTSL:SourceKind(profKey, spellID)
         elseif item.quests then return "quest" end
     end
     return "unknown"
+end
+
+-- Prix d'ACQUISITION du plan côté PNJ : prix au formateur, ou prix vendeur de l'objet-recette. nil
+-- pour butin/quête (pas de prix fixe) ou hors base. Complète SourceKind (tooltip de progression).
+function MTSL:SourcePrice(profKey, spellID)
+    if not (self:IsAvailable() and spellID) then return nil end
+    local mprof = mtslProf(profKey); if not mprof then return nil end
+    local sk = indexOf(mprof)[spellID]; if not sk then return nil end
+    if sk.trainers then
+        local p = sk.trainers.price
+        return (p and p > 0) and p or nil
+    end
+    local recItemID = recipeItemFor(profKey, spellID)
+    local item = recItemID and itemsOf(mprof)[recItemID]
+    local p = item and item.vendors and item.vendors.price
+    return (p and p > 0) and p or nil
 end

@@ -112,6 +112,9 @@ function PW:_BuildHeader(f)
 
     -- (Bouton fermer : le natif de MakeWindow porte la logique dock/CloseCraft via opts.onClose.)
     Skin.MakeSeparator(f, -(self.HEADER_H - 2))
+
+    -- Aide contextuelle « bouton i » hors-cadre (dépendance molle : _ProfWindow_HelpPlate.lua).
+    if self._BuildHelp then self:_BuildHelp(f) end
 end
 
 -- Le médaillon suit le métier affiché (icônes de sort 64×64 → chemin heureux de SetWindowPortrait).
@@ -139,7 +142,8 @@ end
 -- Bascule liste apprises <-> manquantes. Réinitialise la sélection (une recette d'un mode n'existe pas
 -- dans l'autre) puis rafraîchit liste + détail. Sans effet si MTSL absent.
 function PW:_ToggleMissing()
-    if not (COC.MTSL and COC.MTSL:IsAvailable()) or self.rerollKey then return end
+    if self.rerollKey then return end
+    if not (COC.MTSL and COC.MTSL:IsAvailable()) then COC:NeedMTSL(); return end
     self.missingMode = not self.missingMode
     self.selectedKey, self.selectedIndex = nil, nil
     self:_SyncMissingBtn()
@@ -152,9 +156,16 @@ end
 function PW:_SyncMissingBtn()
     local b = self.missingBtn; if not b then return end
     local ok = COC.MTSL and COC.MTSL:IsAvailable()
-    local show = ok and self.profKey and not self.rerollKey and not self._compact and not self.docked
+    -- Visibilité CONTEXTUELLE seule (plein écran de MON métier) — plus gatée par MTSL : le bouton reste
+    -- affiché sans l'addon (enticing), le clic déclenche alors la popup de dépendance (cf. _ToggleMissing).
+    local show = self.profKey and not self.rerollKey and not self._compact and not self.docked
     b:SetShown(show and true or false)
     if not show then self.missingMode = false; return end
+    if not ok then   -- MTSL absent : bouton normal, libellé nu, aucun mode manquantes
+        self.missingMode = false
+        b:SetText(L["Manquantes"]); if b.SetSelected then b:SetSelected(false) end
+        return
+    end
     local n = self:MissingCount()   -- compte DÉDUPÉ (écarte les faux manquants MTSL déjà appris)
     b:SetText(self.missingMode and L["‹ Apprises seules"] or string.format(L["Manquantes (%d)"], n))
     if b.SetSelected then b:SetSelected(self.missingMode and true or false) end
@@ -223,80 +234,30 @@ function PW:_OrdersModuleMissing(col)
 end
 
 -- ------------------------------------------------------------------
--- Bouton de retour sur la fenêtre NATIVE (vue Blizzard) : pose un petit bouton doré sur
--- TradeSkillFrame / CraftFrame pour rebasculer vers la vue custom sans passer par /co profwindow.
+-- Mode DOCK (« Vue Blizzard ») : EnsureNativeToggle / OpenDock / CloseDock / _RestorePlacement /
+-- _RefreshDock vivent dans CraftingOrderClassic_ProfWindow_Dock.lua (anti-monolithe).
 -- ------------------------------------------------------------------
-function PW:EnsureNativeToggle(frame, key)
-    if not frame then return end
-    self._nativeToggle = self._nativeToggle or {}
-    if self._nativeToggle[key] then return end
-    local btn = Skin.MakeGoldButton(frame, 150, 20, L["» Vue Crafting Order"])
-    btn:SetPoint("TOPRIGHT", -66, -8)
-    btn:SetScript("OnClick", function() PW:SetEnabled(true) end)
-    self._nativeToggle[key] = btn
-end
-
--- ------------------------------------------------------------------
--- Dock « Commandes » en VUE BLIZZARD : la fenêtre native reste VISIBLE (non neutralisée) et on épingle
--- NOTRE colonne Commandes à sa droite (le « panneau de commande » demandé). Réutilise tel quel le rendu
--- de _ProfWindow_Orders via le layout compact. S'EXCLUT de la vue custom 3 colonnes (custom = frame
--- neutralisée + 3 colonnes ; dock = native intacte + colonne seule) → jamais les deux à la fois.
--- ------------------------------------------------------------------
-function PW:OpenDock(nativeFrame)
-    if not nativeFrame then return end
-    self:Build()
-    self.docked = true
-    self.standaloneKey = nil
-    self.rerollKey = nil                -- défense en profondeur : docké natif ≠ vue reroll
-    self._compact = nil                 -- force _ApplyMode à recalculer au retour en vue custom
-    self:_ApplyMode(true)               -- colonne Commandes seule (réutilise le layout compact)
-    if self.vanillaBtn then self.vanillaBtn:Hide() end   -- « Vue Blizzard » redondant : on Y est déjà
-    self.frame:ClearAllPoints()
-    self.frame:SetPoint("TOPLEFT", nativeFrame, "TOPRIGHT", 6, 0)
-    self.frame:Show()
-    self:Refresh()
-end
-
-function PW:CloseDock()
-    if not self.docked then return end
-    self.docked = false
-    if self.vanillaBtn then self.vanillaBtn:Show() end
-    self:Hide()
-end
-
--- Replace la fenêtre custom à sa position mémorisée (drag) ou au centre après un passage en dock
--- (qui l'avait épinglée à la native).
-function PW:_RestorePlacement()
-    if not self.frame then return end
-    self.frame:ClearAllPoints()
-    local pos = COC.db and COC.db.profWinPos
-    if pos then self.frame:SetPoint(pos[1], UIParent, pos[2], pos[3], pos[4]) else self.frame:SetPoint("CENTER") end
-end
-
--- Refresh en mode dock : on ne touche NI aux recettes NI au détail (la native s'en charge), juste le
--- titre/rang + la colonne Commandes. Native fermée entre-temps → on retire le dock.
-function PW:_RefreshDock()
-    local craft = COC.Craft
-    local name = craft and craft:GetOpenProfessionInfo()
-    if not name then self:CloseDock(); return end
-    self.profKey = craft:OpenProfessionKey()
-    local rank, maxRank = craft:OpenRank()
-    self:_SetTitle(name, (rank and maxRank) and string.format("|cFFE8B84B%d|r / %d", rank, maxRank) or nil)
-    self:_SyncPortrait()
-    self:_SyncLFWBtn()
-    self:_SyncMissingBtn()
-    if self.RefreshOrders then self:RefreshOrders() end
-end
 
 -- ------------------------------------------------------------------
 -- Refresh global (coalescé)
 -- ------------------------------------------------------------------
--- Bouton « Créer » sécurisé affiché → Hide() de la fenêtre lève ADDON_ACTION_BLOCKED en combat (vu en
--- jeu). SetAlpha/EnableMouse non protégés : on escamote en combat, vrai Hide à la sortie (_hidePending).
+-- Bouton « Créer » sécurisé descendant → la fenêtre est PROTÉGÉE par contagion : en PLEIN combat,
+-- Hide ET EnableMouse sont bloqués (ADDON_ACTION_BLOCKED — EnableMouse vu en jeu 2026-07-17, via la
+-- fermeture de la fenêtre native en repli combat alors que NOTRE frame était déjà cachée). Règle :
+-- en combat, aucun appel protégé si la frame est déjà cachée/escamotée ; l'escamotage complet
+-- (alpha 0 + souris off) ne se fait qu'à l'ENTRÉE en combat (PLAYER_REGEN_DISABLED, où les
+-- modifications passent encore) ; le vrai Hide est rejoué à la sortie (_hidePending).
 function PW:Hide()
     if not self.frame then return end
-    local c = InCombatLockdown and InCombatLockdown(); self._hidePending = c or nil
-    self.frame:SetAlpha(c and 0 or 1); self.frame:EnableMouse(not c); if not c then self.frame:Hide() end
+    if not (InCombatLockdown and InCombatLockdown()) then
+        self._hidePending = nil
+        self.frame:SetAlpha(1); self.frame:EnableMouse(true); self.frame:Hide()
+        return
+    end
+    if not self.frame:IsShown() or self._hidePending then return end
+    self._hidePending = true
+    self.frame:SetAlpha(0); self.frame:EnableMouse(false)
+    if self.frame.escProxy then self.frame.escProxy:Hide() end   -- Échap ne doit plus la « fermer »
 end
 
 function PW:_DoRefresh()

@@ -64,6 +64,24 @@ end
 -- =========================================================================
 -- Fenêtre native complète (ButtonFrameTemplate).
 -- =========================================================================
+-- Échap ferme la fenêtre (comme le bouton X). On n'inscrit PAS la fenêtre elle-même dans
+-- UISpecialFrames : la vue métier est PROTÉGÉE par contagion (bouton « Créer » sécurisé descendant)
+-- → le Hide() déclenché par Échap serait bloqué en combat (ADDON_ACTION_BLOCKED, vu en jeu
+-- 2026-07-17). Un PROXY invisible et non protégé porte donc l'Échap et rejoue la logique du X.
+-- Garde alpha : une fenêtre escamotée en combat (alpha 0, cf. PW:Hide) ne doit pas « se fermer ».
+local function attachEscProxy(f, name, onClose)
+    local esc = CreateFrame("Frame", name .. "EscProxy", UIParent)
+    esc:Hide()
+    esc:SetScript("OnHide", function()
+        if not f:IsShown() or f:GetAlpha() == 0 then return end
+        if onClose then onClose() else f:Hide() end
+    end)
+    f:HookScript("OnShow", function() esc:Show() end)
+    f:HookScript("OnHide", function() esc:Hide() end)
+    f.escProxy = esc
+    tinsert(UISpecialFrames, name .. "EscProxy")
+end
+
 -- Fournit d'un coup : barre de titre + portrait rond + bouton fermer + panneau encastré marbre
 -- (`f.Inset`) + fond rocher. opts :
 --   title     : texte de la barre de titre (SetTitle du PortraitFrameTemplateMixin)
@@ -95,6 +113,7 @@ function Skin.MakeWindow(name, w, h, opts)
     if f.SetTitle and opts.title then f:SetTitle(opts.title) end
     if opts.portrait then Skin.SetWindowPortrait(f, opts.portrait) end
     if opts.onClose and f.CloseButton then f.CloseButton:SetScript("OnClick", opts.onClose) end
+    attachEscProxy(f, name, opts.onClose)
     -- BARRE D'ACTIONS native du template (opts.buttonBar) : ButtonFrameTemplate embarque une bande à
     -- boutons en bas de cadre (BtnCornerLeft/Right + tuile ButtonBottomBorder, le marbre s'arrêtant
     -- 26 px au-dessus du bas — SharedUIPanelTemplates.xml:765). C'est LE bloc « Destinataire + Poster »

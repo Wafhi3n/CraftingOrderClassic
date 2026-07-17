@@ -17,27 +17,29 @@ local Skin = UI.Skin
 --   · detail = en-tête (icône+nom+métier) / rangée quantité+stacks / texte d'info (flex) ;
 --   · gatherers = la liste des récolteurs (ligne « toute la liste » épinglée + scroll).
 local PRICE_H = 54   -- hauteur de la zone « prix proposé » (centrage vertical, cf. UI.GATHER)
+-- help / helpDir : accroches de l'AIDE CONTEXTUELLE (bouton « i », dispatch par onglet dans
+-- _UI_HelpPlate.lua). Tag STRUCTUREL only ; directions : colonne gauche → RIGHT, colonne droite → LEFT.
 local SPEC = {
     x1 = 0, x2 = 848, vBottom = 18,
     { id = "left", w = 333, top = -63, bottom = 20,
-      { id = "filters", h = 34, bg = true, dir = "cols",
+      { id = "filters", h = 34, bg = true, dir = "cols", help = "filters", helpDir = "RIGHT",
         { id = "srch" } },
-      { id = "verPills", h = 22, sep = false },
+      { id = "verPills", h = 22, sep = false, help = "verPills", helpDir = "RIGHT" },
       { dir = "cols", sep = false,
-        { id = "resources" },
+        { id = "resources", help = "resources", helpDir = "RIGHT" },
         { id = "resGutter", w = 22, sep = false } } },
     { top = -63, bottom = 20,
       { id = "detail", h = 160, padL = 5, padR = 5,
-        { id = "ItemSelected", h = 46, dir = "cols",
+        { id = "ItemSelected", h = 46, dir = "cols", help = "ItemSelected", helpDir = "LEFT",
           { id = "resIcon",  w = 50 },
           { id = "resText",  sep = false } },
-        { id = "qtyRow", h = 26, dir = "cols",
+        { id = "qtyRow", h = 26, dir = "cols", help = "qtyRow", helpDir = "LEFT",
           { id = "qtyHdr" },
           { id = "qtyCtl", w = 150, sep = false } },
         { id = "info", sep = false } },
-      { id = "price", h = PRICE_H, major = true, padL = 10 },
-      { id = "scope", h = 36, major = true, bg = true, padL = 10, padT = 4 },
-      { id = "gatherers", padL = 10 } },
+      { id = "price", h = PRICE_H, major = true, padL = 10, help = "price", helpDir = "LEFT" },
+      { id = "scope", h = 36, major = true, bg = true, padL = 10, padT = 4, help = "scope", helpDir = "LEFT" },
+      { id = "gatherers", padL = 10, help = "gatherers", helpDir = "LEFT" } },
 }
 
 -- Métriques dérivées (mêmes rôles que UI.POST) : PAD marge intérieure · LEFT_W largeur du flyout ·
@@ -50,6 +52,9 @@ UI.GATHER = {
     WIDE_W  = (SPEC.x2 - SPEC.x1) - SPEC[1].w - GUTTER - 2 * PAD,
     PRICE_H = PRICE_H,
 }
+
+-- Zones porteuses d'aide contextuelle, extraites de la SPEC (cf. _UI_HelpPlate.lua, dispatch onglet).
+UI.GATHER.helpNodes = Skin.CollectHelp(SPEC)
 
 function UI:_BuildGatherSections(panel)
     self.gatherSec = Skin.MakeSections(panel, SPEC)

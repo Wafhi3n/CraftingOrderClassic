@@ -4,49 +4,51 @@
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
-92 modules + 4 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
+97 modules + 4 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
 
 ## Modules (ordre de chargement)
 
 | Fichier | Rôle | Lignes |
 |---|---|---|
-| `CraftingOrderClassic.lua` | Crafting Order - Classic — réseau GLOBAL et SOCIAL de commandes de craft. | 390 |
+| `CraftingOrderClassic.lua` | Crafting Order - Classic — réseau GLOBAL et SOCIAL de commandes de craft. | 406 |
 | `CraftingOrderClassic_Trace.lua` | trace réseau PERSISTÉE, lisible hors-jeu. | 79 |
 | `CraftingOrderClassic_Migrations.lua` | versionnage du schéma SavedVariables. | 40 |
 | `CraftingOrderClassic_Locale.lua` | socle de localisation du CHROME de l'UI. | 12 |
 | `CraftingOrderClassic_Locale_enUS.lua` | overlay ANGLAIS (enUS/enGB). | 263 |
-| `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 255 |
+| `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 339 |
 | `CraftingOrderClassic_Locale_deDE.lua` | overlay ALLEMAND (deDE). | 264 |
-| `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 239 |
+| `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 323 |
 | `CraftingOrderClassic_Locale_esES.lua` | overlay ESPAGNOL (esES/esMX). | 265 |
-| `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 240 |
+| `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 324 |
 | `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 186 |
 | `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 183 |
 | `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 183 |
 | `CraftingOrderClassic_Elemental.lua` | pseudo-« métier » de récolte « Élémentaire ». | 61 |
 | `CraftingOrderClassic_UI_Skin.lua` | tokens + helpers SÉMANTIQUES du skin (métiers, statuts, rareté, quantités, icônes natives) et petits widgets d'affichage. | 416 |
-| `CraftingOrderClassic_UI_Skin_Native.lua` | kit de chrome Blizzard NATIF (le « framework » UI de COC). | 466 |
+| `CraftingOrderClassic_UI_Skin_Native.lua` | kit de chrome Blizzard NATIF (le « framework » UI de COC). | 485 |
 | `CraftingOrderClassic_UI_Skin_Sections.lua` | kit de chrome natif, volet SECTIONS : comment on découpe l'intérieur d'une fenêtre en blocs et en zones. | 247 |
+| `CraftingOrderClassic_UI_Skin_HelpPlate.lua` | kit d'AIDE CONTEXTUELLE (le « bouton i » de retail). | 130 |
 | `CraftingOrderClassic_ShareReagents.lua` | « liste de courses » : diffuser en un clic les réactifs d'une recette (vue métier) ou d'une commande (carte) dans un canal de discussion, avec le LIEN objet de chaque réactif. | 157 |
-| `CraftingOrderClassic_UI.lua` | fenêtre principale (chrome Blizzard natif, kit UI_Skin_Native). | 479 |
-| `CraftingOrderClassic_UI_Post_Layout.lua` | GÉOMÉTRIE de l'onglet « Commande » : colonnes, zones, séparateurs. | 121 |
+| `CraftingOrderClassic_UI.lua` | fenêtre principale (chrome Blizzard natif, kit UI_Skin_Native). | 485 |
+| `CraftingOrderClassic_UI_HelpPlate.lua` | AIDE CONTEXTUELLE de la FENÊTRE PRINCIPALE (« bouton i »). | 166 |
+| `CraftingOrderClassic_UI_Post_Layout.lua` | GÉOMÉTRIE de l'onglet « Commande » : colonnes, zones, séparateurs. | 127 |
 | `CraftingOrderClassic_UI_Post.lua` | onglet « Commande » : sélection de plan (gauche) + réactifs « je fournis » / commission g-s-c / ciblage artisan (droite). | 373 |
 | `CraftingOrderClassic_UI_Post_Detail.lua` | onglet « Commande », PANNEAU DROIT : en-tête du plan sélectionné (icône + cadre doré + nom + niveau), liste des réactifs « je fournis », et la rangée commission. | 194 |
-| `CraftingOrderClassic_UI_Post_Artisans.lua` | onglet « Commande », section droite basse : boutons source, liste des artisans, ciblage (@Nom), libellé destinataire, bouton Poster. | 219 |
+| `CraftingOrderClassic_UI_Post_Artisans.lua` | onglet « Commande », section droite basse : boutons source, liste des artisans, ciblage (@Nom), libellé destinataire, bouton Poster. | 220 |
 | `CraftingOrderClassic_UI_Post_Categories.lua` | onglet « Commande », panneau gauche : regroupe la LISTE DES PLANS en sections type fenêtre native (emplacement puis type pour les équipements, type pour les armes, catégorie pour le reste). | 182 |
 | `CraftingOrderClassic_UI_Post_Paperdoll.lua` | onglet « Commande », vue SILHOUETTE de l'Enchantement. | 330 |
-| `CraftingOrderClassic_UI_Post_LazyGold.lua` | onglet « Commande » : couche Lazy Gold (lecture seule). | 150 |
-| `CraftingOrderClassic_UI_Gather_Layout.lua` | GÉOMÉTRIE de l'onglet « Récolte » : la SPEC (structure éditable, cf. | 61 |
+| `CraftingOrderClassic_UI_Post_LazyGold.lua` | onglet « Commande » : couche Lazy Gold (lecture seule). | 151 |
+| `CraftingOrderClassic_UI_Gather_Layout.lua` | GÉOMÉTRIE de l'onglet « Récolte » : la SPEC (structure éditable, cf. | 66 |
 | `CraftingOrderClassic_UI_Gather.lua` | onglet « Récolte » : ressources de récolte (minéraux, herbes, cuirs, poissons) + demande de quantité + prix par pile + ciblage récolteur. | 499 |
 | `CraftingOrderClassic_UI_Gather_Categories.lua` | onglet « Récolte », panneau gauche : repliage des en-têtes et remplissage des lignes (en-tête de section/sous-catégorie, ou ressource). | 65 |
-| `CraftingOrderClassic_UI_Artisans_Layout.lua` | GÉOMÉTRIE de l'onglet « Artisans » (annuaire social). | 39 |
+| `CraftingOrderClassic_UI_Artisans_Layout.lua` | GÉOMÉTRIE de l'onglet « Artisans » (annuaire social). | 44 |
 | `CraftingOrderClassic_UI_Artisans.lua` | onglet « Artisans » : annuaire social. | 410 |
 | `CraftingOrderClassic_UI_Artisans_Groups.lua` | fusion « une ligne par JOUEUR » (rerolls). | 207 |
 | `CraftingOrderClassic_UI_Artisans_Icons.lua` | onglet « Artisans » : tout ce qui est ICÔNE de métier. | 186 |
 | `CraftingOrderClassic_UI_Artisans_Muted.lua` | panel « En sourdine » de l'onglet Artisans. | 86 |
-| `CraftingOrderClassic_UI_MyArtisans_Layout.lua` | GÉOMÉTRIE de l'onglet « Mes artisans ». | 48 |
+| `CraftingOrderClassic_UI_MyArtisans_Layout.lua` | GÉOMÉTRIE de l'onglet « Mes artisans ». | 53 |
 | `CraftingOrderClassic_UI_MyArtisans.lua` | onglet « Mes artisans » : vue agrégée des métiers du COMPTE (tous mes rerolls du royaume), en mode « connu ». | 433 |
-| `CraftingOrderClassic_UI_MyArtisans_LazyGold.lua` | onglet « Mes artisans » : couche Lazy Gold. | 134 |
+| `CraftingOrderClassic_UI_MyArtisans_LazyGold.lua` | onglet « Mes artisans » : couche Lazy Gold. | 135 |
 | `CraftingOrderClassic_UI_Help.lua` | onglet Aide : page unique défilante qui explique les autres onglets (Carnet/Commande/Récolte/Artisans), la Vue Métier et le réseau. | 163 |
 | `CraftingOrderClassic_UI_News.lua` | onglet « Nouveautés » : notes de version (changelog) affichées EN JEU, version par version, la plus récente en tête. | 241 |
 | `CraftingOrderClassic_Social.lua` | couche sociale passive (socle). | 380 |
@@ -63,14 +65,17 @@
 | `CraftingOrderClassic_RecipeCats_Enchanting.lua` | sous-catégories de l'ENCHANTEMENT. | 52 |
 | `CraftingOrderClassic_Craft.lua` | socle de lecture LIVE de la fenêtre métier (migration de la fenêtre custom depuis Guild Economy / TradeScanner_Craft.lua). | 206 |
 | `CraftingOrderClassic_Enchant.lua` | spécifique à l'Enchantement (API Craft). | 326 |
-| `CraftingOrderClassic_MTSL.lua` | pont LECTURE SEULE vers l'addon « Missing TradeSkills List » (MTSL). | 253 |
-| `CraftingOrderClassic_ProfWindow.lua` | fenêtre métier custom 3 colonnes (migration depuis Guild Economy) : Recettes \| Détail+Craft \| Commandes du métier. | 499 |
-| `CraftingOrderClassic_ProfWindow_Layout.lua` | GÉOMÉTRIE de la vue métier (fenêtre 3 colonnes). | 65 |
-| `CraftingOrderClassic_ProfWindow_Toolbar.lua` | barre d'outils de la colonne Recettes (vue métier) : les toggles de TRI (slot recTools, à gauche : rentabilité / valeurs exactes / progression — Lazy Gold) et de FILTRE (slot recFilterToggles, à droite : « j'ai les matériaux » / « montée de compétence »). | 221 |
-| `CraftingOrderClassic_ProfWindow_Recipes.lua` | colonne GAUCHE : liste de recettes virtualisée (scroll), recherche, couleur par difficulté, sélection, badge « demandé » (nb de commandes ouvertes pour l'objet). | 463 |
+| `CraftingOrderClassic_MTSL.lua` | pont LECTURE SEULE vers l'addon « Missing TradeSkills List » (MTSL). | 273 |
+| `CraftingOrderClassic_ProfWindow.lua` | fenêtre métier custom 3 colonnes (migration depuis Guild Economy) : Recettes \| Détail+Craft \| Commandes du métier. | 460 |
+| `CraftingOrderClassic_ProfWindow_Layout.lua` | GÉOMÉTRIE de la vue métier (fenêtre 3 colonnes). | 76 |
+| `CraftingOrderClassic_ProfWindow_HelpPlate.lua` | AIDE CONTEXTUELLE de la Vue Métier (« bouton i »). | 82 |
+| `CraftingOrderClassic_ProfWindow_Dock.lua` | mode DOCK de la vue métier (« Vue Blizzard ») : la fenêtre native reste VISIBLE (non neutralisée) et NOTRE colonne Commandes s'épingle à sa droite. | 70 |
+| `CraftingOrderClassic_ProfWindow_Toolbar.lua` | barre d'outils de la colonne Recettes (vue métier) : les toggles de TRI (slot recTools, à gauche : rentabilité / valeurs exactes / progression — Lazy Gold) et de FILTRE (slot recFilterToggles, à droite : « j'ai les matériaux » / « montée de compétence »). | 223 |
+| `CraftingOrderClassic_ProfWindow_Recipes.lua` | colonne GAUCHE : liste de recettes virtualisée (scroll), recherche, couleur par difficulté, sélection, badge « demandé » (nb de commandes ouvertes pour l'objet). | 476 |
+| `CraftingOrderClassic_ProfWindow_Leveling.lua` | aide à la MONTÉE DE MÉTIER dans la liste de recettes : coût de progression (réactifs au prix Lazy Gold ÷ chance de point selon la couleur), badge « meilleur coût/point » sur la recette recommandée, icônes de SOURCE sur les manquantes (formateur / vendeur PNJ / coté à l'HV / à farmer) et tri « progression » affiné par coût. | 167 |
 | `CraftingOrderClassic_ProfWindow_Detail.lua` | colonne CENTRE : détail de la recette sélectionnée (icône, réactifs have/need) + boutons Créer / Créer tout. | 411 |
 | `CraftingOrderClassic_ProfWindow_Info.lua` | PANNEAU D'INFO en SECTIONS pour la colonne centrale de la vue métier. | 144 |
-| `CraftingOrderClassic_LazyGold.lua` | pont LECTURE SEULE vers l'addon « Lazy Gold Classic » (LG). | 312 |
+| `CraftingOrderClassic_LazyGold.lua` | pont LECTURE SEULE vers l'addon « Lazy Gold Classic » (LG). | 337 |
 | `CraftingOrderClassic_ProfWindow_Orders.lua` | colonne « Commandes » de la vue métier (cabine de l'artisan) : construction (onglets de relation, en-tête, scroll), vue LISTE (une ligne par commande : demandeur + prix + âge ; une ligne sourdine cliquée se réaffiche), collecte/tri et rafraîchissement. | 343 |
 | `CraftingOrderClassic_ProfWindow_Orders_Card.lua` | vue SÉLECTIONNÉE de la colonne « Commandes » : la carte complète d'une commande (composants fournis, repères Lazy Gold, ACCEPTER / REFUSER / CHUCHOTER ; croix en haut à droite = retour liste). | 255 |
 | `CraftingOrderClassic_ProfWindow_LFW.lua` | config de l'OFFRE « recherche de travail » par métier. | 327 |
@@ -273,7 +278,6 @@
 
 **`Skin.MakeWindow(name, w, h, opts)`**
 
-> Fenêtre native complète (ButtonFrameTemplate).
 > Fournit d'un coup : barre de titre + portrait rond + bouton fermer + panneau encastré marbre
 > (`f.Inset`) + fond rocher. opts :
 >   title     : texte de la barre de titre (SetTitle du PortraitFrameTemplateMixin)
@@ -446,6 +450,32 @@
 **`Skin.MakeSections(panel, spec)`**
 
 
+### `CraftingOrderClassic_UI_Skin_HelpPlate.lua`
+
+**`Skin.CollectHelp(spec)`**
+
+> Parcourt un arbre de SPEC (cf. MakeSections) et collecte les nœuds tagués `help`, en profondeur.
+> Rend { { id=, key=, dir= }, ... } dans l'ordre de déclaration. `key` = valeur brute de `help` (un id
+> de texte, résolu en locale par le consommateur — pas ici : la SPEC ne connaît pas COC.L).
+
+**`Skin.MakeHelpButton(parent, onToggle, opts)`**
+
+> Bouton rond « i », posé un peu HORS CADRE (retail). Template natif RinglessHelpPlateButtonTemplate
+> (help-i + surbrillance) ; repli défensif si absent. `onToggle` au clic. opts : size · point (ancre
+> {p, rel, relP, x, y}) · tooltip.
+
+**`Skin.ShowHelp(win, entries, mainButton)`**
+
+> Ouvre le voile d'aide natif sur `win`, avec une tuile par entrée.
+> entries : { { frame = <Region>, text = <string>, dir = "UP|DOWN|LEFT|RIGHT" }, ... }.
+> La géométrie est LUE À CHAUD (positions réelles), donc appelable à chaque ouverture. Rend true si posé.
+
+**`Skin.HideHelp()`**
+
+
+**`Skin.HelpIsOpen()`**
+
+
 ## Détail par module (en-tête + API publique)
 
 ### `CraftingOrderClassic.lua`
@@ -459,7 +489,7 @@
 > État actuel : capture AUTONOME des recettes (scan des fenêtres métier via CraftLink) +
 > persistance propre (CraftingOrderClassicDB). Le carnet d'ordres et le social arrivent (C/D).
 
-**API** : `COC:Scan()` · `COC:ScanSoon()` · `COC:Status()` · `COC:ChannelCmd(arg)` · `COC:NotifyCmd(arg)` · `COC:ScanCmd(arg)` · `COC:CrafterScanCmd(arg)` · `COC:ChannelNotice()` · `COC:Beacon()` · `COC:BeaconDiag()` · `COC:WipeRoster()` · `COC:GreenWallDiag()` · `COC:Help()` · `COC:Slash(msg)`
+**API** : `COC:Scan()` · `COC:ScanSoon()` · `COC:Status()` · `COC:ChannelCmd(arg)` · `COC:NotifyCmd(arg)` · `COC:ScanCmd(arg)` · `COC:CrafterScanCmd(arg)` · `COC:ChannelNotice()` · `COC:MissingAddon(displayName)` · `COC:NeedLazyGold()` · `COC:NeedMTSL()` · `COC:Beacon()` · `COC:BeaconDiag()` · `COC:WipeRoster()` · `COC:GreenWallDiag()` · `COC:Help()` · `COC:Slash(msg)`
 
 ### `CraftingOrderClassic_Trace.lua`
 > CraftingOrderClassic_Trace.lua — trace réseau PERSISTÉE, lisible hors-jeu.
@@ -609,6 +639,29 @@
 
 **API** : `Skin.MakeInset(parent, x1, y1, x2, y2, opts)` · `Skin.MakeDivider(parent, x1, x2, y, heavy, opts)` · `Skin.MakeDividerV(parent, x, top, bottom, heavy)` · `Skin.ScrollTrack(scrollName)` · `Skin.MakeSections(panel, spec)`
 
+### `CraftingOrderClassic_UI_Skin_HelpPlate.lua`
+> CraftingOrderClassic_UI_Skin_HelpPlate.lua — kit d'AIDE CONTEXTUELLE (le « bouton i » de retail).
+> À NE PAS confondre avec _UI_Help.lua (l'onglet « Aide », une PAGE de doc défilante qu'on lit). Ici
+> c'est l'overlay EN PLACE : un clic fige la fenêtre et pose des bulles sur ses vrais contrôles. Le jeu
+> retail a les deux ; complémentaires (bulles courtes ici, détail dans l'onglet Aide).
+> 
+> Même table `Skin` que les autres _UI_Skin*. On EMPRUNTE le système natif `Blizzard_HelpPlate` (chargé
+> sur Era : dépendance dure de Blizzard_UIPanels_Game) : un voile plein écran `HelpPlateCanvas` capte
+> TOUS les clics de la fenêtre, et chaque « tuile » surligne un rectangle avec une bulle fléchée au
+> survol. Zéro asset (l'icône est `Interface\common\help-i`, celle de retail).
+> 
+> LE PARI « aide sur les objets SPEC » (idée user) : `Skin.MakeSections` rend `{ [id] = frame }`, donc
+> chaque section EST une vraie frame positionnée. Au lieu de coder les coordonnées à la main (ce que
+> fait Blizzard), on TAGUE le nœud SPEC (`help = "<id>"`, `helpDir = "LEFT|RIGHT|UP|DOWN"`) et on dérive
+> la `HighLightBox` du rectangle RÉEL de la frame, à l'ouverture. Le TEXTE reste du contenu (locale),
+> déclaré côté consommateur — la SPEC ne porte que le point d'accroche (cf. discipline SPEC=structure).
+> 
+> ⚠️ ÉCHELLES : le voile est reparenté sur UIParent (donc à l'échelle UIParent) mais ANCRÉ sur la
+> fenêtre. On normalise chaque rectangle en PIXELS ÉCRAN puis on divise par l'échelle du voile
+> (`HelpPlate.GetEffectiveScale`) → robuste quelle que soit l'échelle d'UI, sans supposer scale=1.
+
+**API** : `Skin.CollectHelp(spec)` · `Skin.MakeHelpButton(parent, onToggle, opts)` · `Skin.ShowHelp(win, entries, mainButton)` · `Skin.HideHelp()` · `Skin.HelpIsOpen()`
+
 ### `CraftingOrderClassic_ShareReagents.lua`
 > CraftingOrderClassic_ShareReagents.lua — « liste de courses » : diffuser en un clic les réactifs
 > d'une recette (vue métier) ou d'une commande (carte) dans un canal de discussion, avec le LIEN objet
@@ -627,7 +680,17 @@
 > Onglets : Carnet / Commande / Récolte / Artisans / Mes artisans / Aide / Nouveautés.
 > Lit le cache (COC.db.orders + Directory), jamais le réseau directement.
 
-**API** : `UI:Build()` · `UI:BuildTabs(f)` · `UI:ShowTab(id)` · `UI:BuildOrdersTab(f)` · `UI:Toast(text, icon)` · `UI:RefreshOrders()` · `UI:RefreshHandoff()` · `UI:RefreshSoon()` · `UI:Refresh()` · `UI:Toggle()`
+**API** : `UI:Build()` · `UI:BuildTabs(f)` · `UI:ShowTab(id)` · `UI:BuildOrdersTab(f)` · `UI:Toast(text, icon)` · `UI:RefreshOrders()` · `UI:RefreshHandoff()` · `UI:RefreshSoon()` · `UI:Refresh()` · `UI:Toggle(tab)`
+
+### `CraftingOrderClassic_UI_HelpPlate.lua`
+> CraftingOrderClassic_UI_HelpPlate.lua — AIDE CONTEXTUELLE de la FENÊTRE PRINCIPALE (« bouton i »).
+> Même système natif que la Vue Métier (kit _UI_Skin_HelpPlate.lua : voile qui fige les clics + bulles),
+> mais la fenêtre principale a 7 ONGLETS partageant le cadre → l'aide est DISPATCHÉE selon l'onglet
+> actif (`UI.activeTab`). Un seul bouton `i`, un registre `_HelpConfigFor(tab)` : chaque onglet fournit
+> ses zones SPEC (nodes), l'accès à ses sections (sec), ses textes et ses contrôles hors-SPEC. Palier
+> courant : l'onglet Commande (post) ; Récolte/Artisans/… s'ajouteront comme de nouvelles branches.
+> Échap-ferme-l'aide + icônes inline sont dans le kit → gratuits ici. NE PAS confondre avec l'onglet
+> « Aide » (_UI_Help.lua, page de doc défilante).
 
 ### `CraftingOrderClassic_UI_Post_Layout.lua`
 > CraftingOrderClassic_UI_Post_Layout.lua — GÉOMÉTRIE de l'onglet « Commande » : colonnes, zones,
@@ -1056,7 +1119,7 @@
 > CE QU'ON NE BAKE JAMAIS : les noms restent puisés dans MTSL au runtime selon la langue du client —
 > rien n'est figé en anglais, cohérent avec le reste de l'écosystème.
 
-**API** : `MTSL:IsAvailable()` · `MTSL:SkillDetail(profKey, spellID)` · `MTSL:MissingRecipes(profKey)` · `MTSL:MinSkill(profKey, spellID)` · `MTSL:RecipeItem(profKey, spellID)` · `MTSL:SourceKind(profKey, spellID)`
+**API** : `MTSL:IsAvailable()` · `MTSL:SkillDetail(profKey, spellID)` · `MTSL:MissingRecipes(profKey)` · `MTSL:MinSkill(profKey, spellID)` · `MTSL:RecipeItem(profKey, spellID)` · `MTSL:SourceKind(profKey, spellID)` · `MTSL:SourcePrice(profKey, spellID)`
 
 ### `CraftingOrderClassic_ProfWindow.lua`
 > CraftingOrderClassic_ProfWindow.lua — fenêtre métier custom 3 colonnes (migration depuis
@@ -1068,7 +1131,7 @@
 > `/co profwindow` bascule custom ↔ « Vue Blizzard » (opt-out). Quand la vue custom est active, désactive
 > le takeover de Guild Economy (TradeScannerDB.replaceProfWindow=false) → jamais deux fenêtres à la fois.
 
-**API** : `PW.CanFulfill(o)` · `PW:NeutralizeNative()` · `PW:RestoreNative()` · `PW:Build()` · `PW:EnsureNativeToggle(frame, key)` · `PW:OpenDock(nativeFrame)` · `PW:CloseDock()` · `PW:Hide()` · `PW:OpenFor(profKey)` · `PW:Refresh()` · `PW:IsEnabled()` · `PW:SetEnabled(on)` · `PW:OnProfessionShow()` · `PW:OnProfessionClose()`
+**API** : `PW.CanFulfill(o)` · `PW:NeutralizeNative()` · `PW:RestoreNative()` · `PW:Build()` · `PW:Hide()` · `PW:OpenFor(profKey)` · `PW:Refresh()` · `PW:IsEnabled()` · `PW:SetEnabled(on)` · `PW:OnProfessionShow()` · `PW:OnProfessionClose()`
 
 ### `CraftingOrderClassic_ProfWindow_Layout.lua`
 > CraftingOrderClassic_ProfWindow_Layout.lua — GÉOMÉTRIE de la vue métier (fenêtre 3 colonnes).
@@ -1084,6 +1147,22 @@
 
 **API** : `PW:Sec(id)`
 
+### `CraftingOrderClassic_ProfWindow_HelpPlate.lua`
+> CraftingOrderClassic_ProfWindow_HelpPlate.lua — AIDE CONTEXTUELLE de la Vue Métier (« bouton i »).
+> Glue entre le kit générique (_UI_Skin_HelpPlate.lua) et cette fenêtre : le bouton `i` hors-cadre + le
+> TEXTE des bulles (contenu localisé, court — le détail vit dans l'onglet Aide, cf. _UI_Help.lua).
+> Les ZONES et leur direction de bulle sont déclarées dans la SPEC (_ProfWindow_Layout.lua : champs
+> help/helpDir) → exposées en PW.helpNodes ; ici on ne fait que MAPPER id → texte.
+
+### `CraftingOrderClassic_ProfWindow_Dock.lua`
+> CraftingOrderClassic_ProfWindow_Dock.lua — mode DOCK de la vue métier (« Vue Blizzard ») :
+> la fenêtre native reste VISIBLE (non neutralisée) et NOTRE colonne Commandes s'épingle à sa
+> droite. S'exclut de la vue custom 3 colonnes (custom = native neutralisée + 3 colonnes ; dock =
+> native intacte + colonne seule) → jamais les deux à la fois. Extrait de _ProfWindow.lua
+> (anti-monolithe) ; chargé APRÈS lui (PW existe).
+
+**API** : `PW:EnsureNativeToggle(frame, key)` · `PW:OpenDock(nativeFrame)` · `PW:CloseDock()`
+
 ### `CraftingOrderClassic_ProfWindow_Toolbar.lua`
 > CraftingOrderClassic_ProfWindow_Toolbar.lua — barre d'outils de la colonne Recettes (vue métier) :
 > les toggles de TRI (slot recTools, à gauche : rentabilité / valeurs exactes / progression — Lazy Gold)
@@ -1097,6 +1176,17 @@
 > ouvertes pour l'objet). Port de TradeScanner_ProfWindow_Recipes.lua adapté à COC.Craft.
 
 **API** : `PW:ToggleRecipeSection(ckey)` · `PW:MissingCount()` · `PW:RefreshRecipes()` · `PW:RenderRecipes()` · `PW:SelectRecipe(e)` · `PW:GetSelectedRecipe()`
+
+### `CraftingOrderClassic_ProfWindow_Leveling.lua`
+> CraftingOrderClassic_ProfWindow_Leveling.lua — aide à la MONTÉE DE MÉTIER dans la liste de
+> recettes : coût de progression (réactifs au prix Lazy Gold ÷ chance de point selon la couleur),
+> badge « meilleur coût/point » sur la recette recommandée, icônes de SOURCE sur les manquantes
+> (formateur / vendeur PNJ / coté à l'HV / à farmer) et tri « progression » affiné par coût.
+> Les guides statiques se trompent quand l'économie du serveur diverge (vécu : shards à 10 pc alors
+> que le guide dit d'acheter de la dust) — ici tout est au prix RÉEL (Auctionator via Lazy Gold).
+> Tout est soft-dep : sans Lazy Gold le coût disparaît (les icônes de source restent, MTSL suffit) ;
+> sans MTSL, pas d'icônes (les manquantes n'existent pas). Appelé par _ProfWindow_Recipes sous garde
+> nil (`self._FillLevelingRight and …`) : l'absence de ce fichier ne casse rien.
 
 ### `CraftingOrderClassic_ProfWindow_Detail.lua`
 > CraftingOrderClassic_ProfWindow_Detail.lua — colonne CENTRE : détail de la recette sélectionnée
@@ -1138,7 +1228,7 @@
 > Le COÛT des réactifs et l'objet produit viennent de NOS données CraftLink (RecipeReagents/RecipeProduct),
 > pas des tables de LG : on reste maître de la recette, LG ne sert QUE d'oracle de prix.
 
-**API** : `LG:IsAvailable()` · `LG:ItemValue(itemID)` · `LG:CoinTier(copper)` · `LG:ProfitTier(copper)` · `LG:ExactMode()` · `LG:SetExactMode(on)` · `LG:ProfitText(copper)` · `LG:Money(copper, colored)` · `LG:CraftProfit(profKey, spellID, numMade)` · `LG:EntryProfit(profKey, entry)` · `LG:BestPlanFor(profKey, rank)` · `LG:BestProfitFor(profKey, rank)` · `LG:PlanName(profKey, plan)` · `LG:BestPlanName(profKey, rank)` · `LG:BestKnownPlanFor(profKey, r)` · `LG:MinProfit()` · `LG:HighlightTier(profit)`
+**API** : `LG:IsAvailable()` · `LG:ItemValue(itemID)` · `LG:CoinTier(copper)` · `LG:ProfitTier(copper)` · `LG:ExactMode()` · `LG:SetExactMode(on)` · `LG:ProfitText(copper)` · `LG:Money(copper, colored)` · `LG:CraftProfit(profKey, spellID, numMade)` · `LG:EntryProfit(profKey, entry)` · `LG:CraftCost(profKey, spellID)` · `LG:EntryCost(profKey, entry)` · `LG:BestPlanFor(profKey, rank)` · `LG:BestProfitFor(profKey, rank)` · `LG:PlanName(profKey, plan)` · `LG:BestPlanName(profKey, rank)` · `LG:BestKnownPlanFor(profKey, r)` · `LG:MinProfit()` · `LG:HighlightTier(profit)`
 
 ### `CraftingOrderClassic_ProfWindow_Orders.lua`
 > CraftingOrderClassic_ProfWindow_Orders.lua — colonne « Commandes » de la vue métier (cabine de

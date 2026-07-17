@@ -1,5 +1,32 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.22.0 — Contextual help, unmissable dependencies, and an Escape key that behaves
+
+New players kept missing the same handful of buttons, so profession windows now have a small "i"
+button that opens the game's own contextual help widget, the one Blizzard uses for its own windows:
+the background dims and a callout points straight at whatever's in question. Every tab (Profession
+view, Order, Gather, Artisans, My Artisans, Ledger) has its own tour, so the button explains what's
+actually on screen instead of a generic tooltip.
+
+CraftingOrderClassic leans on two optional addons, Lazy Gold and MTSL, but there was no sign either
+one was missing. The buttons that need them stay visible and colored whether or not you have the
+addon installed, and clicking one without it now pops a short explanation of what it does and where
+to get it, instead of doing nothing.
+
+The "can craft that" alert for incoming trade requests fired even when you didn't actually know the
+recipe, usually gems or enchants you had the reagents for but not the plan. It now checks your known
+recipes before nagging you about your own orders. A friend who's online without the addon no longer
+shows up as offline by mistake.
+
+Escape used to leave profession windows open more often than not, and three separate bug reports
+pointed at the same cause: hiding or disabling mouse input on a protected window mid-combat throws an
+ADDON_ACTION_BLOCKED error. Windows now route through a small proxy frame instead, so Escape closes
+them cleanly whether or not you're in combat.
+
+One more: the "what to level next" helper now shows cost per skill point, an Auctioneer price badge,
+and an icon pointing at the vendor who sells a recipe you don't know yet, on top of a slightly
+smarter sort.
+
 ## v1.21.0 — Enchants by slot, and a trade panel that stops hiding things
 
 Picking an enchant meant scrolling some 300 plans with near-identical names. The Order tab has a

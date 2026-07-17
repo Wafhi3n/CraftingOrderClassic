@@ -64,6 +64,7 @@ function UI:Build()
     if self.BuildGatherTab then self:BuildGatherTab(f) end
     if self.BuildHelpTab   then self:BuildHelpTab(f)   end
     if self.BuildNewsTab   then self:BuildNewsTab(f)   end
+    if self._BuildHelp     then self:_BuildHelp(f)     end   -- aide contextuelle « bouton i » (dépend. molle)
     self:ShowTab("orders")
 
     -- Résolution asynchrone des noms : Blizzard renvoie les infos d'objet en différé. Un seul
@@ -120,6 +121,7 @@ function UI:ShowTab(id)
     -- Affordance du portrait cliquable (flèche) : visible seulement là où le clic fait quelque chose.
     if self.frame._portraitArrow then self.frame._portraitArrow:SetShown(id == "post" or id == "gather") end
     self:Refresh()
+    if self._MaybeAutoHelp then self:_MaybeAutoHelp(id) end   -- tutoriel one-shot au 1er passage sur un onglet aidé
 end
 
 -- ------------------------------------------------------------------
@@ -473,7 +475,11 @@ function UI:_SyncHeaderSkill(prof)
     end
 end
 
-function UI:Toggle()
+-- `tab` (optionnel) : onglet sur lequel ATTERRIR à l'ouverture. La minimap passe "post" → un clic
+-- gauche ouvre toujours sur Commande (l'action principale de l'addon, demande user). Sans argument :
+-- comportement historique (garde l'onglet courant).
+function UI:Toggle(tab)
     self:Build()
-    if self.frame:IsShown() then self.frame:Hide() else self.frame:Show(); self:Refresh() end
+    if self.frame:IsShown() then self.frame:Hide()
+    else self.frame:Show(); if tab then self:ShowTab(tab) else self:Refresh() end end
 end

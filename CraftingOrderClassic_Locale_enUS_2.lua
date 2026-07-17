@@ -10,7 +10,7 @@ local L = COC.L
 
 local en2 = {
     -- Minimap + menu métiers
-    ["Clic : ouvrir le carnet d'ordres"] = "Click: open the order ledger",
+    ["Clic : ouvrir les commandes"] = "Click: open orders",
     ["Clic droit : mes métiers"] = "Right click: my professions",
     ["Mes métiers"] = "My professions", ["Aucun métier connu."] = "No known profession.",
     ["Don / gratuit"] = "Free / gift",
@@ -176,6 +176,83 @@ local en2 = {
         "|cFFFFFFFF/co channel off|r leaves it anytime (whisper and guild stay active); |cFFFFFFFF/co channel on|r rejoins it.",
     ["Statuts d'une commande : "] = "Order statuses: ",
 
+    -- Aide contextuelle « bouton i » (Vue Métier) — cf. _ProfWindow_HelpPlate.lua (bulles courtes)
+    ["Aide : survole les zones surlignées pour comprendre chaque fonction."] =
+        "Help: hover the highlighted areas to understand each feature.",
+    ["Barre de filtres. À gauche (avec Lazy Gold) : pièce = trier par rentabilité, « 123 » = prix exacts au lieu de l'indicateur compact, flèche verte = trier par montée de compétence. Au centre : la recherche. À droite : sac = seulement les recettes dont tu as les matériaux, flèche orange = masquer les recettes grises (aucun gain de compétence)."] =
+        "Filter bar. On the left (with Lazy Gold): coin = sort by profit, \"123\" = exact prices instead of the compact indicator, green arrow = sort by skill-up. In the middle: the search. On the right: bag = only recipes you have the materials for, orange arrow = hide gray recipes (no skill gain).",
+    ["Tes recettes, groupées par famille (clique un en-tête pour replier). À droite de chaque ligne : %s = rentabilité à l'HV (survole pour le profit net exact), %s = plan conseillé pour monter le métier (meilleur coût par point), « ×N » doré = commandes en attente pour cet objet. En mode Manquantes, une icône dit où obtenir le plan : formateur, vendeur, HV ou à farmer."] =
+        "Your recipes, grouped by family (click a header to collapse). On the right of each line: %s = profit at the AH (hover for the exact net profit), %s = recommended recipe to level up (best cost per point), gold \"×N\" = pending orders for that item. In Missing mode, an icon shows where to get the recipe: trainer, vendor, AH, or to farm.",
+    ["Le plan sélectionné : ses réactifs et le bouton pour le fabriquer."] =
+        "The selected recipe: its reagents and the button to craft it.",
+    ["Les commandes reçues pour ce métier — accepte, crafte, livre. Les onglets filtrent la source (tous / guilde / amis / annuaire)."] =
+        "Orders received for this profession — accept, craft, deliver. The tabs filter the source (all / guild / friends / directory).",
+    ["Chercher du travail : signale au royaume que tu proposes ce métier. L'engrenage voisin règle ton offre (composants fournis, commission)."] =
+        "Look for work: tell the realm you offer this profession. The gear next to it sets up your offer (provided reagents, fee).",
+    ["Vue Blizzard : rebascule sur la fenêtre de métier native de Blizzard."] =
+        "Blizzard view: switch back to Blizzard's native profession window.",
+    ["Filtre les commandes par source : tous, ta guilde, tes amis, ou ton annuaire d'artisans."] =
+        "Filter orders by source: all, your guild, your friends, or your artisan directory.",
+
+    -- Aide contextuelle « bouton i » — onglet Commande (cf. _UI_HelpPlate.lua)
+    ["Filtre les plans : recherche par nom, filtre par qualité, filtre par réactif, et l'outil %s « 123 » de Lazy Gold (prix/rentabilité)."] =
+        "Filter the recipes: search by name, filter by quality, filter by reagent, and Lazy Gold's %s \"123\" tool (price/profit).",
+    ["La liste des plans. Choisis celui que tu veux faire réaliser par un artisan."] =
+        "The recipe list. Pick the one you want a crafter to make.",
+    ["L'objet choisi. La pastille « Je fournis » indique que tu apportes tous les composants toi-même."] =
+        "The chosen item. The \"I provide\" pill means you bring all the reagents yourself.",
+    ["La commission que tu proposes à l'artisan pour ce craft."] =
+        "The commission you offer the crafter for this craft.",
+    ["La portée : diffuser à tous, ou restreindre (guilde / amis)."] =
+        "The reach: broadcast to everyone, or restrict (guild / friends).",
+    ["Le destinataire : toute la source sélectionnée, ou un artisan précis."] =
+        "The recipient: the whole selected source, or a specific crafter.",
+    ["Poster : envoie la commande au(x) destinataire(s) choisi(s)."] =
+        "Post: send the order to the chosen recipient(s).",
+
+    -- Aide contextuelle « bouton i » — onglet Récolte (cf. _UI_HelpPlate.lua)
+    ["Recherche une ressource par nom."] = "Search a resource by name.",
+    ["Extensions : filtre les ressources d'une extension (ex. Élémentaire)."] =
+        "Expansions: filter resources from an expansion (e.g. Elemental).",
+    ["La liste des ressources. Choisis celle que tu veux faire récolter."] =
+        "The resource list. Pick the one you want gathered.",
+    ["La ressource choisie."] = "The chosen resource.",
+    ["À l'unité ou par pile, et la quantité voulue."] = "Per unit or per stack, and the wanted quantity.",
+    ["Le prix que tu proposes au récolteur."] = "The price you offer the gatherer.",
+    ["Le destinataire : toute la source, ou un récolteur précis."] =
+        "The recipient: the whole source, or a specific gatherer.",
+
+    -- Aide contextuelle « bouton i » — onglet Artisans (cf. _UI_HelpPlate.lua)
+    ["Filtre l'annuaire par source : guilde, amis, ajoutés manuellement, croisés, ou les joueurs en sourdine."] =
+        "Filter the directory by source: guild, friends, manually added, recently met, or muted players.",
+    ["Ajoute un joueur manuellement (+), rafraîchis l'annuaire, ou active le repérage."] =
+        "Add a player manually (+), refresh the directory, or turn on tracking.",
+    ["Filtre les artisans par métier."] = "Filter artisans by profession.",
+    ["La liste des artisans connus. Survole un nom pour ses métiers ; pastille verte = a l'addon et répond, jaune = en ligne sans l'addon, grise = hors ligne."] =
+        "The list of known artisans. Hover a name for their professions; green dot = has the addon and answers, yellow = online without the addon, gray = offline.",
+
+    -- Aide contextuelle « bouton i » — onglet Mes artisans (cf. _UI_HelpPlate.lua)
+    ["Partage tes rerolls sur le réseau (les autres voient tes métiers), et choisis le perso mis en « vitrine »."] =
+        "Share your rerolls on the network (others see your professions), and pick the character on \"display\".",
+    ["Tous les plans du royaume : la liste agrégée de toutes tes recettes, au lieu du découpage par métier (Lazy Gold requis)."] =
+        "All realm recipes: the aggregated list of all your recipes, instead of the per-profession split (Lazy Gold required).",
+    ["Tes métiers (tous les persos du compte). Choisis-en un pour voir ses recettes à droite."] =
+        "Your professions (all account characters). Pick one to see its recipes on the right.",
+    ["En-tête des recettes du métier choisi : bouton « Manquantes » et outils de prix (Lazy Gold)."] =
+        "Header of the chosen profession's recipes: \"Missing\" button and price tools (Lazy Gold).",
+    ["Les recettes du métier sélectionné (ou tous les plans du royaume)."] =
+        "The recipes of the selected profession (or all realm recipes).",
+
+    -- Aide contextuelle « bouton i » — onglet Carnet (cf. _UI_HelpPlate.lua)
+    ["Filtre ton carnet : commandes En cours, Archivées, ou Confiées (gardées pour un artisan)."] =
+        "Filter your ledger: Active, Archived, or Entrusted orders (kept for a crafter).",
+    ["Le Carnet = TES commandes postées. Accepter/livrer se fait dans la Vue Métier, pas ici ; quand une commande t'est remise, le bouton « J'ai reçu » confirme la réception."] =
+        "The Ledger = YOUR posted orders. Accepting/delivering happens in the Profession View, not here; when an order is handed to you, the \"Received\" button confirms receipt.",
+
+    -- Popup dépendance optionnelle manquante (boutons Lazy Gold / MTSL toujours visibles)
+    ["Cette fonction nécessite l'addon |cFFFFD100%s|r (non installé ou désactivé). Installe-le pour en profiter."] =
+        "This feature needs the |cFFFFD100%s|r addon (not installed or disabled). Install it to use it.",
+
     -- Sous-catégories de recettes (vue métier) — voir _RecipeCats_*.lua
     ["Divers"] = "Misc",
     ["Potions de soin"] = "Healing Potions",
@@ -250,6 +327,13 @@ local en2 = {
     ["Diffuser les réactifs"] = "Broadcast reagents", ["Diffuser les réactifs dans un canal"] = "Broadcast the reagents to a channel", ["Canal : "] = "Channel: ",  -- liste de courses
     ["Dire"] = "Say", ["Groupe"] = "Party", ["Raid"] = "Raid", ["Envoyer"] = "Send", ["Réactifs pour %s :"] = "Reagents for %s:", ["Réactifs pour %s (%d) :"] = "Reagents for %s (%d):",
     ["choisis un canal valide."] = "pick a valid channel.", ["aucun réactif à diffuser."] = "no reagents to broadcast.", ["Diffuser"] = "Broadcast",
+    -- Aide à la montée de métier (Leveling)
+    ["Progression : ~%s par point (estimation)"] = "Leveling: ~%s per point (estimate)",
+    ["Meilleur coût/point pour monter le métier"] = "Best cost per point to level the profession",
+    ["Plan : au formateur%s"] = "Recipe: from the trainer%s",
+    ["Plan : chez un vendeur PNJ%s"] = "Recipe: from an NPC vendor%s",
+    ["Plan : coté à l'HV — %s"] = "Recipe: listed on the AH — %s",
+    ["Plan : à farmer (butin/quête — absent de l'HV)"] = "Recipe: farm it (drop/quest — not on the AH)",
 }
 
 for k, v in pairs(en2) do L[k] = v end

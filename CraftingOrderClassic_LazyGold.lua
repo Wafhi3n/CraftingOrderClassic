@@ -135,6 +135,31 @@ function LG:EntryProfit(profKey, entry)
     return p and p.profit or nil
 end
 
+-- Coût des seuls RÉACTIFS d'une recette : { cost, missing } en cuivre, ou nil si aucun réactif n'est
+-- pricé / recette hors catalogue. Contrairement à CraftProfit, PAS besoin du prix de vente du produit
+-- — les enchants (services sans objet produit) ont donc aussi un coût. Sert au coût de PROGRESSION
+-- (montée de métier, cf. _ProfWindow_Leveling), pas à la rentabilité.
+function LG:CraftCost(profKey, spellID)
+    if not (self:IsAvailable() and profKey and spellID) then return nil end
+    local lib = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
+    local reags = lib and (lib.RecipeReagents and lib:RecipeReagents(profKey, spellID)) or {}
+    if #reags == 0 then return nil end
+    local cost, missing, priced = 0, false, false
+    for _, reag in ipairs(reags) do
+        local p = self:ItemValue(reag[1])
+        if p then cost = cost + p * (reag[2] or 1); priced = true else missing = true end
+    end
+    if not priced then return nil end
+    return { cost = cost, missing = missing }
+end
+
+-- Coût réactifs d'une ENTRÉE de liste (résout le spellID comme EntryProfit), ou nil.
+function LG:EntryCost(profKey, entry)
+    local spellID = entrySpell(profKey, entry)
+    if not spellID then return nil end
+    return self:CraftCost(profKey, spellID)
+end
+
 -- ---------------------------------------------------------------------------
 -- Meilleur profit ATTEIGNABLE dans un métier, par niveau de compétence
 -- ---------------------------------------------------------------------------

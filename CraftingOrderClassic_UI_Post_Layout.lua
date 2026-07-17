@@ -55,10 +55,13 @@ local Skin = UI.Skin
 -- les builders qui se parentent aux slots — `string=`/`type=` de l'essai user n'étaient pas des
 -- propriétés du générateur, et `L` n'existe même pas dans ce fichier (crash au chargement).
 local PRICE_H = 54   -- hauteur de la zone « commission » (réutilisée pour le centrage vertical, cf. UI.POST)
+-- help / helpDir : accroches de l'AIDE CONTEXTUELLE (bouton « i », dispatch par onglet dans
+-- _UI_HelpPlate.lua). Tag STRUCTUREL only (le TEXTE est mappé côté glue). Directions : colonne gauche
+-- → RIGHT ; colonne droite (empilée) → LEFT.
 local SPEC = {
     x1 = 0, x2 = 848, vBottom = 18,
     { id = "left", w = 333, top = -63, bottom = 20,
-      { id = "filters", h = 34, bg = true, dir = "cols",
+      { id = "filters", h = 34, bg = true, dir = "cols", help = "filters", helpDir = "RIGHT",
         { id = "srch" },
         { id = "qualityDropDown", w = 96,  sep = false },
         { id = "reagents",        w = 124, sep = false },
@@ -66,7 +69,7 @@ local SPEC = {
       -- sep=false : la bande grise des filtres SE distingue déjà par sa teinte → pas de filet fin en
       -- plus (il créait un « jeu » visible entre la bande et la liste, signalé par le user).
       { dir = "cols", sep = false,
-        { id = "plans" },
+        { id = "plans", help = "plans", helpDir = "RIGHT" },
         { id = "plansGutter", w = 22, sep = false} }},
     { top = -63, bottom = 20,
       -- Sous-zones de detail (SPEC user) : en-tête du plan / liste des réactifs — la jointure fine
@@ -78,23 +81,23 @@ local SPEC = {
       -- reagentsList = rows{ en-tête réactifs · corps (le scroll) }, à côté de sa gouttière scrollbar.
       -- sep=false partout : pas de filet entre les slots d'un en-tête (la bande/le cadre suffisent).
       { id = "detail", h = 210, padL = 5, padR = 5,
-        { id = "ItemSelected", h = 46, dir = "cols",
+        { id = "ItemSelected", h = 46, dir = "cols", help = "ItemSelected", helpDir = "LEFT",
           { id = "craftIcon",   w = 50 },
           { id = "craftText",   sep = false },
           { id = "providePill", w = 90, sep = false } },
         -- (ColReagentlist GARDE son séparateur d'entrée : le filet fin ItemSelected│réactifs, comme la
         --  ligne sous le nom dans la vue métier — ne pas remettre sep=false ici.)
         { id = "ColReagentlist", dir = "cols",
-          { id = "reagentsList", dir = "rows",
+          { id = "reagentsList", dir = "rows", help = "reagentsList", helpDir = "LEFT",
             { id = "reagHeader", h = 22 },
             { id = "reagBody",   sep = false } },
           { id = "reagentsGutter", w = 22, sep = false } } },
 
       -- major sur price (choix user) : la jointure detail|prix passe en barre LOURDE — l'hypothèse
       -- 3-blocs d'origine ne mettait du lourd qu'à scope (③|④) ; à juger sur capture.
-      { id = "price",  h = PRICE_H, major = true , padL = 10  },
-      { id = "scope",  h = 36, major = true , bg = true , padL = 10 , padT = 4},
-      { id = "artisans" , padL = 10 } },
+      { id = "price",  h = PRICE_H, major = true , padL = 10, help = "price", helpDir = "LEFT" },
+      { id = "scope",  h = 36, major = true , bg = true , padL = 10 , padT = 4, help = "scope", helpDir = "LEFT"},
+      { id = "artisans" , padL = 10, help = "artisans", helpDir = "LEFT" } },
 }
 
 -- Métriques DÉRIVÉES de la SPEC (une seule source de vérité : éditer la SPEC suffit, plus de largeurs
@@ -110,6 +113,9 @@ UI.POST = {
     WIDE_W  = (SPEC.x2 - SPEC.x1) - SPEC[1].w - GUTTER - 2 * PAD,
     PRICE_H = PRICE_H,
 }
+
+-- Zones porteuses d'aide contextuelle, extraites de la SPEC (cf. _UI_HelpPlate.lua, dispatch onglet).
+UI.POST.helpNodes = Skin.CollectHelp(SPEC)
 
 function UI:_BuildPostSections(panel)
     self.postSec = Skin.MakeSections(panel, SPEC)

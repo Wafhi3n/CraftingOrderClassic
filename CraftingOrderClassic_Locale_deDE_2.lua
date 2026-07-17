@@ -147,6 +147,83 @@ local de2 = {
         "|cFFFFFFFF/co channel off|r verlässt ihn jederzeit (Flüstern und Gilde bleiben aktiv); |cFFFFFFFF/co channel on|r tritt wieder bei.",
     ["Statuts d'une commande : "] = "Auftragsstatus: ",
 
+    -- Aide contextuelle « bouton i » (Vue Métier) — cf. _ProfWindow_HelpPlate.lua (bulles courtes)
+    ["Aide : survole les zones surlignées pour comprendre chaque fonction."] =
+        "Hilfe: Bewege den Mauszeiger über die hervorgehobenen Bereiche, um jede Funktion zu verstehen.",
+    ["Barre de filtres. À gauche (avec Lazy Gold) : pièce = trier par rentabilité, « 123 » = prix exacts au lieu de l'indicateur compact, flèche verte = trier par montée de compétence. Au centre : la recherche. À droite : sac = seulement les recettes dont tu as les matériaux, flèche orange = masquer les recettes grises (aucun gain de compétence)."] =
+        "Filterleiste. Links (mit Lazy Gold): Münze = nach Gewinn sortieren, „123“ = exakte Preise statt der kompakten Anzeige, grüner Pfeil = nach Fertigkeitsanstieg sortieren. Mitte: die Suche. Rechts: Beutel = nur Rezepte, für die du das Material hast, oranger Pfeil = graue Rezepte ausblenden (kein Fertigkeitsgewinn).",
+    ["Tes recettes, groupées par famille (clique un en-tête pour replier). À droite de chaque ligne : %s = rentabilité à l'HV (survole pour le profit net exact), %s = plan conseillé pour monter le métier (meilleur coût par point), « ×N » doré = commandes en attente pour cet objet. En mode Manquantes, une icône dit où obtenir le plan : formateur, vendeur, HV ou à farmer."] =
+        "Deine Rezepte, nach Familie gruppiert (Kopfzeile anklicken zum Einklappen). Rechts an jeder Zeile: %s = Gewinn im AH (für den genauen Nettogewinn mit der Maus darüberfahren), %s = empfohlenes Rezept zum Hochleveln (bestes Preis-Leistungs-Verhältnis pro Punkt), goldenes „×N“ = ausstehende Aufträge für diesen Gegenstand. Im Modus Fehlende zeigt ein Symbol, wo du das Rezept bekommst: Lehrer, Händler, AH oder zu farmen.",
+    ["Le plan sélectionné : ses réactifs et le bouton pour le fabriquer."] =
+        "Das ausgewählte Rezept: seine Reagenzien und die Schaltfläche zum Herstellen.",
+    ["Les commandes reçues pour ce métier — accepte, crafte, livre. Les onglets filtrent la source (tous / guilde / amis / annuaire)."] =
+        "Für diesen Beruf erhaltene Aufträge – annehmen, herstellen, liefern. Die Reiter filtern die Quelle (alle / Gilde / Freunde / Verzeichnis).",
+    ["Chercher du travail : signale au royaume que tu proposes ce métier. L'engrenage voisin règle ton offre (composants fournis, commission)."] =
+        "Arbeit suchen: Teile dem Realm mit, dass du diesen Beruf anbietest. Das Zahnrad daneben stellt dein Angebot ein (bereitgestellte Reagenzien, Gebühr).",
+    ["Vue Blizzard : rebascule sur la fenêtre de métier native de Blizzard."] =
+        "Blizzard-Ansicht: zurück zum nativen Berufsfenster von Blizzard wechseln.",
+    ["Filtre les commandes par source : tous, ta guilde, tes amis, ou ton annuaire d'artisans."] =
+        "Aufträge nach Quelle filtern: alle, deine Gilde, deine Freunde oder dein Handwerker-Verzeichnis.",
+
+    -- Aide contextuelle « bouton i » — onglet Commande (cf. _UI_HelpPlate.lua)
+    ["Filtre les plans : recherche par nom, filtre par qualité, filtre par réactif, et l'outil %s « 123 » de Lazy Gold (prix/rentabilité)."] =
+        "Filtert die Rezepte: Suche nach Name, Filter nach Qualität, Filter nach Reagenz und Lazy Golds Werkzeug %s „123“ (Preis/Gewinn).",
+    ["La liste des plans. Choisis celui que tu veux faire réaliser par un artisan."] =
+        "Die Rezeptliste. Wähle das, das ein Handwerker herstellen soll.",
+    ["L'objet choisi. La pastille « Je fournis » indique que tu apportes tous les composants toi-même."] =
+        "Der gewählte Gegenstand. Die Plakette „Ich liefere“ bedeutet, dass du alle Reagenzien selbst mitbringst.",
+    ["La commission que tu proposes à l'artisan pour ce craft."] =
+        "Die Provision, die du dem Handwerker für diese Herstellung anbietest.",
+    ["La portée : diffuser à tous, ou restreindre (guilde / amis)."] =
+        "Die Reichweite: an alle senden oder einschränken (Gilde / Freunde).",
+    ["Le destinataire : toute la source sélectionnée, ou un artisan précis."] =
+        "Der Empfänger: die gesamte gewählte Quelle oder ein bestimmter Handwerker.",
+    ["Poster : envoie la commande au(x) destinataire(s) choisi(s)."] =
+        "Aufgeben: Sende den Auftrag an die gewählten Empfänger.",
+
+    -- Aide contextuelle « bouton i » — onglet Récolte (cf. _UI_HelpPlate.lua)
+    ["Recherche une ressource par nom."] = "Suche eine Ressource nach Namen.",
+    ["Extensions : filtre les ressources d'une extension (ex. Élémentaire)."] =
+        "Erweiterungen: filtert Ressourcen einer Erweiterung (z. B. Elementar).",
+    ["La liste des ressources. Choisis celle que tu veux faire récolter."] =
+        "Die Ressourcenliste. Wähle die, die gesammelt werden soll.",
+    ["La ressource choisie."] = "Die gewählte Ressource.",
+    ["À l'unité ou par pile, et la quantité voulue."] = "Pro Einheit oder pro Stapel und die gewünschte Menge.",
+    ["Le prix que tu proposes au récolteur."] = "Der Preis, den du dem Sammler anbietest.",
+    ["Le destinataire : toute la source, ou un récolteur précis."] =
+        "Der Empfänger: die gesamte Quelle oder ein bestimmter Sammler.",
+
+    -- Aide contextuelle « bouton i » — onglet Artisans (cf. _UI_HelpPlate.lua)
+    ["Filtre l'annuaire par source : guilde, amis, ajoutés manuellement, croisés, ou les joueurs en sourdine."] =
+        "Filtert das Verzeichnis nach Quelle: Gilde, Freunde, manuell hinzugefügt, kürzlich getroffen oder stummgeschaltete Spieler.",
+    ["Ajoute un joueur manuellement (+), rafraîchis l'annuaire, ou active le repérage."] =
+        "Füge einen Spieler manuell hinzu (+), aktualisiere das Verzeichnis oder aktiviere die Erfassung.",
+    ["Filtre les artisans par métier."] = "Filtert Handwerker nach Beruf.",
+    ["La liste des artisans connus. Survole un nom pour ses métiers ; pastille verte = a l'addon et répond, jaune = en ligne sans l'addon, grise = hors ligne."] =
+        "Die Liste bekannter Handwerker. Fahre über einen Namen für seine Berufe; grüner Punkt = hat das Addon und antwortet, gelb = online ohne Addon, grau = offline.",
+
+    -- Aide contextuelle « bouton i » — onglet Mes artisans (cf. _UI_HelpPlate.lua)
+    ["Partage tes rerolls sur le réseau (les autres voient tes métiers), et choisis le perso mis en « vitrine »."] =
+        "Teile deine Twinks im Netzwerk (andere sehen deine Berufe) und wähle den Charakter für die „Auslage“.",
+    ["Tous les plans du royaume : la liste agrégée de toutes tes recettes, au lieu du découpage par métier (Lazy Gold requis)."] =
+        "Alle Rezepte des Realms: die zusammengeführte Liste all deiner Rezepte statt der Aufteilung nach Beruf (Lazy Gold erforderlich).",
+    ["Tes métiers (tous les persos du compte). Choisis-en un pour voir ses recettes à droite."] =
+        "Deine Berufe (alle Charaktere des Kontos). Wähle einen, um rechts seine Rezepte zu sehen.",
+    ["En-tête des recettes du métier choisi : bouton « Manquantes » et outils de prix (Lazy Gold)."] =
+        "Kopfzeile der Rezepte des gewählten Berufs: Schaltfläche „Fehlende“ und Preiswerkzeuge (Lazy Gold).",
+    ["Les recettes du métier sélectionné (ou tous les plans du royaume)."] =
+        "Die Rezepte des ausgewählten Berufs (oder alle Rezepte des Realms).",
+
+    -- Aide contextuelle « bouton i » — onglet Carnet (cf. _UI_HelpPlate.lua)
+    ["Filtre ton carnet : commandes En cours, Archivées, ou Confiées (gardées pour un artisan)."] =
+        "Filtere dein Auftragsbuch: Aktive, Archivierte oder Anvertraute Aufträge (für einen Handwerker aufbewahrt).",
+    ["Le Carnet = TES commandes postées. Accepter/livrer se fait dans la Vue Métier, pas ici ; quand une commande t'est remise, le bouton « J'ai reçu » confirme la réception."] =
+        "Das Auftragsbuch = DEINE aufgegebenen Aufträge. Annehmen/Liefern passiert in der Berufsansicht, nicht hier; wenn dir ein Auftrag übergeben wird, bestätigt die Schaltfläche „Erhalten“ den Empfang.",
+
+    -- Popup dépendance optionnelle manquante (boutons Lazy Gold / MTSL toujours visibles)
+    ["Cette fonction nécessite l'addon |cFFFFD100%s|r (non installé ou désactivé). Installe-le pour en profiter."] =
+        "Diese Funktion benötigt das Addon |cFFFFD100%s|r (nicht installiert oder deaktiviert). Installiere es, um sie zu nutzen.",
+
     -- Sous-catégories de recettes (vue métier) — voir _RecipeCats_*.lua
     ["Divers"] = "Sonstiges",
     ["Potions de soin"] = "Heiltränke",
@@ -234,6 +311,13 @@ local de2 = {
     ["Réactifs pour %s (%d) :"] = "Reagenzien für %s (%d):",
     ["choisis un canal valide."] = "wähle einen gültigen Kanal.",
     ["aucun réactif à diffuser."] = "keine Reagenzien zum Ansagen.", ["Diffuser"] = "Ansagen",
+    -- Aide à la montée de métier (Leveling)
+    ["Progression : ~%s par point (estimation)"] = "Skillen: ~%s pro Punkt (Schätzung)",
+    ["Meilleur coût/point pour monter le métier"] = "Bestes Kosten-pro-Punkt-Verhältnis zum Skillen",
+    ["Plan : au formateur%s"] = "Rezept: beim Lehrer%s",
+    ["Plan : chez un vendeur PNJ%s"] = "Rezept: bei einem NSC-Händler%s",
+    ["Plan : coté à l'HV — %s"] = "Rezept: im AH gelistet — %s",
+    ["Plan : à farmer (butin/quête — absent de l'HV)"] = "Rezept: farmen (Beute/Quest — nicht im AH)",
 }
 
 for k, v in pairs(de2) do L[k] = v end

@@ -224,7 +224,7 @@ function UI:_BuildGatherActionBar(panel)
     local bar = CreateFrame("Frame", nil, panel)
     bar:SetAllPoints(self.frame.ActionBar)
     local posterBtn = Skin.MakeGoldButton(bar, 82, 20, L["Poster"]); posterBtn:SetPoint("RIGHT", -8, 0)
-    posterBtn:SetScript("OnClick", function() UI:DoGatherOrder() end)
+    posterBtn:SetScript("OnClick", function() UI:DoGatherOrder() end); self.gatherBtn = posterBtn   -- exposé pour l'aide
     self.gatherArtisanName = bar:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     self.gatherArtisanName:SetPoint("RIGHT", posterBtn, "LEFT", -14, 0); Skin.ApplyShadow(self.gatherArtisanName)
     local artLbl = bar:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")

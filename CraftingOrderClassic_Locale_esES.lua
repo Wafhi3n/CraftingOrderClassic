@@ -238,7 +238,7 @@ local es = {
     ["» Vue Crafting Order"] = "» Vista Crafting Order",
     ["Module Commandes non chargé — redémarre complètement WoW (quitter/relancer), pas un simple /reload."] =
         "Módulo de Pedidos no cargado — reinicia WoW por completo (salir/relanzar), no solo /reload.",
-    ["Clic : ouvrir le carnet d'ordres"] = "Clic: abrir el libro de pedidos",
+    ["Clic : ouvrir les commandes"] = "Clic: abrir pedidos",
     ["Clic droit : mes métiers"] = "Clic derecho: mis profesiones",
     ["Mes métiers"] = "Mis profesiones", ["Aucun métier connu."] = "Ninguna profesión conocida.",
     ["Don / gratuit"] = "Regalo / gratis",

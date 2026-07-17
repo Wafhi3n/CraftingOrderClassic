@@ -59,7 +59,7 @@ function UI:_BuildMyArtLGBar(panel, anchor)
         return UI.myArtSortProfit and L["Tri par rentabilité — clic pour A-Z."]
             or L["Trier par rentabilité (Lazy Gold)."]
     end, function()
-        if not LG() then return end
+        if not LG() then COC:NeedLazyGold(); return end
         UI.myArtSortProfit = not UI.myArtSortProfit
         UI:RefreshMyArtisans()
     end)
@@ -74,7 +74,7 @@ function UI:_BuildMyArtLGBar(panel, anchor)
         return (g and g:ExactMode()) and L["Valeurs exactes — clic pour l'affichage compact."]
             or L["Afficher les valeurs exactes (po/pa/pc)."]
     end, function()
-        local g = LG(); if not g then return end
+        local g = LG(); if not g then COC:NeedLazyGold(); return end
         g:SetExactMode(not g:ExactMode())
         UI:RefreshMyArtisans()
     end)
@@ -87,22 +87,23 @@ end
 function UI:_SyncMyArtLGBar()
     local g = LG()
     if self.myArtAllBtn then
-        self.myArtAllBtn:SetShown(g and true or false)
+        self.myArtAllBtn:SetShown(true)   -- toujours visible (enticing) ; clic sans Lazy Gold → popup
         self.myArtAllBtn:SetSelected(self.myArtAllProfs and true or false)
     end
     if self.myArtSortBtn then
         -- En mode « tout le royaume » le tri par profit est imposé : le bouton reste allumé, mais
         -- l'éteindre n'aurait pas de sens → on le désactive visuellement plutôt que de mentir.
         local on = g and (self.myArtSortProfit or self.myArtAllProfs)
-        self.myArtSortBtn:SetShown(g and true or false)
+        self.myArtSortBtn:SetShown(true)
         self.myArtSortBtn.onBG:SetShown(on and true or false)
-        self.myArtSortBtn.coin:SetDesaturated(not on)
+        self.myArtSortBtn.coin:SetDesaturated(g and not on or false)   -- coloré si Lazy Gold absent
     end
     if self.myArtExactBtn then
         local ex = g and g:ExactMode()
-        self.myArtExactBtn:SetShown(g and true or false)
+        self.myArtExactBtn:SetShown(true)
         self.myArtExactBtn.onBG:SetShown(ex and true or false)
-        self.myArtExactBtn.num:SetTextColor(ex and 1 or 0.55, ex and 0.82 or 0.55, ex and 0.29 or 0.55)
+        if not g then self.myArtExactBtn.num:SetTextColor(1, 0.82, 0.29)   -- doré : incite au clic (popup)
+        else self.myArtExactBtn.num:SetTextColor(ex and 1 or 0.55, ex and 0.82 or 0.55, ex and 0.29 or 0.55) end
     end
 end
 

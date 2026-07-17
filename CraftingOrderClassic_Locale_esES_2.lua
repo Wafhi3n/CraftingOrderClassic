@@ -148,6 +148,83 @@ local es2 = {
         "|cFFFFFFFF/co channel off|r sale en cualquier momento (susurro y hermandad siguen activos); |cFFFFFFFF/co channel on|r vuelve a unirse.",
     ["Statuts d'une commande : "] = "Estados de un pedido: ",
 
+    -- Aide contextuelle « bouton i » (Vue Métier) — cf. _ProfWindow_HelpPlate.lua (bulles courtes)
+    ["Aide : survole les zones surlignées pour comprendre chaque fonction."] =
+        "Ayuda: pasa el ratón por las zonas resaltadas para entender cada función.",
+    ["Barre de filtres. À gauche (avec Lazy Gold) : pièce = trier par rentabilité, « 123 » = prix exacts au lieu de l'indicateur compact, flèche verte = trier par montée de compétence. Au centre : la recherche. À droite : sac = seulement les recettes dont tu as les matériaux, flèche orange = masquer les recettes grises (aucun gain de compétence)."] =
+        "Barra de filtros. A la izquierda (con Lazy Gold): moneda = ordenar por rentabilidad, «123» = precios exactos en vez del indicador compacto, flecha verde = ordenar por subida de habilidad. En el centro: la búsqueda. A la derecha: bolsa = solo las recetas de las que tienes los materiales, flecha naranja = ocultar las recetas grises (sin ganancia de habilidad).",
+    ["Tes recettes, groupées par famille (clique un en-tête pour replier). À droite de chaque ligne : %s = rentabilité à l'HV (survole pour le profit net exact), %s = plan conseillé pour monter le métier (meilleur coût par point), « ×N » doré = commandes en attente pour cet objet. En mode Manquantes, une icône dit où obtenir le plan : formateur, vendeur, HV ou à farmer."] =
+        "Tus recetas, agrupadas por familia (haz clic en una cabecera para plegar). A la derecha de cada línea: %s = rentabilidad en la CdS (pasa el ratón para el beneficio neto exacto), %s = receta recomendada para subir de nivel (mejor coste por punto), «×N» dorado = pedidos pendientes de ese objeto. En modo Faltantes, un icono indica dónde conseguir el plano: entrenador, vendedor, CdS o farmear.",
+    ["Le plan sélectionné : ses réactifs et le bouton pour le fabriquer."] =
+        "La receta seleccionada: sus componentes y el botón para fabricarla.",
+    ["Les commandes reçues pour ce métier — accepte, crafte, livre. Les onglets filtrent la source (tous / guilde / amis / annuaire)."] =
+        "Los pedidos recibidos para esta profesión: acepta, fabrica, entrega. Las pestañas filtran la fuente (todos / hermandad / amigos / directorio).",
+    ["Chercher du travail : signale au royaume que tu proposes ce métier. L'engrenage voisin règle ton offre (composants fournis, commission)."] =
+        "Buscar trabajo: anuncia al reino que ofreces esta profesión. El engranaje contiguo configura tu oferta (componentes aportados, comisión).",
+    ["Vue Blizzard : rebascule sur la fenêtre de métier native de Blizzard."] =
+        "Vista Blizzard: vuelve a la ventana de profesión nativa de Blizzard.",
+    ["Filtre les commandes par source : tous, ta guilde, tes amis, ou ton annuaire d'artisans."] =
+        "Filtra los pedidos por fuente: todos, tu hermandad, tus amigos o tu directorio de artesanos.",
+
+    -- Aide contextuelle « bouton i » — onglet Commande (cf. _UI_HelpPlate.lua)
+    ["Filtre les plans : recherche par nom, filtre par qualité, filtre par réactif, et l'outil %s « 123 » de Lazy Gold (prix/rentabilité)."] =
+        "Filtra las recetas: búsqueda por nombre, filtro por calidad, filtro por componente y la herramienta %s «123» de Lazy Gold (precio/rentabilidad).",
+    ["La liste des plans. Choisis celui que tu veux faire réaliser par un artisan."] =
+        "La lista de recetas. Elige la que quieres que fabrique un artesano.",
+    ["L'objet choisi. La pastille « Je fournis » indique que tu apportes tous les composants toi-même."] =
+        "El objeto elegido. La insignia «Yo aporto» indica que llevas todos los componentes tú mismo.",
+    ["La commission que tu proposes à l'artisan pour ce craft."] =
+        "La comisión que ofreces al artesano por esta fabricación.",
+    ["La portée : diffuser à tous, ou restreindre (guilde / amis)."] =
+        "El alcance: difundir a todos o restringir (hermandad / amigos).",
+    ["Le destinataire : toute la source sélectionnée, ou un artisan précis."] =
+        "El destinatario: toda la fuente seleccionada o un artesano concreto.",
+    ["Poster : envoie la commande au(x) destinataire(s) choisi(s)."] =
+        "Publicar: envía el pedido a los destinatarios elegidos.",
+
+    -- Aide contextuelle « bouton i » — onglet Récolte (cf. _UI_HelpPlate.lua)
+    ["Recherche une ressource par nom."] = "Busca un recurso por nombre.",
+    ["Extensions : filtre les ressources d'une extension (ex. Élémentaire)."] =
+        "Expansiones: filtra los recursos de una expansión (p. ej. Elemental).",
+    ["La liste des ressources. Choisis celle que tu veux faire récolter."] =
+        "La lista de recursos. Elige el que quieres que recolecten.",
+    ["La ressource choisie."] = "El recurso elegido.",
+    ["À l'unité ou par pile, et la quantité voulue."] = "Por unidad o por montón, y la cantidad deseada.",
+    ["Le prix que tu proposes au récolteur."] = "El precio que ofreces al recolector.",
+    ["Le destinataire : toute la source, ou un récolteur précis."] =
+        "El destinatario: toda la fuente o un recolector concreto.",
+
+    -- Aide contextuelle « bouton i » — onglet Artisans (cf. _UI_HelpPlate.lua)
+    ["Filtre l'annuaire par source : guilde, amis, ajoutés manuellement, croisés, ou les joueurs en sourdine."] =
+        "Filtra el directorio por fuente: hermandad, amigos, añadidos manualmente, encontrados recientemente, o jugadores silenciados.",
+    ["Ajoute un joueur manuellement (+), rafraîchis l'annuaire, ou active le repérage."] =
+        "Añade un jugador manualmente (+), actualiza el directorio o activa el rastreo.",
+    ["Filtre les artisans par métier."] = "Filtra los artesanos por profesión.",
+    ["La liste des artisans connus. Survole un nom pour ses métiers ; pastille verte = a l'addon et répond, jaune = en ligne sans l'addon, grise = hors ligne."] =
+        "La lista de artesanos conocidos. Pasa el ratón por un nombre para ver sus profesiones; punto verde = tiene el addon y responde, amarillo = en línea sin el addon, gris = desconectado.",
+
+    -- Aide contextuelle « bouton i » — onglet Mes artisans (cf. _UI_HelpPlate.lua)
+    ["Partage tes rerolls sur le réseau (les autres voient tes métiers), et choisis le perso mis en « vitrine »."] =
+        "Comparte tus alters en la red (los demás ven tus profesiones) y elige el personaje en «escaparate».",
+    ["Tous les plans du royaume : la liste agrégée de toutes tes recettes, au lieu du découpage par métier (Lazy Gold requis)."] =
+        "Todos los planos del reino: la lista agregada de todas tus recetas, en vez de la división por profesión (requiere Lazy Gold).",
+    ["Tes métiers (tous les persos du compte). Choisis-en un pour voir ses recettes à droite."] =
+        "Tus profesiones (todos los personajes de la cuenta). Elige una para ver sus recetas a la derecha.",
+    ["En-tête des recettes du métier choisi : bouton « Manquantes » et outils de prix (Lazy Gold)."] =
+        "Cabecera de las recetas de la profesión elegida: botón «Faltantes» y herramientas de precio (Lazy Gold).",
+    ["Les recettes du métier sélectionné (ou tous les plans du royaume)."] =
+        "Las recetas de la profesión seleccionada (o todos los planos del reino).",
+
+    -- Aide contextuelle « bouton i » — onglet Carnet (cf. _UI_HelpPlate.lua)
+    ["Filtre ton carnet : commandes En cours, Archivées, ou Confiées (gardées pour un artisan)."] =
+        "Filtra tu libro: pedidos Activos, Archivados o Confiados (guardados para un artesano).",
+    ["Le Carnet = TES commandes postées. Accepter/livrer se fait dans la Vue Métier, pas ici ; quand une commande t'est remise, le bouton « J'ai reçu » confirme la réception."] =
+        "El Libro = TUS pedidos publicados. Aceptar/entregar se hace en la Vista de Profesión, no aquí; cuando te entregan un pedido, el botón «Recibido» confirma la recepción.",
+
+    -- Popup dépendance optionnelle manquante (boutons Lazy Gold / MTSL toujours visibles)
+    ["Cette fonction nécessite l'addon |cFFFFD100%s|r (non installé ou désactivé). Installe-le pour en profiter."] =
+        "Esta función necesita el addon |cFFFFD100%s|r (no instalado o desactivado). Instálalo para usarla.",
+
     -- Sous-catégories de recettes (vue métier) — voir _RecipeCats_*.lua
     ["Divers"] = "Varios",
     ["Potions de soin"] = "Pociones de curación",
@@ -235,6 +312,13 @@ local es2 = {
     ["Réactifs pour %s (%d) :"] = "Reactivos para %s (%d):",
     ["choisis un canal valide."] = "elige un canal válido.",
     ["aucun réactif à diffuser."] = "no hay reactivos que difundir.", ["Diffuser"] = "Difundir",
+    -- Aide à la montée de métier (Leveling)
+    ["Progression : ~%s par point (estimation)"] = "Progresión: ~%s por punto (estimación)",
+    ["Meilleur coût/point pour monter le métier"] = "Mejor coste por punto para subir el oficio",
+    ["Plan : au formateur%s"] = "Receta: en el instructor%s",
+    ["Plan : chez un vendeur PNJ%s"] = "Receta: en un vendedor PNJ%s",
+    ["Plan : coté à l'HV — %s"] = "Receta: en la casa de subastas — %s",
+    ["Plan : à farmer (butin/quête — absent de l'HV)"] = "Receta: a farmear (botín/misión — no está en la subasta)",
 }
 
 for k, v in pairs(es2) do L[k] = v end

@@ -19,6 +19,21 @@ local BODY_W = 780
 local function versionsLatest()
     return {
         {
+            v = "v1.22.0", title = L["L'aide contextuelle, des dépendances qu'on ne peut plus rater, et une touche Échap qui obéit"],
+            lines = {
+                L["Un nouveau bouton « i » ouvre l'aide contextuelle du jeu, le même système que Blizzard utilise pour ses propres fenêtres : le fond s'assombrit et une bulle pointe directement sur ce dont il est question. Chaque onglet (Vue Métier, Commande, Récolte, Artisans, Mes artisans, Carnet) a sa propre visite guidée, donc le bouton explique ce qui est réellement affiché plutôt qu'une infobulle générique."],
+                L["Lazy Gold et MTSL restent optionnels, mais rien ne signalait qu'ils manquaient. Les boutons qui en dépendent restent visibles et colorés même sans l'addon installé, et cliquer dessus sans l'avoir ouvre désormais une explication de ce qu'il fait et où le trouver, plutôt que de ne rien faire du tout."],
+                L["L'alerte « peut faire cette commande » se déclenchait même quand tu ne connaissais pas la recette, souvent des gemmes ou enchants dont tu avais les réactifs sans le plan. Elle vérifie maintenant tes recettes connues avant de te notifier sur tes propres commandes. Un ami en ligne sans l'addon ne s'affiche plus « Hors ligne » par erreur."],
+                L["Échap laissait souvent les fenêtres de métier ouvertes, et trois rapports différents pointaient la même cause : cacher ou désactiver la souris d'une fenêtre protégée en plein combat déclenche une erreur du jeu. Les fenêtres passent maintenant par un petit relais dédié, donc Échap les ferme proprement, en combat ou non."],
+                L["L'aide « quoi monter ensuite » affiche maintenant le coût par point de compétence, une pastille de prix Auctioneer, et une icône vers le PNJ qui vend une recette que tu ne connais pas encore, en plus d'un tri affiné."],
+            },
+        },
+    }
+end
+
+local function versionsRecent()
+    return {
+        {
             v = "v1.21.0", title = L["L'enchant par emplacement, et un panneau d'échange qui ne cache plus rien"],
             lines = {
                 L["Choisir un enchant demandait de fouiller des centaines de plans aux noms presque identiques. L'onglet Commande a maintenant une vue silhouette : clique l'emplacement à enchanter, tu obtiens ses stats, puis ses variantes de la plus forte à la plus faible. La bascule est dans la bande de filtres ; la liste reste pour tout ce qui n'a pas d'emplacement (huiles, baguettes, produits de désenchantement)."],
@@ -28,11 +43,6 @@ local function versionsLatest()
                 L["Plus discret : les lignes de chat « X sait faire cette commande captée » sont désactivées par défaut — la commande est poussée aux amis capables dans tous les cas, le message n'était que du bruit. |cFFFFFFFF/co verbose|r les remet."],
             },
         },
-    }
-end
-
-local function versionsRecent()
-    return {
         {
             v = "v1.20.0", title = L["Enchante en un clic, trié par emplacement, et depuis l'échange"],
             lines = {
@@ -77,6 +87,11 @@ local function versionsRecent()
                 L["La vue métier est refaite, avec une colonne Commandes en liste : une ligne par commande (demandeur, objet voulu, prix), et le clic ouvre la carte complète (composants fournis, coût des réactifs, Accepter / Refuser / Chuchoter) avec une croix pour revenir à la liste. Et les sous-catégories de récolte (Peaux, Écailles, Herbes, Poissons) sont enfin traduites hors client français."],
             },
         },
+    }
+end
+
+local function versionsOlder()
+    return {
         {
             v = "v1.16.0", title = L["Recettes triées, et où est l'or"],
             lines = {
@@ -85,11 +100,6 @@ local function versionsRecent()
                 L["Dans l'annuaire, les métiers passent en icônes : un artisan avec un plan vraiment rentable a un contour doré, le survol nomme le plan, le clic ouvre la Commande déjà ciblée. « Mes artisans » gagne « Tous les plans du royaume » : tous tes persos (même faction) fusionnés et triés par profit — d'un coup d'œil, quel reroll fait des sous. Et si tu as MissingTradeSkillsList, un bouton montre tes recettes non apprises en rouge, avec leur source au clic."],
             },
         },
-    }
-end
-
-local function versionsOlder()
-    return {
         {
             v = "v1.15.1", title = L["Tes commandes n'appartiennent qu'à toi"],
             lines = {
@@ -138,6 +148,11 @@ local function versionsOlder()
                 L["Elles ne se chargent que sur un royaume Saison de la Découverte. Sur un royaume Era classique, rien ne change : l'addon voit exactement le même jeu de recettes qu'avant, et les recettes que tes amis t'ont déjà partagées restent lisibles."],
             },
         },
+    }
+end
+
+local function versionsOldest()
+    return {
         {
             v = "v1.10.1", title = L["Corrections : qui reçoit les alertes de commandes"],
             lines = {
@@ -146,11 +161,6 @@ local function versionsOlder()
                 L["Démuter un joueur réarme la détection de spam le concernant ; revenir de la vue métier d'un reroll ne laisse plus les boutons Créer masqués ; et l'addon travaille nettement moins à chaque ligne de chat sur un royaume chargé."],
             },
         },
-    }
-end
-
-local function versionsOldest()
-    return {
         {
             v = "v1.9.0", title = L["Tes rerolls réunis : cooldowns partagés, une identité, l'onglet Mes artisans"],
             lines = {

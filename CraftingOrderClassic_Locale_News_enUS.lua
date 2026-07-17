@@ -11,6 +11,19 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "What's New",
+    -- v1.22.0
+    ["L'aide contextuelle, des dépendances qu'on ne peut plus rater, et une touche Échap qui obéit"] =
+        "Contextual help, unmissable dependencies, and an Escape key that behaves",
+    ["Un nouveau bouton « i » ouvre l'aide contextuelle du jeu, le même système que Blizzard utilise pour ses propres fenêtres : le fond s'assombrit et une bulle pointe directement sur ce dont il est question. Chaque onglet (Vue Métier, Commande, Récolte, Artisans, Mes artisans, Carnet) a sa propre visite guidée, donc le bouton explique ce qui est réellement affiché plutôt qu'une infobulle générique."] =
+        "A new \"i\" button opens the game's own contextual help, the same system Blizzard uses for its own windows: the background dims and a callout points straight at whatever's in question. Every tab (Profession view, Order, Gather, Artisans, My Artisans, Ledger) has its own tour, so the button explains what's actually on screen instead of a generic tooltip.",
+    ["Lazy Gold et MTSL restent optionnels, mais rien ne signalait qu'ils manquaient. Les boutons qui en dépendent restent visibles et colorés même sans l'addon installé, et cliquer dessus sans l'avoir ouvre désormais une explication de ce qu'il fait et où le trouver, plutôt que de ne rien faire du tout."] =
+        "Lazy Gold and MTSL stay optional, but there was no sign either one was missing. The buttons that need them stay visible and colored whether or not you have the addon installed, and clicking one without it now pops a short explanation of what it does and where to get it, instead of doing nothing.",
+    ["L'alerte « peut faire cette commande » se déclenchait même quand tu ne connaissais pas la recette, souvent des gemmes ou enchants dont tu avais les réactifs sans le plan. Elle vérifie maintenant tes recettes connues avant de te notifier sur tes propres commandes. Un ami en ligne sans l'addon ne s'affiche plus « Hors ligne » par erreur."] =
+        "The \"can craft that\" alert fired even when you didn't actually know the recipe, usually gems or enchants you had the reagents for but not the plan. It now checks your known recipes before nagging you about your own orders. A friend who's online without the addon no longer shows up as offline by mistake.",
+    ["Échap laissait souvent les fenêtres de métier ouvertes, et trois rapports différents pointaient la même cause : cacher ou désactiver la souris d'une fenêtre protégée en plein combat déclenche une erreur du jeu. Les fenêtres passent maintenant par un petit relais dédié, donc Échap les ferme proprement, en combat ou non."] =
+        "Escape used to leave profession windows open more often than not, and three separate bug reports pointed at the same cause: hiding or disabling mouse input on a protected window mid-combat throws a game error. Windows now route through a small proxy frame instead, so Escape closes them cleanly whether or not you're in combat.",
+    ["L'aide « quoi monter ensuite » affiche maintenant le coût par point de compétence, une pastille de prix Auctioneer, et une icône vers le PNJ qui vend une recette que tu ne connais pas encore, en plus d'un tri affiné."] =
+        "The \"what to level next\" helper now shows cost per skill point, an Auctioneer price badge, and an icon pointing at the vendor who sells a recipe you don't know yet, on top of a slightly smarter sort.",
     -- v1.21.0
     ["L'enchant par emplacement, et un panneau d'échange qui ne cache plus rien"] =
         "Enchants by slot, and a trade panel that stops hiding things",

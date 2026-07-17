@@ -199,6 +199,22 @@ function COC:ChannelNotice()
     StaticPopup_Show("COC_CHANNEL_NOTICE")
 end
 
+-- Popup « dépendance optionnelle manquante ». Les boutons Lazy Gold / MissingTradeSkillsList restent
+-- VISIBLES et NORMAUX (colorés, pour donner envie de cliquer) même sans l'addon ; un clic sans l'addon
+-- explique alors la dépendance au lieu d'un no-op silencieux. Le nom de l'addon est un nom propre (non
+-- localisé) réinjecté à chaque appel dans le même dialogue (comme COC_SPAM_MUTE).
+function COC:MissingAddon(displayName)
+    if not (StaticPopupDialogs and StaticPopup_Show) then return end
+    StaticPopupDialogs["COC_MISSING_ADDON"] = {
+        text = string.format(COC.L["Cette fonction nécessite l'addon |cFFFFD100%s|r (non installé ou désactivé). Installe-le pour en profiter."], displayName or "?"),
+        button1 = OKAY or "OK",
+        timeout = 0, whileDead = true, hideOnEscape = true, preferredIndex = 3,
+    }
+    StaticPopup_Show("COC_MISSING_ADDON")
+end
+function COC:NeedLazyGold() self:MissingAddon("Lazy Gold Classic") end
+function COC:NeedMTSL()     self:MissingAddon("Missing Trade Skills List") end
+
 -- Balise TEXTE de découverte. À n'appeler QUE depuis une action joueur (hardware event) — sinon
 -- ADDON_ACTION_BLOCKED (SendChatMessage interdit hors input). Émise au clic Poster et sur /co refresh.
 -- Throttle (30 s plancher) géré par la lib. C'est le seul créneau où l'envoi canal fonctionne.

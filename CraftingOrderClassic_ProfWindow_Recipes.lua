@@ -120,6 +120,7 @@ function PW:_RecipeTooltip(row)
     if prof and prof > 0 then
         GameTooltip:AddLine(L["Profit net"] .. " : |cFF33DD33" .. GetCoinTextureString(prof) .. "|r", 1, 1, 1)
     end
+    if self._LevelingTooltip then self:_LevelingTooltip(e) end   -- coût/point + destination du plan (Leveling)
     GameTooltip:Show()
 end
 
@@ -190,12 +191,19 @@ local function knownAlready(known, m)
     return (m.spellID and known["s" .. m.spellID]) or (m.itemID and known["i" .. m.itemID]) or false
 end
 
+-- Mode « manquantes » : l'union COMPLÈTE apprises + non-apprises. Tri « progression » (By skill-up,
+-- hors mode manquantes) : on n'injecte que les manquantes APPRENABLES MAINTENANT (niveau requis ≤
+-- rang) — le conseil « va acheter ce plan » doit se voir sans ouvrir le mode manquantes (retour user
+-- 2026-07-17), mais la vue par familles reste pur « ce que je sais faire » (pas d'inondation rouge).
 function PW:_ActiveRecipes()
-    if not (self.missingMode and COC.MTSL) then return self.recipes or {} end
+    local mode = (self.missingMode and "all") or (self.recipeSortLevel and "learnable") or nil
+    if not (mode and COC.MTSL) then return self.recipes or {} end
     local out, known = {}, self:_KnownRecipeSet()
     for _, r in ipairs(self.recipes or {}) do out[#out + 1] = r end
+    local rank = COC.Craft and COC.Craft:OpenRank()
     for _, m in ipairs(COC.MTSL:MissingRecipes(self.profKey) or {}) do
-        if not knownAlready(known, m) then out[#out + 1] = m end
+        if not knownAlready(known, m)
+            and (mode == "all" or (rank and (m.level or 0) <= rank)) then out[#out + 1] = m end
     end
     return out
 end
@@ -251,7 +259,7 @@ function PW:_RecipeDisplayList()
         if not r.isHeader
             and (not search or search == "" or (r.name and r.name:lower():find(search, 1, true)))
             and (not haveMats or (r.numAvailable or 0) > 0)
-            and (not skillUp or r.difficulty ~= "trivial")
+            and (not skillUp or r.difficulty ~= "trivial" or (r.isMissing and self._MissingLearnable and self:_MissingLearnable(r)))
             and (not acquirable or self:_IsAcquirable(r)) then
             if sortProfit then r._profit = self:_RowProfit(r) end   -- pré-calc (mémorisé) pour le tri
             items[#items + 1] = r
@@ -268,10 +276,12 @@ function PW:_RecipeDisplayList()
         end)
         return items
     end
-    -- Tri « progression » : même principe à PLAT — d'abord ce qui rapporte un point de compétence à
-    -- coup sûr (orange), puis jaune/vert, gris en fin. À rang égal : A-Z.
+    -- Tri « progression » à PLAT : orange d'abord, gris en fin ; affiné coût/point par
+    -- _ProfWindow_Leveling quand il est chargé (repli rang + A-Z sinon, ex. avant restart .toc).
     if self.recipeSortLevel then
+        local less = self._ProgressionLess
         table.sort(items, function(a, b)
+            if less then return less(self, a, b) end
             local ra, rb = levelRank(a), levelRank(b)
             if ra ~= rb then return ra < rb end
             return (a.name or "") < (b.name or "")
@@ -298,7 +308,7 @@ end
 
 function PW:RefreshRecipes()
     if not self.recScroll then return end
-    self._profitCache = {}   -- invalidé à chaque refresh (prix Auctionator ont pu changer)
+    self._profitCache, self._lvlCache = {}, {}   -- invalidés à chaque refresh (prix Auctionator ont pu changer)
     -- Mode « colonne de cases » : actif quand je CHERCHE du travail dans le métier ouvert (le mien, hors
     -- reroll). Pré-calcule l'ensemble des spellID déjà proposés pour cocher les lignes en O(1) au rendu.
     local D = COC.Directory
@@ -315,6 +325,7 @@ function PW:RefreshRecipes()
     self:_SyncFilterButtons()
     self.wantedMap = self:_ComputeWantedMap()
     self.recDisplay = self:_RecipeDisplayList()
+    if self._ComputeLevelBest then self:_ComputeLevelBest() end   -- badge « meilleur coût/point » (Leveling)
     local n = #self.recDisplay
     if self.recContent then self.recContent:SetHeight(math.max(n * ROW_H, VISIBLE * ROW_H)) end
     -- Repli/recherche peuvent RÉTRÉCIR la liste sous le scroll courant → on le ramène dans les clous,
@@ -347,6 +358,7 @@ end
 function PW:_FillHeaderRow(row, e)
     row.tipLink, row.tipItemID = nil, nil   -- en-tête : pas d'objet à linker (ligne recyclée)
     row.icon:Hide(); row.badge:Hide(); row.sel:Hide(); row.profit:Hide(); row.niv:Hide()   -- sinon fantôme sur l'en-tête recyclé
+    if row.srcTex then row.srcTex:Hide(); row.lvlTex:Hide() end   -- idem pour les icônes Leveling
     if row.lfwChk then row.lfwChk:Hide() end   -- pas de case sur un en-tête (ligne recyclée depuis une recette)
     local open = not self:_CollapseTable()[e.ckey] or (self.recipeSearch or "") ~= ""
     row.expand:SetTexture(open and "Interface\\Buttons\\UI-MinusButton-Up" or "Interface\\Buttons\\UI-PlusButton-Up")
@@ -438,6 +450,7 @@ function PW:_FillRecipeRight(row, e)
     else
         row.badge:Hide()
     end
+    if self._FillLevelingRight then anchor = self:_FillLevelingRight(row, e, anchor) end
     if anchor then row.nameFS:SetPoint("RIGHT", anchor, "LEFT", -4, 0) else row.nameFS:SetPoint("RIGHT", row, "RIGHT", -2, 0) end
 end
 

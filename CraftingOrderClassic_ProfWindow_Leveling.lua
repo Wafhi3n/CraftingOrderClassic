@@ -1,0 +1,167 @@
+-- CraftingOrderClassic_ProfWindow_Leveling.lua — aide à la MONTÉE DE MÉTIER dans la liste de
+-- recettes : coût de progression (réactifs au prix Lazy Gold ÷ chance de point selon la couleur),
+-- badge « meilleur coût/point » sur la recette recommandée, icônes de SOURCE sur les manquantes
+-- (formateur / vendeur PNJ / coté à l'HV / à farmer) et tri « progression » affiné par coût.
+-- Les guides statiques se trompent quand l'économie du serveur diverge (vécu : shards à 10 pc alors
+-- que le guide dit d'acheter de la dust) — ici tout est au prix RÉEL (Auctionator via Lazy Gold).
+-- Tout est soft-dep : sans Lazy Gold le coût disparaît (les icônes de source restent, MTSL suffit) ;
+-- sans MTSL, pas d'icônes (les manquantes n'existent pas). Appelé par _ProfWindow_Recipes sous garde
+-- nil (`self._FillLevelingRight and …`) : l'absence de ce fichier ne casse rien.
+
+local COC = CraftingOrderClassic
+local PW  = COC.ProfWindow
+local L   = COC.L
+
+-- Chance ESTIMÉE de gagner un point par craft, par couleur (orange = garanti ; jaune/vert décroissent).
+-- Les vrais seuils jaune/gris PAR recette n'existent dans aucune source locale → paliers assumés,
+-- affichés comme « estimation ». Gris/inconnu : aucun point, exclu (pas d'entrée dans la table).
+local CHANCE = { optimal = 1.0, medium = 0.75, easy = 0.25 }
+
+-- Icônes NATIVES (gossip, déjà dans le client — aucun asset à livrer). Langage : où va ce plan ?
+local ICON = {
+    trainer = "Interface\\GossipFrame\\TrainerGossipIcon",       -- à apprendre au formateur
+    vendor  = "Interface\\GossipFrame\\VendorGossipIcon",        -- à acheter chez un vendeur PNJ
+    ah      = "Interface\\GossipFrame\\BankerGossipIcon",        -- l'objet-plan est coté à l'HV
+    farm    = "Interface\\GossipFrame\\BattleMasterGossipIcon",  -- butin/quête absent de l'HV : à farmer
+    best    = "Interface\\GossipFrame\\AuctioneerGossipIcon",    -- recommandation « moins cher au point »
+}
+
+-- Une MANQUANTE apprenable MAINTENANT (niveau requis ≤ rang courant) : candidate « va acheter ce
+-- plan ». Traitée comme une ORANGE (chance 1) par le coût ET le tri, et gardée par le filtre
+-- skill-up (cf. _RecipeDisplayList) — elle progresse, une fois le plan acheté.
+function PW:_MissingLearnable(e)
+    if not e.isMissing then return false end
+    local rank = COC.Craft and COC.Craft:OpenRank()
+    return (rank and (e.level or 0) <= rank) and true or false
+end
+
+-- Coût de progression d'une entrée : { perPoint, cost, chance, missing } en cuivre, ou nil (gris,
+-- prix inconnus, Lazy Gold absent, manquante pas encore apprenable…). missing = un réactif sans prix
+-- (coût sous-estimé). Cache par refresh (posé dans RefreshRecipes, le rendu se rejoue à chaque scroll).
+function PW:_LevelCost(e)
+    if e.isHeader or not (COC.LazyGold and COC.LazyGold:IsAvailable()) then return nil end
+    self._lvlCache = self._lvlCache or {}
+    local k = e.spellID or e.itemID or 0
+    local v = self._lvlCache[k]
+    if v ~= nil then return v or nil end
+    local chance
+    if e.isMissing then
+        chance = self:_MissingLearnable(e) and 1.0 or nil
+    else
+        chance = CHANCE[e.difficulty]
+    end
+    local c = chance and COC.LazyGold:EntryCost(self.profKey, e)
+    v = c and { perPoint = c.cost / chance, cost = c.cost, chance = chance, missing = c.missing } or false
+    self._lvlCache[k] = v
+    return v or nil
+end
+
+-- Recommandation « à crafter pour monter » : l'entrée au meilleur coût/point de la liste AFFICHÉE
+-- (connues non grises + manquantes apprenables maintenant — ces dernières = « va acheter ce plan »).
+-- Recalculée à chaque refresh (RefreshRecipes) ; nil si rien de calculable.
+function PW:_ComputeLevelBest()
+    self._lvlBest = nil
+    if not (COC.LazyGold and COC.LazyGold:IsAvailable()) then return end
+    local best, bestPer
+    for _, e in ipairs(self.recDisplay or {}) do
+        if not e.isHeader then
+            local c = self:_LevelCost(e)
+            if c and (not bestPer or c.perPoint < bestPer) then best, bestPer = e, c.perPoint end
+        end
+    end
+    self._lvlBest = best
+end
+
+-- Icône de source d'une MANQUANTE : où obtenir le plan, d'un coup d'œil (le détail PNJ vit dans le
+-- panneau d'info au clic). « ah » = l'objet-plan est coté à l'HV en ce moment (dernier scan
+-- Auctionator) ; butin/quête hors HV = « à farmer ». nil si source inconnue (pas de fausse icône).
+function PW:_MissingSourceIcon(e)
+    local M = COC.MTSL
+    if not (M and M:IsAvailable() and e.spellID) then return nil end
+    local kind = M:SourceKind(self.profKey, e.spellID)
+    if kind == "trainer" then return ICON.trainer end
+    if kind == "vendor" then return ICON.vendor end
+    if kind == "unknown" then return nil end
+    local LG = COC.LazyGold
+    local recItemID = M:RecipeItem(self.profKey, e.spellID)
+    if LG and LG:IsAvailable() and recItemID and LG:ItemValue(recItemID) then return ICON.ah end
+    return ICON.farm
+end
+
+-- Zone droite d'une ligne : icône de source (manquantes) + badge « meilleur coût/point ». Textures
+-- créées à la demande sur la ligne du pool. Renvoie la nouvelle ancre (chaîne droite→gauche de
+-- _FillRecipeRight) — ou l'ancre reçue si rien d'affiché.
+function PW:_FillLevelingRight(row, e, anchor)
+    if not row.srcTex then
+        row.srcTex = row:CreateTexture(nil, "ARTWORK"); row.srcTex:SetSize(14, 14)
+        row.lvlTex = row:CreateTexture(nil, "ARTWORK"); row.lvlTex:SetSize(14, 14)
+    end
+    local function put(tex, icon)
+        tex:SetTexture(icon); tex:ClearAllPoints()
+        if anchor then tex:SetPoint("RIGHT", anchor, "LEFT", -4, 0) else tex:SetPoint("RIGHT", row, "RIGHT", -2, 0) end
+        tex:Show(); anchor = tex
+    end
+    local icon = e.isMissing and self:_MissingSourceIcon(e) or nil
+    if icon then put(row.srcTex, icon) else row.srcTex:Hide() end
+    if self._lvlBest and self._lvlBest == e then put(row.lvlTex, ICON.best) else row.lvlTex:Hide() end
+    return anchor
+end
+
+-- Lignes « progression » du tooltip de ligne (survol) : coût/point estimé, recommandation, et pour
+-- une manquante la destination du plan. Silencieux quand rien n'est calculable.
+function PW:_LevelingTooltip(e)
+    local c = self:_LevelCost(e)
+    if c then
+        local per = GetCoinTextureString(math.max(1, math.floor(c.perPoint + 0.5)))
+        local q = c.missing and " |cFF888888(?)|r" or ""
+        GameTooltip:AddLine(string.format(L["Progression : ~%s par point (estimation)"], per) .. q, 0.60, 0.75, 0.91)
+        if self._lvlBest == e then
+            GameTooltip:AddLine("|T" .. ICON.best .. ":12:12:0:0|t " .. L["Meilleur coût/point pour monter le métier"], 1, 0.82, 0.25)
+        end
+    end
+    if e.isMissing then self:_PlanTooltip(e) end
+end
+
+-- Destination du plan d'une manquante (tooltip) : formateur / vendeur PNJ (prix fixe MTSL), coté à
+-- l'HV (cote Lazy Gold), ou à farmer. Même logique que l'icône de source — les deux doivent raconter
+-- la même histoire.
+function PW:_PlanTooltip(e)
+    local M = COC.MTSL
+    if not (M and M:IsAvailable() and e.spellID) then return end
+    local kind = M:SourceKind(self.profKey, e.spellID)
+    if kind == "unknown" then return end
+    local price = M:SourcePrice(self.profKey, e.spellID)
+    local ptxt = price and (" — " .. GetCoinTextureString(price)) or ""
+    local txt
+    if kind == "trainer" then txt = string.format(L["Plan : au formateur%s"], ptxt)
+    elseif kind == "vendor" then txt = string.format(L["Plan : chez un vendeur PNJ%s"], ptxt)
+    else
+        local LG = COC.LazyGold
+        local recItemID = M:RecipeItem(self.profKey, e.spellID)
+        local ah = LG and LG:IsAvailable() and recItemID and LG:ItemValue(recItemID)
+        if ah then txt = string.format(L["Plan : coté à l'HV — %s"], GetCoinTextureString(ah))
+        else txt = L["Plan : à farmer (butin/quête — absent de l'HV)"] end
+    end
+    GameTooltip:AddLine(txt, 0.91, 0.72, 0.29)
+end
+
+-- Tri « progression » affiné : orange < jaune < vert < gris < inconnu < manquantes, puis coût/point
+-- CROISSANT dans un même rang (coût inconnu en fin de rang), puis A-Z. Une manquante APPRENABLE
+-- MAINTENANT est classée AVEC les oranges (chance 1 après achat du plan — retour user 2026-07-17 :
+-- le conseil « va acheter ce plan » doit remonter, pas fermer la marche) ; les autres manquantes
+-- restent en fin. C'est LA réponse à « quoi crafter là, tout de suite, au moins cher ».
+local DIFF_RANK = { optimal = 1, medium = 2, easy = 3, trivial = 4 }
+local function levelRank(pw, e)
+    if e.isMissing then return pw:_MissingLearnable(e) and 1 or 6 end
+    return DIFF_RANK[e.difficulty] or 5
+end
+
+function PW:_ProgressionLess(a, b)
+    local ra, rb = levelRank(self, a), levelRank(self, b)
+    if ra ~= rb then return ra < rb end
+    local ca, cb = self:_LevelCost(a), self:_LevelCost(b)
+    local pa = ca and ca.perPoint or math.huge
+    local pb = cb and cb.perPoint or math.huge
+    if pa ~= pb then return pa < pb end
+    return (a.name or "") < (b.name or "")
+end

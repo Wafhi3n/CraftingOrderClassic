@@ -237,7 +237,7 @@ local de = {
     ["» Vue Crafting Order"] = "» Crafting-Order-Ansicht",
     ["Module Commandes non chargé — redémarre complètement WoW (quitter/relancer), pas un simple /reload."] =
         "Auftragsmodul nicht geladen — starte WoW komplett neu (beenden/neu starten), nicht nur /reload.",
-    ["Clic : ouvrir le carnet d'ordres"] = "Klick: Auftragsbuch öffnen",
+    ["Clic : ouvrir les commandes"] = "Klick: Aufträge öffnen",
     ["Clic droit : mes métiers"] = "Rechtsklick: meine Berufe",
     ["Mes métiers"] = "Meine Berufe", ["Aucun métier connu."] = "Kein bekannter Beruf.",
     ["Don / gratuit"] = "Geschenk / gratis",

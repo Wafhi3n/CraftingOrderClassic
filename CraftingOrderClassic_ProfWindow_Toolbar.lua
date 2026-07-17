@@ -111,7 +111,7 @@ end
 -- Bascule le tri par rentabilité (sans effet si Lazy Gold absent). Met à jour l'en-tête + rafraîchit.
 -- Exclusif avec le tri progression : un seul à-plat à la fois.
 function PW:_ToggleRecipeSort()
-    if not (COC.LazyGold and COC.LazyGold:IsAvailable()) then return end
+    if not (COC.LazyGold and COC.LazyGold:IsAvailable()) then COC:NeedLazyGold(); return end
     self.recipeSortProfit = not self.recipeSortProfit
     if self.recipeSortProfit then self.recipeSortLevel = nil end
     self:_SyncSortHeader()
@@ -130,7 +130,7 @@ end
 -- c'est un confort de lecture, il doit survivre au /reload.
 function PW:_ToggleProfitExact()
     local LG = COC.LazyGold
-    if not (LG and LG:IsAvailable()) then return end
+    if not (LG and LG:IsAvailable()) then COC:NeedLazyGold(); return end
     LG:SetExactMode(not LG:ExactMode())
     self:_SyncSortHeader()
     self:RefreshRecipes()
@@ -161,15 +161,17 @@ function PW:_SyncSortHeader()
     local ok = LG and LG:IsAvailable()
     local on = self.recipeSortProfit and ok
     if self.recSortBtn then
-        self.recSortBtn:SetShown(ok and true or false)
+        self.recSortBtn:SetShown(true)   -- toujours visible (enticing) ; clic sans Lazy Gold → popup
         if self.recSortBtn.onBG then self.recSortBtn.onBG:SetShown(on and true or false) end
-        if self.recSortBtn.coin then self.recSortBtn.coin:SetDesaturated(not on) end
+        -- coloré si Lazy Gold absent (incite au clic) ; sinon gris quand le tri est inactif (toggle normal)
+        if self.recSortBtn.coin then self.recSortBtn.coin:SetDesaturated(ok and not on or false) end
     end
     if self.recExactBtn then
         local ex = ok and LG:ExactMode()
-        self.recExactBtn:SetShown(ok and true or false)
+        self.recExactBtn:SetShown(true)
         self.recExactBtn.onBG:SetShown(ex and true or false)
-        self.recExactBtn.num:SetTextColor(ex and 1 or 0.55, ex and 0.82 or 0.55, ex and 0.29 or 0.55)
+        if not ok then self.recExactBtn.num:SetTextColor(1, 0.82, 0.29)   -- doré : incite au clic (popup)
+        else self.recExactBtn.num:SetTextColor(ex and 1 or 0.55, ex and 0.82 or 0.55, ex and 0.29 or 0.55) end
     end
     if self.recLevelBtn then
         local lon = self.recipeSortLevel and true or false

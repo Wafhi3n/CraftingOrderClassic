@@ -38,7 +38,7 @@ function UI:_BuildPostLGBar(sec)
         return UI.postSortProfit and L["Tri par rentabilité — clic pour A-Z."]
             or L["Trier par rentabilité (Lazy Gold)."]
     end, function()
-        if not LG() then return end
+        if not LG() then COC:NeedLazyGold(); return end
         UI.postSortProfit = not UI.postSortProfit
         UI:_SyncPostLGBar(); UI:RefreshPostPlans()
     end)
@@ -54,7 +54,7 @@ function UI:_BuildPostLGBar(sec)
         return (g and g:ExactMode()) and L["Valeurs exactes — clic pour l'affichage compact."]
             or L["Afficher les valeurs exactes (po/pa/pc)."]
     end, function()
-        local g = LG(); if not g then return end
+        local g = LG(); if not g then COC:NeedLazyGold(); return end
         g:SetExactMode(not g:ExactMode())
         UI:_SyncPostLGBar(); UI:RefreshPostPlans(); UI:_RefreshPostPriceHint(UI.postEntry)
     end)
@@ -68,15 +68,16 @@ end
 function UI:_SyncPostLGBar()
     local g = LG()
     if self.postSortBtn then
-        self.postSortBtn:SetShown(g and true or false)
+        self.postSortBtn:SetShown(true)   -- toujours visible (enticing) ; clic sans Lazy Gold → popup
         self.postSortBtn.onBG:SetShown((g and self.postSortProfit) and true or false)
-        self.postSortBtn.coin:SetDesaturated(not (g and self.postSortProfit))
+        self.postSortBtn.coin:SetDesaturated((g and not self.postSortProfit) and true or false)
     end
     if self.postExactBtn then
         local ex = g and g:ExactMode()
-        self.postExactBtn:SetShown(g and true or false)
+        self.postExactBtn:SetShown(true)
         self.postExactBtn.onBG:SetShown(ex and true or false)
-        self.postExactBtn.num:SetTextColor(ex and 1 or 0.55, ex and 0.82 or 0.55, ex and 0.29 or 0.55)
+        if not g then self.postExactBtn.num:SetTextColor(1, 0.82, 0.29)   -- doré : incite au clic (popup)
+        else self.postExactBtn.num:SetTextColor(ex and 1 or 0.55, ex and 0.82 or 0.55, ex and 0.29 or 0.55) end
     end
 end
 
