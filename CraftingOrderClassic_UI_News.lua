@@ -19,6 +19,18 @@ local BODY_W = 780
 local function versionsLatest()
     return {
         {
+            v = "v1.22.1", title = L["Les alertes de commande vérifient enfin le métier, et un plan de route qui suit son propre badge"],
+            lines = {
+                L["Une commande à portée large (guilde, amis, tous) déclenchait un toast même chez un joueur sans le métier, du moment qu'elle arrivait par le relais de connexion (chuchotement) plutôt que par le canal : le filtre par métier ne couvrait que le canal. Il s'applique maintenant quel que soit le chemin réseau. Le toast gagne aussi un troisième texte : une commande à portée large n'affiche plus « pour TOI », ce qui donnait l'impression fausse d'une demande personnelle."],
+                L["Le plan de route « quoi monter ensuite » pouvait suggérer une recette différente du badge de coût de la liste, les deux lisant des données légèrement différentes. Le plan utilise maintenant la difficulté réelle de la fenêtre métier à ton rang actuel plutôt qu'une projection, et se rafraîchit au même rythme que le badge. La commande |cFFFFFFFF/co lvldump|r affiche le détail en cas de nouveau désaccord."],
+            },
+        },
+    }
+end
+
+local function versionsRecent()
+    return {
+        {
             v = "v1.22.0", title = L["L'aide contextuelle, des dépendances qu'on ne peut plus rater, et une touche Échap qui obéit"],
             lines = {
                 L["Un nouveau bouton « i » ouvre l'aide contextuelle du jeu, le même système que Blizzard utilise pour ses propres fenêtres : le fond s'assombrit et une bulle pointe directement sur ce dont il est question. Chaque onglet (Vue Métier, Commande, Récolte, Artisans, Mes artisans, Carnet) a sa propre visite guidée, donc le bouton explique ce qui est réellement affiché plutôt qu'une infobulle générique."],
@@ -29,11 +41,6 @@ local function versionsLatest()
                 L["Cette même aide gagne un plan de route : clique le bouton carte et il déroule toute ta montée rang par rang, en choisissant à chaque étape la recette la moins chère (apprise ou achetable, plans compris) et en additionnant le coût total. Les recettes à cooldown ou avec un réactif sans prix connu sont exclues exprès, elles fausseraient le total. Demande Lazy Gold ; MTSL ajoute les prix de plans formateur et vendeur au calcul."],
             },
         },
-    }
-end
-
-local function versionsRecent()
-    return {
         {
             v = "v1.21.0", title = L["L'enchant par emplacement, et un panneau d'échange qui ne cache plus rien"],
             lines = {
@@ -75,6 +82,11 @@ local function versionsRecent()
                 L["Les recettes se trient par ce qui te fait encore progresser : un troisième bouton outil remonte en tête les plans qui donnent un point, d'orange à gris. Les commandes ont le même « ce qui me fait monter d'abord », avec un liseré de difficulté sur le côté de chaque ligne. Plus quelques corrections au passage."],
             },
         },
+    }
+end
+
+local function versionsOlder()
+    return {
         {
             v = "v1.17.1", title = L["Correctif : erreur au login en « Chercher du travail »"],
             lines = {
@@ -88,11 +100,6 @@ local function versionsRecent()
                 L["La vue métier est refaite, avec une colonne Commandes en liste : une ligne par commande (demandeur, objet voulu, prix), et le clic ouvre la carte complète (composants fournis, coût des réactifs, Accepter / Refuser / Chuchoter) avec une croix pour revenir à la liste. Et les sous-catégories de récolte (Peaux, Écailles, Herbes, Poissons) sont enfin traduites hors client français."],
             },
         },
-    }
-end
-
-local function versionsOlder()
-    return {
         {
             v = "v1.16.0", title = L["Recettes triées, et où est l'or"],
             lines = {
@@ -128,6 +135,11 @@ local function versionsOlder()
                 L["Un mute porte désormais une raison et une date, et peut être temporaire : |cFFFFFFFF/co mute Bob 1h spammeur|r se lève tout seul au bout d'une heure (|cFFFFFFFF/co mute|r seul liste les mutés avec raison et temps restant). Et |cFFFFFFFF/co trust <nom>|r marque un joueur de confiance, jamais mis en sourdine automatiquement — le mute manuel restant toujours possible."],
             },
         },
+    }
+end
+
+local function versionsOldest()
+    return {
         {
             v = "v1.11.0", title = L["Annuler une commande publique atteint tout le royaume"],
             lines = {
@@ -149,11 +161,6 @@ local function versionsOlder()
                 L["Elles ne se chargent que sur un royaume Saison de la Découverte. Sur un royaume Era classique, rien ne change : l'addon voit exactement le même jeu de recettes qu'avant, et les recettes que tes amis t'ont déjà partagées restent lisibles."],
             },
         },
-    }
-end
-
-local function versionsOldest()
-    return {
         {
             v = "v1.10.1", title = L["Corrections : qui reçoit les alertes de commandes"],
             lines = {
@@ -177,34 +184,11 @@ local function versionsOldest()
                 L["Protocole de commandes consolidé (mêmes échanges réseau) : ce build reste compatible avec les joueurs encore en 1.7.x."],
             },
         },
-        -- v1.7.0 / v1.7.1 retirées de l'onglet (l'historique complet vit dans CHANGELOG.md). Cet onglet
-        -- ne garde qu'une fenêtre glissante de versions : sinon il croît sans fin, et avec lui les 3
-        -- overlays de locale, qui butent sur le plafond anti-monolithe. Retirer ici = retirer les clés
-        -- correspondantes des overlays (sinon check_locale les signale comme traductions MORTES).
-        {
-            v = "v1.6.0", title = L["Allemand et espagnol + onglet Nouveautés"],
-            lines = {
-                L["L'interface se traduit en allemand et en espagnol selon la langue de ton client WoW."],
-                L["Ce nouvel onglet « Nouveautés » affiche les notes de version directement en jeu."],
-            },
-        },
-        {
-            v = "v1.5.0", title = L["Repérer les crafteurs sans l'addon + passe de performance"],
-            lines = {
-                L["Repérage passif des crafteurs autour de toi, même sans l'addon (onglet Artisans → « Repérer les crafteurs autour », ou |cFFFFFFFF/co crafters on|r). Désactivé par défaut, en ville seulement."],
-                L["Liste de plans de l'onglet Commande réécrite : plus fluide sur les métiers à centaines de recettes (Couture)."],
-                L["La fenêtre ne se redessine plus à chaque message réseau : les rafales sont regroupées en un seul rendu."],
-                L["Protocole de commande durci : un autre client ne peut plus annuler ta commande, usurper une acceptation, ni s'attribuer une livraison."],
-            },
-        },
-        {
-            v = "v1.4.0", title = L["Commander depuis les panneaux Amis & Guilde"],
-            lines = {
-                L["Survole un ami dans la liste d'amis, ou sélectionne un membre dans le panneau de guilde : ses métiers primaires s'affichent sans ouvrir cette fenêtre."],
-                L["Clic droit sur un joueur qui a l'addon (ami, guilde, croisé) : « Passer commande à… » ouvre l'onglet Commande déjà ciblé sur lui."],
-                L["« Met » devient « Annuaire ». Le bouton « Rafraîchir l'annuaire » appelle le canal : tous les porteurs en ligne répondent et s'y ajoutent."],
-            },
-        },
+        -- v1.7.0 / v1.7.1 / v1.6.0 / v1.5.0 / v1.4.0 retirées de l'onglet (l'historique complet vit dans
+        -- CHANGELOG.md). Cet onglet ne garde qu'une fenêtre glissante de versions : sinon il croît sans
+        -- fin, et avec lui les 3 overlays de locale, qui butent sur le plafond anti-monolithe. Retirer ici
+        -- = retirer les clés correspondantes des overlays (sinon check_locale les signale comme
+        -- traductions MORTES).
     }
 end
 

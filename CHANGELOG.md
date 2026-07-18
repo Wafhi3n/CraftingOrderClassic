@@ -1,5 +1,19 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.22.1 — Order alerts that actually check what you can craft
+
+A broad order (guild, friends, everyone) could toast a player who doesn't even have the profession,
+as long as it arrived through the login relay (a whisper) instead of the channel. The channel
+broadcast already filtered by profession; the relay didn't. Now the same check applies no matter
+which path the order took. While in there, the toast text got a third variant: a broad order no
+longer reads "order for YOU," since that's not true and read like a suggestion to craft it yourself.
+
+The "what to level next" route planner could suggest a different recipe than the list's own cost
+badge, because the two were reading slightly different data. The route now uses the profession
+window's real difficulty at your current rank instead of projecting it from static thresholds, and
+refreshes on the same clock as the badge so neither one goes stale. A new `/co lvldump` command
+prints the numbers behind a disagreement, if you ever spot one again.
+
 ## v1.22.0 — Contextual help, unmissable dependencies, and an Escape key that behaves
 
 New players kept missing the same handful of buttons, so profession windows now have a small "i"

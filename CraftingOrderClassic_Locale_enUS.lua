@@ -25,12 +25,6 @@ local en = {
     ["Rafraîchir l'annuaire"] = "Refresh directory",
     ["annuaire : appel lancé sur le canal — les porteurs en ligne vont répondre."] =
         "directory: call sent on the channel — online holders will respond.",
-    ["Survole un ami dans la liste d'amis, ou sélectionne un membre dans le panneau de guilde : ses métiers primaires s'affichent sans ouvrir cette fenêtre."] =
-        "Hover a friend in the Friends list, or select a guildmate in the Guild panel, to see their primary professions without opening this window.",
-    ["Clic droit sur un joueur qui a l'addon (ami, guilde, croisé) : « Passer commande à… » ouvre l'onglet Commande déjà ciblé sur lui."] =
-        "Right-click a player who runs the addon (friend, guild, met): \"Order from…\" opens the Order tab already aimed at them.",
-    ["« Met » devient « Annuaire ». Le bouton « Rafraîchir l'annuaire » appelle le canal : tous les porteurs en ligne répondent et s'y ajoutent."] =
-        "\"Met\" is now \"Directory\". The \"Refresh directory\" button calls the channel: every online addon user answers and joins it.",
     -- Onglet « Mes artisans » (vue agrégée des métiers du compte — 100 % local)
     ["Mes artisans"] = "My Artisans",
     ["%d recettes"] = "%d recipes",

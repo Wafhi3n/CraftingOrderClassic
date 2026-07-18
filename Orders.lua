@@ -246,7 +246,7 @@ end
 -- car appelés par OnNetwork via self: sur la table partagée COC.Orders.
 
 -- Notifier (toast) à la 1re réception ? Selon COC.db.notifyScope : all(défaut)/directed/named/off ; cf. /co notify.
-function Orders:_ShouldAlert(o, distribution)
+function Orders:_ShouldAlert(o)
     local m = (COC.db and COC.db.notifyScope) or "all"
     if COC.Moderation and COC.Moderation:IsMuted(o.buyer) then
         if COC.Trace then COC.Trace:Log("mod", "toast P2P silencé : " .. tostring(o.buyer) .. " (muté)") end
@@ -256,10 +256,13 @@ function Orders:_ShouldAlert(o, distribution)
     -- Nommée sur moi OU sur un de mes rerolls (IsMyChar = MA SavedVariable — aucun message réseau
     -- ne peut m'assigner un reroll, donc pas d'alerte forcée) : toujours (même petit perso).
     if o.recipient == me() or (COC.IsMyChar and COC:IsMyChar(o.recipient)) then return true end
-    -- Commande reçue en TEXTE de canal (portée ROYAUME) : ne notifier QUE pour un métier que J'AI
-    -- (mySkills du perso courant) — anti-flood sur royaume actif, DÉCOUPLÉ du scanner de chat (/co scan).
+    -- Commande NON nommée sur moi : ne notifier QUE pour un métier que J'AI (mySkills du perso
+    -- courant), QUEL QUE SOIT le transport. Le gate ne couvrait que le canal-texte ; or le relais
+    -- mesh à la connexion (OnArtisanOnline → whisper) le contournait → toast chez un joueur sans
+    -- le métier (rapport sosh13 : Lodestone of Retaliation sans Enchantement). DÉCOUPLÉ du scanner
+    -- de chat (/co scan).
     -- Métier inconnu (nil, objet hors catalogue) → fail-open : ne pas rendre une commande publique muette.
-    if distribution == "CHANNEL" and o.profession then
+    if o.profession then
         local D = COC.Directory
         if not (D and D.mySkills and D.mySkills[o.profession]) then return false end
     end
@@ -267,7 +270,10 @@ function Orders:_ShouldAlert(o, distribution)
     return (o.recipient and o.recipient ~= "" and o.recipient ~= "Tous") or m == "all"  -- Guilde/Amis vs large
 end
 
--- Alerte « commande pour TOI » : un joueur t'a ciblé nommément (recipient == ton nom).
+-- Alerte de nouvelle commande (toast + son), trois textes selon le destinataire : « pour TOI »
+-- (nommée sur moi), « pour ton reroll » (nommée sur un de mes persos), sinon texte NEUTRE — une
+-- commande de portée Tous/Guilde/Amis n'est PAS une demande personnelle, l'afficher « pour TOI »
+-- se lisait comme une suggestion de craft (rapport sosh13).
 -- L'objet n'est peut-être pas encore en cache (GetItemInfo est ASYNCHRONE) → on retente (jusqu'à ~3 s)
 -- après avoir déclenché son chargement, sinon l'alerte afficherait « item:2307 » au lieu du nom.
 function Orders:AlertTargeted(o, tries)
@@ -284,8 +290,10 @@ function Orders:AlertTargeted(o, tries)
     if rcpt and rcpt ~= me() and COC.IsMyChar and COC:IsMyChar(rcpt) then
         -- Nommée pour un de mes REROLLS (visible ici grâce à VisibleTo étendu) : texte dédié.
         msg = string.format(L["|cFFFFCC00commande pour ton reroll %s|r de |cFFFFFFFF%s|r : %s%s%s"], rcpt, o.buyer, nm, qty, pr)
-    else
+    elseif rcpt == me() then
         msg = string.format(L["|cFFFFCC00commande pour TOI|r de |cFFFFFFFF%s|r : %s%s%s"], o.buyer, nm, qty, pr)
+    else
+        msg = string.format(L["|cFFFFCC00nouvelle commande|r de |cFFFFFFFF%s|r : %s%s%s"], o.buyer, nm, qty, pr)
     end
     pmsg((Skin and ("|T" .. Skin.tex.workorder .. ":0|t ") or "") .. msg)
     if COC.UI and COC.UI.Toast then COC.UI:Toast(msg) end

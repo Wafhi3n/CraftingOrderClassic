@@ -345,6 +345,9 @@ function COC:Slash(msg)
         end
     elseif cmd == "socialdiag" or cmd == "sdiag" then if COC.Social then COC.Social:Diag(rest) end
     elseif cmd == "trace"  then if COC.Trace then COC.Trace:Cmd(rest) end
+    elseif cmd == "lvldump" then
+        local PW = COC.ProfWindow
+        if PW and PW._LevelDump then PW:_LevelDump() end
     elseif cmd == "help"   then COC:Help()
     else COC:Status() end
 end

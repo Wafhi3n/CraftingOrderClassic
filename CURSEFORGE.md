@@ -5,13 +5,18 @@
 
 ---
 
-Crafting & Gathering Order is a work-order board for WoW Classic, for both crafting and gathering. No
-shared guild, no auction house, no server. You post what you want made or gathered, and everyone
-running the addon on your realm can see it and answer. It talks over a hidden realm channel, so it works
-between total strangers as long as they've got the addon too.
+Crafting & Gathering Order shows everyone you cross paths with what you can craft. Your professions,
+skill levels and recipe list travel with you, and any player on your realm running the addon can look
+you up in the Artisans directory and order straight from you, guildmate or total stranger.
+
+It's also a work-order board, for both crafting and gathering. No shared guild, no auction house, no
+server. You post what you want made or gathered, and everyone running the addon on your realm can see
+it and answer. It talks over a hidden realm channel, so it works between people who've never met, as
+long as they've got the addon too.
 
 ## What it does
 
+- Share your professions, skill levels and known recipes automatically with every addon user you cross paths with. No setup, no signup; playing is enough.
 - Post craft and gather orders from the addon window, or straight from chat with `/co post`.
 - Send an order to everyone, your guild, your friends, or one named player. A named order gets pushed to that person the moment they log in.
 - Get a toast, a chat line and a sound when an order is meant for you. `/co notify` sets how much of that you want.

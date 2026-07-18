@@ -2,8 +2,9 @@
 -- à la progression) : « du rang actuel au plafond, quoi crafter, combien de fois, pour combien ».
 -- Marche gloutonne rang par rang : à chaque rang, la recette au meilleur coût/point ESPÉRÉ parmi
 -- les candidates (apprises + manquantes ACHETABLES — formateur/vendeur prix MTSL, sinon objet-plan
--- coté à l'HV) ; la couleur à un rang FUTUR vient des seuils réels CraftLink `skillColors`
--- (lib v11, source Wowhead). Le prix d'un plan à acheter est AMORTI sur les points qu'il peut
+-- coté à l'HV) ; au rang COURANT la couleur est celle du CLIENT (cohérence avec le badge de la
+-- liste), aux rangs FUTURS elle vient des seuils réels CraftLink `skillColors` (lib v11, source
+-- Wowhead, précis à ±1 rang aux bornes). Le prix d'un plan à acheter est AMORTI sur les points qu'il peut
 -- encore servir (comparaison équitable avec les recettes déjà connues) puis compté UNE fois.
 -- Exclues : recettes à cooldown (1/jour ≠ route) et recettes au coût partiel (réactif sans prix —
 -- un coût sous-estimé détournerait toute la route). Les rangs sans candidate = segment « ? ».
@@ -40,6 +41,16 @@ function PW:_RouteCandidates()
     local lib = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
     local LG, M = COC.LazyGold, COC.MTSL
     if not (lib and lib.RecipeColors and LG and LG:IsAvailable() and self.profKey) then return nil end
+    -- Difficulté LIVE des recettes de la fenêtre métier ouverte : au rang COURANT le client fait foi
+    -- (les seuils Wowhead basculent à ±1 rang des couleurs réelles — dump user 2026-07-18, 4 recettes
+    -- au rang pile sur un seuil) ; les seuils data ne projettent que les rangs FUTURS.
+    local live = {}
+    for _, e in ipairs(self.recipes or {}) do
+        if e.difficulty and not e.isMissing then
+            if e.spellID then live["s" .. e.spellID] = e.difficulty end
+            if e.itemID  then live["i" .. e.itemID]  = e.difficulty end
+        end
+    end
     local known, out = self:_KnownRecipeSet(), {}
     for _, sid in ipairs((lib.GetRecipes and lib:GetRecipes(self.profKey)) or {}) do
         local colors = lib:RecipeColors(self.profKey, sid)
@@ -62,6 +73,7 @@ function PW:_RouteCandidates()
                 out[#out + 1] = {
                     sid = sid, colors = colors, cost = cost.cost, prod = prod,
                     known = isKnown, planPrice = planPrice,
+                    live = live["s" .. sid] or (prod and live["i" .. prod]) or nil,
                     learnAt = (lib.RecipeLearnedAt and lib:RecipeLearnedAt(self.profKey, sid)) or colors[1],
                 }
             end
@@ -72,11 +84,15 @@ end
 
 -- Meilleure candidate à un rang donné : coût/point espéré minimal ; le prix d'un plan pas encore
 -- « acheté » est amorti sur les points qu'il peut encore servir d'ici sa couleur grise (ou la cible).
-local function pickBest(cands, r, target, bought)
+-- Au rang COURANT (`cur`), la couleur live du client remplace les seuils data quand on la connaît :
+-- le 1er segment de la route raconte alors la même histoire que le badge de la liste.
+local function pickBest(cands, r, cur, target, bought)
     local best, bestPer, bestChance
     for _, c in ipairs(cands) do
         if c.learnAt <= r then
-            local col = colorAt(c.colors, r)
+            local col
+            if r == cur and c.live then col = (c.live ~= "trivial") and c.live or nil
+            else col = colorAt(c.colors, r) end
             local chance = col and CHANCE[col]
             if chance then
                 local per = c.cost / chance
@@ -104,7 +120,7 @@ function PW:_ComputeRoute()
     if not cands then return nil end
     local segs, mats, plans, bought = {}, 0, 0, {}
     for r = rank, target - 1 do
-        local best, chance = pickBest(cands, r, target, bought)
+        local best, chance = pickBest(cands, r, rank, target, bought)
         local seg = segs[#segs]
         if not best then
             if seg and seg.gap then seg.to = r + 1
@@ -251,6 +267,7 @@ function PW:_FillRoute()
     local f = self.routeWin; if not f then return end
     local route = self:_ComputeRoute()
     self._routeProf, self._routeRank = self.profKey, route and route.rank or nil
+    self._routeAt = GetTime and GetTime() or 0
     Skin.SetWindowPortrait(f, Skin.ProfIcon(self.profKey) or "Interface\\Icons\\INV_Misc_Map_01")
     if f.SetTitle then f:SetTitle(L["Plan de route"] .. " — " .. Skin.ProfLabel(self.profKey)) end
     local segs = route and route.segments or {}
@@ -300,7 +317,9 @@ end
 
 -- État du bouton (appelé par _SyncSortHeader à chaque refresh) : masqué en reroll ; coloré si Lazy
 -- Gold absent (incite au clic → popup) ou panneau ouvert, grisé sinon. Fenêtre ouverte : re-remplit
--- si le métier OU le rang a changé depuis le dernier calcul (suit les points gagnés en direct).
+-- à chaque refresh de la liste (throttle 1 s) — même cadence que le badge « meilleur coût/point »,
+-- pour que la route suive AUSSI les prix Lazy Gold (vécu 2026-07-18 : route figée sur d'anciens prix
+-- ≠ badge recalculé → les deux guides se contredisaient) ; immédiat si métier ou rang a changé.
 function PW:_SyncRouteBtn()
     local b = self.recRouteBtn
     if b then
@@ -314,6 +333,9 @@ function PW:_SyncRouteBtn()
     local f = self.routeWin
     if f and f:IsShown() then
         local rank = COC.Craft and COC.Craft:OpenRank()
-        if self._routeProf ~= self.profKey or (rank and rank ~= self._routeRank) then self:_FillRoute() end
+        local fresh = ((GetTime and GetTime() or 0) - (self._routeAt or 0)) < 1
+        if self._routeProf ~= self.profKey or (rank and rank ~= self._routeRank) or not fresh then
+            self:_FillRoute()
+        end
     end
 end

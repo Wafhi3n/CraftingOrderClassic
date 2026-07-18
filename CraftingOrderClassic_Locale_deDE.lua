@@ -23,12 +23,6 @@ local de = {
     ["Rafraîchir l'annuaire"] = "Verzeichnis aktualisieren",
     ["annuaire : appel lancé sur le canal — les porteurs en ligne vont répondre."] =
         "Verzeichnis: Aufruf im Kanal gesendet — Online-Nutzer antworten.",
-    ["Survole un ami dans la liste d'amis, ou sélectionne un membre dans le panneau de guilde : ses métiers primaires s'affichent sans ouvrir cette fenêtre."] =
-        "Fahre über einen Freund in der Freundesliste oder wähle ein Gildenmitglied im Gildenfenster: seine Hauptberufe werden angezeigt, ohne dieses Fenster zu öffnen.",
-    ["Clic droit sur un joueur qui a l'addon (ami, guilde, croisé) : « Passer commande à… » ouvre l'onglet Commande déjà ciblé sur lui."] =
-        "Rechtsklick auf einen Spieler mit dem Addon (Freund, Gilde, getroffen): « Auftrag an… » öffnet den Tab Bestellen, bereits auf ihn ausgerichtet.",
-    ["« Met » devient « Annuaire ». Le bouton « Rafraîchir l'annuaire » appelle le canal : tous les porteurs en ligne répondent et s'y ajoutent."] =
-        "« Getroffen » heißt jetzt « Verzeichnis ». Die Schaltfläche « Verzeichnis aktualisieren » ruft den Kanal auf: alle Online-Nutzer antworten und werden hinzugefügt.",
     -- Onglet « Mes artisans » (vue agrégée des métiers du compte — 100 % local)
     ["Mes artisans"] = "Meine Handwerker",
     ["%d recettes"] = "%d Rezepte",
@@ -244,6 +238,7 @@ local de = {
     ["|cFFFF8800entrante|r |cFFFFFFFF%s|r (%s) : %s%s%s"] = "|cFFFF8800eingehend|r |cFFFFFFFF%s|r (%s): %s%s%s",
     ["   |cFF33DD33→ tu sais la crafter|r — Carnet › Entrantes"] = "   |cFF33DD33→ du kannst es herstellen|r — Auftragsbuch › Eingehend",
     ["|cFFFFCC00commande pour TOI|r de |cFFFFFFFF%s|r : %s%s%s"] = "|cFFFFCC00Auftrag für DICH|r von |cFFFFFFFF%s|r: %s%s%s",
+    ["|cFFFFCC00nouvelle commande|r de |cFFFFFFFF%s|r : %s%s%s"] = "|cFFFFCC00neuer Auftrag|r von |cFFFFFFFF%s|r: %s%s%s",
     ["ton artisan |cFFFFFFFF%s|r est en ligne."] = "dein Handwerker |cFFFFFFFF%s|r ist online.",
     ["plan looté : |cFFFFFFFF%s|r — enseigne |cFFFFFFFF%s|r (%s) %s"] =
         "Rezept erbeutet: |cFFFFFFFF%s|r — lehrt |cFFFFFFFF%s|r (%s) %s",

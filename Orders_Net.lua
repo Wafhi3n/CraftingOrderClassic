@@ -179,12 +179,12 @@ function Orders:_OnNew(message, distribution, sender)
     if not existed and sender and samePlayer(sender, o.buyer) and not myChar(o.buyer) and COC.Moderation then
         COC.Moderation:NotePost(o.buyer)
     end
-    -- Garde d'alerte : `o.alerted` (PAS `existed`). Le gate métier du canal-texte (_ShouldAlert) refuse
-    -- parfois une 1re réception CHANNEL sans pour autant que l'ordre ait eu sa chance d'alerter — s'il
-    -- arrive ENSUITE en whisper (fiable, non filtré par métier), il doit encore pouvoir alerter. Si on
-    -- réutilisait `existed`, la mise en cache par la réception CHANNEL bloquerait silencieusement à
-    -- jamais l'alerte whisper suivante pour le même id (course de transport).
-    if not o.alerted and not myChar(o.buyer) and o.status == "open" and self:_ShouldAlert(o, distribution) then
+    -- Garde d'alerte : `o.alerted` (PAS `existed`). _ShouldAlert peut refuser une 1re réception
+    -- (gate métier, portée) sans que l'ordre ait « consommé » son alerte — une réception ultérieure
+    -- dans de meilleures conditions (ordre re-reçu nommé sur moi après mutation par l'acheteur,
+    -- métier appris entre-temps) doit encore pouvoir alerter. Si on réutilisait `existed`, la mise
+    -- en cache par la 1re réception bloquerait silencieusement à jamais l'alerte pour cet id.
+    if not o.alerted and not myChar(o.buyer) and o.status == "open" and self:_ShouldAlert(o) then
         o.alerted = true
         self:AlertTargeted(o)
     end

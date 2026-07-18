@@ -24,12 +24,6 @@ local es = {
     ["Rafraîchir l'annuaire"] = "Actualizar directorio",
     ["annuaire : appel lancé sur le canal — les porteurs en ligne vont répondre."] =
         "directorio: llamada enviada al canal — los usuarios en línea responderán.",
-    ["Survole un ami dans la liste d'amis, ou sélectionne un membre dans le panneau de guilde : ses métiers primaires s'affichent sans ouvrir cette fenêtre."] =
-        "Pasa el cursor sobre un amigo en la lista de amigos, o selecciona un miembro en el panel de hermandad: sus profesiones principales se muestran sin abrir esta ventana.",
-    ["Clic droit sur un joueur qui a l'addon (ami, guilde, croisé) : « Passer commande à… » ouvre l'onglet Commande déjà ciblé sur lui."] =
-        "Clic derecho sobre un jugador que tiene el addon (amigo, hermandad, visto): « Pedir a… » abre la pestaña Pedir ya dirigida a él.",
-    ["« Met » devient « Annuaire ». Le bouton « Rafraîchir l'annuaire » appelle le canal : tous les porteurs en ligne répondent et s'y ajoutent."] =
-        "« Vistos » pasa a « Directorio ». El botón « Actualizar directorio » llama al canal: todos los usuarios en línea responden y se añaden.",
     -- Onglet « Mes artisans » (vue agrégée des métiers du compte — 100 % local)
     ["Mes artisans"] = "Mis artesanos",
     ["%d recettes"] = "%d recetas",
@@ -245,6 +239,7 @@ local es = {
     ["|cFFFF8800entrante|r |cFFFFFFFF%s|r (%s) : %s%s%s"] = "|cFFFF8800entrante|r |cFFFFFFFF%s|r (%s): %s%s%s",
     ["   |cFF33DD33→ tu sais la crafter|r — Carnet › Entrantes"] = "   |cFF33DD33→ sabes fabricarlo|r — Libro › Entrantes",
     ["|cFFFFCC00commande pour TOI|r de |cFFFFFFFF%s|r : %s%s%s"] = "|cFFFFCC00pedido para TI|r de |cFFFFFFFF%s|r: %s%s%s",
+    ["|cFFFFCC00nouvelle commande|r de |cFFFFFFFF%s|r : %s%s%s"] = "|cFFFFCC00nuevo pedido|r de |cFFFFFFFF%s|r: %s%s%s",
     ["ton artisan |cFFFFFFFF%s|r est en ligne."] = "tu artesano |cFFFFFFFF%s|r está en línea.",
     ["plan looté : |cFFFFFFFF%s|r — enseigne |cFFFFFFFF%s|r (%s) %s"] =
         "receta saqueada: |cFFFFFFFF%s|r — enseña |cFFFFFFFF%s|r (%s) %s",

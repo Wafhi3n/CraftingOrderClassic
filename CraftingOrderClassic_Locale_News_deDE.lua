@@ -8,6 +8,13 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "Neues",
+    -- v1.22.1
+    ["Les alertes de commande vérifient enfin le métier, et un plan de route qui suit son propre badge"] =
+        "Bestellbenachrichtigungen, die wirklich den Beruf prüfen, und eine Routenplanung im Einklang mit dem Abzeichen",
+    ["Une commande à portée large (guilde, amis, tous) déclenchait un toast même chez un joueur sans le métier, du moment qu'elle arrivait par le relais de connexion (chuchotement) plutôt que par le canal : le filtre par métier ne couvrait que le canal. Il s'applique maintenant quel que soit le chemin réseau. Le toast gagne aussi un troisième texte : une commande à portée large n'affiche plus « pour TOI », ce qui donnait l'impression fausse d'une demande personnelle."] =
+        "Eine breite Bestellung (Gilde, Freunde, alle) löste einen Hinweis auch bei Spielern aus, die den Beruf gar nicht hatten, sofern sie über die Login-Weiterleitung (ein Flüstern) statt über den Kanal ankam: der Berufsfilter galt bisher nur für den Kanal. Er gilt jetzt unabhängig vom Übertragungsweg. Der Hinweis bekommt außerdem einen dritten Text: eine breite Bestellung zeigt nicht mehr „für DICH\", was wie eine persönliche Anfrage wirkte, obwohl sie keine war.",
+    ["Le plan de route « quoi monter ensuite » pouvait suggérer une recette différente du badge de coût de la liste, les deux lisant des données légèrement différentes. Le plan utilise maintenant la difficulté réelle de la fenêtre métier à ton rang actuel plutôt qu'une projection, et se rafraîchit au même rythme que le badge. La commande |cFFFFFFFF/co lvldump|r affiche le détail en cas de nouveau désaccord."] =
+        "Die Routenplanung „was als Nächstes lernen\" konnte ein anderes Rezept vorschlagen als das Kosten-Abzeichen der Liste, weil beide leicht unterschiedliche Daten lasen. Die Route nutzt jetzt den tatsächlichen Schwierigkeitsgrad des Berufsfensters auf deinem aktuellen Rang statt einer Schätzung, und aktualisiert sich im selben Takt wie das Abzeichen. |cFFFFFFFF/co lvldump|r zeigt die Details bei einer erneuten Abweichung.",
     -- v1.22.0
     ["L'aide contextuelle, des dépendances qu'on ne peut plus rater, et une touche Échap qui obéit"] =
         "Kontexthilfe, unübersehbare Abhängigkeiten, und eine Escape-Taste, die gehorcht",
@@ -92,27 +99,12 @@ local news = {
         "Öffne einen Beruf und klick „Arbeit suchen“: der ganze Realm weiß, dass du verfügbar bist, ein Handwerker-Symbol erscheint über deinem Kopf für Vorbeikommende, und du erscheinst als „[Sucht]“ in ihrem Verzeichnis. Es erlischt von selbst, wenn du es vergisst.",
     ["Au passage : les deux fenêtres ne s'emmêlent plus (un clic la ramène au premier plan), l'annuaire a un bouton partenaire et se limite à ta faction (pas d'échange cross-faction sur Classic), et un artisan ne s'affiche plus avec un métier qui n'est pas le sien."] =
         "Nebenbei: die zwei Fenster überlagern sich nicht mehr (ein Klick bringt eins nach vorne), das Verzeichnis hat einen Partner-Knopf und bleibt bei deiner Fraktion (kein fraktionsübergreifender Handel auf Classic), und ein Handwerker zeigt keinen Beruf mehr, der nicht seiner ist.",
-    ["Repérer les crafteurs sans l'addon + passe de performance"] = "Handwerker ohne Addon erkennen + Leistungsverbesserungen",
-    ["Repérage passif des crafteurs autour de toi, même sans l'addon (onglet Artisans → « Repérer les crafteurs autour », ou |cFFFFFFFF/co crafters on|r). Désactivé par défaut, en ville seulement."] =
-        "Passives Erkennen von Handwerkern in deiner Nähe, auch ohne Addon (Tab Handwerker, oder |cFFFFFFFF/co crafters on|r). Standardmäßig aus, nur in Städten.",
-    ["Liste de plans de l'onglet Commande réécrite : plus fluide sur les métiers à centaines de recettes (Couture)."] =
-        "Rezeptliste im Tab Bestellen überarbeitet: flüssiger bei Berufen mit Hunderten Rezepten (Schneiderei).",
-    ["La fenêtre ne se redessine plus à chaque message réseau : les rafales sont regroupées en un seul rendu."] =
-        "Das Fenster wird nicht mehr bei jeder Netzwerknachricht neu gezeichnet: Schübe werden zu einem Rendern zusammengefasst.",
-    ["Protocole de commande durci : un autre client ne peut plus annuler ta commande, usurper une acceptation, ni s'attribuer une livraison."] =
-        "Auftragsprotokoll gehärtet: ein anderer Client kann deinen Auftrag nicht mehr stornieren, eine Annahme vortäuschen oder eine Lieferung beanspruchen.",
-    ["Commander depuis les panneaux Amis & Guilde"] = "Bestellen aus den Fenstern Freunde & Gilde",
     ["Sous le capot : mises à jour plus sûres"] = "Unter der Haube: sicherere Updates",
     ["Tes données sauvegardées portent désormais une version : une mise à jour qui doit les réorganiser ne tourne qu'une fois, tes recettes et commandes restent intactes."] =
         "Deine gespeicherten Daten tragen jetzt eine Version, sodass ein Update, das sie umbauen muss, nur einmal läuft und deine Rezepte und Aufträge unversehrt bleiben.",
     ["Protocole de commandes consolidé (mêmes échanges réseau) : ce build reste compatible avec les joueurs encore en 1.7.x."] =
         "Das Auftragsprotokoll wurde konsolidiert (gleiche Netzwerk-Kommunikation); dieser Build versteht sich weiterhin mit Spielern auf 1.7.x.",
-    -- (clés v1.7.0/v1.7.1 retirées : ces versions ne sont plus listées dans l'onglet Nouveautés)
-    ["Allemand et espagnol + onglet Nouveautés"] = "Deutsch und Spanisch + Tab Neues",
-    ["L'interface se traduit en allemand et en espagnol selon la langue de ton client WoW."] =
-        "Die Oberfläche wird je nach Sprache deines WoW-Clients ins Deutsche und Spanische übersetzt.",
-    ["Ce nouvel onglet « Nouveautés » affiche les notes de version directement en jeu."] =
-        "Dieser neue Tab « Neues » zeigt die Versionshinweise direkt im Spiel.",
+    -- (clés v1.7.0/v1.7.1/v1.6.0/v1.5.0/v1.4.0 retirées : ces versions ne sont plus listées dans l'onglet Nouveautés)
     -- Onglet Nouveautés — v1.13.0
     ["Modération : mutes avec raison, temporaires, liste de confiance"] = "Moderation: Stummschaltungen mit Grund, temporär, Vertrauensliste",
     ["Un mute porte désormais une raison et une date, et peut être temporaire : |cFFFFFFFF/co mute Bob 1h spammeur|r se lève tout seul au bout d'une heure (|cFFFFFFFF/co mute|r seul liste les mutés avec raison et temps restant). Et |cFFFFFFFF/co trust <nom>|r marque un joueur de confiance, jamais mis en sourdine automatiquement — le mute manuel restant toujours possible."] =

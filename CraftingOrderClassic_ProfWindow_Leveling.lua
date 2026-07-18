@@ -171,6 +171,27 @@ function PW:_PlanTooltip(e)
     GameTooltip:AddLine(txt, 0.91, 0.72, 0.29)
 end
 
+-- Diagnostic « /co lvldump » : imprime, pour chaque recette AFFICHÉE, les valeurs exactes que le
+-- badge « meilleur coût/point » vient de comparer (difficulté live, chance, coût catalogue, coût/pt).
+-- Sert à élucider un désaccord badge ↔ Plan de route sans deviner l'état live (vécu 2026-07-18 :
+-- badge sur Simple Pearl Ring, route sur Ring of Twilight Shadows). Sortie console technique.
+function PW:_LevelDump()
+    print("|cFF33DD88COC|r lvldump — " .. tostring(self.profKey)
+        .. " | rank=" .. tostring(COC.Craft and COC.Craft:OpenRank())
+        .. " | best=" .. ((self._lvlBest and self._lvlBest.name) or "nil"))
+    for _, e in ipairs(self.recDisplay or {}) do
+        if not e.isHeader then
+            local diff = e.isMissing and ("miss:" .. tostring(self:_MissingDifficulty(e))) or tostring(e.difficulty)
+            local c = self:_LevelCost(e)
+            print(string.format("  %s | %s | sid=%s it=%s | %s",
+                e.name or "?", diff, tostring(e.spellID), tostring(e.itemID),
+                c and string.format("cost=%d chance=%.2f perPt=%d%s",
+                        c.cost, c.chance, c.perPoint, c.missing and " PRIX-PARTIEL" or "")
+                  or "exclu (coût ou chance nil)"))
+        end
+    end
+end
+
 -- Tri « progression » affiné : orange < jaune < vert < gris < inconnu < manquantes grises, puis
 -- coût/point CROISSANT dans un même rang (coût inconnu en fin de rang), puis A-Z. Une manquante
 -- apprenable est classée à sa COULEUR ESTIMÉE (retour user 2026-07-17 : le conseil « va acheter ce

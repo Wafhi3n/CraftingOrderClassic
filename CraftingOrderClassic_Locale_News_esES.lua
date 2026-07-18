@@ -8,6 +8,13 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "Novedades",
+    -- v1.22.1
+    ["Les alertes de commande vérifient enfin le métier, et un plan de route qui suit son propre badge"] =
+        "Alertas de pedido que de verdad comprueban el oficio, y una ruta que coincide con su propia insignia",
+    ["Une commande à portée large (guilde, amis, tous) déclenchait un toast même chez un joueur sans le métier, du moment qu'elle arrivait par le relais de connexion (chuchotement) plutôt que par le canal : le filtre par métier ne couvrait que le canal. Il s'applique maintenant quel que soit le chemin réseau. Le toast gagne aussi un troisième texte : une commande à portée large n'affiche plus « pour TOI », ce qui donnait l'impression fausse d'une demande personnelle."] =
+        "Un pedido de alcance amplio (hermandad, amigos, todos) generaba un aviso incluso a un jugador sin el oficio, siempre que llegara por el relevo de conexión (un susurro) en vez del canal: el filtro de oficio solo cubría el canal. Ahora se aplica sin importar la vía. El aviso también gana un tercer texto: un pedido de alcance amplio ya no muestra «para TI», que sonaba como una petición personal sin serlo.",
+    ["Le plan de route « quoi monter ensuite » pouvait suggérer une recette différente du badge de coût de la liste, les deux lisant des données légèrement différentes. Le plan utilise maintenant la difficulté réelle de la fenêtre métier à ton rang actuel plutôt qu'une projection, et se rafraîchit au même rythme que le badge. La commande |cFFFFFFFF/co lvldump|r affiche le détail en cas de nouveau désaccord."] =
+        "La ruta «qué subir a continuación» podía sugerir una receta distinta a la insignia de coste de la lista, porque ambas leían datos ligeramente distintos. La ruta usa ahora la dificultad real de la ventana de oficio en tu rango actual en vez de una proyección, y se actualiza al mismo ritmo que la insignia. |cFFFFFFFF/co lvldump|r muestra el detalle si vuelves a ver un desacuerdo.",
     -- v1.22.0
     ["L'aide contextuelle, des dépendances qu'on ne peut plus rater, et une touche Échap qui obéit"] =
         "Ayuda contextual, dependencias imposibles de pasar por alto, y una tecla Escape que obedece",
@@ -92,27 +99,12 @@ local news = {
         "Abre una profesión y haz clic en «Buscar trabajo»: todo el reino sabe que estás disponible, un icono de artesano aparece sobre tu cabeza para quien pase, y sales como «[Busca]» en su directorio. Se apaga solo al cabo de un rato si lo olvidas.",
     ["Au passage : les deux fenêtres ne s'emmêlent plus (un clic la ramène au premier plan), l'annuaire a un bouton partenaire et se limite à ta faction (pas d'échange cross-faction sur Classic), et un artisan ne s'affiche plus avec un métier qui n'est pas le sien."] =
         "De paso: las dos ventanas ya no se enredan (un clic la trae al frente), el directorio tiene un botón de socio y se limita a tu facción (sin comercio entre facciones en Classic), y un artesano ya no muestra una profesión que no es suya.",
-    ["Repérer les crafteurs sans l'addon + passe de performance"] = "Detectar artesanos sin el addon + mejoras de rendimiento",
-    ["Repérage passif des crafteurs autour de toi, même sans l'addon (onglet Artisans → « Repérer les crafteurs autour », ou |cFFFFFFFF/co crafters on|r). Désactivé par défaut, en ville seulement."] =
-        "Detección pasiva de artesanos a tu alrededor, incluso sin el addon (pestaña Artesanos, o |cFFFFFFFF/co crafters on|r). Desactivado por defecto, solo en ciudad.",
-    ["Liste de plans de l'onglet Commande réécrite : plus fluide sur les métiers à centaines de recettes (Couture)."] =
-        "Lista de recetas de la pestaña Pedir reescrita: más fluida en profesiones con cientos de recetas (Sastrería).",
-    ["La fenêtre ne se redessine plus à chaque message réseau : les rafales sont regroupées en un seul rendu."] =
-        "La ventana ya no se redibuja con cada mensaje de red: las ráfagas se agrupan en un solo dibujado.",
-    ["Protocole de commande durci : un autre client ne peut plus annuler ta commande, usurper une acceptation, ni s'attribuer une livraison."] =
-        "Protocolo de pedidos reforzado: otro cliente ya no puede cancelar tu pedido, falsear una aceptación ni atribuirse una entrega.",
-    ["Commander depuis les panneaux Amis & Guilde"] = "Pedir desde los paneles Amigos y Hermandad",
     ["Sous le capot : mises à jour plus sûres"] = "Bajo el capó: actualizaciones más seguras",
     ["Tes données sauvegardées portent désormais une version : une mise à jour qui doit les réorganiser ne tourne qu'une fois, tes recettes et commandes restent intactes."] =
         "Tus datos guardados ahora llevan una versión, así que una actualización que deba reorganizarlos se ejecuta una sola vez y tus recetas y pedidos quedan intactos.",
     ["Protocole de commandes consolidé (mêmes échanges réseau) : ce build reste compatible avec les joueurs encore en 1.7.x."] =
         "El protocolo de pedidos se consolidó (mismos intercambios de red); esta versión sigue entendiéndose con jugadores en 1.7.x.",
-    -- (clés v1.7.0/v1.7.1 retirées : ces versions ne sont plus listées dans l'onglet Nouveautés)
-    ["Allemand et espagnol + onglet Nouveautés"] = "Alemán y español + pestaña Novedades",
-    ["L'interface se traduit en allemand et en espagnol selon la langue de ton client WoW."] =
-        "La interfaz se traduce al alemán y al español según el idioma de tu cliente de WoW.",
-    ["Ce nouvel onglet « Nouveautés » affiche les notes de version directement en jeu."] =
-        "Esta nueva pestaña « Novedades » muestra las notas de versión directamente en el juego.",
+    -- (clés v1.7.0/v1.7.1/v1.6.0/v1.5.0/v1.4.0 retirées : ces versions ne sont plus listées dans l'onglet Nouveautés)
     -- Onglet Nouveautés — v1.13.0
     ["Modération : mutes avec raison, temporaires, liste de confiance"] = "Moderación: silencios con motivo, temporales, lista de confianza",
     ["Un mute porte désormais une raison et une date, et peut être temporaire : |cFFFFFFFF/co mute Bob 1h spammeur|r se lève tout seul au bout d'une heure (|cFFFFFFFF/co mute|r seul liste les mutés avec raison et temps restant). Et |cFFFFFFFF/co trust <nom>|r marque un joueur de confiance, jamais mis en sourdine automatiquement — le mute manuel restant toujours possible."] =
