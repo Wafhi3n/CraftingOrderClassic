@@ -10,8 +10,9 @@ local Skin = COC.UI.Skin
 local L    = COC.L
 
 -- Petit bouton bascule : fond doré quand actif, survol, tooltip DYNAMIQUE (tipFn est évalué au survol,
--- pas à la construction — le libellé dépend de l'état courant).
-local function makeToolBtn(col, tipFn, onClick)
+-- pas à la construction — le libellé dépend de l'état courant). Méthode PW (et plus un local) :
+-- _ProfWindow_Route s'en sert aussi pour son bouton « carte ».
+function PW:_MakeToolBtn(col, tipFn, onClick)
     local b = CreateFrame("Button", nil, col)
     b:SetSize(20, 20)
     local on = b:CreateTexture(nil, "BACKGROUND")
@@ -33,7 +34,7 @@ end
 --   « 123 »     → valeurs EXACTES (po/pa/pc) au lieu de l'indicateur compact en paliers de pièces
 --   ▲ verte     → tri par MONTÉE DE COMPÉTENCE : à plat, les plans qui rapportent un point d'abord
 function PW:_BuildRecipeTools(tz)
-    local sortBtn = makeToolBtn(tz, function()
+    local sortBtn = self:_MakeToolBtn(tz, function()
         return PW.recipeSortProfit and L["Tri par rentabilité — clic pour A-Z."]
             or L["Trier par rentabilité (Lazy Gold)."]
     end, function() PW:_ToggleRecipeSort() end)
@@ -43,7 +44,7 @@ function PW:_BuildRecipeTools(tz)
     sortBtn.coin = coin
     self.recSortBtn = sortBtn
 
-    local exactBtn = makeToolBtn(tz, function()
+    local exactBtn = self:_MakeToolBtn(tz, function()
         return (COC.LazyGold and COC.LazyGold:ExactMode()) and L["Valeurs exactes — clic pour l'affichage compact."]
             or L["Afficher les valeurs exactes (po/pa/pc)."]
     end, function() PW:_ToggleProfitExact() end)
@@ -52,7 +53,7 @@ function PW:_BuildRecipeTools(tz)
     num:SetPoint("CENTER"); num:SetText("123"); exactBtn.num = num
     self.recExactBtn = exactBtn
 
-    local lvlBtn = makeToolBtn(tz, function()
+    local lvlBtn = self:_MakeToolBtn(tz, function()
         return PW.recipeSortLevel and L["Tri par montée de compétence — clic pour A-Z."]
             or L["Trier par montée de compétence (plans orange d'abord)."]
     end, function() PW:_ToggleRecipeLevelSort() end)
@@ -61,6 +62,9 @@ function PW:_BuildRecipeTools(tz)
     arrow:SetTexture("Interface\\Buttons\\UI-MicroStream-Green"); arrow:SetSize(14, 14); arrow:SetPoint("CENTER")
     lvlBtn.arrow = arrow
     self.recLevelBtn = lvlBtn
+    -- Bouton « plan de route » (carte), fourni par _ProfWindow_Route sous garde nil (soft-dep :
+    -- avant restart .toc, le module absent ne casse rien — le slot reste simplement à 3 boutons).
+    if self._BuildRouteBtn then self:_BuildRouteBtn(tz) end
 end
 
 -- Slot recFilterToggles (à DROITE de la recherche) : filtres qui RÉDUISENT la liste (vs. le tri, à
@@ -68,7 +72,7 @@ end
 --   sac         → « j'ai les matériaux » (pendant du filtre natif « Réactifs en stock »)
 --   ▲ orange    → « montée de compétence » : masque les recettes GRISES (triviales, aucun point)
 function PW:_BuildRecipeFilters(fz)
-    local matBtn = makeToolBtn(fz, function()
+    local matBtn = self:_MakeToolBtn(fz, function()
         return PW.recipeHaveMats and L["Filtre matériaux actif — clic pour tout afficher."]
             or L["N'afficher que les recettes dont j'ai les matériaux."]
     end, function() PW:_ToggleHaveMats() end)
@@ -81,7 +85,7 @@ function PW:_BuildRecipeFilters(fz)
 
     -- Filtre par PALIER de difficulté, donnée live (gratuit, sans MTSL). Flèche orange = couleur du
     -- palier « point garanti » ; grisée quand inactif (cf. _SyncFilterButtons).
-    local upBtn = makeToolBtn(fz, function()
+    local upBtn = self:_MakeToolBtn(fz, function()
         return PW.recipeSkillUp and L["Filtre progression actif — clic pour tout afficher."]
             or L["N'afficher que les recettes qui font monter la compétence (masque le gris)."]
     end, function() PW:_ToggleSkillUp() end)
@@ -97,7 +101,7 @@ end
 -- Ne garde que les manquantes obtenables tout de suite (formateur / vendeur / listées à l'HV). Icône
 -- parchemin (texture déjà validée dans l'addon).
 function PW:_BuildAcquireFilter(hz)
-    local acqBtn = makeToolBtn(hz, function()
+    local acqBtn = self:_MakeToolBtn(hz, function()
         return PW.recipeAcquirable and L["Filtre acquérables actif — clic pour tout afficher."]
             or L["N'afficher que les recettes acquérables (formateur, vendeur ou HV)."]
     end, function() PW:_ToggleAcquirable() end)
@@ -182,6 +186,7 @@ function PW:_SyncSortHeader()
         local label = (on and L["Par rentabilité"]) or (self.recipeSortLevel and L["Par progression"]) or L["Recettes"]
         self.recHdr:SetText("|cFFE8B84B" .. label .. "|r")
     end
+    if self._SyncRouteBtn then self:_SyncRouteBtn() end   -- bouton + suivi live du panneau (Route, soft-dep)
 end
 
 -- Filtres (slot recFilterToggles) : ils n'ont de sens qu'en VUE PLEINE, où numAvailable/difficulty sont

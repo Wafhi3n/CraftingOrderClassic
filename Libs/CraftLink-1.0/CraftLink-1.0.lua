@@ -17,7 +17,7 @@
 -- partagent le mapping position <-> spellID, condition pour que les bitfields échangés
 -- (cf. CraftLink_Registry) soient interprétables.
 
-local MAJOR, MINOR = "CraftLink-1.0", 10   -- v10 : ExtendProfession fusionne aussi `enchants` (noms anglais canoniques TBC/SoD/Wrath, cf. tools/gen_enchant_names.lua) (v9 : couches saisonnières additives ; v8 : cooldowns de recettes ; v7 : gardes anti-clobber compagnons)
+local MAJOR, MINOR = "CraftLink-1.0", 11   -- v11 : skillColors (seuils orange/jaune/vert/gris par recette, cf. tools/gen_skill_colors.lua) + RecipeColors (v10 : enchants fusionnés ; v9 : couches saisonnières ; v8 : cooldowns ; v7 : gardes anti-clobber)
 local lib = LibStub:NewLibrary(MAJOR, MINOR)
 if not lib then return end  -- déjà chargé par un autre addon avec une version >= : on garde l'existante
 
@@ -125,7 +125,7 @@ function lib:ExtendProfession(name, def)
             if not seen[id] then seen[id] = true; base.recipes[#base.recipes + 1] = id end
         end
     end
-    for _, key in ipairs({ "produces", "reagents", "learnedAt", "taughtBy", "itemToSpell", "sellable" }) do
+    for _, key in ipairs({ "produces", "reagents", "learnedAt", "taughtBy", "itemToSpell", "sellable", "skillColors" }) do
         local add = def[key]
         if type(add) == "table" then
             local dst = base[key]; if not dst then dst = {}; base[key] = dst end
@@ -192,6 +192,16 @@ end
 function lib:RecipeLearnedAt(prof, spellID)
     local def = self.professions[prof]
     return def and def.learnedAt and def.learnedAt[spellID] or nil
+end
+
+-- Seuils de difficulté RÉELS d'une recette : { orange, jaune, vert, gris } (gris = rang où elle
+-- ne rapporte plus de point), ou nil si hors base (donnée générée par tools/gen_skill_colors.lua,
+-- source Wowhead ; lacune connue : Poisons Vanilla). La couleur LIVE de l'API du jeu reste la
+-- référence pour une recette APPRISE au rang courant — ces seuils servent aux recettes MANQUANTES
+-- et à la prédiction de couleur à un rang futur (plan de route de montée de métier).
+function lib:RecipeColors(prof, spellID)
+    local def = self.professions[prof]
+    return def and def.skillColors and def.skillColors[spellID] or nil
 end
 
 -- Durée (secondes) du cooldown d'une recette, ou nil si la recette n'a pas de mécanique de CD.

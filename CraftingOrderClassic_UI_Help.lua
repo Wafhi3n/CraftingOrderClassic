@@ -111,11 +111,26 @@ local function contentSocial()
     }
 end
 
+-- Aide à la MONTÉE de métier (Vue Métier) : tri progression, badge meilleur coût/point, plan de route.
+local function contentLeveling()
+    return {
+        {
+            icon = Skin.tex.gold, title = L["Monter son métier au meilleur prix"],
+            lines = {
+                L["Dans la Vue Métier, la flèche verte trie par montée de compétence : les plans qui rapportent un point d'abord, les moins chers en tête (prix Lazy Gold)."],
+                L["Le badge doré marque le meilleur coût par point ; les plans utiles non appris s'affichent aussi, avec où les obtenir (formateur, vendeur, HV, à farmer)."],
+                L["Le bouton carte ouvre le |cFFE8B84BPlan de route|r : du rang actuel au plafond, quoi crafter, combien de fois, pour quel coût total estimé — recalculé à chaque point gagné."],
+                L["Tout repose sur les prix du dernier scan Auctionator (addons Lazy Gold + Auctionator conseillés) : sans eux, ces aides s'effacent."],
+            },
+        },
+    }
+end
+
 -- (Les notes de version « Nouveautés » ont leur propre onglet — cf. CraftingOrderClassic_UI_News.lua.)
 
 local function content()
     local out = {}
-    for _, part in ipairs({ contentIntro(), contentPosting(), contentFulfill(), contentSocial() }) do
+    for _, part in ipairs({ contentIntro(), contentPosting(), contentFulfill(), contentLeveling(), contentSocial() }) do
         for _, sec in ipairs(part) do out[#out + 1] = sec end
     end
     return out

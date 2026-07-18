@@ -192,18 +192,19 @@ local function knownAlready(known, m)
 end
 
 -- Mode « manquantes » : l'union COMPLÈTE apprises + non-apprises. Tri « progression » (By skill-up,
--- hors mode manquantes) : on n'injecte que les manquantes APPRENABLES MAINTENANT (niveau requis ≤
--- rang) — le conseil « va acheter ce plan » doit se voir sans ouvrir le mode manquantes (retour user
--- 2026-07-17), mais la vue par familles reste pur « ce que je sais faire » (pas d'inondation rouge).
+-- hors mode manquantes) : on n'injecte que les manquantes apprenables qui RAPPORTENT ENCORE un point
+-- (couleur estimée non grise, cf. _MissingDifficulty de Leveling) — le conseil « va acheter ce plan »
+-- doit se voir sans ouvrir le mode manquantes (retour user 2026-07-17), mais PAS un plan gris au rang
+-- courant (bug même jour : plan niv. 55 recommandé en tête à rang 244). Sans Leveling.lua : aucune
+-- injection (repli = liste des apprises). La vue par familles reste pur « ce que je sais faire ».
 function PW:_ActiveRecipes()
     local mode = (self.missingMode and "all") or (self.recipeSortLevel and "learnable") or nil
     if not (mode and COC.MTSL) then return self.recipes or {} end
     local out, known = {}, self:_KnownRecipeSet()
     for _, r in ipairs(self.recipes or {}) do out[#out + 1] = r end
-    local rank = COC.Craft and COC.Craft:OpenRank()
     for _, m in ipairs(COC.MTSL:MissingRecipes(self.profKey) or {}) do
         if not knownAlready(known, m)
-            and (mode == "all" or (rank and (m.level or 0) <= rank)) then out[#out + 1] = m end
+            and (mode == "all" or (self._MissingProgresses and self:_MissingProgresses(m))) then out[#out + 1] = m end
     end
     return out
 end
@@ -259,7 +260,7 @@ function PW:_RecipeDisplayList()
         if not r.isHeader
             and (not search or search == "" or (r.name and r.name:lower():find(search, 1, true)))
             and (not haveMats or (r.numAvailable or 0) > 0)
-            and (not skillUp or r.difficulty ~= "trivial" or (r.isMissing and self._MissingLearnable and self:_MissingLearnable(r)))
+            and (not skillUp or r.difficulty ~= "trivial" or (r.isMissing and self._MissingProgresses and self:_MissingProgresses(r)))
             and (not acquirable or self:_IsAcquirable(r)) then
             if sortProfit then r._profit = self:_RowProfit(r) end   -- pré-calc (mémorisé) pour le tri
             items[#items + 1] = r

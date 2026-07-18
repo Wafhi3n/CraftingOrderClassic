@@ -150,8 +150,8 @@ local de2 = {
     -- Aide contextuelle « bouton i » (Vue Métier) — cf. _ProfWindow_HelpPlate.lua (bulles courtes)
     ["Aide : survole les zones surlignées pour comprendre chaque fonction."] =
         "Hilfe: Bewege den Mauszeiger über die hervorgehobenen Bereiche, um jede Funktion zu verstehen.",
-    ["Barre de filtres. À gauche (avec Lazy Gold) : pièce = trier par rentabilité, « 123 » = prix exacts au lieu de l'indicateur compact, flèche verte = trier par montée de compétence. Au centre : la recherche. À droite : sac = seulement les recettes dont tu as les matériaux, flèche orange = masquer les recettes grises (aucun gain de compétence)."] =
-        "Filterleiste. Links (mit Lazy Gold): Münze = nach Gewinn sortieren, „123“ = exakte Preise statt der kompakten Anzeige, grüner Pfeil = nach Fertigkeitsanstieg sortieren. Mitte: die Suche. Rechts: Beutel = nur Rezepte, für die du das Material hast, oranger Pfeil = graue Rezepte ausblenden (kein Fertigkeitsgewinn).",
+    ["Barre de filtres. À gauche (avec Lazy Gold) : pièce = trier par rentabilité, « 123 » = prix exacts au lieu de l'indicateur compact, flèche verte = trier par montée de compétence, carte = plan de route (quoi crafter jusqu'au plafond, au moins cher). Au centre : la recherche. À droite : sac = seulement les recettes dont tu as les matériaux, flèche orange = masquer les recettes grises (aucun gain de compétence)."] =
+        "Filterleiste. Links (mit Lazy Gold): Münze = nach Gewinn sortieren, „123“ = exakte Preise statt der kompakten Anzeige, grüner Pfeil = nach Fertigkeitsanstieg sortieren, Karte = Levelroute (was du bis zum Maximum am günstigsten craften solltest). Mitte: die Suche. Rechts: Beutel = nur Rezepte, für die du das Material hast, oranger Pfeil = graue Rezepte ausblenden (kein Fertigkeitsgewinn).",
     ["Tes recettes, groupées par famille (clique un en-tête pour replier). À droite de chaque ligne : %s = rentabilité à l'HV (survole pour le profit net exact), %s = plan conseillé pour monter le métier (meilleur coût par point), « ×N » doré = commandes en attente pour cet objet. En mode Manquantes, une icône dit où obtenir le plan : formateur, vendeur, HV ou à farmer."] =
         "Deine Rezepte, nach Familie gruppiert (Kopfzeile anklicken zum Einklappen). Rechts an jeder Zeile: %s = Gewinn im AH (für den genauen Nettogewinn mit der Maus darüberfahren), %s = empfohlenes Rezept zum Hochleveln (bestes Preis-Leistungs-Verhältnis pro Punkt), goldenes „×N“ = ausstehende Aufträge für diesen Gegenstand. Im Modus Fehlende zeigt ein Symbol, wo du das Rezept bekommst: Lehrer, Händler, AH oder zu farmen.",
     ["Le plan sélectionné : ses réactifs et le bouton pour le fabriquer."] =
@@ -318,6 +318,32 @@ local de2 = {
     ["Plan : chez un vendeur PNJ%s"] = "Rezept: bei einem NSC-Händler%s",
     ["Plan : coté à l'HV — %s"] = "Rezept: im AH gelistet — %s",
     ["Plan : à farmer (butin/quête — absent de l'HV)"] = "Rezept: farmen (Beute/Quest — nicht im AH)",
+    -- Plan de route (montée de métier)
+    ["Plan de route"] = "Levelroute",
+    ["Plan de route : quoi crafter pour monter au moins cher."] = "Levelroute: was du craften solltest, um am günstigsten zu skillen.",
+    ["Rang %s"] = "Rang %s",
+    ["En tête : rang actuel, plafond entraînable, et coût total estimé (« > » = des rangs sans recette calculable, total incomplet)."] =
+        "Oben: aktueller Rang, trainierbares Maximum und die geschätzten Gesamtkosten („>“ = einige Ränge haben kein berechenbares Rezept, die Summe ist unvollständig).",
+    ["Un segment par ligne : plage de rangs, recette au meilleur coût par point espéré, « ×~N » = crafts attendus, et le coût du segment (parchemin = plan à acheter d'abord, compté dedans). Survole une ligne pour le détail. La route se recalcule à chaque point gagné."] =
+        "Ein Abschnitt pro Zeile: Rangbereich, das Rezept mit den besten erwarteten Kosten pro Punkt, „×~N“ = erwartete Crafts, und die Kosten des Abschnitts (Schriftrolle = zuerst zu kaufendes Rezept, eingerechnet). Für Details mit der Maus über eine Zeile fahren. Die Route wird bei jedem Punkt neu berechnet.",
+    ["Total estimé : %s"] = "Geschätzte Summe: %s",
+    ["Rang au plafond — vois le formateur pour débloquer la suite."] = "Maximaler Rang — besuche deinen Lehrer, um weiterzukommen.",
+    ["aucune recette calculable"] = "kein berechenbares Rezept",
+    ["Estimation : chance de point par couleur, prix du dernier scan HV (Lazy Gold)."] = "Schätzung: Skill-Chance je Farbe, Preise vom letzten AH-Scan (Lazy Gold).",
+    ["Rien à calculer — scanne l'HV (Auctionator) puis rouvre ce panneau."] = "Nichts zu berechnen — scanne das AH (Auctionator) und öffne dieses Fenster erneut.",
+    ["Crafts attendus : ~%d"] = "Erwartete Crafts: ~%d",
+    ["Réactifs (espéré)"] = "Materialien (erwartet)",
+    ["Plan à acheter"] = "Zu kaufendes Rezept",
+    ["Aucune recette calculable sur ce segment (prix HV manquants, ou plans introuvables)."] = "Kein berechenbares Rezept in diesem Abschnitt (fehlende AH-Preise oder nicht beschaffbare Rezepte).",
+    ["Monter son métier au meilleur prix"] = "Skille deinen Beruf zum günstigsten Preis",
+    ["Dans la Vue Métier, la flèche verte trie par montée de compétence : les plans qui rapportent un point d'abord, les moins chers en tête (prix Lazy Gold)."] =
+        "In der Berufsansicht sortiert der grüne Pfeil nach Fertigkeitsanstieg: Rezepte, die einen Punkt bringen, zuerst — die günstigsten oben (Lazy-Gold-Preise).",
+    ["Le badge doré marque le meilleur coût par point ; les plans utiles non appris s'affichent aussi, avec où les obtenir (formateur, vendeur, HV, à farmer)."] =
+        "Das goldene Abzeichen markiert die besten Kosten pro Punkt; nützliche ungelernte Rezepte erscheinen ebenfalls, samt Bezugsquelle (Lehrer, Händler, AH, farmen).",
+    ["Le bouton carte ouvre le |cFFE8B84BPlan de route|r : du rang actuel au plafond, quoi crafter, combien de fois, pour quel coût total estimé — recalculé à chaque point gagné."] =
+        "Der Karten-Button öffnet die |cFFE8B84BLevelroute|r: vom aktuellen Rang bis zum Maximum — was du wie oft craften solltest und zu welchen geschätzten Gesamtkosten, neu berechnet bei jedem Punkt.",
+    ["Tout repose sur les prix du dernier scan Auctionator (addons Lazy Gold + Auctionator conseillés) : sans eux, ces aides s'effacent."] =
+        "Alles beruht auf den Preisen des letzten Auctionator-Scans (Addons Lazy Gold + Auctionator empfohlen): ohne sie blenden sich diese Hilfen aus.",
 }
 
 for k, v in pairs(de2) do L[k] = v end

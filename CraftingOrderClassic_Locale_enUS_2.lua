@@ -179,8 +179,8 @@ local en2 = {
     -- Aide contextuelle « bouton i » (Vue Métier) — cf. _ProfWindow_HelpPlate.lua (bulles courtes)
     ["Aide : survole les zones surlignées pour comprendre chaque fonction."] =
         "Help: hover the highlighted areas to understand each feature.",
-    ["Barre de filtres. À gauche (avec Lazy Gold) : pièce = trier par rentabilité, « 123 » = prix exacts au lieu de l'indicateur compact, flèche verte = trier par montée de compétence. Au centre : la recherche. À droite : sac = seulement les recettes dont tu as les matériaux, flèche orange = masquer les recettes grises (aucun gain de compétence)."] =
-        "Filter bar. On the left (with Lazy Gold): coin = sort by profit, \"123\" = exact prices instead of the compact indicator, green arrow = sort by skill-up. In the middle: the search. On the right: bag = only recipes you have the materials for, orange arrow = hide gray recipes (no skill gain).",
+    ["Barre de filtres. À gauche (avec Lazy Gold) : pièce = trier par rentabilité, « 123 » = prix exacts au lieu de l'indicateur compact, flèche verte = trier par montée de compétence, carte = plan de route (quoi crafter jusqu'au plafond, au moins cher). Au centre : la recherche. À droite : sac = seulement les recettes dont tu as les matériaux, flèche orange = masquer les recettes grises (aucun gain de compétence)."] =
+        "Filter bar. On the left (with Lazy Gold): coin = sort by profit, \"123\" = exact prices instead of the compact indicator, green arrow = sort by skill-up, map = leveling route (what to craft up to the cap, at the lowest cost). In the middle: the search. On the right: bag = only recipes you have the materials for, orange arrow = hide gray recipes (no skill gain).",
     ["Tes recettes, groupées par famille (clique un en-tête pour replier). À droite de chaque ligne : %s = rentabilité à l'HV (survole pour le profit net exact), %s = plan conseillé pour monter le métier (meilleur coût par point), « ×N » doré = commandes en attente pour cet objet. En mode Manquantes, une icône dit où obtenir le plan : formateur, vendeur, HV ou à farmer."] =
         "Your recipes, grouped by family (click a header to collapse). On the right of each line: %s = profit at the AH (hover for the exact net profit), %s = recommended recipe to level up (best cost per point), gold \"×N\" = pending orders for that item. In Missing mode, an icon shows where to get the recipe: trainer, vendor, AH, or to farm.",
     ["Le plan sélectionné : ses réactifs et le bouton pour le fabriquer."] =
@@ -334,6 +334,33 @@ local en2 = {
     ["Plan : chez un vendeur PNJ%s"] = "Recipe: from an NPC vendor%s",
     ["Plan : coté à l'HV — %s"] = "Recipe: listed on the AH — %s",
     ["Plan : à farmer (butin/quête — absent de l'HV)"] = "Recipe: farm it (drop/quest — not on the AH)",
+
+    -- Plan de route (montée de métier)
+    ["Plan de route"] = "Leveling route",
+    ["Plan de route : quoi crafter pour monter au moins cher."] = "Leveling route: what to craft to level up at the lowest cost.",
+    ["Rang %s"] = "Rank %s",
+    ["En tête : rang actuel, plafond entraînable, et coût total estimé (« > » = des rangs sans recette calculable, total incomplet)."] =
+        "At the top: current rank, trainable cap, and the estimated total cost (\">\" = some ranks have no computable recipe, the total is incomplete).",
+    ["Un segment par ligne : plage de rangs, recette au meilleur coût par point espéré, « ×~N » = crafts attendus, et le coût du segment (parchemin = plan à acheter d'abord, compté dedans). Survole une ligne pour le détail. La route se recalcule à chaque point gagné."] =
+        "One segment per line: rank range, the recipe with the best expected cost per point, \"×~N\" = expected crafts, and the segment cost (scroll = recipe to buy first, included). Hover a line for details. The route recomputes with every point you gain.",
+    ["Total estimé : %s"] = "Estimated total: %s",
+    ["Rang au plafond — vois le formateur pour débloquer la suite."] = "Rank at cap — visit your trainer to unlock more.",
+    ["aucune recette calculable"] = "no computable recipe",
+    ["Estimation : chance de point par couleur, prix du dernier scan HV (Lazy Gold)."] = "Estimate: skill-up chance per color, prices from the last AH scan (Lazy Gold).",
+    ["Rien à calculer — scanne l'HV (Auctionator) puis rouvre ce panneau."] = "Nothing to compute — scan the AH (Auctionator) then reopen this panel.",
+    ["Crafts attendus : ~%d"] = "Expected crafts: ~%d",
+    ["Réactifs (espéré)"] = "Reagents (expected)",
+    ["Plan à acheter"] = "Recipe to buy",
+    ["Aucune recette calculable sur ce segment (prix HV manquants, ou plans introuvables)."] = "No computable recipe over this segment (missing AH prices, or unobtainable recipes).",
+    ["Monter son métier au meilleur prix"] = "Level your profession at the lowest cost",
+    ["Dans la Vue Métier, la flèche verte trie par montée de compétence : les plans qui rapportent un point d'abord, les moins chers en tête (prix Lazy Gold)."] =
+        "In the Profession View, the green arrow sorts by skill-up: recipes that grant a point first, cheapest on top (Lazy Gold prices).",
+    ["Le badge doré marque le meilleur coût par point ; les plans utiles non appris s'affichent aussi, avec où les obtenir (formateur, vendeur, HV, à farmer)."] =
+        "The gold badge marks the best cost per point; useful unlearned recipes show up too, with where to get them (trainer, vendor, AH, farm).",
+    ["Le bouton carte ouvre le |cFFE8B84BPlan de route|r : du rang actuel au plafond, quoi crafter, combien de fois, pour quel coût total estimé — recalculé à chaque point gagné."] =
+        "The map button opens the |cFFE8B84BLeveling route|r: from your current rank to the cap, what to craft, how many times, for what estimated total cost — recomputed with every point you gain.",
+    ["Tout repose sur les prix du dernier scan Auctionator (addons Lazy Gold + Auctionator conseillés) : sans eux, ces aides s'effacent."] =
+        "Everything relies on prices from the last Auctionator scan (Lazy Gold + Auctionator addons recommended): without them, these helpers step aside.",
 }
 
 for k, v in pairs(en2) do L[k] = v end

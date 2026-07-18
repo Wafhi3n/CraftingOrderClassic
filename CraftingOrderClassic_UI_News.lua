@@ -26,6 +26,7 @@ local function versionsLatest()
                 L["L'alerte « peut faire cette commande » se déclenchait même quand tu ne connaissais pas la recette, souvent des gemmes ou enchants dont tu avais les réactifs sans le plan. Elle vérifie maintenant tes recettes connues avant de te notifier sur tes propres commandes. Un ami en ligne sans l'addon ne s'affiche plus « Hors ligne » par erreur."],
                 L["Échap laissait souvent les fenêtres de métier ouvertes, et trois rapports différents pointaient la même cause : cacher ou désactiver la souris d'une fenêtre protégée en plein combat déclenche une erreur du jeu. Les fenêtres passent maintenant par un petit relais dédié, donc Échap les ferme proprement, en combat ou non."],
                 L["L'aide « quoi monter ensuite » affiche maintenant le coût par point de compétence, une pastille de prix Auctioneer, et une icône vers le PNJ qui vend une recette que tu ne connais pas encore, en plus d'un tri affiné."],
+                L["Cette même aide gagne un plan de route : clique le bouton carte et il déroule toute ta montée rang par rang, en choisissant à chaque étape la recette la moins chère (apprise ou achetable, plans compris) et en additionnant le coût total. Les recettes à cooldown ou avec un réactif sans prix connu sont exclues exprès, elles fausseraient le total. Demande Lazy Gold ; MTSL ajoute les prix de plans formateur et vendeur au calcul."],
             },
         },
     }

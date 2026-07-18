@@ -26,18 +26,43 @@ local ICON = {
     best    = "Interface\\GossipFrame\\AuctioneerGossipIcon",    -- recommandation « moins cher au point »
 }
 
--- Une MANQUANTE apprenable MAINTENANT (niveau requis ≤ rang courant) : candidate « va acheter ce
--- plan ». Traitée comme une ORANGE (chance 1) par le coût ET le tri, et gardée par le filtre
--- skill-up (cf. _RecipeDisplayList) — elle progresse, une fois le plan acheté.
-function PW:_MissingLearnable(e)
-    if not e.isMissing then return false end
+-- Couleur d'une MANQUANTE au rang courant. D'abord les seuils RÉELS par recette (CraftLink
+-- skillColors, source Wowhead — ex. Red Linen Vest {55,80,97,115} : gris dès 115) ; en repli
+-- (recette hors base, ex. Poisons Vanilla) une ESTIMATION par distance rang − niveau requis
+-- (patron vanilla typique jaune ≈ +20 / vert ≈ +30 / gris ≈ +40, bornes prudentes côté orange).
+-- nil = pas encore apprenable OU grise — aucun point à en tirer, donc jamais recommandée
+-- (bug 2026-07-17 : plan niv. 55 conseillé en tête à un rang 244).
+local MISS_STEPS = { { 10, "optimal" }, { 25, "medium" }, { 40, "easy" } }
+function PW:_MissingDifficulty(e)
+    if not e.isMissing then return nil end
     local rank = COC.Craft and COC.Craft:OpenRank()
-    return (rank and (e.level or 0) <= rank) and true or false
+    if not (rank and (e.level or 0) <= rank) then return nil end
+    local lib = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
+    local c = lib and lib.RecipeColors and lib:RecipeColors(self.profKey, e.spellID)
+    if c then
+        if rank >= c[4] then return nil          -- gris : plus aucun point
+        elseif rank >= c[3] then return "easy"   -- vert
+        elseif rank >= c[2] then return "medium" -- jaune
+        else return "optimal" end                -- orange (apprenable, donc rang >= requis)
+    end
+    local d = rank - (e.level or 0)
+    for _, s in ipairs(MISS_STEPS) do
+        if d <= s[1] then return s[2] end
+    end
+    return nil
 end
 
--- Coût de progression d'une entrée : { perPoint, cost, chance, missing } en cuivre, ou nil (gris,
--- prix inconnus, Lazy Gold absent, manquante pas encore apprenable…). missing = un réactif sans prix
--- (coût sous-estimé). Cache par refresh (posé dans RefreshRecipes, le rendu se rejoue à chaque scroll).
+-- Une MANQUANTE vaut le conseil « va acheter ce plan » si elle est apprenable MAINTENANT **et** pas
+-- grise estimée. Garde le filtre skill-up ET l'injection du tri progression (cf. _RecipeDisplayList /
+-- _ActiveRecipes — appels sous garde nil : ce fichier est soft-dep).
+function PW:_MissingProgresses(e)
+    return self:_MissingDifficulty(e) ~= nil
+end
+
+-- Coût de progression d'une entrée : { perPoint, cost, chance, missing } en cuivre, ou nil (gris —
+-- réel ou estimé —, prix inconnus, Lazy Gold absent, manquante pas encore apprenable…). missing = un
+-- réactif sans prix (coût sous-estimé). Cache par refresh (posé dans RefreshRecipes, le rendu se
+-- rejoue à chaque scroll).
 function PW:_LevelCost(e)
     if e.isHeader or not (COC.LazyGold and COC.LazyGold:IsAvailable()) then return nil end
     self._lvlCache = self._lvlCache or {}
@@ -46,7 +71,8 @@ function PW:_LevelCost(e)
     if v ~= nil then return v or nil end
     local chance
     if e.isMissing then
-        chance = self:_MissingLearnable(e) and 1.0 or nil
+        local d = self:_MissingDifficulty(e)   -- couleur estimée ; nil = grise / pas apprenable
+        chance = d and CHANCE[d] or nil
     else
         chance = CHANCE[e.difficulty]
     end
@@ -57,7 +83,7 @@ function PW:_LevelCost(e)
 end
 
 -- Recommandation « à crafter pour monter » : l'entrée au meilleur coût/point de la liste AFFICHÉE
--- (connues non grises + manquantes apprenables maintenant — ces dernières = « va acheter ce plan »).
+-- (connues non grises + manquantes apprenables NON grises estimées = « va acheter ce plan »).
 -- Recalculée à chaque refresh (RefreshRecipes) ; nil si rien de calculable.
 function PW:_ComputeLevelBest()
     self._lvlBest = nil
@@ -145,14 +171,17 @@ function PW:_PlanTooltip(e)
     GameTooltip:AddLine(txt, 0.91, 0.72, 0.29)
 end
 
--- Tri « progression » affiné : orange < jaune < vert < gris < inconnu < manquantes, puis coût/point
--- CROISSANT dans un même rang (coût inconnu en fin de rang), puis A-Z. Une manquante APPRENABLE
--- MAINTENANT est classée AVEC les oranges (chance 1 après achat du plan — retour user 2026-07-17 :
--- le conseil « va acheter ce plan » doit remonter, pas fermer la marche) ; les autres manquantes
--- restent en fin. C'est LA réponse à « quoi crafter là, tout de suite, au moins cher ».
+-- Tri « progression » affiné : orange < jaune < vert < gris < inconnu < manquantes grises, puis
+-- coût/point CROISSANT dans un même rang (coût inconnu en fin de rang), puis A-Z. Une manquante
+-- apprenable est classée à sa COULEUR ESTIMÉE (retour user 2026-07-17 : le conseil « va acheter ce
+-- plan » doit remonter — mais à sa vraie place : un plan niv. 55 à rang 244 est GRIS, pas orange) ;
+-- les autres manquantes ferment la marche. LA réponse à « quoi crafter là, tout de suite, au moins cher ».
 local DIFF_RANK = { optimal = 1, medium = 2, easy = 3, trivial = 4 }
 local function levelRank(pw, e)
-    if e.isMissing then return pw:_MissingLearnable(e) and 1 or 6 end
+    if e.isMissing then
+        local d = pw:_MissingDifficulty(e)
+        return d and DIFF_RANK[d] or 6
+    end
     return DIFF_RANK[e.difficulty] or 5
 end
 

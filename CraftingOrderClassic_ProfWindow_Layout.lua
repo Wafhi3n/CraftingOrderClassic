@@ -27,7 +27,7 @@ local SPEC = {
         -- Deux encarts d'aide distincts (retour user) : la barre de FILTRES (chaque icône) et la LISTE
         -- (les icônes de droite : rentabilité / demandé / source du plan) — cf. _ProfWindow_HelpPlate.
         { id = "recFilters", h = 26, dir = "cols", help = "recFilters", helpDir = "RIGHT",  -- barre d'outils en SLOTS :
-            { id = "recTools",  w = 70, sep = false },   --   « 123 » + pièce d'or (Lazy Gold) + ▲ progression
+            { id = "recTools",  w = 92, sep = false },   --   « 123 » + pièce d'or (Lazy Gold) + ▲ progression + carte (plan de route)
             { id = "recSearch", sep = false },           --   la recherche REMPLIT le reste
             { id = "recFilterToggles", w = 48, sep = false } }, -- filtres : sac « j'ai les matériaux » (+ palier)
         { dir = "cols", sep = false,

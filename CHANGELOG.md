@@ -27,6 +27,11 @@ One more: the "what to level next" helper now shows cost per skill point, an Auc
 and an icon pointing at the vendor who sells a recipe you don't know yet, on top of a slightly
 smarter sort.
 
+That leveling helper also gets a route planner now: click the map button and it walks your whole
+climb rank by rank, picking the cheapest recipe at each step (learned or buyable, plans included) and
+totaling the gold. Recipes with a cooldown or a reagent with no known price are left out on purpose,
+they'd throw the total off. Needs Lazy Gold; MTSL adds trainer and vendor plan prices to the mix.
+
 ## v1.21.0 — Enchants by slot, and a trade panel that stops hiding things
 
 Picking an enchant meant scrolling some 300 plans with near-identical names. The Order tab has a
