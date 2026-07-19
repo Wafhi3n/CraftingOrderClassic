@@ -19,6 +19,17 @@ local BODY_W = 780
 local function versionsLatest()
     return {
         {
+            v = "v1.24.1", title = L["Deux minerais de plus dans les commandes de récolte"],
+            lines = {
+                L["Le Khorium et l'Éthérium n'apparaissaient pas comme commandables dans l'onglet Récolte. La liste des minerais était dérivée de ceux qu'on peut prospecter en gemmes, et ni l'un ni l'autre ne l'est — le même trou qui cachait déjà l'argent, l'or, le vrai-argent et le fer noir. Les deux rejoignent la liste."],
+            },
+        },
+    }
+end
+
+local function versionsRecent()
+    return {
+        {
             v = "v1.24.0", title = L["La pièce à enchanter se pose d'un clic, et une bourse qui suit la progression"],
             lines = {
                 L["Depuis la v1.21.0, un enchanteur peut cliquer un emplacement de la silhouette d'échange pour te demander la pièce à enchanter. Si tu as l'addon toi aussi, ce clic affiche maintenant une invite chez toi : accepte, et ta pièce équipée se pose toute seule dans l'emplacement « ne sera pas échangé ». Rien n'est donné (cet emplacement ne peut pas changer de mains), la pose est verrouillée sur lui, et rien ne bouge sans ton clic. Sans l'addon en face, le chuchotement explicatif part comme avant."],
@@ -34,11 +45,6 @@ local function versionsLatest()
                 L["Deux corrections : un compte à plusieurs personnages se voyait parfois lister lui-même comme « joignable via » son autre perso dans son propre onglet Artisans, corrigé. Et le plan de route pouvait s'arrêter avant le vrai plafond de compétence après une formation chez le maître, à cause d'une assignation Lua qui perdait silencieusement sa seconde valeur."],
             },
         },
-    }
-end
-
-local function versionsRecent()
-    return {
         {
             v = "v1.22.1", title = L["Les alertes de commande vérifient enfin le métier, et un plan de route qui suit son propre badge"],
             lines = {
@@ -76,6 +82,11 @@ local function versionsRecent()
                 L["Et quand quelqu'un te tend un objet à enchanter en échange, le poser dans la case « ne sera pas échangé » ouvre un petit panneau listant tes enchants pour cet emplacement, prêts à lancer sans fouiller ta fenêtre de métier (qui doit rester ouverte : le jeu ne renseigne tes recettes connues que pendant qu'elle l'est)."],
             },
         },
+    }
+end
+
+local function versionsOlder()
+    return {
         {
             v = "v1.19.1", title = L["Correctif : l'icône « dispo » remarche sur la nouvelle UI des plaques"],
             lines = {
@@ -90,11 +101,6 @@ local function versionsRecent()
                 L["Le LFW marche même sans l'addon : tape « LFW enchantement » en Commerce ou Général et tu apparais comme dispo, avec la même icône de plaque qu'un joueur qui a Crafting Order. Plus une correction : une recette déjà apprise ne s'affichait plus en double avec MissingTradeSkillsList."],
             },
         },
-    }
-end
-
-local function versionsOlder()
-    return {
         {
             v = "v1.18.0", title = L["Chercher du travail : dis ce que tu offres, et trie par progression"],
             lines = {
@@ -132,6 +138,11 @@ local function versionsOlder()
                 L["La vue métier n'affiche plus les commandes privées destinées à quelqu'un d'autre, ni les expirées. Ton compteur de crafts livrés ne peut plus être gonflé par un tiers. Et croiser un artisan coûte deux fois moins de messages : le bonjour porte maintenant tes métiers, ce qui règle aussi les artisans qui s'affichaient sans aucun métier."],
             },
         },
+    }
+end
+
+local function versionsOldest()
+    return {
         {
             v = "v1.15.0", title = L["Recherche de travail : signale que tu es dispo"],
             lines = {
@@ -151,11 +162,6 @@ local function versionsOlder()
                 L["Un mute porte désormais une raison et une date, et peut être temporaire : |cFFFFFFFF/co mute Bob 1h spammeur|r se lève tout seul au bout d'une heure (|cFFFFFFFF/co mute|r seul liste les mutés avec raison et temps restant). Et |cFFFFFFFF/co trust <nom>|r marque un joueur de confiance, jamais mis en sourdine automatiquement — le mute manuel restant toujours possible."],
             },
         },
-    }
-end
-
-local function versionsOldest()
-    return {
         {
             v = "v1.11.0", title = L["Annuler une commande publique atteint tout le royaume"],
             lines = {
@@ -185,26 +191,11 @@ local function versionsOldest()
                 L["Démuter un joueur réarme la détection de spam le concernant ; revenir de la vue métier d'un reroll ne laisse plus les boutons Créer masqués ; et l'addon travaille nettement moins à chaque ligne de chat sur un royaume chargé."],
             },
         },
-        {
-            v = "v1.9.0", title = L["Tes rerolls réunis : cooldowns partagés, une identité, l'onglet Mes artisans"],
-            lines = {
-                L["Cooldowns de recettes partagés : les autres voient « Transmutation : prête » ou « dans 14h » sur ton infobulle d'artisan — fini de demander en canal si ton Arcanite est dispo."],
-                L["Regroupe tes persos sous une identité (|cFFFFFFFF/co alts on|r) : une commande nommée pour ton alchimiste hors ligne arrive sur le perso où tu es connecté, et tu peux l'accepter depuis n'importe lequel. Vérifié des deux côtés (personne ne peut se faire passer pour le reroll d'autrui). Désactivé par défaut."],
-                L["Nouvel onglet « Mes artisans » : tous les métiers de ton compte sur le royaume en une vue, comme un seul perso — niveau, recettes connues par catégorie, cooldowns en tête, et quel perso porte chaque recette."],
-            },
-        },
-        {
-            v = "v1.8.0", title = L["Sous le capot : mises à jour plus sûres"],
-            lines = {
-                L["Tes données sauvegardées portent désormais une version : une mise à jour qui doit les réorganiser ne tourne qu'une fois, tes recettes et commandes restent intactes."],
-                L["Protocole de commandes consolidé (mêmes échanges réseau) : ce build reste compatible avec les joueurs encore en 1.7.x."],
-            },
-        },
-        -- v1.7.0 / v1.7.1 / v1.6.0 / v1.5.0 / v1.4.0 retirées de l'onglet (l'historique complet vit dans
-        -- CHANGELOG.md). Cet onglet ne garde qu'une fenêtre glissante de versions : sinon il croît sans
-        -- fin, et avec lui les 3 overlays de locale, qui butent sur le plafond anti-monolithe. Retirer ici
-        -- = retirer les clés correspondantes des overlays (sinon check_locale les signale comme
-        -- traductions MORTES).
+        -- v1.9.0 / v1.8.0 / v1.7.0 / v1.7.1 / v1.6.0 / v1.5.0 / v1.4.0 retirées de l'onglet (l'historique
+        -- complet vit dans CHANGELOG.md). Cet onglet ne garde qu'une fenêtre glissante de versions :
+        -- sinon il croît sans fin, et avec lui les 3 overlays de locale, qui butent sur le plafond
+        -- anti-monolithe. Retirer ici = retirer les clés correspondantes des overlays (sinon
+        -- check_locale les signale comme traductions MORTES).
     }
 end
 

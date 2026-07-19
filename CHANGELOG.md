@@ -1,5 +1,11 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.24.1 — Two more ores show up in gathering orders
+
+Khorium and Eternium ore weren't showing up as orderable in the Gather tab. The mining list was built
+from what's prospectable into gems, and neither one is, the same gap that used to hide Silver, Gold,
+Truesilver and Dark Iron. Both join that list now.
+
 ## v1.24.0 — One click to hand your enchanter the right piece
 
 The trade silhouette gets its second half. Since v1.21.0, an enchanter can click an equipment slot

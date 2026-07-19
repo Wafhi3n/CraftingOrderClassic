@@ -8,6 +8,11 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "Novedades",
+    -- v1.24.1
+    ["Deux minerais de plus dans les commandes de récolte"] =
+        "Dos minerales más en los encargos de recolección",
+    ["Le Khorium et l'Éthérium n'apparaissaient pas comme commandables dans l'onglet Récolte. La liste des minerais était dérivée de ceux qu'on peut prospecter en gemmes, et ni l'un ni l'autre ne l'est — le même trou qui cachait déjà l'argent, l'or, le vrai-argent et le fer noir. Les deux rejoignent la liste."] =
+        "El Khorium y el Eternio no aparecían como encargables en la pestaña Recolección. La lista de minerales se derivaba de los que se pueden prospectar en gemas, y ninguno de los dos lo es — el mismo hueco que ya escondía la plata, el oro, la plata verdadera y el hierro oscuro. Ambos se unen ahora a la lista.",
     -- v1.24.0
     ["La pièce à enchanter se pose d'un clic, et une bourse qui suit la progression"] =
         "La pieza a encantar se coloca con un clic, y una bolsa que sigue el ritmo",
@@ -117,12 +122,7 @@ local news = {
         "Abre una profesión y haz clic en «Buscar trabajo»: todo el reino sabe que estás disponible, un icono de artesano aparece sobre tu cabeza para quien pase, y sales como «[Busca]» en su directorio. Se apaga solo al cabo de un rato si lo olvidas.",
     ["Au passage : les deux fenêtres ne s'emmêlent plus (un clic la ramène au premier plan), l'annuaire a un bouton partenaire et se limite à ta faction (pas d'échange cross-faction sur Classic), et un artisan ne s'affiche plus avec un métier qui n'est pas le sien."] =
         "De paso: las dos ventanas ya no se enredan (un clic la trae al frente), el directorio tiene un botón de socio y se limita a tu facción (sin comercio entre facciones en Classic), y un artesano ya no muestra una profesión que no es suya.",
-    ["Sous le capot : mises à jour plus sûres"] = "Bajo el capó: actualizaciones más seguras",
-    ["Tes données sauvegardées portent désormais une version : une mise à jour qui doit les réorganiser ne tourne qu'une fois, tes recettes et commandes restent intactes."] =
-        "Tus datos guardados ahora llevan una versión, así que una actualización que deba reorganizarlos se ejecuta una sola vez y tus recetas y pedidos quedan intactos.",
-    ["Protocole de commandes consolidé (mêmes échanges réseau) : ce build reste compatible avec les joueurs encore en 1.7.x."] =
-        "El protocolo de pedidos se consolidó (mismos intercambios de red); esta versión sigue entendiéndose con jugadores en 1.7.x.",
-    -- (clés v1.7.0/v1.7.1/v1.6.0/v1.5.0/v1.4.0 retirées : ces versions ne sont plus listées dans l'onglet Nouveautés)
+    -- (clés v1.8.0/v1.7.0/v1.7.1/v1.6.0/v1.5.0/v1.4.0 retirées : ces versions ne sont plus listées dans l'onglet Nouveautés)
     -- Onglet Nouveautés — v1.13.0
     ["Modération : mutes avec raison, temporaires, liste de confiance"] = "Moderación: silencios con motivo, temporales, lista de confianza",
     ["Un mute porte désormais une raison et une date, et peut être temporaire : |cFFFFFFFF/co mute Bob 1h spammeur|r se lève tout seul au bout d'une heure (|cFFFFFFFF/co mute|r seul liste les mutés avec raison et temps restant). Et |cFFFFFFFF/co trust <nom>|r marque un joueur de confiance, jamais mis en sourdine automatiquement — le mute manuel restant toujours possible."] =
@@ -158,15 +158,7 @@ local news = {
     ["Un panneau pour gérer les mis en sourdine"] = "Un panel para gestionar a los silenciados",
     ["L'onglet Artisans a maintenant une section « En sourdine » : chaque joueur muté y apparaît avec sa raison et le temps restant (ou « permanent »), avec un bouton pour le rétablir directement — plus besoin de deviner qui est encore muté."] =
         "La pestaña Artesanos ahora tiene una sección «Silenciados»: cada jugador silenciado aparece con su motivo y el tiempo restante (o «permanente»), con un botón para reactivarlo directamente — sin adivinar quién sigue silenciado.",
-    -- Onglet Nouveautés — v1.9.0
-    ["Tes rerolls réunis : cooldowns partagés, une identité, l'onglet Mes artisans"] =
-        "Tus alters reunidos: enfriamientos compartidos, una identidad, la pestaña Mis artesanos",
-    ["Cooldowns de recettes partagés : les autres voient « Transmutation : prête » ou « dans 14h » sur ton infobulle d'artisan — fini de demander en canal si ton Arcanite est dispo."] =
-        "Enfriamientos de recetas compartidos: los demás ven «Transmutación: lista» o «en 14h» en tu información de artesano — se acabó preguntar por el canal si tu Arcanita está lista.",
-    ["Regroupe tes persos sous une identité (|cFFFFFFFF/co alts on|r) : une commande nommée pour ton alchimiste hors ligne arrive sur le perso où tu es connecté, et tu peux l'accepter depuis n'importe lequel. Vérifié des deux côtés (personne ne peut se faire passer pour le reroll d'autrui). Désactivé par défaut."] =
-        "Agrupa tus personajes bajo una identidad (|cFFFFFFFF/co alts on|r): un pedido dirigido a tu alquimista desconectado llega al personaje en el que estás conectado, y puedes aceptarlo desde cualquiera. Verificado en ambos sentidos (nadie puede hacerse pasar por el alter de otro). Desactivado por defecto.",
-    ["Nouvel onglet « Mes artisans » : tous les métiers de ton compte sur le royaume en une vue, comme un seul perso — niveau, recettes connues par catégorie, cooldowns en tête, et quel perso porte chaque recette."] =
-        "Nueva pestaña «Mis artesanos»: todas las profesiones de tu cuenta en el reino en una vista, como un solo personaje — nivel, recetas conocidas por categoría, enfriamientos arriba, y qué personaje tiene cada receta.",
+    -- (clés v1.9.0 retirées : version sortie de la fenêtre glissante de l'onglet Nouveautés)
     ["VU"] = "VISTO",
     ["vu crafter (sans l'addon)"] = "visto fabricando (sin el addon)",
     ["vu crafter"] = "visto fabricando",

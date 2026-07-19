@@ -11,6 +11,11 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "What's New",
+    -- v1.24.1
+    ["Deux minerais de plus dans les commandes de récolte"] =
+        "Two more ores in gathering orders",
+    ["Le Khorium et l'Éthérium n'apparaissaient pas comme commandables dans l'onglet Récolte. La liste des minerais était dérivée de ceux qu'on peut prospecter en gemmes, et ni l'un ni l'autre ne l'est — le même trou qui cachait déjà l'argent, l'or, le vrai-argent et le fer noir. Les deux rejoignent la liste."] =
+        "Khorium and Eternium ore weren't showing up as orderable in the Gather tab. The mining list was built from what's prospectable into gems, and neither one is, the same gap that used to hide Silver, Gold, Truesilver and Dark Iron. Both join that list now.",
     -- v1.24.0
     ["La pièce à enchanter se pose d'un clic, et une bourse qui suit la progression"] =
         "The piece to enchant places itself in one click, and a pouch that keeps up",
@@ -120,12 +125,7 @@ local news = {
         "Open a profession and click \"Look for work\": the whole realm knows you're available, an artisan icon shows over your head for anyone passing by, and you appear as \"[LFW]\" in their directory. It lapses on its own after a while if you forget.",
     ["Au passage : les deux fenêtres ne s'emmêlent plus (un clic la ramène au premier plan), l'annuaire a un bouton partenaire et se limite à ta faction (pas d'échange cross-faction sur Classic), et un artisan ne s'affiche plus avec un métier qui n'est pas le sien."] =
         "Along the way: the two windows no longer tangle (a click brings one to the front), the directory has a partner button and sticks to your faction (no cross-faction trading on Classic), and an artisan no longer shows a profession that isn't theirs.",
-    ["Sous le capot : mises à jour plus sûres"] = "Under the hood: safer upgrades",
-    ["Tes données sauvegardées portent désormais une version : une mise à jour qui doit les réorganiser ne tourne qu'une fois, tes recettes et commandes restent intactes."] =
-        "Your saved data now carries a version, so an upgrade that needs to reshape it runs once and your recipes and orders stay intact.",
-    ["Protocole de commandes consolidé (mêmes échanges réseau) : ce build reste compatible avec les joueurs encore en 1.7.x."] =
-        "The order protocol was consolidated (same network exchanges); this build still talks to players still on 1.7.x.",
-    -- (clés v1.7.0/v1.7.1/v1.6.0/v1.5.0/v1.4.0 retirées : ces versions ne sont plus listées dans l'onglet Nouveautés)
+    -- (clés v1.8.0/v1.7.0/v1.7.1/v1.6.0/v1.5.0/v1.4.0 retirées : ces versions ne sont plus listées dans l'onglet Nouveautés)
     -- Onglet Nouveautés — v1.13.0
     ["Modération : mutes avec raison, temporaires, liste de confiance"] = "Moderation: mutes with a reason, temporary mutes, a trust list",
     ["Un mute porte désormais une raison et une date, et peut être temporaire : |cFFFFFFFF/co mute Bob 1h spammeur|r se lève tout seul au bout d'une heure (|cFFFFFFFF/co mute|r seul liste les mutés avec raison et temps restant). Et |cFFFFFFFF/co trust <nom>|r marque un joueur de confiance, jamais mis en sourdine automatiquement — le mute manuel restant toujours possible."] =
@@ -161,15 +161,7 @@ local news = {
     ["Un panneau pour gérer les mis en sourdine"] = "A panel to manage who you've muted",
     ["L'onglet Artisans a maintenant une section « En sourdine » : chaque joueur muté y apparaît avec sa raison et le temps restant (ou « permanent »), avec un bouton pour le rétablir directement — plus besoin de deviner qui est encore muté."] =
         "The Artisans tab now has a Muted section: every muted player shows up with their reason and time left (or \"permanent\"), with a button to unmute them right there — no more guessing who's still muted.",
-    -- Onglet Nouveautés — v1.9.0
-    ["Tes rerolls réunis : cooldowns partagés, une identité, l'onglet Mes artisans"] =
-        "Your alts, together: shared cooldowns, one identity, a My Artisans tab",
-    ["Cooldowns de recettes partagés : les autres voient « Transmutation : prête » ou « dans 14h » sur ton infobulle d'artisan — fini de demander en canal si ton Arcanite est dispo."] =
-        "Shared recipe cooldowns: others see \"Transmute: ready\" or \"in 14h\" on your artisan tooltip — no more asking in chat whether your Arcanite is up.",
-    ["Regroupe tes persos sous une identité (|cFFFFFFFF/co alts on|r) : une commande nommée pour ton alchimiste hors ligne arrive sur le perso où tu es connecté, et tu peux l'accepter depuis n'importe lequel. Vérifié des deux côtés (personne ne peut se faire passer pour le reroll d'autrui). Désactivé par défaut."] =
-        "Group your characters under one identity (|cFFFFFFFF/co alts on|r): an order named for your offline alchemist reaches whichever character you're on, and you can accept it from any of them. Verified both ways (nobody can pose as someone else's alt). Off by default.",
-    ["Nouvel onglet « Mes artisans » : tous les métiers de ton compte sur le royaume en une vue, comme un seul perso — niveau, recettes connues par catégorie, cooldowns en tête, et quel perso porte chaque recette."] =
-        "New \"My Artisans\" tab: all your account's professions on the realm in one view, as a single character — level, known recipes by category, cooldowns at the top, and which character carries each recipe.",
+    -- (clés v1.9.0 retirées : version sortie de la fenêtre glissante de l'onglet Nouveautés)
     ["VU"] = "SEEN",
     ["vu crafter (sans l'addon)"] = "seen crafting (no addon)",
     ["vu crafter"] = "seen crafting",

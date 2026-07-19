@@ -8,6 +8,11 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "Neues",
+    -- v1.24.1
+    ["Deux minerais de plus dans les commandes de récolte"] =
+        "Zwei weitere Erze bei Sammelaufträgen",
+    ["Le Khorium et l'Éthérium n'apparaissaient pas comme commandables dans l'onglet Récolte. La liste des minerais était dérivée de ceux qu'on peut prospecter en gemmes, et ni l'un ni l'autre ne l'est — le même trou qui cachait déjà l'argent, l'or, le vrai-argent et le fer noir. Les deux rejoignent la liste."] =
+        "Khorium- und Eterniumerz erschienen im Sammeln-Tab nicht als bestellbar. Die Erzliste wurde aus dem abgeleitet, was sich zu Edelsteinen aufbereiten lässt, und keins von beiden lässt sich das — dieselbe Lücke, die schon Silber, Gold, Reinsilber und Dunkeleisen versteckt hatte. Beide sind jetzt Teil der Liste.",
     -- v1.24.0
     ["La pièce à enchanter se pose d'un clic, et une bourse qui suit la progression"] =
         "Das zu verzaubernde Teil legt sich mit einem Klick ein, und ein Beutel, der Schritt hält",
@@ -117,12 +122,7 @@ local news = {
         "Öffne einen Beruf und klick „Arbeit suchen“: der ganze Realm weiß, dass du verfügbar bist, ein Handwerker-Symbol erscheint über deinem Kopf für Vorbeikommende, und du erscheinst als „[Sucht]“ in ihrem Verzeichnis. Es erlischt von selbst, wenn du es vergisst.",
     ["Au passage : les deux fenêtres ne s'emmêlent plus (un clic la ramène au premier plan), l'annuaire a un bouton partenaire et se limite à ta faction (pas d'échange cross-faction sur Classic), et un artisan ne s'affiche plus avec un métier qui n'est pas le sien."] =
         "Nebenbei: die zwei Fenster überlagern sich nicht mehr (ein Klick bringt eins nach vorne), das Verzeichnis hat einen Partner-Knopf und bleibt bei deiner Fraktion (kein fraktionsübergreifender Handel auf Classic), und ein Handwerker zeigt keinen Beruf mehr, der nicht seiner ist.",
-    ["Sous le capot : mises à jour plus sûres"] = "Unter der Haube: sicherere Updates",
-    ["Tes données sauvegardées portent désormais une version : une mise à jour qui doit les réorganiser ne tourne qu'une fois, tes recettes et commandes restent intactes."] =
-        "Deine gespeicherten Daten tragen jetzt eine Version, sodass ein Update, das sie umbauen muss, nur einmal läuft und deine Rezepte und Aufträge unversehrt bleiben.",
-    ["Protocole de commandes consolidé (mêmes échanges réseau) : ce build reste compatible avec les joueurs encore en 1.7.x."] =
-        "Das Auftragsprotokoll wurde konsolidiert (gleiche Netzwerk-Kommunikation); dieser Build versteht sich weiterhin mit Spielern auf 1.7.x.",
-    -- (clés v1.7.0/v1.7.1/v1.6.0/v1.5.0/v1.4.0 retirées : ces versions ne sont plus listées dans l'onglet Nouveautés)
+    -- (clés v1.8.0/v1.7.0/v1.7.1/v1.6.0/v1.5.0/v1.4.0 retirées : ces versions ne sont plus listées dans l'onglet Nouveautés)
     -- Onglet Nouveautés — v1.13.0
     ["Modération : mutes avec raison, temporaires, liste de confiance"] = "Moderation: Stummschaltungen mit Grund, temporär, Vertrauensliste",
     ["Un mute porte désormais une raison et une date, et peut être temporaire : |cFFFFFFFF/co mute Bob 1h spammeur|r se lève tout seul au bout d'une heure (|cFFFFFFFF/co mute|r seul liste les mutés avec raison et temps restant). Et |cFFFFFFFF/co trust <nom>|r marque un joueur de confiance, jamais mis en sourdine automatiquement — le mute manuel restant toujours possible."] =
@@ -158,15 +158,7 @@ local news = {
     ["Un panneau pour gérer les mis en sourdine"] = "Ein Panel zur Verwaltung von Stummgeschalteten",
     ["L'onglet Artisans a maintenant une section « En sourdine » : chaque joueur muté y apparaît avec sa raison et le temps restant (ou « permanent »), avec un bouton pour le rétablir directement — plus besoin de deviner qui est encore muté."] =
         "Der Handwerker-Reiter hat jetzt einen Bereich „Stummgeschaltet“: jeder stummgeschaltete Spieler erscheint dort mit Grund und verbleibender Zeit (oder „dauerhaft“), mit einem Knopf, um ihn direkt wieder freizuschalten — kein Rätselraten mehr, wer noch stummgeschaltet ist.",
-    -- Onglet Nouveautés — v1.9.0
-    ["Tes rerolls réunis : cooldowns partagés, une identité, l'onglet Mes artisans"] =
-        "Deine Twinks vereint: geteilte Abklingzeiten, eine Identität, ein Tab „Meine Handwerker“",
-    ["Cooldowns de recettes partagés : les autres voient « Transmutation : prête » ou « dans 14h » sur ton infobulle d'artisan — fini de demander en canal si ton Arcanite est dispo."] =
-        "Geteilte Rezept-Abklingzeiten: andere sehen „Transmutation: bereit“ oder „in 14h“ in deinem Handwerker-Tooltip — kein Nachfragen im Chat mehr, ob dein Arkanit bereit ist.",
-    ["Regroupe tes persos sous une identité (|cFFFFFFFF/co alts on|r) : une commande nommée pour ton alchimiste hors ligne arrive sur le perso où tu es connecté, et tu peux l'accepter depuis n'importe lequel. Vérifié des deux côtés (personne ne peut se faire passer pour le reroll d'autrui). Désactivé par défaut."] =
-        "Gruppiere deine Charaktere unter einer Identität (|cFFFFFFFF/co alts on|r): ein Auftrag für deinen offline Alchemisten erreicht den Charakter, auf dem du eingeloggt bist, und du kannst ihn von jedem annehmen. Beidseitig bestätigt (niemand kann sich als fremder Twink ausgeben). Standardmäßig aus.",
-    ["Nouvel onglet « Mes artisans » : tous les métiers de ton compte sur le royaume en une vue, comme un seul perso — niveau, recettes connues par catégorie, cooldowns en tête, et quel perso porte chaque recette."] =
-        "Neuer Tab „Meine Handwerker“: alle Berufe deines Accounts auf dem Realm in einer Ansicht, wie ein einziger Charakter — Stufe, bekannte Rezepte nach Kategorie, Abklingzeiten oben, und welcher Charakter jedes Rezept kennt.",
+    -- (clés v1.9.0 retirées : version sortie de la fenêtre glissante de l'onglet Nouveautés)
     ["VU"] = "GESEHEN",
     ["vu crafter (sans l'addon)"] = "beim Herstellen gesehen (ohne Addon)",
     ["vu crafter"] = "beim Herstellen gesehen",
