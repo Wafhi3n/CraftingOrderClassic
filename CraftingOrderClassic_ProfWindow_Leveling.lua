@@ -66,7 +66,9 @@ end
 function PW:_LevelCost(e)
     if e.isHeader or not (COC.LazyGold and COC.LazyGold:IsAvailable()) then return nil end
     self._lvlCache = self._lvlCache or {}
-    local k = e.spellID or e.itemID or 0
+    -- Clé PRÉFIXÉE : spellID et itemID sont deux espaces d'ID qui se recouvrent — une clé nue
+    -- ferait partager son coût à deux recettes différentes (même patron que `live` dans Route).
+    local k = e.spellID and ("s" .. e.spellID) or e.itemID and ("i" .. e.itemID) or e
     local v = self._lvlCache[k]
     if v ~= nil then return v or nil end
     local chance

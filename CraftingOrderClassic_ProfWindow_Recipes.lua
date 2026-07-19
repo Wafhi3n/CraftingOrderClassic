@@ -107,13 +107,14 @@ function PW:_RecipeTooltip(row)
     GameTooltip:SetOwner(row, "ANCHOR_RIGHT"); GameTooltip:ClearLines()
     local ok = false
     if e.link then ok = pcall(GameTooltip.SetHyperlink, GameTooltip, e.link)
-    -- Recette MANQUANTE : ni lien ni index d'API (elle n'est pas dans la fenêtre native) → on montre le
-    -- tooltip de l'OBJET PRODUIT via son itemID, au lieu du nom nu.
-    elseif e.isMissing and e.itemID then
-        ok = pcall(GameTooltip.SetHyperlink, GameTooltip, "item:" .. e.itemID)
+    -- Recette MANQUANTE : ni lien ni index d'API (elle n'est pas dans la fenêtre native) → tooltip de
+    -- l'OBJET PRODUIT par itemID, avec repli nom si l'objet n'est pas encore en cache (Skin.TipItem —
+    -- sans lui le survol semblait mort, vécu 2026-07-19).
+    elseif e.isMissing then
+        Skin.TipItem(GameTooltip, e.itemID, e.name); ok = true
     elseif e.index and COC.Craft:IsCraftOpen() then ok = pcall(GameTooltip.SetCraftSpell, GameTooltip, e.index)
     elseif e.index then ok = pcall(GameTooltip.SetTradeSkillItem, GameTooltip, e.index) end
-    if not ok then GameTooltip:SetText(e.name or "?", 1, 1, 1) end
+    if not ok or GameTooltip:NumLines() == 0 then GameTooltip:SetText(e.name or "?", 1, 1, 1) end
     -- Valeur EXACTE du profit au survol (l'indicateur de ligne n'est qu'un palier compact). Uniquement
     -- si POSITIF : on ne met rien pour une recette non rentable (le but est d'être rentable).
     local prof = self:_RowProfit(e)

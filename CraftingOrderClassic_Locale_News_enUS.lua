@@ -11,6 +11,17 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "What's New",
+    -- v1.23.0
+    ["La bourse d'artisan : la liste de courses de tes guildeux, et deux corrections réseau"] =
+        "The artisan pouch: a shopping list for your guildmates, and two networking fixes",
+    ["L'onglet Artisans gagne un bouton sac après les icônes de métier de chaque fiche : un clic ouvre la liste de courses des matériaux qu'il te faut pour monter tes métiers, calculée en local à partir de ce que le jeu diffuse déjà (aucun nouveau trafic réseau). Les réactifs que ton propre métier sait fabriquer sont décomposés en composants de base, et les objets vendus par un PNJ sont mis de côté dans une note plutôt que d'encombrer la grille."] =
+        "The Artisans tab gets a bag button after each entry's profession icons: click it and a shopping list opens for the materials that person needs to keep leveling, worked out locally from what the game already broadcasts (no new network traffic). Reagents their own profession can make from something cheaper get broken down into base components, and vendor items get pulled into a plain note instead of cluttering the grid.",
+    ["Coche « inclure les plans à acheter » et les recettes derrière un coût rejoignent la liste : les plans-objets comme fourniture à apporter, les plans de formateur comme simple note. Le même bloc de fournitures s'affiche maintenant sous le plan de route « quoi monter ensuite », avec le PNJ où aller (nom, zone, coordonnées) et une épingle TomTom cliquable si tu l'as installé."] =
+        "Check \"include recipes to buy\" and plans behind a gold cost join the list too: purchasable plan items as something to hand over, trainer plans as a note. The same supply block now shows up under the \"what to level next\" route planner, with the vendor to visit (name, zone, coordinates) and a clickable TomTom pin if you have it installed.",
+    ["Une recette sans réactif au prix connu (la poussière d'enchantement, par exemple) ne fait plus sauter tout un tronçon du plan de route : elle sert maintenant de repli marqué « ? » quand rien de mieux n'est disponible. Une table de désenchantement maison alimente aussi l'infobulle des poussières, essences et éclats affichés dans ces listes."] =
+        "A recipe with no priced reagent, Enchanting dust being the usual offender, no longer knocks a whole stretch out of the route plan: it's now used as a fallback marked with a \"?\" when nothing better is available. A curated disenchant table also backs the tooltip on any dust, essence or shard shown in these lists.",
+    ["Deux corrections : un compte à plusieurs personnages se voyait parfois lister lui-même comme « joignable via » son autre perso dans son propre onglet Artisans, corrigé. Et le plan de route pouvait s'arrêter avant le vrai plafond de compétence après une formation chez le maître, à cause d'une assignation Lua qui perdait silencieusement sa seconde valeur."] =
+        "Two fixes: an account with more than one character sometimes saw itself listed as reachable \"via\" its own alt in its own Artisans tab, fixed. And the route planner could stop short of a profession's real skill cap right after a trainer promotion, because a Lua multi-assignment quietly dropped its second return value.",
     -- v1.22.1
     ["Les alertes de commande vérifient enfin le métier, et un plan de route qui suit son propre badge"] =
         "Order alerts that actually check the profession, and a route plan that matches its own badge",

@@ -106,7 +106,8 @@ local function itemsOf(mprof)
 end
 
 -- Une ligne PNJ prête à afficher : « [niveau] Nom — Zone (x, y) », comme la fiche MTSL. Coords/zone
--- résolues via npcs.lua + zones.lua. Renvoie nil si le PNJ est inconnu.
+-- résolues via npcs.lua + zones.lua. Renvoie (texte, pin) — pin = { x, y, zone, name } quand les
+-- coordonnées ET la zone sont connues (repère de carte cliquable), nil sinon. nil si PNJ inconnu.
 local function npcLine(npcId)
     local npc = lookup("npcs")[npcId]; if not npc then return nil end
     local lvl = npc.xp_level and npc.xp_level.max
@@ -114,16 +115,20 @@ local function npcLine(npcId)
     local coord = npc.location and npc.location.x and npc.location.y
         and string.format(" (%s, %s)", npc.location.x, npc.location.y) or ""
     local lvlTag = lvl and lvl > 0 and ("|cFF888888[" .. lvl .. "]|r ") or ""
-    return lvlTag .. loc(npc.name) .. (zone and (" |cFF888888— " .. loc(zone.name) .. coord .. "|r") or "")
+    local pin = (zone and npc.location and npc.location.x and npc.location.y)
+        and { x = tonumber(npc.location.x), y = tonumber(npc.location.y),
+              zone = loc(zone.name), name = loc(npc.name) } or nil
+    return lvlTag .. loc(npc.name) .. (zone and (" |cFF888888— " .. loc(zone.name) .. coord .. "|r") or ""), pin
 end
 
 -- Ajoute jusqu'à `maxN` lignes PNJ (formateurs / vendeurs / mobs) à `lines` sous le libellé `label`.
+-- Chaque ligne porte `npc` = pin cliquable (repère TomTom/carte) quand les coords sont connues.
 local function addNpcLines(lines, label, sources, maxN)
     local shown = 0
     for _, npcId in ipairs(sources or {}) do
-        local ln = npcLine(npcId)
+        local ln, pin = npcLine(npcId)
         if ln then
-            lines[#lines + 1] = { label = shown == 0 and label or "", value = ln }
+            lines[#lines + 1] = { label = shown == 0 and label or "", value = ln, npc = pin }
             shown = shown + 1
             if shown >= (maxN or 3) then break end
         end
@@ -254,6 +259,27 @@ function MTSL:SourceKind(profKey, spellID)
         elseif item.quests then return "quest" end
     end
     return "unknown"
+end
+
+-- Première ligne PNJ résolue « [niv] Nom — Zone (x, y) » où obtenir un plan : formateur (sources
+-- trainers) ou vendeur de l'objet-recette. nil pour butin/quête/inconnu ou PNJ hors base. Version
+-- COMPACTE pour les listes (fournitures de la route / bourse) — la fiche complète reste SkillDetail.
+function MTSL:SourceNpcLine(profKey, spellID)
+    if not (self:IsAvailable() and spellID) then return nil end
+    local mprof = mtslProf(profKey); if not mprof then return nil end
+    local sk = indexOf(mprof)[spellID]; if not sk then return nil end
+    local sources
+    if sk.trainers then sources = sk.trainers.sources
+    else
+        local ri = recipeItemFor(profKey, spellID)
+        local item = ri and itemsOf(mprof)[ri]
+        sources = item and item.vendors and item.vendors.sources
+    end
+    for _, npcId in ipairs(sources or {}) do
+        local ln = npcLine(npcId)
+        if ln then return ln end
+    end
+    return nil
 end
 
 -- Prix d'ACQUISITION du plan côté PNJ : prix au formateur, ou prix vendeur de l'objet-recette. nil

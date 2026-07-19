@@ -281,6 +281,18 @@ function Skin.MakeCheck(parent, size)
     return box
 end
 
+-- Pose un OBJET dans un tooltip avec repli ROBUSTE : SetHyperlink d'un objet PAS ENCORE en cache
+-- client « réussit » sans rien rendre (0 ligne) → survol qui semble mort (vécu 2026-07-19 :
+-- recettes MTSL jamais croisées, cases de la bourse). On déclenche la mise en cache (GetItemInfo,
+-- asynchrone — le survol suivant a la fiche complète) et on affiche `name` en attendant.
+function Skin.TipItem(tip, itemID, name)
+    local ok = (itemID and pcall(tip.SetHyperlink, tip, "item:" .. itemID)) and true or false
+    if not ok or tip:NumLines() == 0 then
+        if itemID and GetItemInfo then GetItemInfo(itemID) end
+        tip:SetText(name or "?", 1, 1, 1)
+    end
+end
+
 -- Câble le tooltip d'objet/sort au survol d'une ligne (à appeler UNE fois dans le constructeur de
 -- ligne). Lit `row.tipItemID` / `row.tipSpellID` posés au refresh → priorité à l'objet (le produit).
 function Skin.WireItemTooltip(row)

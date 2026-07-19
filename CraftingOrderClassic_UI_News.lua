@@ -19,10 +19,12 @@ local BODY_W = 780
 local function versionsLatest()
     return {
         {
-            v = "v1.22.1", title = L["Les alertes de commande vérifient enfin le métier, et un plan de route qui suit son propre badge"],
+            v = "v1.23.0", title = L["La bourse d'artisan : la liste de courses de tes guildeux, et deux corrections réseau"],
             lines = {
-                L["Une commande à portée large (guilde, amis, tous) déclenchait un toast même chez un joueur sans le métier, du moment qu'elle arrivait par le relais de connexion (chuchotement) plutôt que par le canal : le filtre par métier ne couvrait que le canal. Il s'applique maintenant quel que soit le chemin réseau. Le toast gagne aussi un troisième texte : une commande à portée large n'affiche plus « pour TOI », ce qui donnait l'impression fausse d'une demande personnelle."],
-                L["Le plan de route « quoi monter ensuite » pouvait suggérer une recette différente du badge de coût de la liste, les deux lisant des données légèrement différentes. Le plan utilise maintenant la difficulté réelle de la fenêtre métier à ton rang actuel plutôt qu'une projection, et se rafraîchit au même rythme que le badge. La commande |cFFFFFFFF/co lvldump|r affiche le détail en cas de nouveau désaccord."],
+                L["L'onglet Artisans gagne un bouton sac après les icônes de métier de chaque fiche : un clic ouvre la liste de courses des matériaux qu'il te faut pour monter tes métiers, calculée en local à partir de ce que le jeu diffuse déjà (aucun nouveau trafic réseau). Les réactifs que ton propre métier sait fabriquer sont décomposés en composants de base, et les objets vendus par un PNJ sont mis de côté dans une note plutôt que d'encombrer la grille."],
+                L["Coche « inclure les plans à acheter » et les recettes derrière un coût rejoignent la liste : les plans-objets comme fourniture à apporter, les plans de formateur comme simple note. Le même bloc de fournitures s'affiche maintenant sous le plan de route « quoi monter ensuite », avec le PNJ où aller (nom, zone, coordonnées) et une épingle TomTom cliquable si tu l'as installé."],
+                L["Une recette sans réactif au prix connu (la poussière d'enchantement, par exemple) ne fait plus sauter tout un tronçon du plan de route : elle sert maintenant de repli marqué « ? » quand rien de mieux n'est disponible. Une table de désenchantement maison alimente aussi l'infobulle des poussières, essences et éclats affichés dans ces listes."],
+                L["Deux corrections : un compte à plusieurs personnages se voyait parfois lister lui-même comme « joignable via » son autre perso dans son propre onglet Artisans, corrigé. Et le plan de route pouvait s'arrêter avant le vrai plafond de compétence après une formation chez le maître, à cause d'une assignation Lua qui perdait silencieusement sa seconde valeur."],
             },
         },
     }
@@ -30,6 +32,13 @@ end
 
 local function versionsRecent()
     return {
+        {
+            v = "v1.22.1", title = L["Les alertes de commande vérifient enfin le métier, et un plan de route qui suit son propre badge"],
+            lines = {
+                L["Une commande à portée large (guilde, amis, tous) déclenchait un toast même chez un joueur sans le métier, du moment qu'elle arrivait par le relais de connexion (chuchotement) plutôt que par le canal : le filtre par métier ne couvrait que le canal. Il s'applique maintenant quel que soit le chemin réseau. Le toast gagne aussi un troisième texte : une commande à portée large n'affiche plus « pour TOI », ce qui donnait l'impression fausse d'une demande personnelle."],
+                L["Le plan de route « quoi monter ensuite » pouvait suggérer une recette différente du badge de coût de la liste, les deux lisant des données légèrement différentes. Le plan utilise maintenant la difficulté réelle de la fenêtre métier à ton rang actuel plutôt qu'une projection, et se rafraîchit au même rythme que le badge. La commande |cFFFFFFFF/co lvldump|r affiche le détail en cas de nouveau désaccord."],
+            },
+        },
         {
             v = "v1.22.0", title = L["L'aide contextuelle, des dépendances qu'on ne peut plus rater, et une touche Échap qui obéit"],
             lines = {
@@ -74,6 +83,11 @@ local function versionsRecent()
                 L["Le LFW marche même sans l'addon : tape « LFW enchantement » en Commerce ou Général et tu apparais comme dispo, avec la même icône de plaque qu'un joueur qui a Crafting Order. Plus une correction : une recette déjà apprise ne s'affichait plus en double avec MissingTradeSkillsList."],
             },
         },
+    }
+end
+
+local function versionsOlder()
+    return {
         {
             v = "v1.18.0", title = L["Chercher du travail : dis ce que tu offres, et trie par progression"],
             lines = {
@@ -82,11 +96,6 @@ local function versionsRecent()
                 L["Les recettes se trient par ce qui te fait encore progresser : un troisième bouton outil remonte en tête les plans qui donnent un point, d'orange à gris. Les commandes ont le même « ce qui me fait monter d'abord », avec un liseré de difficulté sur le côté de chaque ligne. Plus quelques corrections au passage."],
             },
         },
-    }
-end
-
-local function versionsOlder()
-    return {
         {
             v = "v1.17.1", title = L["Correctif : erreur au login en « Chercher du travail »"],
             lines = {

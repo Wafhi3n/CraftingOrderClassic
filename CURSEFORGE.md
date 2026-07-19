@@ -33,6 +33,7 @@ long as they've got the addon too.
 - If you run Lazy Gold, every recipe shows what it'd earn you, and you can sort the list by profit (new in 1.16).
 - If you run MissingTradeSkillsList, flip the recipe list to show what you haven't learned yet, in red, and click one to see where it drops (new in 1.16).
 - The window uses the game's own frame style now, not a custom skin, so it reads as part of the interface (new in 1.17).
+- Click the bag icon on any artisan in the directory to see exactly what materials they need to keep leveling, worked out locally from what the addon already knows about them (new in 1.23).
 
 ## Order from your Friends and Guild list
 

@@ -17,7 +17,7 @@
 -- partagent le mapping position <-> spellID, condition pour que les bitfields échangés
 -- (cf. CraftLink_Registry) soient interprétables.
 
-local MAJOR, MINOR = "CraftLink-1.0", 11   -- v11 : skillColors (seuils orange/jaune/vert/gris par recette, cf. tools/gen_skill_colors.lua) + RecipeColors (v10 : enchants fusionnés ; v9 : couches saisonnières ; v8 : cooldowns ; v7 : gardes anti-clobber)
+local MAJOR, MINOR = "CraftLink-1.0", 12   -- v12 : deSources + DisenchantSource (table curatée du désenchantement, Data/Disenchant.lua) (v11 : skillColors/RecipeColors ; v10 : enchants fusionnés ; v9 : couches saisonnières ; v8 : cooldowns ; v7 : gardes anti-clobber)
 local lib = LibStub:NewLibrary(MAJOR, MINOR)
 if not lib then return end  -- déjà chargé par un autre addon avec une version >= : on garde l'existante
 
@@ -241,6 +241,14 @@ end
 function lib:Conversions(prof)
     local def = self.professions[prof]
     return def and def.conversions or nil
+end
+
+-- Classe d'objets à DÉSENCHANTER pour obtenir un composant, ou nil : { q = qualité (2 vert /
+-- 3 bleu / 4 épique), lo, hi = tranche de NIVEAU D'OBJET (ilvl, ≠ niveau requis — l'afficher
+-- comme « niv. d'objet ») }. Table curatée Data/Disenchant.lua (ESTIMATION, source Wowpedia) —
+-- complémentaire de Conversions (ici la source est une classe d'objets, pas un objet précis).
+function lib:DisenchantSource(itemID)
+    return self.deSources and self.deSources[itemID] or nil
 end
 
 -- Items récoltés par un métier de récolte (Herbalism/Skinning/Fishing/Mining) : { itemID, ... } ou nil.

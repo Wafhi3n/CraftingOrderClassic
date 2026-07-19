@@ -32,6 +32,15 @@ function LG:ItemValue(itemID)
     return nil
 end
 
+-- Objet vendu par un PNJ (prix fixe) ? Lit la table publique de Lazy Gold (VENDOR_ITEMS, prix
+-- vendeur par unité — celle que GetItemCost consulte en premier). Sert à la bourse d'artisan : un
+-- composant vendeur ne vaut pas d'être fourni, l'artisan l'achètera en ville (retour user
+-- 2026-07-19 : Coarse Thread / Red Dye encombraient la grille).
+function LG:IsVendorItem(itemID)
+    local t = self:IsAvailable() and _G.LazyGold.VENDOR_ITEMS
+    return (type(t) == "table" and itemID and t[itemID]) and true or false
+end
+
 -- Icônes NATIVES (textures du jeu, pas de fichier à embarquer). L'étoile « toast-star » marque les
 -- gros profits (≥ 1000 po). Étoiles un peu plus grandes que les pièces pour ressortir.
 local GOLD_ICON   = "|TInterface\\MoneyFrame\\UI-GoldIcon:12:12:0:0|t"

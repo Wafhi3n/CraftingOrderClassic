@@ -345,6 +345,30 @@ local es2 = {
         "El botón mapa abre la |cFFE8B84BRuta de subida|r: de tu rango actual al tope, qué fabricar, cuántas veces y por qué coste total estimado — recalculado con cada punto ganado.",
     ["Tout repose sur les prix du dernier scan Auctionator (addons Lazy Gold + Auctionator conseillés) : sans eux, ces aides s'effacent."] =
         "Todo se basa en los precios del último escaneo de Auctionator (addons Lazy Gold + Auctionator recomendados): sin ellos, estas ayudas se ocultan.",
+
+    -- Bourse d'artisan (onglet Artisans)
+    ["Bourse d'artisan"] = "Bolsa del artesano",
+    ["Clic : les fournitures qu'il lui faut pour monter ses métiers (prix Lazy Gold)."] =
+        "Clic: los suministros que necesita para subir sus oficios (precios de Lazy Gold).",
+    ["Bourse — %s"] = "Bolsa — %s",
+    ["Rien à fournir — métiers au plafond, ou données trop anciennes."] = "Nada que suministrar — oficios al tope, o datos demasiado antiguos.",
+    ["Inclure les plans à acheter"] = "Incluir las recetas por comprar",
+    ["Les plans-objets s'ajoutent aux fournitures ; les plans « au formateur » restent à apprendre chez le PNJ."] =
+        "Los objetos-receta se suman a los suministros; las recetas de instructor deberá aprenderlas con el PNJ.",
+    ["Requis : ×%d"] = "Necesario: ×%d",
+    ["Plan à fournir (il ne le connaît pas encore)"] = "Receta por suministrar (aún no la conoce)",
+    ["Au formateur : %s"] = "Con el instructor: %s",
+    ["Chez un PNJ (inutile de fournir) : %s"] = "En un vendedor PNJ (no hace falta suministrar): %s",
+    ["Fournitures (agrégées)"] = "Suministros (agregados)",
+    ["Clic : poser un repère sur ce PNJ (TomTom ou épingle de carte)."] = "Clic: coloca un punto de ruta en este PNJ (TomTom o marcador del mapa).",
+    ["zone introuvable sur la carte : %s"] = "zona no encontrada en el mapa: %s",
+    ["repère posé : %s — %s (%.0f, %.0f)"] = "punto de ruta colocado: %s — %s (%.0f, %.0f)",
+    ["Route incomplète : %d rang(s) sans recette calculable (prix HV manquants)."] =
+        "Ruta incompleta: %d rango(s) sin receta calculable (faltan precios de subasta).",
+    ["Coche « Inclure les plans à acheter » pour en combler une partie."] =
+        "Marca «Incluir las recetas por comprar» para cubrir una parte.",
+    ["Coût partiel : au moins un réactif sans prix HV."] = "Coste parcial: al menos un componente sin precio de subasta.",
+    ["Désenchanter : objets %s, niv. d'objet %d-%d (estimation)"] = "Desencantar: objetos %s, nivel de objeto %d-%d (estimación)",
 }
 
 for k, v in pairs(es2) do L[k] = v end

@@ -183,4 +183,7 @@ function UI:_SetArtProfIcons(row, list, r, name)
         ic:Show()
     end
     for i = #list + 1, #pool do pool[i]:Hide() end
+    -- Bouton « bourse » (fournitures de progression de cet artisan) après la dernière icône —
+    -- garde nil : _UI_Artisans_Needs.lua est soft-dep (absent avant le restart qui suit son ajout).
+    if self._SetArtNeedsBtn then self:_SetArtNeedsBtn(row, #list * ARI + 4, r, name) end
 end

@@ -1,10 +1,10 @@
 # CraftingOrderClassic — carte du code
 
-> **GÉNÉRÉ** le 2026-07-18 (v1.22.1) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
+> **GÉNÉRÉ** le 2026-07-19 (v1.22.1) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
-98 modules + 4 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
+100 modules + 4 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
 
 ## Modules (ordre de chargement)
 
@@ -15,16 +15,16 @@
 | `CraftingOrderClassic_Migrations.lua` | versionnage du schéma SavedVariables. | 40 |
 | `CraftingOrderClassic_Locale.lua` | socle de localisation du CHROME de l'UI. | 12 |
 | `CraftingOrderClassic_Locale_enUS.lua` | overlay ANGLAIS (enUS/enGB). | 257 |
-| `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 367 |
+| `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 391 |
 | `CraftingOrderClassic_Locale_deDE.lua` | overlay ALLEMAND (deDE). | 259 |
-| `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 349 |
+| `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 373 |
 | `CraftingOrderClassic_Locale_esES.lua` | overlay ESPAGNOL (esES/esMX). | 260 |
-| `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 350 |
+| `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 374 |
 | `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 193 |
 | `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 190 |
 | `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 190 |
 | `CraftingOrderClassic_Elemental.lua` | pseudo-« métier » de récolte « Élémentaire ». | 61 |
-| `CraftingOrderClassic_UI_Skin.lua` | tokens + helpers SÉMANTIQUES du skin (métiers, statuts, rareté, quantités, icônes natives) et petits widgets d'affichage. | 416 |
+| `CraftingOrderClassic_UI_Skin.lua` | tokens + helpers SÉMANTIQUES du skin (métiers, statuts, rareté, quantités, icônes natives) et petits widgets d'affichage. | 428 |
 | `CraftingOrderClassic_UI_Skin_Native.lua` | kit de chrome Blizzard NATIF (le « framework » UI de COC). | 485 |
 | `CraftingOrderClassic_UI_Skin_Sections.lua` | kit de chrome natif, volet SECTIONS : comment on découpe l'intérieur d'une fenêtre en blocs et en zones. | 247 |
 | `CraftingOrderClassic_UI_Skin_HelpPlate.lua` | kit d'AIDE CONTEXTUELLE (le « bouton i » de retail). | 130 |
@@ -44,7 +44,8 @@
 | `CraftingOrderClassic_UI_Artisans_Layout.lua` | GÉOMÉTRIE de l'onglet « Artisans » (annuaire social). | 44 |
 | `CraftingOrderClassic_UI_Artisans.lua` | onglet « Artisans » : annuaire social. | 410 |
 | `CraftingOrderClassic_UI_Artisans_Groups.lua` | fusion « une ligne par JOUEUR » (rerolls). | 207 |
-| `CraftingOrderClassic_UI_Artisans_Icons.lua` | onglet « Artisans » : tout ce qui est ICÔNE de métier. | 186 |
+| `CraftingOrderClassic_UI_Artisans_Icons.lua` | onglet « Artisans » : tout ce qui est ICÔNE de métier. | 189 |
+| `CraftingOrderClassic_UI_Artisans_Needs.lua` | la « BOURSE d'artisan » de l'onglet Artisans : pour un artisan du roster (partenaire, guildie, ami…), la LISTE DE COURSES des fournitures qu'il lui faut pour monter ses métiers — mats agrégés de SA route de progression (COC.Route, calculée 100 % en LOCAL depuis son rang SK diffusé + ses recettes décodées du bitfield RK ; prix Lazy Gold locaux, valables serveur entier). | 343 |
 | `CraftingOrderClassic_UI_Artisans_Muted.lua` | panel « En sourdine » de l'onglet Artisans. | 86 |
 | `CraftingOrderClassic_UI_MyArtisans_Layout.lua` | GÉOMÉTRIE de l'onglet « Mes artisans ». | 53 |
 | `CraftingOrderClassic_UI_MyArtisans.lua` | onglet « Mes artisans » : vue agrégée des métiers du COMPTE (tous mes rerolls du royaume), en mode « connu ». | 433 |
@@ -65,18 +66,19 @@
 | `CraftingOrderClassic_RecipeCats_Enchanting.lua` | sous-catégories de l'ENCHANTEMENT. | 52 |
 | `CraftingOrderClassic_Craft.lua` | socle de lecture LIVE de la fenêtre métier (migration de la fenêtre custom depuis Guild Economy / TradeScanner_Craft.lua). | 206 |
 | `CraftingOrderClassic_Enchant.lua` | spécifique à l'Enchantement (API Craft). | 326 |
-| `CraftingOrderClassic_MTSL.lua` | pont LECTURE SEULE vers l'addon « Missing TradeSkills List » (MTSL). | 273 |
+| `CraftingOrderClassic_MTSL.lua` | pont LECTURE SEULE vers l'addon « Missing TradeSkills List » (MTSL). | 299 |
 | `CraftingOrderClassic_ProfWindow.lua` | fenêtre métier custom 3 colonnes (migration depuis Guild Economy) : Recettes \| Détail+Craft \| Commandes du métier. | 460 |
 | `CraftingOrderClassic_ProfWindow_Layout.lua` | GÉOMÉTRIE de la vue métier (fenêtre 3 colonnes). | 76 |
 | `CraftingOrderClassic_ProfWindow_HelpPlate.lua` | AIDE CONTEXTUELLE de la Vue Métier (« bouton i »). | 82 |
 | `CraftingOrderClassic_ProfWindow_Dock.lua` | mode DOCK de la vue métier (« Vue Blizzard ») : la fenêtre native reste VISIBLE (non neutralisée) et NOTRE colonne Commandes s'épingle à sa droite. | 70 |
 | `CraftingOrderClassic_ProfWindow_Toolbar.lua` | barre d'outils de la colonne Recettes (vue métier) : les toggles de TRI (slot recTools, à gauche : rentabilité / valeurs exactes / progression — Lazy Gold) et de FILTRE (slot recFilterToggles, à droite : « j'ai les matériaux » / « montée de compétence »). | 228 |
-| `CraftingOrderClassic_ProfWindow_Recipes.lua` | colonne GAUCHE : liste de recettes virtualisée (scroll), recherche, couleur par difficulté, sélection, badge « demandé » (nb de commandes ouvertes pour l'objet). | 477 |
-| `CraftingOrderClassic_ProfWindow_Leveling.lua` | aide à la MONTÉE DE MÉTIER dans la liste de recettes : coût de progression (réactifs au prix Lazy Gold ÷ chance de point selon la couleur), badge « meilleur coût/point » sur la recette recommandée, icônes de SOURCE sur les manquantes (formateur / vendeur PNJ / coté à l'HV / à farmer) et tri « progression » affiné par coût. | 217 |
-| `CraftingOrderClassic_ProfWindow_Route.lua` | PLAN DE ROUTE de montée de métier (étage ③ de l'aide à la progression) : « du rang actuel au plafond, quoi crafter, combien de fois, pour combien ». | 341 |
-| `CraftingOrderClassic_ProfWindow_Detail.lua` | colonne CENTRE : détail de la recette sélectionnée (icône, réactifs have/need) + boutons Créer / Créer tout. | 411 |
-| `CraftingOrderClassic_ProfWindow_Info.lua` | PANNEAU D'INFO en SECTIONS pour la colonne centrale de la vue métier. | 144 |
-| `CraftingOrderClassic_LazyGold.lua` | pont LECTURE SEULE vers l'addon « Lazy Gold Classic » (LG). | 337 |
+| `CraftingOrderClassic_ProfWindow_Recipes.lua` | colonne GAUCHE : liste de recettes virtualisée (scroll), recherche, couleur par difficulté, sélection, badge « demandé » (nb de commandes ouvertes pour l'objet). | 478 |
+| `CraftingOrderClassic_ProfWindow_Leveling.lua` | aide à la MONTÉE DE MÉTIER dans la liste de recettes : coût de progression (réactifs au prix Lazy Gold ÷ chance de point selon la couleur), badge « meilleur coût/point » sur la recette recommandée, icônes de SOURCE sur les manquantes (formateur / vendeur PNJ / coté à l'HV / à farmer) et tri « progression » affiné par coût. | 219 |
+| `CraftingOrderClassic_Route.lua` | cœur de CALCUL du plan de route de montée de métier, PARAMÉTRABLE : marche gloutonne rang par rang (recette au meilleur coût/point ESPÉRÉ), seuils réels CraftLink `skillColors` aux rangs futurs, amortissement du prix des plans à acheter, exclusion des recettes à cooldown et des coûts partiels. | 213 |
+| `CraftingOrderClassic_ProfWindow_Route.lua` | fenêtre « PLAN DE ROUTE » de montée de métier (étage ③ de l'aide à la progression) : « du rang actuel au plafond, quoi crafter, combien de fois, pour combien ». | 265 |
+| `CraftingOrderClassic_ProfWindow_Detail.lua` | colonne CENTRE : détail de la recette sélectionnée (icône, réactifs have/need) + boutons Créer / Créer tout. | 418 |
+| `CraftingOrderClassic_ProfWindow_Info.lua` | PANNEAU D'INFO en SECTIONS pour la colonne centrale de la vue métier. | 203 |
+| `CraftingOrderClassic_LazyGold.lua` | pont LECTURE SEULE vers l'addon « Lazy Gold Classic » (LG). | 346 |
 | `CraftingOrderClassic_ProfWindow_Orders.lua` | colonne « Commandes » de la vue métier (cabine de l'artisan) : construction (onglets de relation, en-tête, scroll), vue LISTE (une ligne par commande : demandeur + prix + âge ; une ligne sourdine cliquée se réaffiche), collecte/tri et rafraîchissement. | 343 |
 | `CraftingOrderClassic_ProfWindow_Orders_Card.lua` | vue SÉLECTIONNÉE de la colonne « Commandes » : la carte complète d'une commande (composants fournis, repères Lazy Gold, ACCEPTER / REFUSER / CHUCHOTER ; croix en haut à droite = retour liste). | 255 |
 | `CraftingOrderClassic_ProfWindow_LFW.lua` | config de l'OFFRE « recherche de travail » par métier. | 327 |
@@ -87,7 +89,7 @@
 | `Directory_Skills.lua` | niveaux de compétence + réputation (couche « profil » de l'annuaire). | 119 |
 | `Directory_Cooldowns.lua` | cooldowns de recettes (couche « profil » de l'annuaire). | 82 |
 | `Directory_RelayCodec.lua` | codec du fil RLY : relais de la fiche d'un artisan HORS LIGNE par un de ses partenaires. | 63 |
-| `Directory_Relay.lua` | « contacts de confiance » : les données d'un joueur DÉCONNECTÉ restent servies par ses partenaires (r.isPartner). | 150 |
+| `Directory_Relay.lua` | « contacts de confiance » : les données d'un joueur DÉCONNECTÉ restent servies par ses partenaires (r.isPartner). | 166 |
 | `Directory_AltCodec.lua` | codec du fil ALT (liste des persos d'un même joueur) + vérification par réciprocité. | 115 |
 | `Directory_Alts.lua` | regroupement des rerolls : identité « joueur » multi-persos (verbe ALT). | 270 |
 | `Directory_LFW.lua` | statut « recherche de travail » (Looking For Work) + OFFRE par métier. | 314 |
@@ -201,6 +203,13 @@
 
 > Case à cocher carrée en TEXTURE native (les glyphes ✓/□ s'affichent en tofu dans la police WoW).
 > Renvoie la texture « boîte » avec :SetChecked(bool) qui montre/masque la coche superposée.
+
+**`Skin.TipItem(tip, itemID, name)`**
+
+> Pose un OBJET dans un tooltip avec repli ROBUSTE : SetHyperlink d'un objet PAS ENCORE en cache
+> client « réussit » sans rien rendre (0 ligne) → survol qui semble mort (vécu 2026-07-19 :
+> recettes MTSL jamais croisées, cases de la bourse). On déclenche la mise en cache (GetItemInfo,
+> asynchrone — le survol suivant a la fiche complète) et on affiche `name` en attendant.
 
 **`Skin.WireItemTooltip(row)`**
 
@@ -600,7 +609,7 @@
 > (or des libellés, hover, sélection) ; le chrome (cadre, onglets, boutons) est natif.
 > INTOUCHABLE : le langage couleur des statuts d'ordre et la rareté d'objet ne sont jamais recolorés.
 
-**API** : `Skin.ProfLabel(p)` · `Skin.ProfIcon(key)` · `Skin.StatusInfo(s)` · `Skin.RarityColor(itemID)` · `Skin.QtyText(o)` · `Skin.QtySuffix(o)` · `Skin.FormatDuration(sec)` · `Skin.KnowsProf(r, p)` · `Skin.KnowsProfOrSeen(r, p)` · `Skin.InSource(r, src)` · `Skin.MakeMoneyRow(parent, x, y)` · `Skin.FirstChar(s)` · `Skin.ItemExists(itemID)` · `Skin.Icon(itemID, spellID)` · `Skin.MakeBadge(parent, size)` · `Skin.SearchHint(parent, editbox, text)` · `Skin.MakeCheck(parent, size)` · `Skin.WireItemTooltip(row)` · `Skin.ChatLinkFor(link, itemID, spellID)` · `Skin.WireItemLink(row)` · `Skin.MakeStatusIcon(parent, size)` · `Skin.MoneyIcon(parent, kind, anchorTo)` · `Skin.AutoHideScroll(scrollName, content)` · `Skin.ApplyShadow(fs)` · `Skin.SkinFrameBackdrop(f)` · `Skin.SkinWell(f)` · `Skin.MakeSeparator(parent, offsetY)`
+**API** : `Skin.ProfLabel(p)` · `Skin.ProfIcon(key)` · `Skin.StatusInfo(s)` · `Skin.RarityColor(itemID)` · `Skin.QtyText(o)` · `Skin.QtySuffix(o)` · `Skin.FormatDuration(sec)` · `Skin.KnowsProf(r, p)` · `Skin.KnowsProfOrSeen(r, p)` · `Skin.InSource(r, src)` · `Skin.MakeMoneyRow(parent, x, y)` · `Skin.FirstChar(s)` · `Skin.ItemExists(itemID)` · `Skin.Icon(itemID, spellID)` · `Skin.MakeBadge(parent, size)` · `Skin.SearchHint(parent, editbox, text)` · `Skin.MakeCheck(parent, size)` · `Skin.TipItem(tip, itemID, name)` · `Skin.WireItemTooltip(row)` · `Skin.ChatLinkFor(link, itemID, spellID)` · `Skin.WireItemLink(row)` · `Skin.MakeStatusIcon(parent, size)` · `Skin.MoneyIcon(parent, kind, anchorTo)` · `Skin.AutoHideScroll(scrollName, content)` · `Skin.ApplyShadow(fs)` · `Skin.SkinFrameBackdrop(f)` · `Skin.SkinWell(f)` · `Skin.MakeSeparator(parent, offsetY)`
 
 ### `CraftingOrderClassic_UI_Skin_Native.lua`
 > CraftingOrderClassic_UI_Skin_Native.lua — kit de chrome Blizzard NATIF (le « framework » UI de COC).
@@ -855,6 +864,21 @@
 >   2. les icônes de métier d'une ligne artisan : contour de rentabilité (Lazy Gold), tooltip, et
 >      CLIC → onglet Commande pré-ciblé sur CET artisan et CE métier (UI:OpenPostForArtisan).
 > Extrait de _UI_Artisans.lua (plafond anti-monolithe).
+
+### `CraftingOrderClassic_UI_Artisans_Needs.lua`
+> CraftingOrderClassic_UI_Artisans_Needs.lua — la « BOURSE d'artisan » de l'onglet Artisans :
+> pour un artisan du roster (partenaire, guildie, ami…), la LISTE DE COURSES des fournitures qu'il
+> lui faut pour monter ses métiers — mats agrégés de SA route de progression (COC.Route, calculée
+> 100 % en LOCAL depuis son rang SK diffusé + ses recettes décodées du bitfield RK ; prix Lazy
+> Gold locaux, valables serveur entier). Aucune donnée réseau nouvelle : display-only.
+> Case « inclure les plans à acheter » (db.needsPlans) : la route peut alors passer par des plans
+> qu'il n'a pas — les plans-OBJETS rejoignent la grille comme fournitures à lui apporter, les
+> plans de FORMATEUR restent une note (pas d'objet à donner, il devra l'apprendre au PNJ).
+> Bouton d'entrée : sac posé après les icônes de métier d'une ligne (hook sous garde nil dans
+> _UI_Artisans_Icons — l'absence de ce fichier avant restart ne casse rien). Sans Lazy Gold, le
+> bouton reste visible et le clic ouvre la popup NeedLazyGold (pattern découvrabilité).
+
+**API** : `UI:OpenNeeds(name)`
 
 ### `CraftingOrderClassic_UI_Artisans_Muted.lua`
 > CraftingOrderClassic_UI_Artisans_Muted.lua — panel « En sourdine » de l'onglet Artisans.
@@ -1120,7 +1144,7 @@
 > CE QU'ON NE BAKE JAMAIS : les noms restent puisés dans MTSL au runtime selon la langue du client —
 > rien n'est figé en anglais, cohérent avec le reste de l'écosystème.
 
-**API** : `MTSL:IsAvailable()` · `MTSL:SkillDetail(profKey, spellID)` · `MTSL:MissingRecipes(profKey)` · `MTSL:MinSkill(profKey, spellID)` · `MTSL:RecipeItem(profKey, spellID)` · `MTSL:SourceKind(profKey, spellID)` · `MTSL:SourcePrice(profKey, spellID)`
+**API** : `MTSL:IsAvailable()` · `MTSL:SkillDetail(profKey, spellID)` · `MTSL:MissingRecipes(profKey)` · `MTSL:MinSkill(profKey, spellID)` · `MTSL:RecipeItem(profKey, spellID)` · `MTSL:SourceKind(profKey, spellID)` · `MTSL:SourceNpcLine(profKey, spellID)` · `MTSL:SourcePrice(profKey, spellID)`
 
 ### `CraftingOrderClassic_ProfWindow.lua`
 > CraftingOrderClassic_ProfWindow.lua — fenêtre métier custom 3 colonnes (migration depuis
@@ -1189,17 +1213,27 @@
 > sans MTSL, pas d'icônes (les manquantes n'existent pas). Appelé par _ProfWindow_Recipes sous garde
 > nil (`self._FillLevelingRight and …`) : l'absence de ce fichier ne casse rien.
 
+### `CraftingOrderClassic_Route.lua`
+> CraftingOrderClassic_Route.lua — cœur de CALCUL du plan de route de montée de métier,
+> PARAMÉTRABLE : marche gloutonne rang par rang (recette au meilleur coût/point ESPÉRÉ), seuils
+> réels CraftLink `skillColors` aux rangs futurs, amortissement du prix des plans à acheter,
+> exclusion des recettes à cooldown et des coûts partiels. Deux consommateurs :
+>   · la fenêtre « Plan de route » de la Vue Métier (_ProfWindow_Route.lua — MON perso : recettes
+>     de la fenêtre native + couleur LIVE du client au rang courant) ;
+>   · la « bourse d'artisan » de l'onglet Artisans (_UI_Artisans_Needs.lua — un TIERS du roster :
+>     rang SK diffusé + recettes décodées de son bitfield RK ; pas de couleur live).
+> Les hypothèses (chance de point par couleur) sont ALIGNÉES sur _ProfWindow_Leveling : le badge
+> coût/point, la route et la bourse doivent raconter la même histoire. Aucune UI ici.
+
+**API** : `Route:Candidates(profKey, opts)` · `Route:Compute(profKey, rank, maxRank, opts)` · `Route:Materials(profKey, route)`
+
 ### `CraftingOrderClassic_ProfWindow_Route.lua`
-> CraftingOrderClassic_ProfWindow_Route.lua — PLAN DE ROUTE de montée de métier (étage ③ de l'aide
-> à la progression) : « du rang actuel au plafond, quoi crafter, combien de fois, pour combien ».
-> Marche gloutonne rang par rang : à chaque rang, la recette au meilleur coût/point ESPÉRÉ parmi
-> les candidates (apprises + manquantes ACHETABLES — formateur/vendeur prix MTSL, sinon objet-plan
-> coté à l'HV) ; au rang COURANT la couleur est celle du CLIENT (cohérence avec le badge de la
-> liste), aux rangs FUTURS elle vient des seuils réels CraftLink `skillColors` (lib v11, source
-> Wowhead, précis à ±1 rang aux bornes). Le prix d'un plan à acheter est AMORTI sur les points qu'il peut
-> encore servir (comparaison équitable avec les recettes déjà connues) puis compté UNE fois.
-> Exclues : recettes à cooldown (1/jour ≠ route) et recettes au coût partiel (réactif sans prix —
-> un coût sous-estimé détournerait toute la route). Les rangs sans candidate = segment « ? ».
+> CraftingOrderClassic_ProfWindow_Route.lua — fenêtre « PLAN DE ROUTE » de montée de métier
+> (étage ③ de l'aide à la progression) : « du rang actuel au plafond, quoi crafter, combien de
+> fois, pour combien ». Le CALCUL (marche gloutonne, seuils réels, amortissement des plans,
+> exclusions cooldown/coût partiel) vit dans CraftingOrderClassic_Route.lua (COC.Route), partagé
+> avec la bourse d'artisan — ici : le câblage MON perso (recettes de la fenêtre native + couleur
+> LIVE du client au rang courant, cohérence avec le badge de la liste) et toute l'UI.
 > Tout est soft-dep : sans Lazy Gold, le bouton ouvre la popup NeedLazyGold ; sans ce fichier,
 > rien ne change (hooks sous garde nil dans _ProfWindow_Toolbar).
 
@@ -1245,7 +1279,7 @@
 > Le COÛT des réactifs et l'objet produit viennent de NOS données CraftLink (RecipeReagents/RecipeProduct),
 > pas des tables de LG : on reste maître de la recette, LG ne sert QUE d'oracle de prix.
 
-**API** : `LG:IsAvailable()` · `LG:ItemValue(itemID)` · `LG:CoinTier(copper)` · `LG:ProfitTier(copper)` · `LG:ExactMode()` · `LG:SetExactMode(on)` · `LG:ProfitText(copper)` · `LG:Money(copper, colored)` · `LG:CraftProfit(profKey, spellID, numMade)` · `LG:EntryProfit(profKey, entry)` · `LG:CraftCost(profKey, spellID)` · `LG:EntryCost(profKey, entry)` · `LG:BestPlanFor(profKey, rank)` · `LG:BestProfitFor(profKey, rank)` · `LG:PlanName(profKey, plan)` · `LG:BestPlanName(profKey, rank)` · `LG:BestKnownPlanFor(profKey, r)` · `LG:MinProfit()` · `LG:HighlightTier(profit)`
+**API** : `LG:IsAvailable()` · `LG:ItemValue(itemID)` · `LG:IsVendorItem(itemID)` · `LG:CoinTier(copper)` · `LG:ProfitTier(copper)` · `LG:ExactMode()` · `LG:SetExactMode(on)` · `LG:ProfitText(copper)` · `LG:Money(copper, colored)` · `LG:CraftProfit(profKey, spellID, numMade)` · `LG:EntryProfit(profKey, entry)` · `LG:CraftCost(profKey, spellID)` · `LG:EntryCost(profKey, entry)` · `LG:BestPlanFor(profKey, rank)` · `LG:BestProfitFor(profKey, rank)` · `LG:PlanName(profKey, plan)` · `LG:BestPlanName(profKey, rank)` · `LG:BestKnownPlanFor(profKey, r)` · `LG:MinProfit()` · `LG:HighlightTier(profit)`
 
 ### `CraftingOrderClassic_ProfWindow_Orders.lua`
 > CraftingOrderClassic_ProfWindow_Orders.lua — colonne « Commandes » de la vue métier (cabine de

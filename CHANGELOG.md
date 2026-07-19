@@ -1,5 +1,29 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.23.0 — A shopping list for what your guildmates need to level, plus two networking fixes
+
+New feature: the Artisans tab gets a bag button next to each entry's profession icons. Click it and
+a window lists exactly what materials that person needs to keep leveling their crafts, worked out
+locally from the skill and recipe data they already broadcast, no new network traffic involved.
+Reagents their own profession can make from something cheaper get broken down into base components
+and credited against what the leveling route already produces, so nothing gets counted twice. Items
+sold by a vendor get pulled into a plain note instead of cluttering the shopping grid.
+
+Check "include recipes to buy" and plans behind a gold cost join the list too: purchasable plan items
+as something to hand over, trainer plans as a note. The same supply block now shows up under the
+existing "what to level next" route planner, with the vendor to visit (name, zone, coordinates) and a
+clickable TomTom pin if you have it installed. A recipe with no priced reagent, Enchanting dust being
+the usual offender, no longer knocks a whole stretch of the route out of the plan: it's now used as a
+fallback when nothing better is available, marked with a "?" so the number reads as an estimate. A
+curated disenchant table also backs the tooltip on any dust, essence or shard shown in these lists.
+
+Two fixes: an account with more than one character sometimes saw itself listed as reachable "via"
+its own alt in its own Artisans tab, the login relay from a partner was correctly relaying your
+offline alt back to you, and the directory stored it as if it were someone else's contact. And the
+"what to level next" route planner could stop short of a profession's real skill cap right after a
+trainer promotion, because a Lua multi-assignment quietly dropped its second return value and kept
+targeting the old tier.
+
 ## v1.22.1 — Order alerts that actually check what you can craft
 
 A broad order (guild, friends, everyone) could toast a player who doesn't even have the profession,

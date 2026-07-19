@@ -48,8 +48,13 @@ function PW:_BuildDetail(col)
     local iconBig = body:CreateTexture(nil, "ARTWORK")
     iconBig:SetSize(34, 34); iconBig:SetPoint("TOPLEFT", 12, -10); iconBig:SetTexCoord(0.07, 0.93, 0.07, 0.93); iconBig:Hide()
     self.detIcon = iconBig
-    -- Une Texture ne reçoit pas la souris : bouton invisible par-dessus pour le tooltip de l'objet produit.
-    local iconBtn = CreateFrame("Button", nil, body); iconBtn:SetAllPoints(iconBig)
+    -- Une Texture ne reçoit pas la souris : bouton invisible par-dessus pour le tooltip de l'objet
+    -- produit. Il couvre l'icône ET le nom (retour user 2026-07-19 : survoler « [Pendant of …] »
+    -- ne montrait rien — la zone de tooltip s'arrêtait aux 34 px de l'icône).
+    local iconBtn = CreateFrame("Button", nil, body)
+    iconBtn:SetPoint("TOPLEFT", iconBig, "TOPLEFT", 0, 0)
+    iconBtn:SetPoint("BOTTOMLEFT", iconBig, "BOTTOMLEFT", 0, 0)
+    iconBtn:SetPoint("RIGHT", body, "RIGHT", -10, 0)
     iconBtn:SetScript("OnEnter", function(r) PW:_ProductTooltip(r) end)
     iconBtn:SetScript("OnLeave", GameTooltip_Hide)
     Skin.WireItemLink(iconBtn)   -- shift-clic sur l'icône produit → lien chat
@@ -163,16 +168,18 @@ function PW:_BuildEquipButton(fz)
     b:Hide(); self.detEquipBtn = b
 end
 
--- Tooltip de l'objet PRODUIT (grosse icône du détail). Même logique que la ligne de recette :
--- hyperlien si connu, sinon SetCraftSpell (enchant) / SetTradeSkillItem (métier normal) par index.
+-- Tooltip de l'objet PRODUIT (en-tête du détail : icône + nom). Même logique que la ligne de
+-- recette : hyperlien si connu, MANQUANTE par itemID (repli nom via Skin.TipItem — objet pas
+-- encore en cache = tooltip vide sinon), sinon SetCraftSpell/SetTradeSkillItem par index.
 function PW:_ProductTooltip(anchor)
     local e = self:GetSelectedRecipe(); if not e then return end
     GameTooltip:SetOwner(anchor, "ANCHOR_RIGHT"); GameTooltip:ClearLines()
     local ok = false
     if e.link then ok = pcall(GameTooltip.SetHyperlink, GameTooltip, e.link)
-    elseif COC.Craft:IsCraftOpen() then ok = pcall(GameTooltip.SetCraftSpell, GameTooltip, e.index)
-    else ok = pcall(GameTooltip.SetTradeSkillItem, GameTooltip, e.index) end
-    if not ok then GameTooltip:SetText(e.name or "?", 1, 1, 1) end
+    elseif e.isMissing then Skin.TipItem(GameTooltip, e.itemID, e.name); ok = true
+    elseif e.index and COC.Craft:IsCraftOpen() then ok = pcall(GameTooltip.SetCraftSpell, GameTooltip, e.index)
+    elseif e.index then ok = pcall(GameTooltip.SetTradeSkillItem, GameTooltip, e.index) end
+    if not ok or GameTooltip:NumLines() == 0 then GameTooltip:SetText(e.name or "?", 1, 1, 1) end
     GameTooltip:Show()
 end
 

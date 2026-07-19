@@ -19,4 +19,6 @@
     <Script file="Smelting.lua"/>
     <!-- Recettes à cooldown (curaté) — chargé APRÈS (merge cooldowns/cdGroup). -->
     <Script file="Cooldowns.lua"/>
+    <!-- Table de désenchantement (curaté, toutes saveurs — IDs uniques par extension). -->
+    <Script file="Disenchant.lua"/>
 </Ui>

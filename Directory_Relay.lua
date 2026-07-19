@@ -30,7 +30,10 @@ function Dir:RelayPartnersTo(target)
     if not (CraftLink and Codec and target) then return end
     local cands = {}
     for name, r in pairs(self.roster or {}) do
+        -- SamePlayer : ne pas servir à `target` la fiche d'un de SES rerolls vérifiés (verbe ALT) —
+        -- il détient déjà ses propres données en local (SV par compte), ce serait un miroir inutile.
         if r.isPartner and not self.online[name] and name ~= target
+            and not (self.SamePlayer and self:SamePlayer(name, target))
             and (r.skill or r.recipes or r.cooldowns) then
             cands[#cands + 1] = { name = name, r = r, t = r.lastSeen or 0 }
         end
@@ -79,6 +82,9 @@ end
 
 -- RLY reçu. Rejets silencieux : hors whisper, malformé, trop vieux, origin absurde (moi-même ou
 -- l'émetteur — un joueur EN LIGNE parle pour lui-même), verbe interne inconnu, rate-cap dépassé.
+-- « Moi-même » = TOUT perso de MON compte (IsMyChar) : la SV roster est PAR COMPTE, donc un relais
+-- reçu sur un reroll (légitime vu du partenaire, qui ignore le lien) referait surface en rejouant
+-- ce perso — on se verrait « soi-même via X » dans l'annuaire.
 -- On ne garde que le lot le plus FRAIS (ts = time() - age) ; un lot plus frais remplace tout.
 function Dir:OnRelay(sender, message, distribution)
     if distribution ~= "WHISPER" or not sender then return end
@@ -88,6 +94,7 @@ function Dir:OnRelay(sender, message, distribution)
     if f.verb ~= "SK" and f.verb ~= "RK" and f.verb ~= "CD" then return end
     local me = (UnitName and UnitName("player")) or ""
     if f.origin == me or f.origin == sender then return end
+    if COC.IsMyChar and COC:IsMyChar(f.origin) then return end
     local ts = time() - f.age
     self.roster = self.roster or {}
     local r = self.roster[f.origin]
@@ -137,10 +144,19 @@ end
 -- Entretien + câblage
 -- ------------------------------------------------------------------
 -- Un relais jamais rafraîchi depuis 7 j est périmé (appelé par PruneRoster au démarrage).
+-- Purge aussi les relais portant sur un perso de MON compte (garde OnRelay ajoutée après coup :
+-- guérit les fiches déjà persistées) ; une entrée créée par PUR relais et vidée ici n'a plus rien
+-- à montrer → on la retire, sinon elle traînerait en ligne fantôme jusqu'au TTL de PruneRoster.
 function Dir:PruneRelays()
     local cutoff = time() - RELAY_KEEP
-    for _, r in pairs(self.roster or {}) do
-        if r.relayed and (r.relayed.ts or 0) < cutoff then r.relayed = nil end
+    for name, r in pairs(self.roster or {}) do
+        if r.relayed and ((r.relayed.ts or 0) < cutoff
+                or (COC.IsMyChar and COC:IsMyChar(name))) then
+            r.relayed = nil
+            if not (r.lastSeen or r.skill or r.recipes or r.manual or r.isPartner) then
+                self.roster[name] = nil
+            end
+        end
     end
 end
 

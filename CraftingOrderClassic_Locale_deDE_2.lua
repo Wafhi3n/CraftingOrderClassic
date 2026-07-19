@@ -344,6 +344,30 @@ local de2 = {
         "Der Karten-Button öffnet die |cFFE8B84BLevelroute|r: vom aktuellen Rang bis zum Maximum — was du wie oft craften solltest und zu welchen geschätzten Gesamtkosten, neu berechnet bei jedem Punkt.",
     ["Tout repose sur les prix du dernier scan Auctionator (addons Lazy Gold + Auctionator conseillés) : sans eux, ces aides s'effacent."] =
         "Alles beruht auf den Preisen des letzten Auctionator-Scans (Addons Lazy Gold + Auctionator empfohlen): ohne sie blenden sich diese Hilfen aus.",
+
+    -- Bourse d'artisan (onglet Artisans)
+    ["Bourse d'artisan"] = "Handwerker-Beutel",
+    ["Clic : les fournitures qu'il lui faut pour monter ses métiers (prix Lazy Gold)."] =
+        "Klick: die Materialien, die er zum Skillen seiner Berufe braucht (Lazy-Gold-Preise).",
+    ["Bourse — %s"] = "Beutel — %s",
+    ["Rien à fournir — métiers au plafond, ou données trop anciennes."] = "Nichts zu liefern — Berufe am Maximum oder Daten zu alt.",
+    ["Inclure les plans à acheter"] = "Kaufbare Rezepte einbeziehen",
+    ["Les plans-objets s'ajoutent aux fournitures ; les plans « au formateur » restent à apprendre chez le PNJ."] =
+        "Rezept-Gegenstände zählen zu den Materialien; Lehrer-Rezepte muss er weiterhin beim NPC lernen.",
+    ["Requis : ×%d"] = "Benötigt: ×%d",
+    ["Plan à fournir (il ne le connaît pas encore)"] = "Rezept zum Mitbringen (er kennt es noch nicht)",
+    ["Au formateur : %s"] = "Beim Lehrer: %s",
+    ["Chez un PNJ (inutile de fournir) : %s"] = "Beim NPC-Händler (nicht nötig mitzubringen): %s",
+    ["Fournitures (agrégées)"] = "Materialien (gesamt)",
+    ["Clic : poser un repère sur ce PNJ (TomTom ou épingle de carte)."] = "Klick: setzt eine Wegmarke auf diesen NPC (TomTom oder Kartenstecknadel).",
+    ["zone introuvable sur la carte : %s"] = "Zone auf der Karte nicht gefunden: %s",
+    ["repère posé : %s — %s (%.0f, %.0f)"] = "Wegmarke gesetzt: %s — %s (%.0f, %.0f)",
+    ["Route incomplète : %d rang(s) sans recette calculable (prix HV manquants)."] =
+        "Unvollständige Route: %d Rang/Ränge ohne berechenbares Rezept (fehlende AH-Preise).",
+    ["Coche « Inclure les plans à acheter » pour en combler une partie."] =
+        "Aktiviere „Kaufbare Rezepte einbeziehen“, um einen Teil zu füllen.",
+    ["Coût partiel : au moins un réactif sans prix HV."] = "Teilkosten: mindestens ein Material ohne AH-Preis.",
+    ["Désenchanter : objets %s, niv. d'objet %d-%d (estimation)"] = "Entzaubern: %s Gegenstände, Gegenstandsstufe %d-%d (Schätzung)",
 }
 
 for k, v in pairs(de2) do L[k] = v end

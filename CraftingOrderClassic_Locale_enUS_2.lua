@@ -362,6 +362,30 @@ local en2 = {
         "The map button opens the |cFFE8B84BLeveling route|r: from your current rank to the cap, what to craft, how many times, for what estimated total cost — recomputed with every point you gain.",
     ["Tout repose sur les prix du dernier scan Auctionator (addons Lazy Gold + Auctionator conseillés) : sans eux, ces aides s'effacent."] =
         "Everything relies on prices from the last Auctionator scan (Lazy Gold + Auctionator addons recommended): without them, these helpers step aside.",
+
+    -- Bourse d'artisan (onglet Artisans)
+    ["Bourse d'artisan"] = "Artisan pouch",
+    ["Clic : les fournitures qu'il lui faut pour monter ses métiers (prix Lazy Gold)."] =
+        "Click: the supplies they need to level their professions (Lazy Gold prices).",
+    ["Bourse — %s"] = "Pouch — %s",
+    ["Rien à fournir — métiers au plafond, ou données trop anciennes."] = "Nothing to supply — professions at cap, or data too old.",
+    ["Inclure les plans à acheter"] = "Include recipes to buy",
+    ["Les plans-objets s'ajoutent aux fournitures ; les plans « au formateur » restent à apprendre chez le PNJ."] =
+        "Recipe items join the supplies; trainer-taught recipes must still be learned at the NPC.",
+    ["Requis : ×%d"] = "Needed: ×%d",
+    ["Plan à fournir (il ne le connaît pas encore)"] = "Recipe to supply (they don't know it yet)",
+    ["Au formateur : %s"] = "At the trainer: %s",
+    ["Chez un PNJ (inutile de fournir) : %s"] = "From an NPC vendor (no need to supply): %s",
+    ["Fournitures (agrégées)"] = "Supplies (aggregated)",
+    ["Clic : poser un repère sur ce PNJ (TomTom ou épingle de carte)."] = "Click: drop a waypoint on this NPC (TomTom or map pin).",
+    ["zone introuvable sur la carte : %s"] = "zone not found on the map: %s",
+    ["repère posé : %s — %s (%.0f, %.0f)"] = "waypoint set: %s — %s (%.0f, %.0f)",
+    ["Route incomplète : %d rang(s) sans recette calculable (prix HV manquants)."] =
+        "Incomplete route: %d rank(s) with no computable recipe (missing AH prices).",
+    ["Coche « Inclure les plans à acheter » pour en combler une partie."] =
+        "Check \"Include recipes to buy\" to fill some of them.",
+    ["Coût partiel : au moins un réactif sans prix HV."] = "Partial cost: at least one reagent has no AH price.",
+    ["Désenchanter : objets %s, niv. d'objet %d-%d (estimation)"] = "Disenchant: %s items, item level %d-%d (estimate)",
 }
 
 for k, v in pairs(en2) do L[k] = v end

@@ -41,7 +41,61 @@ local function buildRow(col)
     label:SetTextColor(0.72, 0.66, 0.5); row.label = label
     local value = row:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     value:SetJustifyH("LEFT"); value:SetWordWrap(true); value:SetTextColor(1, 1, 1); row.value = value
+    -- Ligne PNJ cliquable → repère de carte (row.pin posé/purgé au fill ; souris activée alors
+    -- seulement — les lignes sans pin restent transparentes à la souris).
+    row:SetScript("OnMouseUp", function(r) if r.pin then PW:_SetNpcPin(r.pin) end end)
+    row:SetScript("OnEnter", function(r)
+        if not r.pin then return end
+        GameTooltip:SetOwner(r, "ANCHOR_RIGHT")
+        GameTooltip:SetText(L["Clic : poser un repère sur ce PNJ (TomTom ou épingle de carte)."], 1, 1, 1, 1, true)
+        GameTooltip:Show()
+    end)
+    row:SetScript("OnLeave", GameTooltip_Hide)
     row:Hide(); return row
+end
+
+-- Un repère est-il posable ? TomTom (flèche) en priorité, sinon l'épingle NATIVE de la carte.
+local function canPin()
+    if _G.TomTom and _G.TomTom.AddWaypoint then return true end
+    return (C_Map and C_Map.SetUserWaypoint and UiMapPoint and UiMapPoint.CreateFromCoordinates) and true or false
+end
+
+-- Zone LOCALISÉE → uiMapID : scan paresseux de l'arbre C_Map (les noms C_Map sont localisés comme
+-- ceux de MTSL → correspondance directe). Racines 946 (Cosmique — couvre l'Outreterre en TBC) puis
+-- 947 (Azeroth) ; le premier nom rencontré gagne.
+local zoneIds
+local function zoneMapID(zoneName)
+    if not (zoneName and C_Map and C_Map.GetMapChildrenInfo) then return nil end
+    if not zoneIds then
+        zoneIds = {}
+        for _, root in ipairs({ 946, 947 }) do
+            for _, mi in ipairs(C_Map.GetMapChildrenInfo(root, nil, true) or {}) do
+                if mi.name and mi.mapID and not zoneIds[mi.name] then zoneIds[mi.name] = mi.mapID end
+            end
+        end
+    end
+    return zoneIds[zoneName]
+end
+
+-- Pose le repère sur un PNJ de la fiche (pin = { x, y, zone, name }, coords MTSL en 0-100) :
+-- TomTom si présent (flèche + minimap), sinon l'épingle native de la carte. Message si la zone
+-- MTSL n'a pas d'équivalent C_Map (rare : libellés divergents) — plutôt qu'un clic muet.
+function PW:_SetNpcPin(pin)
+    local mapID = zoneMapID(pin.zone)
+    if not mapID then
+        print("|cFF33DD88Crafting Order|r " .. string.format(L["zone introuvable sur la carte : %s"], pin.zone or "?"))
+        return
+    end
+    if _G.TomTom and _G.TomTom.AddWaypoint then
+        pcall(_G.TomTom.AddWaypoint, _G.TomTom, mapID, pin.x / 100, pin.y / 100,
+            { title = pin.name, minimap = true, world = true })
+    elseif C_Map and C_Map.SetUserWaypoint and UiMapPoint and UiMapPoint.CreateFromCoordinates then
+        pcall(C_Map.SetUserWaypoint, UiMapPoint.CreateFromCoordinates(mapID, pin.x / 100, pin.y / 100))
+    else
+        return
+    end
+    print("|cFF33DD88Crafting Order|r " .. string.format(L["repère posé : %s — %s (%.0f, %.0f)"],
+        pin.name or "?", pin.zone or "?", pin.x, pin.y))
 end
 
 function PW:_EnsureInfoPool()
@@ -53,6 +107,7 @@ end
 
 local function fillHeader(row, title)
     row.label:Hide(); row.value:Hide()
+    row.pin = nil; row:EnableMouse(false)   -- ligne poolée : purge un pin résiduel
     row.hdr:SetText(title or ""); row.hdr:Show(); row.hline:Show()
     row:SetHeight(ROW_H)
     return ROW_H
@@ -63,6 +118,10 @@ end
 -- ce qui récupère la colonne de libellé et évite de tronquer.
 local function fillLine(row, ln, colW)
     row.hdr:Hide(); row.hline:Hide()
+    -- Pin de carte : seulement si la ligne porte un PNJ localisé ET qu'un poseur de repère existe
+    -- (TomTom ou épingle native). Sinon la ligne reste transparente à la souris (pas de faux espoir).
+    row.pin = (ln.npc and canPin()) and ln.npc or nil
+    row:EnableMouse(row.pin and true or false)
     local hasLabel = (ln.label or "") ~= ""
     row.label:SetText(hasLabel and ("|cFFCBB79A" .. ln.label .. "|r") or "")
     row.label:SetShown(hasLabel)
