@@ -11,6 +11,13 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "What's New",
+    -- v1.24.0
+    ["La pièce à enchanter se pose d'un clic, et une bourse qui suit la progression"] =
+        "The piece to enchant places itself in one click, and a pouch that keeps up",
+    ["Depuis la v1.21.0, un enchanteur peut cliquer un emplacement de la silhouette d'échange pour te demander la pièce à enchanter. Si tu as l'addon toi aussi, ce clic affiche maintenant une invite chez toi : accepte, et ta pièce équipée se pose toute seule dans l'emplacement « ne sera pas échangé ». Rien n'est donné (cet emplacement ne peut pas changer de mains), la pose est verrouillée sur lui, et rien ne bouge sans ton clic. Sans l'addon en face, le chuchotement explicatif part comme avant."] =
+        "Since v1.21.0, an enchanter can click a slot on the trade silhouette to ask for the piece to enchant. If you run the addon too, that click now shows a prompt on your side: accept, and your equipped piece places itself in the \"will not be traded\" slot. Nothing is given away (that slot can't change hands), the placement is locked to it, and nothing moves without your click. No addon on the other side, and the explanatory whisper goes out as before.",
+    ["La bourse d'artisan se met à jour en direct : fenêtre ouverte, chaque point de métier gagné par le personnage suivi (et chaque recette apprise) recalcule la liste de courses — plus besoin de la rouvrir pour voir la route changer."] =
+        "The artisan pouch now updates live: with the window open, every skill point the tracked character gains (and every recipe they learn) recomputes the shopping list, no reopening needed to see the route change.",
     -- v1.23.0
     ["La bourse d'artisan : la liste de courses de tes guildeux, et deux corrections réseau"] =
         "The artisan pouch: a shopping list for your guildmates, and two networking fixes",

@@ -8,6 +8,13 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "Neues",
+    -- v1.24.0
+    ["La pièce à enchanter se pose d'un clic, et une bourse qui suit la progression"] =
+        "Das zu verzaubernde Teil legt sich mit einem Klick ein, und ein Beutel, der Schritt hält",
+    ["Depuis la v1.21.0, un enchanteur peut cliquer un emplacement de la silhouette d'échange pour te demander la pièce à enchanter. Si tu as l'addon toi aussi, ce clic affiche maintenant une invite chez toi : accepte, et ta pièce équipée se pose toute seule dans l'emplacement « ne sera pas échangé ». Rien n'est donné (cet emplacement ne peut pas changer de mains), la pose est verrouillée sur lui, et rien ne bouge sans ton clic. Sans l'addon en face, le chuchotement explicatif part comme avant."] =
+        "Seit v1.21.0 kann ein Verzauberer einen Platz der Handels-Silhouette anklicken, um dich um das zu verzaubernde Teil zu bitten. Wenn du das Addon ebenfalls nutzt, zeigt dieser Klick jetzt bei dir eine Anfrage an: Bestätige, und dein angelegtes Teil legt sich von selbst in den Platz „Wird nicht gehandelt“. Nichts wird hergegeben (dieser Platz kann den Besitzer nicht wechseln), das Einlegen ist fest auf ihn beschränkt, und ohne deinen Klick bewegt sich nichts. Ohne Addon auf der Gegenseite geht der erklärende Flüsterton wie bisher raus.",
+    ["La bourse d'artisan se met à jour en direct : fenêtre ouverte, chaque point de métier gagné par le personnage suivi (et chaque recette apprise) recalcule la liste de courses — plus besoin de la rouvrir pour voir la route changer."] =
+        "Der Handwerkerbeutel aktualisiert sich jetzt live: Bei offenem Fenster berechnet jeder Fertigkeitspunkt des verfolgten Charakters (und jedes gelernte Rezept) die Einkaufsliste neu — kein erneutes Öffnen mehr nötig, um die Route sich ändern zu sehen.",
     -- v1.23.0
     ["La bourse d'artisan : la liste de courses de tes guildeux, et deux corrections réseau"] =
         "Der Handwerkerbeutel: eine Einkaufsliste für deine Gildenmitglieder, und zwei Netzwerkkorrekturen",

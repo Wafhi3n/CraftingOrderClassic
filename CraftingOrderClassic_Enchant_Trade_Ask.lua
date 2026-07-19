@@ -14,13 +14,17 @@
 -- l'onglet Commande, réutilisée via COC.UI.DOLL — zéro clé de locale pour le chrome d'emplacement, et un
 -- seul endroit à corriger quand une couche saisonnière bouge les emplacements enchantables.
 --
--- ÉTAGE 2 (NON livré, délibérément) : si le partenaire porte COC, remplacer le chuchotement par une
--- invite chez lui + pose en un clic (PickupInventoryItem puis ClickTradeButton(TRADE_ENCHANT_SLOT)).
--- Contraintes à tenir le jour où on le fera : verrouiller en DUR sur l'emplacement 7 (viser 1..6 en
--- ferait un vecteur de VOL — le 7 est « ne sera pas échangé », donc rien n'y est volable), et EXIGER un
--- clic sur l'invite (déplacer l'arme équipée de quelqu'un sans son accord serait hostile). Ça demande un
--- verbe réseau + TRANSPORT_REV, donc un test 2 comptes — impossible aujourd'hui (cf. mémoire
--- coc-ptr-account-testing).
+-- ÉTAGE 2 (livré 2026-07-19, après validation en jeu de l'étage 1 à 2 joueurs) : le clic envoie AUSSI
+-- le verbe ASKE|<slot> en whisper addon. Si le partenaire porte COC, une invite s'affiche chez lui :
+-- UN clic (= hardware event + consentement) et la pièce se pose (PickupInventoryItem puis
+-- ClickTradeButton). Un client sans COC / trop vieux ignore le verbe (dispatch « verbe inconnu ») et
+-- garde le chuchotement texte — les deux partent toujours, dégradation propre sans négocier de version.
+-- Invariants de SÉCURITÉ (ne pas défaire) : la pose vise l'emplacement 7 EN DUR (TRADE_SAFE_SLOT,
+-- jamais lu du payload — viser 1..6 en ferait un vecteur de VOL ; le 7 est « ne sera pas échangé »,
+-- rien n'y est volable) ; le clic sur l'invite est EXIGÉ (déplacer l'arme équipée de quelqu'un sans
+-- son accord serait hostile) ; le verbe n'est accepté QUE d'un émetteur = partenaire d'échange OUVERT.
+-- ClickTradeButton et PickupInventoryItem sont NON protégées (preuve : boutons ItemButtonTemplate
+-- ordinaires dans TradeFrame.xml:148 et PaperDollFrame.lua:804 du source Blizzard Era).
 -- Pas d'étape de déséquipement à prévoir : une pièce PORTÉE se glisse directement dans l'emplacement 7
 -- (retour user 2026-07-17), et `PickupInventoryItem` fait ce déséquipement implicitement. ⚠️ À ne pas
 -- confondre avec « Enchanter équipé » (_ProfWindow_Detail), qui passe par l'attribut sécurisé
@@ -33,6 +37,8 @@ local COC  = CraftingOrderClassic
 local Comp = COC.Companion
 local Skin = COC.UI.Skin
 local L    = COC.L
+
+local CraftLink = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
 
 local Ask = {}
 COC.EnchantTradeAsk = Ask
@@ -55,7 +61,7 @@ end
 -- hardware event, il n'y a pas de throttle Blizzard à contourner, juste nous à discipliner.
 local lastAsk = 0
 
-function Ask:Request(label)
+function Ask:Request(label, token)
     local target = GetUnitName and GetUnitName("NPC")
     if not (target and target ~= "" and SendChatMessage) then return end
     local now = GetTime and GetTime() or 0
@@ -64,6 +70,11 @@ function Ask:Request(label)
     SendChatMessage(string.format(
         L["Mets ton objet « %s » dans l'emplacement du bas de la fenêtre d'échange (« ne sera pas échangé ») — je l'enchante, tu le gardes."],
         label), "WHISPER", nil, target)
+    -- Étage 2 : le même clic porte le verbe ASKE (invite un-clic si le partenaire a COC). Toujours
+    -- émis — un client sans COC l'ignore, et le chuchotement ci-dessus reste l'explication humaine.
+    if CraftLink and CraftLink.Send and token then
+        CraftLink:Send("ASKE|" .. token, "whisper", target)
+    end
     if COC.UI and COC.UI.Toast then
         COC.UI:Toast(string.format(L["Demande envoyée à %s."], Comp.shortName(target)))
     end
@@ -84,7 +95,9 @@ local function makeSlot(root, def, D)
         GameTooltip:Show()
     end)
     b:SetScript("OnLeave", GameTooltip_Hide)
-    b:SetScript("OnClick", function(self) if self.live then Ask:Request(self.label) end end)
+    b:SetScript("OnClick", function(self)
+        if self.live then Ask:Request(self.label, self.def and self.def.slot) end
+    end)
     return b
 end
 
@@ -134,6 +147,79 @@ local function build()
     buildRun(panel.well, D.BOTTOM, "TOPLEFT", (240 - 24 - w3) / 2, -(10 + 8 * D.STEP + 8),
              D.ICON + 6, 0, D, Ask.btns)
     panel:Hide()
+end
+
+-- ------------------------------------------------------------------
+-- Étage 2, côté RECEVEUR : un enchanteur me demande une pièce (verbe ASKE)
+-- ------------------------------------------------------------------
+-- ⚠️ EN DUR, jamais lu du payload (anti-vol, cf. en-tête) : 7 = TRADE_ENCHANT_SLOT Blizzard,
+-- l'emplacement « ne sera pas échangé ».
+local TRADE_SAFE_SLOT = 7
+
+-- Jeton d'emplacement du payload → def de la silhouette. Whitelist DOLL au runtime : un payload
+-- forgé avec un jeton hors silhouette est jeté ici.
+local function slotDef(token)
+    local D = doll()
+    if not (D and token) then return nil end
+    for _, list in ipairs({ D.LEFT, D.RIGHT, D.BOTTOM }) do
+        for _, def in ipairs(list) do if def.slot == token then return def end end
+    end
+end
+
+-- Nom court du partenaire d'échange COURANT, ou nil hors échange ouvert.
+local function tradePartner()
+    if not (_G.TradeFrame and TradeFrame:IsShown()) then return nil end
+    local n = GetUnitName and GetUnitName("NPC")
+    return (n and n ~= "") and Comp.shortName(n) or nil
+end
+
+-- Pose effective (OnAccept du popup : le clic EST le hardware event ET le consentement). TOUT est
+-- re-vérifié — l'état a pu changer entre l'invite et le clic (échange fermé, pièce déséquipée,
+-- curseur occupé, emplacement pris) : dans le doute, ne rien poser du tout.
+local function placeItem(data)
+    if not (data and tradePartner() == data.from) then return end
+    if GetCursorInfo and GetCursorInfo() then return end     -- jamais écraser un curseur plein
+    if GetTradePlayerItemInfo and GetTradePlayerItemInfo(TRADE_SAFE_SLOT) then return end
+    local inv = GetInventorySlotInfo and GetInventorySlotInfo(data.token)
+    if not (inv and GetInventoryItemLink and GetInventoryItemLink("player", inv)) then return end
+    PickupInventoryItem(inv)                                 -- déséquipe implicitement (pièce portée)
+    if CursorHasItem and not CursorHasItem() then return end
+    ClickTradeButton(TRADE_SAFE_SLOT)
+end
+
+-- ASKE reçu → invite. Silencieux dans TOUS les cas dégradés (pas d'échange avec l'émetteur, rien
+-- d'équipé à cet emplacement, emplacement 7 déjà pris) : le chuchotement texte de l'étage 1 arrive
+-- de toute façon et reste l'explication humaine.
+local lastAskFrom = {}
+function Ask:OnAsk(sender, message)
+    -- %w et pas %a : Finger0Slot/Finger1Slot (anneaux) portent un CHIFFRE — %a les jetterait en
+    -- silence le jour où une couche de données active l'enchant d'anneau.
+    local def = slotDef((message or ""):match("^ASKE|(%w+)$"))
+    local from = sender and Comp.shortName(sender)
+    if not (def and from and tradePartner() == from) then return end
+    local now = GetTime and GetTime() or 0
+    if now - (lastAskFrom[from] or 0) < 5 then return end    -- anti-spam d'invites par émetteur
+    lastAskFrom[from] = now
+    local inv = GetInventorySlotInfo and GetInventorySlotInfo(def.slot)
+    local link = inv and GetInventoryItemLink and GetInventoryItemLink("player", inv)
+    if not link then return end
+    if GetTradePlayerItemInfo and GetTradePlayerItemInfo(TRADE_SAFE_SLOT) then return end
+    if not (StaticPopupDialogs and StaticPopup_Show) then return end
+    -- Une invite à la fois : re-recevoir ASKE pendant qu'une invite est affichée ne doit pas empiler
+    -- de popups (le throttle par émetteur ne protège pas de la republication toutes les 5 s).
+    if StaticPopup_Visible and StaticPopup_Visible("COC_ENCHANT_ASK") then return end
+    StaticPopupDialogs["COC_ENCHANT_ASK"] = StaticPopupDialogs["COC_ENCHANT_ASK"] or {
+        text = "%s", button1 = L["Poser la pièce"], button2 = L["Ignorer"],
+        OnAccept = function(_, data) placeItem(data) end,
+        timeout = 0, whileDead = true, hideOnEscape = true, preferredIndex = 3,
+    }
+    StaticPopup_Show("COC_ENCHANT_ASK", string.format(
+        L["%s propose d'enchanter : %s. Poser la pièce dans l'emplacement « ne sera pas échangé » ? Rien n'est donné — tu la récupères enchantée."],
+        from, link), nil, { from = from, token = def.slot })
+end
+
+if CraftLink and CraftLink.RegisterHandler then
+    CraftLink:RegisterHandler("ASKE", function(sender, message) Ask:OnAsk(sender, message) end)
 end
 
 -- ------------------------------------------------------------------

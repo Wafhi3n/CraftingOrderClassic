@@ -8,6 +8,13 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "Novedades",
+    -- v1.24.0
+    ["La pièce à enchanter se pose d'un clic, et une bourse qui suit la progression"] =
+        "La pieza a encantar se coloca con un clic, y una bolsa que sigue el ritmo",
+    ["Depuis la v1.21.0, un enchanteur peut cliquer un emplacement de la silhouette d'échange pour te demander la pièce à enchanter. Si tu as l'addon toi aussi, ce clic affiche maintenant une invite chez toi : accepte, et ta pièce équipée se pose toute seule dans l'emplacement « ne sera pas échangé ». Rien n'est donné (cet emplacement ne peut pas changer de mains), la pose est verrouillée sur lui, et rien ne bouge sans ton clic. Sans l'addon en face, le chuchotement explicatif part comme avant."] =
+        "Desde la v1.21.0, un encantador puede pulsar una casilla de la silueta de intercambio para pedirte la pieza a encantar. Si tú también usas el addon, ese clic ahora muestra un aviso en tu lado: acepta, y tu pieza equipada se coloca sola en la casilla «No se intercambiará». No entregas nada (esa casilla no puede cambiar de manos), la colocación está bloqueada en ella, y nada se mueve sin tu clic. Sin el addon enfrente, el susurro explicativo sale como antes.",
+    ["La bourse d'artisan se met à jour en direct : fenêtre ouverte, chaque point de métier gagné par le personnage suivi (et chaque recette apprise) recalcule la liste de courses — plus besoin de la rouvrir pour voir la route changer."] =
+        "La bolsa del artesano ahora se actualiza en vivo: con la ventana abierta, cada punto de oficio que gana el personaje seguido (y cada receta que aprende) recalcula la lista de la compra — ya no hace falta reabrirla para ver cambiar la ruta.",
     -- v1.23.0
     ["La bourse d'artisan : la liste de courses de tes guildeux, et deux corrections réseau"] =
         "La bolsa del artesano: una lista de la compra para tus compañeros de hermandad, y dos correcciones de red",

@@ -19,6 +19,13 @@ local BODY_W = 780
 local function versionsLatest()
     return {
         {
+            v = "v1.24.0", title = L["La pièce à enchanter se pose d'un clic, et une bourse qui suit la progression"],
+            lines = {
+                L["Depuis la v1.21.0, un enchanteur peut cliquer un emplacement de la silhouette d'échange pour te demander la pièce à enchanter. Si tu as l'addon toi aussi, ce clic affiche maintenant une invite chez toi : accepte, et ta pièce équipée se pose toute seule dans l'emplacement « ne sera pas échangé ». Rien n'est donné (cet emplacement ne peut pas changer de mains), la pose est verrouillée sur lui, et rien ne bouge sans ton clic. Sans l'addon en face, le chuchotement explicatif part comme avant."],
+                L["La bourse d'artisan se met à jour en direct : fenêtre ouverte, chaque point de métier gagné par le personnage suivi (et chaque recette apprise) recalcule la liste de courses — plus besoin de la rouvrir pour voir la route changer."],
+            },
+        },
+        {
             v = "v1.23.0", title = L["La bourse d'artisan : la liste de courses de tes guildeux, et deux corrections réseau"],
             lines = {
                 L["L'onglet Artisans gagne un bouton sac après les icônes de métier de chaque fiche : un clic ouvre la liste de courses des matériaux qu'il te faut pour monter tes métiers, calculée en local à partir de ce que le jeu diffuse déjà (aucun nouveau trafic réseau). Les réactifs que ton propre métier sait fabriquer sont décomposés en composants de base, et les objets vendus par un PNJ sont mis de côté dans une note plutôt que d'encombrer la grille."],

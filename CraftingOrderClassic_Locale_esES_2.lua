@@ -369,6 +369,11 @@ local es2 = {
         "Marca «Incluir las recetas por comprar» para cubrir una parte.",
     ["Coût partiel : au moins un réactif sans prix HV."] = "Coste parcial: al menos un componente sin precio de subasta.",
     ["Désenchanter : objets %s, niv. d'objet %d-%d (estimation)"] = "Desencantar: objetos %s, nivel de objeto %d-%d (estimación)",
+    -- Échange enchanteur, étage 2 : invite un-clic côté client
+    ["%s propose d'enchanter : %s. Poser la pièce dans l'emplacement « ne sera pas échangé » ? Rien n'est donné — tu la récupères enchantée."] =
+        "%s ofrece encantar: %s. ¿Poner la pieza en la casilla «No se intercambiará»? No entregas nada — la recuperas encantada.",
+    ["Poser la pièce"] = "Poner la pieza",
+    ["Ignorer"] = "Ignorar",
 }
 
 for k, v in pairs(es2) do L[k] = v end

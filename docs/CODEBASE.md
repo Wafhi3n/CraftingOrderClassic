@@ -1,6 +1,6 @@
 # CraftingOrderClassic — carte du code
 
-> **GÉNÉRÉ** le 2026-07-19 (v1.23.0) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
+> **GÉNÉRÉ** le 2026-07-19 (v1.24.0) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
@@ -15,14 +15,14 @@
 | `CraftingOrderClassic_Migrations.lua` | versionnage du schéma SavedVariables. | 40 |
 | `CraftingOrderClassic_Locale.lua` | socle de localisation du CHROME de l'UI. | 12 |
 | `CraftingOrderClassic_Locale_enUS.lua` | overlay ANGLAIS (enUS/enGB). | 257 |
-| `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 391 |
+| `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 396 |
 | `CraftingOrderClassic_Locale_deDE.lua` | overlay ALLEMAND (deDE). | 259 |
-| `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 373 |
+| `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 378 |
 | `CraftingOrderClassic_Locale_esES.lua` | overlay ESPAGNOL (esES/esMX). | 260 |
-| `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 374 |
-| `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 204 |
-| `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 201 |
-| `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 201 |
+| `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 379 |
+| `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 211 |
+| `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 208 |
+| `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 208 |
 | `CraftingOrderClassic_Elemental.lua` | pseudo-« métier » de récolte « Élémentaire ». | 61 |
 | `CraftingOrderClassic_UI_Skin.lua` | tokens + helpers SÉMANTIQUES du skin (métiers, statuts, rareté, quantités, icônes natives) et petits widgets d'affichage. | 428 |
 | `CraftingOrderClassic_UI_Skin_Native.lua` | kit de chrome Blizzard NATIF (le « framework » UI de COC). | 485 |
@@ -45,13 +45,13 @@
 | `CraftingOrderClassic_UI_Artisans.lua` | onglet « Artisans » : annuaire social. | 410 |
 | `CraftingOrderClassic_UI_Artisans_Groups.lua` | fusion « une ligne par JOUEUR » (rerolls). | 207 |
 | `CraftingOrderClassic_UI_Artisans_Icons.lua` | onglet « Artisans » : tout ce qui est ICÔNE de métier. | 189 |
-| `CraftingOrderClassic_UI_Artisans_Needs.lua` | la « BOURSE d'artisan » de l'onglet Artisans : pour un artisan du roster (partenaire, guildie, ami…), la LISTE DE COURSES des fournitures qu'il lui faut pour monter ses métiers — mats agrégés de SA route de progression (COC.Route, calculée 100 % en LOCAL depuis son rang SK diffusé + ses recettes décodées du bitfield RK ; prix Lazy Gold locaux, valables serveur entier). | 343 |
+| `CraftingOrderClassic_UI_Artisans_Needs.lua` | la « BOURSE d'artisan » de l'onglet Artisans : pour un artisan du roster (partenaire, guildie, ami…), la LISTE DE COURSES des fournitures qu'il lui faut pour monter ses métiers — mats agrégés de SA route de progression (COC.Route, calculée 100 % en LOCAL depuis son rang SK diffusé + ses recettes décodées du bitfield RK ; prix Lazy Gold locaux, valables serveur entier). | 361 |
 | `CraftingOrderClassic_UI_Artisans_Muted.lua` | panel « En sourdine » de l'onglet Artisans. | 86 |
 | `CraftingOrderClassic_UI_MyArtisans_Layout.lua` | GÉOMÉTRIE de l'onglet « Mes artisans ». | 53 |
 | `CraftingOrderClassic_UI_MyArtisans.lua` | onglet « Mes artisans » : vue agrégée des métiers du COMPTE (tous mes rerolls du royaume), en mode « connu ». | 433 |
 | `CraftingOrderClassic_UI_MyArtisans_LazyGold.lua` | onglet « Mes artisans » : couche Lazy Gold. | 135 |
 | `CraftingOrderClassic_UI_Help.lua` | onglet Aide : page unique défilante qui explique les autres onglets (Carnet/Commande/Récolte/Artisans), la Vue Métier et le réseau. | 178 |
-| `CraftingOrderClassic_UI_News.lua` | onglet « Nouveautés » : notes de version (changelog) affichées EN JEU, version par version, la plus récente en tête. | 245 |
+| `CraftingOrderClassic_UI_News.lua` | onglet « Nouveautés » : notes de version (changelog) affichées EN JEU, version par version, la plus récente en tête. | 252 |
 | `CraftingOrderClassic_Social.lua` | couche sociale passive (socle). | 380 |
 | `CraftingOrderClassic_Social_Menu.lua` | entrées « Crafting Order » du menu contextuel joueur. | 101 |
 | `CraftingOrderClassic_Social_Roster.lua` | affichage des métiers sur les fenêtres NATIVES. | 130 |
@@ -107,7 +107,7 @@
 | `CraftingOrderClassic_Companion_Mail.lua` | greffon COURRIER (scène B de la maquette) : panneau accroché à droite du compositeur d'envoi. | 177 |
 | `CraftingOrderClassic_Companion_Trade.lua` | greffon ÉCHANGE (scène A de la maquette) : panneau accroché SOUS la fenêtre d'échange native quand une commande nous lie au partenaire (dans les DEUX sens : je crafte pour lui = « vendeur », ou il crafte pour moi = « acheteur »). | 114 |
 | `CraftingOrderClassic_Enchant_Trade.lua` | greffon ENCHANTEMENT sur la fenêtre d'ÉCHANGE. | 289 |
-| `CraftingOrderClassic_Enchant_Trade_Ask.lua` | greffon ÉCHANGE : « demande-lui la pièce ». | 159 |
+| `CraftingOrderClassic_Enchant_Trade_Ask.lua` | greffon ÉCHANGE : « demande-lui la pièce ». | 245 |
 | `Debug.lua` | Crafting Order - Classic — Debug : mode solo pour "jouer" un réseau fictif. | 136 |
 | `CraftingOrderClassic_SelfTest.lua` | suite de tests IN-GAME (/cotest). | 180 |
 
@@ -878,7 +878,7 @@
 > _UI_Artisans_Icons — l'absence de ce fichier avant restart ne casse rien). Sans Lazy Gold, le
 > bouton reste visible et le clic ouvre la popup NeedLazyGold (pattern découvrabilité).
 
-**API** : `UI:OpenNeeds(name)`
+**API** : `UI:OpenNeeds(name)` · `UI:RefreshSoon()`
 
 ### `CraftingOrderClassic_UI_Artisans_Muted.lua`
 > CraftingOrderClassic_UI_Artisans_Muted.lua — panel « En sourdine » de l'onglet Artisans.
@@ -1659,13 +1659,17 @@
 > l'onglet Commande, réutilisée via COC.UI.DOLL — zéro clé de locale pour le chrome d'emplacement, et un
 > seul endroit à corriger quand une couche saisonnière bouge les emplacements enchantables.
 > 
-> ÉTAGE 2 (NON livré, délibérément) : si le partenaire porte COC, remplacer le chuchotement par une
-> invite chez lui + pose en un clic (PickupInventoryItem puis ClickTradeButton(TRADE_ENCHANT_SLOT)).
-> Contraintes à tenir le jour où on le fera : verrouiller en DUR sur l'emplacement 7 (viser 1..6 en
-> ferait un vecteur de VOL — le 7 est « ne sera pas échangé », donc rien n'y est volable), et EXIGER un
-> clic sur l'invite (déplacer l'arme équipée de quelqu'un sans son accord serait hostile). Ça demande un
-> verbe réseau + TRANSPORT_REV, donc un test 2 comptes — impossible aujourd'hui (cf. mémoire
-> coc-ptr-account-testing).
+> ÉTAGE 2 (livré 2026-07-19, après validation en jeu de l'étage 1 à 2 joueurs) : le clic envoie AUSSI
+> le verbe ASKE|<slot> en whisper addon. Si le partenaire porte COC, une invite s'affiche chez lui :
+> UN clic (= hardware event + consentement) et la pièce se pose (PickupInventoryItem puis
+> ClickTradeButton). Un client sans COC / trop vieux ignore le verbe (dispatch « verbe inconnu ») et
+> garde le chuchotement texte — les deux partent toujours, dégradation propre sans négocier de version.
+> Invariants de SÉCURITÉ (ne pas défaire) : la pose vise l'emplacement 7 EN DUR (TRADE_SAFE_SLOT,
+> jamais lu du payload — viser 1..6 en ferait un vecteur de VOL ; le 7 est « ne sera pas échangé »,
+> rien n'y est volable) ; le clic sur l'invite est EXIGÉ (déplacer l'arme équipée de quelqu'un sans
+> son accord serait hostile) ; le verbe n'est accepté QUE d'un émetteur = partenaire d'échange OUVERT.
+> ClickTradeButton et PickupInventoryItem sont NON protégées (preuve : boutons ItemButtonTemplate
+> ordinaires dans TradeFrame.xml:148 et PaperDollFrame.lua:804 du source Blizzard Era).
 > Pas d'étape de déséquipement à prévoir : une pièce PORTÉE se glisse directement dans l'emplacement 7
 > (retour user 2026-07-17), et `PickupInventoryItem` fait ce déséquipement implicitement. ⚠️ À ne pas
 > confondre avec « Enchanter équipé » (_ProfWindow_Detail), qui passe par l'attribut sécurisé
@@ -1674,7 +1678,7 @@
 > (il est sans arme le temps de l'enchant). Normal — c'est déjà le flux manuel — mais ça reste une
 > raison de plus d'EXIGER son clic : l'addon ne déséquipe personne tout seul.
 
-**API** : `Ask:Request(label)` · `Ask:Refresh()` · `Ask:Hide()` · `Ask:Update()`
+**API** : `Ask:Request(label, token)` · `Ask:Refresh()` · `Ask:OnAsk(sender, message)` · `Ask:Hide()` · `Ask:Update()`
 
 ### `Debug.lua`
 > Crafting Order - Classic — Debug : mode solo pour "jouer" un réseau fictif.

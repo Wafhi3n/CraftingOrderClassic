@@ -386,6 +386,11 @@ local en2 = {
         "Check \"Include recipes to buy\" to fill some of them.",
     ["Coût partiel : au moins un réactif sans prix HV."] = "Partial cost: at least one reagent has no AH price.",
     ["Désenchanter : objets %s, niv. d'objet %d-%d (estimation)"] = "Disenchant: %s items, item level %d-%d (estimate)",
+    -- Échange enchanteur, étage 2 : invite un-clic côté client
+    ["%s propose d'enchanter : %s. Poser la pièce dans l'emplacement « ne sera pas échangé » ? Rien n'est donné — tu la récupères enchantée."] =
+        "%s offers to enchant: %s. Place it in the \"will not be traded\" slot? You give nothing away — you get it back enchanted.",
+    ["Poser la pièce"] = "Place it",
+    ["Ignorer"] = "Ignore",
 }
 
 for k, v in pairs(en2) do L[k] = v end

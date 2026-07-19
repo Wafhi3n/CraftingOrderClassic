@@ -1,5 +1,21 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.24.0 — One click to hand your enchanter the right piece
+
+The trade silhouette gets its second half. Since v1.21.0, an enchanter can click an equipment slot
+in the empty trade panel and the addon whispers their partner to put that piece in the "will not be
+traded" slot. If the partner runs the addon too, that same click now also shows them a prompt in
+game: accept it and the equipped piece jumps into the safe slot by itself, unequipped and placed in
+one go. Nothing changes hands, since that seventh slot can't be traded away, and the automation is
+deliberately locked to it: it refuses to touch the six real trade slots, and it never moves anything
+without that click on the prompt. No addon on the other side, or an older version? The whisper still
+goes out exactly as before, so the request degrades to plain text.
+
+The artisan pouch now recalculates while you watch. The window used to compute its shopping list
+once, when opened, so a partner gaining skill points or learning a recipe mid-session kept showing
+you yesterday's route. Skill and recipe broadcasts now repaint the open window within a second or
+two, no reopening needed.
+
 ## v1.23.0 — A shopping list for what your guildmates need to level, plus two networking fixes
 
 New feature: the Artisans tab gets a bag button next to each entry's profession icons. Click it and

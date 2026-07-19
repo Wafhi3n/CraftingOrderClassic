@@ -317,6 +317,24 @@ function UI:_FillNeedsProf(f, used, y, p)
     return y + 8
 end
 
+-- La bourse est une fenêtre SÉPARÉE : UI:RefreshSoon est gaté sur la fenêtre PRINCIPALE et ne la
+-- repeint jamais. Post-hook : tout refresh demandé (SK/RK frais au roster — le partenaire vient de
+-- monter son métier ou d'apprendre une recette) recalcule AUSSI la bourse ouverte, débouncé (les
+-- annonces SK+RK arrivent en rafale).
+local origRefreshSoon = UI.RefreshSoon
+function UI:RefreshSoon()
+    origRefreshSoon(self)
+    local f = self.needsWin
+    if not (f and f:IsShown()) then return end
+    if not (C_Timer and C_Timer.After) then return self:_FillNeeds() end
+    if self._needsPending then return end
+    self._needsPending = true
+    C_Timer.After(0.3, function()
+        UI._needsPending = nil
+        if UI.needsWin and UI.needsWin:IsShown() then UI:_FillNeeds() end
+    end)
+end
+
 -- (Re)calcule et peint la bourse du perso mémorisé (titre, remarque des plans, sections métier).
 function UI:_FillNeeds()
     local f = self.needsWin

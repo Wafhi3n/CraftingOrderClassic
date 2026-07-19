@@ -368,6 +368,11 @@ local de2 = {
         "Aktiviere „Kaufbare Rezepte einbeziehen“, um einen Teil zu füllen.",
     ["Coût partiel : au moins un réactif sans prix HV."] = "Teilkosten: mindestens ein Material ohne AH-Preis.",
     ["Désenchanter : objets %s, niv. d'objet %d-%d (estimation)"] = "Entzaubern: %s Gegenstände, Gegenstandsstufe %d-%d (Schätzung)",
+    -- Échange enchanteur, étage 2 : invite un-clic côté client
+    ["%s propose d'enchanter : %s. Poser la pièce dans l'emplacement « ne sera pas échangé » ? Rien n'est donné — tu la récupères enchantée."] =
+        "%s bietet dir eine Verzauberung an: %s. In den Platz „Wird nicht gehandelt“ legen? Du gibst nichts her — du bekommst es verzaubert zurück.",
+    ["Poser la pièce"] = "Hineinlegen",
+    ["Ignorer"] = "Ignorieren",
 }
 
 for k, v in pairs(de2) do L[k] = v end
