@@ -11,8 +11,8 @@ local news = {
     -- v1.24.1
     ["Deux minerais de plus dans les commandes de récolte"] =
         "Dos minerales más en los encargos de recolección",
-    ["Le Khorium et l'Éthérium n'apparaissaient pas comme commandables dans l'onglet Récolte. La liste des minerais était dérivée de ceux qu'on peut prospecter en gemmes, et ni l'un ni l'autre ne l'est — le même trou qui cachait déjà l'argent, l'or, le vrai-argent et le fer noir. Les deux rejoignent la liste."] =
-        "El Khorium y el Eternio no aparecían como encargables en la pestaña Recolección. La lista de minerales se derivaba de los que se pueden prospectar en gemas, y ninguno de los dos lo es — el mismo hueco que ya escondía la plata, el oro, la plata verdadera y el hierro oscuro. Ambos se unen ahora a la lista.",
+    ["Le khorium et l'éternium n'apparaissaient pas comme commandables dans l'onglet Récolte. La liste des minerais était dérivée de ceux qu'on peut prospecter en gemmes, et ni l'un ni l'autre ne l'est — le même trou qui cachait déjà l'argent, l'or, le vrai-argent et le sombrefer. Les deux rejoignent la liste."] =
+        "El korio y el eternio no aparecían como encargables en la pestaña Recolección. La lista de minerales se derivaba de los que se pueden prospectar en gemas, y ninguno de los dos lo es — el mismo hueco que ya escondía la plata, el oro, la veraplata y el hierro negro. Ambos se unen ahora a la lista.",
     -- v1.24.0
     ["La pièce à enchanter se pose d'un clic, et une bourse qui suit la progression"] =
         "La pieza a encantar se coloca con un clic, y una bolsa que sigue el ritmo",

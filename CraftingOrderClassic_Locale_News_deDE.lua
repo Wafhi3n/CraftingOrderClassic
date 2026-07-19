@@ -11,8 +11,8 @@ local news = {
     -- v1.24.1
     ["Deux minerais de plus dans les commandes de récolte"] =
         "Zwei weitere Erze bei Sammelaufträgen",
-    ["Le Khorium et l'Éthérium n'apparaissaient pas comme commandables dans l'onglet Récolte. La liste des minerais était dérivée de ceux qu'on peut prospecter en gemmes, et ni l'un ni l'autre ne l'est — le même trou qui cachait déjà l'argent, l'or, le vrai-argent et le fer noir. Les deux rejoignent la liste."] =
-        "Khorium- und Eterniumerz erschienen im Sammeln-Tab nicht als bestellbar. Die Erzliste wurde aus dem abgeleitet, was sich zu Edelsteinen aufbereiten lässt, und keins von beiden lässt sich das — dieselbe Lücke, die schon Silber, Gold, Reinsilber und Dunkeleisen versteckt hatte. Beide sind jetzt Teil der Liste.",
+    ["Le khorium et l'éternium n'apparaissaient pas comme commandables dans l'onglet Récolte. La liste des minerais était dérivée de ceux qu'on peut prospecter en gemmes, et ni l'un ni l'autre ne l'est — le même trou qui cachait déjà l'argent, l'or, le vrai-argent et le sombrefer. Les deux rejoignent la liste."] =
+        "Khorium- und Eterniumerz erschienen im Sammeln-Tab nicht als bestellbar. Die Erzliste wurde aus dem abgeleitet, was sich zu Edelsteinen aufbereiten lässt, und keins von beiden lässt sich das — dieselbe Lücke, die schon Silber, Gold, Echtsilber und Dunkeleisen versteckt hatte. Beide sind jetzt Teil der Liste.",
     -- v1.24.0
     ["La pièce à enchanter se pose d'un clic, et une bourse qui suit la progression"] =
         "Das zu verzaubernde Teil legt sich mit einem Klick ein, und ein Beutel, der Schritt hält",

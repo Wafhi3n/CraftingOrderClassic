@@ -14,7 +14,7 @@ local news = {
     -- v1.24.1
     ["Deux minerais de plus dans les commandes de récolte"] =
         "Two more ores in gathering orders",
-    ["Le Khorium et l'Éthérium n'apparaissaient pas comme commandables dans l'onglet Récolte. La liste des minerais était dérivée de ceux qu'on peut prospecter en gemmes, et ni l'un ni l'autre ne l'est — le même trou qui cachait déjà l'argent, l'or, le vrai-argent et le fer noir. Les deux rejoignent la liste."] =
+    ["Le khorium et l'éternium n'apparaissaient pas comme commandables dans l'onglet Récolte. La liste des minerais était dérivée de ceux qu'on peut prospecter en gemmes, et ni l'un ni l'autre ne l'est — le même trou qui cachait déjà l'argent, l'or, le vrai-argent et le sombrefer. Les deux rejoignent la liste."] =
         "Khorium and Eternium ore weren't showing up as orderable in the Gather tab. The mining list was built from what's prospectable into gems, and neither one is, the same gap that used to hide Silver, Gold, Truesilver and Dark Iron. Both join that list now.",
     -- v1.24.0
     ["La pièce à enchanter se pose d'un clic, et une bourse qui suit la progression"] =
