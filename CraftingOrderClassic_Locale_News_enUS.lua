@@ -11,6 +11,11 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "What's New",
+    -- v1.24.2
+    ["Les stats d'enchant parlent enfin ta langue"] =
+        "Enchant stat names finally speak your language",
+    ["Les sous-catégories de la vue enchant (Force, Esprit, Croisé…) venaient d'un libellé interne jamais traduit : tout le monde les voyait en anglais, client français compris. Elles sont maintenant lues directement sur ton jeu, comme les noms de sorts, donc dans ta langue sans rien à traduire à la main à chaque nouvelle recette."] =
+        "The subcategory names in the enchant view (Strength, Spirit, Crusader, and so on) were stuck in English for everyone, French clients included, because they came from an internal label the addon never translated. They're now read straight from your game client, the same way spell names already are, so they show up in your own language with no manual translation as new enchants get added.",
     -- v1.24.1
     ["Deux minerais de plus dans les commandes de récolte"] =
         "Two more ores in gathering orders",
@@ -149,14 +154,6 @@ local news = {
     ["Correctif : erreur en combat dans la vue métier"] = "Fix: an in-combat error in the profession view",
     ["Sélectionner une recette pendant un combat ne provoque plus d'erreur bloquée : le bouton « Créer » est un bouton sécurisé, que le jeu interdit de masquer en plein combat. L'addon attend maintenant la fin du combat pour l'afficher ou le masquer."] =
         "Picking a recipe during combat no longer throws a blocked-action error. The Create button is a secure button, and the game forbids hiding one mid-combat. The addon now waits until combat ends to show or hide it.",
-    -- Onglet Nouveautés — v1.10.1
-    ["Corrections : qui reçoit les alertes de commandes"] = "Fixes to who gets notified",
-    ["Les alertes de commandes ne dépendent plus du réglage |cFFFFFFFF/co scan|r : le scanner de chat et le carnet partageaient une option par erreur. Une commande publique te prévient désormais dès que tu as le métier."] =
-        "Order alerts no longer depend on your |cFFFFFFFF/co scan|r setting. The chat scanner and the order book shared one option by accident. A public order now toasts you as soon as you have the profession for it.",
-    ["Une commande publique portant un objet absent du catalogue arrivait en silence : elle te prévient maintenant, au lieu de dormir dans le carnet."] =
-        "A public order carrying an item missing from the catalogue used to arrive silently. It notifies you now, instead of sitting unseen on the board.",
-    ["Démuter un joueur réarme la détection de spam le concernant ; revenir de la vue métier d'un reroll ne laisse plus les boutons Créer masqués ; et l'addon travaille nettement moins à chaque ligne de chat sur un royaume chargé."] =
-        "Unmuting a player re-arms spam detection for them; coming back from an alt's profession view no longer leaves the Create buttons hidden; and the addon does noticeably less work per chat line on a busy realm.",
     -- Onglet Nouveautés — v1.14.0
     ["Un panneau pour gérer les mis en sourdine"] = "A panel to manage who you've muted",
     ["L'onglet Artisans a maintenant une section « En sourdine » : chaque joueur muté y apparaît avec sa raison et le temps restant (ou « permanent »), avec un bouton pour le rétablir directement — plus besoin de deviner qui est encore muté."] =

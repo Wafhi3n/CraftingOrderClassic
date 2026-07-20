@@ -89,25 +89,47 @@ local MAGNITUDE = {
 -- DISTINCTES de « Resistance » générique, elles doivent rester séparées (ne pas « corriger »).
 local STAT_ALIAS = { Deflect = "Deflection", Spellpower = "Spell Power" }
 
+-- Stats de base dont le libellé ne peut PAS être lu sur le client (aucune variante « nue » au catalogue,
+-- cf. statLabel) mais qui portent un vrai nom d'interface : celles-là valent mieux que le repli verbeux.
+-- La valeur est une clé de locale, donc du FRANÇAIS (convention COC.L). Ce sont des clés DYNAMIQUES →
+-- listées dans scripts\check_locale_whitelist.lua, sinon le contrôle de locale les croit mortes.
+-- Les autres irréductibles (Grand Arcanist, Lesser Block…) n'ont qu'UNE variante : son nom localisé fait
+-- déjà un en-tête exact, rien à traduire.
+local STAT_L = {
+    ["Absorption"]        = "Absorption",
+    ["Arcane Resistance"] = "Résistance aux Arcanes",
+    ["Armor"]             = "Armure",
+    ["Beastslayer"]       = "Tueur de bêtes",
+    ["Healing"]           = "Soins",
+    ["Nature Resistance"] = "Résistance à la Nature",
+    ["Protection"]        = "Protection",
+    ["Shadow Resistance"] = "Résistance à l'Ombre",
+}
+
 -- Effet (anglais) → stat de BASE : « Major Spirit » → « Spirit » ; « Crusader » → « Crusader ».
+-- Rend AUSSI si un qualificatif a été retiré — c'est ce qui distingue une variante « nue » (statLabel
+-- s'en sert pour lire le libellé sur le client). Ne PAS déduire la nudité de `effet == stat de base` :
+-- une stat ALIASÉE change de nom au passage (« Deflect » → « Deflection ») et serait crue qualifiée.
 local function baseStat(effect)
     if not effect or effect == "" then return nil end
     local first, rest = effect:match("^(%S+)%s+(.+)$")
-    local b = (first and MAGNITUDE[first]) and rest or effect
-    return STAT_ALIAS[b] or b
+    local mag = (first and MAGNITUDE[first]) and true or false
+    local b = mag and rest or effect
+    return STAT_ALIAS[b] or b, mag
 end
 
 -- Maps dérivées UNE fois du catalogue CraftLink (noms anglais canoniques → indépendant de la langue du
 -- client) : spellID → mot d'emplacement, spellID → stat de base, stat de base → rang (alphabétique, pour
 -- que les sous-catégories soient ordonnées de façon stable — le moteur trie sur un NOMBRE).
 -- Les huiles/baguettes n'y figurent pas → nil partout (elles gardent le classement par objet produit).
-local _wordBySpell, _statBySpell, _statOrder
+local _wordBySpell, _statBySpell, _statOrder, _labelSpell, _statLabelCache
 local function buildMaps()
     _wordBySpell, _statBySpell, _statOrder = {}, {}, {}
+    _labelSpell, _statLabelCache = {}, {}
     local c = CL()
     local def = c and c.GetProfession and c:GetProfession("Enchanting")
     if not def then return end
-    local named, seen = {}, {}
+    local named, seen, bare, alt = {}, {}, {}, {}
     -- 1) Noms ANGLAIS canoniques du catalogue : la source ROBUSTE (indépendante de la langue du client).
     --    Vanilla (gen_professions.lua) ET, depuis lib v10, TBC/Wrath/SoD (gen_enchant_names.lua —
     --    ExtendProfession fusionne la table `enchants` des couches).
@@ -128,12 +150,18 @@ local function buildMaps()
         local w, eff = Enchant:Parse(nm)
         if w and SLOT_NAME[w] then
             _wordBySpell[id] = w
-            local b = baseStat(eff)
-            if b then _statBySpell[id] = b; seen[b] = true end
+            local b, mag = baseStat(eff)
+            if b then
+                _statBySpell[id] = b; seen[b] = true
+                -- Variante SANS qualificatif (« Spirit », pas « Major Spirit ») = celle qui porte le
+                -- libellé de la stat. Départage par plus petit spellID : pairs() n'a pas d'ordre.
+                local t = (not mag) and bare or alt
+                if not t[b] or id < t[b] then t[b] = id end
+            end
         end
     end
     local list = {}
-    for b in pairs(seen) do list[#list + 1] = b end
+    for b in pairs(seen) do list[#list + 1] = b; _labelSpell[b] = bare[b] or alt[b] end
     table.sort(list)
     for i, b in ipairs(list) do _statOrder[b] = i end
 end
@@ -170,12 +198,36 @@ function Enchant:SectionFor(spellID)
     return (_G[s[1]] or w), 100 + s[2]
 end
 
+-- Libellé AFFICHÉ d'une stat de base, dans la langue du CLIENT.
+-- Le catalogue est en ANGLAIS — c'est ce qui rend le REGROUPEMENT indépendant de la langue — mais
+-- l'en-tête montré au joueur doit suivre son client. Plutôt que d'entretenir 120 traductions par langue
+-- (et d'en inventer le wording), on lit le nom que le client donne DÉJÀ à la recette : la variante SANS
+-- qualificatif (« Enchant Bracer - Spirit », par opposition à « Major Spirit ») porte exactement la stat
+-- de base, donc son nom localisé raccourci EST le libellé cherché — wording officiel Blizzard, toutes
+-- langues d'un coup, et rien à retoucher quand une couche s'ajoute.
+-- Relevé sur le catalogue complet (2026-07-20) : 96 des 108 groupes de Wrath ont une telle variante
+-- (37/46 en Era, 46/58 en SoD, 65/77 en TBC). Les 15 restants passent par STAT_L quand la stat a un vrai
+-- nom d'interface, sinon par leur unique variante (« Blocage inférieur » : exact, juste plus verbeux).
+-- Le nom n'est mis en cache QUE s'il a été résolu : GetSpellInfo peut être froid au tout premier appel.
+local function statLabel(b)
+    local fr = STAT_L[b]
+    if fr then return L[fr] end
+    if _statLabelCache[b] then return _statLabelCache[b] end
+    local c, id = CL(), _labelSpell[b]
+    local nm = (c and id) and c:RecipeName(id, "") or nil
+    local short = (nm and nm ~= "") and Enchant:ShortName(nm, id) or nil
+    if not (short and short ~= "") then return b end
+    _statLabelCache[b] = short
+    return short
+end
+
 -- Sous-catégorie d'un enchant d'équipement : la STAT DE BASE (« Major Spirit » → « Spirit »), pour
 -- regrouper les variantes sous une seule tête dans la colonne. Rend `libellé, rang, niveau` :
---   * libellé : `L[stat]` — la clé ANGLAISE est le repli (COC.L rend la clé si aucun overlay), donc c'est
---     lisible tout de suite et traduisible plus tard en ajoutant les clés (clé DYNAMIQUE : le checker de
---     locale ne la voit pas, cf. la note dans les overlays) ;
---   * rang : index alphabétique stable (le moteur ordonne les sous-catégories par NOMBRE) ;
+--   * libellé : localisé par statLabel ci-dessus ;
+--   * rang : index alphabétique stable (le moteur ordonne les sous-catégories par NOMBRE). ⚠️ Il se
+--     calcule sur le nom ANGLAIS : hors client anglais l'ordre des sous-catégories reste cohérent et
+--     stable, mais ce n'est pas l'alphabet affiché — le rendre localisé imposerait de figer l'ordre sur
+--     des noms que GetSpellInfo peut ne pas encore avoir résolus, donc on s'en tient à l'anglais ;
 --   * niveau : rang de métier de la recette → les variantes se trient du plus fort au plus faible
 --     (Superior Impact avant Lesser Impact), comme partout ailleurs dans l'addon.
 -- nil pour tout ce qui n'est pas un enchant d'équipement (huiles, baguettes) → classement par objet.
@@ -185,7 +237,7 @@ function Enchant:StatFor(spellID)
     if not b then return nil end
     local c = CL()
     local tier = (c and c.RecipeLearnedAt and c:RecipeLearnedAt("Enchanting", spellID)) or 0
-    return (L[b] or b), (_statOrder[b] or 500), tier
+    return statLabel(b), (_statOrder[b] or 500), tier
 end
 
 -- INVTYPE de l'objet (GetItemInfoInstant) → mots d'emplacement dont les enchants lui sont applicables.
@@ -275,7 +327,10 @@ function Enchant:HasCatalogFor(word)
 end
 
 -- Enchants du catalogue pour une LISTE de mots d'emplacement, groupés par STAT DE BASE :
---   { { stat = <libellé localisé>, order = n, variants = { { spellID =, word =, tier = }, … } }, … }
+--   { { base = <stat anglaise>, stat = <libellé localisé>, order = n,
+--       variants = { { spellID =, word =, tier = }, … } }, … }
+-- Le regroupement se fait sur `base` (identité canonique), JAMAIS sur `stat` : ce dernier est du texte
+-- d'affichage traduit, deux stats distinctes pourraient y collider selon la langue.
 -- Les groupes sortent dans l'ordre de StatFor (alphabétique stable), et les variantes d'un groupe du
 -- plus haut rang de métier au plus bas (la meilleure d'abord), comme partout ailleurs dans l'addon.
 -- Une LISTE de mots car un emplacement de la silhouette en couvre parfois plusieurs (Bracer+Bracers,
@@ -286,9 +341,13 @@ function Enchant:CatalogGroups(words)
     for _, w in ipairs(words or {}) do
         for _, id in ipairs(by[w] or {}) do
             local label, order, tier = self:StatFor(id)
-            if label then
-                local g = groups[label]
-                if not g then g = { stat = label, order = order or 500, variants = {} }; groups[label] = g end
+            local base = _statBySpell[id]
+            if label and base then
+                local g = groups[base]
+                if not g then
+                    g = { base = base, stat = label, order = order or 500, variants = {} }
+                    groups[base] = g
+                end
                 g.variants[#g.variants + 1] = { spellID = id, word = w, tier = tier or 0 }
             end
         end

@@ -1,5 +1,13 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.24.2 — Enchant stat names read from your own client now
+
+The subcategory names in the enchant view (Strength, Spirit, Crusader, and so on) were stuck in
+English for everyone, French clients included: they came from an internal label the addon never
+actually translated. They're now read straight from your game client, the same way spell names
+already are, so they show up in your own language automatically, no translation table to keep in
+sync as new enchants get added.
+
 ## v1.24.1 — Two more ores show up in gathering orders
 
 Khorium and Eternium ore weren't showing up as orderable in the Gather tab. The mining list was built

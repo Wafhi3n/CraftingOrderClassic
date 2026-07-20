@@ -256,6 +256,18 @@ local de2 = {
     ["Herbes"] = "Kräuter",
     ["Poissons"] = "Fische",
 
+    -- Sous-catégories d'ENCHANTEMENT (clés DYNAMIQUES : STAT_L dans _Enchant.lua). Ce sont les seules
+    -- stats de base dont le libellé ne se lit pas sur le client — toutes les autres viennent de
+    -- GetSpellInfo, donc déjà traduites par Blizzard. Ne pas allonger cette liste sans raison.
+    ["Absorption"] = "Absorption",
+    ["Résistance aux Arcanes"] = "Arkanwiderstand",
+    ["Armure"] = "Rüstung",
+    ["Tueur de bêtes"] = "Bestientöter",
+    ["Soins"] = "Heilung",
+    ["Résistance à la Nature"] = "Naturwiderstand",
+    ["Protection"] = "Schutz",
+    ["Résistance à l'Ombre"] = "Schattenwiderstand",
+
     -- Pont MissingTradeSkillsList (recettes manquantes + source)
     ["Manquantes"] = "Fehlend",
     ["Manquantes (%d)"] = "Fehlend (%d)",

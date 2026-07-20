@@ -286,6 +286,18 @@ local en2 = {
     ["Essences"] = "Essences",
     ["Poussières"] = "Dusts",
 
+    -- Sous-catégories d'ENCHANTEMENT (clés DYNAMIQUES : STAT_L dans _Enchant.lua). Ce sont les seules
+    -- stats de base dont le libellé ne se lit pas sur le client — toutes les autres viennent de
+    -- GetSpellInfo, donc déjà traduites par Blizzard. Ne pas allonger cette liste sans raison.
+    ["Absorption"] = "Absorption",
+    ["Résistance aux Arcanes"] = "Arcane Resistance",
+    ["Armure"] = "Armor",
+    ["Tueur de bêtes"] = "Beastslayer",
+    ["Soins"] = "Healing",
+    ["Résistance à la Nature"] = "Nature Resistance",
+    ["Protection"] = "Protection",
+    ["Résistance à l'Ombre"] = "Shadow Resistance",
+
     -- Pont MissingTradeSkillsList (recettes manquantes + source)
     ["Manquantes"] = "Missing",
     ["Manquantes (%d)"] = "Missing (%d)",

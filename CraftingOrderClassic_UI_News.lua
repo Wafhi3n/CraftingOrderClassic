@@ -19,9 +19,9 @@ local BODY_W = 780
 local function versionsLatest()
     return {
         {
-            v = "v1.24.1", title = L["Deux minerais de plus dans les commandes de récolte"],
+            v = "v1.24.2", title = L["Les stats d'enchant parlent enfin ta langue"],
             lines = {
-                L["Le khorium et l'éternium n'apparaissaient pas comme commandables dans l'onglet Récolte. La liste des minerais était dérivée de ceux qu'on peut prospecter en gemmes, et ni l'un ni l'autre ne l'est — le même trou qui cachait déjà l'argent, l'or, le vrai-argent et le sombrefer. Les deux rejoignent la liste."],
+                L["Les sous-catégories de la vue enchant (Force, Esprit, Croisé…) venaient d'un libellé interne jamais traduit : tout le monde les voyait en anglais, client français compris. Elles sont maintenant lues directement sur ton jeu, comme les noms de sorts, donc dans ta langue sans rien à traduire à la main à chaque nouvelle recette."],
             },
         },
     }
@@ -29,6 +29,12 @@ end
 
 local function versionsRecent()
     return {
+        {
+            v = "v1.24.1", title = L["Deux minerais de plus dans les commandes de récolte"],
+            lines = {
+                L["Le khorium et l'éternium n'apparaissaient pas comme commandables dans l'onglet Récolte. La liste des minerais était dérivée de ceux qu'on peut prospecter en gemmes, et ni l'un ni l'autre ne l'est — le même trou qui cachait déjà l'argent, l'or, le vrai-argent et le sombrefer. Les deux rejoignent la liste."],
+            },
+        },
         {
             v = "v1.24.0", title = L["La pièce à enchanter se pose d'un clic, et une bourse qui suit la progression"],
             lines = {
@@ -73,6 +79,11 @@ local function versionsRecent()
                 L["Plus discret : les lignes de chat « X sait faire cette commande captée » sont désactivées par défaut — la commande est poussée aux amis capables dans tous les cas, le message n'était que du bruit. |cFFFFFFFF/co verbose|r les remet."],
             },
         },
+    }
+end
+
+local function versionsOlder()
+    return {
         {
             v = "v1.20.0", title = L["Enchante en un clic, trié par emplacement, et depuis l'échange"],
             lines = {
@@ -82,11 +93,6 @@ local function versionsRecent()
                 L["Et quand quelqu'un te tend un objet à enchanter en échange, le poser dans la case « ne sera pas échangé » ouvre un petit panneau listant tes enchants pour cet emplacement, prêts à lancer sans fouiller ta fenêtre de métier (qui doit rester ouverte : le jeu ne renseigne tes recettes connues que pendant qu'elle l'est)."],
             },
         },
-    }
-end
-
-local function versionsOlder()
-    return {
         {
             v = "v1.19.1", title = L["Correctif : l'icône « dispo » remarche sur la nouvelle UI des plaques"],
             lines = {
@@ -130,6 +136,11 @@ local function versionsOlder()
                 L["Dans l'annuaire, les métiers passent en icônes : un artisan avec un plan vraiment rentable a un contour doré, le survol nomme le plan, le clic ouvre la Commande déjà ciblée. « Mes artisans » gagne « Tous les plans du royaume » : tous tes persos (même faction) fusionnés et triés par profit — d'un coup d'œil, quel reroll fait des sous. Et si tu as MissingTradeSkillsList, un bouton montre tes recettes non apprises en rouge, avec leur source au clic."],
             },
         },
+    }
+end
+
+local function versionsOldest()
+    return {
         {
             v = "v1.15.1", title = L["Tes commandes n'appartiennent qu'à toi"],
             lines = {
@@ -138,11 +149,6 @@ local function versionsOlder()
                 L["La vue métier n'affiche plus les commandes privées destinées à quelqu'un d'autre, ni les expirées. Ton compteur de crafts livrés ne peut plus être gonflé par un tiers. Et croiser un artisan coûte deux fois moins de messages : le bonjour porte maintenant tes métiers, ce qui règle aussi les artisans qui s'affichaient sans aucun métier."],
             },
         },
-    }
-end
-
-local function versionsOldest()
-    return {
         {
             v = "v1.15.0", title = L["Recherche de travail : signale que tu es dispo"],
             lines = {
@@ -183,15 +189,7 @@ local function versionsOldest()
                 L["Elles ne se chargent que sur un royaume Saison de la Découverte. Sur un royaume Era classique, rien ne change : l'addon voit exactement le même jeu de recettes qu'avant, et les recettes que tes amis t'ont déjà partagées restent lisibles."],
             },
         },
-        {
-            v = "v1.10.1", title = L["Corrections : qui reçoit les alertes de commandes"],
-            lines = {
-                L["Les alertes de commandes ne dépendent plus du réglage |cFFFFFFFF/co scan|r : le scanner de chat et le carnet partageaient une option par erreur. Une commande publique te prévient désormais dès que tu as le métier."],
-                L["Une commande publique portant un objet absent du catalogue arrivait en silence : elle te prévient maintenant, au lieu de dormir dans le carnet."],
-                L["Démuter un joueur réarme la détection de spam le concernant ; revenir de la vue métier d'un reroll ne laisse plus les boutons Créer masqués ; et l'addon travaille nettement moins à chaque ligne de chat sur un royaume chargé."],
-            },
-        },
-        -- v1.9.0 / v1.8.0 / v1.7.0 / v1.7.1 / v1.6.0 / v1.5.0 / v1.4.0 retirées de l'onglet (l'historique
+        -- v1.10.1 / v1.9.0 / v1.8.0 / v1.7.0 / v1.7.1 / v1.6.0 / v1.5.0 / v1.4.0 retirées de l'onglet (l'historique
         -- complet vit dans CHANGELOG.md). Cet onglet ne garde qu'une fenêtre glissante de versions :
         -- sinon il croît sans fin, et avec lui les 3 overlays de locale, qui butent sur le plafond
         -- anti-monolithe. Retirer ici = retirer les clés correspondantes des overlays (sinon

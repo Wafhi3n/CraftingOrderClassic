@@ -8,6 +8,11 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "Neues",
+    -- v1.24.2
+    ["Les stats d'enchant parlent enfin ta langue"] =
+        "Verzauberungs-Werte sprechen endlich deine Sprache",
+    ["Les sous-catégories de la vue enchant (Force, Esprit, Croisé…) venaient d'un libellé interne jamais traduit : tout le monde les voyait en anglais, client français compris. Elles sont maintenant lues directement sur ton jeu, comme les noms de sorts, donc dans ta langue sans rien à traduire à la main à chaque nouvelle recette."] =
+        "Die Unterkategorien der Verzauberungsansicht (Stärke, Willenskraft, Kreuzritter …) stammten aus einer internen Bezeichnung, die nie übersetzt wurde: alle sahen sie auf Englisch, auch auf dem französischen Client. Sie werden jetzt direkt von deinem Client gelesen, genau wie Zaubernamen, also in deiner eigenen Sprache, ohne dass bei jedem neuen Verzauberungsrezept von Hand übersetzt werden muss.",
     -- v1.24.1
     ["Deux minerais de plus dans les commandes de récolte"] =
         "Zwei weitere Erze bei Sammelaufträgen",
@@ -146,14 +151,6 @@ local news = {
     ["Correctif : erreur en combat dans la vue métier"] = "Behoben: Fehler im Kampf in der Berufsansicht",
     ["Sélectionner une recette pendant un combat ne provoque plus d'erreur bloquée : le bouton « Créer » est un bouton sécurisé, que le jeu interdit de masquer en plein combat. L'addon attend maintenant la fin du combat pour l'afficher ou le masquer."] =
         "Ein Rezept während des Kampfes auszuwählen löst keinen blockierten Fehler mehr aus. Der Erstellen-Knopf ist ein geschützter Knopf, den das Spiel mitten im Kampf nicht verbergen lässt. Das Addon wartet nun das Kampfende ab, um ihn ein- oder auszublenden.",
-    -- Onglet Nouveautés — v1.10.1
-    ["Corrections : qui reçoit les alertes de commandes"] = "Korrekturen: wer Auftragsbenachrichtigungen erhält",
-    ["Les alertes de commandes ne dépendent plus du réglage |cFFFFFFFF/co scan|r : le scanner de chat et le carnet partageaient une option par erreur. Une commande publique te prévient désormais dès que tu as le métier."] =
-        "Auftragsbenachrichtigungen hängen nicht mehr von deiner |cFFFFFFFF/co scan|r-Einstellung ab. Der Chat-Scanner und das Auftragsbuch teilten sich versehentlich eine Option. Ein öffentlicher Auftrag benachrichtigt dich jetzt, sobald du den Beruf dafür hast.",
-    ["Une commande publique portant un objet absent du catalogue arrivait en silence : elle te prévient maintenant, au lieu de dormir dans le carnet."] =
-        "Ein öffentlicher Auftrag mit einem Gegenstand, der nicht im Katalog steht, kam bisher lautlos an. Jetzt benachrichtigt er dich, statt unbemerkt im Auftragsbuch zu liegen.",
-    ["Démuter un joueur réarme la détection de spam le concernant ; revenir de la vue métier d'un reroll ne laisse plus les boutons Créer masqués ; et l'addon travaille nettement moins à chaque ligne de chat sur un royaume chargé."] =
-        "Das Entstummschalten eines Spielers aktiviert die Spam-Erkennung für ihn wieder; die Rückkehr aus der Berufsansicht eines Twinks lässt die Erstellen-Knöpfe nicht mehr verborgen; und das Addon leistet pro Chat-Zeile auf einem stark besuchten Realm deutlich weniger Arbeit.",
     -- Onglet Nouveautés — v1.14.0
     ["Un panneau pour gérer les mis en sourdine"] = "Ein Panel zur Verwaltung von Stummgeschalteten",
     ["L'onglet Artisans a maintenant une section « En sourdine » : chaque joueur muté y apparaît avec sa raison et le temps restant (ou « permanent »), avec un bouton pour le rétablir directement — plus besoin de deviner qui est encore muté."] =
