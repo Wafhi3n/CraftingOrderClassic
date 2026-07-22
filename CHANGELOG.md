@@ -1,5 +1,24 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.26.0 — Filter any craft list by the stat it gives
+
+Every recipe list, the Order tab, the profession window and My Artisans, gets a stat picker. Pick
+Strength and you see only what gives Strength, gems, gear, elixirs, all of it. The list is built from
+what the open profession actually makes, so Cooking won't offer you Spell Power and Jewelcrafting
+won't offer you Defense.
+
+None of those stats are typed out anywhere. They're read off your own client, so they show up in your
+language and they'll keep working on items I've never looked at, including whatever Wrath brings. The
+filter matches on the stat's real identity, not its name, so it behaves the same whether your game is
+in English, French or German.
+
+Alchemy sorts better too. Elixirs now group under the stat they give (Agility, Strength, Spell
+Power), while healing and mana potions, flasks and transmutes keep their own headings, since "restores
+health" was never a stat to begin with. On TBC that pulled 74 loose consumables out of the Misc pile.
+
+An elixir that grants two stats only shows under one of them for now. If you spot one filed under the
+wrong stat, tell me.
+
 ## v1.25.0 — Cut gems sort by color, then by what they give
 
 Jewelcrafting dumped every cut gem under a single "Gem" heading. Hundreds of lines, no order to them.

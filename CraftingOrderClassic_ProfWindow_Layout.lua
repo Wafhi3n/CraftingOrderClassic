@@ -30,6 +30,11 @@ local SPEC = {
             { id = "recTools",  w = 92, sep = false },   --   « 123 » + pièce d'or (Lazy Gold) + ▲ progression + carte (plan de route)
             { id = "recSearch", sep = false },           --   la recherche REMPLIT le reste
             { id = "recFilterToggles", w = 48, sep = false } }, -- filtres : sac « j'ai les matériaux » (+ palier)
+        -- Rangée du filtre par STAT. Une rangée à elle seule parce que la colonne ne fait que 230 px :
+        -- recTools (92) + recFilterToggles (48) ne laissent déjà que ~90 px à la recherche, un
+        -- sélecteur de plus sur la même ligne ne serait pas lisible.
+        { id = "statFilter", h = 28, bg = true, dir = "cols", sep = false,
+            { id = "recStatDD" } },
         { dir = "cols", sep = false,
             { id = "recList", help = "recList", helpDir = "RIGHT" },   -- liste virtualisée
             { id = "recGutter", w = 22, sep = false } }, -- gouttière scrollbar

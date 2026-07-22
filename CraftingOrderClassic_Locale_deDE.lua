@@ -184,6 +184,8 @@ local de = {
     ["Aucune ressource sélectionnée."] = "Keine Ressource ausgewählt.", ["par stack"] = "pro Stapel", ["à l'unité"] = "pro Stück",
     ["Commande de récolte postée !"] = "Sammelauftrag erstellt!", ["Choisis d'abord une ressource."] = "Wähle zuerst eine Ressource.",
     ["Toutes"] = "Alle",
+    ["Stat"] = "Wert",
+    ["Toutes les stats"] = "Alle Werte",
     -- Légendes de la rangée de filtres style HdV (onglet Commande) : mots courts, au-dessus du champ.
     ["Objet |cFFE8B84Bélémentaire|r (farmé sur les mobs, pas de métier). Diffusé à tous. Quantité et prix |cFFE8B84B%s.|r"] =
         "|cFFE8B84BElementar|r-Gegenstand (von Gegnern gefarmt, kein Beruf). An alle gesendet. Menge und Preis |cFFE8B84B%s.|r",

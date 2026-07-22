@@ -37,9 +37,17 @@ local function viewsOf(profKey, entries, opts)
         if getSection then sec, secOrder, flat = getSection(entry) end
         if not sec then sec, secOrder = COC.SectionOf(itemID) end
         secOrder = secOrder or 900   -- garde : un rang nil ferait planter le tri (comparaison avec nil)
+        -- ORDRE DE PRIORITÉ, et il compte :
+        --  1. la table DÉCLARÉE (jugement humain : « Potions de soin », « Flacons » — des familles
+        --     qu'aucune lecture d'objet ne devinera jamais) ;
+        --  2. le classement DÉRIVÉ de l'appelant (enchant, taille de gemme, stat d'un consommable),
+        --     qui ne COMBLE que ce que la table ne dit pas ;
+        --  3. « Divers » en dernier recours.
+        -- L'inverse (dérivé d'abord) écraserait « Potions de soin » par un groupe de stats.
         local subs
         if not flat then
-            if getSub then   -- sous-catégorie fournie par l'appelant (entrée SANS objet produit)
+            if RC:HasCategories(profKey) then subs = RC:SubsOfStrict(profKey, itemID) end
+            if not subs and getSub then
                 local sub, subOrder, tier, lone = getSub(entry)
                 if sub then
                     subs = { { sub = sub, order = subOrder or 0, tier = tier or 0, lone = lone } }
@@ -173,12 +181,31 @@ function RC.SectionForSpell(spellID)
     return COC.Enchant:SectionFor(spellID)
 end
 
-function RC.SubForSpell(spellID)
-    if not spellID then return nil end
-    if COC.Enchant then
+-- Rang des groupes DÉRIVÉS d'une stat de consommable : après les groupes déclarés (qui portent leur
+-- index de déclaration, 1..n) et avant « Divers » (999). Tous le même, donc c'est le LIBELLÉ qui les
+-- ordonne entre eux — sortViews départage sur `_sub` à rang égal.
+local CONSUMABLE_STAT_ORDER = 600
+local CONSUMABLE_CLASS = 0   -- classID 0 = Consommable
+
+function RC.SubForSpell(profKey, spellID, itemID)
+    if COC.Enchant and spellID then
         local label, order, tier = COC.Enchant:StatFor(spellID)
         if label then return label, order, tier end   -- pas de `lone` : un enchant seul garde son en-tête
     end
-    if COC.Gem then return COC.Gem:StatFor(spellID) end
+    if COC.Gem and spellID then
+        local label, order, tier, lone = COC.Gem:StatFor(spellID)
+        if label then return label, order, tier, lone end
+    end
+    -- Consommables : un élixir n'a pas de stat d'OBJET, il applique un effet — mais c'est bien une
+    -- stat qu'il donne, et c'est ainsi qu'on le cherche. Une seule stat en en-tête (le libellé sert
+    -- de titre de groupe, pas de fiche technique). Restreint aux consommables : ailleurs, un niveau
+    -- « par stat » doublonnerait le classement par emplacement, déjà plus parlant.
+    if COC.Stats and itemID and GetItemInfoInstant
+        and select(6, GetItemInfoInstant(itemID)) == CONSUMABLE_CLASS then
+        local label = COC.Stats:LabelFor(itemID, 1)
+        -- `Tier` = le rang de métier de la recette : c'est lui qui met l'élixir majeur devant le
+        -- mineur DANS le groupe. Il exige le métier, d'où sa présence dans la signature.
+        if label then return label, CONSUMABLE_STAT_ORDER, RC:Tier(profKey, itemID) end
+    end
     return nil
 end

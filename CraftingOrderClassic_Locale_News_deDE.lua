@@ -8,6 +8,13 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "Neues",
+    -- v1.26.0
+    ["Filtre n'importe quelle liste par la stat qu'elle donne"] =
+        "Filtere jede Rezeptliste nach dem Wert, den sie gibt",
+    ["Chaque liste de recettes — l'onglet Commande, la fenêtre métier, Mes artisans — reçoit un sélecteur de stat. Tu choisis Force, tu ne vois que ce qui donne de la Force : gemmes, équipements, élixirs. Le menu se remplit avec ce que le métier ouvert fabrique vraiment, donc la Cuisine ne te propose pas Puissance des sorts. Ces stats ne sont écrites nulle part, elles sont lues sur ton propre jeu — dans ta langue, et valables pour des objets que je n'ai jamais regardés, Wrath compris."] =
+        "Jede Rezeptliste — der Auftrags-Reiter, das Berufsfenster, Meine Handwerker — bekommt einen Wert-Auswähler. Wähle Stärke und du siehst nur, was Stärke gibt: Edelsteine, Ausrüstung, Elixiere. Das Menü füllt sich mit dem, was der offene Beruf wirklich herstellt, Kochkunst bietet dir also keine Zaubermacht an. Diese Werte stehen nirgends geschrieben, sie werden von deinem Client gelesen, also in deiner Sprache und auch bei Gegenständen, die ich nie angesehen habe, Wrath inbegriffen.",
+    ["L'alchimie se range mieux aussi : les élixirs se regroupent sous la stat qu'ils donnent, pendant que les potions de soin et de mana, les flacons et les transmutations gardent leurs propres en-têtes — « rend de la vie » n'a jamais été une stat. Sur TBC, ça sort 74 consommables du fourre-tout Divers."] =
+        "Auch die Alchemie sortiert sich besser: Elixiere gruppieren sich nach dem Wert, den sie geben, während Heil- und Manatränke, Fläschchen und Transmutationen ihre eigenen Überschriften behalten — „stellt Leben wieder her“ war nie ein Wert. Auf TBC holt das 74 lose Verbrauchsgegenstände aus dem Sonstiges-Haufen.",
     -- v1.25.0
     ["Les gemmes se rangent par couleur, puis par ce qu'elles donnent"] =
         "Edelsteine sortieren sich nach Farbe und danach, was sie geben",

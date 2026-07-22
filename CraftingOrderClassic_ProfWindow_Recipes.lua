@@ -86,6 +86,7 @@ function PW:_BuildRecipes(col)
     if ftz then self:_BuildRecipeFilters(ftz) end
     local htz = self:Sec("recHeaderTools")   -- bouton « acquérables » dans son slot d'en-tête (à côté du titre)
     if htz and self._BuildAcquireFilter then self:_BuildAcquireFilter(htz) end
+    self:_BuildRecipeStatFilter(self:Sec("recStatDD"))
 
     -- Liste dans sa zone, scrollbar dans la gouttière (le −6 laisse respirer le bord, la barre
     -- déborde dans les 22 px de recGutter — même patron que toutes les listes converties).
@@ -267,6 +268,11 @@ function PW:_RecipeDisplayList()
             items[#items + 1] = r
         end
     end
+    -- Filtre par STAT (rangée dédiée de la colonne Recettes) : même sélecteur partagé que l'onglet
+    -- Commande, mais son propre choix — filtrer sur la Force ici ne doit pas filtrer là-bas.
+    if COC.StatFilter then
+        items = COC.StatFilter:Apply("prof", items, function(r) return r.itemID end)
+    end
     -- Tri « rentabilité » (Lazy Gold) : on ABANDONNE le regroupement — liste À PLAT, sans en-tête ni
     -- sous-catégorie, du plus rentable au moins rentable. C'est le but du mode : voir d'un coup quoi
     -- fabriquer en premier, peu importe la famille. Profit inconnu / à perte → en fin de liste.
@@ -294,7 +300,7 @@ function PW:_RecipeDisplayList()
         itemID    = function(r) return r.itemID end,
         -- Classement dérivé du sort (enchantements, tailles de gemme) : cf. RecipeCats.SectionForSpell.
         section   = function(r) return COC.RecipeCats.SectionForSpell(r.spellID) end,
-        sub       = function(r) return COC.RecipeCats.SubForSpell(r.spellID) end,
+        sub       = function(r) return COC.RecipeCats.SubForSpell(self.profKey, r.spellID, r.itemID) end,
         name      = function(r) return r.name or "" end,
         collapsed = ((search or "") ~= "") and nil or self:_CollapseTable(),
     })
@@ -303,6 +309,15 @@ end
 function PW:RefreshRecipes()
     if not self.recScroll then return end
     self._profitCache, self._lvlCache = {}, {}   -- invalidés à chaque refresh (prix Auctionator ont pu changer)
+    -- Le filtre par stat ne SURVIT PAS à un changement de métier : un « Force » hérité de la Forge
+    -- viderait la Cuisine sans que rien ne l'explique. Détecté ici, et GARDÉ sur le changement réel,
+    -- parce que `profKey` est posé à trois endroits selon le mode (plein / reroll / compact) et que
+    -- relire le sélecteur coûte un balayage (cf. _Stats_Filter.lua).
+    if COC.StatFilter and self._statProfKey ~= self.profKey then
+        self._statProfKey = self.profKey
+        COC.StatFilter:Reset("prof")
+        COC.StatFilter:RefreshDropdown(self.recStatDD)
+    end
     -- Mode « colonne de cases » : actif quand je CHERCHE du travail dans le métier ouvert (le mien, hors
     -- reroll). Pré-calcule l'ensemble des spellID déjà proposés pour cocher les lignes en O(1) au rendu.
     local D = COC.Directory

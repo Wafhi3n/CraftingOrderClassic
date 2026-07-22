@@ -65,7 +65,12 @@ local SPEC = {
         { id = "srch" },
         { id = "qualityDropDown", w = 96,  sep = false },
         { id = "reagents",        w = 124, sep = false },
-        { id = "AH_Filter",       w = 44,  sep = false } },   -- outils Lazy Gold (tri + « 123 »)
+        { id = "AH_Filter",       w = 44,  sep = false } },
+      -- 2e rangée de filtres : le sélecteur de STAT, seul. La 1re est pleine (96+124+44 de largeurs
+      -- fixes ne laissent que ~69 px à la recherche) et les noms de stats sont longs (« Score de
+      -- critique »), d'où une rangée à eux. Coût assumé : 34 px de hauteur de liste.
+      { id = "statFilter", h = 30, bg = true, dir = "cols", sep = false,
+        { id = "statDropDown" } },   -- outils Lazy Gold (tri + « 123 »)
       -- sep=false : la bande grise des filtres SE distingue déjà par sa teinte → pas de filet fin en
       -- plus (il créait un « jeu » visible entre la bande et la liste, signalé par le user).
       { dir = "cols", sep = false,

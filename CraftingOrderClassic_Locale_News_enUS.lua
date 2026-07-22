@@ -11,6 +11,13 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "What's New",
+    -- v1.26.0
+    ["Filtre n'importe quelle liste par la stat qu'elle donne"] =
+        "Filter any craft list by the stat it gives",
+    ["Chaque liste de recettes — l'onglet Commande, la fenêtre métier, Mes artisans — reçoit un sélecteur de stat. Tu choisis Force, tu ne vois que ce qui donne de la Force : gemmes, équipements, élixirs. Le menu se remplit avec ce que le métier ouvert fabrique vraiment, donc la Cuisine ne te propose pas Puissance des sorts. Ces stats ne sont écrites nulle part, elles sont lues sur ton propre jeu — dans ta langue, et valables pour des objets que je n'ai jamais regardés, Wrath compris."] =
+        "Every recipe list, the Order tab, the profession window and My Artisans, gets a stat picker. Pick Strength and you see only what gives Strength, gems, gear, elixirs. The menu is built from what the open profession actually makes, so Cooking won't offer you Spell Power. None of those stats are typed out anywhere, they're read off your own client, so they show up in your language and keep working on items I've never looked at, Wrath included.",
+    ["L'alchimie se range mieux aussi : les élixirs se regroupent sous la stat qu'ils donnent, pendant que les potions de soin et de mana, les flacons et les transmutations gardent leurs propres en-têtes — « rend de la vie » n'a jamais été une stat. Sur TBC, ça sort 74 consommables du fourre-tout Divers."] =
+        "Alchemy sorts better too. Elixirs group under the stat they give, while healing and mana potions, flasks and transmutes keep their own headings, since \"restores health\" was never a stat. On TBC that pulled 74 loose consumables out of the Misc pile.",
     -- v1.25.0
     ["Les gemmes se rangent par couleur, puis par ce qu'elles donnent"] =
         "Cut gems sort by color, then by what they give",

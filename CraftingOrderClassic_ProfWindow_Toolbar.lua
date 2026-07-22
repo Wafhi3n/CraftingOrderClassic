@@ -71,6 +71,23 @@ end
 -- gauche, qui la RÉORDONNE). Actif = fond doré (comme les toggles de tri).
 --   sac         → « j'ai les matériaux » (pendant du filtre natif « Réactifs en stock »)
 --   ▲ orange    → « montée de compétence » : masque les recettes GRISES (triviales, aucun point)
+-- Slot recStatDD (rangée à elle seule) : « ne montrer que ce qui donne <stat> ». Le menu se peuple
+-- sur MES recettes du métier ouvert — pas sur la liste affichée, qui rétrécirait à chaque choix et
+-- interdirait de changer de stat sans repasser par « Toutes ».
+-- `_ActiveRecipes` contient des en-têtes (isHeader) sans itemID : l'accesseur les ignore de fait.
+function PW:_BuildRecipeStatFilter(zone)
+    local SF = COC.StatFilter
+    if not (SF and zone) then return end
+    local dd = SF:MakeDropdown("COCProfStatDD", zone, 175, "prof", {
+        key      = function() return PW.profKey end,
+        entries  = function() return PW:_ActiveRecipes() end,
+        itemID   = function(r) return (not r.isHeader) and r.itemID or nil end,
+        onChange = function() PW:RefreshRecipes() end,
+    })
+    dd:SetPointVisual("LEFT", zone, "LEFT", 4, -1)
+    self.recStatDD = dd
+end
+
 function PW:_BuildRecipeFilters(fz)
     local matBtn = self:_MakeToolBtn(fz, function()
         return PW.recipeHaveMats and L["Filtre matériaux actif — clic pour tout afficher."]

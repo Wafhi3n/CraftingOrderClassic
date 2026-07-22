@@ -99,7 +99,10 @@ function UI:_RenderPostPlanRows(list)
     local disp = self:_PostProfitFlat(list) or COC.RecipeCats:BuildDisplay(self.postProf, list, {
         itemID    = function(it) return it.e and it.e.itemID end,
         section   = function(it) return COC.RecipeCats.SectionForSpell(it.e and it.e.spellID) end,
-        sub       = function(it) return COC.RecipeCats.SubForSpell(it.e and it.e.spellID) end,
+        sub       = function(it)
+            local e = it.e
+            return COC.RecipeCats.SubForSpell(self.postProf, e and e.spellID, e and e.itemID)
+        end,
         name      = function(it) return it.name or "" end,
         before    = function(a, b) if a.ready ~= b.ready then return a.ready end end,
         collapsed = searching and nil or self:_PostCollapseTable(),

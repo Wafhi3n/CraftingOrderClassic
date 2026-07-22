@@ -185,6 +185,8 @@ local es = {
     ["Aucune ressource sélectionnée."] = "Ningún recurso seleccionado.", ["par stack"] = "por montón", ["à l'unité"] = "por unidad",
     ["Commande de récolte postée !"] = "¡Pedido de recolección publicado!", ["Choisis d'abord une ressource."] = "Elige primero un recurso.",
     ["Toutes"] = "Todas",
+    ["Stat"] = "Estadística",
+    ["Toutes les stats"] = "Todas las estadísticas",
     -- Légendes de la rangée de filtres style HdV (onglet Commande) : mots courts, au-dessus du champ.
     ["Objet |cFFE8B84Bélémentaire|r (farmé sur les mobs, pas de métier). Diffusé à tous. Quantité et prix |cFFE8B84B%s.|r"] =
         "Objeto |cFFE8B84Belemental|r (obtenido de las criaturas, sin profesión). Difundido a todos. Cantidad y precio |cFFE8B84B%s.|r",

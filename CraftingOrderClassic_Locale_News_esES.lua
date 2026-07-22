@@ -8,6 +8,13 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "Novedades",
+    -- v1.26.0
+    ["Filtre n'importe quelle liste par la stat qu'elle donne"] =
+        "Filtra cualquier lista por la estadística que da",
+    ["Chaque liste de recettes — l'onglet Commande, la fenêtre métier, Mes artisans — reçoit un sélecteur de stat. Tu choisis Force, tu ne vois que ce qui donne de la Force : gemmes, équipements, élixirs. Le menu se remplit avec ce que le métier ouvert fabrique vraiment, donc la Cuisine ne te propose pas Puissance des sorts. Ces stats ne sont écrites nulle part, elles sont lues sur ton propre jeu — dans ta langue, et valables pour des objets que je n'ai jamais regardés, Wrath compris."] =
+        "Cada lista de recetas — la pestaña Pedido, la ventana de profesión, Mis artesanos — recibe un selector de estadística. Eliges Fuerza y solo ves lo que da Fuerza: gemas, equipo, elixires. El menú se llena con lo que la profesión abierta fabrica de verdad, así que Cocina no te ofrece Poder con hechizos. Esas estadísticas no están escritas en ningún sitio, se leen de tu propio juego, así que aparecen en tu idioma y siguen funcionando con objetos que nunca he mirado, Wrath incluido.",
+    ["L'alchimie se range mieux aussi : les élixirs se regroupent sous la stat qu'ils donnent, pendant que les potions de soin et de mana, les flacons et les transmutations gardent leurs propres en-têtes — « rend de la vie » n'a jamais été une stat. Sur TBC, ça sort 74 consommables du fourre-tout Divers."] =
+        "La alquimia también se ordena mejor: los elixires se agrupan según la estadística que dan, mientras que las pociones de vida y maná, los frascos y las transmutaciones conservan sus propios encabezados — «restaura vida» nunca fue una estadística. En TBC eso saca 74 consumibles del montón de Varios.",
     -- v1.25.0
     ["Les gemmes se rangent par couleur, puis par ce qu'elles donnent"] =
         "Las gemas se ordenan por color y luego por lo que dan",

@@ -92,11 +92,20 @@ end
 -- Plusieurs entrées = l'objet s'affiche sous plusieurs en-têtes (il a plusieurs effets).
 -- Renvoie nil si le métier n'a aucune table déclarée → l'appelant garde l'affichage à plat d'avant.
 function RC:SubsOf(profKey, itemID)
+    local hit = self:SubsOfStrict(profKey, itemID)
+    if hit then return hit end
+    if not (profKey and defs[profKey]) then return nil end
+    return { { sub = L["Divers"], order = UNSORTED_ORDER, tier = self:Tier(profKey, itemID) } }
+end
+
+-- Même chose SANS le repli « Divers » : nil quand l'objet n'est déclaré nulle part.
+-- La nuance est ce qui permet à un classement DÉRIVÉ (les stats lues sur l'objet) de venir combler
+-- les trous d'une table saisie à la main. Avec le repli, « Divers » gagnait toujours et le dérivé
+-- n'avait jamais sa chance — c'est ce qui laissait 74 consommables TBC en vrac (mesuré 2026-07-22).
+function RC:SubsOfStrict(profKey, itemID)
     if not (profKey and defs[profKey]) then return nil end
     local map = index[profKey] or buildIndex(profKey)
-    local hit = itemID and map[itemID]
-    if hit then return hit end
-    return { { sub = L["Divers"], order = UNSORTED_ORDER, tier = self:Tier(profKey, itemID) } }
+    return (itemID and map[itemID]) or nil
 end
 
 -- Rang de tri INTERNE à une sous-catégorie : le niveau de métier auquel la recette s'apprend

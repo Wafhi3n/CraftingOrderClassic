@@ -169,6 +169,29 @@ function UI:_BuildPostPlanFilters()
     end)
     rChk:SetScript("OnLeave", GameTooltip_Hide)
     self:_RefreshReagFilterBtn()
+
+    self:_BuildPostStatFilter()
+end
+
+-- Sélecteur de stat, sur sa propre rangée (cf. SPEC `statFilter` dans _UI_Post_Layout).
+-- Le menu se peuple sur le CATALOGUE ENTIER du métier, pas sur la liste affichée : sinon il
+-- rétrécirait avec la recherche et le filtre en cours, et on ne pourrait plus changer de stat sans
+-- repasser par « Toutes ». C'est aussi ce qui rend honnête la clé de cache (le métier).
+function UI:_BuildPostStatFilter()
+    local SF = COC.StatFilter
+    if not SF then return end
+    local slot = self:PostSec("statDropDown")
+    local dd = SF:MakeDropdown("COCPostStatDD", slot, 300, "post", {
+        key      = function() return UI.postProf end,
+        entries  = function()
+            local c = CL()
+            return (UI.postProf and c and c:ProfessionCatalogue(UI.postProf)) or {}
+        end,
+        itemID   = function(e) return e.itemID end,
+        onChange = function() UI:RefreshPostPlans() end,
+    })
+    dd:SetPointVisual("LEFT", slot, "LEFT", 5, -2)
+    self.postStatDD = dd
 end
 
 function UI:_ToggleProfFlyout()
@@ -227,6 +250,13 @@ function UI:_RefreshProfDropdown()
         r:SetText(Skin.ProfLabel(prof)); r:SetSelected(prof == self.postProf)
         r:SetScript("OnClick", function()
             UI.postProf = prof; UI.postEntry = nil; UI:_RefreshProfDropdown()
+            -- Le filtre par stat ne SURVIT PAS au changement de métier : un « Force » hérité de la
+            -- Forge viderait la Cuisine sans que rien ne l'explique. C'est ici, et pas dans le
+            -- rafraîchissement de liste, que le sélecteur se relit (SetValue relit la liste = balayage).
+            if COC.StatFilter then
+                COC.StatFilter:Reset("post")
+                COC.StatFilter:RefreshDropdown(UI.postStatDD)
+            end
             UI:_SyncMainPortrait()   -- le médaillon suit le métier IMMÉDIATEMENT (plus au prochain refresh)
             UI:RefreshPostPlans(); UI:RefreshPostPlanDetail(); UI:RefreshPostArtisans()
             fly:Hide()
@@ -280,6 +310,11 @@ function UI:RefreshPostPlans()
     -- niveau (cf. UI:_SyncHeaderSkill) — l'ancien FontString local chevauchait la 1ʳᵉ ligne de liste.
     self.postArtMode = artFilter and artMode or nil
     self:_SyncHeaderSkill()
+    -- Filtre par STAT (rangée dédiée) : appliqué APRÈS recherche/qualité/réactifs, juste avant le
+    -- rendu. Rend la même table quand aucune stat n'est choisie → le cas courant ne paie rien.
+    if COC.StatFilter then
+        out = COC.StatFilter:Apply("post", out, function(it) return it.e and it.e.itemID end)
+    end
     -- Tri par section (emplacement/type) + rendu en-têtes+lignes : cf. _UI_Post_Categories.lua.
     -- Le « prêt » (P2) remonte en tête de SA section (plus en tête globale) : le regroupement prime.
     self:_RenderPostPlanRows(out)

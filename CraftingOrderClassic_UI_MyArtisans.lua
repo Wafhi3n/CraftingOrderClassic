@@ -73,6 +73,7 @@ function UI:_BuildMyArtRight()
 
     -- Barre Lazy Gold (pièce / « 123 »), à gauche du bouton Manquantes (même slot).
     self:_BuildMyArtLGBar(bz, mBtn)
+    self:_BuildMyArtStatFilter(self:MyArtSec("recStatDD"))
 
     -- Liste des recettes : largeur LUE sur la zone.
     local rz = self:MyArtSec("recList")
@@ -129,6 +130,25 @@ function UI:_BuildMyArtHeader()
     dd:SetPointVisual("RIGHT", sc, "RIGHT", -8, -2)
     self.myArtMainLbl:SetPoint("RIGHT", dd, "LEFT", 8, -2)   -- +8/−2 : compense la marge de l'art du dropdown
     self.myArtMainDD = dd
+end
+
+-- Slot recStatDD : « ne montrer que ce qui donne <stat> ». Le menu se peuple sur les recettes du
+-- métier de reroll SÉLECTIONNÉ, via la même source que la liste (_MyArtRecs). La clé de cache suit
+-- donc le couple perso+métier, sinon un reroll hériterait des stats d'un autre.
+function UI:_BuildMyArtStatFilter(zone)
+    local SF = COC.StatFilter
+    if not (SF and zone) then return end
+    local dd = SF:MakeDropdown("COCMyArtStatDD", zone, 260, "myart", {
+        key      = function()
+            local e = UI.myArtSelEntry
+            return e and ((e.key or "?") .. "\1" .. (e.profKey or "?")) or nil
+        end,
+        entries  = function() return UI:_MyArtRecs(UI.myArtSelEntry) end,
+        itemID   = function(rc) return rc.itemID end,
+        onChange = function() UI:RefreshMyArtisans() end,
+    })
+    dd:SetPointVisual("LEFT", zone, "LEFT", 4, -1)
+    self.myArtStatDD = dd
 end
 
 -- Recale le bandeau sur l'état réel (coche + libellé vitrine) — le bouton vitrine n'a de sens que
@@ -298,12 +318,31 @@ function UI:_MyArtMissing(e)
     return n
 end
 
--- `profs` = tous les métiers du compte (utilisé seulement en mode « tout le royaume »).
-function UI:_MyArtDisplayList(e, profs)
-    -- « Tout le royaume » : liste à plat inter-métiers, triée par profit. Pas de bandeau CD (il est
-    -- propre à un métier), pas de sections (le tri global est justement ce qu'on veut voir).
-    if self.myArtAllProfs then return self:_MyArtAllList(profs or { e }, recEntryOf, itemOnlyEntries) end
+-- Métier sélectionné dans la colonne de gauche (le 1er par défaut, la sélection est conservée tant
+-- qu'elle existe encore), et remise à zéro du filtre par stat quand ce choix CHANGE : un « Force »
+-- hérité d'un forgeron viderait la liste d'un cuisinier sans que rien ne l'explique — même règle que
+-- dans les deux autres vues. Gardé sur le changement RÉEL, relire le sélecteur coûte un balayage
+-- (cf. _Stats_Filter.lua). Extrait de RefreshMyArtisans, qui butait sur l'anti-monolithe.
+function UI:_MyArtSyncSelection(list)
+    local sel, selE = self.myArtSelProf, nil
+    for _, e in ipairs(list) do if e.profKey == sel then selE = e end end
+    if not selE and list[1] then selE = list[1]; self.myArtSelProf = selE.profKey end
+    local selKey = selE and ((selE.key or "?") .. "\1" .. (selE.profKey or "?")) or nil
+    if COC.StatFilter and self._myArtStatKey ~= selKey then
+        self._myArtStatKey = selKey
+        COC.StatFilter:Reset("myart")
+        COC.StatFilter:RefreshDropdown(self.myArtStatDD)
+    end
+    self.myArtSelEntry = selE
+    return selE
+end
 
+-- Recettes BRUTES d'un métier de reroll, avant tout filtre ni tri : les connues, les objets sans
+-- recette (cooldowns), et les manquantes si le mode est actif. Extrait de _MyArtDisplayList pour que
+-- le sélecteur de stat peuple son menu sur la MÊME source que la liste — sinon il proposerait des
+-- stats absentes, ou en cacherait.
+function UI:_MyArtRecs(e)
+    if not (e and e.known) then return {} end
     local c = CL()
     local recs = {}
     for sid in pairs(e.known) do recs[#recs + 1] = recEntryOf(e, sid, false) end
@@ -312,6 +351,21 @@ function UI:_MyArtDisplayList(e, profs)
         for _, sid in ipairs((c and c:GetRecipes(e.profKey)) or {}) do
             if not e.known[sid] then recs[#recs + 1] = recEntryOf(e, sid, true) end
         end
+    end
+    return recs
+end
+
+-- `profs` = tous les métiers du compte (utilisé seulement en mode « tout le royaume »).
+function UI:_MyArtDisplayList(e, profs)
+    -- « Tout le royaume » : liste à plat inter-métiers, triée par profit. Pas de bandeau CD (il est
+    -- propre à un métier), pas de sections (le tri global est justement ce qu'on veut voir).
+    if self.myArtAllProfs then return self:_MyArtAllList(profs or { e }, recEntryOf, itemOnlyEntries) end
+
+    local recs = self:_MyArtRecs(e)
+    -- Filtre par STAT : avant le tri, donc valable dans les DEUX rendus (à plat par rentabilité ou
+    -- groupé par catégories). Sa clé de vue est distincte de l'onglet Commande et de la vue métier.
+    if COC.StatFilter then
+        recs = COC.StatFilter:Apply("myart", recs, function(rc) return rc.itemID end)
     end
     -- Tri par rentabilité : liste à PLAT (les catégories disparaissent), comme la vue métier.
     if self.myArtSortProfit and COC.LazyGold and COC.LazyGold:IsAvailable() then
@@ -388,11 +442,7 @@ function UI:RefreshMyArtisans()
         return Skin.ProfLabel(a.profKey) < Skin.ProfLabel(b.profKey)
     end)
 
-    -- Sélection par défaut = 1er métier ; conserve la sélection si elle existe encore.
-    local sel = self.myArtSelProf
-    local selE
-    for _, e in ipairs(list) do if e.profKey == sel then selE = e end end
-    if not selE and list[1] then selE = list[1]; self.myArtSelProf = selE.profKey end
+    local selE = self:_MyArtSyncSelection(list)
 
     local n = 0
     for _, e in ipairs(list) do
