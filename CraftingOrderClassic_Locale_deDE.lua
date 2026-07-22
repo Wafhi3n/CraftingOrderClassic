@@ -8,6 +8,11 @@ if (GetLocale and GetLocale() or "") ~= "deDE" then return end
 local L = COC.L
 
 local de = {
+    -- Benachrichtigung « neue Version verfügbar » (Directory_Version / Minimap / /co version)
+    ["Une nouvelle version est disponible : |cFFFFD100%s|r (vous avez la %s). Pensez à mettre à jour."] =
+        "Eine neue Version ist verfügbar: |cFFFFD100%s|r (du hast %s). Zeit für ein Update.",
+    ["Nouvelle version disponible : %s"] = "Neue Version verfügbar: %s",
+    ["Crafting Order — version %s"] = "Crafting Order — Version %s",
     ["Enchanter équipé"] = "Ausgerüstetes verzaubern", ["Enchante directement la pièce équipée — sans cibler."] = "Verzaubert direkt das ausgerüstete Teil — ohne Zielauswahl.",
     ["Enchanter cet objet"] = "Diesen Gegenstand verzaubern", ["Ouvre ta fenêtre d'Enchantement."] = "Öffne dein Verzauberkunst-Fenster.", ["Aucun enchantement connu pour cet emplacement."] = "Keine bekannte Verzauberung für diesen Platz.",
     ["Choisir par emplacement"] = "Nach Platz auswählen", ["Retour"] = "Zurück",   -- vue silhouette (onglet Commande)

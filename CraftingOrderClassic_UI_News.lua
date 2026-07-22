@@ -21,6 +21,13 @@ local BODY_W = 780
 local function versionsLatest()
     return {
         {
+            v = "v1.27.0", title = L["Prévenu quand une nouvelle version sort"],
+            lines = {
+                L["L'addon repère maintenant qu'il tourne en retard. Il lit la version des joueurs que tu croises sur le réseau, et dès qu'il en voit une plus récente chez plusieurs personnes différentes, il te le dit d'une ligne dans le chat et pose un point rouge sur le bouton minimap. Le point s'efface tout seul une fois que tu as mis à jour."],
+                L["Ce « plusieurs personnes différentes » est voulu : un joueur isolé ne peut pas te faire croire que tu es en retard en annonçant un faux numéro, il faut que des joueurs distincts le confirment. Et ça ne te prévient qu'une fois par version, jamais à chaque connexion. Tape /co version pour voir ta version et s'il en existe une plus récente."],
+            },
+        },
+        {
             v = "v1.26.0", title = L["Filtre n'importe quelle liste par la stat qu'elle donne"],
             lines = {
                 L["Chaque liste de recettes — l'onglet Commande, la fenêtre métier, Mes artisans — reçoit un sélecteur de stat. Tu choisis Force, tu ne vois que ce qui donne de la Force : gemmes, équipements, élixirs. Le menu se remplit avec ce que le métier ouvert fabrique vraiment, donc la Cuisine ne te propose pas Puissance des sorts. Ces stats ne sont écrites nulle part, elles sont lues sur ton propre jeu — dans ta langue, et valables pour des objets que je n'ai jamais regardés, Wrath compris."],

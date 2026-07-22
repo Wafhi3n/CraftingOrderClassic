@@ -9,6 +9,11 @@ if loc ~= "esES" and loc ~= "esMX" then return end
 local L = COC.L
 
 local es = {
+    -- Notificación « nueva versión disponible » (Directory_Version / minimapa / /co version)
+    ["Une nouvelle version est disponible : |cFFFFD100%s|r (vous avez la %s). Pensez à mettre à jour."] =
+        "Hay una nueva versión disponible: |cFFFFD100%s|r (tienes la %s). Actualiza cuando puedas.",
+    ["Nouvelle version disponible : %s"] = "Nueva versión disponible: %s",
+    ["Crafting Order — version %s"] = "Crafting Order — versión %s",
     ["Enchanter équipé"] = "Encantar equipado", ["Enchante directement la pièce équipée — sans cibler."] = "Encanta directamente la pieza equipada — sin apuntar.",
     ["Enchanter cet objet"] = "Encantar este objeto", ["Ouvre ta fenêtre d'Enchantement."] = "Abre tu ventana de Encantamiento.", ["Aucun enchantement connu pour cet emplacement."] = "Ningún encantamiento conocido para esa ranura.",
     ["Choisir par emplacement"] = "Elegir por ranura", ["Retour"] = "Volver",   -- vue silhouette (onglet Commande)

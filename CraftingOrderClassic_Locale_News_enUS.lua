@@ -11,6 +11,12 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "What's New",
+    -- v1.27.0
+    ["Prévenu quand une nouvelle version sort"] = "Tells you when a new version is out",
+    ["L'addon repère maintenant qu'il tourne en retard. Il lit la version des joueurs que tu croises sur le réseau, et dès qu'il en voit une plus récente chez plusieurs personnes différentes, il te le dit d'une ligne dans le chat et pose un point rouge sur le bouton minimap. Le point s'efface tout seul une fois que tu as mis à jour."] =
+        "The addon now notices when you're running behind. It reads the version off other players you cross paths with on the network, and once it's seen a newer one from a few different people, it drops a single line in chat and puts a red dot on the minimap button. The dot clears itself once you update.",
+    ["Ce « plusieurs personnes différentes » est voulu : un joueur isolé ne peut pas te faire croire que tu es en retard en annonçant un faux numéro, il faut que des joueurs distincts le confirment. Et ça ne te prévient qu'une fois par version, jamais à chaque connexion. Tape /co version pour voir ta version et s'il en existe une plus récente."] =
+        "That \"few different people\" part is on purpose. One player can't spoof you into thinking you're behind by broadcasting a fake number, it takes separate players to corroborate it. And it only tells you once per version, never every login. Type /co version to see what you're on and whether there's something newer.",
     -- v1.26.0
     ["Filtre n'importe quelle liste par la stat qu'elle donne"] =
         "Filter any craft list by the stat it gives",

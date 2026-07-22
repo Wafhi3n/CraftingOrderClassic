@@ -8,6 +8,12 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "Neues",
+    -- v1.27.0
+    ["Prévenu quand une nouvelle version sort"] = "Sagt dir Bescheid, wenn eine neue Version da ist",
+    ["L'addon repère maintenant qu'il tourne en retard. Il lit la version des joueurs que tu croises sur le réseau, et dès qu'il en voit une plus récente chez plusieurs personnes différentes, il te le dit d'une ligne dans le chat et pose un point rouge sur le bouton minimap. Le point s'efface tout seul une fois que tu as mis à jour."] =
+        "Das Addon merkt jetzt, wenn du eine alte Version läufst. Es liest die Version der Spieler, denen du im Netzwerk begegnest, und sobald es eine neuere bei mehreren verschiedenen Leuten gesehen hat, sagt es dir per Chatzeile Bescheid und setzt einen roten Punkt auf den Minimap-Knopf. Der Punkt verschwindet von selbst, sobald du aktualisiert hast.",
+    ["Ce « plusieurs personnes différentes » est voulu : un joueur isolé ne peut pas te faire croire que tu es en retard en annonçant un faux numéro, il faut que des joueurs distincts le confirment. Et ça ne te prévient qu'une fois par version, jamais à chaque connexion. Tape /co version pour voir ta version et s'il en existe une plus récente."] =
+        "Das „mehrere verschiedene Leute\" ist Absicht: ein einzelner Spieler kann dir keine falsche Versionsnummer vorgaukeln, es braucht die Bestätigung durch getrennte Spieler. Und es meldet sich nur einmal pro Version, nicht bei jedem Login. Tippe /co version, um deine Version zu sehen und ob es eine neuere gibt.",
     -- v1.26.0
     ["Filtre n'importe quelle liste par la stat qu'elle donne"] =
         "Filtere jede Rezeptliste nach dem Wert, den sie gibt",

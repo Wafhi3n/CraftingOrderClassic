@@ -1,5 +1,17 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.27.0 — Tells you when a new version is out
+
+The addon now notices when you're running behind. It reads the version off other players you cross
+paths with on the network, and once it's seen a newer one from a few different people, it drops a
+single line in chat and puts a red dot on the minimap button. The dot clears itself once you update.
+
+That "few different people" part is on purpose. One player can't spoof you into thinking you're behind
+by broadcasting a fake number, it takes separate players to corroborate it. And it only tells you once
+per new version, not every login.
+
+`/co version` shows what you're on and whether there's something newer.
+
 ## v1.26.0 — Filter any craft list by the stat it gives
 
 Every recipe list, the Order tab, the profession window and My Artisans, gets a stat picker. Pick

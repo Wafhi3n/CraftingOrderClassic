@@ -40,14 +40,17 @@ function Dir:CaptureSkills()
     if COC.db then COC.db.mySkills = self.mySkills; mirrorMySkills(self.mySkills) end
 end
 
--- Fil SK : "SK|lvl=<n>|key,cur,max;...[;rep=<n>]". rep (crafts livrés) = pseudo-chunk FINAL, ignoré par un
--- client v1.0.0 → rétro-compatible ; JAMAIS dans l'en-tête (corromprait leur 1er métier).
+-- Fil SK : "SK|lvl=<n>|key,cur,max;...[;rep=<n>][;cv=<ver>]". rep (crafts livrés) et cv (ma version, cf.
+-- Directory_Version) = pseudo-chunks FINAUX, ignorés par un vieux client (parse par préfixe) → rétro-
+-- compatibles ; JAMAIS dans l'en-tête (corromprait leur 1er métier).
 function Dir:_SkillPayload()
     local parts = {}
     for key, sk in pairs(self.mySkills or {}) do parts[#parts + 1] = key .. "," .. sk[1] .. "," .. sk[2] end
     if #parts == 0 then return nil end
     local lvl, rep = (UnitLevel and UnitLevel("player")) or 0, (COC.db and COC.db.delivered) or 0
-    return "SK|lvl=" .. lvl .. "|" .. table.concat(parts, ";") .. (rep > 0 and (";rep=" .. rep) or "")
+    local tail = (rep > 0) and (";rep=" .. rep) or ""
+    if self._MyVersion then self:_MyVersion(); if self._myVerStr then tail = tail .. ";cv=" .. self._myVerStr end end
+    return "SK|lvl=" .. lvl .. "|" .. table.concat(parts, ";") .. tail
 end
 
 function Dir:AnnounceSkills()
@@ -56,29 +59,33 @@ function Dir:AnnounceSkills()
     if sk then CraftLink:Send(sk, "global") end
 end
 
--- Parse le message SK → (skills, level, rep) ou nil. PUR (aucun effet sur le roster) : réutilisé
+-- Parse le message SK → (skills, level, rep, ver) ou nil. PUR (aucun effet sur le roster) : réutilisé
 -- par OnSkill (données directes) ET Directory_Relay (fiche relayée). Formats : "SK|lvl=N|..."
--- (avec niveau) ou ancien "SK|...". rep = pseudo-chunk final.
+-- (avec niveau) ou ancien "SK|...". rep + cv (version) = pseudo-chunks finaux (cf. _SkillPayload).
 function Dir:_ParseSKBody(message)
     local lvl, body = (message or ""):match("^SK|lvl=(%d+)|(.+)$")
     if not body then body = (message or ""):match("^SK|(.+)$") end
     if not body then return nil end
-    local skills, rep = {}, nil
+    local skills, rep, ver = {}, nil, nil
     for chunk in body:gmatch("[^;]+") do
         local rp = chunk:match("^rep=(%d+)$")
-        if rp then rep = tonumber(rp) else
+        local cv = (not rp) and chunk:match("^cv=(.+)$") or nil
+        if rp then rep = tonumber(rp)
+        elseif cv then ver = cv
+        else
             local key, cur, max = chunk:match("^([^,]+),(%d+),(%d+)$")
             if key then skills[key] = { tonumber(cur), tonumber(max) } end
         end
     end
-    return skills, lvl and tonumber(lvl) or nil, rep
+    return skills, lvl and tonumber(lvl) or nil, rep, ver
 end
 
 -- SK reçu (niveaux d'un autre) → cache roster.
 function Dir:OnSkill(sender, message)
     if not sender then return end
-    local skills, lvl, rep = self:_ParseSKBody(message)
+    local skills, lvl, rep, ver = self:_ParseSKBody(message)
     if not skills then return end
+    if ver and self.NotePeerVersion then self:NotePeerVersion(sender, ver) end   -- version = 1re main (jamais relais)
     local r = self:_Touch(sender)
     if lvl then r.level = lvl end
     if rep then r.rep = rep end

@@ -22,6 +22,12 @@ function UI:BuildMinimapButton()
     overlay:SetSize(53, 53); overlay:SetPoint("TOPLEFT")
     overlay:SetTexture("Interface\\Minimap\\MiniMap-TrackingBorder")
 
+    -- Pastille « nouvelle version dispo » (masquée par défaut ; pilotée par Directory_Version via SetUpdateBadge).
+    local badge = b:CreateTexture(nil, "OVERLAY")
+    badge:SetSize(12, 12); badge:SetPoint("TOPRIGHT", -2, -2); badge:SetTexture(Skin.tex.dotRed)
+    badge:Hide()
+    self.updateBadge = badge
+
     local function place(angle)
         b:SetPoint("CENTER", Minimap, "CENTER", RADIUS * cos(angle), RADIUS * sin(angle))
     end
@@ -45,10 +51,21 @@ function UI:BuildMinimapButton()
         GameTooltip:AddLine("|cFF33DD88Crafting Order|r — Classic")
         GameTooltip:AddLine(L["Clic : ouvrir les commandes"], 1, 1, 1)
         GameTooltip:AddLine(L["Clic droit : mes métiers"], 0.6, 1, 0.6)
+        if UI._updateVer then
+            GameTooltip:AddLine(string.format(L["Nouvelle version disponible : %s"], UI._updateVer), 1, 0.82, 0)
+        end
         GameTooltip:Show()
     end)
     b:SetScript("OnLeave", function() GameTooltip:Hide() end)
     self.minimapBtn = b
+    if self._updateVer then self:SetUpdateBadge(true, self._updateVer) end   -- état demandé avant la création du bouton
+end
+
+-- Allume/éteint la pastille « nouvelle version » du bouton minimap (appelée par Directory_Version).
+-- Sûre AVANT la création du bouton : on mémorise l'état voulu, réappliqué en fin de BuildMinimapButton.
+function UI:SetUpdateBadge(shown, ver)
+    self._updateVer = shown and ver or nil
+    if self.updateBadge then self.updateBadge:SetShown(shown and true or false) end
 end
 
 -- ------------------------------------------------------------------

@@ -10,6 +10,11 @@ if loc ~= "enUS" and loc ~= "enGB" then return end
 local L = COC.L
 
 local en = {
+    -- Notification « nouvelle version disponible » (Directory_Version / minimap / /co version)
+    ["Une nouvelle version est disponible : |cFFFFD100%s|r (vous avez la %s). Pensez à mettre à jour."] =
+        "A new version is available: |cFFFFD100%s|r (you have %s). Time to update.",
+    ["Nouvelle version disponible : %s"] = "New version available: %s",
+    ["Crafting Order — version %s"] = "Crafting Order — version %s",
     ["Enchanter équipé"] = "Enchant equipped", ["Enchante directement la pièce équipée — sans cibler."] = "Enchants the equipped item directly — no targeting.",
     ["Enchanter cet objet"] = "Enchant this item", ["Ouvre ta fenêtre d'Enchantement."] = "Open your Enchanting window.", ["Aucun enchantement connu pour cet emplacement."] = "No known enchant for that slot.",
     ["Choisir par emplacement"] = "Pick by slot", ["Retour"] = "Back",   -- vue silhouette (onglet Commande)

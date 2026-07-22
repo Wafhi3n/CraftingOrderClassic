@@ -389,6 +389,7 @@ function Dir:Start()
     if self.StartRelay then self:StartRelay() end           -- verbe RLY (Directory_Relay.lua)
     if self.StartAlts then self:StartAlts() end             -- verbe ALT (Directory_Alts.lua)
     if self.StartLFW then self:StartLFW() end               -- verbe LFW (Directory_LFW.lua)
+    if self.StartVersion then self:StartVersion() end       -- détection maj (Directory_Version.lua)
     CraftLink:OnPresence(function(kind, who) Dir:OnPresence(kind, who) end)
     if CraftLink.OnBeacon then CraftLink:OnBeacon(function(who) Dir:OnBeacon(who) end) end
 
