@@ -156,6 +156,13 @@ end
 -- l'emplacement « ne sera pas échangé ».
 local TRADE_SAFE_SLOT = 7
 
+-- Silencieux pour le JOUEUR ≠ silencieux pour le DIAGNOSTIC. Retour terrain du 1er test réel
+-- (2026-07-21 : l'ami enchanteur clique, le partenaire reçoit le chuchotement texte et AUCUNE invite) :
+-- rien ne permettait de distinguer « le verbe n'est jamais arrivé » de « une garde l'a refusé », les
+-- deux se présentent identiquement — un silence. Chaque refus se NOMME donc dans /co trace (même
+-- discipline que _Inbound:Alert pour ses entrantes silencées). Rien n'est affiché au joueur.
+local function traceAsk(msg) if COC.Trace then COC.Trace:Log("aske", msg) end end
+
 -- Jeton d'emplacement du payload → def de la silhouette. Whitelist DOLL au runtime : un payload
 -- forgé avec un jeton hors silhouette est jeté ici.
 local function slotDef(token)
@@ -177,37 +184,78 @@ end
 -- re-vérifié — l'état a pu changer entre l'invite et le clic (échange fermé, pièce déséquipée,
 -- curseur occupé, emplacement pris) : dans le doute, ne rien poser du tout.
 local function placeItem(data)
-    if not (data and tradePartner() == data.from) then return end
-    if GetCursorInfo and GetCursorInfo() then return end     -- jamais écraser un curseur plein
-    if GetTradePlayerItemInfo and GetTradePlayerItemInfo(TRADE_SAFE_SLOT) then return end
+    if not (data and tradePartner() == data.from) then
+        traceAsk("pose annulée — échange fermé ou partenaire changé"); return
+    end
+    if GetCursorInfo and GetCursorInfo() then                -- jamais écraser un curseur plein
+        traceAsk("pose annulée — curseur déjà occupé"); return
+    end
+    if GetTradePlayerItemInfo and GetTradePlayerItemInfo(TRADE_SAFE_SLOT) then
+        traceAsk("pose annulée — emplacement " .. TRADE_SAFE_SLOT .. " déjà pris"); return
+    end
     local inv = GetInventorySlotInfo and GetInventorySlotInfo(data.token)
-    if not (inv and GetInventoryItemLink and GetInventoryItemLink("player", inv)) then return end
+    if not (inv and GetInventoryItemLink and GetInventoryItemLink("player", inv)) then
+        traceAsk("pose annulée — rien d'équipé en " .. tostring(data.token)); return
+    end
     PickupInventoryItem(inv)                                 -- déséquipe implicitement (pièce portée)
-    if CursorHasItem and not CursorHasItem() then return end
+    -- Curseur vide APRÈS le pickup = l'appel n'a rien fait. Seul témoin qu'on aurait d'un blocage de
+    -- la couche de protection (ADDON_ACTION_BLOCKED n'est PAS une erreur Lua rattrapable, cf.
+    -- CraftLink_Transport sendChannelLine) — donc la trace ici vaut preuve, pas le pcall.
+    if CursorHasItem and not CursorHasItem() then
+        traceAsk("pose annulée — PickupInventoryItem n'a rien pris (bloqué ?)"); return
+    end
     ClickTradeButton(TRADE_SAFE_SLOT)
+    traceAsk("pose effectuée : " .. tostring(data.token) .. " → emplacement " .. TRADE_SAFE_SLOT)
 end
 
 -- ASKE reçu → invite. Silencieux dans TOUS les cas dégradés (pas d'échange avec l'émetteur, rien
 -- d'équipé à cet emplacement, emplacement 7 déjà pris) : le chuchotement texte de l'étage 1 arrive
 -- de toute façon et reste l'explication humaine.
-local lastAskFrom = {}
-function Ask:OnAsk(sender, message)
+-- Toutes les conditions d'une invite LÉGITIME, chacune nommée. Rend le contexte, ou nil + la raison.
+-- Extrait de OnAsk pour que chaque refus ait un libellé sans gonfler l'appelant (anti-monolithe).
+local function askGuards(sender, message)
     -- %w et pas %a : Finger0Slot/Finger1Slot (anneaux) portent un CHIFFRE — %a les jetterait en
     -- silence le jour où une couche de données active l'enchant d'anneau.
-    local def = slotDef((message or ""):match("^ASKE|(%w+)$"))
-    local from = sender and Comp.shortName(sender)
-    if not (def and from and tradePartner() == from) then return end
-    local now = GetTime and GetTime() or 0
-    if now - (lastAskFrom[from] or 0) < 5 then return end    -- anti-spam d'invites par émetteur
-    lastAskFrom[from] = now
-    local inv = GetInventorySlotInfo and GetInventorySlotInfo(def.slot)
+    local token = (message or ""):match("^ASKE|(%w+)$")
+    local def   = token and slotDef(token)
+    if not def then
+        return nil, "jeton refusé : " .. tostring(token or message) ..
+                    (doll() and "" or " (COC.UI.DOLL absent !)")
+    end
+    local from, partner = sender and Comp.shortName(sender), tradePartner()
+    if not (from and partner == from) then
+        return nil, "émetteur ≠ partenaire d'échange ouvert (reçu=" .. tostring(from) ..
+                    ", partenaire=" .. tostring(partner) .. ")"
+    end
+    local inv  = GetInventorySlotInfo and GetInventorySlotInfo(def.slot)
     local link = inv and GetInventoryItemLink and GetInventoryItemLink("player", inv)
-    if not link then return end
-    if GetTradePlayerItemInfo and GetTradePlayerItemInfo(TRADE_SAFE_SLOT) then return end
+    if not link then return nil, "rien d'équipé en " .. tostring(def.slot) end
+    if GetTradePlayerItemInfo and GetTradePlayerItemInfo(TRADE_SAFE_SLOT) then
+        return nil, "emplacement " .. TRADE_SAFE_SLOT .. " déjà occupé"
+    end
+    return { def = def, from = from, link = link }
+end
+
+local lastAskFrom = {}
+function Ask:OnAsk(sender, message)
+    local ok, why = askGuards(sender, message)
+    if not ok then traceAsk("refus — " .. why); return end
+    local def, from, link = ok.def, ok.from, ok.link
+    -- Throttle APRÈS les gardes (il était AVANT à la livraison v1.24.0) : un ASKE refusé pour une
+    -- raison TRANSITOIRE (pièce pas encore équipée, emplacement 7 momentanément pris) condamnait la
+    -- vraie demande qui suit dans les 5 s. Aucun vecteur de spam ouvert au passage : sans échange
+    -- ouvert AVEC l'émetteur, on n'atteint jamais cette ligne.
+    local now = GetTime and GetTime() or 0
+    if now - (lastAskFrom[from] or 0) < 5 then                -- anti-spam d'invites par émetteur
+        traceAsk("refus — throttle 5 s (" .. from .. ")"); return
+    end
+    lastAskFrom[from] = now
     if not (StaticPopupDialogs and StaticPopup_Show) then return end
     -- Une invite à la fois : re-recevoir ASKE pendant qu'une invite est affichée ne doit pas empiler
     -- de popups (le throttle par émetteur ne protège pas de la republication toutes les 5 s).
-    if StaticPopup_Visible and StaticPopup_Visible("COC_ENCHANT_ASK") then return end
+    if StaticPopup_Visible and StaticPopup_Visible("COC_ENCHANT_ASK") then
+        traceAsk("refus — une invite est déjà affichée"); return
+    end
     StaticPopupDialogs["COC_ENCHANT_ASK"] = StaticPopupDialogs["COC_ENCHANT_ASK"] or {
         text = "%s", button1 = L["Poser la pièce"], button2 = L["Ignorer"],
         OnAccept = function(_, data) placeItem(data) end,
@@ -216,6 +264,7 @@ function Ask:OnAsk(sender, message)
     StaticPopup_Show("COC_ENCHANT_ASK", string.format(
         L["%s propose d'enchanter : %s. Poser la pièce dans l'emplacement « ne sera pas échangé » ? Rien n'est donné — tu la récupères enchantée."],
         from, link), nil, { from = from, token = def.slot })
+    traceAsk("invite AFFICHÉE : " .. def.slot .. " demandé par " .. from)
 end
 
 if CraftLink and CraftLink.RegisterHandler then
