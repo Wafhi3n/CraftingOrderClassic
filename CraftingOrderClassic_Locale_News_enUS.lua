@@ -11,6 +11,15 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "What's New",
+    -- v1.25.0
+    ["Les gemmes se rangent par couleur, puis par ce qu'elles donnent"] =
+        "Cut gems sort by color, then by what they give",
+    ["La joaillerie versait toutes les gemmes taillées sous un seul en-tête « Gemme ». Elles se rangent maintenant par couleur de châsse, et sous chaque couleur par la stat qu'elles donnent : « Force - Audacieux », « Endurance - Solide ». Cette stat n'est pas une table écrite à la main, elle est lue sur ton propre jeu — donc dans ta langue, et valable pour des gemmes que je n'ai jamais regardées."] =
+        "Jewelcrafting dumped every cut gem under a single \"Gem\" heading. Gems now sit under their socket color, and under that, under the stat they give, so you get \"Strength - Bold\" and \"Stamina - Solid\". That stat isn't a list I typed out, it's read off your own client, which is why it shows up in your language and why it'll keep working on gems I've never looked at.",
+    ["Les gemmes méta, elles, reviennent à une simple liste : chaque taille de méta n'existe qu'en un seul exemplaire, un en-tête au-dessus n'aurait fait que répéter la ligne. Bagues, colliers, statues et figurines gardent le classement qu'ils avaient."] =
+        "Meta gems get a plain list instead. Every meta cut is a single gem, so a heading above each one just repeated the line underneath it. Rings, necklaces, statues and figurines keep sorting the way they always did.",
+    ["Corrigé aussi : quand un enchanteur te demandait une pièce, l'invite ne s'affichait parfois jamais. Une première demande arrivée trop tôt, avant que tu aies équipé la pièce, armait quand même le délai de cinq secondes — et la vraie demande qui suivait passait à la trappe. Le délai ne démarre plus que sur une demande réellement affichée."] =
+        "Also fixed: when an enchanter asked you for a piece, the prompt sometimes never showed up. A first request that arrived a moment too early, before you'd equipped the piece, still armed the five second cooldown, so the real request that followed got swallowed. The cooldown now only starts once a request has actually gone through.",
     -- v1.24.2
     ["Les stats d'enchant parlent enfin ta langue"] =
         "Enchant stat names finally speak your language",

@@ -40,15 +40,18 @@ local function viewsOf(profKey, entries, opts)
         local subs
         if not flat then
             if getSub then   -- sous-catégorie fournie par l'appelant (entrée SANS objet produit)
-                local sub, subOrder, tier = getSub(entry)
-                if sub then subs = { { sub = sub, order = subOrder or 0, tier = tier or 0 } } end
+                local sub, subOrder, tier, lone = getSub(entry)
+                if sub then
+                    subs = { { sub = sub, order = subOrder or 0, tier = tier or 0, lone = lone } }
+                end
             end
             if not subs and RC:HasCategories(profKey) then subs = RC:SubsOf(profKey, itemID) end
         end
         if subs then
             for _, s in ipairs(subs) do
                 out[#out + 1] = setmetatable(
-                    { _sec = sec, _secOrder = secOrder, _sub = s.sub, _subOrder = s.order, _tier = s.tier },
+                    { _sec = sec, _secOrder = secOrder, _sub = s.sub, _subOrder = s.order,
+                      _tier = s.tier, _lone = s.lone },
                     { __index = entry })
             end
         else   -- métier sans table déclarée → affichage à plat d'avant, inchangé
@@ -67,6 +70,12 @@ local function sortViews(views, opts)
         if a._secOrder ~= b._secOrder then return a._secOrder < b._secOrder end
         if a._sec      ~= b._sec      then return a._sec      < b._sec      end
         if a._subOrder ~= b._subOrder then return a._subOrder < b._subOrder end
+        -- Deux sous-catégories DISTINCTES peuvent partager un rang : « Endurance - Solide » et
+        -- « Endurance - Audacieux » viennent de la même stat déclarée. Sans ce départage elles
+        -- s'entrelaceraient au tri suivant (niveau, nom) et flatten ré-émettrait l'en-tête à chaque
+        -- bascule. Le `or ""` couvre les entrées SANS sous-catégorie (comparer nil lèverait une erreur).
+        local sa, sb = a._sub or "", b._sub or ""
+        if sa ~= sb then return sa < sb end
         if before then
             local r = before(a, b)
             if r ~= nil then return r end
@@ -74,6 +83,31 @@ local function sortViews(views, opts)
         if a._tier ~= b._tier then return a._tier > b._tier end
         return (name and name(a) or "") < (name and name(b) or "")
     end)
+end
+
+-- Sections où le niveau « sous-catégorie » n'apporte RIEN : toutes leurs sous-catégories n'ont qu'UN
+-- élément. Vécu sur les gemmes méta (14 tailles, 14 gemmes) : on obtenait 14 en-têtes qui ne
+-- faisaient que répéter le premier mot de l'unique ligne en dessous — « Bracing » puis « Bracing
+-- Earthstorm Diamond ». La section entière repasse donc à plat.
+--
+-- DEUX GARDES, sinon le remède serait pire que le mal :
+--  * OPT-IN (`_lone`) : seul un fournisseur de sous-catégorie qui le demande est concerné. Ailleurs
+--    un groupe d'un seul élément reste légitime — « Flacons (1) » en Alchimie nomme une famille, ce
+--    n'est pas un préfixe du nom de l'objet ;
+--  * décision par SECTION, jamais par groupe : aplatir un groupe isolé au milieu de groupes garnis
+--    laisserait une ligne orpheline entre deux en-têtes, ce qui se lit comme un bug d'affichage.
+local function loneSections(views, counts)
+    local flat = {}
+    for _, v in ipairs(views) do
+        if v._sub then
+            if not v._lone or counts[RC.KeySub(v._sec, v._sub)] > 1 then
+                flat[v._sec] = false
+            elseif flat[v._sec] == nil then
+                flat[v._sec] = true
+            end
+        end
+    end
+    return flat
 end
 
 -- Aplatit les vues triées en insérant les en-têtes. Un en-tête porte `name` ET `label` : les quatre
@@ -84,9 +118,12 @@ local function flatten(views, collapsed)
         local ks = RC.KeySection(v._sec); counts[ks] = (counts[ks] or 0) + 1
         if v._sub then local kb = RC.KeySub(v._sec, v._sub); counts[kb] = (counts[kb] or 0) + 1 end
     end
+    local flatSec = loneSections(views, counts)
     local out, lastSec, lastSub = {}, nil, nil
     for _, v in ipairs(views) do
         local ks = RC.KeySection(v._sec)
+        -- Section dont AUCUNE sous-catégorie ne regroupe : on la rend à plat (cf. loneSections).
+        if v._sub and flatSec[v._sec] then v._sub = nil end
         if v._sec ~= lastSec then
             out[#out + 1] = { isHeader = true, depth = 1, name = v._sec, label = v._sec,
                               ckey = ks, count = counts[ks] }
@@ -108,8 +145,10 @@ end
 -- Point d'entrée unique.
 --   opts.itemID    (obligatoire) entrée → itemID de l'objet classé
 --   opts.section   (optionnel)   entrée → sec, order, flat : classe une entrée SANS itemID (enchants)
---   opts.sub       (optionnel)   entrée → sub, order, tier : sous-catégorie fournie (idem), prioritaire
---                                sur RC:SubsOf ; nil → repli sur le classement par itemID
+--   opts.sub       (optionnel)   entrée → sub, order, tier, lone : sous-catégorie fournie (idem),
+--                                prioritaire sur RC:SubsOf ; nil → repli sur le classement par itemID.
+--                                `lone` = « si cette sous-catégorie n'a qu'un élément, son en-tête ne
+--                                vaut pas la ligne qu'il coûte » (cf. loneSections)
 --   opts.name      (optionnel)   entrée → nom, pour le départage alphabétique
 --   opts.before    (optionnel)   comparateur prioritaire ; renvoie nil s'il ne tranche pas
 --   opts.collapsed (optionnel)   table d'état de repliage ; nil = tout déplié
@@ -118,4 +157,28 @@ function RC:BuildDisplay(profKey, entries, opts)
     local views = viewsOf(profKey, entries, opts)
     sortViews(views, opts)
     return flatten(views, opts.collapsed)
+end
+
+-- Classement dérivé du SORT plutôt que de l'objet produit — à passer tel quel en `opts.section` /
+-- `opts.sub`. Deux métiers en ont besoin, pour des raisons opposées :
+--   * Enchantement : un enchant est un SERVICE (aucun objet), que COC.SectionOf rangerait en vrac
+--     sous « Autres » → emplacement en section, stat de base en sous-catégorie ;
+--   * Joaillerie : la gemme EST un objet et sa COULEUR fait déjà la section (COC.SectionOf la lit
+--     sur l'objet) ; seule la TAILLE, invisible côté client, se dérive ici.
+-- Écrit ICI et pas dans chaque vue : l'onglet Commande et la vue métier doivent classer À
+-- L'IDENTIQUE, et un dispatch recopié des deux côtés finit toujours par diverger.
+-- ⚠️ PAS de `X and X:f()` : `and` TRONQUE le multi-retour (cf. mémoire lua-and-truncates-multireturn).
+function RC.SectionForSpell(spellID)
+    if not (spellID and COC.Enchant) then return nil end
+    return COC.Enchant:SectionFor(spellID)
+end
+
+function RC.SubForSpell(spellID)
+    if not spellID then return nil end
+    if COC.Enchant then
+        local label, order, tier = COC.Enchant:StatFor(spellID)
+        if label then return label, order, tier end   -- pas de `lone` : un enchant seul garde son en-tête
+    end
+    if COC.Gem then return COC.Gem:StatFor(spellID) end
+    return nil
 end

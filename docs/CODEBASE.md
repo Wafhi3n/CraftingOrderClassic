@@ -1,10 +1,10 @@
 # CraftingOrderClassic — carte du code
 
-> **GÉNÉRÉ** le 2026-07-20 (v1.24.1) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
+> **GÉNÉRÉ** le 2026-07-22 (v1.24.2) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
-100 modules + 4 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
+103 modules + 4 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
 
 ## Modules (ordre de chargement)
 
@@ -15,14 +15,14 @@
 | `CraftingOrderClassic_Migrations.lua` | versionnage du schéma SavedVariables. | 40 |
 | `CraftingOrderClassic_Locale.lua` | socle de localisation du CHROME de l'UI. | 12 |
 | `CraftingOrderClassic_Locale_enUS.lua` | overlay ANGLAIS (enUS/enGB). | 257 |
-| `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 396 |
+| `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 408 |
 | `CraftingOrderClassic_Locale_deDE.lua` | overlay ALLEMAND (deDE). | 259 |
-| `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 378 |
+| `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 390 |
 | `CraftingOrderClassic_Locale_esES.lua` | overlay ESPAGNOL (esES/esMX). | 260 |
-| `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 379 |
-| `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 203 |
-| `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 200 |
-| `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 200 |
+| `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 391 |
+| `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 200 |
+| `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 197 |
+| `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 197 |
 | `CraftingOrderClassic_Elemental.lua` | pseudo-« métier » de récolte « Élémentaire ». | 61 |
 | `CraftingOrderClassic_UI_Skin.lua` | tokens + helpers SÉMANTIQUES du skin (métiers, statuts, rareté, quantités, icônes natives) et petits widgets d'affichage. | 428 |
 | `CraftingOrderClassic_UI_Skin_Native.lua` | kit de chrome Blizzard NATIF (le « framework » UI de COC). | 485 |
@@ -35,7 +35,7 @@
 | `CraftingOrderClassic_UI_Post.lua` | onglet « Commande » : sélection de plan (gauche) + réactifs « je fournis » / commission g-s-c / ciblage artisan (droite). | 373 |
 | `CraftingOrderClassic_UI_Post_Detail.lua` | onglet « Commande », PANNEAU DROIT : en-tête du plan sélectionné (icône + cadre doré + nom + niveau), liste des réactifs « je fournis », et la rangée commission. | 194 |
 | `CraftingOrderClassic_UI_Post_Artisans.lua` | onglet « Commande », section droite basse : boutons source, liste des artisans, ciblage (@Nom), libellé destinataire, bouton Poster. | 220 |
-| `CraftingOrderClassic_UI_Post_Categories.lua` | onglet « Commande », panneau gauche : regroupe la LISTE DES PLANS en sections type fenêtre native (emplacement puis type pour les équipements, type pour les armes, catégorie pour le reste). | 182 |
+| `CraftingOrderClassic_UI_Post_Categories.lua` | onglet « Commande », panneau gauche : regroupe la LISTE DES PLANS en sections type fenêtre native (emplacement puis type pour les équipements, type pour les armes, catégorie pour le reste). | 181 |
 | `CraftingOrderClassic_UI_Post_Paperdoll.lua` | onglet « Commande », vue SILHOUETTE de l'Enchantement. | 330 |
 | `CraftingOrderClassic_UI_Post_LazyGold.lua` | onglet « Commande » : couche Lazy Gold (lecture seule). | 151 |
 | `CraftingOrderClassic_UI_Gather_Layout.lua` | GÉOMÉTRIE de l'onglet « Récolte » : la SPEC (structure éditable, cf. | 66 |
@@ -51,7 +51,7 @@
 | `CraftingOrderClassic_UI_MyArtisans.lua` | onglet « Mes artisans » : vue agrégée des métiers du COMPTE (tous mes rerolls du royaume), en mode « connu ». | 433 |
 | `CraftingOrderClassic_UI_MyArtisans_LazyGold.lua` | onglet « Mes artisans » : couche Lazy Gold. | 135 |
 | `CraftingOrderClassic_UI_Help.lua` | onglet Aide : page unique défilante qui explique les autres onglets (Carnet/Commande/Récolte/Artisans), la Vue Métier et le réseau. | 178 |
-| `CraftingOrderClassic_UI_News.lua` | onglet « Nouveautés » : notes de version (changelog) affichées EN JEU, version par version, la plus récente en tête. | 243 |
+| `CraftingOrderClassic_UI_News.lua` | onglet « Nouveautés » : notes de version (changelog) affichées EN JEU, version par version, la plus récente en tête. | 241 |
 | `CraftingOrderClassic_Social.lua` | couche sociale passive (socle). | 380 |
 | `CraftingOrderClassic_Social_Menu.lua` | entrées « Crafting Order » du menu contextuel joueur. | 101 |
 | `CraftingOrderClassic_Social_Roster.lua` | affichage des métiers sur les fenêtres NATIVES. | 130 |
@@ -59,20 +59,23 @@
 | `CraftingOrderClassic_Nameplate.lua` | icône « recherche de travail » (LFW) sur les plaques. | 121 |
 | `CraftingOrderClassic_ProfOrders.lua` | COORDINATEUR d'événements de la fenêtre métier. | 82 |
 | `CraftingOrderClassic_RecipeCats.lua` | SOUS-CATÉGORIES de recettes (moteur + registre). | 113 |
-| `CraftingOrderClassic_RecipeCats_Group.lua` | REGROUPEMENT partagé : transforme une liste plate d'entrées (recettes, plans, ressources…) en liste d'AFFICHAGE à deux niveaux :      Section (COC.SectionOf)  >  Sous-catégorie (COC.RecipeCats)  >  les objets, triés  Écrit une fois ici parce que QUATRE listes en ont besoin et qu'elles n'ont pas la même structure de ligne : vue métier (recettes de l'API), onglet Commande (plans du catalogue), Mes artisans (recettes connues), onglet Récolte (ressources). | 121 |
+| `CraftingOrderClassic_RecipeCats_Group.lua` | REGROUPEMENT partagé : transforme une liste plate d'entrées (recettes, plans, ressources…) en liste d'AFFICHAGE à deux niveaux :      Section (COC.SectionOf)  >  Sous-catégorie (COC.RecipeCats)  >  les objets, triés  Écrit une fois ici parce que QUATRE listes en ont besoin et qu'elles n'ont pas la même structure de ligne : vue métier (recettes de l'API), onglet Commande (plans du catalogue), Mes artisans (recettes connues), onglet Récolte (ressources). | 184 |
 | `CraftingOrderClassic_RecipeCats_Alchemy.lua` | sous-catégories de l'ALCHIMIE (données, éditées à la main). | 77 |
 | `CraftingOrderClassic_RecipeCats_Gathering.lua` | sous-catégories des métiers de RÉCOLTE. | 179 |
 | `CraftingOrderClassic_RecipeCats_Smelting.lua` | sous-catégorie « Lingots » du Minage (facette FONTE). | 39 |
 | `CraftingOrderClassic_RecipeCats_Enchanting.lua` | sous-catégories de l'ENCHANTEMENT. | 52 |
 | `CraftingOrderClassic_Craft.lua` | socle de lecture LIVE de la fenêtre métier (migration de la fenêtre custom depuis Guild Economy / TradeScanner_Craft.lua). | 206 |
-| `CraftingOrderClassic_Enchant.lua` | spécifique à l'Enchantement (API Craft). | 326 |
+| `CraftingOrderClassic_Enchant.lua` | spécifique à l'Enchantement (API Craft). | 385 |
+| `CraftingOrderClassic_Stats.lua` | STATS d'un objet : identité canonique + libellé localisé. | 180 |
+| `CraftingOrderClassic_Gem.lua` | spécifique à la JOAILLERIE : sous-catégorise les GEMMES TAILLÉES par TAILLE (le mot qui porte la stat). | 216 |
+| `CraftingOrderClassic_Gem_Stats.lua` | correspondance TAILLE DE GEMME → STAT (données, éditées à la main). | 41 |
 | `CraftingOrderClassic_MTSL.lua` | pont LECTURE SEULE vers l'addon « Missing TradeSkills List » (MTSL). | 299 |
 | `CraftingOrderClassic_ProfWindow.lua` | fenêtre métier custom 3 colonnes (migration depuis Guild Economy) : Recettes \| Détail+Craft \| Commandes du métier. | 460 |
 | `CraftingOrderClassic_ProfWindow_Layout.lua` | GÉOMÉTRIE de la vue métier (fenêtre 3 colonnes). | 76 |
 | `CraftingOrderClassic_ProfWindow_HelpPlate.lua` | AIDE CONTEXTUELLE de la Vue Métier (« bouton i »). | 82 |
 | `CraftingOrderClassic_ProfWindow_Dock.lua` | mode DOCK de la vue métier (« Vue Blizzard ») : la fenêtre native reste VISIBLE (non neutralisée) et NOTRE colonne Commandes s'épingle à sa droite. | 70 |
 | `CraftingOrderClassic_ProfWindow_Toolbar.lua` | barre d'outils de la colonne Recettes (vue métier) : les toggles de TRI (slot recTools, à gauche : rentabilité / valeurs exactes / progression — Lazy Gold) et de FILTRE (slot recFilterToggles, à droite : « j'ai les matériaux » / « montée de compétence »). | 228 |
-| `CraftingOrderClassic_ProfWindow_Recipes.lua` | colonne GAUCHE : liste de recettes virtualisée (scroll), recherche, couleur par difficulté, sélection, badge « demandé » (nb de commandes ouvertes pour l'objet). | 478 |
+| `CraftingOrderClassic_ProfWindow_Recipes.lua` | colonne GAUCHE : liste de recettes virtualisée (scroll), recherche, couleur par difficulté, sélection, badge « demandé » (nb de commandes ouvertes pour l'objet). | 470 |
 | `CraftingOrderClassic_ProfWindow_Leveling.lua` | aide à la MONTÉE DE MÉTIER dans la liste de recettes : coût de progression (réactifs au prix Lazy Gold ÷ chance de point selon la couleur), badge « meilleur coût/point » sur la recette recommandée, icônes de SOURCE sur les manquantes (formateur / vendeur PNJ / coté à l'HV / à farmer) et tri « progression » affiné par coût. | 219 |
 | `CraftingOrderClassic_Route.lua` | cœur de CALCUL du plan de route de montée de métier, PARAMÉTRABLE : marche gloutonne rang par rang (recette au meilleur coût/point ESPÉRÉ), seuils réels CraftLink `skillColors` aux rangs futurs, amortissement du prix des plans à acheter, exclusion des recettes à cooldown et des coûts partiels. | 213 |
 | `CraftingOrderClassic_ProfWindow_Route.lua` | fenêtre « PLAN DE ROUTE » de montée de métier (étage ③ de l'aide à la progression) : « du rang actuel au plafond, quoi crafter, combien de fois, pour combien ». | 265 |
@@ -107,7 +110,7 @@
 | `CraftingOrderClassic_Companion_Mail.lua` | greffon COURRIER (scène B de la maquette) : panneau accroché à droite du compositeur d'envoi. | 177 |
 | `CraftingOrderClassic_Companion_Trade.lua` | greffon ÉCHANGE (scène A de la maquette) : panneau accroché SOUS la fenêtre d'échange native quand une commande nous lie au partenaire (dans les DEUX sens : je crafte pour lui = « vendeur », ou il crafte pour moi = « acheteur »). | 114 |
 | `CraftingOrderClassic_Enchant_Trade.lua` | greffon ENCHANTEMENT sur la fenêtre d'ÉCHANGE. | 289 |
-| `CraftingOrderClassic_Enchant_Trade_Ask.lua` | greffon ÉCHANGE : « demande-lui la pièce ». | 245 |
+| `CraftingOrderClassic_Enchant_Trade_Ask.lua` | greffon ÉCHANGE : « demande-lui la pièce ». | 294 |
 | `Debug.lua` | Crafting Order - Classic — Debug : mode solo pour "jouer" un réseau fictif. | 136 |
 | `CraftingOrderClassic_SelfTest.lua` | suite de tests IN-GAME (/cotest). | 180 |
 
@@ -1048,7 +1051,7 @@
 >    l'appelant (nil = tout déplié — c'est ce qu'on veut pendant une recherche, sinon un résultat
 >    pourrait rester invisible sous un en-tête fermé).
 
-**API** : `RC.KeySection(sec)` · `RC.KeySub(sec, sub)` · `RC:BuildDisplay(profKey, entries, opts)`
+**API** : `RC.KeySection(sec)` · `RC.KeySub(sec, sub)` · `RC:BuildDisplay(profKey, entries, opts)` · `RC.SectionForSpell(spellID)` · `RC.SubForSpell(spellID)`
 
 ### `CraftingOrderClassic_RecipeCats_Alchemy.lua`
 > CraftingOrderClassic_RecipeCats_Alchemy.lua — sous-catégories de l'ALCHIMIE (données, éditées à la
@@ -1121,6 +1124,88 @@
 > API publique : Enchant:Parse · Enchant:SlotFor · Enchant:SectionFor · Enchant:StatFor · Enchant:ShortName.
 
 **API** : `Enchant:Parse(name)` · `Enchant:SlotFor(spellID)` · `Enchant:SectionFor(spellID)` · `Enchant:StatFor(spellID)` · `Enchant:CraftsForEquipLoc(equipLoc, subclassID)` · `Enchant:HasCatalogFor(word)` · `Enchant:CatalogGroups(words)` · `Enchant:ShortName(name, spellID)`
+
+### `CraftingOrderClassic_Stats.lua`
+> CraftingOrderClassic_Stats.lua — STATS d'un objet : identité canonique + libellé localisé.
+> 
+> Brique PARTAGÉE, pensée pour le filtrage par stat (« montre-moi ce qui donne de la force ») aussi
+> bien sur les gemmes que sur les ÉQUIPEMENTS fabriqués. D'où la séparation stricte :
+>   * `token`  = clé ITEM_MOD_* rendue par le client → l'IDENTITÉ, insensible à la langue. C'est
+>                elle que doit indexer tout filtre ou toute sauvegarde, JAMAIS le libellé ;
+>   * `label`  = _G[token], déjà traduit par le client → l'AFFICHAGE. Zéro traduction à maintenir,
+>                même discipline que les libellés d'emplacement de _Enchant.lua.
+> 
+> DEUX SOURCES, dans cet ordre :
+>   1. GetItemStats — l'API. Elle couvre les objets dont les stats sont des stats d'OBJET (armures,
+>      armes), et rend les tokens canoniques ;
+>   2. le TOOLTIP, en repli. Le bonus d'une GEMME n'est pas un stat d'objet mais un enchantement
+>      porté par elle : selon la version du client, l'API peut ne rien rendre alors que le tooltip
+>      affiche « +10 Force » (vérifié en jeu sur « Bold Crimson Spinel », TBC 2026-07-22). Le token
+>      y est RETROUVÉ quand le libellé correspond à une globale ITEM_MOD_* du client (cf. modIndex)
+>      — donc les gemmes restent filtrables. Sinon on garde le libellé seul, sans inventer de token :
+>      l'objet sort du filtre par stat, ce qui vaut mieux qu'un filtre qui ment.
+> 
+> API : Stats:Of (liste triée) · Stats:LabelFor (libellé court) · Stats:TokensOf (pour un filtre).
+
+**API** : `Stats:Of(itemID)` · `Stats:LabelFor(itemID, maxCount)` · `Stats:TokensOf(itemID)`
+
+### `CraftingOrderClassic_Gem.lua`
+> CraftingOrderClassic_Gem.lua — spécifique à la JOAILLERIE : sous-catégorise les GEMMES TAILLÉES
+> par TAILLE (le mot qui porte la stat).
+> 
+> Une gemme taillée s'appelle « <Taille> <Gemme brute> » en anglais : « Stormy Azure Moonstone ».
+> La COULEUR est déjà connue du client (classID 3 = Gemme, et le subclassID EST la couleur) — c'est
+> COC.SectionOf qui en fait la section, comme pour n'importe quel objet. Reste la TAILLE, que rien
+> côté client ne donne : il faut la lire dans le nom.
+> 
+> ⚠️ Et le nom doit être l'ANGLAIS CANONIQUE (table `names` de CraftLink, lib v13), jamais le nom
+> runtime : en français l'adjectif passe en FIN et il S'ACCORDE — « Pierre de lune azur orageuSE »
+> (fém.) mais « Œil-de-nuit orageuX » (masc.). Regrouper sur le nom localisé éclaterait la taille en
+> deux groupes selon le genre de la gemme. Même piège, même remède que _Enchant.lua : clé canonique
+> anglaise, libellé lu sur le client.
+> 
+> API publique : Gem:StatFor (sous-catégorie pour RecipeCats:BuildDisplay) · Gem:CutFor · Gem:IsGem.
+> La correspondance TAILLE → STAT (« Stormy » = pénétration des sorts) se déclare à part, dans
+> _Gem_Stats.lua : voir Gem:RegisterStats plus bas.
+
+**API** : `Gem:IsGem(itemID)` · `Gem:RegisterStats(groups)` · `Gem:StatOfCut(cut)` · `Gem:CutsForStat(statKey)` · `Gem:CutFor(spellID)` · `Gem:StatFor(spellID)`
+
+### `CraftingOrderClassic_Gem_Stats.lua`
+> CraftingOrderClassic_Gem_Stats.lua — correspondance TAILLE DE GEMME → STAT (données, éditées à la
+> main). Voir _Gem.lua pour le moteur ; en résumé :
+> 
+>   * on déclare des groupes { stat = <clé de locale>, cuts = { <mots anglais>, … } } — donc dans le
+>     sens STAT → TAILLES, parce qu'une même stat change de nom de taille d'une extension à l'autre
+>     et qu'un futur FILTRE se pose exactement dans ce sens (« montre-moi les gemmes de pénétration
+>     des sorts » = Gem:CutsForStat) ;
+>   * les `cuts` sont les mots ANGLAIS canoniques, tels qu'ils ouvrent le nom de la gemme
+>     (« Stormy Azure Moonstone » → "Stormy"). JAMAIS le mot français : il s'accorde en genre selon
+>     la gemme, il éclaterait le groupe (cf. l'avertissement en tête de _Gem.lua) ;
+>   * l'ORDRE des groupes EST l'ordre d'affichage des sous-en-têtes ;
+>   * deux tailles sous la même stat partagent le RANG : leurs en-têtes sortent côte à côte, chacun
+>     préfixé par la stat (« Endurance - Solide », puis « Endurance - Audacieux ») ;
+>   * une taille ABSENTE d'ici n'est pas perdue — au contraire, c'est le cas NORMAL : voir ci-dessous.
+> 
+> ÉTAT : table VOLONTAIREMENT VIDE, et elle a vocation à le rester en grande partie.
+> La stat n'est PAS saisie ici : elle est LUE SUR L'OBJET par COC.Stats (GetItemStats, sinon le
+> tooltip), donc exacte, traduite par le client, et valable pour toutes les extensions — y compris
+> celles qui n'existent pas encore. L'en-tête sort déjà en « Force - Audacieux » sans rien déclarer.
+> 
+> Ce fichier ne sert donc qu'à CORRIGER les cas où la lecture automatique déçoit :
+>   * une gemme dont le client ne dit rien d'exploitable (effet en texte libre, méta compliquée) ;
+>   * un wording qu'on veut raccourcir ou uniformiser entre deux extensions ;
+>   * un ordre d'affichage voulu (les stats déclarées passent avant les autres).
+> 
+> POUR EN AJOUTER UNE :
+>   1. ajouter le groupe ci-dessous (l'ordre compte) ;
+>   2. ajouter la clé `stat` dans les 3 overlays de locale, comme pour _RecipeCats_Alchemy — et si
+>      le client possède déjà une globale au wording EXACT, la passer résolue plutôt qu'inventer une
+>      traduction (c'est justement ce que fait la lecture automatique) ;
+>   3. ces clés sont dynamiques → les déclarer dans scripts\check_locale_whitelist.lua, sinon le
+>      contrôle de locale les croit mortes.
+> 
+> Forme attendue :
+>   { stat = "Pénétration des sorts", cuts = { "Stormy" } },
 
 ### `CraftingOrderClassic_MTSL.lua`
 > CraftingOrderClassic_MTSL.lua — pont LECTURE SEULE vers l'addon « Missing TradeSkills List » (MTSL).

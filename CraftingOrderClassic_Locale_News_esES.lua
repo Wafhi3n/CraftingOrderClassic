@@ -8,6 +8,15 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "Novedades",
+    -- v1.25.0
+    ["Les gemmes se rangent par couleur, puis par ce qu'elles donnent"] =
+        "Las gemas se ordenan por color y luego por lo que dan",
+    ["La joaillerie versait toutes les gemmes taillées sous un seul en-tête « Gemme ». Elles se rangent maintenant par couleur de châsse, et sous chaque couleur par la stat qu'elles donnent : « Force - Audacieux », « Endurance - Solide ». Cette stat n'est pas une table écrite à la main, elle est lue sur ton propre jeu — donc dans ta langue, et valable pour des gemmes que je n'ai jamais regardées."] =
+        "Joyería volcaba todas las gemas talladas bajo un único encabezado «Gema». Ahora se colocan bajo su color de ranura y, dentro de cada color, según la estadística que dan, como «Fuerza - Audaz» o «Aguante - Sólida». Esa estadística no es una tabla escrita a mano, se lee directamente de tu propio juego, por eso aparece en tu idioma y sigue funcionando con gemas que nunca he mirado.",
+    ["Les gemmes méta, elles, reviennent à une simple liste : chaque taille de méta n'existe qu'en un seul exemplaire, un en-tête au-dessus n'aurait fait que répéter la ligne. Bagues, colliers, statues et figurines gardent le classement qu'ils avaient."] =
+        "Las gemas meta pasan a una lista simple. De cada talla meta solo existe una gema, así que un encabezado encima no hacía más que repetir la línea de debajo. Anillos, collares, estatuas y figurillas conservan la clasificación que ya tenían.",
+    ["Corrigé aussi : quand un enchanteur te demandait une pièce, l'invite ne s'affichait parfois jamais. Une première demande arrivée trop tôt, avant que tu aies équipé la pièce, armait quand même le délai de cinq secondes — et la vraie demande qui suivait passait à la trappe. Le délai ne démarre plus que sur une demande réellement affichée."] =
+        "También corregido: cuando un encantador te pedía una pieza, el aviso a veces no aparecía nunca. Una primera petición que llegaba demasiado pronto, antes de que hubieras equipado la pieza, activaba igualmente la espera de cinco segundos, y la petición real que venía después se perdía. La espera ahora solo empieza cuando una petición ha pasado de verdad.",
     -- v1.24.2
     ["Les stats d'enchant parlent enfin ta langue"] =
         "Las estadísticas de encantamiento por fin hablan tu idioma",

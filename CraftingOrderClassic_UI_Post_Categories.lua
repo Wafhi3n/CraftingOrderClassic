@@ -34,6 +34,7 @@ local MATERIAL_ARMOR = { [1] = true, [2] = true, [3] = true, [4] = true }
 
 -- Section (libellé localisé) + rang de tri d'un objet produit. Libellés issus des globales client
 -- (déjà localisées : noms d'emplacement _G[INVTYPE_*], sous-classe/type via GetItemInfoInstant).
+--   * gemme (classID 3)    → par COULEUR                            rang 250+
 --   * arme (classID 2)     → par TYPE (épée/hache/masse…)          rang 300+
 --   * armure/bijou (4)     → par EMPLACEMENT, puis matériau         rang 100+
 --   * conteneur (1)        → sac/carquois                           rang 400
@@ -54,6 +55,11 @@ local function sectionOf(itemID)
             return slotName, rank
         end
         return iSub or iType or L["Autres"], 150
+    elseif classID == 3 then
+        -- Gemme : le subclassID EST la couleur, et `iSub` en porte déjà le libellé LOCALISÉ (« Bleu »).
+        -- Sans ce cas, toute la Joaillerie tombait sous un unique en-tête « Gemme » via la branche
+        -- fourre-tout du bas. La TAILLE (la stat) est le niveau du dessous : cf. COC.Gem:StatFor.
+        return iSub or iType or L["Autres"], 250 + (subclassID or 0)
     elseif classID == 1 then
         return iSub or iType or L["Autres"], 400
     end
@@ -88,19 +94,12 @@ function UI:_RenderPostPlanRows(list)
     local searching = (self.postSearch or "") ~= ""
     -- Tri par rentabilité (Lazy Gold) : liste À PLAT, sans sections — on veut le classement global du
     -- plus rentable au moins. Sinon, regroupement normal.
-    -- Enchantement : même classement EMPLACEMENT › STAT DE BASE que la vue métier (cf. ProfWindow_Recipes)
-    -- — un enchant est un SERVICE (aucun itemID) que COC.SectionOf rangerait en vrac sous « Autres ».
-    -- ⚠️ PAS de `X and X:f()` ici : `and` TRONQUE le multi-retour (cf. mémoire lua-and-truncates-multireturn).
+    -- Classement dérivé du sort (enchantements : emplacement › stat ; gemmes : couleur › taille) —
+    -- MÊME dispatch que la vue métier, écrit une seule fois : cf. RecipeCats.SectionForSpell.
     local disp = self:_PostProfitFlat(list) or COC.RecipeCats:BuildDisplay(self.postProf, list, {
         itemID    = function(it) return it.e and it.e.itemID end,
-        section   = function(it)
-            if not COC.Enchant then return end
-            return COC.Enchant:SectionFor(it.e and it.e.spellID)
-        end,
-        sub       = function(it)
-            if not COC.Enchant then return end
-            return COC.Enchant:StatFor(it.e and it.e.spellID)
-        end,
+        section   = function(it) return COC.RecipeCats.SectionForSpell(it.e and it.e.spellID) end,
+        sub       = function(it) return COC.RecipeCats.SubForSpell(it.e and it.e.spellID) end,
         name      = function(it) return it.name or "" end,
         before    = function(a, b) if a.ready ~= b.ready then return a.ready end end,
         collapsed = searching and nil or self:_PostCollapseTable(),

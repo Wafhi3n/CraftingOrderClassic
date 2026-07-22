@@ -1,5 +1,25 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.25.0 — Cut gems sort by color, then by what they give
+
+Jewelcrafting dumped every cut gem under a single "Gem" heading. Hundreds of lines, no order to them.
+Gems now sit under their socket color, and under that, under the stat they give, so you get
+"Strength - Bold", "Stamina - Solid", "Healing / Spell Damage - Teardrop".
+
+That stat isn't a list I typed out. It's read off your own client, which is why it shows up in your
+language and why it'll keep working on gems I've never looked at. The cut name comes from the same
+place, so a French client reads "Force - Audacieux" with no translation table anywhere.
+
+Meta gems get a plain list instead. Every meta cut is a single gem, so a heading above each one just
+repeated the line underneath it.
+
+Rings, necklaces, statues and figurines keep sorting the way they always did.
+
+Also fixed: when an enchanter asked you for a piece, the prompt sometimes never showed up. A first
+request that arrived a moment too early, before you'd equipped the piece, still armed the five second
+cooldown, so the real request that followed got swallowed. The cooldown now only starts once a
+request has actually gone through.
+
 ## v1.24.2 — Enchant stat names read from your own client now
 
 The subcategory names in the enchant view (Strength, Spirit, Crusader, and so on) were stuck in

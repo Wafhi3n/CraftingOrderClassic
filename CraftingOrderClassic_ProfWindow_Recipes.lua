@@ -292,17 +292,9 @@ function PW:_RecipeDisplayList()
     end
     return COC.RecipeCats:BuildDisplay(self.profKey, items, {
         itemID    = function(r) return r.itemID end,
-        -- Enchantement : un enchant est un SERVICE (aucun objet produit → COC.SectionOf le rangerait en
-        -- « Autres/Divers », tous en vrac). On le classe EMPLACEMENT (section) › STAT DE BASE (sous-cat) ›
-        -- variantes triées par niveau. ⚠️ PAS de `X and X:f()` : `and` TRONQUE le multi-retour.
-        section   = function(r)
-            if not COC.Enchant then return end
-            return COC.Enchant:SectionFor(r.spellID)
-        end,
-        sub       = function(r)
-            if not COC.Enchant then return end
-            return COC.Enchant:StatFor(r.spellID)
-        end,
+        -- Classement dérivé du sort (enchantements, tailles de gemme) : cf. RecipeCats.SectionForSpell.
+        section   = function(r) return COC.RecipeCats.SectionForSpell(r.spellID) end,
+        sub       = function(r) return COC.RecipeCats.SubForSpell(r.spellID) end,
         name      = function(r) return r.name or "" end,
         collapsed = ((search or "") ~= "") and nil or self:_CollapseTable(),
     })

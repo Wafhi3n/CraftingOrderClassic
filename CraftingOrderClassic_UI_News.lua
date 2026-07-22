@@ -13,11 +13,21 @@ local BODY_W = 780
 -- Une entrée par version. Les lignes v1.4.0 REUTILISENT les clés déjà traduites de l'ancienne section
 -- « Nouveautés » de l'Aide (overlay enUS existant) → pas de doublon de traduction. Scindé en deux
 -- blocs (récent / plus ancien) concaténés par versions() : chaque bloc reste sous le seuil anti-monolithe.
--- Bloc de TÊTE : la version courante, seule. Une 9ᵉ version dans versionsRecent la poussait à 66 lignes,
--- au-dessus du plafond anti-monolithe (60 l./fonction) — d'où un bloc de plus, comme les 3 existants.
--- À la prochaine release, verser cette entrée dans versionsRecent et repartir d'un bloc de tête vide.
+-- Bloc de TÊTE : les versions les plus récentes. Une 9ᵉ version dans versionsRecent la poussait à
+-- 66 lignes, au-dessus du plafond anti-monolithe (60 l./fonction) — d'où ce bloc de plus.
+-- ⚠️ À la release suivante, AJOUTER l'entrée en tête de CE bloc ; ne PAS reverser dans versionsRecent,
+-- qui repasserait aussitôt au-dessus du plafond. Quand ce bloc-ci s'en approchera à son tour, en créer
+-- un nouveau devant lui (versions() n'a qu'à le concaténer en premier).
 local function versionsLatest()
     return {
+        {
+            v = "v1.25.0", title = L["Les gemmes se rangent par couleur, puis par ce qu'elles donnent"],
+            lines = {
+                L["La joaillerie versait toutes les gemmes taillées sous un seul en-tête « Gemme ». Elles se rangent maintenant par couleur de châsse, et sous chaque couleur par la stat qu'elles donnent : « Force - Audacieux », « Endurance - Solide ». Cette stat n'est pas une table écrite à la main, elle est lue sur ton propre jeu — donc dans ta langue, et valable pour des gemmes que je n'ai jamais regardées."],
+                L["Les gemmes méta, elles, reviennent à une simple liste : chaque taille de méta n'existe qu'en un seul exemplaire, un en-tête au-dessus n'aurait fait que répéter la ligne. Bagues, colliers, statues et figurines gardent le classement qu'ils avaient."],
+                L["Corrigé aussi : quand un enchanteur te demandait une pièce, l'invite ne s'affichait parfois jamais. Une première demande arrivée trop tôt, avant que tu aies équipé la pièce, armait quand même le délai de cinq secondes — et la vraie demande qui suivait passait à la trappe. Le délai ne démarre plus que sur une demande réellement affichée."],
+            },
+        },
         {
             v = "v1.24.2", title = L["Les stats d'enchant parlent enfin ta langue"],
             lines = {

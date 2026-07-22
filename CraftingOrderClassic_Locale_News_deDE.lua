@@ -8,6 +8,15 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "Neues",
+    -- v1.25.0
+    ["Les gemmes se rangent par couleur, puis par ce qu'elles donnent"] =
+        "Edelsteine sortieren sich nach Farbe und danach, was sie geben",
+    ["La joaillerie versait toutes les gemmes taillées sous un seul en-tête « Gemme ». Elles se rangent maintenant par couleur de châsse, et sous chaque couleur par la stat qu'elles donnent : « Force - Audacieux », « Endurance - Solide ». Cette stat n'est pas une table écrite à la main, elle est lue sur ton propre jeu — donc dans ta langue, et valable pour des gemmes que je n'ai jamais regardées."] =
+        "Juwelenschleifen warf alle geschliffenen Steine unter eine einzige Überschrift „Edelstein“. Die Steine stehen jetzt unter ihrer Sockelfarbe und darunter nach dem Wert, den sie geben, also „Stärke - Kühn“ oder „Ausdauer - Massiv“. Dieser Wert ist keine von Hand getippte Tabelle, er wird direkt von deinem Client gelesen, deshalb erscheint er in deiner Sprache und funktioniert auch bei Steinen, die ich nie angesehen habe.",
+    ["Les gemmes méta, elles, reviennent à une simple liste : chaque taille de méta n'existe qu'en un seul exemplaire, un en-tête au-dessus n'aurait fait que répéter la ligne. Bagues, colliers, statues et figurines gardent le classement qu'ils avaient."] =
+        "Meta-Steine bekommen stattdessen eine schlichte Liste. Jeden Meta-Schliff gibt es nur ein einziges Mal, eine Überschrift darüber hätte also nur die Zeile darunter wiederholt. Ringe, Halsketten, Statuen und Figuren werden weiter wie bisher sortiert.",
+    ["Corrigé aussi : quand un enchanteur te demandait une pièce, l'invite ne s'affichait parfois jamais. Une première demande arrivée trop tôt, avant que tu aies équipé la pièce, armait quand même le délai de cinq secondes — et la vraie demande qui suivait passait à la trappe. Le délai ne démarre plus que sur une demande réellement affichée."] =
+        "Ebenfalls behoben: Wenn ein Verzauberer dich um ein Ausrüstungsteil bat, erschien die Abfrage manchmal gar nicht. Eine erste Anfrage, die zu früh eintraf, bevor du das Teil angelegt hattest, setzte trotzdem die Sperre von fünf Sekunden, und die eigentliche Anfrage danach ging verloren. Die Sperre startet jetzt erst, wenn eine Anfrage wirklich durchgekommen ist.",
     -- v1.24.2
     ["Les stats d'enchant parlent enfin ta langue"] =
         "Verzauberungs-Werte sprechen endlich deine Sprache",
