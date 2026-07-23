@@ -348,10 +348,7 @@ function COC:Slash(msg)
     elseif cmd == "lvldump" then
         local PW = COC.ProfWindow
         if PW and PW._LevelDump then PW:_LevelDump() end
-    elseif cmd == "version" or cmd == "ver" then
-        local mine = (D and D._MyVersion and (D:_MyVersion() and D._myVerStr)) or "?"
-        p(string.format(COC.L["Crafting Order — version %s"], mine))
-        if D and D._updateVer then p(string.format(COC.L["Nouvelle version disponible : %s"], D._updateVer)) end
+    elseif cmd == "version" or cmd == "ver" then if D and D.VersionCmd then D:VersionCmd(rest) end
     elseif cmd == "help"   then COC:Help()
     else COC:Status() end
 end

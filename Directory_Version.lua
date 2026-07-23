@@ -12,6 +12,10 @@ local COC = CraftingOrderClassic
 local Dir = COC.Directory
 
 local CONFIRM = 2   -- nb de joueurs DISTINCTS annonçant la version supérieure avant d'alerter (anti-leurre)
+-- Une alerte PERSISTÉE (SV) qui n'est jamais re-corroborée pendant ce délai s'oublie toute seule : une
+-- vraie version se re-confirme en continu au fil des SK ; un numéro fantaisiste (test d'injection, deux
+-- farceurs de mèche) ne reviendra jamais — sans ce TTL, la pastille resterait allumée à VIE.
+local ALERT_TTL = 7 * 86400
 
 local function p(msg) print("|cFF33DD88Crafting Order|r " .. msg) end
 
@@ -84,6 +88,7 @@ function Dir:_EvalUpdate()
     end
     if not best then return end
     self._updateVer = best
+    if COC.db then COC.db.updateAlertedAt = time() end   -- re-corroborée aujourd'hui → le TTL repart
     if COC.UI and COC.UI.SetUpdateBadge then COC.UI:SetUpdateBadge(true, best) end
     if (COC.db and COC.db.updateAlerted) ~= best then
         if COC.db then COC.db.updateAlerted = best end
@@ -93,17 +98,41 @@ function Dir:_EvalUpdate()
 end
 
 -- Bringup (appelé par Directory:Start). Repart d'un comptage vierge à chaque session (les « qui »
--- distincts sont du runtime). Si une version signalée la session passée est TOUJOURS devant la mienne,
--- on rallume la pastille en SILENCE (pas de re-nag chat) ; si j'ai mis à jour depuis, on oublie.
+-- distincts sont du runtime). Si une version signalée la session passée est TOUJOURS devant la mienne
+-- ET récemment re-corroborée (ALERT_TTL), on rallume la pastille en SILENCE (pas de re-nag chat) ;
+-- si j'ai mis à jour depuis, ou si plus personne ne la confirme depuis le TTL, on oublie.
 function Dir:StartVersion()
     self._verSeen = {}
     self:_MyVersion()
-    local last = COC.db and COC.db.updateAlerted
+    local db = COC.db
+    local last = db and db.updateAlerted
     if not last then return end
-    if V.Greater(V.Parse(last), self:_MyVersion()) then
+    if not V.Greater(V.Parse(last), self:_MyVersion()) then
+        db.updateAlerted, db.updateAlertedAt = nil, nil   -- mise à jour effectuée → on efface la mémoire d'alerte
+    elseif db.updateAlertedAt and (time() - db.updateAlertedAt) > ALERT_TTL then
+        db.updateAlerted, db.updateAlertedAt = nil, nil   -- jamais re-corroborée depuis le TTL → leurre probable
+    else
+        db.updateAlertedAt = db.updateAlertedAt or time() -- alerte d'avant le TTL (v1.27.0) : l'horloge démarre ici
         self._updateVer = last
         if COC.UI and COC.UI.SetUpdateBadge then COC.UI:SetUpdateBadge(true, last) end
-    elseif COC.db then
-        COC.db.updateAlerted = nil   -- mise à jour effectuée → on efface la mémoire d'alerte
+    end
+end
+
+-- /co version [reset] — affiche ma version + l'éventuelle version signalée. `reset` oublie l'alerte
+-- (pastille + mémoire SV + comptage runtime) : l'effaceur du test d'injection, et la seule sortie
+-- manuelle si un numéro fantaisiste a été corroboré par des farceurs avant d'expirer par TTL.
+function Dir:VersionCmd(rest)
+    if (rest or ""):lower() == "reset" then
+        self._verSeen = {}
+        self._updateVer = nil
+        if COC.db then COC.db.updateAlerted, COC.db.updateAlertedAt = nil, nil end
+        if COC.UI and COC.UI.SetUpdateBadge then COC.UI:SetUpdateBadge(false) end
+        p(COC.L["alerte de version oubliée — elle reviendra si le réseau la re-confirme."])
+        return
+    end
+    p(string.format(COC.L["Crafting Order — version %s"], (self:_MyVersion() and self._myVerStr) or "?"))
+    if self._updateVer then
+        p(string.format(COC.L["Nouvelle version disponible : %s"], self._updateVer))
+        p(COC.L["(/co version reset si cette alerte est erronée)"])
     end
 end

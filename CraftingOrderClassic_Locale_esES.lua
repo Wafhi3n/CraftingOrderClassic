@@ -13,6 +13,8 @@ local es = {
     ["Une nouvelle version est disponible : |cFFFFD100%s|r (vous avez la %s). Pensez à mettre à jour."] =
         "Hay una nueva versión disponible: |cFFFFD100%s|r (tienes la %s). Actualiza cuando puedas.",
     ["Nouvelle version disponible : %s"] = "Nueva versión disponible: %s",
+    ["alerte de version oubliée — elle reviendra si le réseau la re-confirme."] = "aviso de versión olvidado. Volverá si la red lo confirma de nuevo.",
+    ["(/co version reset si cette alerte est erronée)"] = "(/co version reset si este aviso es erróneo)",
     ["Crafting Order — version %s"] = "Crafting Order — versión %s",
     ["Enchanter équipé"] = "Encantar equipado", ["Enchante directement la pièce équipée — sans cibler."] = "Encanta directamente la pieza equipada — sin apuntar.",
     ["Enchanter cet objet"] = "Encantar este objeto", ["Ouvre ta fenêtre d'Enchantement."] = "Abre tu ventana de Encantamiento.", ["Aucun enchantement connu pour cet emplacement."] = "Ningún encantamiento conocido para esa ranura.",

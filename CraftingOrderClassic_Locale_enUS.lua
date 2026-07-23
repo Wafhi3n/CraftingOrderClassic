@@ -14,6 +14,8 @@ local en = {
     ["Une nouvelle version est disponible : |cFFFFD100%s|r (vous avez la %s). Pensez à mettre à jour."] =
         "A new version is available: |cFFFFD100%s|r (you have %s). Time to update.",
     ["Nouvelle version disponible : %s"] = "New version available: %s",
+    ["alerte de version oubliée — elle reviendra si le réseau la re-confirme."] = "version alert forgotten. It'll come back if the network confirms it again.",
+    ["(/co version reset si cette alerte est erronée)"] = "(/co version reset if this alert is wrong)",
     ["Crafting Order — version %s"] = "Crafting Order — version %s",
     ["Enchanter équipé"] = "Enchant equipped", ["Enchante directement la pièce équipée — sans cibler."] = "Enchants the equipped item directly — no targeting.",
     ["Enchanter cet objet"] = "Enchant this item", ["Ouvre ta fenêtre d'Enchantement."] = "Open your Enchanting window.", ["Aucun enchantement connu pour cet emplacement."] = "No known enchant for that slot.",
