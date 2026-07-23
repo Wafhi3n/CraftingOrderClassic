@@ -1,5 +1,18 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.27.1 — Ready for 1.15.9, and no more directions to enemy cities
+
+Classic Era, Season of Discovery and Hardcore moved to patch 1.15.9, the one that brings the modern
+interface. This build marks the addon compatible. The nameplate code was checked against the new UI
+source and the [LFW] badge works as before. One thing the new UI decides for everyone: friendly
+nameplates inside dungeons belong to the game itself, so no badge there.
+
+Also fixed, the supply lists could send you to the wrong side of the war. NPC lines under a missing
+recipe (trainers, vendors) listed both factions, so an Alliance character could be told to go
+shopping in the Undercity. NPCs of the opposite faction are filtered out now; loot mobs and neutral
+vendors stay, they serve everyone. And the little (+N) counter next to those lines only counts NPCs
+you could actually visit.
+
 ## v1.27.0 — Tells you when a new version is out
 
 The addon now notices when you're running behind. It reads the version off other players you cross

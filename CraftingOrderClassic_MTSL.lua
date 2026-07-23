@@ -105,11 +105,29 @@ local function itemsOf(mprof)
     return map
 end
 
+-- Faction OPPOSÉE du joueur : « Horde » si Alliance, « Alliance » si Horde, nil sinon (Classic Era n'a
+-- pas de joueur neutre → en pratique toujours l'une des deux ; fail-open si l'API renvoie autre chose).
+-- MTSL liste les PNJ des DEUX factions (champ `reacts` = Alliance|Horde|Hostile|Neutral) ; on s'en sert
+-- pour masquer les sources d'ACQUISITION de l'autre camp (sans ça, la route envoyait un Alliance à
+-- Undercity). Les mobs de butin (« Hostile ») et les PNJ neutres ne valent JAMAIS la faction opposée
+-- → jamais masqués. Mémoïsé : la faction d'un perso ne change pas dans une session (reload = état neuf).
+local _oppoFaction
+local function oppositeFaction()
+    if _oppoFaction == nil then
+        local f = UnitFactionGroup and UnitFactionGroup("player")
+        _oppoFaction = (f == "Alliance" and "Horde") or (f == "Horde" and "Alliance") or false
+    end
+    return _oppoFaction or nil
+end
+
 -- Une ligne PNJ prête à afficher : « [niveau] Nom — Zone (x, y) », comme la fiche MTSL. Coords/zone
 -- résolues via npcs.lua + zones.lua. Renvoie (texte, pin) — pin = { x, y, zone, name } quand les
--- coordonnées ET la zone sont connues (repère de carte cliquable), nil sinon. nil si PNJ inconnu.
+-- coordonnées ET la zone sont connues (repère de carte cliquable), nil sinon. nil si PNJ inconnu OU
+-- de la faction opposée (on ne dirige jamais le joueur vers une ville/un PNJ de l'autre camp).
 local function npcLine(npcId)
     local npc = lookup("npcs")[npcId]; if not npc then return nil end
+    local oppo = oppositeFaction()
+    if oppo and npc.reacts == oppo then return nil end
     local lvl = npc.xp_level and npc.xp_level.max
     local zone = npc.zone_id and lookup("zones")[npc.zone_id]
     local coord = npc.location and npc.location.x and npc.location.y
@@ -124,17 +142,22 @@ end
 -- Ajoute jusqu'à `maxN` lignes PNJ (formateurs / vendeurs / mobs) à `lines` sous le libellé `label`.
 -- Chaque ligne porte `npc` = pin cliquable (repère TomTom/carte) quand les coords sont connues.
 local function addNpcLines(lines, label, sources, maxN)
-    local shown = 0
+    local shown, resolvable = 0, 0
     for _, npcId in ipairs(sources or {}) do
-        local ln, pin = npcLine(npcId)
+        local ln, pin = npcLine(npcId)   -- nil = PNJ inconnu OU faction opposée (déjà filtré)
         if ln then
-            lines[#lines + 1] = { label = shown == 0 and label or "", value = ln, npc = pin }
-            shown = shown + 1
-            if shown >= (maxN or 3) then break end
+            resolvable = resolvable + 1
+            if shown < (maxN or 3) then
+                lines[#lines + 1] = { label = shown == 0 and label or "", value = ln, npc = pin }
+                shown = shown + 1
+            end
         end
     end
-    local total = #(sources or {})
-    if total > shown then lines[#lines].value = lines[#lines].value .. string.format(" |cFF888888(+%d)|r", total - shown) end
+    -- « (+N) » = affichables NON montrés (jamais les filtrés/inconnus) ; jamais accolé si rien n'a été
+    -- montré (sinon on décorerait une ligne étrangère précédente).
+    if shown > 0 and resolvable > shown then
+        lines[#lines].value = lines[#lines].value .. string.format(" |cFF888888(+%d)|r", resolvable - shown)
+    end
 end
 
 -- Fiche DÉTAILLÉE d'une recette manquante -> { lines = { {label, value}, ... }, itemID = objet-recette }.

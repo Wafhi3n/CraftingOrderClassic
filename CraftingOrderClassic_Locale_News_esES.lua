@@ -8,6 +8,12 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "Novedades",
+    -- v1.27.1
+    ["Prêt pour le patch 1.15.9"] = "Listo para el parche 1.15.9",
+    ["Classic Era, SoD et Hardcore passent à la 1.15.9 et à sa nouvelle interface. L'addon a été vérifié contre elle et se déclare compatible : le badge [Dispo] au-dessus des plaques fonctionne comme avant. Seule limite, décidée par Blizzard : en instance, les plaques amies sont réservées au jeu lui-même, donc pas de badge en donjon."] =
+        "Classic Era, SoD y Hardcore pasan a la 1.15.9 y a su nueva interfaz. El addon se ha comprobado contra ella y se declara compatible, la insignia [Dispo] sobre las placas funciona como antes. Un límite, decisión de Blizzard: en las estancias, las placas amistosas quedan reservadas al propio juego, así que no hay insignia en las mazmorras.",
+    ["Corrigé : la liste des PNJ sous une recette manquante (formateurs, vendeurs) mélangeait les deux factions, au point d'envoyer un personnage Alliance à Fossoyeuse. Les PNJ du camp d'en face sont maintenant masqués ; les monstres à butin et les PNJ neutres restent, eux servent tout le monde."] =
+        "Corregido: la lista de PNJ bajo una receta que te falta (maestros, vendedores) mezclaba ambas facciones, hasta el punto de mandar a un personaje de la Alianza a Entrañas. Los PNJ del bando contrario ahora se ocultan; los monstruos de botín y los PNJ neutrales se quedan, esos atienden a todos.",
     -- v1.27.0
     ["Prévenu quand une nouvelle version sort"] = "Te avisa cuando sale una versión nueva",
     ["L'addon repère maintenant qu'il tourne en retard. Il lit la version des joueurs que tu croises sur le réseau, et dès qu'il en voit une plus récente chez plusieurs personnes différentes, il te le dit d'une ligne dans le chat et pose un point rouge sur le bouton minimap. Le point s'efface tout seul une fois que tu as mis à jour."] =

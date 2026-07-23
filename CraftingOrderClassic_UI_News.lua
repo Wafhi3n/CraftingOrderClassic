@@ -21,6 +21,13 @@ local BODY_W = 780
 local function versionsLatest()
     return {
         {
+            v = "v1.27.1", title = L["Prêt pour le patch 1.15.9"],
+            lines = {
+                L["Classic Era, SoD et Hardcore passent à la 1.15.9 et à sa nouvelle interface. L'addon a été vérifié contre elle et se déclare compatible : le badge [Dispo] au-dessus des plaques fonctionne comme avant. Seule limite, décidée par Blizzard : en instance, les plaques amies sont réservées au jeu lui-même, donc pas de badge en donjon."],
+                L["Corrigé : la liste des PNJ sous une recette manquante (formateurs, vendeurs) mélangeait les deux factions, au point d'envoyer un personnage Alliance à Fossoyeuse. Les PNJ du camp d'en face sont maintenant masqués ; les monstres à butin et les PNJ neutres restent, eux servent tout le monde."],
+            },
+        },
+        {
             v = "v1.27.0", title = L["Prévenu quand une nouvelle version sort"],
             lines = {
                 L["L'addon repère maintenant qu'il tourne en retard. Il lit la version des joueurs que tu croises sur le réseau, et dès qu'il en voit une plus récente chez plusieurs personnes différentes, il te le dit d'une ligne dans le chat et pose un point rouge sur le bouton minimap. Le point s'efface tout seul une fois que tu as mis à jour."],

@@ -11,6 +11,12 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "What's New",
+    -- v1.27.1
+    ["Prêt pour le patch 1.15.9"] = "Ready for patch 1.15.9",
+    ["Classic Era, SoD et Hardcore passent à la 1.15.9 et à sa nouvelle interface. L'addon a été vérifié contre elle et se déclare compatible : le badge [Dispo] au-dessus des plaques fonctionne comme avant. Seule limite, décidée par Blizzard : en instance, les plaques amies sont réservées au jeu lui-même, donc pas de badge en donjon."] =
+        "Classic Era, SoD and Hardcore move to 1.15.9 and its new interface. The addon has been checked against it and marks itself compatible, the [LFW] badge above nameplates works like before. One limit, Blizzard's call: inside instances, friendly nameplates belong to the game itself, so no badge in dungeons.",
+    ["Corrigé : la liste des PNJ sous une recette manquante (formateurs, vendeurs) mélangeait les deux factions, au point d'envoyer un personnage Alliance à Fossoyeuse. Les PNJ du camp d'en face sont maintenant masqués ; les monstres à butin et les PNJ neutres restent, eux servent tout le monde."] =
+        "Fixed: the NPC list under a missing recipe (trainers, vendors) mixed both factions, to the point of sending an Alliance character to the Undercity. NPCs from the other side are now hidden; loot mobs and neutral NPCs stay, they serve everyone.",
     -- v1.27.0
     ["Prévenu quand une nouvelle version sort"] = "Tells you when a new version is out",
     ["L'addon repère maintenant qu'il tourne en retard. Il lit la version des joueurs que tu croises sur le réseau, et dès qu'il en voit une plus récente chez plusieurs personnes différentes, il te le dit d'une ligne dans le chat et pose un point rouge sur le bouton minimap. Le point s'efface tout seul une fois que tu as mis à jour."] =
