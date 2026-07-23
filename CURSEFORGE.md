@@ -35,6 +35,7 @@ long as they've got the addon too.
 - The window uses the game's own frame style now, not a custom skin, so it reads as part of the interface (new in 1.17).
 - Click the bag icon on any artisan in the directory to see exactly what materials they need to keep leveling, worked out locally from what the addon already knows about them (new in 1.23).
 - Get a heads-up when you're running an old version, read off the versions other players around you are on, with a dot on the minimap that clears once you update (new in 1.27).
+- Ready for patch 1.15.9 and the modern interface it brings to Era, Season of Discovery and Hardcore (1.27.1).
 
 ## Order from your Friends and Guild list
 
@@ -158,7 +159,8 @@ there too, along with the essences, dusts and shards an enchanter pulls from dis
 
 If you run MissingTradeSkillsList, a button above the list folds in the recipes you haven't learned,
 drawn in red beside the ones you have. Click one and the middle panel tells you where it comes from,
-the vendor, drop or quest, with the NPC and its coordinates.
+the vendor, drop or quest, with the NPC and its coordinates. It only ever points you at NPCs your own
+faction can talk to; loot drops and neutral vendors show for everyone.
 
 ## Season of Discovery
 
