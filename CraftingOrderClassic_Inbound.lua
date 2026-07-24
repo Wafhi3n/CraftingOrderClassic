@@ -143,17 +143,7 @@ function Inbound:Add(e)
     e.id = id; e.ts = time()
     e.status = (existing and existing.status == "dismissed") and "dismissed" or (existing and existing.status) or "new"
     COC.db.inbound[id] = e
-    -- Purge des trop vieilles (EXPIRY) PUIS plafond MAX_IN (retire les plus anciennes) — anti-explosion
-    -- mémoire sur un canal Commerce actif. `e` vient d'être posée (ts = maintenant) → jamais retirée.
-    local survivors = {}
-    for k, v in pairs(COC.db.inbound) do
-        if (time() - (v.ts or 0)) > EXPIRY then COC.db.inbound[k] = nil
-        else survivors[#survivors + 1] = { k = k, ts = v.ts or 0 } end
-    end
-    if #survivors > MAX_IN then
-        table.sort(survivors, function(a, b) return a.ts > b.ts end)   -- plus récentes d'abord
-        for i = MAX_IN + 1, #survivors do COC.db.inbound[survivors[i].k] = nil end
-    end
+    self:Prune()   -- `e` vient d'être posée (ts = maintenant) → jamais retirée
     if e.status == "new" then self:Alert(e) end
     if e.status == "new" and COC.Moderation then COC.Moderation:NotePost(e.buyer) end   -- anti-spam
     -- « Garder pour un ami capable » : si un artisan connu sait la faire, on me le signale et on la
@@ -188,14 +178,46 @@ function Inbound:Alert(e)
     local msg = string.format(L["|cFFFF8800entrante|r |cFFFFFFFF%s|r (%s) : %s%s%s"], e.buyer, src, nm, qty, pr)
     pmsg((Skin and ("|T" .. Skin.tex.workorder .. ":0|t ") or "") .. msg)
     if COC.UI and COC.UI.Toast then COC.UI:Toast(msg) end
-    if e.canCraft then print(L["   |cFF33DD33→ tu sais la crafter|r — Carnet › Entrantes"]) end
+    if e.canCraft then print(L["   |cFF33DD33→ tu sais la crafter|r — vue métier › onglet Entrantes"]) end
     pcall(function() PlaySound(SOUNDKIT and SOUNDKIT.TELL_MESSAGE or 3081, "Master") end)
+end
+
+-- ------------------------------------------------------------------
+-- Cycle de vie
+-- ------------------------------------------------------------------
+-- Une entrante a-t-elle dépassé sa durée de vie ? Une demande /commerce est ÉPHÉMÈRE : au-delà
+-- d'EXPIRY le demandeur a presque toujours été servi (ou a renoncé) — on n'a aucun moyen de le
+-- savoir, donc on oublie. Exception : une entrante ACCEPTÉE (je m'y suis engagé) vit ORDER_TTL,
+-- comme une commande du carnet.
+function Inbound:Expired(e)
+    local ttl = (e.status == "accepted") and ((COC.Orders and COC.Orders.ORDER_TTL) or 21600) or EXPIRY
+    return (time() - (e.ts or 0)) > ttl
+end
+
+-- Purge : trop vieilles (Expired) PUIS plafond MAX_IN (retire les plus anciennes) — anti-explosion
+-- mémoire sur un canal Commerce actif. Appelée par TOUS les chemins de lecture (All/Count, vue
+-- métier, Handoff) et au démarrage : EXPIRY n'était appliquée que dans Add() → sans nouvelle
+-- capture, une entrante de la veille restait « en attente » 20 h après (SavedVariables), bien
+-- après que le demandeur ait eu son objet (bug terrain 2026-07-23).
+function Inbound:Prune()
+    local inb = COC.db and COC.db.inbound
+    if not inb then return end
+    local survivors = {}
+    for k, v in pairs(inb) do
+        if self:Expired(v) then inb[k] = nil
+        else survivors[#survivors + 1] = { k = k, ts = v.ts or 0 } end
+    end
+    if #survivors > MAX_IN then
+        table.sort(survivors, function(a, b) return a.ts > b.ts end)   -- plus récentes d'abord
+        for i = MAX_IN + 1, #survivors do inb[survivors[i].k] = nil end
+    end
 end
 
 -- ------------------------------------------------------------------
 -- Lecture + actions
 -- ------------------------------------------------------------------
 function Inbound:All()
+    self:Prune()
     local out = {}
     for _, e in pairs(COC.db and COC.db.inbound or {}) do
         if e.status ~= "dismissed" then out[#out + 1] = e end
@@ -205,9 +227,26 @@ function Inbound:All()
 end
 
 function Inbound:Count()
+    self:Prune()
     local n = 0
     for _, e in pairs(COC.db and COC.db.inbound or {}) do if e.status == "new" then n = n + 1 end end
     return n
+end
+
+-- Est-ce que je sais RÉELLEMENT la crafter, revérifié EN DIRECT ? (e.canCraft est figé à la
+-- capture : une recette apprise depuis doit changer la réponse.)
+function Inbound:CanCraftLive(e)
+    if not CraftLink then return e.canCraft and true or false end
+    return CraftLink:IKnowRecipeForItem(e.profession, e.itemID) and true or false
+end
+
+-- Politique d'affichage dans la VUE MÉTIER (cockpit ProfWindow_Orders) : même règle que Alert —
+-- en scope "mine", une entrante dont je n'ai pas la recette n'est pas actionnable (son bouton
+-- Accepter serait mensonger : je ne peux pas la satisfaire) → masquée du cockpit. Elle reste au
+-- Carnet › Entrantes (relais vers un ami capable via Handoff). En scope "all", tout le flux.
+function Inbound:VisibleInProfView(e)
+    if scanScope() ~= "mine" then return true end
+    return self:CanCraftLive(e)
 end
 
 function Inbound:Accept(id)
@@ -229,6 +268,7 @@ end
 function Inbound:Start()
     if not COC.db then return end
     COC.db.inbound = COC.db.inbound or {}
+    self:Prune()   -- backlog SavedVariables de la session d'avant (les entrantes ne survivent pas à EXPIRY)
     local f = CreateFrame("Frame")
     f:RegisterEvent("CHAT_MSG_CHANNEL")
     f:RegisterEvent("CHAT_MSG_GUILD")

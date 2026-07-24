@@ -27,6 +27,7 @@ local de = {
     -- Filtres Carnet
     ["Tous"] = "Alle", ["Guilde"] = "Gilde", ["Amis"] = "Freunde",
     ["Annuaire"] = "Verzeichnis",
+    ["Entrantes"] = "Eingehend",
     ["Rafraîchir l'annuaire"] = "Verzeichnis aktualisieren",
     ["annuaire : appel lancé sur le canal — les porteurs en ligne vont répondre."] =
         "Verzeichnis: Aufruf im Kanal gesendet — Online-Nutzer antworten.",
@@ -245,7 +246,7 @@ local de = {
     ["Mes métiers"] = "Meine Berufe", ["Aucun métier connu."] = "Kein bekannter Beruf.",
     ["Don / gratuit"] = "Geschenk / gratis",
     ["|cFFFF8800entrante|r |cFFFFFFFF%s|r (%s) : %s%s%s"] = "|cFFFF8800eingehend|r |cFFFFFFFF%s|r (%s): %s%s%s",
-    ["   |cFF33DD33→ tu sais la crafter|r — Carnet › Entrantes"] = "   |cFF33DD33→ du kannst es herstellen|r — Auftragsbuch › Eingehend",
+    ["   |cFF33DD33→ tu sais la crafter|r — vue métier › onglet Entrantes"] = "   |cFF33DD33→ du kannst es herstellen|r — Berufsfenster › Reiter Eingehend",
     ["|cFFFFCC00commande pour TOI|r de |cFFFFFFFF%s|r : %s%s%s"] = "|cFFFFCC00Auftrag für DICH|r von |cFFFFFFFF%s|r: %s%s%s",
     ["|cFFFFCC00nouvelle commande|r de |cFFFFFFFF%s|r : %s%s%s"] = "|cFFFFCC00neuer Auftrag|r von |cFFFFFFFF%s|r: %s%s%s",
     ["ton artisan |cFFFFFFFF%s|r est en ligne."] = "dein Handwerker |cFFFFFFFF%s|r ist online.",

@@ -113,6 +113,7 @@ function Handoff:ForwardInboundTo(who)
     if not (O and CraftLink and COC.db and COC.db.inbound and who and who ~= m) then return end
     local r = COC.Directory and COC.Directory.roster and COC.Directory.roster[who]
     if not self:_Related(r) then return end
+    if COC.Inbound then COC.Inbound:Prune() end   -- jamais pousser une entrante périmée (demandeur déjà servi)
     for _, e in pairs(COC.db.inbound) do
         if e.status ~= "dismissed" and e.buyer ~= who then
             local o = self:_SynthFromInbound(e)
@@ -261,6 +262,7 @@ end
 function Handoff:Pending()
     local m, out = me(), {}
     if not (COC.Orders and COC.db) then return out end
+    if COC.Inbound then COC.Inbound:Prune() end   -- « Confiées » sans entrantes périmées
     for _, o in pairs(COC.db.orders or {}) do
         if o.buyer == m and o.status == "open" then
             for _, a in ipairs(self:CapableKnownList(o)) do out[#out + 1] = self:_Row(o, a, o.id) end

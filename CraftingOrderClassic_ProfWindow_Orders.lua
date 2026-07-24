@@ -3,7 +3,8 @@
 -- commande : demandeur + prix + âge ; une ligne sourdine cliquée se réaffiche), collecte/tri et
 -- rafraîchissement. La vue SÉLECTIONNÉE (carte complète : composants, Lazy Gold, ACCEPTER/REFUSER/
 -- CHUCHOTER) vit dans _ProfWindow_Orders_Card.lua (anti-monolithe). Onglets de relation (Tous /
--- Guilde / Amis / Annuaire) au header. Inclut les demandes captées (/commerce, /guilde).
+-- Guilde / Amis / Annuaire) + onglet de SOURCE « Entrantes » (chat capté /commerce·/guilde et
+-- ordres `captured`, avec badge de comptage) au header.
 
 local COC  = CraftingOrderClassic
 local UI   = COC.UI
@@ -16,11 +17,16 @@ local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
 PW.ORD_CARD_W = 280          -- largeur de la carte (partagée avec _Orders_Card)
 local ROW_H   = 22           -- ligne de la vue LISTE (une commande = une ligne)
 
+-- 4 onglets de RELATION (qui est l'acheteur) + 1 onglet de SOURCE : « Entrantes » isole ce qui
+-- vient du CHAT (demandes captées /commerce·/guilde + ordres `captured` poussés par un pair) —
+-- autre nature que les commandes réseau (pas de cycle ACK/DONE, réponse en chuchotement manuel),
+-- donc jamais mélangées aux onglets de relation (demande user 2026-07-23).
 local REL = {
-    { id = "all",    label = L["Tous"]    },
-    { id = "guild",  label = L["Guilde"]  },
-    { id = "friend", label = L["Amis"]    },
-    { id = "recent", label = L["Annuaire"] },
+    { id = "all",     label = L["Tous"]    },
+    { id = "guild",   label = L["Guilde"]  },
+    { id = "friend",  label = L["Amis"]    },
+    { id = "recent",  label = L["Annuaire"] },
+    { id = "inbound", label = L["Entrantes"] },
 }
 PW.ORD_REL_COL = { guild = "FF8FD98F", friend = "FF6FB7FF", recent = "FFCBB389" }
 
@@ -100,14 +106,27 @@ function PW:_BuildRelTabs()
     self:_PlaceOrdTabs(self._compact)
 end
 
--- Vue pleine : au-dessus de la colonne Commandes (4 = offset du panneau de sections dans la fenêtre,
--- ORD_X = frontière détail|commandes). Compact/dock (fenêtre 300 px) : bord gauche. −62 = 2 px sous
--- le sommet du marbre (même placement que les onglets de la fenêtre principale).
+-- Vue pleine : barre calée à DROITE du cadre — à 5 languettes elle est PLUS LARGE que la colonne
+-- Commandes, calée à gauche de la colonne elle débordait du cadre (retour terrain 2026-07-23) ; en
+-- grandissant vers la gauche elle mord sur le marbre au-dessus du détail, où il y a la place.
+-- Compact/dock (fenêtre 300 px) : bord gauche + rétrécissement à l'échelle si la barre dépasse
+-- (les offsets sont re-divisés par l'échelle : un SetPoint s'exprime dans l'espace LOCAL du frame).
+-- Re-appelée après chaque badge « Entrantes (N) » (RefreshOrders) : la largeur de la barre vit.
 function PW:_PlaceOrdTabs(compact)
-    local first = self.ordRelTabs and self.ordRelTabs.buttons[REL[1].id]
+    local bar = self.ordRelTabs
+    local first = bar and bar.buttons[REL[1].id]
     if not first then return end
+    local total = -4 * (#REL - 1)                     -- chevauchement natif des languettes (−4 px)
+    for _, d in ipairs(REL) do total = total + bar.buttons[d.id]:GetWidth() end
+    local fw = self.frame:GetWidth() or 0
+    local s = (compact and fw > 0 and total > fw - 16) and math.max((fw - 16) / total, 0.7) or 1
+    for _, d in ipairs(REL) do bar.buttons[d.id]:SetScale(s) end
     first:ClearAllPoints()
-    first:SetPoint("TOPLEFT", self.frame, "TOPLEFT", compact and 10 or (4 + PW.ORD_X + 8), -28)
+    if compact or fw == 0 then                        -- fw 0 = build avant sizing (re-posée au 1er refresh)
+        first:SetPoint("TOPLEFT", self.frame, "TOPLEFT", 8 / s, -28 / s)
+    else
+        first:SetPoint("TOPLEFT", self.frame, "TOPLEFT", fw - total - 12, -28)
+    end
 end
 
 -- Zones SPEC de la colonne (cf. _ProfWindow_Layout.lua) : ordBody (en-tête + scroll liste/carte) /
@@ -243,49 +262,29 @@ end
 -- ------------------------------------------------------------------
 -- Rafraîchissement : collecte (carnet + entrantes) filtrée par métier ouvert + relation.
 -- ------------------------------------------------------------------
--- Collecte les commandes du métier : visibles triées récentes d'abord, puis les sourdines repliées
--- en bas. Renvoie (liste, en attente, acceptées, nb sourdines).
-function PW:_CollectOrders()
-    local prof, relTab = self.profKey, self.ordRelTab or "all"
-    local muted = (COC.db and COC.db.muted) or {}
-    local O, Mod, now = COC.Orders, COC.Moderation, time()
-    local ttl = (O and O.ORDER_TTL) or (6 * 3600)
-    local function keep(name) return relTab == "all" or PW:_OrdRelation(name) == relTab end
-    -- La vue métier appliquait le seul filtre de RELATION : elle montrait donc aussi les commandes NOMMÉES
-    -- pour un TIERS (fuite d'info sur une commande privée) et les commandes OUVERTES expirées. On applique
-    -- ici les MÊMES règles que le Carnet (Orders:All) : routage VisibleTo + TTL.
-    local function shown(o)
-        if O and O.VisibleTo and not O:VisibleTo(o) then return false end
-        return not (o.status == "open" and (now - (o.ts or now)) > ttl)
-    end
-    -- Sourdine : par ID d'ordre (db.muted) OU par JOUEUR (Moderation) — un acheteur muté ne doit pas
-    -- continuer à remplir la vue métier. Les deux sont repliés en bas, pas supprimés.
-    local function isMuted(o)
-        return (muted[o.id] or (Mod and Mod.IsMuted and Mod:IsMuted(o.buyer))) and true or false
-    end
-    local list, mutedList, pending, accepted, mutedN = {}, {}, 0, 0, 0
-    for _, o in pairs((COC.db and COC.db.orders) or {}) do
-        if o.profession == prof and o.status ~= "cancelled" and o.status ~= "done"
-           and keep(o.buyer) and shown(o) then
-            if isMuted(o) then
-                mutedN = mutedN + 1
-                mutedList[#mutedList + 1] = { o = o, kind = "order", muted = true }
-            else
-                list[#list + 1] = { o = o, kind = "order" }
-                if o.status == "open" then pending = pending + 1
-                elseif o.status == "accepted" then accepted = accepted + 1 end
-            end
-        end
-    end
+-- Entrantes /commerce du métier ouvert : ÉPHÉMÈRES (Inbound:Prune — jamais de « 20 h » ici) et
+-- seulement celles que je peux réellement servir (Inbound:VisibleInProfView, scope "mine").
+-- `list` nil = comptage seul (badge de l'onglet Entrantes depuis un autre onglet). Renvoie le
+-- nombre retenu (toutes comptent « en attente »).
+function PW:_CollectInbound(list, prof)
+    local Inb, n = COC.Inbound, 0
+    if Inb then Inb:Prune() end
     for _, e in pairs((COC.db and COC.db.inbound) or {}) do
-        if e.profession == prof and e.status ~= "dismissed" and keep(e.buyer) then
-            list[#list + 1] = { o = e, kind = "inbound" }; pending = pending + 1
+        if e.profession == prof and e.status ~= "dismissed"
+           and (not Inb or Inb:VisibleInProfView(e)) then
+            n = n + 1
+            if list then list[#list + 1] = { o = e, kind = "inbound" } end
         end
     end
+    return n
+end
+
+-- Tri de la vue liste : récentes d'abord ; « progression d'abord » (▲ du header) fait passer les
+-- commandes dont le plan ME rapporte un point (orange) en tête, puis jaune/vert ; plan gris ou
+-- inconnu derrière — à rang égal, récentes d'abord (le tri est refait dans le comparateur,
+-- table.sort n'est pas stable). Les sourdines sont repliées à la FIN (cf. mockup Vue Métier).
+function PW:_SortOrdList(list, mutedList)
     table.sort(list, function(a, b) return (a.o.ts or 0) > (b.o.ts or 0) end)
-    -- « Progression d'abord » (▲ du header) : les commandes dont le plan ME rapporte un point
-    -- (orange) passent en tête, puis jaune/vert ; plan gris ou inconnu derrière. À rang égal :
-    -- récentes d'abord (le tri ci-dessus est refait dans le comparateur, table.sort n'est pas stable).
     if self.ordSortLevel then
         local RANK = { optimal = 1, medium = 2, easy = 3, trivial = 4 }
         table.sort(list, function(a, b)
@@ -296,15 +295,71 @@ function PW:_CollectOrders()
         end)
     end
     table.sort(mutedList, function(a, b) return (a.o.ts or 0) > (b.o.ts or 0) end)
-    -- Visibles d'abord, puis les commandes en sourdine repliées en bas (cf. mockup Vue Métier).
     for _, it in ipairs(mutedList) do list[#list + 1] = it end
-    return list, pending, accepted, mutedN
+end
+
+-- Collecte les commandes du métier : visibles triées récentes d'abord, puis les sourdines repliées
+-- en bas. Onglet « Entrantes » (canal) = SEULEMENT le chat (captées + `captured`) ; les onglets de
+-- relation n'en montrent plus aucune. Renvoie (liste, en attente, acceptées, nb sourdines,
+-- nb Canal) — le dernier alimente le badge de l'onglet Entrantes quel que soit l'onglet actif.
+function PW:_CollectOrders()
+    local prof, relTab = self.profKey, self.ordRelTab or "all"
+    local canal = relTab == "inbound"
+    local muted = (COC.db and COC.db.muted) or {}
+    local O, Mod, now = COC.Orders, COC.Moderation, time()
+    local H = COC.Handoff
+    local ttl = (O and O.ORDER_TTL) or (6 * 3600)
+    local function keep(name) return relTab == "all" or PW:_OrdRelation(name) == relTab end
+    -- Mêmes règles que le Carnet (Orders:All) : routage VisibleTo + TTL (une vue de relation seule
+    -- montrerait les commandes NOMMÉES pour un TIERS et les OUVERTES expirées). Une commande CAPTÉE
+    -- (demandeur sans addon, poussée par un pair) suit la règle de son alerte (_OnSuggest : « ssi
+    -- ICanCraft ») : sans la recette, rien à en faire au cockpit.
+    local function shown(o)
+        if O and O.VisibleTo and not O:VisibleTo(o) then return false end
+        if o.captured and H and not H:ICanCraft(o) then return false end
+        return not (o.status == "open" and (now - (o.ts or now)) > ttl)
+    end
+    -- Sourdine : par ID d'ordre (db.muted) OU par JOUEUR (Moderation) — un acheteur muté ne doit pas
+    -- continuer à remplir la vue métier. Les deux sont repliés en bas, pas supprimés.
+    local function isMuted(o)
+        return (muted[o.id] or (Mod and Mod.IsMuted and Mod:IsMuted(o.buyer))) and true or false
+    end
+    local list, mutedList, pending, accepted, mutedN, canalN = {}, {}, 0, 0, 0, 0
+    local function add(o)
+        if isMuted(o) then
+            mutedN = mutedN + 1
+            mutedList[#mutedList + 1] = { o = o, kind = "order", muted = true }
+        else
+            list[#list + 1] = { o = o, kind = "order" }
+            if o.status == "open" then pending = pending + 1
+            elseif o.status == "accepted" then accepted = accepted + 1 end
+        end
+    end
+    for _, o in pairs((COC.db and COC.db.orders) or {}) do
+        if o.profession == prof and o.status ~= "cancelled" and o.status ~= "done" and shown(o) then
+            if o.captured then
+                canalN = canalN + 1
+                if canal then add(o) end
+            elseif not canal and keep(o.buyer) then add(o) end
+        end
+    end
+    local inbN = self:_CollectInbound(canal and list or nil, prof)
+    canalN = canalN + inbN
+    if canal then pending = pending + inbN end
+    self:_SortOrdList(list, mutedList)
+    return list, pending, accepted, mutedN, canalN
 end
 
 function PW:RefreshOrders()
     if not self.ordContent then return end
     self._ordDiffMap = nil   -- couleurs de difficulté re-lues à chaque refresh (un skill-up les change)
-    local list, pending, accepted, mutedN = self:_CollectOrders()
+    local list, pending, accepted, mutedN, canalN = self:_CollectOrders()
+    -- Badge de l'onglet Entrantes : « Entrantes (2) » dès qu'il y a du chat capté pour ce métier —
+    -- visible depuis n'importe quel onglet (MakeTabs:SetText re-mesure la languette).
+    if self.ordRelTabs then
+        self.ordRelTabs:SetText("inbound",
+            canalN > 0 and (L["Entrantes"] .. " (" .. canalN .. ")") or L["Entrantes"])
+    end
     -- La largeur de contenu suit le viewport (mode compact plus étroit → les lignes suivent).
     local sw = self.ordScroll and self.ordScroll:GetWidth() or 0
     if sw > 0 then self.ordContent:SetWidth(sw) end

@@ -135,6 +135,7 @@ function PW:_ComputeWantedMap()
     for _, o in pairs((COC.db and COC.db.orders) or {}) do
         if o.profession == self.profKey and o.status ~= "cancelled" and o.status ~= "done" then add(o) end
     end
+    if COC.Inbound then COC.Inbound:Prune() end   -- pastilles « demandé » sans entrantes périmées
     for _, e in pairs((COC.db and COC.db.inbound) or {}) do
         if e.profession == self.profKey and e.status ~= "dismissed" then add(e) end
     end

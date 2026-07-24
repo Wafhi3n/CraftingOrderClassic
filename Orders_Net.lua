@@ -157,7 +157,10 @@ function Orders:_OnNew(message, distribution, sender)
         o.id, o.buyer, o.kind = id, buyer, (kind ~= "" and kind) or "item"
         if o.kind == "enchant" then o.spellID = tonumber(oid) else o.itemID = tonumber(oid) end
         o.qty        = tonumber(qty) or 1
-        o.profession = (prof ~= "" and prof) or nil
+        -- Métier : déclaré > DÉRIVÉ de l'objet. Un NEW sans métier (payload dégradé, injecteur COCM)
+        -- alertait (fail-open de _ShouldAlert) mais restait INVISIBLE de la vue métier, qui filtre
+        -- strictement sur o.profession == profKey (vécu /cocm new 2026-07-23).
+        o.profession = (prof ~= "" and prof) or (o.itemID and self:ProfForItem(o.itemID)) or nil
         o.price      = (price ~= "" and price) or nil
         o.recipient  = (recipient and recipient ~= "" and recipient) or "Tous"
         o.byStack    = byStack == "1"

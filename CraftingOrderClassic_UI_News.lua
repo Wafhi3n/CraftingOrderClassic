@@ -21,6 +21,14 @@ local BODY_W = 780
 local function versionsLatest()
     return {
         {
+            v = "v1.27.2", title = L["Un onglet Entrantes, et des demandes qui ne traînent plus"],
+            lines = {
+                L["Les demandes captées dans /commerce et /guilde restaient affichées des heures. On en voyait encore une marquée « 20h » le lendemain, bien après que le demandeur ait trouvé quelqu'un d'autre. Elles disparaissent maintenant 30 minutes après avoir été vues, comme un cri dans /commerce. Celle que tu as acceptée, elle, tient six heures : tu t'es engagé dessus."],
+                L["La fenêtre métier ne fait plus non plus semblant que tu peux les honorer : elle listait une demande de gemme dont tu n'as pas la recette, bouton Accepter compris, à 190 de compétence pour une taille qui en demande 350. Elle ne montre plus que ce que tu sais vraiment faire (revérifié en direct, donc une recette apprise la fait réapparaître). Ce qu'elle masque reste dans le Carnet pour le passer à un ami capable."],
+                L["Et ces demandes du chat ont leur propre onglet Entrantes, avec un compteur à côté. Une demande lue dans /commerce ou poussée par un pair n'a rien à voir avec une vraie commande de l'addon (pas de cycle accepter-livrer, tu réponds au chuchotement à la main) : les mélanger aux onglets Tous / Guilde / Amis / Annuaire embrouillait les deux. Corrigé aussi, une commande arrivée sans métier déclenchait son alerte mais n'apparaissait dans aucune fenêtre métier ; le métier est maintenant déduit de l'objet."],
+            },
+        },
+        {
             v = "v1.27.1", title = L["Prêt pour le patch 1.15.9"],
             lines = {
                 L["Classic Era, SoD et Hardcore passent à la 1.15.9 et à sa nouvelle interface. L'addon a été vérifié contre elle et se déclare compatible : le badge [Dispo] au-dessus des plaques fonctionne comme avant. Seule limite, décidée par Blizzard : en instance, les plaques amies sont réservées au jeu lui-même, donc pas de badge en donjon."],

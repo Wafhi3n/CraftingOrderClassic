@@ -11,6 +11,15 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "What's New",
+    -- v1.27.2
+    ["Un onglet Entrantes, et des demandes qui ne traînent plus"] =
+        "An Incoming tab, and requests that don't linger",
+    ["Les demandes captées dans /commerce et /guilde restaient affichées des heures. On en voyait encore une marquée « 20h » le lendemain, bien après que le demandeur ait trouvé quelqu'un d'autre. Elles disparaissent maintenant 30 minutes après avoir été vues, comme un cri dans /commerce. Celle que tu as acceptée, elle, tient six heures : tu t'es engagé dessus."] =
+        "Requests picked up from /trade and /guild used to hang around for hours. One would still read \"20h\" the next day, long after the buyer had found someone else. They now disappear 30 minutes after they're seen, the way a shout in /trade works. One you've accepted sticks around six hours, since you've committed to it.",
+    ["La fenêtre métier ne fait plus non plus semblant que tu peux les honorer : elle listait une demande de gemme dont tu n'as pas la recette, bouton Accepter compris, à 190 de compétence pour une taille qui en demande 350. Elle ne montre plus que ce que tu sais vraiment faire (revérifié en direct, donc une recette apprise la fait réapparaître). Ce qu'elle masque reste dans le Carnet pour le passer à un ami capable."] =
+        "The profession window also stopped pretending you could fill them. It listed a request for a gem you have no recipe for, Accept button and all, at skill 190 for a cut that needs 350. It now only shows what you can really craft (rechecked live, so a recipe you learn brings the request back). Whatever it hides stays in the Ledger for you to hand off to a capable friend.",
+    ["Et ces demandes du chat ont leur propre onglet Entrantes, avec un compteur à côté. Une demande lue dans /commerce ou poussée par un pair n'a rien à voir avec une vraie commande de l'addon (pas de cycle accepter-livrer, tu réponds au chuchotement à la main) : les mélanger aux onglets Tous / Guilde / Amis / Annuaire embrouillait les deux. Corrigé aussi, une commande arrivée sans métier déclenchait son alerte mais n'apparaissait dans aucune fenêtre métier ; le métier est maintenant déduit de l'objet."] =
+        "And those chat requests get their own Incoming tab, with a count next to it. A request read off /trade or forwarded by a peer is nothing like a real addon order (no accept-deliver cycle, you answer them in whisper by hand), so mixing them into the All / Guild / Friends / Directory tabs muddied both. Also fixed, an order that arrived without a profession fired its alert but showed up in no profession window; the profession is now worked out from the item.",
     -- v1.27.1
     ["Prêt pour le patch 1.15.9"] = "Ready for patch 1.15.9",
     ["Classic Era, SoD et Hardcore passent à la 1.15.9 et à sa nouvelle interface. L'addon a été vérifié contre elle et se déclare compatible : le badge [Dispo] au-dessus des plaques fonctionne comme avant. Seule limite, décidée par Blizzard : en instance, les plaques amies sont réservées au jeu lui-même, donc pas de badge en donjon."] =

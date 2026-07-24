@@ -16,7 +16,7 @@ local en2 = {
     ["Don / gratuit"] = "Free / gift",
     -- Entrantes (alertes chat)
     ["|cFFFF8800entrante|r |cFFFFFFFF%s|r (%s) : %s%s%s"] = "|cFFFF8800incoming|r |cFFFFFFFF%s|r (%s): %s%s%s",
-    ["   |cFF33DD33→ tu sais la crafter|r — Carnet › Entrantes"] = "   |cFF33DD33→ you can craft it|r — Ledger › Incoming",
+    ["   |cFF33DD33→ tu sais la crafter|r — vue métier › onglet Entrantes"] = "   |cFF33DD33→ you can craft it|r — profession view › Incoming tab",
     ["|cFFFFCC00commande pour TOI|r de |cFFFFFFFF%s|r : %s%s%s"] = "|cFFFFCC00order for YOU|r from |cFFFFFFFF%s|r: %s%s%s",
     ["|cFFFFCC00nouvelle commande|r de |cFFFFFFFF%s|r : %s%s%s"] = "|cFFFFCC00new order|r from |cFFFFFFFF%s|r: %s%s%s",
     ["ton artisan |cFFFFFFFF%s|r est en ligne."] = "your crafter |cFFFFFFFF%s|r is online.",

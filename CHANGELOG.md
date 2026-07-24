@@ -1,5 +1,26 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.27.2 — Captured requests get their own tab and don't linger anymore
+
+Requests picked up from /trade and /guild used to hang around for hours. One would still read "20h"
+the next day, long after the buyer had found someone else, and there was no telling whether they'd
+been served. Those requests now expire 30 minutes after they're seen, the way a shout in /trade
+actually works. One you've accepted sticks around six hours, since you've committed to it.
+
+They also stopped pretending you could fill them. The profession window would list a request for a
+gem you have no recipe for, Accept button and all, even at skill 190 for a cut that needs 350. Now
+the cockpit only shows what you can really craft (it rechecks live, so a recipe you learn brings the
+request back). Whatever it hides still sits in the Ledger for you to hand off to a capable friend.
+
+And the captured requests moved out of the relation tabs into an Incoming tab of their own, with a
+count next to it. The chat-scanned requests and the ones a peer forwards you are a different animal
+from a real network order (no accept-deliver cycle, you answer them in whisper by hand), so mixing
+them into All/Guild/Friends/Directory only muddied both. They get their own place now.
+
+Also fixed, an order that arrived without a profession attached would fire its alert but never show
+up in the profession window, which filters strictly by trade. It now works the profession out from
+the item.
+
 ## v1.27.1 — Ready for 1.15.9, and no more directions to enemy cities
 
 Classic Era, Season of Discovery and Hardcore moved to patch 1.15.9, the one that brings the modern

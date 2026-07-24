@@ -29,6 +29,7 @@ local en = {
     -- Filtres Carnet
     ["Tous"] = "All", ["Guilde"] = "Guild", ["Amis"] = "Friends",
     ["Annuaire"] = "Directory",
+    ["Entrantes"] = "Incoming",
     ["Rafraîchir l'annuaire"] = "Refresh directory",
     ["annuaire : appel lancé sur le canal — les porteurs en ligne vont répondre."] =
         "directory: call sent on the channel — online holders will respond.",
