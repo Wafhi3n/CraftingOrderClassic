@@ -5,37 +5,42 @@
 
 ---
 
-Crafting & Gathering Order shows everyone you cross paths with what you can craft. Your professions,
-skill levels and recipe list travel with you, and any player on your realm running the addon can look
-you up in the Artisans directory and order straight from you, guildmate or total stranger.
+Classic gives you no way to find out who can craft what. You can't inspect a stranger and see they're
+a Jewelcrafter, there's no realm-wide list of professions, and the game forgets a friend's skills the
+second they log off. So you spam /trade and hope someone answers.
 
-It's also a work-order board, for both crafting and gathering. No shared guild, no auction house, no
-server. You post what you want made or gathered, and everyone running the addon on your realm can see
-it and answer. It talks over a hidden realm channel, so it works between people who've never met, as
-long as they've got the addon too.
+Crafting & Gathering Order fills that hole. Every profession, skill level and recipe you know travels
+with you over a hidden realm channel, and everyone else running the addon does the same. Look someone
+up in the Artisans directory and you see what they can actually make, their skill level, whether
+they're online, and how you know them, then order straight from them, whether it's a guildmate or a
+stranger you've never spoken to.
+
+It's also a work-order board for crafting and gathering. No shared guild, no auction house, no server.
+Post what you want made or gathered and everyone on your realm running the addon sees it and can
+answer, even people you've never met, as long as they've got the addon too.
 
 ## What it does
 
-- Share your professions, skill levels and known recipes automatically with every addon user you cross paths with. No setup, no signup; playing is enough.
+- See what anyone running the addon can craft, their skill level and their recipe list, in the Artisans directory. The game never shows you this; the addon carries it for you.
+- Share your own professions, skills and known recipes the same way, automatically. No setup, no signup; playing is enough.
 - Post craft and gather orders from the addon window, or straight from chat with `/co post`.
 - Send an order to everyone, your guild, your friends, or one named player. A named order gets pushed to that person the moment they log in.
 - Get a toast, a chat line and a sound when an order is meant for you. `/co notify` sets how much of that you want.
-- Browse the Artisans directory: who can make what, who's online, their skill levels, and how you know them.
 - Pick a crafter and the recipe list narrows to what they can actually make, so you never send someone a request they can't fill.
 - Filter recipes down to what you can make right now with the reagents already in your bags.
-- Order from your friends and guildmates without opening the board (new in 1.4).
-- See recipe cooldowns on other artisans, so you know whether their Transmute is ready or still ticking (new in 1.9).
-- Group your alts under one identity, so an order for your offline alchemist reaches whatever character you're playing (new in 1.9).
-- Check every profession on your whole account at once in the My Artisans tab (new in 1.9).
-- Season of Discovery recipes are built in, on SoD realms only, so seasonal crafts show up on the board like any other (new in 1.12).
-- Keep the board clean: mute a spammer (with a reason, or just for an hour), or trust a busy friend so they're never auto-muted (new in 1.13).
-- Recipes sorted into real categories instead of one flat "Consumable" pile, everywhere they show up (new in 1.16).
-- If you run Lazy Gold, every recipe shows what it'd earn you, and you can sort the list by profit (new in 1.16).
-- If you run MissingTradeSkillsList, flip the recipe list to show what you haven't learned yet, in red, and click one to see where it drops (new in 1.16).
-- The window uses the game's own frame style now, not a custom skin, so it reads as part of the interface (new in 1.17).
-- Click the bag icon on any artisan in the directory to see exactly what materials they need to keep leveling, worked out locally from what the addon already knows about them (new in 1.23).
+- Order from your friends and guildmates without opening the board.
+- See recipe cooldowns on other artisans, so you know whether their Transmute is ready or still ticking.
+- Group your alts under one identity, so an order for your offline alchemist reaches whatever character you're playing.
+- Check every profession on your whole account at once in the My Artisans tab.
+- Season of Discovery recipes are built in, on SoD realms only, so seasonal crafts show up on the board like any other.
+- Keep the board clean: mute a spammer (with a reason, or just for an hour), or trust a busy friend so they're never auto-muted.
+- Recipes sorted into real categories instead of one flat "Consumable" pile, everywhere they show up.
+- If you run Lazy Gold, every recipe shows what it'd earn you, and you can sort the list by profit.
+- If you run MissingTradeSkillsList, flip the recipe list to show what you haven't learned yet, in red, and click one to see where it drops.
+- The window uses the game's own frame style, not a custom skin, so it reads as part of the interface.
+- Click the bag icon on any artisan in the directory to see exactly what materials they need to keep leveling, worked out locally from what the addon already knows about them.
 - Get a heads-up when you're running an old version, read off the versions other players around you are on, with a dot on the minimap that clears once you update (new in 1.27).
-- Ready for patch 1.15.9 and the modern interface it brings to Era, Season of Discovery and Hardcore (1.27.1).
+- Ready for patch 1.15.9 and the modern interface it brings to Era, Season of Discovery and Hardcore.
 
 ## Order from your Friends and Guild list
 
@@ -112,9 +117,12 @@ them a spare plan with `/co gift`. It drafts a friendly whisper; it never sends 
 
 ## Catching requests from non-users
 
-When someone without the addon posts a request in `/trade` or `/guild`, it lands in an Incoming queue so
-it doesn't slip past you. Accept it, then reply to them in chat yourself. Sales (WTS) and crafters
-advertising their services (LFW) get filtered out. `/co scan` turns the scanner on and off.
+When someone without the addon posts a request in `/trade` or `/guild`, it lands in an Incoming tab in
+the profession window so it doesn't slip past you, but only when you actually know the recipe, so a cut
+you can't do won't ping you. Accept it, then reply to them in chat yourself. These captured requests
+clear themselves after half an hour, the way a shout in /trade really works, so yesterday's leftovers
+don't sit on your board pretending someone's still waiting. Sales (WTS) and crafters advertising their
+services (LFW) get filtered out. `/co scan` turns the scanner on and off.
 
 ## Keeping the board clean
 
