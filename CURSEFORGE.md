@@ -42,17 +42,18 @@ answer, even people you've never met, as long as they've got the addon too.
 - Get a heads-up when you're running an old version, read off the versions other players around you are on, with a dot on the minimap that clears once you update (new in 1.27).
 - Ready for patch 1.15.9 and the modern interface it brings to Era, Season of Discovery and Hardcore.
 
-## Order from your Friends and Guild list
+## Order straight from a name, friend or stranger
 
-Hover a friend in the Friends list and their professions and skill levels show up next to the game's own
-tooltip. Battle.net friends count too, not just friends added by character name. Click a guildmate in the
-Guild panel and the same summary sits under their detail, with an Order button right there, so it works
-even when they're offline.
+Mouse over any addon user in the world, a guildmate or a complete stranger you just ran past, and their
+professions and skill levels show up under the game's own tooltip. Hold Shift and it lists their recipes
+by name. Right-click them and you get an Order entry for each profession they craft, each one opening the
+Order tab already set to it, so you can order from someone you've never spoken to without adding them to
+anything first.
 
-Right-click anyone who runs the addon, a friend, an online guildmate, or someone you bumped into in the
-world, and you get an Order entry for each profession they craft, each one opening the Order tab already
-set to it. Their summary also shows how many recipes they know, and holding Shift over their in-world
-tooltip lists those recipes by name.
+The Friends list and Guild panel get the same treatment as built-in shortcuts. Hover a friend and the
+summary sits next to their tooltip, Battle.net friends included, not just friends added by character
+name. Click a guildmate and it sits under their detail with an Order button right there, so it works even
+when they're offline.
 
 The directory fills itself in as you cross paths with other users. When it's looking empty, the Refresh
 button calls out on the channel and everyone online answers.
