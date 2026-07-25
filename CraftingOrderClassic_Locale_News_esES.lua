@@ -8,6 +8,13 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "Novedades",
+    -- v1.28.0
+    ["Le plan de route suit chaque point, et sait quand une recette est finie"] =
+        "La ruta de subida sigue cada punto y sabe cuándo una receta está acabada",
+    ["Le plan de route prenait du retard : tu gagnais un point et il gardait l'ancien plan jusqu'à ce qu'autre chose le réveille — pire en Enchantement, où le jeu ne donne jamais ton rang en direct à l'addon. Il suit maintenant chaque point à l'instant où tu le gagnes. Il sait aussi quand une recette passe grise : il lisait la couleur en direct à ton rang courant mais projetait les rangs suivants d'après les données, si bien qu'une recette que tu voyais grise était encore comptée, et conseillée, un rang plus loin. Grise, c'est fini : elle disparaît des étapes ET du total, pas seulement de la première ligne."] =
+        "La ruta de subida se quedaba atrás: ganabas un punto y mantenía el plan antiguo hasta que otra cosa la despertaba — peor en Encantamiento, donde el juego nunca le da al addon tu nivel en directo. Ahora sigue cada punto en el instante en que lo ganas. También aprendió cuándo una receta se vuelve gris: leía el color en directo en tu nivel actual pero proyectaba los niveles siguientes según los datos, así que una receta que veías gris en tu lista aún se contaba, y se recomendaba, un nivel más allá. Gris es gris para siempre ahora: desaparece de los pasos Y del total, no solo de la primera línea.",
+    ["La fenêtre de route a rattrapé la bourse d'artisan : une case pour inclure ou non les plans à acheter, un vrai en-tête avec l'icône du métier et ton rang, et un bandeau « Étapes » repliable pour que la liste de courses ne passe plus sous le bas de la fenêtre. Et au plafond entraîné, elle ne se contente plus de hausser les épaules : elle explique comment débloquer le palier suivant — l'entraîner chez ton formateur, ou acheter le livre de rang pour les Premiers soins — et pointe le PNJ où aller, filtré à ta faction."] =
+        "La ventana de ruta alcanzó a la bolsa de artesano: una casilla para incluir o no las recetas a comprar, una cabecera de verdad con el icono de la profesión y tu nivel, y una banda «Pasos» plegable para que la lista de la compra ya no quede empujada bajo el borde inferior de la ventana. Y al tope entrenado ya no se encoge de hombros: explica cómo desbloquear el siguiente nivel — entrenarlo con tu maestro, o comprar el libro de rango para Primeros Auxilios — y te señala el PNJ a visitar, filtrado según tu facción.",
     -- v1.27.2
     ["Un onglet Entrantes, et des demandes qui ne traînent plus"] =
         "Una pestaña Entrantes, y peticiones que ya no se quedan pegadas",

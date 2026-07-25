@@ -11,6 +11,13 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "What's New",
+    -- v1.28.0
+    ["Le plan de route suit chaque point, et sait quand une recette est finie"] =
+        "The leveling route keeps up, and knows when a recipe's done",
+    ["Le plan de route prenait du retard : tu gagnais un point et il gardait l'ancien plan jusqu'à ce qu'autre chose le réveille — pire en Enchantement, où le jeu ne donne jamais ton rang en direct à l'addon. Il suit maintenant chaque point à l'instant où tu le gagnes. Il sait aussi quand une recette passe grise : il lisait la couleur en direct à ton rang courant mais projetait les rangs suivants d'après les données, si bien qu'une recette que tu voyais grise était encore comptée, et conseillée, un rang plus loin. Grise, c'est fini : elle disparaît des étapes ET du total, pas seulement de la première ligne."] =
+        "The Leveling Route used to lag behind: you'd gain a point and it kept the old plan until something else nudged it — worst on Enchanting, where the game never hands the addon your live skill. It follows every point now, the moment you earn it. It also learned when a recipe goes grey: it read the live colour at your current rank but projected the ranks ahead from data, so a recipe you could see greyed out in your list still got counted, and recommended, a rank later. Grey is grey for good now: it drops out of the steps and the total, not just the top line.",
+    ["La fenêtre de route a rattrapé la bourse d'artisan : une case pour inclure ou non les plans à acheter, un vrai en-tête avec l'icône du métier et ton rang, et un bandeau « Étapes » repliable pour que la liste de courses ne passe plus sous le bas de la fenêtre. Et au plafond entraîné, elle ne se contente plus de hausser les épaules : elle explique comment débloquer le palier suivant — l'entraîner chez ton formateur, ou acheter le livre de rang pour les Premiers soins — et pointe le PNJ où aller, filtré à ta faction."] =
+        "The route window caught up with the artisan pouch: a box to fold the buyable recipes in or out, a proper header with the profession's icon and your rank, and a collapsible Steps band so the shopping list stops getting pushed off the bottom of the small window. And at your trained cap it no longer just shrugs: it tells you how to open the next tier — train it at your trainer, or buy the rank book for First Aid — and points you at the NPC to visit, filtered to your faction.",
     -- v1.27.2
     ["Un onglet Entrantes, et des demandes qui ne traînent plus"] =
         "An Incoming tab, and requests that don't linger",

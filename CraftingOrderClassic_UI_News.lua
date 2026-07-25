@@ -21,6 +21,13 @@ local BODY_W = 780
 local function versionsLatest()
     return {
         {
+            v = "v1.28.0", title = L["Le plan de route suit chaque point, et sait quand une recette est finie"],
+            lines = {
+                L["Le plan de route prenait du retard : tu gagnais un point et il gardait l'ancien plan jusqu'à ce qu'autre chose le réveille — pire en Enchantement, où le jeu ne donne jamais ton rang en direct à l'addon. Il suit maintenant chaque point à l'instant où tu le gagnes. Il sait aussi quand une recette passe grise : il lisait la couleur en direct à ton rang courant mais projetait les rangs suivants d'après les données, si bien qu'une recette que tu voyais grise était encore comptée, et conseillée, un rang plus loin. Grise, c'est fini : elle disparaît des étapes ET du total, pas seulement de la première ligne."],
+                L["La fenêtre de route a rattrapé la bourse d'artisan : une case pour inclure ou non les plans à acheter, un vrai en-tête avec l'icône du métier et ton rang, et un bandeau « Étapes » repliable pour que la liste de courses ne passe plus sous le bas de la fenêtre. Et au plafond entraîné, elle ne se contente plus de hausser les épaules : elle explique comment débloquer le palier suivant — l'entraîner chez ton formateur, ou acheter le livre de rang pour les Premiers soins — et pointe le PNJ où aller, filtré à ta faction."],
+            },
+        },
+        {
             v = "v1.27.2", title = L["Un onglet Entrantes, et des demandes qui ne traînent plus"],
             lines = {
                 L["Les demandes captées dans /commerce et /guilde restaient affichées des heures. On en voyait encore une marquée « 20h » le lendemain, bien après que le demandeur ait trouvé quelqu'un d'autre. Elles disparaissent maintenant 30 minutes après avoir été vues, comme un cri dans /commerce. Celle que tu as acceptée, elle, tient six heures : tu t'es engagé dessus."],

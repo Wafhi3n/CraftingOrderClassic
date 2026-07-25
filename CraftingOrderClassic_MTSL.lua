@@ -320,3 +320,11 @@ function MTSL:SourcePrice(profKey, spellID)
     local p = item and item.vendors and item.vendors.price
     return (p and p > 0) and p or nil
 end
+
+-- Ligne PNJ « [niv] Nom — Zone (x, y) » (+ pin) pour un npc id BRUT, HORS recette : sert aux
+-- « passerelles » de palier (le vendeur d'un livre de RANG n'est rattaché à aucune recette de la base
+-- MTSL). nil si MTSL absent, PNJ inconnu, ou de la faction opposée (npcLine filtre déjà l'autre camp).
+function MTSL:NpcLine(npcId)
+    if not (self:IsAvailable() and npcId) then return nil end
+    return npcLine(npcId)
+end

@@ -395,7 +395,20 @@ f:SetScript("OnEvent", function(_, event, arg1)
         SlashCmdList["CRAFTINGORDER"] = function(msg) COC:Slash(msg) end
         p(COC.L["chargé — |cFFFFFFFF/co help|r pour les commandes. (Réseau global de craft — autonome.)"])
     elseif event == "SKILL_LINES_CHANGED" then
-        -- Gain de point / apprentissage : recapture mes niveaux et les rediffuse (throttlé).
+        -- Gain de point / apprentissage. Si la fenêtre métier est OUVERTE : CAPTURE locale +
+        -- rafraîchissement UI IMMÉDIATS, pour que la route/le badge « coût/point » suivent l'événement
+        -- AUTORITAIRE du point. Sans ça, ils ne suivaient que les proxys TRADE_SKILL_UPDATE/CRAFT_UPDATE
+        -- (qui ne tombent pas à chaque gain, surtout côté Craft), et côté ENCHANTEMENT le rang lu par
+        -- Craft:OpenRank vient du CACHE Directory.mySkills (l'API Craft n'expose pas le rang) → il doit
+        -- être frais tout de suite. Gaté sur la fenêtre ouverte : en Era, les compétences d'ARME montent
+        -- en plein combat (même événement) — inutile de recapturer à chaque coup fenêtre fermée.
+        local PW = COC.ProfWindow
+        if COC.Directory and PW and PW.frame and PW.frame:IsShown() then
+            COC.Directory:CaptureSkills()
+            if PW.Refresh then PW:Refresh() end
+        end
+        -- Diffusion réseau (+ capture de repli fenêtre fermée) : throttlée 2 s (une série de crafts
+        -- spamme cet événement — on ne réannonce pas mon profil à chaque point).
         if COC.Directory and not COC._skillTimer and C_Timer then
             COC._skillTimer = true
             C_Timer.After(2, function()

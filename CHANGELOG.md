@@ -1,5 +1,25 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.28.0 — The leveling route keeps up, and knows when a recipe's done
+
+The Leveling Route used to lag behind you. You'd craft, gain a point, and it kept showing the old
+plan until something else happened to nudge it — worst on Enchanting, where the game never hands the
+addon your live skill, so the route was reading a stale copy. It follows every point now, the moment
+you earn it.
+
+It also learned when a recipe goes grey. The route reads the live colour at your current rank but
+projects the ranks ahead from data, and the two don't always line up right at the green-to-grey edge
+— so a recipe you could plainly see greyed out in your list still got counted, and recommended, a
+rank later. Grey is grey for good now: it drops out of the steps and the total, not just the top line.
+
+The route window caught up with the artisan pouch. There's a box to fold the buyable recipes in or
+out, a proper header with the profession's icon and your rank, and a collapsible Steps band so the
+shopping list stops getting pushed off the bottom of the small window.
+
+And when you reach your trained cap, the route no longer just shrugs. It tells you how to open the
+next tier — train it at your trainer, or for First Aid buy the rank book — and points you at the NPC
+to go see, filtered to your faction.
+
 ## v1.27.2 — Captured requests get their own tab and don't linger anymore
 
 Requests picked up from /trade and /guild used to hang around for hours. One would still read "20h"
