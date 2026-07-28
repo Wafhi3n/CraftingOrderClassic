@@ -52,7 +52,7 @@ local _statGroups, _statByCut, _statOrderByCut = {}, nil, nil
 
 -- Déclarées ICI, avant RegisterStats, pour qu'il puisse purger le cache de libellés : sans ça une
 -- déclaration arrivée APRÈS un premier affichage resterait sans effet (libellé déjà figé).
-local _cutBySpell, _cutOrder, _repSpell, _labelCache
+local _cutBySpell, _cutOrder, _repSpell, _labelCache, _cutCount
 
 function Gem:RegisterStats(groups)
     if type(groups) ~= "table" then return end
@@ -101,9 +101,12 @@ end
 -- Restreint aux recettes dont l'objet produit EST une gemme : la Joaillerie fabrique aussi des
 -- bagues, colliers, statues et figurines, qui gardent leur classement par emplacement.
 -- (Les locales de ces maps sont déclarées plus haut — cf. RegisterStats.)
+--
+-- On compte aussi COMBIEN de gemmes porte chaque taille DANS LE CATALOGUE : c'est ce nombre qui dit
+-- si un en-tête de taille sait regrouper quoi que ce soit (cf. le `lone` de StatFor).
 
 local function buildMaps()
-    _cutBySpell, _cutOrder, _repSpell, _labelCache = {}, {}, {}, {}
+    _cutBySpell, _cutOrder, _repSpell, _labelCache, _cutCount = {}, {}, {}, {}, {}
     local c = CL()
     local def = c and c.GetProfession and c:GetProfession(PROF)
     if not def then return end
@@ -115,6 +118,7 @@ local function buildMaps()
         local cut = (product and Gem:IsGem(product) and e.name) and e.name:match("^(%S+)%s+%S")
         if cut then
             _cutBySpell[e.id] = cut
+            _cutCount[cut] = (_cutCount[cut] or 0) + 1
             seen[cut] = true
             -- Représentant de la taille = plus petit spellID : pairs() n'a pas d'ordre, il faut un
             -- départage STABLE (c'est lui qui portera le libellé lu sur le client).
@@ -200,10 +204,16 @@ end
 --   * rang    : l'ordre de déclaration de la stat, sinon 500 + rang alphabétique anglais — les
 --               tailles non encore rattachées à une stat passent donc APRÈS celles qui le sont ;
 --   * niveau  : rang de métier de la recette → les variantes se trient du plus fort au plus faible ;
---   * lone    : toujours vrai ici. Le libellé d'une taille est le PREMIER MOT du nom de la gemme :
---               un en-tête pour une seule ligne ne fait que la répéter (« Bracing » / « Bracing
---               Earthstorm Diamond »). On autorise donc le moteur à aplatir une section dont aucune
---               taille ne regroupe — les gemmes MÉTA, où chaque taille est unique.
+--   * lone    : vrai seulement pour une taille UNIQUE DANS LE CATALOGUE. Son libellé s'ouvre sur le
+--               premier mot du nom de la gemme : quand une seule gemme la porte, l'en-tête ne fera
+--               JAMAIS que répéter la ligne d'en dessous (« Bracing » / « Bracing Earthstorm
+--               Diamond ») — c'est le cas des gemmes MÉTA, et le moteur aplatit alors la section.
+--               ⚠️ Le critère est le CATALOGUE, jamais la liste affichée : la vue métier ne montre
+--               que les recettes APPRISES, donc un joaillier qui ne connaît qu'une taille de bleu
+--               perdait l'en-tête « Endurance - Solide » que l'onglet Commande, lui, affichait
+--               (constat en jeu 2026-07-28). Or les deux vues doivent classer À L'IDENTIQUE : la
+--               question « cet en-tête peut-il regrouper quelqu'un ? » se tranche sur les données,
+--               pas sur ce qui se trouve à l'écran.
 -- nil pour tout ce qui n'est pas une gemme taillée (bagues, colliers, statues) → classement normal.
 function Gem:StatFor(spellID)
     local cut = self:CutFor(spellID)
@@ -212,5 +222,5 @@ function Gem:StatFor(spellID)
     local order = _statOrderByCut[cut] or (500 + (_cutOrder[cut] or 400))
     local c = CL()
     local tier = (c and c.RecipeLearnedAt and c:RecipeLearnedAt(PROF, spellID)) or 0
-    return cutLabel(cut), order, tier, true
+    return cutLabel(cut), order, tier, (_cutCount[cut] or 0) <= 1
 end
