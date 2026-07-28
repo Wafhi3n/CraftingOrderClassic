@@ -1,5 +1,31 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.29.0 — Orders on screen, and a journal to read them in
+
+Your accepted orders now sit on screen the way tracked quests do. The item you agreed to make, and
+under it every reagent with what you've got against what you need, like `Bolt of Silk Cloth 2/4`.
+When the last one drops into your bags the line turns white and the order climbs to the top under
+"Ready to deliver". Nothing to open, nothing to go and check. Drag any line to move the whole thing,
+`/co track` if you'd rather not have it at all.
+
+It follows your leveling as well. For each profession still climbing, it names the single recipe that
+buys your next skill point for the least gold, lists its reagents the same way, and tells you which
+plan to buy and from whom when the cheapest route runs through one you don't own yet.
+
+You can also give an order a name and a story. A second button next to Post opens it as a quest sheet
+on parchment, where you write a title and a few lines. The crafters who see it read "The blacksmith's
+burden" rather than "Enchanted Thorium Helm", with your text underneath. Same order, it just reads
+like a quest.
+
+And there's a journal. `/co journal` opens a parchment window where your orders and your real quests
+share one list, grouped by section and by zone, with the full text of whichever you click. It reads
+the game's quest log without writing to it, so your own quest window keeps whatever you had selected.
+It shows every quest in a zone at once, too, where the game's log stops at six.
+
+One Jewelcrafting fix while I was in there. A cut header like "Stamina - Solid" vanished from the
+profession window when you only knew one gem of that cut, even though the Order tab still showed it.
+Both views group the same way now.
+
 ## v1.28.0 — The leveling route keeps up, and knows when a recipe's done
 
 The Leveling Route used to lag behind you. You'd craft, gain a point, and it kept showing the old

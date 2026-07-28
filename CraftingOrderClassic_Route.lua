@@ -164,6 +164,64 @@ function Route:Compute(profKey, rank, maxRank, opts)
         partial = anyPartial }
 end
 
+-- ------------------------------------------------------------------
+-- Prochain point seulement (consommateur CHAUD : le suivi à l'écran)
+-- ------------------------------------------------------------------
+-- Candidates() balaie TOUTES les recettes du métier et interroge Lazy Gold pour chacune. Compute()
+-- paie ça une fois puis marche rang par rang jusqu'au plafond : c'est un chemin FROID (on ouvre une
+-- fenêtre). Le suivi à l'écran, lui, se recalcule à chaque BAG_UPDATE — d'où ce cache, même patron
+-- que LG:BestPlanFor (clé + TTL). Clé : métier + inclusion des plans + version de données + nombre
+-- de recettes connues (apprendre un plan doit rebattre les candidates).
+local CANDS, CANDS_TTL = {}, 120
+
+function Route:InvalidateCandidates(profKey)
+    if profKey then CANDS[profKey] = nil else CANDS = {} end
+end
+
+local function candsKey(profKey, opts)
+    local lib = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
+    local dv = (lib and lib.DataVersion) and lib:DataVersion() or 0
+    local n = 0
+    for _ in pairs(opts.known or {}) do n = n + 1 end
+    return profKey .. "|" .. (opts.plans and 1 or 0) .. "|" .. tostring(dv) .. "|" .. n
+end
+
+function Route:CachedCandidates(profKey, opts)
+    local now = (GetTime and GetTime()) or 0
+    local key = candsKey(profKey, opts)
+    local c = CANDS[profKey]
+    if c and c.key == key and (now - c.at) < CANDS_TTL then return c.cands end
+    local cands = self:Candidates(profKey, opts)
+    if not cands then return nil end
+    CANDS[profKey] = { cands = cands, key = key, at = now }
+    return cands
+end
+
+-- La MEILLEURE recette pour le prochain point, sans marcher jusqu'au plafond : un seul pickBest au
+-- rang courant. `target` reste celui de la route complète — l'amortissement du prix d'un plan doit
+-- raconter la même histoire ici et dans la fenêtre Plan de route (un plan cher se justifie sur tous
+-- les points qu'il servira ENCORE, pas sur un seul). Rend nil si rien n'est calculable ou si le
+-- métier est déjà au plafond. opts : voir Candidates.
+function Route:NextStep(profKey, rank, maxRank, opts)
+    if not (profKey and rank) then return nil end
+    local target = (maxRank and maxRank > 0) and maxRank or nil
+    if not target then
+        for _, cap in ipairs(CAPS) do if rank < cap then target = cap; break end end
+    end
+    if not target or rank >= target then return nil end
+    local cands = self:CachedCandidates(profKey, opts or {})
+    if not cands then return nil end
+    local best, chance, partial = pickBest(cands, rank, rank, target, {})
+    if not (best and chance) then return nil end
+    return {
+        sid = best.sid, prod = best.prod, rank = rank, target = target,
+        cost = best.cost, chance = chance, perPoint = best.cost / chance,
+        -- `plan` non nil = la route ACHÈTE ce plan pour ce point (le joueur ne le connaît pas encore).
+        plan = (not best.known) and { price = best.planPrice or 0 } or nil,
+        partial = partial or nil,
+    }
+end
+
 -- Ajoute `n` unités du réactif `id` au sac `acc`, avec deux raffinements terrain (retour user
 -- 2026-07-19, capture Couture) :
 --  · CRÉDIT de production : ce que la route CRAFTE déjà (acc.produced, ex. rouleaux montés pour

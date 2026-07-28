@@ -11,6 +11,19 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "What's New",
+    -- v1.29.0
+    ["Tes commandes à l'écran, et un journal pour les lire"] =
+        "Orders on screen, and a journal to read them in",
+    ["Les commandes que tu as acceptées s'affichent à l'écran, comme les quêtes suivies. L'objet que tu t'es engagé à faire, et dessous chaque réactif avec ce que tu as sur ce qu'il te faut : « Balle de soie 2/4 ». Quand le dernier tombe dans tes sacs, la ligne passe au blanc et la commande remonte en tête sous « Prêt à livrer ». Rien à ouvrir, rien à aller vérifier. Glisse n'importe quelle ligne pour déplacer le tout, /co track si tu n'en veux pas."] =
+        "The orders you've accepted sit on screen the way tracked quests do. The item you agreed to make, and under it every reagent with what you've got against what you need, like 'Bolt of Silk Cloth 2/4'. When the last one drops into your bags the line turns white and the order climbs to the top under 'Ready to deliver'. Nothing to open, nothing to go and check. Drag any line to move the whole thing, /co track if you'd rather not have it.",
+    ["Il suit aussi ta montée de métier. Pour chaque métier encore en progression, il nomme LA recette qui achète ton prochain point le moins cher, liste ses réactifs de la même façon, et te dit quel plan acheter et à qui quand la route la moins chère passe par un plan que tu n'as pas encore."] =
+        "It follows your leveling as well. For each profession still climbing, it names the single recipe that buys your next skill point for the least gold, lists its reagents the same way, and tells you which plan to buy and from whom when the cheapest route runs through one you don't own yet.",
+    ["Tu peux donner un nom et une histoire à une commande. Un second bouton à côté de Poster l'ouvre comme une fiche de quête sur parchemin, où tu écris un titre et quelques lignes. Les artisans qui la voient lisent « Le fardeau du forgeron » plutôt que « Heaume de thorium enchanté », avec ton texte dessous. C'est la même commande, elle se lit juste comme une quête."] =
+        "You can give an order a name and a story. A second button next to Post opens it as a quest sheet on parchment, where you write a title and a few lines. The crafters who see it read 'The blacksmith's burden' rather than 'Enchanted Thorium Helm', with your text underneath. Same order, it just reads like a quest.",
+    ["Et il y a un journal. /co journal ouvre une fenêtre parchemin où tes commandes et tes vraies quêtes partagent une seule liste, groupées par section et par zone, avec le texte complet de celle que tu cliques. Il lit le journal de quêtes du jeu sans y écrire, donc ta propre fenêtre de quête garde ce que tu avais sélectionné. Il montre aussi toutes les quêtes d'une zone d'un coup, là où le journal du jeu s'arrête à six."] =
+        "And there's a journal. /co journal opens a parchment window where your orders and your real quests share one list, grouped by section and by zone, with the full text of whichever you click. It reads the game's quest log without writing to it, so your own quest window keeps whatever you had selected. It shows every quest in a zone at once, too, where the game's log stops at six.",
+    ["Un correctif de joaillerie au passage : un en-tête de taille comme « Endurance - Solide » disparaissait de la fenêtre métier quand tu ne connaissais qu'une seule gemme de cette taille, alors que l'onglet Commande l'affichait. Les deux vues classent pareil maintenant."] =
+        "One Jewelcrafting fix while I was in there. A cut header like 'Stamina - Solid' vanished from the profession window when you only knew one gem of that cut, even though the Order tab still showed it. Both views group the same way now.",
     -- v1.28.0
     ["Le plan de route suit chaque point, et sait quand une recette est finie"] =
         "The leveling route keeps up, and knows when a recipe's done",

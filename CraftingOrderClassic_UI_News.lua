@@ -18,6 +18,25 @@ local BODY_W = 780
 -- ⚠️ À la release suivante, AJOUTER l'entrée en tête de CE bloc ; ne PAS reverser dans versionsRecent,
 -- qui repasserait aussitôt au-dessus du plafond. Quand ce bloc-ci s'en approchera à son tour, en créer
 -- un nouveau devant lui (versions() n'a qu'à le concaténer en premier).
+-- Bloc de tête COURANT, créé pour v1.29.0 : `versionsLatest` atteignait 64 lignes en accueillant
+-- cette entrée (plafond 60/fonction). C'est exactement la manœuvre que son propre commentaire
+-- prévoit — un bloc de plus DEVANT, que versions() concatène en premier. À la prochaine release,
+-- ajouter ici ; quand celui-ci s'approchera à son tour de 60, en créer encore un devant.
+local function versionsCurrent()
+    return {
+        {
+            v = "v1.29.0", title = L["Tes commandes à l'écran, et un journal pour les lire"],
+            lines = {
+                L["Les commandes que tu as acceptées s'affichent à l'écran, comme les quêtes suivies. L'objet que tu t'es engagé à faire, et dessous chaque réactif avec ce que tu as sur ce qu'il te faut : « Balle de soie 2/4 ». Quand le dernier tombe dans tes sacs, la ligne passe au blanc et la commande remonte en tête sous « Prêt à livrer ». Rien à ouvrir, rien à aller vérifier. Glisse n'importe quelle ligne pour déplacer le tout, /co track si tu n'en veux pas."],
+                L["Il suit aussi ta montée de métier. Pour chaque métier encore en progression, il nomme LA recette qui achète ton prochain point le moins cher, liste ses réactifs de la même façon, et te dit quel plan acheter et à qui quand la route la moins chère passe par un plan que tu n'as pas encore."],
+                L["Tu peux donner un nom et une histoire à une commande. Un second bouton à côté de Poster l'ouvre comme une fiche de quête sur parchemin, où tu écris un titre et quelques lignes. Les artisans qui la voient lisent « Le fardeau du forgeron » plutôt que « Heaume de thorium enchanté », avec ton texte dessous. C'est la même commande, elle se lit juste comme une quête."],
+                L["Et il y a un journal. /co journal ouvre une fenêtre parchemin où tes commandes et tes vraies quêtes partagent une seule liste, groupées par section et par zone, avec le texte complet de celle que tu cliques. Il lit le journal de quêtes du jeu sans y écrire, donc ta propre fenêtre de quête garde ce que tu avais sélectionné. Il montre aussi toutes les quêtes d'une zone d'un coup, là où le journal du jeu s'arrête à six."],
+                L["Un correctif de joaillerie au passage : un en-tête de taille comme « Endurance - Solide » disparaissait de la fenêtre métier quand tu ne connaissais qu'une seule gemme de cette taille, alors que l'onglet Commande l'affichait. Les deux vues classent pareil maintenant."],
+            },
+        },
+    }
+end
+
 local function versionsLatest()
     return {
         {
@@ -244,7 +263,8 @@ local function versionsOldest()
 end
 
 local function versions()
-    local out = versionsLatest()
+    local out = versionsCurrent()
+    for _, e in ipairs(versionsLatest()) do out[#out + 1] = e end
     for _, e in ipairs(versionsRecent()) do out[#out + 1] = e end
     for _, e in ipairs(versionsOlder()) do out[#out + 1] = e end
     for _, e in ipairs(versionsOldest()) do out[#out + 1] = e end

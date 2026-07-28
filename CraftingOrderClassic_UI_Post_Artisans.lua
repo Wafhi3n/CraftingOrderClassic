@@ -117,8 +117,16 @@ function UI:_BuildPostActionBar(panel, sec)
     local posterBtn = Skin.MakeGoldButton(bar, 82, 20, L["Poster"]); posterBtn:SetPoint("RIGHT", -8, 0)
     posterBtn:SetScript("OnClick", function() UI:DoPostOrder() end)
     self.postBtn = posterBtn   -- exposé pour l'aide contextuelle (bulle « Poster »)
+    -- Seconde voie de post : la commande devient une QUÊTE (titre + récit), écrite dans la fiche
+    -- parchemin. Bouton séparé plutôt que des champs dans la colonne : le narratif est optionnel et
+    -- ne doit pas rogner la liste d'artisans de ceux qui ne s'en servent pas.
+    -- 140 et non 124 : l'espagnol dit « Publicar como misión », le plus long des trois overlays.
+    local questBtn = Skin.MakeGoldButton(bar, 140, 20, L["Poster en quête"])
+    questBtn:SetPoint("RIGHT", posterBtn, "LEFT", -6, 0)
+    questBtn:SetScript("OnClick", function() UI:DoPostAsQuest() end)
+    self.postQuestBtn = questBtn
     self.postArtisanName = bar:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    self.postArtisanName:SetPoint("RIGHT", posterBtn, "LEFT", -14, 0); Skin.ApplyShadow(self.postArtisanName)
+    self.postArtisanName:SetPoint("RIGHT", questBtn, "LEFT", -14, 0); Skin.ApplyShadow(self.postArtisanName)
     local artLbl = bar:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     artLbl:SetPoint("RIGHT", self.postArtisanName, "LEFT", -6, 0)
     artLbl:SetText("|cFFE8B84B" .. L["Destinataire :"] .. "|r"); Skin.ApplyShadow(artLbl)

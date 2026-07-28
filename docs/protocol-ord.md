@@ -28,6 +28,28 @@ Séparateur de champ = `|`. Les champs sont positionnels.
 | **DONE** | `id`, `acceptedBy\|""` | `^ORD\|DONE\|([^\|]*)\|(.*)$` |
 | **NACK** | `id`, `who` (émetteur) | `^ORD\|NACK\|([^\|]*)\|(.*)$` |
 | **SUGG** | `id`, `[captured]`(=`1` si entrante captée, sinon absent) | `^ORD\|SUGG\|([^\|]*)\|?(%d*)$` |
+| **TTL** | `id`, `title` (assaini, ≤ `TITLE_MAX` = 80 **octets**) | `^ORD\|TTL\|([^\|]*)\|(.*)$` |
+| **TXQ** | `id` — demande de description, **whisper 1:1 uniquement** | `^ORD\|TXQ\|(.+)$` |
+| **TXT** | `id`, `text` (assaini, ≤ `TEXT_MAX` = 180 **octets**) — réponse, **whisper 1:1** | `^ORD\|TXT\|([^\|]*)\|(.*)$` |
+
+### Narratif (TTL / TXQ / TXT) — pourquoi des VERBES et pas des champs
+
+Le motif de `NEW` est **ancré sur `$`**. Un champ supplémentaire en fin de payload ne dégrade pas :
+le motif échoue **en bloc**, `Codec.Decode` rend `nil`, et la commande devient **totalement invisible**
+pour tout client d'une version antérieure. À l'inverse, un **verbe inconnu** rend `nil` dans
+`Codec.Decode` et est ignoré proprement par `OnNetwork`. Les verbes séparés sont donc la **seule**
+extension rétro-compatible du protocole. Le test `tests/test_narrative_codec.lua` verrouille l'octet
+exact du `NEW` — s'il casse, c'est que quelqu'un a repris le mauvais chemin.
+
+La **description ne se diffuse jamais** : elle se demande à l'auteur en 1:1 (`TXQ` → `TXT`). Diffuser
+un pavé de texte libre par commande postée serait à la fois du gaspillage de bande passante et une
+nuisance à l'échelle du royaume.
+
+Le texte libre est **assaini à l'émission ET à la réception** (`Codec.CleanText`) : on retire `|`
+— séparateur du fil, mais surtout préfixe de tous les échappements d'interface (`|c` couleur,
+`|T` texture, `|H` lien), sans quoi un titre hostile fabrique un faux lien d'objet chez tout le monde
+— ainsi que `~` (séparateur du transport canal) et les caractères de contrôle. La troncature est en
+**octets**, sur une frontière UTF-8 (un « é » coupé en deux s'affiche en caractère parasite).
 
 ### Tolérances de rétro-compatibilité (à préserver telles quelles)
 
@@ -69,6 +91,8 @@ SV, jamais pilotable par le réseau). Sans opt-in `/co alts` et sans claim reçu
 | **NEW — CRÉATION d'un id INCONNU** | **n'importe qui** — `sender ≠ buyer` est LÉGITIME (relais mesh) | `not existed` |
 | **NEW — MUTATION d'un id CONNU** | **`SamePlayer(sender, o.buyer` EN CACHE`)` EXIGÉ** — sinon message **ignoré**, champs intacts | `existed` |
 | **NEW reçu en `CHANNEL`** | **`SamePlayer(sender, f.buyer)` EXIGÉ** — le canal n'est alimenté que par `Post`/`PostEntry`/`Cancel` sur ses PROPRES commandes (un reroll VÉRIFIÉ passe) | — |
+| **TTL / TXT (texte libre)** | **`SamePlayer(sender, o.buyer)` EXIGÉ, sans exception** — pas de première-écriture par un tiers, contrairement à `NEW`. Conséquence assumée : une commande arrivée par **relais mesh depuis un TIERS** n'a pas de titre tant que son auteur n'est pas là pour le rappeler. ⚠️ **Il n'existe AUCUN verbe de re-demande de titre** — `TXQ`/`TXT` ne portent que la description. Le rattrapage passe uniquement par l'auteur : `RebroadcastMine` joint un `TTL` à chaque `NEW` réémis, et `OnArtisanOnline` fait de même pour SES propres commandes (`Orders:PushTitleTo`). Un `TTL` relayé par un tiers serait rejeté à l'arrivée, donc inutile à envoyer. Une commande sans nom vaut mieux qu'un nom écrit par n'importe qui à la place d'autrui. Rien n'est stocké venant d'un joueur **en sourdine**. | — |
+| **TXQ (répondre à une demande)** | On ne répond que pour **ses propres** commandes (`IsMyChar(o.buyer)`), et **throttlé par demandeur** (10 s) — sans quoi une rafale de `TXQ` fait de notre client un amplificateur de chuchotements | `o.text` non vide |
 
 > ### ⚠️ NEW : on garde la MUTATION, jamais la CRÉATION
 >

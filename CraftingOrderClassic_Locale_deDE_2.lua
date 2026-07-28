@@ -393,6 +393,49 @@ local de2 = {
         "%s bietet dir eine Verzauberung an: %s. In den Platz „Wird nicht gehandelt“ legen? Du gibst nichts her — du bekommst es verzaubert zurück.",
     ["Poser la pièce"] = "Hineinlegen",
     ["Ignorer"] = "Ignorieren",
+    -- Suivi à l'écran des commandes (_Tracker*.lua / _Journal.lua)
+    ["Prêt à livrer"] = "Lieferbereit",
+    ["Progression"] = "Fortschritt",
+    ["Mes commandes"] = "Meine Aufträge",
+    ["réactifs inconnus"] = "Materialien unbekannt",
+    ["+%d de plus"] = "+%d weitere",
+    ["suivi des commandes affiché."] = "Auftragsverfolgung eingeblendet.",
+    ["suivi des commandes masqué."] = "Auftragsverfolgung ausgeblendet.",
+    ["position du suivi réinitialisée."] = "Position der Verfolgung zurückgesetzt.",
+    ["suivi masqué en combat."] = "Verfolgung im Kampf ausgeblendet.",
+    ["suivi visible en combat."] = "Verfolgung im Kampf sichtbar.",
+    ["suivi des commandes à l'écran (glisser une ligne pour le déplacer)"] =
+        "Auftragsverfolgung am Bildschirm (eine Zeile ziehen zum Verschieben)",
+    ["~%s/point"] = "~%s/Punkt",
+    [">%s/point"] = ">%s/Punkt",
+    ["suivi : %d entrées au maximum."] = "Verfolgung: höchstens %d Einträge.",
+    ["Le suivi à l'écran"] = "Die Bildschirm-Verfolgung",
+    ["Hors de toute fenêtre, le suivi liste ce sur quoi tu peux agir maintenant — exactement comme le suivi de quête."] =
+        "Außerhalb jedes Fensters listet die Verfolgung auf, was du jetzt tun kannst — genau wie die Questverfolgung.",
+    ["Sections, par ordre de priorité : |cFFE8B84BPrêt à livrer|r (tu as tous les réactifs), |cFFE8B84BEn cours|r, |cFFE8B84BProgression|r (la recette du prochain point de métier), |cFFE8B84BMes commandes|r."] =
+        "Abschnitte nach Priorität: |cFFE8B84BLieferbereit|r (alle Materialien vorhanden), |cFFE8B84BAktiv|r, |cFFE8B84BFortschritt|r (das Rezept für den nächsten Fertigkeitspunkt), |cFFE8B84BMeine Aufträge|r.",
+    ["Clic gauche sur une ligne : ouvre le métier concerné. Clic droit : ouvre le Carnet. Maj-clic un réactif : le lie dans le chat."] =
+        "Linksklick auf eine Zeile: öffnet den Beruf. Rechtsklick: öffnet das Auftragsbuch. Shift-Klick auf ein Material: verlinkt es im Chat.",
+    ["Glisse n'importe quelle ligne pour déplacer le suivi ; clique l'en-tête d'une section pour la replier."] =
+        "Ziehe eine beliebige Zeile, um die Verfolgung zu verschieben; klicke eine Abschnittsüberschrift, um sie einzuklappen.",
+    ["|cFFFFFFFF/co track|r affiche/masque · |cFFFFFFFF/co track reset|r remet en place · |cFFFFFFFF/co track combat|r masque en combat · |cFFFFFFFF/co track lines 5|r borne le nombre d'entrées."] =
+        "|cFFFFFFFF/co track|r ein/aus · |cFFFFFFFF/co track reset|r Position zurücksetzen · |cFFFFFFFF/co track combat|r im Kampf ausblenden · |cFFFFFFFF/co track lines 5|r Anzahl der Einträge begrenzen.",
+    ["usage : /co %s <id> <texte>"] = "Verwendung: /co %s <id> <Text>",
+    ["texte effacé pour %s"] = "Text für %s gelöscht",
+    ["nommer et raconter ta commande : elle se lit alors comme une quête"] =
+        "Gib deinem Auftrag Namen und Geschichte: er liest sich dann wie eine Quest",
+    ["Poster en quête"] = "Als Quest posten",
+    ["Objectifs"] = "Ziele",
+    ["Récompense :"] = "Belohnung:",
+    ["Fermer"] = "Schließen",
+    ["Sans titre"] = "Ohne Titel",
+    ["voir une commande sous forme de quête (parchemin)"] = "einen Auftrag als Quest ansehen (Pergament)",
+    ["Onglet |cFFE8B84BCommande|r → |cFFE8B84BPoster en quête|r : donne un titre et un récit à ta demande, sur un vrai parchemin de quête. Elle apparaît ensuite sous ce nom chez les artisans."] =
+        "Reiter |cFFE8B84BAuftrag|r → |cFFE8B84BAls Quest posten|r: Gib deiner Anfrage Titel und Geschichte auf echtem Quest-Pergament. Sie erscheint danach unter diesem Namen bei den Handwerkern.",
+    ["Journal"] = "Journal",
+    ["Choisis une entrée à gauche."] = "Wähle links einen Eintrag.",
+    ["journal parchemin : commandes et quêtes côte à côte (clic droit sur un en-tête du suivi)"] =
+        "Pergament-Journal: Aufträge und Quests nebeneinander (Rechtsklick auf eine Verfolgungs-Überschrift)",
 }
 
 for k, v in pairs(de2) do L[k] = v end

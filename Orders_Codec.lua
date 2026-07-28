@@ -18,6 +18,40 @@ local Codec = {}
 COC.OrdersCodec = Codec
 
 -- ------------------------------------------------------------------
+-- Texte libre (titre / description d'une commande) — assainissement PARTAGÉ
+-- ------------------------------------------------------------------
+-- Bornes en OCTETS (un message addon plafonne à 255) : les accents français font 2 octets, compter
+-- en caractères sous-estimerait la taille réelle d'un tiers.
+Codec.TITLE_MAX = 80
+Codec.TEXT_MAX  = 180
+
+-- Tronque à `max` OCTETS sans couper une séquence UTF-8 : une coupe au milieu d'un « é » affiche un
+-- caractère parasite chez TOUS les destinataires.
+local function truncBytes(s, max)
+    if #s <= max then return s end
+    local i = max
+    while i > 0 do
+        local b = s:byte(i + 1)                      -- octet de CONTINUATION (10xxxxxx) ? on recule
+        if not b or b < 128 or b >= 192 then break end
+        i = i - 1
+    end
+    return s:sub(1, i)
+end
+
+-- Texte libre prêt pour le fil ET pour l'affichage. On retire :
+--   · `|` — séparateur du fil, MAIS surtout préfixe de tous les échappements d'interface (|c couleur,
+--     |T texture, |H lien) : sans ça un titre hostile fabrique un faux lien d'objet, colle une
+--     texture, ou masque du texte dans l'interface de tout le monde ;
+--   · `~` — séparateur du transport canal-texte (cf. BroadcastText) ;
+--   · les caractères de contrôle (retours à la ligne compris), qui casseraient la mise en page.
+-- ⚠️ À appliquer à l'ÉMISSION *et* à la RÉCEPTION : un pair hostile n'envoie pas ce que NOUS encodons.
+function Codec.CleanText(s, max)
+    if type(s) ~= "string" then return "" end
+    s = s:gsub("[|~]", ""):gsub("%c", " "):gsub("^%s+", ""):gsub("%s+$", "")
+    return truncBytes(s, max or Codec.TEXT_MAX)
+end
+
+-- ------------------------------------------------------------------
 -- ENCODAGE — une fonction par verbe, expressions reprises telles quelles du code d'origine.
 -- ------------------------------------------------------------------
 local ENCODERS = {
@@ -40,6 +74,17 @@ local ENCODERS = {
     NACK   = function(o) return "ORD|NACK|" .. o.id .. "|" .. (o.who or "") end,
     -- SUGG : suffixe |1 si l'ordre a été capté dans /commerce·/guilde (entrante).
     SUGG   = function(o) return "ORD|SUGG|" .. o.id .. (o.captured and "|1" or "") end,
+    -- ---------------------------------------------------------------
+    -- Narratif : TTL (titre, diffusé avec le NEW) · TXQ (demande de description, 1:1) · TXT (réponse).
+    -- Des verbes SÉPARÉS, jamais un champ de plus dans NEW : le motif de NEW est ancré sur `$`, un
+    -- champ supplémentaire le ferait échouer EN BLOC chez tout client plus ancien — la commande
+    -- deviendrait INVISIBLE, pas dégradée. Un verbe inconnu, lui, rend nil dans Codec.Decode et est
+    -- ignoré proprement : c'est la SEULE extension rétro-compatible du protocole.
+    -- La description ne se diffuse pas : elle se demande à l'auteur, en chuchotement (voie fiable du
+    -- transport) — sinon chaque commande postée déverserait un pavé de texte libre sur le canal.
+    TTL = function(o) return "ORD|TTL|" .. o.id .. "|" .. Codec.CleanText(o.title, Codec.TITLE_MAX) end,
+    TXQ = function(o) return "ORD|TXQ|" .. o.id end,
+    TXT = function(o) return "ORD|TXT|" .. o.id .. "|" .. Codec.CleanText(o.text, Codec.TEXT_MAX) end,
 }
 
 function Codec.Encode(verb, o)
@@ -83,6 +128,24 @@ local DECODERS = {
         local id, cap = message:match("^ORD|SUGG|([^|]*)|?(%d*)$")   -- suffixe |1 optionnel
         if not id then return nil end
         return { verb = "SUGG", id = id, captured = cap }
+    end,
+    -- Narratif. La queue est GOURMANDE (`.*`) : un émetteur hostile peut y glisser des `|`, et un
+    -- motif strict rejetterait alors le message au lieu de le nettoyer. On capture tout, puis
+    -- CleanText assainit — la confiance est placée dans le nettoyage, jamais dans la forme reçue.
+    TTL = function(message)
+        local id, title = message:match("^ORD|TTL|([^|]*)|(.*)$")
+        if not id or id == "" then return nil end
+        return { verb = "TTL", id = id, title = Codec.CleanText(title, Codec.TITLE_MAX) }
+    end,
+    TXQ = function(message)
+        local id = message:match("^ORD|TXQ|(.+)$")
+        if not id then return nil end
+        return { verb = "TXQ", id = id }
+    end,
+    TXT = function(message)
+        local id, text = message:match("^ORD|TXT|([^|]*)|(.*)$")
+        if not id or id == "" then return nil end
+        return { verb = "TXT", id = id, text = Codec.CleanText(text, Codec.TEXT_MAX) }
     end,
 }
 

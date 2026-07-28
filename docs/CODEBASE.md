@@ -1,28 +1,28 @@
 # CraftingOrderClassic — carte du code
 
-> **GÉNÉRÉ** le 2026-07-26 (v1.28.0) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
+> **GÉNÉRÉ** le 2026-07-29 (v1.29.0) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
-105 modules + 4 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
+113 modules + 4 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
 
 ## Modules (ordre de chargement)
 
 | Fichier | Rôle | Lignes |
 |---|---|---|
-| `CraftingOrderClassic.lua` | Crafting Order - Classic — réseau GLOBAL et SOCIAL de commandes de craft. | 423 |
+| `CraftingOrderClassic.lua` | Crafting Order - Classic — réseau GLOBAL et SOCIAL de commandes de craft. | 433 |
 | `CraftingOrderClassic_Trace.lua` | trace réseau PERSISTÉE, lisible hors-jeu. | 79 |
 | `CraftingOrderClassic_Migrations.lua` | versionnage du schéma SavedVariables. | 40 |
 | `CraftingOrderClassic_Locale.lua` | socle de localisation du CHROME de l'UI. | 12 |
 | `CraftingOrderClassic_Locale_enUS.lua` | overlay ANGLAIS (enUS/enGB). | 267 |
-| `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 416 |
+| `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 459 |
 | `CraftingOrderClassic_Locale_deDE.lua` | overlay ALLEMAND (deDE). | 269 |
-| `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 398 |
+| `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 441 |
 | `CraftingOrderClassic_Locale_esES.lua` | overlay ESPAGNOL (esES/esMX). | 270 |
-| `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 399 |
-| `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 244 |
-| `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 241 |
-| `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 241 |
+| `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 442 |
+| `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 257 |
+| `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 254 |
+| `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 254 |
 | `CraftingOrderClassic_Elemental.lua` | pseudo-« métier » de récolte « Élémentaire ». | 61 |
 | `CraftingOrderClassic_UI_Skin.lua` | tokens + helpers SÉMANTIQUES du skin (métiers, statuts, rareté, quantités, icônes natives) et petits widgets d'affichage. | 428 |
 | `CraftingOrderClassic_UI_Skin_Native.lua` | kit de chrome Blizzard NATIF (le « framework » UI de COC). | 485 |
@@ -32,9 +32,9 @@
 | `CraftingOrderClassic_UI.lua` | fenêtre principale (chrome Blizzard natif, kit UI_Skin_Native). | 485 |
 | `CraftingOrderClassic_UI_HelpPlate.lua` | AIDE CONTEXTUELLE de la FENÊTRE PRINCIPALE (« bouton i »). | 166 |
 | `CraftingOrderClassic_UI_Post_Layout.lua` | GÉOMÉTRIE de l'onglet « Commande » : colonnes, zones, séparateurs. | 132 |
-| `CraftingOrderClassic_UI_Post.lua` | onglet « Commande » : sélection de plan (gauche) + réactifs « je fournis » / commission g-s-c / ciblage artisan (droite). | 408 |
+| `CraftingOrderClassic_UI_Post.lua` | onglet « Commande » : sélection de plan (gauche) + réactifs « je fournis » / commission g-s-c / ciblage artisan (droite). | 438 |
 | `CraftingOrderClassic_UI_Post_Detail.lua` | onglet « Commande », PANNEAU DROIT : en-tête du plan sélectionné (icône + cadre doré + nom + niveau), liste des réactifs « je fournis », et la rangée commission. | 194 |
-| `CraftingOrderClassic_UI_Post_Artisans.lua` | onglet « Commande », section droite basse : boutons source, liste des artisans, ciblage (@Nom), libellé destinataire, bouton Poster. | 220 |
+| `CraftingOrderClassic_UI_Post_Artisans.lua` | onglet « Commande », section droite basse : boutons source, liste des artisans, ciblage (@Nom), libellé destinataire, bouton Poster. | 228 |
 | `CraftingOrderClassic_UI_Post_Categories.lua` | onglet « Commande », panneau gauche : regroupe la LISTE DES PLANS en sections type fenêtre native (emplacement puis type pour les équipements, type pour les armes, catégorie pour le reste). | 184 |
 | `CraftingOrderClassic_UI_Post_Paperdoll.lua` | onglet « Commande », vue SILHOUETTE de l'Enchantement. | 330 |
 | `CraftingOrderClassic_UI_Post_LazyGold.lua` | onglet « Commande » : couche Lazy Gold (lecture seule). | 151 |
@@ -50,8 +50,8 @@
 | `CraftingOrderClassic_UI_MyArtisans_Layout.lua` | GÉOMÉTRIE de l'onglet « Mes artisans ». | 57 |
 | `CraftingOrderClassic_UI_MyArtisans.lua` | onglet « Mes artisans » : vue agrégée des métiers du COMPTE (tous mes rerolls du royaume), en mode « connu ». | 483 |
 | `CraftingOrderClassic_UI_MyArtisans_LazyGold.lua` | onglet « Mes artisans » : couche Lazy Gold. | 135 |
-| `CraftingOrderClassic_UI_Help.lua` | onglet Aide : page unique défilante qui explique les autres onglets (Carnet/Commande/Récolte/Artisans), la Vue Métier et le réseau. | 178 |
-| `CraftingOrderClassic_UI_News.lua` | onglet « Nouveautés » : notes de version (changelog) affichées EN JEU, version par version, la plus récente en tête. | 287 |
+| `CraftingOrderClassic_UI_Help.lua` | onglet Aide : page unique défilante qui explique les autres onglets (Carnet/Commande/Récolte/Artisans), la Vue Métier et le réseau. | 196 |
+| `CraftingOrderClassic_UI_News.lua` | onglet « Nouveautés » : notes de version (changelog) affichées EN JEU, version par version, la plus récente en tête. | 307 |
 | `CraftingOrderClassic_Social.lua` | couche sociale passive (socle). | 380 |
 | `CraftingOrderClassic_Social_Menu.lua` | entrées « Crafting Order » du menu contextuel joueur. | 101 |
 | `CraftingOrderClassic_Social_Roster.lua` | affichage des métiers sur les fenêtres NATIVES. | 130 |
@@ -68,7 +68,7 @@
 | `CraftingOrderClassic_Enchant.lua` | spécifique à l'Enchantement (API Craft). | 385 |
 | `CraftingOrderClassic_Stats.lua` | STATS d'un objet : identité canonique + libellé localisé. | 366 |
 | `CraftingOrderClassic_Stats_Filter.lua` | sélecteur « ne montrer que ce qui donne <stat> ». | 103 |
-| `CraftingOrderClassic_Gem.lua` | spécifique à la JOAILLERIE : sous-catégorise les GEMMES TAILLÉES par TAILLE (le mot qui porte la stat). | 216 |
+| `CraftingOrderClassic_Gem.lua` | spécifique à la JOAILLERIE : sous-catégorise les GEMMES TAILLÉES par TAILLE (le mot qui porte la stat). | 226 |
 | `CraftingOrderClassic_Gem_Stats.lua` | correspondance TAILLE DE GEMME → STAT (données, éditées à la main). | 41 |
 | `CraftingOrderClassic_MTSL.lua` | pont LECTURE SEULE vers l'addon « Missing TradeSkills List » (MTSL). | 330 |
 | `CraftingOrderClassic_ProfWindow.lua` | fenêtre métier custom 3 colonnes (migration depuis Guild Economy) : Recettes \| Détail+Craft \| Commandes du métier. | 460 |
@@ -78,7 +78,7 @@
 | `CraftingOrderClassic_ProfWindow_Toolbar.lua` | barre d'outils de la colonne Recettes (vue métier) : les toggles de TRI (slot recTools, à gauche : rentabilité / valeurs exactes / progression — Lazy Gold) et de FILTRE (slot recFilterToggles, à droite : « j'ai les matériaux » / « montée de compétence »). | 245 |
 | `CraftingOrderClassic_ProfWindow_Recipes.lua` | colonne GAUCHE : liste de recettes virtualisée (scroll), recherche, couleur par difficulté, sélection, badge « demandé » (nb de commandes ouvertes pour l'objet). | 486 |
 | `CraftingOrderClassic_ProfWindow_Leveling.lua` | aide à la MONTÉE DE MÉTIER dans la liste de recettes : coût de progression (réactifs au prix Lazy Gold ÷ chance de point selon la couleur), badge « meilleur coût/point » sur la recette recommandée, icônes de SOURCE sur les manquantes (formateur / vendeur PNJ / coté à l'HV / à farmer) et tri « progression » affiné par coût. | 219 |
-| `CraftingOrderClassic_Route.lua` | cœur de CALCUL du plan de route de montée de métier, PARAMÉTRABLE : marche gloutonne rang par rang (recette au meilleur coût/point ESPÉRÉ), seuils réels CraftLink `skillColors` aux rangs futurs, amortissement du prix des plans à acheter, exclusion des recettes à cooldown et des coûts partiels. | 265 |
+| `CraftingOrderClassic_Route.lua` | cœur de CALCUL du plan de route de montée de métier, PARAMÉTRABLE : marche gloutonne rang par rang (recette au meilleur coût/point ESPÉRÉ), seuils réels CraftLink `skillColors` aux rangs futurs, amortissement du prix des plans à acheter, exclusion des recettes à cooldown et des coûts partiels. | 323 |
 | `CraftingOrderClassic_ProfWindow_Route.lua` | fenêtre « PLAN DE ROUTE » de montée de métier (étage ③ de l'aide à la progression) : « du rang actuel au plafond, quoi crafter, combien de fois, pour combien ». | 400 |
 | `CraftingOrderClassic_ProfWindow_Detail.lua` | colonne CENTRE : détail de la recette sélectionnée (icône, réactifs have/need) + boutons Créer / Créer tout. | 418 |
 | `CraftingOrderClassic_ProfWindow_Info.lua` | PANNEAU D'INFO en SECTIONS pour la colonne centrale de la vue métier. | 203 |
@@ -101,9 +101,13 @@
 | `CraftingOrderClassic_LFWChat.lua` | détection « recherche de travail » dans le CHAT VISIBLE. | 88 |
 | `Directory_MyArtisans.lua` | agrégation des métiers du COMPTE (onglet « Mes artisans »). | 168 |
 | `Directory_LootScan.lua` | découverte PASSIVE des artisans NON-porteurs de l'addon qui craftent à proximité. | 170 |
-| `Orders_Codec.lua` | codec du protocole filaire ORD\| (sérialisation ⇄ parsing, SOURCE DE VÉRITÉ). | 95 |
-| `Orders.lua` | Crafting Order - Classic — Orders : carnet d'ordres GLOBAL (modèle + cycle + protocole). | 484 |
-| `Orders_Net.lua` | couche « fil réseau » du carnet d'ordres (protocole ORD\|). | 318 |
+| `Orders_Codec.lua` | codec du protocole filaire ORD\| (sérialisation ⇄ parsing, SOURCE DE VÉRITÉ). | 158 |
+| `Orders.lua` | Crafting Order - Classic — Orders : carnet d'ordres GLOBAL (modèle + cycle + protocole). | 493 |
+| `Orders_Net.lua` | couche « fil réseau » du carnet d'ordres (protocole ORD\|). | 329 |
+| `Orders_Narrative.lua` | TITRE et DESCRIPTION libres d'une commande : « donne un nom et une histoire à ce que tu demandes ». | 254 |
+| `CraftingOrderClassic_QuestSheet.lua` | FICHE DE QUÊTE réutilisable : affiche (ou fait écrire) une commande sous la forme d'une vraie quête du jeu. | 340 |
+| `CraftingOrderClassic_JournalQuests.lua` | lecture EN SEULE LECTURE du journal de quêtes du JEU, pour que le journal COC affiche les vraies quêtes à côté des commandes. | 103 |
+| `CraftingOrderClassic_JournalWin.lua` | LE JOURNAL : une fenêtre parchemin où les commandes et les vraies quêtes du joueur cohabitent par sections. | 311 |
 | `CraftingOrderClassic_Inbound.lua` | couche réseau « passive » : capte les demandes de craft postées dans /commerce (Trade) et /guilde par des joueurs SANS l'addon, alerte le joueur, et les range dans une file « Entrantes » (acceptable / ignorable). | 287 |
 | `CraftingOrderClassic_Handoff.lua` | « garder une commande pour un ami capable ». | 283 |
 | `CraftingOrderClassic_Moderation.lua` | modération / anti-spam. | 333 |
@@ -113,6 +117,10 @@
 | `CraftingOrderClassic_Companion_Trade.lua` | greffon ÉCHANGE (scène A de la maquette) : panneau accroché SOUS la fenêtre d'échange native quand une commande nous lie au partenaire (dans les DEUX sens : je crafte pour lui = « vendeur », ou il crafte pour moi = « acheteur »). | 114 |
 | `CraftingOrderClassic_Enchant_Trade.lua` | greffon ENCHANTEMENT sur la fenêtre d'ÉCHANGE. | 289 |
 | `CraftingOrderClassic_Enchant_Trade_Ask.lua` | greffon ÉCHANGE : « demande-lui la pièce ». | 294 |
+| `CraftingOrderClassic_Journal.lua` | MODÈLE « journal » : la liste unique, triée par PRIORITÉ, de ce sur quoi le joueur peut agir maintenant. | 269 |
+| `CraftingOrderClassic_Tracker.lua` | SUIVI À L'ÉCRAN des commandes, façon suivi de quête : un cadre léger, déplaçable, hors de toute fenêtre, qui liste ce sur quoi le joueur peut agir MAINTENANT. | 215 |
+| `CraftingOrderClassic_Tracker_Rows.lua` | LIGNES du suivi à l'écran : pool réutilisable + peinture d'un groupe de sections rendu par COC.Journal:Grouped. | 238 |
+| `CraftingOrderClassic_Tracker_Next.lua` | section « Progression » du suivi à l'écran : pour chaque métier encore en montée, LA recette à crafter maintenant pour gagner le prochain point, ses réactifs en objectifs, et le plan à acheter quand la route en achète un. | 151 |
 | `Debug.lua` | Crafting Order - Classic — Debug : mode solo pour "jouer" un réseau fictif. | 136 |
 | `CraftingOrderClassic_SelfTest.lua` | suite de tests IN-GAME (/cotest). | 180 |
 
@@ -738,7 +746,7 @@
 > Ici, chaque zone se parente à SON bloc (`UI:PostSec(id)`) et s'ancre en coordonnées RELATIVES au
 > bloc — plus aucun offset absolu de panneau (cf. l'en-tête du fichier Layout pour le pourquoi).
 
-**API** : `UI:BuildPostTab(f)` · `UI:RefreshPost()` · `UI:RefreshPostPlans()` · `UI:SelectPostPlan(entry)` · `UI:DoPostOrder()`
+**API** : `UI:BuildPostTab(f)` · `UI:RefreshPost()` · `UI:RefreshPostPlans()` · `UI:SelectPostPlan(entry)` · `UI:DoPostOrder(narr)` · `UI:DoPostAsQuest()`
 
 ### `CraftingOrderClassic_UI_Post_Detail.lua`
 > CraftingOrderClassic_UI_Post_Detail.lua — onglet « Commande », PANNEAU DROIT : en-tête du plan
@@ -1335,7 +1343,7 @@
 > Les hypothèses (chance de point par couleur) sont ALIGNÉES sur _ProfWindow_Leveling : le badge
 > coût/point, la route et la bourse doivent raconter la même histoire. Aucune UI ici.
 
-**API** : `Route:Candidates(profKey, opts)` · `Route:Compute(profKey, rank, maxRank, opts)` · `Route:Materials(profKey, route)` · `Route:HasHigherTier(profKey, rank)` · `Route:Gateway(profKey, rank)` · `Route:NextTierCap(rank)`
+**API** : `Route:Candidates(profKey, opts)` · `Route:Compute(profKey, rank, maxRank, opts)` · `Route:InvalidateCandidates(profKey)` · `Route:CachedCandidates(profKey, opts)` · `Route:NextStep(profKey, rank, maxRank, opts)` · `Route:Materials(profKey, route)` · `Route:HasHigherTier(profKey, rank)` · `Route:Gateway(profKey, rank)` · `Route:NextTierCap(rank)`
 
 ### `CraftingOrderClassic_ProfWindow_Route.lua`
 > CraftingOrderClassic_ProfWindow_Route.lua — fenêtre « PLAN DE ROUTE » de montée de métier
@@ -1627,7 +1635,7 @@
 > PUR : aucune dépendance à l'API WoW ni à LibStub → chargeable hors client (tests headless Elune).
 > Ne référence que la table globale CraftingOrderClassic (pour publier COC.OrdersCodec).
 
-**API** : `Codec.Encode(verb, o)` · `Codec.Decode(message)`
+**API** : `Codec.CleanText(s, max)` · `Codec.Encode(verb, o)` · `Codec.Decode(message)`
 
 ### `Orders.lua`
 > Crafting Order - Classic — Orders : carnet d'ordres GLOBAL (modèle + cycle + protocole).
@@ -1652,6 +1660,105 @@
 > Le cycle local (Post/Accept/Deliver/Cancel/Decline), l'alerting et les helpers restent dans Orders.lua.
 
 **API** : `Orders:Broadcast(action, o, opts)` · `Orders:OnNetwork(sender, message, distribution)`
+
+### `Orders_Narrative.lua`
+> Orders_Narrative.lua — TITRE et DESCRIPTION libres d'une commande : « donne un nom et une histoire
+> à ce que tu demandes ». C'est le premier étage de la convergence commande ⇄ quête (le suivi à
+> l'écran et, plus tard, le journal en parchemin les affichent comme une quête).
+> 
+> Deux voies, choisies pour des raisons opposées :
+>   · TTL (titre) voyage AVEC le NEW — sans lui, une commande apparaîtrait sans nom chez tout le
+>     monde et il faudrait N chuchotements pour le récupérer ;
+>   · TXQ/TXT (description) ne se diffuse JAMAIS : on la demande à l'auteur en 1:1. Un pavé de texte
+>     libre par commande postée sur le canal du royaume serait à la fois du gaspillage et une
+>     nuisance à grande échelle.
+> 
+> SÉCURITÉ — c'est ici que vit la surface de texte libre de l'addon, donc la règle est stricte :
+>   · un titre/texte n'est accepté QUE de l'acheteur de la commande (samePlayer). Conséquence
+>     ASSUMÉE : une commande arrivée par relais mesh n'a pas de titre tant que son auteur ne nous
+>     l'a pas envoyé — récupérable par TXQ. On préfère une commande sans nom à un nom que
+>     n'importe qui aurait pu écrire à la place d'autrui ;
+>   · le contenu est ré-assaini À LA RÉCEPTION (Codec.CleanText retire `|`, donc toute fabrication
+>     de faux lien, de texture ou de couleur) — on ne fait jamais confiance à la forme reçue ;
+>   · rien n'est stocké venant d'un joueur en sourdine ;
+>   · répondre à un TXQ est throttlé par demandeur : sinon un seul joueur transforme notre client en
+>     amplificateur de chuchotements.
+
+**API** : `Orders:ApplyPendingTitle(o)` · `Orders:SetNarrative(id, title, text)` · `Orders:AttachNarrative(o, title, text)` · `Orders:PushTitleTo(who, o)` · `Orders:RequestText(id)` · `Orders:ShowAsQuest(id)` · `Orders:NarrativeCmd(rest, which)`
+
+### `CraftingOrderClassic_QuestSheet.lua`
+> CraftingOrderClassic_QuestSheet.lua — FICHE DE QUÊTE réutilisable : affiche (ou fait écrire) une
+> commande sous la forme d'une vraie quête du jeu. Deux modes, deux hôtes :
+>   · ÉDITION — l'auteur tape titre et récit DANS LA TYPOGRAPHIE FINALE : ce qu'il voit est
+>     littéralement ce que le destinataire verra ;
+>   · LECTURE — l'affichage d'une quête reçue.
+> Le CONTENU se construit dans n'importe quel cadre hôte (`BuildContent`) : la popup autonome, ou le
+> volet de détail du journal. Rien n'est stocké sur l'hôte — plusieurs fiches coexistent sans se
+> marcher dessus.
+> 
+> ⚠️ Ce fichier est écrit pour être PORTABLE : il est destiné à resservir dans RPQuestMaster (module
+> Total RP 3). Il ne dépend de COC que par `COC.L` (locale) et `COC.OrdersCodec` (bornes +
+> assainissement du texte libre) — rien de l'onglet Commande, rien du kit Skin maison.
+> 
+> CONTRAT PUBLIC
+>   local c = QuestSheet:BuildContent(host, { buttons = true, close = true })   -- une fois
+>   QuestSheet:FillContent(c, {
+>       title, text, giver,
+>       objectives = { { text = "…", done = false }, … },   -- ou `objective` (chaîne unique)
+>       reward, editable, acceptText, onAccept = function(title, text) end,
+>   })
+>   QuestSheet:Open(data)   -- raccourci : la popup autonome
+>   QuestSheet:Close()
+> 
+> Chrome EMPRUNTÉ au client : polices `QuestTitleFont` / `QuestFont` / `QuestFontNormalSmall` (celles
+> de QuestInfo.xml) et filet `UI-HorizontalBreak`. ⚠️ Ces polices sont NOIRES (r=g=b=0, calibrées
+> pour le parchemin) : sans fond clair le texte serait invisible.
+> Aucun bouton sécurisé ici : la fiche écrit et affiche, elle ne crafte pas.
+
+**API** : `Sheet.ApplyParchment(tex)` · `Sheet:BuildContent(host, opts)` · `Sheet:FillContent(c, data)` · `Sheet:Frame()` · `Sheet:Open(data)` · `Sheet:Close()`
+
+### `CraftingOrderClassic_JournalQuests.lua`
+> CraftingOrderClassic_JournalQuests.lua — lecture EN SEULE LECTURE du journal de quêtes du JEU,
+> pour que le journal COC affiche les vraies quêtes à côté des commandes.
+> 
+> POURQUOI ON LIT AU LIEU D'INJECTER — décision structurante, ne pas la rouvrir : le journal natif
+> n'est PAS extensible. `QuestLog_Update` lit `GetNumQuestLogEntries()` / `GetQuestLogTitle(i)`, des
+> fonctions C sans API d'ajout, et sa liste est figée à `QUESTS_DISPLAYED = 6`. Y glisser nos
+> commandes voudrait dire réécrire la fonction de Blizzard et confisquer ses boutons de ligne — avec
+> un conflit frontal garanti avec Questie. On lit par l'API publique, on n'écrit jamais.
+> 
+> ⚠️ DEUX PIÈGES D'API, tous deux liés au fait que ce journal est un ÉTAT PARTAGÉ :
+> 
+>  1. `GetQuestLogQuestText` et `GetQuestLogLeaderBoard` lisent la SÉLECTION COURANTE du journal du
+>     jeu. La changer perturbe la fenêtre native et tout addon qui s'y fie. On sauvegarde donc
+>     `GetQuestLogSelection()`, on sélectionne, on lit, ON RESTAURE — sans exception.
+> 
+>  2. Un en-tête de zone REPLIÉ dans le journal natif masque ses quêtes à l'énumération : elles ne
+>     sortent tout simplement pas de `GetQuestLogTitle`. On pourrait tout déplier
+>     (`ExpandQuestHeader(0)`) — on ne le fait PAS : ce serait modifier l'affichage du joueur pour
+>     notre confort, et l'état replié n'est pas restaurable proprement. On affiche donc ce qui est
+>     visible, et on marque la section repliée telle quelle. Honnête et sans effet de bord.
+> 
+> Aucune UI ici : ce module rend des données.
+
+**API** : `Q:Groups()` · `Q:Detail(index)` · `Q:GiverLine(entry)`
+
+### `CraftingOrderClassic_JournalWin.lua`
+> CraftingOrderClassic_JournalWin.lua — LE JOURNAL : une fenêtre parchemin où les commandes et les
+> vraies quêtes du joueur cohabitent par sections. C'est l'aboutissement du modèle `COC.Journal` :
+> la même liste d'entrées qui alimente le suivi à l'écran, présentée ici pour l'immersion.
+> 
+> Fenêtre SÉPARÉE (choix user) : le Carnet garde sa vue fonctionnelle — colonnes, tris, statuts —
+> et le journal apporte la vue immersive. Aucune régression possible sur l'existant.
+> 
+> Deux volets : la liste à gauche (sections repliables), le détail à droite. Le détail n'est PAS
+> réécrit ici : c'est le contenu de `COC.QuestSheet` encastré dans un volet (`BuildContent`), le
+> même code que la popup « Poster en quête ». Une seule fiche de quête dans tout l'addon.
+> 
+> Les vraies quêtes sont LUES par `COC.JournalQuests` (jamais écrites) — voir ce fichier pour
+> pourquoi le journal natif n'est pas extensible et quels pièges d'état partagé il pose.
+
+**API** : `Win:Refresh()` · `Win:Select(kind, key, extra)` · `Win:Frame()` · `Win:Show()` · `Win:Hide()` · `Win:Toggle()`
 
 ### `CraftingOrderClassic_Inbound.lua`
 > CraftingOrderClassic_Inbound.lua — couche réseau « passive » : capte les demandes de craft
@@ -1803,6 +1910,71 @@
 > raison de plus d'EXIGER son clic : l'addon ne déséquipe personne tout seul.
 
 **API** : `Ask:Request(label, token)` · `Ask:Refresh()` · `Ask:OnAsk(sender, message)` · `Ask:Hide()` · `Ask:Update()`
+
+### `CraftingOrderClassic_Journal.lua`
+> CraftingOrderClassic_Journal.lua — MODÈLE « journal » : la liste unique, triée par PRIORITÉ, de ce
+> sur quoi le joueur peut agir maintenant. C'est la couche que consomment le suivi à l'écran
+> (_Tracker*.lua, façon suivi de quête) et, plus tard, le journal COC en parchemin où commandes et
+> quêtes cohabiteront par sections. UNE seule définition de « qu'est-ce qui est prioritaire » :
+> deux vues qui trient différemment finissent toujours par se contredire (vécu avec l'alerte
+> Entrantes et son jumeau côté vue métier).
+> 
+> Une ENTRÉE ressemble volontairement à une quête :
+>   { key, section, title, tag, complete, objectives = { {itemID, have, need, done}, … },
+>     itemID/spellID (tooltip), sort, order }
+> `objectives = nil` ≠ `objectives = {}` : nil = on ne CONNAÎT pas les réactifs (catalogue muet) et
+> on ne prétend donc pas que la commande est prête ; {} = il n'y a rien à rassembler (tout fourni
+> par l'acheteur) → réellement prête.
+> 
+> Les fournisseurs d'entrées s'ENREGISTRENT (Journal:AddProvider) : chaque palier ajoute le sien
+> sans toucher ce fichier. Aucune UI ici.
+
+**API** : `Journal:AddProvider(fn)` · `Journal:RecipeOf(o)` · `Journal:ObjectivesFor(o, ctx)` · `Journal:Entries()` · `Journal:Grouped(max)`
+
+### `CraftingOrderClassic_Tracker.lua`
+> CraftingOrderClassic_Tracker.lua — SUIVI À L'ÉCRAN des commandes, façon suivi de quête : un cadre
+> léger, déplaçable, hors de toute fenêtre, qui liste ce sur quoi le joueur peut agir MAINTENANT.
+> Il ne décide de rien : le modèle et l'ordre de priorité vivent dans COC.Journal, les lignes dans
+> _Tracker_Rows.lua. À terme, le même modèle alimentera le journal COC en parchemin.
+> 
+> Deux invariants, chacun payé ailleurs dans cette codebase :
+>   · AUCUN bouton sécurisé ici. Un SecureActionButton interdirait de masquer le cadre — et tous ses
+>     ancêtres — en combat (wow-protected-frame-hide-combat). Le suivi NAVIGUE, il ne crafte pas.
+>   · Le rafraîchissement n'est PAS gaté sur la fenêtre principale. UI:RefreshSoon l'est, et c'est
+>     exactement ce qui empêchait la bourse d'artisan de se repeindre : on post-hooke APRÈS la garde.
+
+**API** : `Tracker:Cfg()` · `Tracker:Frame()` · `Tracker:BeginDrag()` · `Tracker:EndDrag()` · `Tracker:ToggleSection(section)` · `Tracker:OnEntryClick(e, button)` · `Tracker:Refresh()` · `Tracker:RefreshSoon()` · `Tracker:Toggle()` · `Tracker:Cmd(rest)` · `Tracker:Start()`
+
+### `CraftingOrderClassic_Tracker_Rows.lua`
+> CraftingOrderClassic_Tracker_Rows.lua — LIGNES du suivi à l'écran : pool réutilisable + peinture
+> d'un groupe de sections rendu par COC.Journal:Grouped. La coque (fenêtre, déplacement, événements,
+> cadence) vit dans _Tracker.lua ; ici, uniquement du texte posé au pixel.
+> 
+> Fidélité au suivi de quête NATIF — valeurs LUES dans Blizzard_UIPanels_Game\Vanilla\QuestLogFrame,
+> pas approchées à l'œil :
+>   · une ligne = 13 px (QuestWatchFrame:SetHeight(watchTextIndex * 13)), largeur = max + 10 ;
+>   · titre dont tous les objectifs sont remplis → NORMAL_FONT_COLOR, sinon 0.75/0.61/0 ;
+>   · objectif rempli → HIGHLIGHT_FONT_COLOR, sinon 0.8/0.8/0.8 ;
+>   · la coche des quêtes terminées = Interface\Buttons\UI-CheckBox-Check (Skin.tex.checkMark) ;
+>   · le [-]/[+] d'une section = UI-MinusButton-UP / UI-PlusButton-UP (QuestLogTitleButtonTemplate).
+> Aucune police custom : les GameFont* portent déjà l'ombre qui rend le texte lisible sur le monde.
+
+**API** : `Tracker:Paint(groups, overflow)`
+
+### `CraftingOrderClassic_Tracker_Next.lua`
+> CraftingOrderClassic_Tracker_Next.lua — section « Progression » du suivi à l'écran : pour chaque
+> métier encore en montée, LA recette à crafter maintenant pour gagner le prochain point, ses
+> réactifs en objectifs, et le plan à acheter quand la route en achète un.
+> 
+> Montage HYBRIDE, imposé par l'API : hors fenêtre de métier, le rang est lisible à tout moment
+> (GetSkillLineInfo, via db.mySkills que Dir:CaptureSkills tient à jour) mais les RECETTES ne le sont
+> pas — d'où rang LIVE + recettes du CACHE (db.knownRecipes, partition du perso courant). C'est le
+> chemin déjà éprouvé par la bourse d'artisan. Conséquence assumée : un plan appris depuis la
+> dernière ouverture de la fenêtre manque au calcul jusqu'à la prochaine.
+> 
+> Le calcul lui-même est COC.Route:NextStep — un seul pickBest au rang courant, pas la marche
+> jusqu'au plafond de Route:Compute : ce fournisseur tourne à chaque BAG_UPDATE.
+> Un fournisseur de plus dans COC.Journal, rien d'autre : aucune UI ici.
 
 ### `Debug.lua`
 > Crafting Order - Classic — Debug : mode solo pour "jouer" un réseau fictif.

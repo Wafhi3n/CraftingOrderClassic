@@ -109,7 +109,10 @@ function Orders:PostEntry(entry, qty, price, opts)
         status = "open", ts = time(),
     }
     COC.db.orders[o.id] = o
+    -- Narratif optionnel (fiche de quête) : posé AVANT le NEW, diffusé APRÈS par son verbe dédié.
+    if opts.title or opts.text then self:AttachNarrative(o, opts.title, opts.text) end
     self:Broadcast("NEW", o, { channel = true })   -- {channel} = diffusion voulue → portée royaume si publique
+    if o.title then self:Broadcast("TTL", o, { channel = true }) end
     return o
 end
 
@@ -318,6 +321,11 @@ function Orders:RebroadcastMine()
         local mine = o.buyer == me() or (COC.IsMyChar and COC:IsMyChar(o.buyer))
         if mine and (o.status == "open" or o.status == "accepted") then
             self:Broadcast("NEW", o)
+            -- Le titre est un VERBE SÉPARÉ : sans ce rappel, un pair atteint par la RE-diffusion et
+            -- non par la diffusion initiale (le cas nominal — il était hors ligne au moment du post)
+            -- verrait la commande sans nom, définitivement. Il n'existe pas de re-demande de titre :
+            -- seul l'acheteur peut nommer sa commande, donc seul son propre rappel la nomme.
+            if o.title then self:Broadcast("TTL", o) end
         end
     end
 end
@@ -403,6 +411,7 @@ function Orders:OnArtisanOnline(who)
     for _, o in pairs(COC.db.orders or {}) do
         if sent < 25 and self:_RelayMatch(o, who) then
             CraftLink:Send(self:_NewPayload(o), "whisper", who)
+            if self.PushTitleTo then self:PushTitleTo(who, o) end   -- cf. Orders_Narrative
             sent = sent + 1
         end
     end

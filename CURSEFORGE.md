@@ -40,6 +40,9 @@ answer, even people you've never met, as long as they've got the addon too.
 - The window uses the game's own frame style, not a custom skin, so it reads as part of the interface.
 - Click the bag icon on any artisan in the directory to see exactly what materials they need to keep leveling, worked out locally from what the addon already knows about them.
 - Get a heads-up when you're running an old version, read off the versions other players around you are on, with a dot on the minimap that clears once you update (new in 1.27).
+- Follow the orders you've accepted on screen, like tracked quests, with every reagent counted against your bags (new in 1.29).
+- Give an order a title and a story, so it reads like a quest to whoever picks it up (new in 1.29).
+- Read your orders and your real quests in one parchment journal with `/co journal` (new in 1.29).
 - Ready for patch 1.15.9 and the modern interface it brings to Era, Season of Discovery and Hardcore.
 
 ## Order straight from a name, friend or stranger
@@ -78,6 +81,20 @@ An order isn't done the second a crafter clicks Deliver. It goes to Delivered, a
 they got it, either automatically when the item lands in their bags or with a Received button. A
 crafter's delivered-count only ticks up on that confirmation, so it tracks goods that actually changed
 hands rather than clicks.
+
+## On screen, and in a journal
+
+The orders you've accepted sit on your screen the way tracked quests do. Under each one, every reagent
+with what you've got against what you need, counted from your bags as you loot. When the last one lands
+the order climbs to the top under Ready to deliver. It also names the cheapest recipe for your next
+skill point in each profession you're still levelling, and where to buy the plan if the cheapest route
+goes through one you don't own. Drag any line to move it, `/co track` to switch it off.
+
+Orders can carry a title and a few lines of your own writing. Post as quest opens a parchment sheet
+where you write them, and the crafters who see the order read your title instead of the item name, with
+your text underneath. `/co journal` then puts your orders and your real quests in one parchment window,
+grouped by section and by zone. It reads the game's quest log without writing to it, so your own quest
+window keeps whatever you had selected.
 
 ## Hand off from the trade and mail windows
 

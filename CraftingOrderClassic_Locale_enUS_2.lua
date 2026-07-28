@@ -411,6 +411,49 @@ local en2 = {
         "%s offers to enchant: %s. Place it in the \"will not be traded\" slot? You give nothing away — you get it back enchanted.",
     ["Poser la pièce"] = "Place it",
     ["Ignorer"] = "Ignore",
+    -- Suivi à l'écran des commandes (_Tracker*.lua / _Journal.lua)
+    ["Prêt à livrer"] = "Ready to deliver",
+    ["Progression"] = "Leveling",
+    ["Mes commandes"] = "My orders",
+    ["réactifs inconnus"] = "reagents unknown",
+    ["+%d de plus"] = "+%d more",
+    ["suivi des commandes affiché."] = "order tracker shown.",
+    ["suivi des commandes masqué."] = "order tracker hidden.",
+    ["position du suivi réinitialisée."] = "tracker position reset.",
+    ["suivi masqué en combat."] = "tracker hidden in combat.",
+    ["suivi visible en combat."] = "tracker visible in combat.",
+    ["suivi des commandes à l'écran (glisser une ligne pour le déplacer)"] =
+        "on-screen order tracker (drag a line to move it)",
+    ["~%s/point"] = "~%s/point",
+    [">%s/point"] = ">%s/point",
+    ["suivi : %d entrées au maximum."] = "tracker: %d entries at most.",
+    ["Le suivi à l'écran"] = "The on-screen tracker",
+    ["Hors de toute fenêtre, le suivi liste ce sur quoi tu peux agir maintenant — exactement comme le suivi de quête."] =
+        "Outside of any window, the tracker lists what you can act on right now — just like the quest tracker.",
+    ["Sections, par ordre de priorité : |cFFE8B84BPrêt à livrer|r (tu as tous les réactifs), |cFFE8B84BEn cours|r, |cFFE8B84BProgression|r (la recette du prochain point de métier), |cFFE8B84BMes commandes|r."] =
+        "Sections, by priority: |cFFE8B84BReady to deliver|r (you have every reagent), |cFFE8B84BActive|r, |cFFE8B84BLeveling|r (the recipe for your next skill point), |cFFE8B84BMy orders|r.",
+    ["Clic gauche sur une ligne : ouvre le métier concerné. Clic droit : ouvre le Carnet. Maj-clic un réactif : le lie dans le chat."] =
+        "Left-click a line: opens that profession. Right-click: opens the Ledger. Shift-click a reagent: links it in chat.",
+    ["Glisse n'importe quelle ligne pour déplacer le suivi ; clique l'en-tête d'une section pour la replier."] =
+        "Drag any line to move the tracker; click a section header to collapse it.",
+    ["|cFFFFFFFF/co track|r affiche/masque · |cFFFFFFFF/co track reset|r remet en place · |cFFFFFFFF/co track combat|r masque en combat · |cFFFFFFFF/co track lines 5|r borne le nombre d'entrées."] =
+        "|cFFFFFFFF/co track|r show/hide · |cFFFFFFFF/co track reset|r restore position · |cFFFFFFFF/co track combat|r hide in combat · |cFFFFFFFF/co track lines 5|r cap the number of entries.",
+    ["usage : /co %s <id> <texte>"] = "usage: /co %s <id> <text>",
+    ["texte effacé pour %s"] = "text cleared for %s",
+    ["nommer et raconter ta commande : elle se lit alors comme une quête"] =
+        "name your order and tell its story: it then reads like a quest",
+    ["Poster en quête"] = "Post as quest",
+    ["Objectifs"] = "Objectives",
+    ["Récompense :"] = "Reward:",
+    ["Fermer"] = "Close",
+    ["Sans titre"] = "Untitled",
+    ["voir une commande sous forme de quête (parchemin)"] = "view an order as a quest (parchment sheet)",
+    ["Onglet |cFFE8B84BCommande|r → |cFFE8B84BPoster en quête|r : donne un titre et un récit à ta demande, sur un vrai parchemin de quête. Elle apparaît ensuite sous ce nom chez les artisans."] =
+        "|cFFE8B84BOrder|r tab → |cFFE8B84BPost as quest|r: give your request a title and a story, on a real quest parchment. It then shows up under that name for crafters.",
+    ["Journal"] = "Journal",
+    ["Choisis une entrée à gauche."] = "Pick an entry on the left.",
+    ["journal parchemin : commandes et quêtes côte à côte (clic droit sur un en-tête du suivi)"] =
+        "parchment journal: orders and quests side by side (right-click a tracker header)",
 }
 
 for k, v in pairs(en2) do L[k] = v end

@@ -20,7 +20,9 @@ local KEYWORD_RCPT = { Tous = true, Guilde = true, Amis = true }
 -- SEULS verbes autorisés en TEXTE de canal (portée royaume). Liste blanche volontaire : un verbe ajouté
 -- au protocole ne doit pas se retrouver diffusé au royaume entier par accident. ACK/DLV/DONE/NACK/SUGG
 -- restent DIRIGÉS (whisper) — ils nomment un accepteur/acheteur, les publier serait une fuite gratuite.
-local CHANNEL_VERBS = { NEW = true, CANCEL = true }
+-- TTL (titre) suit exactement le NEW : une commande nommée doit s'afficher nommée partout où elle
+-- s'affiche, sinon le titre ne serait visible que du petit cercle atteint en whisper.
+local CHANNEL_VERBS = { NEW = true, CANCEL = true, TTL = true }
 
 -- Ce nom est-il un perso de MON compte ? (IsMyChar = MA SavedVariable, décision locale — cf.
 -- Directory_Alts.) Sert à ne pas s'auto-alerter/anti-spammer sur les commandes de mes rerolls.
@@ -109,7 +111,7 @@ function Orders:Broadcast(action, o, opts)
     local payload = Codec.Encode(action, o)   -- NEW/CANCEL/ACK/DLV/DONE (nil sinon)
     if not payload then return end
     CraftLink:Send(payload, "global")
-    if action == "NEW" then
+    if action == "NEW" or action == "TTL" then
         if o.recipient == "Guilde" then CraftLink:Send(payload, "guild") end
         -- Fanout whisper vers les artisans connus EN LIGNE concernés (contourne le canal caché HS).
         for name in pairs(self:_FanoutTargets(o)) do CraftLink:Send(payload, "whisper", name) end
@@ -182,6 +184,9 @@ function Orders:_OnNew(message, distribution, sender)
     if not existed and sender and samePlayer(sender, o.buyer) and not myChar(o.buyer) and COC.Moderation then
         COC.Moderation:NotePost(o.buyer)
     end
+    -- Un TTL arrivé AVANT son NEW attendait dans le sas : maintenant que l'acheteur est établi en
+    -- cache, on peut vérifier sa provenance et l'appliquer (cf. Orders_Narrative).
+    if self.ApplyPendingTitle then self:ApplyPendingTitle(o) end
     -- Garde d'alerte : `o.alerted` (PAS `existed`). _ShouldAlert peut refuser une 1re réception
     -- (gate métier, portée) sans que l'ordre ait « consommé » son alerte — une réception ultérieure
     -- dans de meilleures conditions (ordre re-reçu nommé sur moi après mutation par l'acheteur,
@@ -288,6 +293,12 @@ function Orders:OnNetwork(sender, message, distribution)
     local action = message:match("^ORD|([A-Z]+)|")
     if action == "NEW" then self:_OnNew(message, distribution, sender)
     elseif action == "SUGG" then self:_OnSuggest(message, sender)
+    -- Narratif (Orders_Narrative.lua) : sous garde d'existence — un client dont ce module manquerait
+    -- doit ignorer le verbe, jamais tomber en erreur.
+    elseif action == "TTL" and self._OnTitle     then self:_OnTitle(message, sender)
+    elseif action == "TXQ" and self._OnTextQuery then self:_OnTextQuery(message, sender)
+    elseif action == "TXT" and self._OnText      then self:_OnText(message, sender)
+    elseif action == "TTL" or action == "TXQ" or action == "TXT" then return
     else self:_OnCycle(action, message, sender) end
     if COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end   -- maj live coalescée (rafales de fanout)
     local PW = COC.ProfWindow

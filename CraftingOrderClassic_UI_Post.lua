@@ -370,7 +370,9 @@ end
 -- =========================================================================
 -- Poster
 -- =========================================================================
-function UI:DoPostOrder()
+-- `narr` (optionnel) = { title, text } venant de la fiche de quête. Un seul chemin de post : le
+-- bouton « Poster » appelle sans argument, la fiche appelle avec — aucun comportement dupliqué.
+function UI:DoPostOrder(narr)
     local e = self.postEntry
     if not e then self.postSelLbl:SetText("|cFFFF4444" .. L["Choisis d'abord un plan."] .. "|r"); return end
     local qty = tonumber(self.postQty:GetText()) or 1
@@ -390,12 +392,40 @@ function UI:DoPostOrder()
     COC.Orders:PostEntry(e, qty, price, {
         profession = self.postProf, provided = provided,
         recipient  = self:_PostTargetLabel(),
+        title      = narr and narr.title or nil,
+        text       = narr and narr.text or nil,
     })
     if COC.Beacon then COC:Beacon() end   -- balise TEXTE de découverte (clic = hardware event)
     self.postGold:SetText("0"); self.postSilver:SetText("0"); self.postCopper:SetText("0")
     self.postQty:SetText("1"); self.postEntry = nil; self.postProvide = {}
     self.postSelLbl:SetText("|cFF33DD33" .. L["Commande postée !"] .. "|r")
     self:ShowTab("orders")
+end
+
+-- Ouvre la fiche de quête en ÉDITION, pré-remplie avec ce que la commande dira déjà d'elle-même :
+-- l'objectif (le plan et sa quantité) et la récompense (la commission saisie). L'auteur n'a plus qu'à
+-- écrire le titre et le récit. La validation repasse par DoPostOrder — même chemin, mêmes gardes.
+function UI:DoPostAsQuest()
+    local e = self.postEntry
+    if not e then self.postSelLbl:SetText("|cFFFF4444" .. L["Choisis d'abord un plan."] .. "|r"); return end
+    if not COC.QuestSheet then return self:DoPostOrder() end
+    local qty = tonumber(self.postQty:GetText()) or 1
+    local nm  = entryName(e)   -- helper déjà présent en tête de ce fichier
+    local g   = tonumber(self.postGold:GetText())   or 0
+    local s   = tonumber(self.postSilver:GetText()) or 0
+    local cu  = tonumber(self.postCopper:GetText()) or 0
+    local reward
+    if g > 0 or s > 0 or cu > 0 then
+        reward = GetCoinTextureString and GetCoinTextureString(g * 10000 + s * 100 + cu) or nil
+    end
+    COC.QuestSheet:Open({
+        editable   = true,
+        objective  = nm .. ((qty > 1) and (" ×" .. qty) or ""),
+        reward     = reward,
+        giver      = (UnitName and UnitName("player")) or "",
+        acceptText = L["Poster"],
+        onAccept   = function(title, text) UI:DoPostOrder({ title = title, text = text }) end,
+    })
 end
 
 -- Réactifs en poche (P2) : les sacs changent (loot, craft, échange...) → la liste de plans « prêts »

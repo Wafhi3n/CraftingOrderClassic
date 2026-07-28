@@ -126,11 +126,29 @@ local function contentLeveling()
     }
 end
 
+-- Le suivi à l'écran (HUD hors fenêtre, façon suivi de quête) — cf. CraftingOrderClassic_Tracker*.lua.
+local function contentTracker()
+    return {
+        {
+            icon = Skin.tex.workorder, title = L["Le suivi à l'écran"],
+            lines = {
+                L["Hors de toute fenêtre, le suivi liste ce sur quoi tu peux agir maintenant — exactement comme le suivi de quête."],
+                L["Sections, par ordre de priorité : |cFFE8B84BPrêt à livrer|r (tu as tous les réactifs), |cFFE8B84BEn cours|r, |cFFE8B84BProgression|r (la recette du prochain point de métier), |cFFE8B84BMes commandes|r."],
+                L["Clic gauche sur une ligne : ouvre le métier concerné. Clic droit : ouvre le Carnet. Maj-clic un réactif : le lie dans le chat."],
+                L["Glisse n'importe quelle ligne pour déplacer le suivi ; clique l'en-tête d'une section pour la replier."],
+                L["|cFFFFFFFF/co track|r affiche/masque · |cFFFFFFFF/co track reset|r remet en place · |cFFFFFFFF/co track combat|r masque en combat · |cFFFFFFFF/co track lines 5|r borne le nombre d'entrées."],
+                L["Onglet |cFFE8B84BCommande|r → |cFFE8B84BPoster en quête|r : donne un titre et un récit à ta demande, sur un vrai parchemin de quête. Elle apparaît ensuite sous ce nom chez les artisans."],
+            },
+        },
+    }
+end
+
 -- (Les notes de version « Nouveautés » ont leur propre onglet — cf. CraftingOrderClassic_UI_News.lua.)
 
 local function content()
     local out = {}
-    for _, part in ipairs({ contentIntro(), contentPosting(), contentFulfill(), contentLeveling(), contentSocial() }) do
+    for _, part in ipairs({ contentIntro(), contentPosting(), contentFulfill(), contentTracker(),
+                            contentLeveling(), contentSocial() }) do
         for _, sec in ipairs(part) do out[#out + 1] = sec end
     end
     return out

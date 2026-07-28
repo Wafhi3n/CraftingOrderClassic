@@ -279,6 +279,10 @@ function COC:Help()
     print("  |cFFFFFFFF/co ping|r — |cFFFF8800" .. L["diag"] .. "|r : " .. L["teste l'aller-retour réseau (PING global → PONG des autres porteurs)"])
     print("  |cFFFFFFFF/co métier [nom]|r — " .. L["vue commandes d'un métier (ou menu des métiers si vide)"])
     print("  |cFFFFFFFF/co profwindow|r — " .. L["basculer fenêtre métier custom / vue Blizzard"])
+    print("  |cFFFFFFFF/co track [on|off|reset|combat|lines N]|r — " .. L["suivi des commandes à l'écran (glisser une ligne pour le déplacer)"])
+    print("  |cFFFFFFFF/co title <id> <titre>|r / |cFFFFFFFF/co text <id> <description>|r — " .. L["nommer et raconter ta commande : elle se lit alors comme une quête"])
+    print("  |cFFFFFFFF/co quest <id>|r — " .. L["voir une commande sous forme de quête (parchemin)"])
+    print("  |cFFFFFFFF/co journal|r — " .. L["journal parchemin : commandes et quêtes côte à côte (clic droit sur un en-tête du suivi)"])
     print("  |cFFFFFFFF/co channel [on|off]|r — " .. L["(dés)activer le canal réseau global"])
     print("  |cFFFFFFFF/co notify [all|directed|named|off]|r — " .. L["portée des notifications de commande"])
     print("  |cFFFFFFFF/co scan [mine|all|off]|r — " .. L["portée du scan des demandes de craft en chat (défaut : mes métiers)"])
@@ -317,6 +321,11 @@ function COC:Slash(msg)
             local key = CraftLink:ResolveProfession(rest)
             if key then COC.ProfWindow:OpenFor(key) else p(COC.L["métier inconnu : "] .. rest) end
         elseif COC.UI and COC.UI.ToggleProfMenu then COC.UI:ToggleProfMenu() end
+    elseif cmd == "journal" then if COC.JournalWin then COC.JournalWin:Toggle() end
+    elseif cmd == "quest" or cmd == "quête" or cmd == "quete" then if O and O.ShowAsQuest then O:ShowAsQuest(rest) end
+    elseif cmd == "title" or cmd == "titre" then if O and O.NarrativeCmd then O:NarrativeCmd(rest, "title") end
+    elseif cmd == "text"  or cmd == "texte" then if O and O.NarrativeCmd then O:NarrativeCmd(rest, "text")  end
+    elseif cmd == "track" or cmd == "suivi" then if COC.Tracker then COC.Tracker:Cmd(rest) end
     elseif cmd == "profwindow" or cmd == "pw" then
         if COC.ProfWindow then COC.ProfWindow:SetEnabled(not COC.ProfWindow:IsEnabled()) end
     elseif cmd == "channel" or cmd == "canal" then COC:ChannelCmd(rest)
@@ -388,6 +397,7 @@ f:SetScript("OnEvent", function(_, event, arg1)
         if COC.ProfOrders then COC.ProfOrders:Start() end  -- overlay « commandes du métier » sur la fenêtre métier
         if COC.Nameplate then COC.Nameplate:Start() end    -- icône LFW (recherche de travail) sur les plaques
         if COC.EnchantTrade then COC.EnchantTrade:Start() end  -- greffon enchant sur l'échange (objet en slot 7)
+        if COC.Tracker  then COC.Tracker:Start()  end      -- suivi à l'écran (façon suivi de quête)
         if COC.UI and COC.UI.BuildMinimapButton then COC.UI:BuildMinimapButton() end
         if COC.Debug and C_Timer then C_Timer.After(1, function() COC.Debug:Reapply() end) end
         SLASH_CRAFTINGORDER1 = "/co"

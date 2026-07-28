@@ -394,6 +394,49 @@ local es2 = {
         "%s ofrece encantar: %s. ¿Poner la pieza en la casilla «No se intercambiará»? No entregas nada — la recuperas encantada.",
     ["Poser la pièce"] = "Poner la pieza",
     ["Ignorer"] = "Ignorar",
+    -- Suivi à l'écran des commandes (_Tracker*.lua / _Journal.lua)
+    ["Prêt à livrer"] = "Listo para entregar",
+    ["Progression"] = "Progresión",
+    ["Mes commandes"] = "Mis pedidos",
+    ["réactifs inconnus"] = "reactivos desconocidos",
+    ["+%d de plus"] = "+%d más",
+    ["suivi des commandes affiché."] = "seguimiento de pedidos mostrado.",
+    ["suivi des commandes masqué."] = "seguimiento de pedidos oculto.",
+    ["position du suivi réinitialisée."] = "posición del seguimiento restablecida.",
+    ["suivi masqué en combat."] = "seguimiento oculto en combate.",
+    ["suivi visible en combat."] = "seguimiento visible en combate.",
+    ["suivi des commandes à l'écran (glisser une ligne pour le déplacer)"] =
+        "seguimiento de pedidos en pantalla (arrastra una línea para moverlo)",
+    ["~%s/point"] = "~%s/punto",
+    [">%s/point"] = ">%s/punto",
+    ["suivi : %d entrées au maximum."] = "seguimiento: %d entradas como máximo.",
+    ["Le suivi à l'écran"] = "El seguimiento en pantalla",
+    ["Hors de toute fenêtre, le suivi liste ce sur quoi tu peux agir maintenant — exactement comme le suivi de quête."] =
+        "Fuera de cualquier ventana, el seguimiento lista aquello sobre lo que puedes actuar ahora — igual que el seguimiento de misiones.",
+    ["Sections, par ordre de priorité : |cFFE8B84BPrêt à livrer|r (tu as tous les réactifs), |cFFE8B84BEn cours|r, |cFFE8B84BProgression|r (la recette du prochain point de métier), |cFFE8B84BMes commandes|r."] =
+        "Secciones, por prioridad: |cFFE8B84BListo para entregar|r (tienes todos los reactivos), |cFFE8B84BActivos|r, |cFFE8B84BProgresión|r (la receta del próximo punto de habilidad), |cFFE8B84BMis pedidos|r.",
+    ["Clic gauche sur une ligne : ouvre le métier concerné. Clic droit : ouvre le Carnet. Maj-clic un réactif : le lie dans le chat."] =
+        "Clic izquierdo en una línea: abre esa profesión. Clic derecho: abre el Registro. Mayús-clic en un reactivo: lo enlaza en el chat.",
+    ["Glisse n'importe quelle ligne pour déplacer le suivi ; clique l'en-tête d'une section pour la replier."] =
+        "Arrastra cualquier línea para mover el seguimiento; haz clic en el encabezado de una sección para plegarla.",
+    ["|cFFFFFFFF/co track|r affiche/masque · |cFFFFFFFF/co track reset|r remet en place · |cFFFFFFFF/co track combat|r masque en combat · |cFFFFFFFF/co track lines 5|r borne le nombre d'entrées."] =
+        "|cFFFFFFFF/co track|r mostrar/ocultar · |cFFFFFFFF/co track reset|r restablecer posición · |cFFFFFFFF/co track combat|r ocultar en combate · |cFFFFFFFF/co track lines 5|r limitar el número de entradas.",
+    ["usage : /co %s <id> <texte>"] = "uso: /co %s <id> <texto>",
+    ["texte effacé pour %s"] = "texto borrado para %s",
+    ["nommer et raconter ta commande : elle se lit alors comme une quête"] =
+        "da nombre e historia a tu pedido: se leerá como una misión",
+    ["Poster en quête"] = "Publicar como misión",
+    ["Objectifs"] = "Objetivos",
+    ["Récompense :"] = "Recompensa:",
+    ["Fermer"] = "Cerrar",
+    ["Sans titre"] = "Sin título",
+    ["voir une commande sous forme de quête (parchemin)"] = "ver un pedido como una misión (pergamino)",
+    ["Onglet |cFFE8B84BCommande|r → |cFFE8B84BPoster en quête|r : donne un titre et un récit à ta demande, sur un vrai parchemin de quête. Elle apparaît ensuite sous ce nom chez les artisans."] =
+        "Pestaña |cFFE8B84BPedido|r → |cFFE8B84BPublicar como misión|r: da un título y una historia a tu petición, sobre un pergamino de misión real. Aparecerá con ese nombre para los artesanos.",
+    ["Journal"] = "Diario",
+    ["Choisis une entrée à gauche."] = "Elige una entrada a la izquierda.",
+    ["journal parchemin : commandes et quêtes côte à côte (clic droit sur un en-tête du suivi)"] =
+        "diario de pergamino: pedidos y misiones lado a lado (clic derecho en un encabezado del seguimiento)",
 }
 
 for k, v in pairs(es2) do L[k] = v end
