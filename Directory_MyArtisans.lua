@@ -94,19 +94,18 @@ function Dir:AggregateMyProfs()
     local main = db.altMain or me()
     local myFaction = UnitFactionGroup and UnitFactionGroup("player")
     if myFaction ~= "Horde" and myFaction ~= "Alliance" then myFaction = nil end
-    -- Secondaires INCLUS ici (secondary = {}), contrairement aux vues réseau : la Cuisine et la Pêche
-    -- rapportent de l'or (Lazy Gold les valorise), et cette vue est justement là pour dire quel perso
-    -- du compte peut se faire des sous. Le filtre SECONDARY_PROF reste en vigueur ailleurs (on ne passe
-    -- pas commande de Cuisine à un inconnu).
+    -- Aucun filtre ici (secondary = {}) : cette vue est là pour dire quel perso du compte peut se
+    -- faire des sous, or la Cuisine et la Pêche rapportent de l'or (Lazy Gold les valorise). Même les
+    -- Poisons y ont leur place — c'est MON reroll, pas un inconnu à qui passer commande.
     return aggregate(db.myChars, db.knownRecipes, db.mySkillsByChar, myRealm(), main,
         {}, db.myCharFaction, myFaction)
 end
 
 -- Cœur PUR. Une entrée par (perso ≠ `cur`, métier connu) du royaume — pour le menu « Mes métiers »
 -- (section Rerolls). Métier « connu » = présent dans knownRecipes[key] OU mySkillsByChar[key] (un
--- métier de récolte sans recette n'apparaît que via le skill). Filtre les secondaires (Cooking,
--- First Aid, Fishing) pour afficher SEULEMENT les métiers primaires. Tri par nom de perso puis clé
--- de métier (libellé localisé côté UI).
+-- métier de récolte sans recette n'apparaît que via le skill). `secondary` = métiers à écarter (la
+-- prod y passe COC.HIDDEN_PROF, donc les Poisons seuls). Tri par nom de perso puis clé de métier
+-- (libellé localisé côté UI).
 -- `factions`/`myFaction` : même filtre que aggregate() (cf. Mes artisans) — un reroll d'en face n'est
 -- pas quelqu'un à qui « passer commande », il n'a rien à faire dans ce menu.
 local function rerollEntries(knownRecipes, mySkillsByChar, realm, cur, secondary, factions, myFaction)
@@ -142,14 +141,14 @@ local function rerollEntries(knownRecipes, mySkillsByChar, realm, cur, secondary
 end
 Dir._RerollProfEntries = rerollEntries   -- exposé pour tests/test_myartisans.lua
 
--- Wrapper : (perso, métier) de MES rerolls du royaume courant (perso courant exclu), primaires seulement.
+-- Wrapper : (perso, métier) de MES rerolls du royaume courant (perso courant exclu), hors métiers cachés.
 function Dir:RerollProfEntries()
     local db = COC.db
     if not db then return {} end
     local myFaction = UnitFactionGroup and UnitFactionGroup("player")
     if myFaction ~= "Horde" and myFaction ~= "Alliance" then myFaction = nil end
     return rerollEntries(db.knownRecipes, db.mySkillsByChar, myRealm(), me(),
-        COC.SECONDARY_PROF or {}, db.myCharFaction, myFaction)
+        COC.HIDDEN_PROF or {}, db.myCharFaction, myFaction)
 end
 
 -- Purge conservatrice des partitions de skill orphelines (perso supprimé en jeu) : clé absente à

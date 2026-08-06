@@ -8,6 +8,13 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "Neues",
+    -- v1.30.0
+    ["La cuisine, le secourisme et la pêche comptent comme des métiers"] =
+        "Kochkunst, Erste Hilfe und Angeln zählen als Berufe",
+    ["L'annuaire faisait comme si ces trois-là n'existaient pas. Tu pouvais commander une pile de nourriture depuis l'onglet Commande, mais rien ne te disait QUI est cuisinier : pas d'icône sur sa ligne, pas de pastille pour filtrer, rien dans l'infobulle quand tu le survolais. Ils comptent maintenant comme les autres, et un clic droit sur un joueur propose « Commander Cuisine » comme il propose la forge. La pêche, elle, reste une récolte : elle s'affiche et se filtre, mais elle se commande depuis l'onglet Récolte, comme l'herboristerie."] =
+        "Das Verzeichnis tat so, als gäbe es diese drei nicht. Du konntest im Bestellen-Tab einen Stapel Essen bestellen, aber nichts verriet dir, WER überhaupt kocht: kein Symbol in seiner Zeile, kein Knopf zum Filtern, nichts im Tooltip, wenn du über ihn gefahren bist. Jetzt zählen sie wie alle anderen, und ein Rechtsklick auf einen Spieler bietet «Kochkunst bestellen» genauso an wie Schmiedekunst. Angeln bleibt ein Sammelberuf: Es wird angezeigt und gefiltert, bestellt wird es aber im Sammeln-Tab, so wie Kräuter.",
+    ["Leur montée suit aussi : la bourse d'artisan et le suivi à l'écran nomment ton prochain point de cuisine ou de secourisme exactement comme ils le font déjà pour un métier principal. Une exception est volontaire : voir quelqu'un cuisiner au feu de camp ne l'ajoute toujours pas à l'annuaire, une capitale l'enterrerait sous des gens qui ne sont pas vraiment cuisiniers. Un cuisinier qui a l'addon apparaît normalement, par ses propres niveaux de métier."] =
+        "Das Hochleveln zieht mit: Der Handwerkerbeutel und die Verfolgung am Bildschirm nennen deinen nächsten Punkt in Kochkunst oder Erster Hilfe genauso wie bei einem Hauptberuf. Eine Ausnahme ist gewollt: Wer am Lagerfeuer kocht, landet weiterhin nicht im Verzeichnis, denn eine Hauptstadt würde es unter Leuten begraben, die gar keine echten Köche sind. Ein Koch mit dem Addon taucht ganz normal auf, über seine eigenen Berufsstufen.",
     -- v1.29.0
     ["Tes commandes à l'écran, et un journal pour les lire"] =
         "Deine Aufträge auf dem Bildschirm, und ein Journal zum Nachlesen",

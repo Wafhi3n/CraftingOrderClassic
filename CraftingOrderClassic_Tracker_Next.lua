@@ -22,9 +22,10 @@ local ARROW = "|TInterface\\ChatFrame\\ChatFrameExpandArrow:12:12|t"
 local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true) end
 
 -- Métiers du perso courant encore en montée, RANG DÉCROISSANT (décision user : le plus haut d'abord).
--- Les métiers secondaires sont écartés, comme dans la bourse.
+-- Seuls les métiers CACHÉS sont écartés, comme dans la bourse : la Cuisine et le Secourisme se
+-- montent aussi, et le tri par rang les pose naturellement en bas de section (rang faible).
 local function levelingProfs()
-    local out, SEC = {}, COC.SECONDARY_PROF or {}
+    local out, SEC = {}, COC.HIDDEN_PROF or {}
     for key, v in pairs((COC.db and COC.db.mySkills) or {}) do
         local rank, max = v[1] or 0, v[2] or 0
         if not SEC[key] and rank > 0 and rank < max then

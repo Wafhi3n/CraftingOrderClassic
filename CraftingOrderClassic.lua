@@ -14,11 +14,18 @@ local COC = CraftingOrderClassic
 
 local CraftLink = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
 
--- Métiers SECONDAIRES (WoW) — source de vérité PARTAGÉE (Social, Directory_LootScan, UI_Artisans).
--- On ne passe PAS de commande pour eux → jamais détectés (découverte de crafteurs) ni affichés dans
--- l'annuaire/tooltip/pills. Clés CraftLink exactes (cf. Libs/CraftLink-1.0/Data/*/{Cooking,FirstAid,Fishing}.lua).
--- Poisons inclus : pseudo-métier exclusif voleur (usage perso, non commandable à un tiers).
+-- Métiers SECONDAIRES (WoW) — ne sert plus QU'À la découverte passive de crafteurs sans l'addon
+-- (Directory_LootScan). Motif : cuisiner au feu de camp ou se bander le bras est trop banal pour
+-- peupler l'annuaire depuis un CLEU — on noierait les vrais artisans sous le bruit de la capitale.
+-- Ce n'est PAS un filtre d'affichage : Cuisine/Secourisme/Pêche se montrent comme les autres métiers
+-- (icône de ligne, pastille, tooltip, « Commander … »). Clés CraftLink exactes (cf.
+-- Libs/CraftLink-1.0/Data/*/{Cooking,FirstAid}.lua et Data/Gathering.lua pour la Pêche).
 COC.SECONDARY_PROF = { Cooking = true, ["First Aid"] = true, Fishing = true, Poisons = true }
+
+-- Métiers JAMAIS affichés NI commandables — source de vérité PARTAGÉE (Social, UI_Artisans,
+-- Directory_MyArtisans). Les Poisons seuls : pseudo-métier exclusif voleur, à usage perso, qu'on ne
+-- commande pas à un tiers. Vide sur TBC/Wrath (la table de données Poisons est Vanilla uniquement).
+COC.HIDDEN_PROF = { Poisons = true }
 
 -- Métiers de RÉCOLTE pure — source de vérité PARTAGÉE (UI_Post, Social_Menu). On ne passe pas de
 -- commande de CRAFT dessus : le dropdown de la fenêtre Commande les exclut et les entrées « Commander

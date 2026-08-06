@@ -11,6 +11,13 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "What's New",
+    -- v1.30.0
+    ["La cuisine, le secourisme et la pêche comptent comme des métiers"] =
+        "Cooking, First Aid and Fishing count as professions",
+    ["L'annuaire faisait comme si ces trois-là n'existaient pas. Tu pouvais commander une pile de nourriture depuis l'onglet Commande, mais rien ne te disait QUI est cuisinier : pas d'icône sur sa ligne, pas de pastille pour filtrer, rien dans l'infobulle quand tu le survolais. Ils comptent maintenant comme les autres, et un clic droit sur un joueur propose « Commander Cuisine » comme il propose la forge. La pêche, elle, reste une récolte : elle s'affiche et se filtre, mais elle se commande depuis l'onglet Récolte, comme l'herboristerie."] =
+        "The directory acted like those three didn't exist. You could order a stack of food from the Post tab, but nothing told you who the cooks were: no icon on their row, no pill to filter by, nothing in the tooltip when you hovered them. They count like the rest now, and right-clicking a player offers 'Order Cooking' the way it offers Blacksmithing. Fishing stays a gathering skill, so it shows up and filters, but you order fish from the Gather tab the way you do herbs.",
+    ["Leur montée suit aussi : la bourse d'artisan et le suivi à l'écran nomment ton prochain point de cuisine ou de secourisme exactement comme ils le font déjà pour un métier principal. Une exception est volontaire : voir quelqu'un cuisiner au feu de camp ne l'ajoute toujours pas à l'annuaire, une capitale l'enterrerait sous des gens qui ne sont pas vraiment cuisiniers. Un cuisinier qui a l'addon apparaît normalement, par ses propres niveaux de métier."] =
+        "Leveling them follows. The artisan pouch and the on-screen tracker name your next cooking or first aid point exactly as they already do for a primary profession. One exception is deliberate: seeing someone cook at a campfire still doesn't add them to the directory, because a capital city would bury it under people who aren't really cooks. A cook running the addon shows up normally, from their own skill levels.",
     -- v1.29.0
     ["Tes commandes à l'écran, et un journal pour les lire"] =
         "Orders on screen, and a journal to read them in",

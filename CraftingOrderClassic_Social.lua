@@ -30,9 +30,10 @@ function Social:MaybeDiscover(name)
     D:DiscoverPlayer(name)
 end
 
--- Métiers SECONDAIRES : jamais affichés dans le résumé social (seuls les PRIMAIRES intéressent la
--- prise de commande). Table PARTAGÉE définie dans CraftingOrderClassic.lua (source unique).
-local SECONDARY_PROF = COC.SECONDARY_PROF
+-- Métiers CACHÉS : jamais affichés dans le résumé social ni proposés à la commande (les Poisons, cf.
+-- CraftingOrderClassic.lua). La Cuisine, le Secourisme et la Pêche, eux, s'affichent normalement —
+-- on peut leur passer commande. Table PARTAGÉE (source unique).
+local HIDDEN_PROF = COC.HIDDEN_PROF
 
 -- =========================================================================
 -- Résolution Battle.net → nom de PERSONNAGE WoW. Les surfaces natives d'amis BNet (menu, tooltip)
@@ -48,8 +49,9 @@ function Social:BNetCharFromAccount(acc)
 end
 
 -- =========================================================================
--- Résumé métiers d'un joueur connu (roster CraftLink) — icônes INLINE + niveaux. Métiers PRIMAIRES
--- uniquement (cf. SECONDARY_PROF). Renvoie nil si le joueur n'a pas l'addon / aucun métier primaire connu.
+-- Résumé métiers d'un joueur connu (roster CraftLink) — icônes INLINE + niveaux. Tous ses métiers,
+-- Cuisine/Secourisme/Pêche compris ; seuls les CACHÉS sautent (cf. HIDDEN_PROF). Renvoie nil si le
+-- joueur n'a pas l'addon / aucun métier connu.
 -- =========================================================================
 function Social:ProfSummary(name)
     if not (name and COC.Directory) then return nil end
@@ -72,30 +74,30 @@ function Social:ProfSummary(name)
     local parts = {}
     -- Priorité : niveaux SK reçus (plus précis — icône + « 250/300 »).
     for key, sv in pairs(r.skill or {}) do
-        if not SECONDARY_PROF[key] then parts[#parts + 1] = profMark(key) .. " " .. sv[1] .. "/" .. sv[2] .. recipeCount(key) end
+        if not HIDDEN_PROF[key] then parts[#parts + 1] = profMark(key) .. " " .. sv[1] .. "/" .. sv[2] .. recipeCount(key) end
     end
     -- Fallback : métiers connus via bitfield RK, sans niveau → icône seule.
     if #parts == 0 then
         for key in pairs(r.recipes or {}) do
-            if not SECONDARY_PROF[key] then parts[#parts + 1] = profMark(key) .. recipeCount(key) end
+            if not HIDDEN_PROF[key] then parts[#parts + 1] = profMark(key) .. recipeCount(key) end
         end
     end
     -- Repli : fiche RELAYÉE par un partenaire (artisan hors ligne) — plus riche qu'un « vu crafter »,
     -- mais grade estimation (la ligne « via X » d'OnUnitTooltip qualifie la provenance).
     if #parts == 0 and r.relayed then
         for key, sv in pairs(r.relayed.skill or {}) do
-            if not SECONDARY_PROF[key] then parts[#parts + 1] = profMark(key) .. " " .. sv[1] .. "/" .. sv[2] end
+            if not HIDDEN_PROF[key] then parts[#parts + 1] = profMark(key) .. " " .. sv[1] .. "/" .. sv[2] end
         end
         if #parts == 0 then
             for key in pairs(r.relayed.recipes or {}) do
-                if not SECONDARY_PROF[key] then parts[#parts + 1] = profMark(key) end
+                if not HIDDEN_PROF[key] then parts[#parts + 1] = profMark(key) end
             end
         end
     end
     -- Dernier recours : non-porteur d'addon VU crafter (CHAT_MSG_LOOT) → plancher de skill « N+ ».
     if #parts == 0 then
         for key, floor in pairs(r.craftSeen or {}) do
-            if not SECONDARY_PROF[key] then
+            if not HIDDEN_PROF[key] then
                 parts[#parts + 1] = profMark(key) .. ((floor and floor > 0) and (" " .. floor .. "+") or "")
             end
         end
@@ -128,7 +130,7 @@ function Social:CooldownLines(r, cap, profFilter)
     if not (src and next(src)) then return nil end
     local now, agg = time(), {}
     for prof, set in pairs(src) do
-        if (not profFilter or prof == profFilter) and not SECONDARY_PROF[prof] then
+        if (not profFilter or prof == profFilter) and not HIDDEN_PROF[prof] then
             for sid, readyAt in pairs(set) do
                 local grp = CraftLink:RecipeCdGroup(prof, sid)
                 local key = grp and (prof .. "|" .. grp) or (prof .. "#" .. sid)
@@ -176,7 +178,7 @@ function Social:HasRecipeDetail(name)
     local r = COC.Directory.roster[name]
     if not (r and r.recipes) then return false end
     for key, hex in pairs(r.recipes) do
-        if not SECONDARY_PROF[key] and hex and hex ~= "" then return true end
+        if not HIDDEN_PROF[key] and hex and hex ~= "" then return true end
     end
     return false
 end
@@ -189,7 +191,7 @@ function Social:RecipeDetail(name, perProfCap)
     local sk = GetSkin()
     local lines = {}
     for key, hex in pairs(r.recipes) do
-        if not SECONDARY_PROF[key] then
+        if not HIDDEN_PROF[key] then
             local set = CraftLink:DecodeKnown(key, hex)
             local names = {}
             for spellID in pairs(set or {}) do names[#names + 1] = CraftLink:RecipeName(spellID) end
@@ -208,9 +210,9 @@ end
 
 -- =========================================================================
 -- Métiers CRAFTABLES connus d'un joueur, pour les entrées « Commander <métier> » du menu clic-droit.
--- skill ∪ recipes, moins les SECONDAIRES (pas de commande — cf. COC.SECONDARY_PROF) et les récoltes
--- pures (COC.GATHER_ONLY) que la fenêtre Commande n'accepte pas. Trié par libellé localisé (ordre
--- stable pour l'UI). Renvoie un tableau de clés métier (typiquement 0..2 métiers primaires).
+-- skill ∪ recipes, moins les CACHÉS (COC.HIDDEN_PROF) et les récoltes pures (COC.GATHER_ONLY) que la
+-- fenêtre Commande n'accepte pas — la Cuisine et le Secourisme, eux, sont bien commandables. Trié par
+-- libellé localisé (ordre stable pour l'UI). Renvoie un tableau de clés métier.
 -- =========================================================================
 function Social:OrderableProfs(name)
     if not (name and COC.Directory) then return {} end
@@ -220,7 +222,7 @@ function Social:OrderableProfs(name)
     local seen, out = {}, {}
     local function add(t)
         for k in pairs(t or {}) do
-            if not SECONDARY_PROF[k] and not gather[k] and not seen[k] then
+            if not HIDDEN_PROF[k] and not gather[k] and not seen[k] then
                 seen[k] = true; out[#out + 1] = k
             end
         end

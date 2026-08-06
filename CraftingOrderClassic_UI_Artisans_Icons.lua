@@ -1,5 +1,5 @@
 -- CraftingOrderClassic_UI_Artisans_Icons.lua — onglet « Artisans » : tout ce qui est ICÔNE de métier.
---   1. les pills de filtre métier (icône seule, plus de texte : 10 métiers tiennent sur une rangée) ;
+--   1. les pills de filtre métier (icône seule, plus de texte : tous les métiers tiennent sur une rangée) ;
 --   2. les icônes de métier d'une ligne artisan : contour de rentabilité (Lazy Gold), tooltip, et
 --      CLIC → onglet Commande pré-ciblé sur CET artisan et CE métier (UI:OpenPostForArtisan).
 -- Extrait de _UI_Artisans.lua (plafond anti-monolithe).
@@ -34,14 +34,15 @@ local function makeProfPill(panel, key)
 end
 
 -- Pills dans la BANDE « profFilter » de la SPEC (ancres LEFT → centrées verticalement). La bande fait
--- UNE rangée : si les pills venaient à déborder (jamais vu : 10 icônes ≈ 300 px pour ~600 utiles), le
--- repli les enroule sur une 2ᵉ ligne qui dépasserait sous la bande — élargir la fenêtre plutôt.
+-- UNE rangée : si les pills venaient à déborder, le repli les enroule sur une 2ᵉ ligne qui dépasserait
+-- sous la bande — élargir la fenêtre plutôt. Marge actuelle : le pire cas est Wrath (15 icônes + le
+-- bouton « Tous » ≈ 540 px) pour ~620 px utiles, et la fenêtre Artisans est à largeur FIXE (SPEC.x2).
 function UI:_BuildArtPills()
     local band = self:ArtSec("profFilter")
     local c = CL(); local profs = c and c:Professions() or {}
     local defs = { "Tous" }
-    for _, p in ipairs(profs) do   -- primaires seulement : pas de pill Cuisine/Secours/Pêche
-        if not (COC.SECONDARY_PROF and COC.SECONDARY_PROF[p]) then defs[#defs + 1] = p end
+    for _, p in ipairs(profs) do   -- tous les métiers commandables : seuls les Poisons sautent
+        if not (COC.HIDDEN_PROF and COC.HIDDEN_PROF[p]) then defs[#defs + 1] = p end
     end
     local x, y, rowH = 72, 0, 28   -- x départ : dégage le libellé « Métier : » en entier
     local bw = band:GetWidth(); local maxW = (bw > 1 and bw or 600) - 4

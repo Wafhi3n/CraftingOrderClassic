@@ -1,5 +1,20 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.30.0 — Cooking, First Aid and Fishing count as professions
+
+The directory acted like those three didn't exist. You could order a stack of food from the Post tab,
+but nothing told you who the cooks were: no icon on their row, no pill to filter by, nothing in the
+tooltip when you hovered them. They count like the rest now, so you can right-click a player and pick
+"Order Cooking" the way you would Blacksmithing. Fishing stays a gathering skill, so it shows up and
+filters but you still order fish from the Gather tab, the way you do herbs.
+
+Leveling them follows. The artisan pouch and the on-screen tracker name your next cooking or first
+aid point exactly as they already do for a primary profession.
+
+One exception is deliberate. Seeing someone cook at a campfire still doesn't add them to the
+directory, because a capital city would bury it under people who aren't really cooks. A cook running
+the addon shows up normally, from their own skill levels.
+
 ## v1.29.0 — Orders on screen, and a journal to read them in
 
 Your accepted orders now sit on screen the way tracked quests do. The item you agreed to make, and

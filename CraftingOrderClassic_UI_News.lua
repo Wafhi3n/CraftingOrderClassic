@@ -25,6 +25,13 @@ local BODY_W = 780
 local function versionsCurrent()
     return {
         {
+            v = "v1.30.0", title = L["La cuisine, le secourisme et la pêche comptent comme des métiers"],
+            lines = {
+                L["L'annuaire faisait comme si ces trois-là n'existaient pas. Tu pouvais commander une pile de nourriture depuis l'onglet Commande, mais rien ne te disait QUI est cuisinier : pas d'icône sur sa ligne, pas de pastille pour filtrer, rien dans l'infobulle quand tu le survolais. Ils comptent maintenant comme les autres, et un clic droit sur un joueur propose « Commander Cuisine » comme il propose la forge. La pêche, elle, reste une récolte : elle s'affiche et se filtre, mais elle se commande depuis l'onglet Récolte, comme l'herboristerie."],
+                L["Leur montée suit aussi : la bourse d'artisan et le suivi à l'écran nomment ton prochain point de cuisine ou de secourisme exactement comme ils le font déjà pour un métier principal. Une exception est volontaire : voir quelqu'un cuisiner au feu de camp ne l'ajoute toujours pas à l'annuaire, une capitale l'enterrerait sous des gens qui ne sont pas vraiment cuisiniers. Un cuisinier qui a l'addon apparaît normalement, par ses propres niveaux de métier."],
+            },
+        },
+        {
             v = "v1.29.0", title = L["Tes commandes à l'écran, et un journal pour les lire"],
             lines = {
                 L["Les commandes que tu as acceptées s'affichent à l'écran, comme les quêtes suivies. L'objet que tu t'es engagé à faire, et dessous chaque réactif avec ce que tu as sur ce qu'il te faut : « Balle de soie 2/4 ». Quand le dernier tombe dans tes sacs, la ligne passe au blanc et la commande remonte en tête sous « Prêt à livrer ». Rien à ouvrir, rien à aller vérifier. Glisse n'importe quelle ligne pour déplacer le tout, /co track si tu n'en veux pas."],

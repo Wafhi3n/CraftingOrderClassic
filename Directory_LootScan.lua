@@ -59,7 +59,10 @@ end
 function Dir:_NoteSeen(who, prof, spellID)
     who = who and (who:match("^([^%-]+)") or who)
     if not (who and who ~= "" and prof) then return end
-    if COC.SECONDARY_PROF and COC.SECONDARY_PROF[prof] then return end   -- Cuisine/Secours/Pêche : pas de commande
+    -- Secondaires écartés ICI SEULEMENT (ils s'AFFICHENT partout ailleurs, et se commandent) : cuisiner
+    -- au feu de camp est trop banal pour peupler l'annuaire depuis un CLEU — on noierait les vrais
+    -- artisans sous le bruit de la capitale. Un cuisinier qui a l'addon remonte de toute façon par SK.
+    if COC.SECONDARY_PROF and COC.SECONDARY_PROF[prof] then return end
     if who == (UnitName and UnitName("player")) then return end
     self.roster = self.roster or {}
     local r = self.roster[who]; if not r then r = {}; self.roster[who] = r end

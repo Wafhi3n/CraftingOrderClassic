@@ -57,7 +57,7 @@ function UI:_NeedsEligible(r)
     local lib = CL()
     if not (r and r.skill and r.recipes and lib and lib.DataVersion
             and r.recipeDV == lib:DataVersion()) then return false end
-    local SEC = COC.SECONDARY_PROF or {}
+    local SEC = COC.HIDDEN_PROF or {}
     for key, sv in pairs(r.skill) do
         if not SEC[key] and r.recipes[key] and (sv[1] or 0) < (sv[2] or 0) then return true end
     end
@@ -70,7 +70,7 @@ function UI:_NeedsProfs(r)
     local lib, out = CL(), {}
     if not (r and lib and lib.DecodeKnown and lib.DataVersion
             and r.recipeDV == lib:DataVersion()) then return out end
-    local SEC = COC.SECONDARY_PROF or {}
+    local SEC = COC.HIDDEN_PROF or {}
     for key, sv in pairs(r.skill or {}) do
         local hex = r.recipes and r.recipes[key]
         if hex and not SEC[key] and (sv[1] or 0) < (sv[2] or 0) then

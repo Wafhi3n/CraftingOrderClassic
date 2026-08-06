@@ -8,6 +8,13 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "Novedades",
+    -- v1.30.0
+    ["La cuisine, le secourisme et la pêche comptent comme des métiers"] =
+        "Cocina, Primeros auxilios y Pesca cuentan como profesiones",
+    ["L'annuaire faisait comme si ces trois-là n'existaient pas. Tu pouvais commander une pile de nourriture depuis l'onglet Commande, mais rien ne te disait QUI est cuisinier : pas d'icône sur sa ligne, pas de pastille pour filtrer, rien dans l'infobulle quand tu le survolais. Ils comptent maintenant comme les autres, et un clic droit sur un joueur propose « Commander Cuisine » comme il propose la forge. La pêche, elle, reste une récolte : elle s'affiche et se filtre, mais elle se commande depuis l'onglet Récolte, comme l'herboristerie."] =
+        "El directorio hacía como si esas tres no existieran. Podías encargar una pila de comida desde la pestaña Encargo, pero nada te decía QUIÉN cocina: ningún icono en su línea, ninguna pastilla para filtrar, nada en la información al pasar por encima. Ahora cuentan como las demás, y un clic derecho sobre un jugador ofrece «Encargar Cocina» igual que ofrece Herrería. La Pesca sigue siendo recolección: se muestra y se filtra, pero el pescado se encarga desde la pestaña Recolección, igual que las hierbas.",
+    ["Leur montée suit aussi : la bourse d'artisan et le suivi à l'écran nomment ton prochain point de cuisine ou de secourisme exactement comme ils le font déjà pour un métier principal. Une exception est volontaire : voir quelqu'un cuisiner au feu de camp ne l'ajoute toujours pas à l'annuaire, une capitale l'enterrerait sous des gens qui ne sont pas vraiment cuisiniers. Un cuisinier qui a l'addon apparaît normalement, par ses propres niveaux de métier."] =
+        "Su progresión también sigue: la bolsa de artesano y el seguimiento en pantalla nombran tu próximo punto de cocina o de primeros auxilios igual que ya lo hacen con una profesión principal. Una excepción es deliberada: ver a alguien cocinar en una hoguera sigue sin añadirlo al directorio, porque una capital lo enterraría bajo gente que no cocina de verdad. Un cocinero con el addon aparece con normalidad, por sus propios niveles de profesión.",
     -- v1.29.0
     ["Tes commandes à l'écran, et un journal pour les lire"] =
         "Tus pedidos en pantalla, y un diario para leerlos",

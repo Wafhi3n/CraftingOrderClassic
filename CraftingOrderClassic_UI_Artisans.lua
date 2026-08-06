@@ -39,7 +39,7 @@ local knowsProf = Skin.KnowsProfOrSeen
 -- Métiers connus d'un artisan, en liste { key, sv } : niveau (SK) si connu, sinon recette seule (RK).
 -- Union des deux sources, triée par libellé localisé — même ordre visuel que l'ancien texte concaténé.
 local function profsList(r)
-    local SEC = COC.SECONDARY_PROF or {}   -- Cuisine/Secours/Pêche jamais affichés (pas de commande)
+    local SEC = COC.HIDDEN_PROF or {}      -- seuls les Poisons sautent (Cuisine/Secours/Pêche s'affichent)
     local seen, parts = {}, {}
     local skKnown = r.skill and next(r.skill)   -- SK = vérité terrain du perso : s'il est connu, il PRIME
     for key, sv in pairs(r.skill or {}) do
