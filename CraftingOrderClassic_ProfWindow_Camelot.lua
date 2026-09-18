@@ -84,13 +84,17 @@ function PW:CamelotAttach(native)
     local fullW = nativeBaseW + colW + GAP * 2
     -- Élargir SANS toucher aux enfants de Blizzard : eux sont ancrés TOPLEFT, ils ne bougent pas.
     native:SetWidth(fullW)
-    -- ⚠️ NE PAS toucher à la largeur DÉCLARÉE au gestionnaire de panneaux
-    -- (`SetUIPanelAttribute(native, "width", …)`). Ça corrigeait un chevauchement COSMÉTIQUE — la
-    -- fiche de personnage s'ouvrant par-dessus notre colonne — mais ça écrit dans la machinerie des
-    -- panneaux, dont on ne maîtrise pas les effets de bord (le cadre est déclaré `checkFit = 1`,
-    -- donc le gestionnaire le RE-SCALE selon cette largeur). Écarté tant qu'on n'a pas élucidé la
-    -- disparition des barres d'action en combat signalée le 2026-09-18.
-    -- Le chevauchement est le moindre mal : il est visible, réversible, et il ne casse rien.
+    -- Élargir le CADRE ne suffit pas : le gestionnaire de panneaux garde la largeur qu'on lui a
+    -- DÉCLARÉE à l'enregistrement (`professionsFrameWidthOverride` = 750, cf.
+    -- Blizzard_ProfessionsRegistration) et tuile les autres panneaux dessus — la fiche de
+    -- personnage s'ouvrait par-dessus notre colonne. On lui annonce donc notre encombrement réel.
+    --
+    -- Historique, pour ne pas refaire le détour : cette ligne a été retirée le 2026-09-18, soupçonnée
+    -- de faire « disparaître l'UI ». C'était FAUX — le coupable était un bug de ressources graphiques
+    -- de la beta elle-même (assertions `texture->GetSize()`, `GxResourceStateTracker` dans
+    -- `_classic_beta_\Errors\`, antérieures au premier déploiement de COC sur ce client, et qui se
+    -- réparent au /reload). Rétablie une fois la vraie cause établie.
+    if SetUIPanelAttribute then pcall(SetUIPanelAttribute, native, "width", fullW) end
 
     self.frame:SetParent(native)          -- suit l'ouverture/fermeture et le déplacement du natif
     self.frame:ClearAllPoints()
@@ -110,7 +114,12 @@ function PW:CamelotAttach(native)
 end
 
 function PW:CamelotDetach(native)
-    if native and nativeBaseW then native:SetWidth(nativeBaseW) end
+    if native and nativeBaseW then
+        native:SetWidth(nativeBaseW)
+        -- Rendre aussi l'encombrement déclaré, sinon le gestionnaire réserverait à vie la place de
+        -- notre colonne pour une fenêtre redevenue étroite.
+        if SetUIPanelAttribute then pcall(SetUIPanelAttribute, native, "width", nativeBaseW) end
+    end
     self.docked = false
     if self.frame then
         self.frame:Hide()
