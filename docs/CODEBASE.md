@@ -1,16 +1,17 @@
 # CraftingOrderClassic — carte du code
 
-> **GÉNÉRÉ** le 2026-08-06 (v1.30.0) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
+> **GÉNÉRÉ** le 2026-09-18 (v1.30.0) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
-113 modules + 4 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
+117 modules + 4 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
 
 ## Modules (ordre de chargement)
 
 | Fichier | Rôle | Lignes |
 |---|---|---|
-| `CraftingOrderClassic.lua` | Crafting Order - Classic — réseau GLOBAL et SOCIAL de commandes de craft. | 440 |
+| `CraftingOrderClassic.lua` | Crafting Order - Classic — réseau GLOBAL et SOCIAL de commandes de craft. | 448 |
+| `CraftingOrderClassic_Compat.lua` | couche d'adaptation d'API entre les SAVEURS de client. | 200 |
 | `CraftingOrderClassic_Trace.lua` | trace réseau PERSISTÉE, lisible hors-jeu. | 79 |
 | `CraftingOrderClassic_Migrations.lua` | versionnage du schéma SavedVariables. | 40 |
 | `CraftingOrderClassic_Locale.lua` | socle de localisation du CHROME de l'UI. | 12 |
@@ -24,8 +25,8 @@
 | `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 261 |
 | `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 261 |
 | `CraftingOrderClassic_Elemental.lua` | pseudo-« métier » de récolte « Élémentaire ». | 61 |
-| `CraftingOrderClassic_UI_Skin.lua` | tokens + helpers SÉMANTIQUES du skin (métiers, statuts, rareté, quantités, icônes natives) et petits widgets d'affichage. | 428 |
-| `CraftingOrderClassic_UI_Skin_Native.lua` | kit de chrome Blizzard NATIF (le « framework » UI de COC). | 485 |
+| `CraftingOrderClassic_UI_Skin.lua` | tokens + helpers SÉMANTIQUES du skin (métiers, statuts, rareté, quantités, icônes natives) et petits widgets d'affichage. | 431 |
+| `CraftingOrderClassic_UI_Skin_Native.lua` | kit de chrome Blizzard NATIF (le « framework » UI de COC). | 488 |
 | `CraftingOrderClassic_UI_Skin_Sections.lua` | kit de chrome natif, volet SECTIONS : comment on découpe l'intérieur d'une fenêtre en blocs et en zones. | 247 |
 | `CraftingOrderClassic_UI_Skin_HelpPlate.lua` | kit d'AIDE CONTEXTUELLE (le « bouton i » de retail). | 130 |
 | `CraftingOrderClassic_ShareReagents.lua` | « liste de courses » : diffuser en un clic les réactifs d'une recette (vue métier) ou d'une commande (carte) dans un canal de discussion, avec le LIEN objet de chaque réactif. | 157 |
@@ -34,7 +35,7 @@
 | `CraftingOrderClassic_UI_Post_Layout.lua` | GÉOMÉTRIE de l'onglet « Commande » : colonnes, zones, séparateurs. | 132 |
 | `CraftingOrderClassic_UI_Post.lua` | onglet « Commande » : sélection de plan (gauche) + réactifs « je fournis » / commission g-s-c / ciblage artisan (droite). | 438 |
 | `CraftingOrderClassic_UI_Post_Detail.lua` | onglet « Commande », PANNEAU DROIT : en-tête du plan sélectionné (icône + cadre doré + nom + niveau), liste des réactifs « je fournis », et la rangée commission. | 194 |
-| `CraftingOrderClassic_UI_Post_Artisans.lua` | onglet « Commande », section droite basse : boutons source, liste des artisans, ciblage (@Nom), libellé destinataire, bouton Poster. | 228 |
+| `CraftingOrderClassic_UI_Post_Artisans.lua` | onglet « Commande », section droite basse : boutons source, liste des artisans, ciblage (@Nom), libellé destinataire, bouton Poster. | 227 |
 | `CraftingOrderClassic_UI_Post_Categories.lua` | onglet « Commande », panneau gauche : regroupe la LISTE DES PLANS en sections type fenêtre native (emplacement puis type pour les équipements, type pour les armes, catégorie pour le reste). | 184 |
 | `CraftingOrderClassic_UI_Post_Paperdoll.lua` | onglet « Commande », vue SILHOUETTE de l'Enchantement. | 330 |
 | `CraftingOrderClassic_UI_Post_LazyGold.lua` | onglet « Commande » : couche Lazy Gold (lecture seule). | 151 |
@@ -45,36 +46,38 @@
 | `CraftingOrderClassic_UI_Artisans.lua` | onglet « Artisans » : annuaire social. | 410 |
 | `CraftingOrderClassic_UI_Artisans_Groups.lua` | fusion « une ligne par JOUEUR » (rerolls). | 207 |
 | `CraftingOrderClassic_UI_Artisans_Icons.lua` | onglet « Artisans » : tout ce qui est ICÔNE de métier. | 190 |
-| `CraftingOrderClassic_UI_Artisans_Needs.lua` | la « BOURSE d'artisan » de l'onglet Artisans : pour un artisan du roster (partenaire, guildie, ami…), la LISTE DE COURSES des fournitures qu'il lui faut pour monter ses métiers — mats agrégés de SA route de progression (COC.Route, calculée 100 % en LOCAL depuis son rang SK diffusé + ses recettes décodées du bitfield RK ; prix Lazy Gold locaux, valables serveur entier). | 361 |
+| `CraftingOrderClassic_UI_Artisans_Needs.lua` | la « BOURSE d'artisan » de l'onglet Artisans : pour un artisan du roster (partenaire, guildie, ami…), la LISTE DE COURSES des fournitures qu'il lui faut pour monter ses métiers — mats agrégés de SA route de progression (COC.Route, calculée 100 % en LOCAL depuis son rang SK diffusé + ses recettes décodées du bitfield RK ; prix Lazy Gold locaux, valables serveur entier). | 358 |
 | `CraftingOrderClassic_UI_Artisans_Muted.lua` | panel « En sourdine » de l'onglet Artisans. | 86 |
 | `CraftingOrderClassic_UI_MyArtisans_Layout.lua` | GÉOMÉTRIE de l'onglet « Mes artisans ». | 57 |
 | `CraftingOrderClassic_UI_MyArtisans.lua` | onglet « Mes artisans » : vue agrégée des métiers du COMPTE (tous mes rerolls du royaume), en mode « connu ». | 483 |
 | `CraftingOrderClassic_UI_MyArtisans_LazyGold.lua` | onglet « Mes artisans » : couche Lazy Gold. | 135 |
 | `CraftingOrderClassic_UI_Help.lua` | onglet Aide : page unique défilante qui explique les autres onglets (Carnet/Commande/Récolte/Artisans), la Vue Métier et le réseau. | 196 |
 | `CraftingOrderClassic_UI_News.lua` | onglet « Nouveautés » : notes de version (changelog) affichées EN JEU, version par version, la plus récente en tête. | 314 |
-| `CraftingOrderClassic_Social.lua` | couche sociale passive (socle). | 382 |
+| `CraftingOrderClassic_Social.lua` | couche sociale passive (socle). | 385 |
 | `CraftingOrderClassic_Social_Menu.lua` | entrées « Crafting Order » du menu contextuel joueur. | 101 |
 | `CraftingOrderClassic_Social_Roster.lua` | affichage des métiers sur les fenêtres NATIVES. | 130 |
 | `CraftingOrderClassic_Minimap.lua` | bouton minimap (toggle du carnet). | 137 |
 | `CraftingOrderClassic_Nameplate.lua` | icône « recherche de travail » (LFW) sur les plaques. | 121 |
-| `CraftingOrderClassic_ProfOrders.lua` | COORDINATEUR d'événements de la fenêtre métier. | 82 |
+| `CraftingOrderClassic_ProfOrders.lua` | COORDINATEUR d'événements de la fenêtre métier. | 84 |
 | `CraftingOrderClassic_RecipeCats.lua` | SOUS-CATÉGORIES de recettes (moteur + registre). | 122 |
 | `CraftingOrderClassic_RecipeCats_Group.lua` | REGROUPEMENT partagé : transforme une liste plate d'entrées (recettes, plans, ressources…) en liste d'AFFICHAGE à deux niveaux :      Section (COC.SectionOf)  >  Sous-catégorie (COC.RecipeCats)  >  les objets, triés  Écrit une fois ici parce que QUATRE listes en ont besoin et qu'elles n'ont pas la même structure de ligne : vue métier (recettes de l'API), onglet Commande (plans du catalogue), Mes artisans (recettes connues), onglet Récolte (ressources). | 211 |
 | `CraftingOrderClassic_RecipeCats_Alchemy.lua` | sous-catégories de l'ALCHIMIE (données, éditées à la main). | 98 |
 | `CraftingOrderClassic_RecipeCats_Gathering.lua` | sous-catégories des métiers de RÉCOLTE. | 179 |
 | `CraftingOrderClassic_RecipeCats_Smelting.lua` | sous-catégorie « Lingots » du Minage (facette FONTE). | 39 |
 | `CraftingOrderClassic_RecipeCats_Enchanting.lua` | sous-catégories de l'ENCHANTEMENT. | 52 |
-| `CraftingOrderClassic_Craft.lua` | socle de lecture LIVE de la fenêtre métier (migration de la fenêtre custom depuis Guild Economy / TradeScanner_Craft.lua). | 206 |
+| `CraftingOrderClassic_Craft.lua` | socle de lecture LIVE de la fenêtre métier (migration de la fenêtre custom depuis Guild Economy / TradeScanner_Craft.lua). | 230 |
+| `CraftingOrderClassic_Craft_Mainline.lua` | 3ᵉ backend de lecture de la fenêtre métier, pour les clients MAINLINE/Retail (WoW: Forever / Camelot, interface 16001). | 203 |
 | `CraftingOrderClassic_Enchant.lua` | spécifique à l'Enchantement (API Craft). | 385 |
 | `CraftingOrderClassic_Stats.lua` | STATS d'un objet : identité canonique + libellé localisé. | 366 |
 | `CraftingOrderClassic_Stats_Filter.lua` | sélecteur « ne montrer que ce qui donne <stat> ». | 103 |
 | `CraftingOrderClassic_Gem.lua` | spécifique à la JOAILLERIE : sous-catégorise les GEMMES TAILLÉES par TAILLE (le mot qui porte la stat). | 226 |
 | `CraftingOrderClassic_Gem_Stats.lua` | correspondance TAILLE DE GEMME → STAT (données, éditées à la main). | 41 |
 | `CraftingOrderClassic_MTSL.lua` | pont LECTURE SEULE vers l'addon « Missing TradeSkills List » (MTSL). | 330 |
-| `CraftingOrderClassic_ProfWindow.lua` | fenêtre métier custom 3 colonnes (migration depuis Guild Economy) : Recettes \| Détail+Craft \| Commandes du métier. | 460 |
+| `CraftingOrderClassic_ProfWindow.lua` | fenêtre métier custom 3 colonnes (migration depuis Guild Economy) : Recettes \| Détail+Craft \| Commandes du métier. | 465 |
 | `CraftingOrderClassic_ProfWindow_Layout.lua` | GÉOMÉTRIE de la vue métier (fenêtre 3 colonnes). | 81 |
 | `CraftingOrderClassic_ProfWindow_HelpPlate.lua` | AIDE CONTEXTUELLE de la Vue Métier (« bouton i »). | 82 |
 | `CraftingOrderClassic_ProfWindow_Dock.lua` | mode DOCK de la vue métier (« Vue Blizzard ») : la fenêtre native reste VISIBLE (non neutralisée) et NOTRE colonne Commandes s'épingle à sa droite. | 70 |
+| `CraftingOrderClassic_ProfWindow_Camelot.lua` | POC : notre colonne Commandes À L'INTÉRIEUR de la fenêtre de métier NATIVE de WoW: Forever (Camelot). | 167 |
 | `CraftingOrderClassic_ProfWindow_Toolbar.lua` | barre d'outils de la colonne Recettes (vue métier) : les toggles de TRI (slot recTools, à gauche : rentabilité / valeurs exactes / progression — Lazy Gold) et de FILTRE (slot recFilterToggles, à droite : « j'ai les matériaux » / « montée de compétence »). | 245 |
 | `CraftingOrderClassic_ProfWindow_Recipes.lua` | colonne GAUCHE : liste de recettes virtualisée (scroll), recherche, couleur par difficulté, sélection, badge « demandé » (nb de commandes ouvertes pour l'objet). | 486 |
 | `CraftingOrderClassic_ProfWindow_Leveling.lua` | aide à la MONTÉE DE MÉTIER dans la liste de recettes : coût de progression (réactifs au prix Lazy Gold ÷ chance de point selon la couleur), badge « meilleur coût/point » sur la recette recommandée, icônes de SOURCE sur les manquantes (formateur / vendeur PNJ / coté à l'HV / à farmer) et tri « progression » affiné par coût. | 219 |
@@ -89,6 +92,7 @@
 | `CraftingOrderClassic_ProfWindow_Reroll.lua` | vue métier LECTURE SEULE d'un REROLL. | 119 |
 | `Directory.lua` | Crafting Order - Classic — Directory : l'annuaire des GENS (présence + qui peut crafter quoi). | 469 |
 | `Directory_Presence.lua` | présence : la vérité JEU (amis/guilde) et sa fusion avec la vérité ADDON. | 76 |
+| `Directory_Recipes.lua` | COUTURE de lecture du registre « qui sait crafter quoi » d'un artisan. | 93 |
 | `Directory_Confed.lua` | source « confédération » (GreenWall) de l'annuaire, DISPLAY-ONLY. | 51 |
 | `Directory_Skills.lua` | niveaux de compétence + réputation (couche « profil » de l'annuaire). | 126 |
 | `Directory_Version.lua` | détection « nouvelle version disponible » (100 % P2P, aucun serveur). | 138 |
@@ -109,13 +113,13 @@
 | `CraftingOrderClassic_JournalQuests.lua` | lecture EN SEULE LECTURE du journal de quêtes du JEU, pour que le journal COC affiche les vraies quêtes à côté des commandes. | 103 |
 | `CraftingOrderClassic_JournalWin.lua` | LE JOURNAL : une fenêtre parchemin où les commandes et les vraies quêtes du joueur cohabitent par sections. | 311 |
 | `CraftingOrderClassic_Inbound.lua` | couche réseau « passive » : capte les demandes de craft postées dans /commerce (Trade) et /guilde par des joueurs SANS l'addon, alerte le joueur, et les range dans une file « Entrantes » (acceptable / ignorable). | 287 |
-| `CraftingOrderClassic_Handoff.lua` | « garder une commande pour un ami capable ». | 283 |
+| `CraftingOrderClassic_Handoff.lua` | « garder une commande pour un ami capable ». | 286 |
 | `CraftingOrderClassic_Moderation.lua` | modération / anti-spam. | 333 |
-| `CraftingOrderClassic_LootAlert.lua` | alerte quand TU loots un objet-PLAN (recette/formule/ schéma/patron) catalogué par CraftLink, MAIS seulement s'il te CONCERNE : soit tu as le métier (candidat à l'apprendre), soit un AMI/PARTENAIRE de ton annuaire ne le connaît pas encore (candidat à un don — cf. | 155 |
+| `CraftingOrderClassic_LootAlert.lua` | alerte quand TU loots un objet-PLAN (recette/formule/ schéma/patron) catalogué par CraftLink, MAIS seulement s'il te CONCERNE : soit tu as le métier (candidat à l'apprendre), soit un AMI/PARTENAIRE de ton annuaire ne le connaît pas encore (candidat à un don — cf. | 158 |
 | `CraftingOrderClassic_Companion.lua` | socle des GREFFONS : panneaux compagnons accrochés aux fenêtres natives (échange, courrier) pour livrer une commande sans quitter le geste en cours. | 211 |
 | `CraftingOrderClassic_Companion_Mail.lua` | greffon COURRIER (scène B de la maquette) : panneau accroché à droite du compositeur d'envoi. | 177 |
 | `CraftingOrderClassic_Companion_Trade.lua` | greffon ÉCHANGE (scène A de la maquette) : panneau accroché SOUS la fenêtre d'échange native quand une commande nous lie au partenaire (dans les DEUX sens : je crafte pour lui = « vendeur », ou il crafte pour moi = « acheteur »). | 114 |
-| `CraftingOrderClassic_Enchant_Trade.lua` | greffon ENCHANTEMENT sur la fenêtre d'ÉCHANGE. | 289 |
+| `CraftingOrderClassic_Enchant_Trade.lua` | greffon ENCHANTEMENT sur la fenêtre d'ÉCHANGE. | 291 |
 | `CraftingOrderClassic_Enchant_Trade_Ask.lua` | greffon ÉCHANGE : « demande-lui la pièce ». | 294 |
 | `CraftingOrderClassic_Journal.lua` | MODÈLE « journal » : la liste unique, triée par PRIORITÉ, de ce sur quoi le joueur peut agir maintenant. | 269 |
 | `CraftingOrderClassic_Tracker.lua` | SUIVI À L'ÉCRAN des commandes, façon suivi de quête : un cadre léger, déplaçable, hors de toute fenêtre, qui liste ce sur quoi le joueur peut agir MAINTENANT. | 215 |
@@ -354,6 +358,7 @@
 > de titre −21 et le nom de métier de l'en-tête −14). Le corps de la languette vit donc DANS le gris,
 > son bas ouvert plonge vers le contenu — le rendu « onglets sur la barre grise » demandé. La fenêtre
 > réserve la bande dessous (PAD_TOP, UI.lua). Contrat `bar` inchangé : .buttons[id], :Select, :SetText.
+> Le gabarit d'onglet natif change de nom selon la saveur — résolu dans Compat (COC.Api).
 
 **`Skin.MakeFlatRow(parent, w, h)`**
 
@@ -513,6 +518,27 @@
 > persistance propre (CraftingOrderClassicDB). Le carnet d'ordres et le social arrivent (C/D).
 
 **API** : `COC:Scan()` · `COC:ScanSoon()` · `COC:Status()` · `COC:ChannelCmd(arg)` · `COC:NotifyCmd(arg)` · `COC:ScanCmd(arg)` · `COC:CrafterScanCmd(arg)` · `COC:ChannelNotice()` · `COC:MissingAddon(displayName)` · `COC:NeedLazyGold()` · `COC:NeedMTSL()` · `COC:Beacon()` · `COC:BeaconDiag()` · `COC:WipeRoster()` · `COC:GreenWallDiag()` · `COC:Help()` · `COC:Slash(msg)`
+
+### `CraftingOrderClassic_Compat.lua`
+> CraftingOrderClassic_Compat.lua — couche d'adaptation d'API entre les SAVEURS de client.
+> 
+> Pourquoi : depuis WoW: Forever (Camelot, interface 16001) l'écosystème vise un client dont
+> l'API est MAINLINE/Retail, pas Classic. Une quarantaine de globaux que COC appelait depuis
+> toujours n'y existent plus — ils ont migré dans des espaces de noms `C_*`.
+> 
+> Le parti pris : **un seul code pour toutes les saveurs**, pas de fork. La plupart des formes
+> modernes existent AUSSI sur l'Era ; on prend la moderne quand elle est là, l'ancienne sinon.
+> L'Era y gagne au passage (moins de globaux dépréciés).
+> 
+> Règle de ce fichier : ce qu'on expose garde TOUJOURS la signature historique, celle que le
+> reste de COC connaît déjà. Quand les deux backends divergent (tuple contre table), c'est ICI
+> que ça se normalise, en un seul endroit, pas dans 30 fichiers.
+> 
+> Chargé juste après CraftingOrderClassic.lua : tout le reste de COC peut compter sur COC.Api.
+> NB : la lib CraftLink charge AVANT COC et ne peut donc pas s'appuyer là-dessus — elle résout
+> ses propres appels chez elle.
+
+**API** : `A.GetSpellName(spellID)` · `A.GetBNetFriend(index)` · `A.GetNumQuestLogEntries()` · `A.GetQuestLogTitle(index)` · `A.GetQuestSelection()` · `A.RestoreQuestSelection(token)` · `A.SelectQuestLogEntry(index)` · `A.RegisterEventSafe(frame, event)` · `A.HookScriptSafe(frame, script, handler)` · `A.RegisterEventsSafe(frame, events)` · `A.TitleFontString(frame)` · `A.PortraitTexture(frame)` · `A.ChatMessagingBlocked()`
 
 ### `CraftingOrderClassic_Trace.lua`
 > CraftingOrderClassic_Trace.lua — trace réseau PERSISTÉE, lisible hors-jeu.
@@ -1123,6 +1149,29 @@
 
 **API** : `Craft:IsCraftOpen()` · `Craft:GetSelectedRecipe()` · `Craft:GetOpenProfessionInfo()` · `Craft:GetActiveAPI()` · `Craft:OpenProfessionKey()` · `Craft:DifficultyColor(difficulty)` · `Craft:OpenRank()` · `Craft:ReadRecipes()` · `Craft:Reagents(index)` · `Craft:MuteNativeReagents(mute)` · `Craft:Do(index, count)` · `Craft:ArmNativeSelection(index)`
 
+### `CraftingOrderClassic_Craft_Mainline.lua`
+> CraftingOrderClassic_Craft_Mainline.lua — 3ᵉ backend de lecture de la fenêtre métier, pour les
+> clients MAINLINE/Retail (WoW: Forever / Camelot, interface 16001).
+> 
+> Le socle `_Craft.lua` sait lire deux API indexées : TradeSkill (métiers normaux) et Craft
+> (Enchantement en Classic Era). Sur Forever AUCUNE des deux n'existe — tout passe par
+> `C_TradeSkillUI`, et surtout le modèle change : les recettes ne sont plus des INDEX dans une
+> liste, elles sont clefées par **`recipeSpellID`**.
+> 
+> Ce fichier réconcilie les deux mondes : il tient une liste ORDONNÉE de recipeID et expose la
+> même table d'API indexée que les deux autres backends. Le socle et tous ses appelants
+> (ProfWindow, ProfOrders, Enchant_Trade…) continuent de raisonner en index, sans le savoir.
+> 
+> Deux simplifications offertes par le client, à ne pas réimplémenter :
+>   * `relativeDifficulty` donne la couleur de seuil en direct (0 Optimal / 1 Medium / 2 Easy /
+>     3 Trivial) → nos `skillColors` générés (lib v11) ne servent plus sur cette cible.
+>   * `learned` dit si le joueur connaît la recette → c'est l'entrée du registre, sans déduction.
+> 
+> Mesuré en jeu le 2026-09-18 (Cuisine) : `supportsQualities = false` partout — Forever n'utilise
+> PAS les paliers de qualité Dragonflight, le modèle d'ordre de COC passe intact.
+
+**API** : `Craft:MainlineRank()` · `Craft:MainlineOpen()`
+
 ### `CraftingOrderClassic_Enchant.lua`
 > CraftingOrderClassic_Enchant.lua — spécifique à l'Enchantement (API Craft).
 > Résout l'EMPLACEMENT équipé ciblé par un enchant (pour le bouton « Enchanter équipé » qui applique
@@ -1306,6 +1355,28 @@
 
 **API** : `PW:EnsureNativeToggle(frame, key)` · `PW:OpenDock(nativeFrame)` · `PW:CloseDock()`
 
+### `CraftingOrderClassic_ProfWindow_Camelot.lua`
+> CraftingOrderClassic_ProfWindow_Camelot.lua — POC : notre colonne Commandes À L'INTÉRIEUR de la
+> fenêtre de métier NATIVE de WoW: Forever (Camelot).
+> 
+> Pourquoi ce mode existe. La vue custom 3 colonnes a été écrite parce que la fenêtre native de
+> Classic Era est rudimentaire (pas de recherche, pas de catégories, détail minimal). Celle de
+> Forever est la fenêtre RETAIL moderne : recherche, filtres, catégories sémantiques, panneau de
+> détail complet, favoris, suivi, Create All. Elle est meilleure que la nôtre. Sur cette cible on
+> ne la remplace donc pas — on lui ajoute ce qu'elle n'a pas : le carnet de commandes.
+> 
+> Ce qui rend la greffe propre, vérifié sur le source Blizzard (1.60.1) :
+>   * `ProfessionsFrame` n'est nulle part `SetForbidden` → on a le droit d'y parenter des frames.
+>   * `CraftingPage` est ancrée TOPLEFT SEULEMENT (x=3, y=-21) → elle ne s'étire PAS. Élargir le
+>     cadre ouvre une bande vide à droite SANS déplacer quoi que ce soit de Blizzard.
+>   * Les onglets verticaux sont ancrés à `$parent TOPRIGHT`, donc DEHORS : ils suivent le nouveau
+>     bord droit, rien ne casse.
+> Ce qu'on ne fait PAS : ajouter un onglet à `rightProfessionTabs`. `RefreshRightTabs` itère ce
+> tableau et CACHE tout ce qui dépasse les métiers connus — notre onglet serait masqué à chaque
+> rafraîchissement. La bande élargie n'a pas besoin d'onglet.
+
+**API** : `PW:CamelotAttach(native)` · `PW:CamelotDetach(native)` · `PW:IsEnabled()`
+
 ### `CraftingOrderClassic_ProfWindow_Toolbar.lua`
 > CraftingOrderClassic_ProfWindow_Toolbar.lua — barre d'outils de la colonne Recettes (vue métier) :
 > les toggles de TRI (slot recTools, à gauche : rentabilité / valeurs exactes / progression — Lazy Gold)
@@ -1462,6 +1533,30 @@
 > (DiscoverFriendsAndGuild) et la requête d'affichage. Chargé APRÈS Directory.lua (.toc).
 
 **API** : `Dir:ForEachBNetWoWFriend(fn)` · `Dir:DiscoverFriendsAndGuild()` · `Dir:PresenceOf(name)`
+
+### `Directory_Recipes.lua`
+> Directory_Recipes.lua — COUTURE de lecture du registre « qui sait crafter quoi » d'un artisan.
+> 
+> Pourquoi. Le registre reçu peut prendre DEUX formes selon la saveur de l'émetteur :
+>   * BITFIELD (verbe RK) — positions de bits dans le catalogue partagé. N'a de sens que si les
+>     deux bouts ont EXACTEMENT le même catalogue, d'où le `dataVersion` sur le fil.
+>   * IDENTIFIANTS (verbe RI, Camelot / WoW: Forever) — les recipeID eux-mêmes. Auto-descriptif,
+>     aucune version à faire concorder (cf. CraftLink_RegistryIDs.lua).
+> 
+> Avant cette couture, la garde `r.recipeDV == lib:DataVersion()` était RECOPIÉE dans quatre
+> modules (Handoff, LazyGold, UI_Artisans_Needs, UI_Post_Artisans), chacun appelant `HasBit`
+> directement. Ajouter une seconde forme y aurait ajouté quatre branchements — et la prochaine
+> forme, quatre de plus. Ici les appelants posent une QUESTION (« connaît-il cette recette ? ») et
+> ignorent la réponse à « sous quelle forme est-ce stocké ».
+> 
+> Même philosophie que la table d'API du socle métier (`*_Craft.lua`) : un seul endroit sait que
+> les saveurs divergent.
+> 
+> NB : les deux jeux étant séparés (un client Camelot ne parle qu'à des clients Camelot), un même
+> roster ne mélange pas les formes en pratique. La couture reste écrite pour les deux — c'est ce
+> qui la rend indépendante de cette hypothèse.
+
+**API** : `Dir:RecipeForm(r, prof)` · `Dir:RecipeTester(r, prof)` · `Dir:RecipeKnownSet(r, prof)` · `Dir:HasRecipeData(r, prof)` · `Dir:RecipeFingerprint(r, prof)` · `Dir:HasAnyRecipeRecord(r, prof)`
 
 ### `Directory_Confed.lua`
 > Directory_Confed.lua — source « confédération » (GreenWall) de l'annuaire, DISPLAY-ONLY.
