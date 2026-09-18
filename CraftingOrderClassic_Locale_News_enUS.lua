@@ -268,6 +268,13 @@ local news = {
         "Nothing gets posted to the community and nothing is read out of it. What a community can actually carry was measured before anything was built on it, and the answer is narrow: the text of a club message can't be read from an addon, and an addon message sent to its channel is accepted and then dropped. So the circle gives you the roster and who's online; orders and skill levels keep travelling exactly as they did.",
     ["Les métiers ne viennent pas non plus de la communauté : ces champs-là ne sont remplis que pour un roster de guilde. Un membre de cercle affiche ses métiers quand il répond à l'addon, comme tout le monde."] =
         "Professions don't come from the community either: those fields only get filled in for guild rosters. A circle member shows their professions once they answer the addon, like anyone else.",
+    -- v1.31.1
+    ["Les nouveaux venus apparaissent tout seuls"] =
+        "New installs show up on their own",
+    ["Quelqu'un qui venait d'installer l'addon restait invisible tant qu'il ne cliquait pas « Rafraîchir l'annuaire » — ce que personne ne pense à faire devant un annuaire qui a l'air vide, et avoir l'air vide était justement le problème."] =
+        "Someone who had just installed the addon stayed invisible until they clicked Refresh directory, which nobody thinks to do in front of a directory that looks empty, and looking empty was the whole problem.",
+    ["À la connexion, l'addon ne s'annonçait que sur le canal caché du royaume, le moins fiable de ses moyens d'atteindre les autres. L'annonce qui touche vraiment les inconnus n'a le droit de partir que juste après un clic ou une touche : à la connexion il n'y avait donc aucun moment pour l'envoyer, et elle était jetée au lieu d'être gardée. Elle attend maintenant, et part à ton premier clic ou ta première touche — quelques secondes, sans que tu fasses quoi que ce soit. La connexion sonde aussi directement les joueurs autour de toi, ce que le bouton « Rafraîchir » faisait déjà et pas elle."] =
+        "Logging in only announced you on the hidden realm channel, the least reliable of the ways the addon has of reaching people. The announcement that actually finds strangers is only allowed out right after you click or press a key: at login there was no moment to send it, so it was dropped rather than kept for later. It waits now, and goes out on your first click or keypress, a few seconds, without you doing anything. Logging in also pings the players around you directly, which the Refresh button already did and login didn't.",
 }
 
 for k, v in pairs(news) do L[k] = v end

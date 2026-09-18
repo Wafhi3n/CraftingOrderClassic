@@ -1,5 +1,20 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.31.1 — New installs show up on their own
+
+Someone who had just installed the addon stayed invisible to everyone until they clicked Refresh
+directory. Nobody thinks to do that in front of a directory that looks empty, and looking empty was
+the whole problem.
+
+Logging in only announced you on the hidden realm channel, which is the least reliable of the ways
+the addon has of reaching people. The announcement that actually finds strangers is only allowed out
+right after you click or press a key, so at login there was no moment to send it, and it was dropped
+rather than kept for later.
+
+It waits now. It goes out on your first click or keypress after you log in, so a few seconds, and you
+do nothing. Logging in also pings the players around you directly, which the Refresh button already
+did and login didn't.
+
 ## v1.31.0 — Crafting circles, built on WoW communities
 
 The realm channel has no memory and no member list. Someone who wasn't logged in when you posted

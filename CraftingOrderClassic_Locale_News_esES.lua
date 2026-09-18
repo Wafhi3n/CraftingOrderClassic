@@ -265,6 +265,13 @@ local news = {
         "No se publica nada en la comunidad ni se lee nada de ella. Lo que una comunidad puede llevar de verdad se midió antes de apoyarse en ella, y es poco: el texto de un mensaje de club no se puede leer desde un addon, y un mensaje de addon enviado a su canal se acepta y luego se descarta. Así que el círculo te da la lista y quién está conectado; los pedidos y los niveles de profesión siguen viajando igual que antes.",
     ["Les métiers ne viennent pas non plus de la communauté : ces champs-là ne sont remplis que pour un roster de guilde. Un membre de cercle affiche ses métiers quand il répond à l'addon, comme tout le monde."] =
         "Las profesiones tampoco vienen de la comunidad: esos campos solo se rellenan para las listas de hermandad. Un miembro del círculo muestra sus profesiones cuando responde al addon, como todo el mundo.",
+    -- v1.31.1
+    ["Les nouveaux venus apparaissent tout seuls"] =
+        "Los recién llegados aparecen solos",
+    ["Quelqu'un qui venait d'installer l'addon restait invisible tant qu'il ne cliquait pas « Rafraîchir l'annuaire » — ce que personne ne pense à faire devant un annuaire qui a l'air vide, et avoir l'air vide était justement le problème."] =
+        "Quien acababa de instalar el addon seguía invisible hasta que pulsaba « Actualizar directorio », algo que nadie piensa en hacer ante un directorio que parece vacío, y parecer vacío era justo el problema.",
+    ["À la connexion, l'addon ne s'annonçait que sur le canal caché du royaume, le moins fiable de ses moyens d'atteindre les autres. L'annonce qui touche vraiment les inconnus n'a le droit de partir que juste après un clic ou une touche : à la connexion il n'y avait donc aucun moment pour l'envoyer, et elle était jetée au lieu d'être gardée. Elle attend maintenant, et part à ton premier clic ou ta première touche — quelques secondes, sans que tu fasses quoi que ce soit. La connexion sonde aussi directement les joueurs autour de toi, ce que le bouton « Rafraîchir » faisait déjà et pas elle."] =
+        "Al conectarte, el addon solo te anunciaba en el canal oculto del reino, el menos fiable de sus medios para llegar a los demás. El anuncio que sí alcanza a los desconocidos solo puede salir justo después de un clic o una tecla: al conectarte no había momento para enviarlo, así que se descartaba en vez de guardarse. Ahora espera y sale con tu primer clic o tecla, unos segundos, sin que hagas nada. La conexión también sondea directamente a los jugadores a tu alrededor, algo que el botón Actualizar ya hacía y la conexión no.",
 }
 
 for k, v in pairs(news) do L[k] = v end

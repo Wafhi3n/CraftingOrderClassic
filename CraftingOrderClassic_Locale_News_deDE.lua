@@ -265,6 +265,13 @@ local news = {
         "In die Gemeinschaft wird nichts gepostet und aus ihr nichts gelesen. Was eine Gemeinschaft wirklich tragen kann, wurde gemessen, bevor darauf gebaut wurde, und es ist wenig: der Text einer Klubnachricht ist von einem Addon aus nicht lesbar, und eine Addon-Nachricht an ihren Kanal wird angenommen und dann verworfen. Der Kreis liefert also die Liste und wer online ist; Aufträge und Berufsstufen laufen genau wie bisher.",
     ["Les métiers ne viennent pas non plus de la communauté : ces champs-là ne sont remplis que pour un roster de guilde. Un membre de cercle affiche ses métiers quand il répond à l'addon, comme tout le monde."] =
         "Die Berufe kommen ebenfalls nicht aus der Gemeinschaft: diese Felder werden nur für Gildenlisten gefüllt. Ein Kreismitglied zeigt seine Berufe, sobald es dem Addon antwortet, wie alle anderen auch.",
+    -- v1.31.1
+    ["Les nouveaux venus apparaissent tout seuls"] =
+        "Neuzugänge tauchen von selbst auf",
+    ["Quelqu'un qui venait d'installer l'addon restait invisible tant qu'il ne cliquait pas « Rafraîchir l'annuaire » — ce que personne ne pense à faire devant un annuaire qui a l'air vide, et avoir l'air vide était justement le problème."] =
+        "Wer das Addon gerade erst installiert hatte, blieb unsichtbar, bis er auf « Verzeichnis aktualisieren » klickte — worauf niemand kommt, wenn das Verzeichnis leer aussieht, und genau das leere Aussehen war das Problem.",
+    ["À la connexion, l'addon ne s'annonçait que sur le canal caché du royaume, le moins fiable de ses moyens d'atteindre les autres. L'annonce qui touche vraiment les inconnus n'a le droit de partir que juste après un clic ou une touche : à la connexion il n'y avait donc aucun moment pour l'envoyer, et elle était jetée au lieu d'être gardée. Elle attend maintenant, et part à ton premier clic ou ta première touche — quelques secondes, sans que tu fasses quoi que ce soit. La connexion sonde aussi directement les joueurs autour de toi, ce que le bouton « Rafraîchir » faisait déjà et pas elle."] =
+        "Beim Anmelden kündigte dich das Addon nur im versteckten Realm-Kanal an, dem unzuverlässigsten seiner Wege, andere zu erreichen. Die Ankündigung, die Fremde wirklich erreicht, darf nur direkt nach einem Klick oder Tastendruck raus: beim Anmelden gab es also keinen Moment dafür, und sie wurde verworfen statt aufgehoben. Jetzt wartet sie und geht bei deinem ersten Klick oder Tastendruck raus — ein paar Sekunden, ohne dass du etwas tust. Beim Anmelden werden außerdem die Spieler um dich herum direkt angepingt, was der Aktualisieren-Knopf schon tat und das Anmelden nicht.",
 }
 
 for k, v in pairs(news) do L[k] = v end

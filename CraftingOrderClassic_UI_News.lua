@@ -25,6 +25,13 @@ local BODY_W = 780
 local function versionsCurrent()
     return {
         {
+            v = "v1.31.1", title = L["Les nouveaux venus apparaissent tout seuls"],
+            lines = {
+                L["Quelqu'un qui venait d'installer l'addon restait invisible tant qu'il ne cliquait pas « Rafraîchir l'annuaire » — ce que personne ne pense à faire devant un annuaire qui a l'air vide, et avoir l'air vide était justement le problème."],
+                L["À la connexion, l'addon ne s'annonçait que sur le canal caché du royaume, le moins fiable de ses moyens d'atteindre les autres. L'annonce qui touche vraiment les inconnus n'a le droit de partir que juste après un clic ou une touche : à la connexion il n'y avait donc aucun moment pour l'envoyer, et elle était jetée au lieu d'être gardée. Elle attend maintenant, et part à ton premier clic ou ta première touche — quelques secondes, sans que tu fasses quoi que ce soit. La connexion sonde aussi directement les joueurs autour de toi, ce que le bouton « Rafraîchir » faisait déjà et pas elle."],
+            },
+        },
+        {
             v = "v1.31.0", title = L["Les cercles d'artisans, posés sur les communautés WoW"],
             lines = {
                 L["Le canal du royaume n'a ni mémoire ni liste de membres : qui n'était pas connecté quand tu as posté n'a rien vu, et chaque session recommence à chercher qui est là. Une communauté WoW répond aux deux. Marque-la avec /co circle et ses membres apparaissent sous « Cercle » dans l'onglet Artisans, avec leur présence, y compris ceux qui sont hors ligne. C'est toi qui crées la communauté et qui invites : un cercle est un petit groupe que tu as choisi, pas le royaume entier."],
