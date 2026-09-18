@@ -43,6 +43,8 @@ answer, even people you've never met, as long as they've got the addon too.
 - Follow the orders you've accepted on screen, like tracked quests, with every reagent counted against your bags (new in 1.29).
 - Give an order a title and a story, so it reads like a quest to whoever picks it up (new in 1.29).
 - Read your orders and your real quests in one parchment journal with `/co journal` (new in 1.29).
+- Cooking, First Aid and Fishing count as professions in the directory, so you can look them up and order from them like anything else (new in 1.30).
+- Turn a WoW community into a crafting circle with `/co circle`, and its members show up in the Artisans directory with their presence, including the ones who are offline (new in 1.31).
 - Ready for patch 1.15.9 and the modern interface it brings to Era, Season of Discovery and Hardcore.
 
 ## Order straight from a name, friend or stranger
@@ -195,6 +197,20 @@ Blacksmithing, Tailoring, Enchanting, Engineering, Alchemy and the rest — so a
 shows its reagents, and gets matched to crafters like any classic recipe. On a regular Era realm none of
 this loads and nothing changes; the recipes your friends have already shared with you stay exactly as
 they were.
+
+## Crafting circles (WoW communities)
+
+The realm channel has no memory and no member list. Someone who wasn't logged in when you posted
+never saw it, and every session starts by working out again who's around.
+
+If your realm has WoW communities, you can point the addon at one. Mark it with `/co circle` and its
+members appear under a Circle bucket in the Artisans tab, with their presence, including the ones who
+are offline right now. You create the community and you invite who you want, which is rather the
+point: a circle is a small group you picked, not the whole realm.
+
+Nothing is posted to the community and nothing is read out of it. Orders and skill levels keep
+travelling the way they always have; the circle only tells the addon who belongs to it and who's
+around.
 
 ## Confederations (GreenWall)
 
