@@ -198,9 +198,13 @@ function UI:_SyncOptionalArtTabs()
     if not self.artSrcBtns then return end
     -- Mode solo (/co debug) : on montre tout, pour pouvoir travailler l'UI sans SoD live ni cercle.
     local debug = COC.db and COC.db.debug
+    -- « Cercle » se montre dès qu'un cercle est MARQUÉ, pas dès qu'il a des membres : un cercle
+    -- qu'on vient de créer est vide (on s'en exclut soi-même), et faire disparaître l'onglet juste
+    -- après que le joueur l'a marqué donne l'impression que la commande n'a rien fait. Un onglet
+    -- vide, lui, se lit : « c'est bien branché, il n'y a personne d'autre ».
     local on = {
         confed = (D and D._GreenWallActive and D:_GreenWallActive()) or debug,
-        circle = (D and D._circleSet and next(D._circleSet) ~= nil) or debug,
+        circle = (D and D.CircleIds and next(D:CircleIds()) ~= nil) or debug,
     }
     for id, shown in pairs(on) do
         local b = self.artSrcBtns[id]

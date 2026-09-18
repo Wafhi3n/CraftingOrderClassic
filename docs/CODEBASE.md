@@ -4,23 +4,23 @@
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
-117 modules + 4 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
+118 modules + 4 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
 
 ## Modules (ordre de chargement)
 
 | Fichier | Rôle | Lignes |
 |---|---|---|
-| `CraftingOrderClassic.lua` | Crafting Order - Classic — réseau GLOBAL et SOCIAL de commandes de craft. | 448 |
+| `CraftingOrderClassic.lua` | Crafting Order - Classic — réseau GLOBAL et SOCIAL de commandes de craft. | 447 |
 | `CraftingOrderClassic_Compat.lua` | couche d'adaptation d'API entre les SAVEURS de client. | 200 |
 | `CraftingOrderClassic_Trace.lua` | trace réseau PERSISTÉE, lisible hors-jeu. | 79 |
 | `CraftingOrderClassic_Migrations.lua` | versionnage du schéma SavedVariables. | 40 |
 | `CraftingOrderClassic_Locale.lua` | socle de localisation du CHROME de l'UI. | 12 |
 | `CraftingOrderClassic_Locale_enUS.lua` | overlay ANGLAIS (enUS/enGB). | 267 |
-| `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 459 |
+| `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 473 |
 | `CraftingOrderClassic_Locale_deDE.lua` | overlay ALLEMAND (deDE). | 269 |
-| `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 441 |
+| `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 455 |
 | `CraftingOrderClassic_Locale_esES.lua` | overlay ESPAGNOL (esES/esMX). | 270 |
-| `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 442 |
+| `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 456 |
 | `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 264 |
 | `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 261 |
 | `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 261 |
@@ -43,7 +43,7 @@
 | `CraftingOrderClassic_UI_Gather.lua` | onglet « Récolte » : ressources de récolte (minéraux, herbes, cuirs, poissons) + demande de quantité + prix par pile + ciblage récolteur. | 501 |
 | `CraftingOrderClassic_UI_Gather_Categories.lua` | onglet « Récolte », panneau gauche : repliage des en-têtes et remplissage des lignes (en-tête de section/sous-catégorie, ou ressource). | 65 |
 | `CraftingOrderClassic_UI_Artisans_Layout.lua` | GÉOMÉTRIE de l'onglet « Artisans » (annuaire social). | 44 |
-| `CraftingOrderClassic_UI_Artisans.lua` | onglet « Artisans » : annuaire social. | 410 |
+| `CraftingOrderClassic_UI_Artisans.lua` | onglet « Artisans » : annuaire social. | 439 |
 | `CraftingOrderClassic_UI_Artisans_Groups.lua` | fusion « une ligne par JOUEUR » (rerolls). | 207 |
 | `CraftingOrderClassic_UI_Artisans_Icons.lua` | onglet « Artisans » : tout ce qui est ICÔNE de métier. | 190 |
 | `CraftingOrderClassic_UI_Artisans_Needs.lua` | la « BOURSE d'artisan » de l'onglet Artisans : pour un artisan du roster (partenaire, guildie, ami…), la LISTE DE COURSES des fournitures qu'il lui faut pour monter ses métiers — mats agrégés de SA route de progression (COC.Route, calculée 100 % en LOCAL depuis son rang SK diffusé + ses recettes décodées du bitfield RK ; prix Lazy Gold locaux, valables serveur entier). | 358 |
@@ -90,10 +90,11 @@
 | `CraftingOrderClassic_ProfWindow_Orders_Card.lua` | vue SÉLECTIONNÉE de la colonne « Commandes » : la carte complète d'une commande (composants fournis, repères Lazy Gold, ACCEPTER / REFUSER / CHUCHOTER ; croix en haut à droite = retour liste). | 255 |
 | `CraftingOrderClassic_ProfWindow_LFW.lua` | config de l'OFFRE « recherche de travail » par métier. | 327 |
 | `CraftingOrderClassic_ProfWindow_Reroll.lua` | vue métier LECTURE SEULE d'un REROLL. | 119 |
-| `Directory.lua` | Crafting Order - Classic — Directory : l'annuaire des GENS (présence + qui peut crafter quoi). | 470 |
-| `Directory_Presence.lua` | présence : la vérité JEU (amis/guilde) et sa fusion avec la vérité ADDON. | 76 |
+| `Directory.lua` | Crafting Order - Classic — Directory : l'annuaire des GENS (présence + qui peut crafter quoi). | 475 |
+| `Directory_Presence.lua` | présence : la vérité JEU (amis/guilde) et sa fusion avec la vérité ADDON. | 82 |
 | `Directory_Recipes.lua` | COUTURE de lecture du registre « qui sait crafter quoi » d'un artisan. | 129 |
 | `Directory_Confed.lua` | source « confédération » (GreenWall) de l'annuaire, DISPLAY-ONLY. | 51 |
+| `Directory_Club.lua` | source « cercle » (communautés WoW) de l'annuaire, DISPLAY-ONLY. | 264 |
 | `Directory_Skills.lua` | niveaux de compétence + réputation (couche « profil » de l'annuaire). | 126 |
 | `Directory_Version.lua` | détection « nouvelle version disponible » (100 % P2P, aucun serveur). | 138 |
 | `Directory_Cooldowns.lua` | cooldowns de recettes (couche « profil » de l'annuaire). | 82 |
@@ -1563,6 +1564,28 @@
 > 
 > Extrait de Directory.lua (anti-monolithe) : ajoute des méthodes sur la table partagée COC.Directory
 > (créée par Directory.lua, chargé AVANT dans le .toc). Voir [[coc-confederation-display]].
+
+### `Directory_Club.lua`
+> Directory_Club.lua — source « cercle » (communautés WoW) de l'annuaire, DISPLAY-ONLY.
+> 
+> Un « cercle d'artisans » est une COMMUNAUTÉ que le joueur a marquée comme telle (`/co circle`).
+> Contrairement au canal global, elle est RESTREINTE : chacun crée la sienne, y invite qui il veut,
+> ou rejoint celle d'un autre. COC ne peut ni créer ni rejoindre à sa place (`CreateClub` et
+> `RedeemTicket` vivent dans un addon en environnement sécurisé) — il se contente d'exploiter les
+> cercles auxquels le joueur appartient déjà.
+> 
+> Ce que le cercle apporte, et que le canal n'aura jamais : une LISTE de membres persistante et leur
+> PRÉSENCE, sans un seul message réseau. Ce qu'il n'apporte PAS (mesuré le 2026-09-18, cf.
+> docs/COMMUNITIES-TRANSPORT.md) :
+>   * aucun transport — le contenu d'un message de club est opaque (`|Kw1|k`) et un AddonMessage
+>     envoyé sur son canal est accepté puis avalé. Les métiers continuent donc de passer par le
+>     protocole SK/RK en whisper, comme avant ;
+>   * aucun métier dans le roster — `profession1ID` & co sont vides sur une communauté de
+>     personnage (ils viennent du roster de GUILDE). Vérité terrain : 5 métiers appris, 0 annoncés.
+> 
+> Même forme que Directory_Confed.lua : des méthodes greffées sur COC.Directory, zéro transport.
+
+**API** : `Dir:CircleIds()` · `Dir:IsCircle(clubId)` · `Dir:SetCircle(clubId, on)` · `Dir:EachClub(fn)` · `Dir:FocusCircles()` · `Dir:RefreshCircles()` · `Dir:RefreshCirclesSoon()` · `Dir:ForEachCircleMemberOnline(fn)` · `Dir:CircleCmd(rest)`
 
 ### `Directory_Skills.lua`
 > Directory_Skills.lua — niveaux de compétence + réputation (couche « profil » de l'annuaire).
