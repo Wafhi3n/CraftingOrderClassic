@@ -25,6 +25,14 @@ local BODY_W = 780
 local function versionsCurrent()
     return {
         {
+            v = "v1.31.0", title = L["Les cercles d'artisans, posés sur les communautés WoW"],
+            lines = {
+                L["Le canal du royaume n'a ni mémoire ni liste de membres : qui n'était pas connecté quand tu as posté n'a rien vu, et chaque session recommence à chercher qui est là. Une communauté WoW répond aux deux. Marque-la avec /co circle et ses membres apparaissent sous « Cercle » dans l'onglet Artisans, avec leur présence, y compris ceux qui sont hors ligne. C'est toi qui crées la communauté et qui invites : un cercle est un petit groupe que tu as choisi, pas le royaume entier."],
+                L["Rien n'est posté dans la communauté et rien n'en est lu. Ce qu'une communauté peut réellement porter a été mesuré avant qu'on s'appuie dessus, et c'est étroit : le texte d'un message de club est illisible depuis un addon, et un message addon envoyé sur son canal est accepté puis jeté. Le cercle te donne donc la liste et qui est en ligne ; les commandes et les niveaux de métier continuent de circuler exactement comme avant."],
+                L["Les métiers ne viennent pas non plus de la communauté : ces champs-là ne sont remplis que pour un roster de guilde. Un membre de cercle affiche ses métiers quand il répond à l'addon, comme tout le monde."],
+            },
+        },
+        {
             v = "v1.30.0", title = L["La cuisine, le secourisme et la pêche comptent comme des métiers"],
             lines = {
                 L["L'annuaire faisait comme si ces trois-là n'existaient pas. Tu pouvais commander une pile de nourriture depuis l'onglet Commande, mais rien ne te disait QUI est cuisinier : pas d'icône sur sa ligne, pas de pastille pour filtrer, rien dans l'infobulle quand tu le survolais. Ils comptent maintenant comme les autres, et un clic droit sur un joueur propose « Commander Cuisine » comme il propose la forge. La pêche, elle, reste une récolte : elle s'affiche et se filtre, mais elle se commande depuis l'onglet Récolte, comme l'herboristerie."],

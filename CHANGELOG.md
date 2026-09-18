@@ -1,5 +1,24 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.31.0 — Crafting circles, built on WoW communities
+
+The realm channel has no memory and no member list. Someone who wasn't logged in when you posted
+never saw it, and every session starts by working out again who's around.
+
+A WoW community answers both, so CO-Classic can now use one as a crafting circle. Mark it with
+`/co circle` and its members appear under a Circle bucket in the Artisans tab, with their presence,
+including the ones who are offline right now. You create the community and you invite who you want,
+which is rather the point: a circle is a small group you picked, not the whole realm.
+
+Nothing gets posted to the community and nothing is read out of it. What a community can actually
+carry was measured before anything was built on it, and the answer is narrow. The text of a club
+message can't be read from an addon at all, and an addon message sent to a community channel is
+accepted and then quietly dropped. So the circle gives you the roster and who's online; orders and
+skill levels keep travelling exactly as they did.
+
+Professions don't come from the community either. Those fields only get filled in for guild rosters,
+so a circle member shows their professions once they answer the addon, like anyone else.
+
 ## v1.30.0 — Cooking, First Aid and Fishing count as professions
 
 The directory acted like those three didn't exist. You could order a stack of food from the Post tab,

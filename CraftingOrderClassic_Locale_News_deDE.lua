@@ -256,6 +256,15 @@ local news = {
         "|cFFFFCC00Auftrag für deinen Twink %s|r von |cFFFFFFFF%s|r: %s%s%s",
     ["En ligne via %s"] = "Online über %s",
     ["reroll : %s (%s)"] = "Twink: %s (%s)",
+    -- v1.31.0
+    ["Les cercles d'artisans, posés sur les communautés WoW"] =
+        "Handwerkerkreise, auf WoW-Gemeinschaften aufgebaut",
+    ["Le canal du royaume n'a ni mémoire ni liste de membres : qui n'était pas connecté quand tu as posté n'a rien vu, et chaque session recommence à chercher qui est là. Une communauté WoW répond aux deux. Marque-la avec /co circle et ses membres apparaissent sous « Cercle » dans l'onglet Artisans, avec leur présence, y compris ceux qui sont hors ligne. C'est toi qui crées la communauté et qui invites : un cercle est un petit groupe que tu as choisi, pas le royaume entier."] =
+        "Der Realmkanal hat kein Gedächtnis und keine Mitgliederliste: Wer nicht eingeloggt war, als du gepostet hast, hat nichts gesehen, und jede Sitzung fängt wieder von vorn an. Eine WoW-Gemeinschaft löst beides. Markiere sie mit /co circle, und ihre Mitglieder erscheinen unter « Kreis » im Reiter Handwerker, mit ihrer Anwesenheit, auch die gerade offline sind. Du erstellst die Gemeinschaft und lädst ein, wen du willst: ein Kreis ist eine kleine Gruppe deiner Wahl, nicht der ganze Realm.",
+    ["Rien n'est posté dans la communauté et rien n'en est lu. Ce qu'une communauté peut réellement porter a été mesuré avant qu'on s'appuie dessus, et c'est étroit : le texte d'un message de club est illisible depuis un addon, et un message addon envoyé sur son canal est accepté puis jeté. Le cercle te donne donc la liste et qui est en ligne ; les commandes et les niveaux de métier continuent de circuler exactement comme avant."] =
+        "In die Gemeinschaft wird nichts gepostet und aus ihr nichts gelesen. Was eine Gemeinschaft wirklich tragen kann, wurde gemessen, bevor darauf gebaut wurde, und es ist wenig: der Text einer Klubnachricht ist von einem Addon aus nicht lesbar, und eine Addon-Nachricht an ihren Kanal wird angenommen und dann verworfen. Der Kreis liefert also die Liste und wer online ist; Aufträge und Berufsstufen laufen genau wie bisher.",
+    ["Les métiers ne viennent pas non plus de la communauté : ces champs-là ne sont remplis que pour un roster de guilde. Un membre de cercle affiche ses métiers quand il répond à l'addon, comme tout le monde."] =
+        "Die Berufe kommen ebenfalls nicht aus der Gemeinschaft: diese Felder werden nur für Gildenlisten gefüllt. Ein Kreismitglied zeigt seine Berufe, sobald es dem Addon antwortet, wie alle anderen auch.",
 }
 
 for k, v in pairs(news) do L[k] = v end
