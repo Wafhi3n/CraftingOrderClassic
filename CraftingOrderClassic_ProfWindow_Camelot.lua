@@ -84,17 +84,20 @@ function PW:CamelotAttach(native)
     local fullW = nativeBaseW + colW + GAP * 2
     -- Élargir SANS toucher aux enfants de Blizzard : eux sont ancrés TOPLEFT, ils ne bougent pas.
     native:SetWidth(fullW)
-    -- Élargir le CADRE ne suffit pas : le gestionnaire de panneaux garde la largeur qu'on lui a
-    -- DÉCLARÉE à l'enregistrement (`professionsFrameWidthOverride` = 750, cf.
-    -- Blizzard_ProfessionsRegistration) et tuile les autres panneaux dessus — la fiche de
-    -- personnage s'ouvrait par-dessus notre colonne. On lui annonce donc notre encombrement réel.
-    --
-    -- Historique, pour ne pas refaire le détour : cette ligne a été retirée le 2026-09-18, soupçonnée
-    -- de faire « disparaître l'UI ». C'était FAUX — le coupable était un bug de ressources graphiques
-    -- de la beta elle-même (assertions `texture->GetSize()`, `GxResourceStateTracker` dans
-    -- `_classic_beta_\Errors\`, antérieures au premier déploiement de COC sur ce client, et qui se
-    -- réparent au /reload). Rétablie une fois la vraie cause établie.
-    if SetUIPanelAttribute then pcall(SetUIPanelAttribute, native, "width", fullW) end
+    -- ⚠️ NE JAMAIS écrire dans le système de panneaux depuis du code addon.
+    -- On a tenté `SetUIPanelAttribute(native, "width", fullW)` pour que le gestionnaire réserve
+    -- notre largeur réelle (sinon la fiche de personnage s'ouvre par-dessus notre colonne).
+    -- Le jeu nous a nommés : « attempt to compare local 'oldR' (a secret number value, while
+    -- execution tainted by 'CraftingOrderClassic') », pile Menu → ShowUIPanel → EnterEditMode →
+    -- RefreshPartyFrames → CompactUnitFrame_UpdateHealthColor.
+    -- Mécanisme, lisible dans Blizzard_UIParentPanelManager : `RegisterUIPanel` remplit
+    -- `UIPanelWindows`, donc `SetUIPanelAttribute` va jusqu'à `SetFrameAttributes` →
+    -- `frame:SetAttributeNoHandler(...)` DEPUIS NOTRE CODE → les attributs sécurisés du cadre sont
+    -- teintés → le dispatch `FramePositionDelegate:SetAttribute(...)` exécute toute la chaîne
+    -- sécurisée en teinté → la première lecture d'une valeur SECRÈTE lève.
+    -- Sur l'Era une taint donnait au pire un ADDON_ACTION_BLOCKED ; sur Midnight elle fait planter
+    -- le code de Blizzard, et le blâme nous est imputé nommément.
+    -- Le chevauchement de panneaux est COSMÉTIQUE. On le garde.
 
     self.frame:SetParent(native)          -- suit l'ouverture/fermeture et le déplacement du natif
     self.frame:ClearAllPoints()
@@ -116,9 +119,6 @@ end
 function PW:CamelotDetach(native)
     if native and nativeBaseW then
         native:SetWidth(nativeBaseW)
-        -- Rendre aussi l'encombrement déclaré, sinon le gestionnaire réserverait à vie la place de
-        -- notre colonne pour une fenêtre redevenue étroite.
-        if SetUIPanelAttribute then pcall(SetUIPanelAttribute, native, "width", nativeBaseW) end
     end
     self.docked = false
     if self.frame then
