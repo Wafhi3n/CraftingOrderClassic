@@ -13,13 +13,17 @@
 # synchronisée par sync-libs.ps1. Rend cet addon AUTONOME (n'a pas besoin de Guild Economy).
 Libs\LibStub\LibStub.lua
 Libs\CraftLink-1.0\lib.xml
-Libs\CraftLink-1.0\Data\Vanilla.xml
+Libs\CraftLink-1.0\Data\Camelot.xml
 
 # Variante WoW: FOREVER (nom de code CAMELOT, client _classic_beta_, interface 16001).
 # ATTENTION : ce client est MAINLINE/Retail (WOW_PROJECT_ID == 1), pas Classic. Les API de
 # metier Classic n'y existent pas. Voir docs/FOREVER-PORT.md et CraftingOrderClassic_Compat.lua.
-# Contenu vanilla niveau 60 -> dataset Vanilla. La couche de donnees CAMELOT (600+ recettes)
-# reste A FAIRE : cf. CraftLink/tools/gen_season.lua.
+# Dataset CAMELOT (Data/Camelot.xml, 2512 recettes) et NON Vanilla : Forever ne fait pas
+# qu'ajouter, il RETIRE -- les 6 potions de soin ont quitte l'Alchimie (sorts 2330/2337/3447/
+# 7181/11457/17556) pour Premiers soins avec de nouveaux sorts. Une couche additive ne sait pas
+# retirer, d'ou un set complet genere par CraftLink/tools/gen_flavor.lua. Pas de Poisons : Forever
+# en a fait des sorts sans reactif. dataVersion 1908807446, volontairement != Vanilla (un client
+# Forever et un client Era ne doivent jamais comparer leurs bitfields de registre).
 
 CraftingOrderClassic.lua
 # Couche d'adaptation d'API entre SAVEURS (Classic vs MAINLINE/Forever). Doit venir juste
