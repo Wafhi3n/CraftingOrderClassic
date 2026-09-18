@@ -154,7 +154,7 @@ end
 
 -- === Groupe 6 : découpage en sections (SectionOf) ===
 function T:_TestSection()
-    if not (COC.SectionOf and GetItemInfoInstant) then return end
+    if not (COC.SectionOf and COC.Api.GetItemInfoInstant) then return end
     local label, order = COC.SectionOf(2589)   -- Linen Cloth (Classic Era)
     check(type(label) == "string" and type(order) == "number", "SectionOf : renvoie (string, number)")
 end

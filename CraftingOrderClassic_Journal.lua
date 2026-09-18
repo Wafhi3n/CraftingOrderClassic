@@ -65,7 +65,7 @@ end
 local function craftCount(o)
     local n = math.max(1, tonumber(o.qty) or 1)
     if not o.byStack then return n end
-    local sz = o.itemID and GetItemInfo and select(8, GetItemInfo(o.itemID))
+    local sz = o.itemID and COC.Api.GetItemInfo and select(8, COC.Api.GetItemInfo(o.itemID))
     return n * ((sz and sz > 1) and sz or 1)
 end
 
@@ -235,7 +235,7 @@ function Journal:Entries()
         now = time and time() or 0,
         bagCount = function(id)
             local v = cache[id]
-            if v == nil then v = (GetItemCount and GetItemCount(id, false)) or 0; cache[id] = v end
+            if v == nil then v = (COC.Api.GetItemCount and COC.Api.GetItemCount(id, false)) or 0; cache[id] = v end
             return v
         end,
     }

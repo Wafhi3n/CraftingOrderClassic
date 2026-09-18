@@ -45,9 +45,9 @@ end
 -- CraftLink puis nom de sort (enchants = services sans objet).
 local function segName(sid, prod)
     local lib = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
-    local nm = prod and GetItemInfo and GetItemInfo(prod)
+    local nm = prod and COC.Api.GetItemInfo and COC.Api.GetItemInfo(prod)
     if not nm and prod and lib and lib.ItemName then nm = lib:ItemName(prod) end
-    if not nm and GetSpellInfo then nm = GetSpellInfo(sid) end
+    if not nm then nm = COC.Api.GetSpellName(sid) end
     if not nm and lib and lib.RecipeName then nm = lib:RecipeName(sid) end
     return nm or ("spell:" .. sid)
 end
@@ -188,7 +188,7 @@ local function fillSegRow(row, s)
         row.name:SetText("|cFF888888" .. L["aucune recette calculable"] .. "|r")
         row.cost:SetText("")
     else
-        row.icon:SetTexture((s.prod and GetItemIcon and GetItemIcon(s.prod))
+        row.icon:SetTexture((s.prod and COC.Api.GetItemIcon and COC.Api.GetItemIcon(s.prod))
             or "Interface\\Icons\\INV_Misc_QuestionMark")
         row.icon:SetDesaturated(false)
         local plan = (s.plan or 0) > 0 and "|TInterface\\Icons\\INV_Scroll_03:12:12|t " or ""
@@ -331,7 +331,7 @@ function PW:_FillRouteGateway(f, used, y, route)
     if not (g or higher) then return y end
     y = U:_NeedsTextLine(f, used, y + 8, "|cFFE8B84B" .. L["Débloquer le palier suivant"] .. "|r")
     if g then
-        local nm = (g.item and GetItemInfo and GetItemInfo(g.item)) or g.name or L["Livre de rang"]
+        local nm = (g.item and COC.Api.GetItemInfo and COC.Api.GetItemInfo(g.item)) or g.name or L["Livre de rang"]
         local price = (g.price and g.price > 0) and (" — " .. GetCoinTextureString(g.price)) or ""
         y = U:_NeedsTextLine(f, used, y, "|TInterface\\Icons\\INV_Scroll_03:12:12|t |cFFEEDD88"
             .. string.format(L["À apprendre : %s"], nm) .. price .. "|r")

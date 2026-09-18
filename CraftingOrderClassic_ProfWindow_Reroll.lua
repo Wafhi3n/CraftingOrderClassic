@@ -66,7 +66,7 @@ function PW:_RerollReagents(spellID)
         local id, qty = rg[1], rg[2] or 1
         out[#out + 1] = {
             name = c:ItemName(id) or ("item:" .. id),
-            texture = (GetItemIcon and GetItemIcon(id)) or nil,
+            texture = (COC.Api.GetItemIcon and COC.Api.GetItemIcon(id)) or nil,
             need = qty, readonly = true, link = "item:" .. id,
         }
     end
@@ -103,7 +103,7 @@ function PW:_OpenSmelting()
     if craft and craft:GetOpenProfessionInfo() and craft:OpenProfessionKey() == "Mining" then
         self:OnProfessionShow(); return          -- déjà ouverte nativement → (ré)affiche la vue pleine
     end
-    local spell = GetSpellInfo and GetSpellInfo(2656)   -- nom localisé du sort « Fonte »
+    local spell = COC.Api.GetSpellName(2656)   -- nom localisé du sort « Fonte »
     if spell and spell ~= "" and CastSpellByName then
         self.standaloneKey = nil
         CastSpellByName(spell)                    -- ouvre la fenêtre de fonte → OnProfessionShow

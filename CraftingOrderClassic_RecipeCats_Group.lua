@@ -200,8 +200,8 @@ function RC.SubForSpell(profKey, spellID, itemID)
     -- stat qu'il donne, et c'est ainsi qu'on le cherche. Une seule stat en en-tête (le libellé sert
     -- de titre de groupe, pas de fiche technique). Restreint aux consommables : ailleurs, un niveau
     -- « par stat » doublonnerait le classement par emplacement, déjà plus parlant.
-    if COC.Stats and itemID and GetItemInfoInstant
-        and select(6, GetItemInfoInstant(itemID)) == CONSUMABLE_CLASS then
+    if COC.Stats and itemID and COC.Api.GetItemInfoInstant
+        and select(6, COC.Api.GetItemInfoInstant(itemID)) == CONSUMABLE_CLASS then
         local label = COC.Stats:LabelFor(itemID, 1)
         -- `Tier` = le rang de métier de la recette : c'est lui qui met l'élixir majeur devant le
         -- mineur DANS le groupe. Il exige le métier, d'où sa présence dans la signature.

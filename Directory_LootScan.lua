@@ -84,7 +84,7 @@ end
 function Dir:NoteCraftSeen(who, item)
     if not (who and item) then return end
     local itemID = tonumber(item)
-    if not itemID and GetItemInfoInstant then itemID = select(1, GetItemInfoInstant(item)) end
+    if not itemID and COC.Api.GetItemInfoInstant then itemID = select(1, COC.Api.GetItemInfoInstant(item)) end
     local bi = itemID and ensureReverse(); local hit = bi and bi[itemID]
     if hit then self:_NoteSeen(who, hit.prof, hit.spellID) end
 end

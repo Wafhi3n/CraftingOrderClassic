@@ -64,9 +64,10 @@ function PW:RestoreNative() restore(_G.TradeSkillFrame, "trade"); restore(_G.Cra
 -- Construction du shell
 -- ------------------------------------------------------------------
 function PW:_BuildHeader(f)
-    -- Titre = la barre native (f.TitleText, alimentée via self.titleFS). L'ancien wordmark « Crafting
-    -- Order » du coin est retiré (portrait + titre portent l'identité).
-    self.titleFS = f.TitleText
+    -- Titre = la barre native. L'ancien wordmark « Crafting Order » du coin est retiré (portrait +
+    -- titre portent l'identité). Le FontString ne vit PAS au même endroit selon la saveur
+    -- (`f.TitleText` en Era, `f.TitleContainer.TitleText` sur Forever) → résolveur de Compat.
+    self.titleFS = COC.Api.TitleFontString(f)
 
     -- Rangée de contrôles SOUS la barre de titre (y −28..−48, HEADER_H = 56 inchangé). À gauche, x = 64 :
     -- le médaillon du portrait déborde dans le cadre (~58 px de large jusqu'à y ≈ −53) → on le contourne.
@@ -128,7 +129,11 @@ end
 -- bouton fermer, quelle que soit la longueur du titre (vécu : « 250 » collé au X). En les fusionnant,
 -- le rang hérite du centrage natif du titre et suit son étendue réelle.
 function PW:_SetTitle(label, suffix)
-    self.titleFS:SetText(suffix and (label .. "  " .. suffix) or label)
+    local text = suffix and (label .. "  " .. suffix) or label
+    -- `SetTitle` (mixin PortraitFrameTemplate) existe des DEUX côtés et vise le bon FontString,
+    -- où qu'il vive : c'est la voie d'écriture. Le FontString résolu ne sert que de repli.
+    if self.frame and self.frame.SetTitle then self.frame:SetTitle(text)
+    elseif self.titleFS then self.titleFS:SetText(text) end
 end
 
 -- Bascule mon statut LFW pour le métier OUVERT (mien). Ignoré hors vue pleine (reroll = pas mon perso).

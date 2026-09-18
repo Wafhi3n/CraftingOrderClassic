@@ -26,7 +26,7 @@ local Q = {}
 COC.JournalQuests = Q
 
 local function api()
-    return GetNumQuestLogEntries and GetQuestLogTitle and true or false
+    return COC.Api.GetNumQuestLogEntries and COC.Api.GetQuestLogTitle and true or false
 end
 
 -- Le TAG affiché par le journal natif — « (Complete) », « (Daily) », « (Failed) », « (Daily PvP) » —
@@ -52,8 +52,8 @@ end
 function Q:Groups()
     if not api() then return {} end
     local groups, current = {}, nil
-    for i = 1, (GetNumQuestLogEntries() or 0) do
-        local title, level, rawTag, isHeader, isCollapsed, isComplete, frequency = GetQuestLogTitle(i)
+    for i = 1, (COC.Api.GetNumQuestLogEntries() or 0) do
+        local title, level, rawTag, isHeader, isCollapsed, isComplete, frequency = COC.Api.GetQuestLogTitle(i)
         if title and isHeader then
             current = { header = title, collapsed = isCollapsed and true or false, quests = {} }
             groups[#groups + 1] = current
@@ -75,9 +75,9 @@ end
 -- Détail d'une quête : description, texte d'objectif, et lignes d'objectifs avec leur état.
 -- La sélection du journal du jeu est sauvegardée puis RESTAURÉE (cf. piège 1 en tête de fichier).
 function Q:Detail(index)
-    if not (index and SelectQuestLogEntry and GetQuestLogQuestText) then return nil end
-    local prev = GetQuestLogSelection and GetQuestLogSelection()
-    SelectQuestLogEntry(index)
+    if not (index and GetQuestLogQuestText) then return nil end
+    local prev = COC.Api.GetQuestSelection()
+    COC.Api.SelectQuestLogEntry(index)
     local desc, objText = GetQuestLogQuestText()
     local lines = {}
     for j = 1, (GetNumQuestLeaderBoards and GetNumQuestLeaderBoards() or 0) do
@@ -86,7 +86,7 @@ function Q:Detail(index)
             lines[#lines + 1] = { text = text, done = finished and true or false }
         end
     end
-    if prev and prev > 0 then SelectQuestLogEntry(prev) end
+    COC.Api.RestoreQuestSelection(prev)
     -- Sans aucune ligne d'objectif (quête « parle à X »), le texte d'objectif fait office de ligne
     -- unique — sinon la fiche s'afficherait sans aucun objectif, ce qui est faux.
     if #lines == 0 and objText and objText ~= "" then lines[1] = { text = objText, done = false } end

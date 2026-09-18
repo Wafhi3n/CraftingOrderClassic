@@ -144,7 +144,7 @@ end
 function Tracker:_PaintObjective(r, obj, y)
     reset(r, IND_OBJ, y, self.frame)
     textAt(r, 0)
-    local name = (obj.itemID and GetItemInfo and GetItemInfo(obj.itemID)) or nil
+    local name = (obj.itemID and COC.Api.GetItemInfo and COC.Api.GetItemInfo(obj.itemID)) or nil
     if not name and obj.itemID then
         local c = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
         name = (c and c.ItemName) and c:ItemName(obj.itemID) or ("item:" .. obj.itemID)
@@ -153,8 +153,8 @@ function Tracker:_PaintObjective(r, obj, y)
     r.text:SetTextColor(unpack(obj.done and COLOR.objDone or COLOR.obj))
     r.tipItemID = obj.itemID
     r.onClick = function()
-        if not (IsShiftKeyDown and IsShiftKeyDown() and obj.itemID and GetItemInfo) then return end
-        local link = select(2, GetItemInfo(obj.itemID))
+        if not (IsShiftKeyDown and IsShiftKeyDown() and obj.itemID and COC.Api.GetItemInfo) then return end
+        local link = select(2, COC.Api.GetItemInfo(obj.itemID))
         if link and ChatEdit_InsertLink then ChatEdit_InsertLink(link) end
     end
     return r.text:GetStringWidth() + IND_OBJ

@@ -191,8 +191,8 @@ function ET.Update()
     -- le multi-retour à UNE valeur → equipLoc devenait nil (« aucun enchant pour cet emplacement »).
     -- `subclass` (7ᵉ retour) sert à reconnaître un BÂTON parmi les armes à 2 mains (cf. CraftsForEquipLoc).
     local equipLoc, subclass
-    if GetItemInfoInstant then
-        local _, _, _, loc, _, _, sub = GetItemInfoInstant(link)
+    if COC.Api.GetItemInfoInstant then
+        local _, _, _, loc, _, _, sub = COC.Api.GetItemInfoInstant(link)
         equipLoc, subclass = loc, sub
     end
     local crafts = COC.Enchant and COC.Enchant:CraftsForEquipLoc(equipLoc, subclass)
@@ -265,9 +265,11 @@ end
 function ET:Start()
     build()
     local f = CreateFrame("Frame")
-    for _, ev in ipairs({ "TRADE_SHOW", "TRADE_CLOSED", "TRADE_TARGET_ITEM_CHANGED",
-                          "CRAFT_SHOW", "CRAFT_CLOSE", "CRAFT_UPDATE",
-                          "PLAYER_REGEN_ENABLED" }) do f:RegisterEvent(ev) end
+    -- CRAFT_* n'existe pas sur un client MAINLINE (Forever) et RegisterEvent lève sur un
+    -- événement inconnu → enregistrement gardé (cf. COC.Api.RegisterEventsSafe).
+    COC.Api.RegisterEventsSafe(f, { "TRADE_SHOW", "TRADE_CLOSED", "TRADE_TARGET_ITEM_CHANGED",
+                                    "CRAFT_SHOW", "CRAFT_CLOSE", "CRAFT_UPDATE",
+                                    "PLAYER_REGEN_ENABLED" })
     f:SetScript("OnEvent", function(_, ev)
         if ev == "TRADE_CLOSED" then
             hidePanel()   -- escamotage à l'alpha si on est en combat, vrai Hide au rejeu de sortie

@@ -24,7 +24,7 @@ local DONE_RETENTION = 7 * 86400 -- 7 j (depuis la création) : au-delà, une co
 
 local function me()  return (UnitName and UnitName("player")) or "?" end
 local function pmsg(m) print("|cFF33DD88Crafting Order|r " .. m) end
-local function itemName(id) return (id and GetItemInfo and (GetItemInfo(id))) or (id and ("item:" .. id)) or "?" end
+local function itemName(id) return (id and COC.Api.GetItemInfo and (COC.Api.GetItemInfo(id))) or (id and ("item:" .. id)) or "?" end
 
 -- Métier qui produit cet itemID (depuis le catalogue itemToSpell), ou nil.
 function Orders:ProfForItem(itemID)
@@ -282,7 +282,7 @@ end
 function Orders:AlertTargeted(o, tries)
     local nm  = self:OrderName(o)
     if (nm:match("^item:") or nm:match("^spell:")) and (tries or 0) < 10 then
-        if o.itemID and GetItemInfo then GetItemInfo(o.itemID) end   -- amorce le chargement async
+        if o.itemID and COC.Api.GetItemInfo then COC.Api.GetItemInfo(o.itemID) end   -- amorce le chargement async
         if C_Timer then C_Timer.After(0.3, function() Orders:AlertTargeted(o, (tries or 0) + 1) end); return end
     end
     local Skin = COC.UI and COC.UI.Skin

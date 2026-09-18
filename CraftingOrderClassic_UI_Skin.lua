@@ -9,6 +9,9 @@ CraftingOrderClassic.UI = CraftingOrderClassic.UI or {}
 local Skin = {}
 CraftingOrderClassic.UI.Skin = Skin
 local L = CraftingOrderClassic.L
+-- Accès aux API objets/sorts via la couche de compatibilité (cf. CraftingOrderClassic_Compat.lua) :
+-- les globaux Classic n'existent plus sur Forever. Compat est chargé avant ce fichier.
+local Api = CraftingOrderClassic.Api
 
 Skin.color = {
     panel     = { 0.082, 0.063, 0.043 },        -- #15100b fond fenêtre
@@ -59,7 +62,7 @@ Skin.profSpellID = {
 function Skin.ProfIcon(key)
     if not key then return nil end
     local sid = Skin.profSpellID[key]
-    if sid and GetSpellTexture then local t = GetSpellTexture(sid); if t then return t end end
+    if sid and Api.GetSpellTexture then local t = Api.GetSpellTexture(sid); if t then return t end end
     if key == "Elemental" then return "Interface\\Icons\\Spell_Fire_FlameBolt" end
     if key == "Poisons"   then return "Interface\\Icons\\Trade_BrewPoison" end   -- pas de spell d'apprenti
     return nil
@@ -78,8 +81,8 @@ function Skin.StatusInfo(s) local t = Skin.statusFR[s or "open"] or Skin.statusF
 
 -- Couleur de rareté d'un objet {r,g,b} (or par défaut : services/enchants, ou nom non encore en cache).
 function Skin.RarityColor(itemID)
-    if itemID and GetItemInfo then
-        local q = select(3, GetItemInfo(itemID))
+    if itemID and Api.GetItemInfo then
+        local q = select(3, Api.GetItemInfo(itemID))
         if q and ITEM_QUALITY_COLORS and ITEM_QUALITY_COLORS[q] then
             local c = ITEM_QUALITY_COLORS[q]; return c.r, c.g, c.b
         end
@@ -98,7 +101,7 @@ function Skin.QtyText(o)
     local n = o.qty or 1
     if not o.byStack then return "×" .. n end
     local word = (n > 1) and L["piles"] or L["pile"]
-    local stackSize = o.itemID and GetItemInfo and select(8, GetItemInfo(o.itemID))
+    local stackSize = o.itemID and Api.GetItemInfo and select(8, Api.GetItemInfo(o.itemID))
     if stackSize and stackSize > 1 then return n .. " " .. word .. " (" .. (n * stackSize) .. ")" end
     return n .. " " .. word
 end
@@ -184,15 +187,15 @@ end
 -- propre par version, sans re-générer les données (sur un client TBC, l'objet apparaîtra).
 function Skin.ItemExists(itemID)
     if not itemID then return true end
-    if GetItemInfoInstant then return GetItemInfoInstant(itemID) ~= nil end
+    if Api.GetItemInfoInstant then return Api.GetItemInfoInstant(itemID) ~= nil end
     return true   -- API absente : on ne filtre pas
 end
 
 -- Icône native d'un objet/sort (texture du client — aucun asset à fournir). nil si introuvable.
 function Skin.Icon(itemID, spellID)
-    if itemID and GetItemIcon then local t = GetItemIcon(itemID); if t then return t end end
-    if itemID and GetItemInfo then local t = select(10, GetItemInfo(itemID)); if t then return t end end
-    if spellID and GetSpellTexture then local t = GetSpellTexture(spellID); if t then return t end end
+    if itemID and Api.GetItemIcon then local t = Api.GetItemIcon(itemID); if t then return t end end
+    if itemID and Api.GetItemInfo then local t = select(10, Api.GetItemInfo(itemID)); if t then return t end end
+    if spellID and Api.GetSpellTexture then local t = Api.GetSpellTexture(spellID); if t then return t end end
     return nil
 end
 
@@ -288,7 +291,7 @@ end
 function Skin.TipItem(tip, itemID, name)
     local ok = (itemID and pcall(tip.SetHyperlink, tip, "item:" .. itemID)) and true or false
     if not ok or tip:NumLines() == 0 then
-        if itemID and GetItemInfo then GetItemInfo(itemID) end
+        if itemID and Api.GetItemInfo then Api.GetItemInfo(itemID) end
         tip:SetText(name or "?", 1, 1, 1)
     end
 end
@@ -314,10 +317,10 @@ end
 function Skin.ChatLinkFor(link, itemID, spellID)
     if link and link:find("|H", 1, true) then return link end
     if itemID then
-        local _, il = GetItemInfo(itemID)
+        local _, il = Api.GetItemInfo(itemID)
         return il or ("|cffffffff|Hitem:" .. itemID .. "|h[" .. itemID .. "]|h|r")
     end
-    if spellID and GetSpellLink then return GetSpellLink(spellID) end
+    if spellID and Api.GetSpellLink then return Api.GetSpellLink(spellID) end
     return nil
 end
 

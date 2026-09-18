@@ -25,8 +25,8 @@ local function pmsg(m) print("|cFF33DD88Crafting Order|r " .. m) end
 local function resolveLink(it)
     if it.link then return it.link end
     local id = it.id
-    if id and GetItemInfo then
-        local _, lnk = GetItemInfo(id)
+    if id and COC.Api.GetItemInfo then
+        local _, lnk = COC.Api.GetItemInfo(id)
         if lnk then return lnk end
     end
     if id then

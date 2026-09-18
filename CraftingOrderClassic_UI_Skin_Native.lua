@@ -140,10 +140,11 @@ end
 -- Sert aussi de feedback dynamique (ex. onglet Commande : le portrait devient l'icône du métier choisi
 -- — icônes de sort 64×64, donc chemin heureux).
 function Skin.SetWindowPortrait(f, tex)
-    if not (f and f.portrait and tex) then return end
-    if SetPortraitToTexture and pcall(SetPortraitToTexture, f.portrait, tex) then return end
-    f.portrait:SetTexture(tex)
-    if f.portrait.SetMask then f.portrait:SetMask("Interface\\CharacterFrame\\TempPortraitAlphaMask") end
+    local p, preMasked = COC.Api.PortraitTexture(f)   -- l'emplacement varie selon la saveur
+    if not (p and tex) then return end
+    if SetPortraitToTexture and pcall(SetPortraitToTexture, p, tex) then return end
+    p:SetTexture(tex)
+    if not preMasked and p.SetMask then p:SetMask("Interface\\CharacterFrame\\TempPortraitAlphaMask") end
 end
 
 -- Rend le médaillon CLIQUABLE, avec une petite flèche d'affordance (sinon un rond ne se devine pas
@@ -153,17 +154,18 @@ end
 -- Renvoie (bouton, flèche) — la flèche s'expose pour que l'appelant la masque hors contexte (ex. un
 -- onglet où le clic ne fait rien) via `arrow:SetShown(bool)`.
 function Skin.SetPortraitClickable(f, onClick, tooltipText)
-    if not (f and f.portrait) then return end
+    local p = COC.Api.PortraitTexture(f)              -- l'emplacement varie selon la saveur
+    if not p then return end
     local btn, arrow = f._portraitBtn, f._portraitArrow
     if not btn then
         btn = CreateFrame("Button", nil, f)
-        btn:SetAllPoints(f.portrait)
+        btn:SetAllPoints(p)
         btn:SetFrameLevel(f:GetFrameLevel() + 10)
         local hi = btn:CreateTexture(nil, "HIGHLIGHT")
         hi:SetAllPoints(); hi:SetColorTexture(1, 1, 1, 0.18)
         arrow = f:CreateTexture(nil, "OVERLAY")
         arrow:SetSize(14, 14); arrow:SetTexture(Skin.tex.arrowDown)
-        arrow:SetPoint("BOTTOMRIGHT", f.portrait, "BOTTOMRIGHT", 3, -1)
+        arrow:SetPoint("BOTTOMRIGHT", p, "BOTTOMRIGHT", 3, -1)
         f._portraitBtn, f._portraitArrow = btn, arrow
     end
     btn:SetScript("OnClick", onClick)
@@ -200,12 +202,13 @@ end
 -- de titre −21 et le nom de métier de l'en-tête −14). Le corps de la languette vit donc DANS le gris,
 -- son bas ouvert plonge vers le contenu — le rendu « onglets sur la barre grise » demandé. La fenêtre
 -- réserve la bande dessous (PAD_TOP, UI.lua). Contrat `bar` inchangé : .buttons[id], :Select, :SetText.
+-- Le gabarit d'onglet natif change de nom selon la saveur — résolu dans Compat (COC.Api).
 function Skin.MakeTabs(f, defs, onSelect, opts)
     local x = (opts and opts.tabX) or 62
     local y = (opts and opts.tabY) or -28
     local bar, prev = { buttons = {} }, nil
     for i, d in ipairs(defs) do
-        local b = CreateFrame("Button", (f:GetName() or "COCWin") .. "Tab" .. i, f, "TabButtonTemplate")
+        local b = CreateFrame("Button", (f:GetName() or "COCWin") .. "Tab" .. i, f, COC.Api.TabTemplate)
         b:SetText(d.label)
         PanelTemplates_TabResize(b, 0)
         if prev then b:SetPoint("LEFT", prev, "RIGHT", -4, 0)

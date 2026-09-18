@@ -197,7 +197,7 @@ local function entryData(key)
     local o = found.order
     local objs = {}
     for _, ob in ipairs(found.objectives or {}) do
-        local nm = (ob.itemID and GetItemInfo and GetItemInfo(ob.itemID)) or ("item:" .. tostring(ob.itemID))
+        local nm = (ob.itemID and COC.Api.GetItemInfo and COC.Api.GetItemInfo(ob.itemID)) or ("item:" .. tostring(ob.itemID))
         objs[#objs + 1] = { text = nm .. ": " .. ob.have .. "/" .. ob.need, done = ob.done }
     end
     if #objs == 0 then objs[1] = { text = found.title, done = found.complete } end

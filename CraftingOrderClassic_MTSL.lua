@@ -192,7 +192,7 @@ function MTSL:SkillDetail(profKey, spellID)
         recItemID = recipeItemFor(profKey, spellID)
         local item = recItemID and itemsOf(mprof)[recItemID]
         if recItemID then
-            local nm = (GetItemInfo and GetItemInfo(recItemID)) or (item and loc(item.name)) or ("item:" .. recItemID)
+            local nm = (COC.Api.GetItemInfo and COC.Api.GetItemInfo(recItemID)) or (item and loc(item.name)) or ("item:" .. recItemID)
             lines[#lines + 1] = { label = L["Appris de"], value = nm }
         end
         if item and item.vendors then
@@ -241,7 +241,7 @@ function MTSL:MissingRecipes(profKey)
             out[#out + 1] = {
                 isMissing = true, spellID = spellID, itemID = itemID,
                 name = loc(sk.name), level = sk.min_skill or 0,
-                icon = itemID and GetItemIcon and GetItemIcon(itemID) or "Interface\\Icons\\INV_Scroll_03",
+                icon = itemID and COC.Api.GetItemIcon and COC.Api.GetItemIcon(itemID) or "Interface\\Icons\\INV_Scroll_03",
                 difficulty = "trivial",   -- neutre : une recette non apprise n'a pas de couleur de difficulté
             }
         end

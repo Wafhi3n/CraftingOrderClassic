@@ -53,9 +53,9 @@ end
 
 local function recipeName(sid, prod)
     local lib = CL()
-    local nm = prod and GetItemInfo and GetItemInfo(prod)
+    local nm = prod and COC.Api.GetItemInfo and COC.Api.GetItemInfo(prod)
     if not nm and prod and lib and lib.ItemName then nm = lib:ItemName(prod) end
-    if not nm and GetSpellInfo then nm = GetSpellInfo(sid) end
+    if not nm then nm = COC.Api.GetSpellName(sid) end
     if not nm and lib and lib.RecipeName then nm = lib:RecipeName(sid) end
     return nm or ("spell:" .. tostring(sid))
 end

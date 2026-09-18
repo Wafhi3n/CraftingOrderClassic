@@ -136,7 +136,7 @@ end
 
 function Inbound:Add(e)
     if not COC.db then return end
-    if e.itemID and GetItemInfo then GetItemInfo(e.itemID) end   -- amorce le cache (nom localisé + rareté)
+    if e.itemID and COC.Api.GetItemInfo then COC.Api.GetItemInfo(e.itemID) end   -- amorce le cache (nom localisé + rareté)
     COC.db.inbound = COC.db.inbound or {}
     local id = e.buyer .. "_" .. e.itemID
     local existing = COC.db.inbound[id]

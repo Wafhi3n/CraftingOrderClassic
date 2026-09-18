@@ -13,7 +13,7 @@ local L    = COC.L
 
 local PLH   = 20         -- hauteur ligne (plan ET en-tête : pool virtualisé homogène ; DOIT égaler _UI_Post.lua)
 
-local INSTANT = GetItemInfoInstant
+local INSTANT = COC.Api.GetItemInfoInstant
 
 -- Ordre canonique des emplacements d'armure (token INVTYPE -> rang) : suit le paperdoll
 -- (tête → pieds), puis doigts/bijoux, bouclier/tenu. Sert de tri PRIMAIRE des sections.

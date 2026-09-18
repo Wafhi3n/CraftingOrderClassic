@@ -15,6 +15,9 @@ Libs\CraftLink-1.0\lib.xml
 Libs\CraftLink-1.0\Data\TBC.xml
 
 CraftingOrderClassic.lua
+# Couche d'adaptation d'API entre SAVEURS (Classic vs MAINLINE/Forever). Doit venir juste
+# apres le fichier racine : tout le reste de COC compte sur COC.Api.
+CraftingOrderClassic_Compat.lua
 CraftingOrderClassic_Trace.lua
 CraftingOrderClassic_Migrations.lua
 CraftingOrderClassic_Locale.lua
@@ -70,6 +73,9 @@ CraftingOrderClassic_RecipeCats_Gathering.lua
 CraftingOrderClassic_RecipeCats_Smelting.lua
 CraftingOrderClassic_RecipeCats_Enchanting.lua
 CraftingOrderClassic_Craft.lua
+# 3e backend metier, pour les clients MAINLINE (Forever/Camelot) : C_TradeSkillUI, recettes
+# clefees par recipeSpellID. Inerte ailleurs. Doit venir APRES le socle _Craft.lua.
+CraftingOrderClassic_Craft_Mainline.lua
 CraftingOrderClassic_Enchant.lua
 CraftingOrderClassic_Stats.lua
 CraftingOrderClassic_Stats_Filter.lua
@@ -80,6 +86,9 @@ CraftingOrderClassic_ProfWindow.lua
 CraftingOrderClassic_ProfWindow_Layout.lua
 CraftingOrderClassic_ProfWindow_HelpPlate.lua
 CraftingOrderClassic_ProfWindow_Dock.lua
+# POC Camelot : notre colonne Commandes DANS la fenetre de metier native de Forever
+# (elargissement du cadre). Garde de saveur en tete : inerte hors client MAINLINE.
+CraftingOrderClassic_ProfWindow_Camelot.lua
 CraftingOrderClassic_ProfWindow_Toolbar.lua
 CraftingOrderClassic_ProfWindow_Recipes.lua
 CraftingOrderClassic_ProfWindow_Leveling.lua
@@ -94,6 +103,9 @@ CraftingOrderClassic_ProfWindow_LFW.lua
 CraftingOrderClassic_ProfWindow_Reroll.lua
 Directory.lua
 Directory_Presence.lua
+# Couture de lecture du registre (bitfield RK / identifiants RI) : les consommateurs posent
+# une question, ils n'ont plus a connaitre la FORME du payload ni a recopier la garde de version.
+Directory_Recipes.lua
 Directory_Confed.lua
 Directory_Skills.lua
 Directory_Version.lua

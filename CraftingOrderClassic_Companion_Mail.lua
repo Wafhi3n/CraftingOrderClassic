@@ -99,8 +99,8 @@ local function fill()
     -- Joint l'objet crafté depuis les sacs (best-effort ; enchant sans itemID → rien à joindre).
     if o.itemID and not alreadyAttached(o.itemID) then
         local wantN = o.qty or 1
-        if o.byStack and GetItemInfo then
-            local stackSize = select(8, GetItemInfo(o.itemID))
+        if o.byStack and COC.Api.GetItemInfo then
+            local stackSize = select(8, COC.Api.GetItemInfo(o.itemID))
             if stackSize and stackSize > 1 then wantN = wantN * stackSize end
         end
         attachItem(o.itemID, wantN)

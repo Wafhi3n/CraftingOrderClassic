@@ -22,9 +22,9 @@ local function shortName(n) return n and (n:match("^([^%-]+)") or n) or n end
 -- via BattleTag n'entre jamais dans l'onglet Amis même croisé et en ligne. `fn` reçoit chaque perso.
 -- BNGetFriendInfo ne liste QUE les connectés → tout perso rendu ici est en ligne.
 function Dir:ForEachBNetWoWFriend(fn)
-    if not (BNGetNumFriends and BNGetFriendInfo) then return end
+    if not BNGetNumFriends then return end
     for i = 1, (BNGetNumFriends() or 0) do
-        local _, _, _, _, characterName, _, client, isOnline = BNGetFriendInfo(i)
+        local characterName, client, isOnline = COC.Api.GetBNetFriend(i)
         if isOnline and characterName and client == (BNET_CLIENT_WOW or "WoW") then fn(characterName) end
     end
 end

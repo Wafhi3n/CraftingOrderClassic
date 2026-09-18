@@ -22,7 +22,7 @@ COC.Gem   = Gem
 local L   = COC.L
 
 local PROF    = "Jewelcrafting"
-local INSTANT = GetItemInfoInstant
+local INSTANT = COC.Api.GetItemInfoInstant
 
 local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true) end
 
@@ -138,7 +138,7 @@ local function reagentName(c, spellID)
     local list = def and def.reagents and def.reagents[spellID]
     local first = list and list[1]
     if not (first and first[1]) then return nil end
-    return (GetItemInfo(first[1]))
+    return (COC.Api.GetItemInfo(first[1]))
 end
 
 -- Libellé de la taille dans la langue du CLIENT, sans aucune traduction à maintenir : on RETRANCHE
@@ -152,7 +152,7 @@ end
 local function deriveLabel(cut)
     local c, id = CL(), _repSpell[cut]
     local product = (c and id and c.RecipeProduct) and c:RecipeProduct(PROF, id) or nil
-    local full = product and GetItemInfo(product) or nil
+    local full = product and COC.Api.GetItemInfo(product) or nil
     local reag = (c and id) and reagentName(c, id) or nil
     if not (full and reag and reag ~= "") then return nil end
     local s, e = full:find(reag, 1, true)

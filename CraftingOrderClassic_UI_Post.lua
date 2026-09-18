@@ -26,7 +26,7 @@ local QUALITY_STEPS = { false, 2, 3, 4 }
 local P = UI.POST   -- métriques partagées de l'onglet (PAD, largeurs de listes) — cf. _UI_Post_Layout.lua
 
 local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true) end
-local function isSoulbound(id) return id and GetItemInfo and select(14, GetItemInfo(id)) == 1 end
+local function isSoulbound(id) return id and COC.Api.GetItemInfo and select(14, COC.Api.GetItemInfo(id)) == 1 end
 
 local function entryName(e)
     local c = CL(); if not c then return "?" end
@@ -40,9 +40,9 @@ end
 -- (ex. Bolt of Cloth) apparaît dans des dizaines de plans → sans cache on rappelait GetItemCount
 -- des centaines de fois par rafraîchissement de la liste.
 local function bagCount(id, cache)
-    if not cache then return GetItemCount(id, false) or 0 end
+    if not cache then return COC.Api.GetItemCount(id, false) or 0 end
     local v = cache[id]
-    if v == nil then v = GetItemCount(id, false) or 0; cache[id] = v end
+    if v == nil then v = COC.Api.GetItemCount(id, false) or 0; cache[id] = v end
     return v
 end
 local function hasReagentsInBags(c, prof, spellID, countCache)
@@ -295,7 +295,7 @@ function UI:RefreshPostPlans()
         if (e.spellID or isDisen or isOre) and Skin.ItemExists(e.itemID) and not (e.itemID and isSoulbound(e.itemID))
             and (not artFilter or not e.spellID or artFilter(e.spellID)) then
             local okq = true
-            if qmin and e.itemID then local q = select(3, GetItemInfo(e.itemID)); okq = q ~= nil and q >= qmin end
+            if qmin and e.itemID then local q = select(3, COC.Api.GetItemInfo(e.itemID)); okq = q ~= nil and q >= qmin end
             local nm = entryName(e)
             if okq and (not s or s == "" or nm:lower():find(s, 1, true)) then
                 -- Sans recette, pas de réactifs à avoir en poche : « prêt » n'a pas de sens (false).

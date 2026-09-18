@@ -334,10 +334,13 @@ function Social:Start()
         -- Tooltip MONDE : OnTooltipSetUnit fonctionne en Classic Era (l'API tooltip n'a PAS été
         -- neutralisée comme le menu) → chemin ÉPROUVÉ, on le garde en primaire. On enregistre AUSSI
         -- l'API moderne en repli ; _cocProfAdded (remis à zéro sur OnTooltipCleared) évite le doublon.
-        if GameTooltip and GameTooltip.HookScript then
-            GameTooltip:HookScript("OnTooltipSetUnit", OnUnitTooltip)
-            GameTooltip:HookScript("OnTooltipCleared", function(tt) tt._cocProfAdded = nil end)
-        end
+        -- HookScript LÈVE si le widget ne connaît pas le type de script : sur Retail/Forever
+        -- `OnTooltipSetUnit` n'existe plus (refonte tooltip). Non gardé, il emportait TOUT ce qui
+        -- suit dans ce pcall — menus, roster, découverte. D'où l'enregistrement gardé : sur Era le
+        -- chemin éprouvé s'installe, sur Forever il échoue sans bruit et l'API moderne ci-dessous
+        -- prend le relais.
+        COC.Api.HookScriptSafe(GameTooltip, "OnTooltipSetUnit", OnUnitTooltip)
+        COC.Api.HookScriptSafe(GameTooltip, "OnTooltipCleared", function(tt) tt._cocProfAdded = nil end)
         if TooltipDataProcessor and TooltipDataProcessor.AddTooltipPostCall
             and Enum and Enum.TooltipDataType and Enum.TooltipDataType.Unit then
             TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, OnUnitTooltip)

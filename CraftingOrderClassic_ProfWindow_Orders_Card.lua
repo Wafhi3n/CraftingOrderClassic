@@ -146,7 +146,7 @@ function PW:_CardActions(card, it)
     end)
     card.whisper:Show()
     card.whisper:SetScript("OnClick", function() if ChatFrame_SendTell then ChatFrame_SendTell(o.buyer) end end)
-    card.invite:SetScript("OnClick", function() if InviteUnit and o.buyer then InviteUnit(o.buyer) end end)
+    card.invite:SetScript("OnClick", function() if COC.Api.InviteUnit and o.buyer then COC.Api.InviteUnit(o.buyer) end end)
     card:SetScript("OnMouseUp", function(_, btn)
         if btn ~= "RightButton" then return end
         if IsShiftKeyDown and IsShiftKeyDown() and o.buyer and COC.Moderation then

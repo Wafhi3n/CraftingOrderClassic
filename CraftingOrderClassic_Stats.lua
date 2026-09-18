@@ -277,7 +277,7 @@ function Stats:Of(itemID)
         _cache[itemID] = list
         return list
     end
-    if not GetItemInfo(itemID) then return nil end
+    if not COC.Api.GetItemInfo(itemID) then return nil end
     local list = fromAPI(itemID)
     if not list or #list == 0 then
         -- L'API n'a rien vu : la vérité est peut-être au tooltip (gemme, consommable). Mais s'il n'est

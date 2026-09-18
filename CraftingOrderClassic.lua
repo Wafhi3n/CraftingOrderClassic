@@ -372,12 +372,20 @@ end
 local f = CreateFrame("Frame")
 f:RegisterEvent("ADDON_LOADED")
 f:RegisterEvent("PLAYER_LOGIN")
--- Capture autonome : on scanne à l'ouverture/maj des fenêtres TradeSkill ET Craft (Enchantement).
-f:RegisterEvent("TRADE_SKILL_SHOW")
-f:RegisterEvent("TRADE_SKILL_UPDATE")
-f:RegisterEvent("CRAFT_SHOW")
-f:RegisterEvent("CRAFT_UPDATE")
-f:RegisterEvent("SKILL_LINES_CHANGED")   -- gain de skill → recapture + rediffusion (Étape D)
+-- Capture autonome : on scanne à l'ouverture/maj des fenêtres TradeSkill ET Craft (Enchantement),
+-- plus le gain de skill (SKILL_LINES_CHANGED → recapture + rediffusion, Étape D).
+--
+-- Ces événements N'EXISTENT PAS sur un client MAINLINE (WoW: Forever), et `RegisterEvent` LÈVE
+-- sur un événement inconnu au lieu de l'ignorer — une seule ligne non gardée fait tomber tout le
+-- chargement. Ce fichier CRÉE le namespace et se charge donc AVANT Compat : il ne peut pas
+-- utiliser COC.Api.RegisterEventSafe, d'où ce garde-fou local au même contrat.
+local function regSafe(ev) return (pcall(f.RegisterEvent, f, ev)) and true or false end
+-- TRADE_SKILL_LIST_UPDATE existe des DEUX cotes (Era et Forever) et remplace TRADE_SKILL_UPDATE,
+-- qui n'existe pas sur Mainline : sans lui, la liste ne se rafraichirait jamais sur Forever.
+for _, ev in ipairs({ "TRADE_SKILL_SHOW", "TRADE_SKILL_UPDATE", "TRADE_SKILL_LIST_UPDATE",
+                      "CRAFT_SHOW", "CRAFT_UPDATE", "SKILL_LINES_CHANGED" }) do
+    regSafe(ev)
+end
 f:SetScript("OnEvent", function(_, event, arg1)
     if event == "ADDON_LOADED" and arg1 == ADDON then
         CraftingOrderClassicDB = CraftingOrderClassicDB or {}

@@ -113,7 +113,7 @@ end
 -- un no-op silencieux : accrocher tout de suite s'il est déjà là, sinon attendre ADDON_LOADED.
 local function isUIPanelsLoaded()
     if C_AddOns and C_AddOns.IsAddOnLoaded then return C_AddOns.IsAddOnLoaded("Blizzard_UIPanels_Game") end
-    return IsAddOnLoaded and IsAddOnLoaded("Blizzard_UIPanels_Game")
+    return COC.Api.IsAddOnLoaded and COC.Api.IsAddOnLoaded("Blizzard_UIPanels_Game")
 end
 
 -- Orchestrateur (appelé par Social:Start)

@@ -46,9 +46,11 @@ end
 function ProfOrders:Start()
     if not COC.db then return end
     local f = CreateFrame("Frame")
-    for _, ev in ipairs({ "TRADE_SKILL_SHOW", "TRADE_SKILL_UPDATE", "TRADE_SKILL_CLOSE",
-                          "CRAFT_SHOW", "CRAFT_UPDATE", "CRAFT_CLOSE",
-                          "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED" }) do f:RegisterEvent(ev) end
+    -- Les événements de métier Classic n'existent pas sur un client MAINLINE (Forever) et
+    -- RegisterEvent lève sur un inconnu → enregistrement gardé (cf. COC.Api.RegisterEventsSafe).
+    COC.Api.RegisterEventsSafe(f, { "TRADE_SKILL_SHOW", "TRADE_SKILL_UPDATE", "TRADE_SKILL_LIST_UPDATE", "TRADE_SKILL_CLOSE",
+                                    "CRAFT_SHOW", "CRAFT_UPDATE", "CRAFT_CLOSE",
+                                    "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED" })
     f:SetScript("OnEvent", function(_, event)
         if event == "PLAYER_REGEN_DISABLED" then ProfOrders:_OnCombat(); return end
         -- Fin de combat : on rejoue tout masquage de fenêtre différé (Hide protégé pendant le combat).
