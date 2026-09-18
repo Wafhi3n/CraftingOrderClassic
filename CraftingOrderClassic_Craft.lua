@@ -33,6 +33,13 @@ end
 
 -- Nom localisé + isCraft du métier ouvert (ou nil).
 function Craft:GetOpenProfessionInfo()
+    -- MAINLINE (Forever/Camelot) d'abord : ni CraftFrame ni GetTradeSkillLine n'y existent, et la
+    -- dichotomie Craft/TradeSkill n'a plus de sens — tout passe par C_TradeSkillUI (isCraft=false).
+    if self.MAINLINE_API then
+        local name = self.MAINLINE_API.getSkillName()
+        if name and name ~= "" then return name, false end
+        return nil, nil
+    end
     if CraftFrame and CraftFrame:IsShown() then
         local name = (GetCraftDisplaySkillLine and GetCraftDisplaySkillLine())
                   or (GetCraftName and GetCraftName())
@@ -58,6 +65,12 @@ local TRADESKILL_API = {
     getReagInfo = function(i, j) return GetTradeSkillReagentInfo(i, j) end,
     getReagLink = function(i, j) return GetTradeSkillReagentItemLink and GetTradeSkillReagentItemLink(i, j) end,
     getRecipeLink = function(i) return GetTradeSkillRecipeLink and GetTradeSkillRecipeLink(i) end,  -- lien SORT recette (|Henchant:)
+    -- spellID de la RECETTE : ici il faut le DÉDUIRE du lien. Sur Mainline la recette EST le sort,
+    -- d'où cet accesseur — chaque backend sait le fournir à sa façon (cf. _Craft_Mainline.lua).
+    getSpellID  = function(i)
+        local l = GetTradeSkillRecipeLink and GetTradeSkillRecipeLink(i)
+        return l and tonumber(l:match("|Henchant:(%d+)")) or nil
+    end,
     craft       = function(i, n) if DoTradeSkill then DoTradeSkill(i, n or 1) end end,
 }
 local CRAFT_API = {
@@ -74,6 +87,10 @@ local CRAFT_API = {
     getReagInfo = function(i, j) return GetCraftReagentInfo(i, j) end,
     getReagLink = function(i, j) return GetCraftReagentItemLink and GetCraftReagentItemLink(i, j) end,
     getRecipeLink = function(i) return GetCraftItemLink and GetCraftItemLink(i) end,  -- l'enchant EST le sort (|Henchant:)
+    getSpellID  = function(i)
+        local l = GetCraftItemLink and GetCraftItemLink(i)
+        return l and tonumber(l:match("|Henchant:(%d+)")) or nil
+    end,
     craft       = function(_)
         -- DoCraft est une fonction PROTÉGÉE en Classic Era : un addon ne peut PAS l'appeler (même
         -- depuis un clic) après avoir neutralisé l'UI native. Le craft d'enchantement passe donc par
@@ -86,6 +103,7 @@ local CRAFT_API = {
 function Craft:GetActiveAPI()
     local name, isCraft = self:GetOpenProfessionInfo()
     if not name then return nil end
+    if self.MAINLINE_API then return self.MAINLINE_API, false end
     return (isCraft and CRAFT_API or TRADESKILL_API), isCraft
 end
 
@@ -112,6 +130,11 @@ end
 -- l'API n'expose pas le rang → on le lit via l'annuaire (Directory tient mySkills à jour via l'API
 -- skill, lisible sans ouvrir la fenêtre).
 function Craft:OpenRank()
+    -- MAINLINE : la fiche de métier porte le rang, pas besoin de passer par l'annuaire.
+    if self.MainlineRank then
+        local r, m = self:MainlineRank()
+        if r then return r, m end
+    end
     if not self:IsCraftOpen() and GetTradeSkillLine then
         local _, rank, maxRank = GetTradeSkillLine()
         if rank and rank > 0 then return rank, maxRank end
@@ -137,10 +160,11 @@ function Craft:ReadRecipes()
             else
                 local link   = api.getLink(i)
                 local itemID = link and tonumber(link:match("|Hitem:(%d+)")) or nil
-                -- spellID de la RECETTE (pas de l'objet produit) : lien |Henchant: → sert au rang requis
-                -- MTSL (« niv. X ») et au linkage chat de la recette elle-même. Peut être nil (API absente).
-                local recLink = api.getRecipeLink and api.getRecipeLink(i)
-                local spellID = recLink and tonumber(recLink:match("|Henchant:(%d+)")) or nil
+                -- spellID de la RECETTE (pas de l'objet produit) : sert au rang requis MTSL
+                -- (« niv. X ») et au linkage chat de la recette. Chaque backend sait le fournir —
+                -- déduit d'un lien |Henchant: en Classic, rendu tel quel sur Mainline où la recette
+                -- EST le sort. Peut rester nil si l'API sous-jacente ne l'expose pas.
+                local spellID = api.getSpellID and api.getSpellID(i) or nil
                 local mn, mx = api.getNumMade(i)
                 out[#out + 1] = {
                     index = i, name = name, link = link, itemID = itemID, spellID = spellID,
