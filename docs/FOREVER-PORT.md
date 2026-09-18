@@ -207,8 +207,14 @@ rendait `false` — **les enregistrements de préfixe ne survivent pas à une se
   peut pas distinguer « pas d'écho vers soi-même » de « bloqué » avec un seul client. À départager
   à deux personnages, ou en observant un autre joueur.
 - **GUILD** : non testé (pas de guilde).
-- **CHANNEL** (canal custom `CraftLinkNet`) : non testé. C'est une voie que COC utilise.
+- **CHANNEL** (canal custom `CraftLinkNet`) : ✅ **PROUVÉ le 2026-09-18** — `SendAddonMessage` sur
+  l'index de `CraftLinkNet` rend `Success` **et le message revient à l'émetteur**. Un canal custom
+  ordinaire relaie donc bien l'AddonMessage sur Forever. (Reste non prouvé : la réception par un
+  AUTRE joueur, qui demande un 2e compte.)
 - La **balise TEXTE `CLNK1`** via `SendChatMessage` sous hardware event : non testée.
+
+Voir `COMMUNITIES-TRANSPORT.md` pour le relevé complet des communautés (`C_Club`) : elles ne peuvent
+transporter **aucune** donnée, et servent uniquement d'annuaire.
 
 ### ⬜ Toujours à confirmer
 

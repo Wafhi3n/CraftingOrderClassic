@@ -256,6 +256,15 @@ local news = {
         "|cFFFFCC00pedido para tu alter %s|r de |cFFFFFFFF%s|r: %s%s%s",
     ["En ligne via %s"] = "En línea vía %s",
     ["reroll : %s (%s)"] = "alter: %s (%s)",
+    -- v1.31.0
+    ["Les cercles d'artisans, posés sur les communautés WoW"] =
+        "Círculos de artesanos, apoyados en las comunidades de WoW",
+    ["Le canal du royaume n'a ni mémoire ni liste de membres : qui n'était pas connecté quand tu as posté n'a rien vu, et chaque session recommence à chercher qui est là. Une communauté WoW répond aux deux. Marque-la avec /co circle et ses membres apparaissent sous « Cercle » dans l'onglet Artisans, avec leur présence, y compris ceux qui sont hors ligne. C'est toi qui crées la communauté et qui invites : un cercle est un petit groupe que tu as choisi, pas le royaume entier."] =
+        "El canal del reino no tiene memoria ni lista de miembros: quien no estaba conectado cuando publicaste no vio nada, y cada sesión vuelve a empezar buscando quién anda por ahí. Una comunidad de WoW resuelve ambas cosas. Márcala con /co circle y sus miembros aparecen bajo « Círculo » en la pestaña Artesanos, con su presencia, incluidos los que están desconectados. Tú creas la comunidad y tú invitas a quien quieres: un círculo es un grupo pequeño que has elegido, no el reino entero.",
+    ["Rien n'est posté dans la communauté et rien n'en est lu. Ce qu'une communauté peut réellement porter a été mesuré avant qu'on s'appuie dessus, et c'est étroit : le texte d'un message de club est illisible depuis un addon, et un message addon envoyé sur son canal est accepté puis jeté. Le cercle te donne donc la liste et qui est en ligne ; les commandes et les niveaux de métier continuent de circuler exactement comme avant."] =
+        "No se publica nada en la comunidad ni se lee nada de ella. Lo que una comunidad puede llevar de verdad se midió antes de apoyarse en ella, y es poco: el texto de un mensaje de club no se puede leer desde un addon, y un mensaje de addon enviado a su canal se acepta y luego se descarta. Así que el círculo te da la lista y quién está conectado; los pedidos y los niveles de profesión siguen viajando igual que antes.",
+    ["Les métiers ne viennent pas non plus de la communauté : ces champs-là ne sont remplis que pour un roster de guilde. Un membre de cercle affiche ses métiers quand il répond à l'addon, comme tout le monde."] =
+        "Las profesiones tampoco vienen de la comunidad: esos campos solo se rellenan para las listas de hermandad. Un miembro del círculo muestra sus profesiones cuando responde al addon, como todo el mundo.",
 }
 
 for k, v in pairs(news) do L[k] = v end

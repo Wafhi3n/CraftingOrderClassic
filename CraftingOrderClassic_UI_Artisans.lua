@@ -10,7 +10,7 @@ local L    = COC.L
 local ARH = 40              -- hauteur ligne artisan
 local A   = UI.ART          -- métriques dérivées de la SPEC — cf. _UI_Artisans_Layout.lua
 
-local SRC_TAG = { guild = L["GUILDE"], friend = L["AMIS"], added = L["AJOUTÉ"], recent = L["CROISÉ"], confed = L["CONFÉDÉRÉ"] }
+local SRC_TAG = { guild = L["GUILDE"], friend = L["AMIS"], added = L["AJOUTÉ"], recent = L["CROISÉ"], confed = L["CONFÉDÉRÉ"], circle = L["CERCLE"] }
 
 -- Libellés des 3 états de présence (cf. Dir:PresenceOf). « sans addon » n'est pas cosmétique : il dit
 -- pourquoi ses métiers/niveaux peuvent être périmés et pourquoi une commande ne lui parviendra pas.
@@ -90,19 +90,23 @@ function UI:BuildArtisansTab(f)
     srcHdr:SetPoint("TOPLEFT", 14, -6); srcHdr:SetText(L["SOURCE"])
     srcHdr:SetTextColor(Skin.unpack(Skin.color.textMuted))
 
-    -- « Confédération » (confed) : bucket EN PLUS, masqué si GreenWall absent (cf. RefreshArtisans),
-    -- EN DERNIER → le masquer ne laisse aucun trou. « muted » = panneau de gestion des mis en
-    -- sourdine (données = COC.db.mutedPlayers, pas le roster ; cf. UI_Artisans_Muted.lua).
-    local srcDefs = { {id="all",label=L["Tous"]}, {id="guild",label=L["Guilde"]}, {id="friend",label=L["Amis"]}, {id="added",label=L["Ajoutés"]}, {id="recent",label=L["Annuaire"]}, {id="muted",label=L["En sourdine"]}, {id="confed",label=L["Confédération"]} }
-    self.artSrcBtns = {}
-    for i, d in ipairs(srcDefs) do
+    -- Deux buckets CONDITIONNELS en fin de liste : « Confédération » (masqué sans GreenWall) et
+    -- « Cercle » (masqué si aucune communauté marquée). Ils ne sont plus posés à un rang fixe : dès
+    -- qu'il y en a DEUX, en masquer un seul laisserait un trou au milieu de la bande. La position
+    -- est donc recalculée sur les seuls boutons visibles (cf. _RelayoutArtSrcTabs).
+    -- « muted » = panneau de gestion des mis en sourdine (données = COC.db.mutedPlayers, pas le
+    -- roster ; cf. UI_Artisans_Muted.lua).
+    local srcDefs = { {id="all",label=L["Tous"]}, {id="guild",label=L["Guilde"]}, {id="friend",label=L["Amis"]}, {id="added",label=L["Ajoutés"]}, {id="recent",label=L["Annuaire"]}, {id="muted",label=L["En sourdine"]}, {id="confed",label=L["Confédération"]}, {id="circle",label=L["Cercle"]} }
+    self.artSrcBtns, self.artSrcOrder = {}, {}
+    for _, d in ipairs(srcDefs) do
         local b = Skin.MakeFilterButton(sz, 190, 24, d.label)   -- bande de filtre style HdV (verrou doré, pas de bleu)
-        b:SetPoint("TOPLEFT", 12, -22 - (i - 1) * 26)
         local cnt = b:CreateFontString(nil, "OVERLAY", "GameFontNormal")
         cnt:SetPoint("RIGHT", -10, 0); Skin.ApplyShadow(cnt); b.count = cnt
         b:SetScript("OnClick", function() UI.artSource = d.id; UI:_RefreshArtSrcTabs(); UI:RefreshArtisans() end)
         self.artSrcBtns[d.id] = b
+        self.artSrcOrder[#self.artSrcOrder + 1] = d.id
     end
+    self:_RelayoutArtSrcTabs()
     self:_RefreshArtSrcTabs()
 
     self:_BuildArtisanAddScan(self:ArtSec("addPlayer"))   -- cluster bas de la sidebar (sa zone)
@@ -172,14 +176,43 @@ function UI:_RefreshDirectory()
     if C_Timer then C_Timer.After(2, function() if UI.RefreshArtisans then UI:RefreshArtisans() end end) end
 end
 
--- Le bucket « Confédération » n'existe que si GreenWall est actif (display-only) : on le montre/masque et,
--- s'il était sélectionné alors que GreenWall a disparu, on retombe sur « Tous ».
-function UI:_SyncConfedTab()
+-- Repose les boutons de source VISIBLES les uns sous les autres. Sans ça, masquer un bucket
+-- conditionnel qui n'est pas le dernier laisse un trou dans la bande.
+function UI:_RelayoutArtSrcTabs()
+    if not (self.artSrcBtns and self.artSrcOrder) then return end
+    local row = 0
+    for _, id in ipairs(self.artSrcOrder) do
+        local b = self.artSrcBtns[id]
+        if b and b:IsShown() then
+            b:SetPoint("TOPLEFT", 12, -22 - row * 26)
+            row = row + 1
+        end
+    end
+end
+
+-- Les deux buckets conditionnels : « Confédération » n'existe que si GreenWall est actif,
+-- « Cercle » que si le joueur a marqué au moins une communauté. Si celui qui était sélectionné
+-- disparaît, on retombe sur « Tous » plutôt que d'afficher une liste vide sans explication.
+function UI:_SyncOptionalArtTabs()
     local D = COC.Directory
-    -- Visible si GreenWall actif — OU en mode solo (/co debug) pour tester l'UI sans SoD live.
-    local gwOn = (D and D._GreenWallActive and D:_GreenWallActive()) or (COC.db and COC.db.debug)
-    if self.artSrcBtns and self.artSrcBtns.confed then self.artSrcBtns.confed:SetShown(gwOn and true or false) end
-    if not gwOn and self.artSource == "confed" then self.artSource = "all"; self:_RefreshArtSrcTabs() end
+    if not self.artSrcBtns then return end
+    -- Mode solo (/co debug) : on montre tout, pour pouvoir travailler l'UI sans SoD live ni cercle.
+    local debug = COC.db and COC.db.debug
+    -- « Cercle » se montre dès qu'un cercle est MARQUÉ, pas dès qu'il a des membres : un cercle
+    -- qu'on vient de créer est vide (on s'en exclut soi-même), et faire disparaître l'onglet juste
+    -- après que le joueur l'a marqué donne l'impression que la commande n'a rien fait. Un onglet
+    -- vide, lui, se lit : « c'est bien branché, il n'y a personne d'autre ».
+    local on = {
+        confed = (D and D._GreenWallActive and D:_GreenWallActive()) or debug,
+        circle = (D and D.CircleIds and next(D:CircleIds()) ~= nil) or debug,
+    }
+    for id, shown in pairs(on) do
+        local b = self.artSrcBtns[id]
+        if b then b:SetShown(shown and true or false) end
+        if not shown and self.artSource == id then self.artSource = "all" end
+    end
+    self:_RelayoutArtSrcTabs()
+    self:_RefreshArtSrcTabs()
 end
 
 -- Pills de filtre métier + icônes de métier des lignes : cf. _UI_Artisans_Icons.lua
@@ -231,10 +264,10 @@ function UI:RefreshArtisans()
     if not self.artPillsBuilt then self:_BuildArtPills(); self.artPillsBuilt = true end
     self:_SyncCrafterScanChk()
     local D = COC.Directory
-    self:_SyncConfedTab()   -- montre/masque le bucket « Confédération » selon GreenWall (display-only)
+    self:_SyncOptionalArtTabs()   -- montre/masque « Confédération » et « Cercle » (display-only)
 
     -- Compteurs par source (+ « all » = total ; « muted » = mis en sourdine, hors roster)
-    local counts = { all = 0, guild = 0, friend = 0, added = 0, recent = 0, confed = 0 }
+    local counts = { all = 0, guild = 0, friend = 0, added = 0, recent = 0, confed = 0, circle = 0 }
     for _, r in pairs(D and D.roster or {}) do
         if not (D and D._SameFaction) or D:_SameFaction(r) then   -- confinement faction (mêmes règles que la liste)
             local s = r.source or "recent"; counts[s] = (counts[s] or 0) + 1; counts.all = counts.all + 1

@@ -87,6 +87,7 @@ function Dir:ClassifySource(name)
     if self._guildSet  and self._guildSet[name]  then return "guild"  end
     if self._friendSet and self._friendSet[name] then return "friend" end
     if self._confedSet and self._confedSet[name] then return "confed" end
+    if self._circleSet and self._circleSet[name] then return "circle" end
     return nil
 end
 
@@ -121,7 +122,10 @@ function Dir:PruneRoster(maxAgeDays, maxRecent)
     local cutoff = time() - (maxAgeDays or RECENT_TTL_DAYS) * 86400
     local recents = {}
     for name, r in pairs(self.roster) do
+        -- « circle » est une RELATION (le joueur a marqué ce cercle), au même titre que guilde/amis :
+        -- on la garde. De toute façon la liste est re-dérivée du club à chaque session.
         local keep = r.manual or r.source == "guild" or r.source == "friend" or r.source == "added"
+            or r.source == "circle"
         if not keep then
             -- Rétention = dernier signe de vie DIRECT ou RELAYÉ : une entrée créée par pur relais
             -- n'a pas de lastSeen (pas de fausse présence) — sans ce max elle serait purgée aussitôt.
@@ -399,6 +403,7 @@ function Dir:Start()
     self:_WireBringup()
     self:_InstallWhisperErrorFilter()
     self:_WireGreenWall()   -- greffe passive confédération (no-op sans GreenWall) — display-only
+    if self._WireClubs then self:_WireClubs() end   -- source « cercle » (communautés) — display-only
 
     -- Capture mes niveaux + relations dès que possible (n'a pas besoin du canal).
     if C_Timer then

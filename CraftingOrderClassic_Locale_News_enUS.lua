@@ -259,6 +259,15 @@ local news = {
         "|cFFFFCC00order for your alt %s|r from |cFFFFFFFF%s|r: %s%s%s",
     ["En ligne via %s"] = "Online via %s",
     ["reroll : %s (%s)"] = "alt: %s (%s)",
+    -- v1.31.0
+    ["Les cercles d'artisans, posés sur les communautés WoW"] =
+        "Crafting circles, built on WoW communities",
+    ["Le canal du royaume n'a ni mémoire ni liste de membres : qui n'était pas connecté quand tu as posté n'a rien vu, et chaque session recommence à chercher qui est là. Une communauté WoW répond aux deux. Marque-la avec /co circle et ses membres apparaissent sous « Cercle » dans l'onglet Artisans, avec leur présence, y compris ceux qui sont hors ligne. C'est toi qui crées la communauté et qui invites : un cercle est un petit groupe que tu as choisi, pas le royaume entier."] =
+        "The realm channel has no memory and no member list: anyone who wasn't logged in when you posted never saw it, and every session starts by working out again who's around. A WoW community answers both. Mark one with /co circle and its members appear under Circle in the Artisans tab, with their presence, including the ones who are offline. You create the community and you invite who you want: a circle is a small group you picked, not the whole realm.",
+    ["Rien n'est posté dans la communauté et rien n'en est lu. Ce qu'une communauté peut réellement porter a été mesuré avant qu'on s'appuie dessus, et c'est étroit : le texte d'un message de club est illisible depuis un addon, et un message addon envoyé sur son canal est accepté puis jeté. Le cercle te donne donc la liste et qui est en ligne ; les commandes et les niveaux de métier continuent de circuler exactement comme avant."] =
+        "Nothing gets posted to the community and nothing is read out of it. What a community can actually carry was measured before anything was built on it, and the answer is narrow: the text of a club message can't be read from an addon, and an addon message sent to its channel is accepted and then dropped. So the circle gives you the roster and who's online; orders and skill levels keep travelling exactly as they did.",
+    ["Les métiers ne viennent pas non plus de la communauté : ces champs-là ne sont remplis que pour un roster de guilde. Un membre de cercle affiche ses métiers quand il répond à l'addon, comme tout le monde."] =
+        "Professions don't come from the community either: those fields only get filled in for guild rosters. A circle member shows their professions once they answer the addon, like anyone else.",
 }
 
 for k, v in pairs(news) do L[k] = v end
