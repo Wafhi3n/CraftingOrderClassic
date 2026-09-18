@@ -356,8 +356,8 @@ function Dir:WhoCanCraft(prof, spellID)
     if not CraftLink then return {} end
     local myDV, out = CraftLink:DataVersion(), {}
     for player, r in pairs(self.roster) do
-        local hex = r.recipes and r.recipes[prof]
-        if hex and r.recipeDV == myDV and CraftLink:HasBit(prof, hex, spellID) then
+        local test = self:RecipeTester(r, prof)
+        if test and test(spellID) then
             out[#out + 1] = { player = player, online = self.online[player] == true }
         end
     end
@@ -414,7 +414,7 @@ function Dir:Start()
             C_Timer.NewTicker(45, function()
                 Dir:RediscoverKnown()
                 if C_GuildInfo and C_GuildInfo.GuildRoster then C_GuildInfo.GuildRoster()
-                elseif GuildRoster then GuildRoster() end
+                elseif COC.Api.GuildRoster then COC.Api.GuildRoster() end
             end)
         end
         -- NB : pas de balise sur timer (ADDON_ACTION_BLOCKED hors action joueur). La découverte
@@ -437,7 +437,7 @@ function Dir:_WireEvents()
         C_Timer.After(2, function() Dir._relTimer = nil; Dir:ScanRelations(); Dir:DiscoverFriendsAndGuild() end)
     end)
     if C_GuildInfo and C_GuildInfo.GuildRoster then C_GuildInfo.GuildRoster()
-    elseif GuildRoster then GuildRoster() end
+    elseif COC.Api.GuildRoster then COC.Api.GuildRoster() end
     if C_FriendList and C_FriendList.ShowFriends then C_FriendList.ShowFriends() end
 
     local sk = CreateFrame("Frame")

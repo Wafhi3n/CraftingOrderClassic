@@ -34,10 +34,9 @@ function UI:_TargetArtisanFilter(prof)
     local D = COC.Directory
     local r = D and D.roster and D.roster[t:sub(2)]
     if not r then return nil end
-    local hex = r.recipes and r.recipes[prof]
-    if hex and hex ~= "" and r.recipeDV == c:DataVersion() then
-        return function(spellID) return c:HasBit(prof, hex, spellID) end, L["connus"]
-    end
+    local D = COC.Directory
+    local test = D and D.RecipeTester and D:RecipeTester(r, prof)
+    if test then return test, L["connus"] end
     local sk = r.skill and r.skill[prof]
     if sk and sk[1] then
         local cap = sk[1]

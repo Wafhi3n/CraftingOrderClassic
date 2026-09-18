@@ -35,7 +35,7 @@ local function pmsg(m) print("|cFF33DD88Crafting Order|r " .. m) end
 -- de dev COCMonitor est chargé (contexte test/diag).
 local function verbose()
     if COC.db and COC.db.verbose then return true end
-    local ial = (C_AddOns and C_AddOns.IsAddOnLoaded) or IsAddOnLoaded
+    local ial = (C_AddOns and C_AddOns.IsAddOnLoaded) or COC.Api.IsAddOnLoaded
     return (ial and ial("COCMonitor")) and true or false
 end
 
@@ -64,9 +64,12 @@ function Handoff:CanCraft(who, o)
     if not prof then return false end
     local spellID = o.spellID
     if not spellID and o.itemID then local i2s = c:ItemToSpell(prof); spellID = i2s and i2s[o.itemID] end
-    local hex = r.recipes and r.recipes[prof]
-    if hex and r.recipeDV == c:DataVersion() and spellID and c:HasBit(prof, hex, spellID) then return true end
-    return ((r.skill and r.skill[prof]) or (r.recipes and r.recipes[prof])) ~= nil
+    local D = COC.Directory
+    local test = D and D.RecipeTester and D:RecipeTester(r, prof)
+    if test and spellID and test(spellID) then return true end
+    -- Repli : sans registre LISIBLE, savoir qu'il exerce le metier reste une information utile.
+    return ((r.skill and r.skill[prof])
+        or (D and D.HasAnyRecipeRecord and D:HasAnyRecipeRecord(r, prof))) and true or false
 end
 
 -- MOI, est-ce que je sais VRAIMENT crafter cet ordre ? (revérif côté récepteur avant d'alerter)
@@ -191,7 +194,7 @@ function Handoff:AlertCapable(o, tries)
     end
     local nm = O:OrderName(o)
     if (nm:match("^item:") or nm:match("^spell:")) and (tries or 0) < 10 then
-        if o.itemID and GetItemInfo then GetItemInfo(o.itemID) end
+        if o.itemID and COC.Api.GetItemInfo then COC.Api.GetItemInfo(o.itemID) end
         if C_Timer then C_Timer.After(0.3, function() Handoff:AlertCapable(o, (tries or 0) + 1) end); return end
     end
     local Skin = COC.UI and COC.UI.Skin
@@ -235,7 +238,7 @@ function Handoff:AlertReroll(o, alt, tries)
     local O = COC.Orders; if not O then return end
     local nm = O:OrderName(o)
     if (nm:match("^item:") or nm:match("^spell:")) and (tries or 0) < 10 then
-        if o.itemID and GetItemInfo then GetItemInfo(o.itemID) end
+        if o.itemID and COC.Api.GetItemInfo then COC.Api.GetItemInfo(o.itemID) end
         if C_Timer then C_Timer.After(0.3, function() Handoff:AlertReroll(o, alt, (tries or 0) + 1) end); return end
     end
     o._rerollAlertDone = true

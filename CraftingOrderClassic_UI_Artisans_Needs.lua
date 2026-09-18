@@ -24,7 +24,7 @@ local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
 
 -- Nom affichable d'une recette (plans de formateur : pas d'objet) : sort, sinon nom canonique lib.
 local function recipeName(sid)
-    local nm = GetSpellInfo and GetSpellInfo(sid)
+    local nm = COC.Api.GetSpellName(sid)
     if not nm then
         local lib = CL()
         nm = lib and lib.RecipeName and lib:RecipeName(sid)
@@ -34,7 +34,7 @@ end
 
 -- Nom affichable d'un objet : cache client, sinon nom canonique lib (jamais « item:123 » nu).
 local function itemName(id)
-    local nm = GetItemInfo and GetItemInfo(id)
+    local nm = COC.Api.GetItemInfo and COC.Api.GetItemInfo(id)
     if not nm then
         local lib = CL()
         nm = lib and lib.ItemName and lib:ItemName(id)
@@ -54,12 +54,11 @@ end
 -- rang SK sous le plafond entraîné ET bitfield RK décodable (même DataVersion — une fiche relayée
 -- ou périmée n'a pas de liste de courses honnête, on CACHE le bouton). Pas de décodage ici.
 function UI:_NeedsEligible(r)
-    local lib = CL()
-    if not (r and r.skill and r.recipes and lib and lib.DataVersion
-            and r.recipeDV == lib:DataVersion()) then return false end
+    local D = COC.Directory
+    if not (r and r.skill and D and D.HasRecipeData) then return false end
     local SEC = COC.HIDDEN_PROF or {}
     for key, sv in pairs(r.skill) do
-        if not SEC[key] and r.recipes[key] and (sv[1] or 0) < (sv[2] or 0) then return true end
+        if not SEC[key] and D:HasRecipeData(r, key) and (sv[1] or 0) < (sv[2] or 0) then return true end
     end
     return false
 end
@@ -67,14 +66,12 @@ end
 -- Métiers ÉLIGIBLES avec recettes DÉCODÉES (chemin froid : à l'ouverture de la fenêtre seulement).
 -- -> liste triée { key, rank, max, set } ; set = clé "s<spellID>" (format attendu par COC.Route).
 function UI:_NeedsProfs(r)
-    local lib, out = CL(), {}
-    if not (r and lib and lib.DecodeKnown and lib.DataVersion
-            and r.recipeDV == lib:DataVersion()) then return out end
+    local D, out = COC.Directory, {}
+    if not (r and D and D.RecipeKnownSet) then return out end
     local SEC = COC.HIDDEN_PROF or {}
     for key, sv in pairs(r.skill or {}) do
-        local hex = r.recipes and r.recipes[key]
-        if hex and not SEC[key] and (sv[1] or 0) < (sv[2] or 0) then
-            local known, set = lib:DecodeKnown(key, hex), {}
+        if not SEC[key] and (sv[1] or 0) < (sv[2] or 0) then
+            local known, set = D:RecipeKnownSet(r, key), {}
             for sid in pairs(known or {}) do set["s" .. sid] = true end
             if next(set) then out[#out + 1] = { key = key, rank = sv[1] or 0, max = sv[2] or 0, set = set } end
         end
@@ -239,7 +236,7 @@ function UI:_NeedsGrid(f, used, y, items)
         local c = (i - 1) % perRow
         if i > 1 and c == 0 then y = y + STEP end
         s:ClearAllPoints(); s:SetPoint("TOPLEFT", 4 + c * STEP, -y)
-        s.icon:SetTexture((GetItemIcon and GetItemIcon(it.itemID)) or "Interface\\Icons\\INV_Misc_QuestionMark")
+        s.icon:SetTexture((COC.Api.GetItemIcon and COC.Api.GetItemIcon(it.itemID)) or "Interface\\Icons\\INV_Misc_QuestionMark")
         s.count:SetText((it.qty or 1) > 1 and it.qty or "")
         s.tag:SetShown(it.plan and true or false)
         s.tipItemID, s.tipQty, s.tipCost, s.tipPlan = it.itemID, it.qty or 1, it.cost, it.plan

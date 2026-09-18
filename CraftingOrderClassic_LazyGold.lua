@@ -254,9 +254,9 @@ end
 -- niveau peuvent avoir appris des recettes différentes.
 local knownBestCache = {}   -- [profKey.."|"..hex] = { at, best = {profit, sid} | nil }
 
-local function buildBestKnown(profKey, hex)
-    local lib = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
-    local known = lib and lib.DecodeKnown and lib:DecodeKnown(profKey, hex)
+-- `known` = set { [spellID] = true } fourni par la couture (Directory_Recipes) : ce module n'a
+-- pas a savoir si le registre est arrive en bitfield ou en identifiants.
+local function buildBestKnown(profKey, known)
     if not known then return nil end
     local best
     for sid in pairs(known) do
@@ -268,21 +268,21 @@ local function buildBestKnown(profKey, hex)
     return best
 end
 
--- `r` = fiche roster de l'artisan (r.recipes[profKey] = bitmask hex, r.recipeDV = version des
--- données au moment de la diffusion). Renvoie nil si le bitmask exact n'est pas dispo pour ce
--- métier (fiche relayée, jamais croisé en direct) ou périmé (DataVersion a changé depuis) — dans
--- ce cas l'appelant doit retomber sur BestPlanFor(profKey, rank), une approximation moins fiable
--- mais toujours disponible.
+-- `r` = fiche roster de l'artisan. Renvoie nil si son registre n'est pas EXPLOITABLE pour ce
+-- métier (jamais croisé en direct, ou bitfield d'une autre version du catalogue) — dans ce cas
+-- l'appelant retombe sur BestPlanFor(profKey, rank), une approximation moins fiable mais
+-- toujours disponible. La forme du registre est l'affaire de la couture, pas la nôtre.
 function LG:BestKnownPlanFor(profKey, r)
     if not (self:IsAvailable() and profKey and r) then return nil end
-    local lib = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
-    local hex = r.recipes and r.recipes[profKey]
-    if not (hex and hex ~= "" and lib and lib.DataVersion and r.recipeDV == lib:DataVersion()) then return nil end
+    local D = COC.Directory
+    -- La clé de cache vient de la couture : elle intègre la FORME du registre, donc deux
+    -- registres de formes différentes ne peuvent pas se répondre l'un pour l'autre.
+    local k = D and D.RecipeFingerprint and D:RecipeFingerprint(r, profKey)
+    if not k then return nil end
     local now = GetTime and GetTime() or 0
-    local k = profKey .. "|" .. hex
     local c = knownBestCache[k]
     if not c or (now - c.at) > CACHE_TTL then
-        c = { at = now, best = buildBestKnown(profKey, hex) }
+        c = { at = now, best = buildBestKnown(profKey, D:RecipeKnownSet(r, profKey)) }
         knownBestCache[k] = c
     end
     return c.best

@@ -62,8 +62,11 @@ local function relationsMissing(c, prof, spellID)
     local out = {}
     for name, r in pairs(D.roster or {}) do
         if r.isPartner or r.isFriend then
-            local hex = r.recipes and r.recipes[prof]
-            if hex and not c:HasBit(prof, hex, spellID) then out[#out + 1] = name end
+            -- Un registre ILLISIBLE (formes/versions qui ne concordent pas) ne veut PAS dire
+            -- « il ne la connait pas » : la couture rend nil, et on ne l'accuse pas de manquer
+            -- un plan. Avant, HasBit etait appele sans garde de version et pouvait le lister a tort.
+            local test = D.RecipeTester and D:RecipeTester(r, prof)
+            if test and not test(spellID) then out[#out + 1] = name end
         end
     end
     table.sort(out)
