@@ -464,8 +464,18 @@ function Dir:_WireBringup()
         Dir:CaptureSkills()
         local function bringup()
             Dir:Announce(); CraftLink:Send("HI", "global")
-            -- NB : PAS de balise texte ici — SendChatMessage hors action joueur = ADDON_ACTION_BLOCKED
-            -- (testé). La balise n'est émise que sous hardware event (clic Poster, /co refresh, /co beacon).
+            -- PING en portée : un AddonMessage, donc AUCUN hardware event requis — il n'y avait pas de
+            -- raison que seul `Dir:Refresh` l'envoie. Réveille les porteurs alentour sans passer par le
+            -- canal (le vecteur le moins fiable), et sans dépendre de la guilde ni de la liste d'amis.
+            CraftLink:Send("PING", "yell")
+            -- Balise texte d'ARRIVÉE, ENFILÉE (cf. CraftLink_TextQueue). L'ancien commentaire disait ici
+            -- « PAS de balise : SendChatMessage hors action joueur = ADDON_ACTION_BLOCKED ». Le constat
+            -- était juste, la conclusion trop large : on ne pouvait pas l'ÉMETTRE, on pouvait l'ENFILER.
+            -- Faute de quoi le seul vecteur qui atteint les INCONNUS du royaume ne partait que si le
+            -- joueur cliquait « Rafraîchir l'annuaire » — ce qu'un nouvel installé ne sait pas. Mesuré au
+            -- premier test à deux clients (2026-09-18) : le pote ne voyait personne avant ce clic.
+            -- Enfilée, elle part à son premier clic ou sa première touche, soit quelques secondes après.
+            if CraftLink.QueueBeacon then CraftLink:QueueBeacon() end
             -- D : à chaque (re)acquisition du canal, repousser MES commandes ouvertes/acceptées (resync
             -- léger) → un pair qui vient de (re)joindre les reçoit sans attendre le ticker de 2 h.
             if COC.Orders and COC.Orders.RebroadcastMine then COC.Orders:RebroadcastMine() end
