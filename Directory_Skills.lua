@@ -25,13 +25,44 @@ local function mirrorMySkills(skills)
     COC.db.mySkillsByChar[me() .. "-" .. myRealm()] = part
 end
 
+-- L'API skill existe sous DEUX formes qui ne se recouvrent pas, et c'est un piège à double détente :
+--   * Classic Era/TBC/Wrath : globales `GetNumSkillLines` / `GetSkillLineInfo(i)`, qui rend un TUPLE.
+--   * Forever/Camelot (MAINLINE) : `C_SkillInfo.GetNumSkillLines` / `.GetSkillLineInfo(i)`, qui rend
+--     UNE TABLE (`SkillLineAttributes`) — et où les globales n'existent PAS.
+-- Le portage Forever a manqué les deux : la garde sortait en silence faute de global, donc `mySkills`
+-- restait VIDE. Conséquence bien plus large que le menu « Mes métiers » qui l'a révélé : `_SkillPayload`
+-- se construit sur `mySkills`, donc le fil SK n'annonçait **aucun métier** — sur la cible du projet.
+-- Les deux helpers acceptent les deux formes DEPUIS LES DEUX points d'entrée : c'est le type du retour
+-- qui tranche, jamais la saveur supposée. Une garde par saveur redeviendrait fausse au prochain portage.
+local function numSkillLines()
+    local get = (C_SkillInfo and C_SkillInfo.GetNumSkillLines) or GetNumSkillLines
+    if not get then return nil end           -- aucune API : ne RIEN toucher (surtout pas vider mySkills)
+    return get() or 0
+end
+
+-- Rend (name, isHeader, rank, maxRank). On passe par `{ get(i) }` et non par une destructuration
+-- positionnelle : sur la forme TABLE, `local a, b = get(i)` rend b = nil SANS erreur — c'est
+-- exactement le silence qu'on corrige ici, et il ne doit pas pouvoir revenir par la petite porte.
+local function skillLineInfo(i)
+    local get = (C_SkillInfo and C_SkillInfo.GetSkillLineInfo) or GetSkillLineInfo
+    if not get then return nil end
+    local r = { get(i) }
+    if type(r[1]) == "table" then
+        local a = r[1]
+        return a.name, a.isHeader, a.rank, a.maxRank
+    end
+    return r[1], r[2], r[4], r[7]            -- tuple Classic : name, isHeader, rank(4), maxRank(7)
+end
+
 -- Capture MES niveaux de métier via l'API skill. Le nom de ligne est localisé → ResolveProfession
 -- le ramène à la clé interne EN (les aliases de CraftLink contiennent les noms FR/DE/ES).
 function Dir:CaptureSkills()
-    if not (CraftLink and GetNumSkillLines) then return end
+    if not CraftLink then return end
+    local n = numSkillLines()
+    if not n then return end
     self.mySkills = {}
-    for i = 1, GetNumSkillLines() do
-        local name, isHeader, _, rank, _, _, maxRank = GetSkillLineInfo(i)
+    for i = 1, n do
+        local name, isHeader, rank, maxRank = skillLineInfo(i)
         if name and not isHeader and rank and rank > 0 then
             local key = CraftLink:ResolveProfession(name)
             if key and CraftLink.professions[key] then self.mySkills[key] = { rank, maxRank } end
