@@ -90,7 +90,9 @@ end
 function UI:_ToggleGatherFlyout()
     -- Ancré sous le PORTRAIT (déclencheur du choix de métier), comme l'onglet Commande.
     if self.gatherProfFlyout then
-        self.gatherProfFlyout:ToggleAt("TOPLEFT", self.frame.portrait, "BOTTOMLEFT", -6, -6)
+        -- Même résolution que l'onglet Commande (cf. UI_Post:_ToggleProfFlyout).
+        local p = COC.Api.PortraitTexture(self.frame)
+        if p then self.gatherProfFlyout:ToggleAt("TOPLEFT", p, "BOTTOMLEFT", -6, -6) end
     end
 end
 

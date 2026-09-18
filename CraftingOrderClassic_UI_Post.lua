@@ -197,7 +197,11 @@ end
 function UI:_ToggleProfFlyout()
     -- Ancré sous le PORTRAIT (déclencheur du choix de métier), pas sous un bouton du panneau.
     if self.postProfFlyout then
-        self.postProfFlyout:ToggleAt("TOPLEFT", self.frame.portrait, "BOTTOMLEFT", -6, -6)
+        -- Le médaillon ne vit pas au même endroit selon la saveur (`f.portrait` en Era,
+        -- `f.PortraitContainer.portrait` sur Forever) -> résolveur de Compat. Ancré sur nil, le
+        -- menu s'ouvrait dans le vide : le clic sur le portrait ne faisait « rien ».
+        local p = COC.Api.PortraitTexture(self.frame)
+        if p then self.postProfFlyout:ToggleAt("TOPLEFT", p, "BOTTOMLEFT", -6, -6) end
     end
 end
 
