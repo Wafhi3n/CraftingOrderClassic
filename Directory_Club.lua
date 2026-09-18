@@ -121,10 +121,21 @@ function Dir:FocusCircles()
 end
 
 -- Parcourt les membres d'un cercle prêt. Rend le nombre de membres vus (0 = pas encore streamé).
+-- Est-ce MOI ? On tranche sur le GUID, jamais sur le nom. Un GUID est exact et unique ; comparer des
+-- noms dépend de l'accentuation, de la casse et du suffixe de royaume que chaque API rend à sa façon
+-- — et ça s'est vu en jeu le 2026-09-18, le joueur apparaissait dans son propre cercle. `isSelf` est
+-- lu en premier : c'est le client qui l'affirme, autant le croire. Le nom reste en dernier recours,
+-- pour le cas d'un membre sans GUID exploitable.
+local function isMe(info, name)
+    if info and info.isSelf ~= nil then return info.isSelf == true end
+    local myGuid = UnitGUID and UnitGUID("player")
+    if myGuid and info and info.guid then return info.guid == myGuid end
+    return name ~= nil and name == me()
+end
+
 function Dir:_EachCircleMember(raw, fn)
     if club("AreMembersReady", raw) ~= true then return 0 end
     local ids, seen = club("GetClubMembers", raw) or {}, 0
-    local mine = me()
     for _, memberId in ipairs(ids) do
         local info = club("GetMemberInfo", raw, memberId)
         -- La garde sort du `if`, PAS dans l'assignation : `info and memberName(...)` ne rendrait
@@ -132,7 +143,7 @@ function Dir:_EachCircleMember(raw, fn)
         -- nil — donc tout membre cross-royaume passerait pour joignable.
         if info then
             local name, realm = memberName(info.guid)
-            if name and name ~= mine then
+            if name and not isMe(info, name) then
                 seen = seen + 1
                 fn(name, realm, info)
             end
@@ -171,9 +182,13 @@ function Dir:RefreshCircles()
     end
     -- Quitter un cercle doit RETIRER le classement : sans ça, `_ApplySource` retombe sur
     -- `r.source or "recent"` et l'ancien « circle » survivrait indéfiniment.
-    for name in pairs(self._circleSet) do
-        local r = not set[name] and self.roster and self.roster[name]
-        if r and r.source == "circle" and not r.manual then r.source = nil end
+    --
+    -- Le balayage porte sur TOUT le roster, pas sur l'ancien `_circleSet` : celui-là vit en mémoire
+    -- et repart vide à chaque /reload, alors que `source = "circle"` est PERSISTÉ dans la
+    -- SavedVariable. Un membre sorti du cercle — ou classé à tort avant un correctif — gardait donc
+    -- son étiquette pour toujours, et aucune session suivante ne pouvait la lui retirer.
+    for name, r in pairs(self.roster or {}) do
+        if r.source == "circle" and not set[name] and not r.manual then r.source = nil end
     end
     self._circleSet, self._circleOnline = set, online
     self:ReclassifyAll()   -- reclasse tout le roster + rafraîchit l'UI
