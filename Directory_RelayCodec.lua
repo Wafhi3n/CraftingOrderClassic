@@ -46,6 +46,13 @@ function RelayCodec.BuildRK(prof, hex, dv)
     return string.format("RK|%s|%s|%d", prof, hex, dv or 0)
 end
 
+-- Même format que CraftLink:BuildRI ("RI|prof|payload"), depuis les champs stockés. Pas de
+-- dataVersion : la forme identifiants ne dépend d'aucun catalogue partagé.
+function RelayCodec.BuildRI(prof, payload)
+    if not (prof and payload and payload ~= "") then return nil end
+    return string.format("RI|%s|%s", prof, payload)
+end
+
 -- Fil CD depuis les readyAt STOCKÉS (roster), recalculés à `now` : le restant relayé est donc
 -- courant même si l'origin est hors ligne depuis des heures. Tri par spellID (déterministe).
 function RelayCodec.BuildCD(prof, cds, now)

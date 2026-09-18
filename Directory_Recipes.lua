@@ -85,6 +85,42 @@ function Dir:RecipeFingerprint(r, prof)
     return form .. "|" .. tostring(prof) .. "|" .. data
 end
 
+-- ------------------------------------------------------------------
+-- Le FIL : quelle forme j'émets, et comment je reçois l'autre
+-- ------------------------------------------------------------------
+
+-- Le message de registre à diffuser pour ce métier, ou nil si je n'ai rien à dire.
+-- Sur Camelot on émet des IDENTIFIANTS (RI) : il n'y a pas de catalogue partagé à faire concorder,
+-- et le contenu du jeu bouge encore. Ailleurs, le bitfield (RK) reste plus compact et le catalogue
+-- est stable. Les deux jeux étant séparés, un client ne rencontre jamais l'autre forme en pratique.
+function Dir:RecipeMessage(prof)
+    local c = CL()
+    if not (c and prof) then return nil end
+    if COC.Api and COC.Api.IS_MAINLINE and c.BuildRI then return c:BuildRI(prof) end
+    return c.BuildRK and c:BuildRK(prof) or nil
+end
+
+-- RI reçu (recettes d'un autre, forme identifiants) → cache roster persistant.
+-- Miroir exact de Dir:OnRK, garde comprise : SK fait foi sur les métiers, donc un registre annoncé
+-- pour un métier que l'émetteur ne déclare PAS est refusé. Sans ça, un perso pourrait faire passer
+-- les recettes d'un de ses alts pour les siennes — trou déjà fermé une fois côté RK, à ne pas
+-- rouvrir en ajoutant un second verbe.
+function Dir:OnRI(sender, message)
+    local c = CL()
+    if not (sender and c and c.ParseRI) then return end
+    local prof, payload = c:ParseRI(message)
+    if not prof then return end
+    local r = self.roster[sender]; if not r then r = {}; self.roster[sender] = r end
+    if r.skill and next(r.skill) and not r.skill[prof] then return end  -- anti fuite d'alts
+    r.recipeIDs = r.recipeIDs or {}
+    r.recipeIDs[prof] = payload
+    self:_ApplySource(sender, r)          -- guilde/ami si reconnu, sinon « recent »
+    r.lastSeen = time()
+    self.online[sender] = true            -- présence passive : un message prouve la présence
+    self:_NoteLinked(sender, r)
+    if COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end
+end
+
 -- Ce joueur a-t-il UN registre quelconque pour ce métier, même illisible ? Sert aux replis qui se
 -- contentent de savoir qu'il exerce ce métier (sans prétendre connaître ses recettes).
 function Dir:HasAnyRecipeRecord(r, prof)

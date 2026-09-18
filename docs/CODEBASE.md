@@ -53,7 +53,7 @@
 | `CraftingOrderClassic_UI_MyArtisans_LazyGold.lua` | onglet « Mes artisans » : couche Lazy Gold. | 135 |
 | `CraftingOrderClassic_UI_Help.lua` | onglet Aide : page unique défilante qui explique les autres onglets (Carnet/Commande/Récolte/Artisans), la Vue Métier et le réseau. | 196 |
 | `CraftingOrderClassic_UI_News.lua` | onglet « Nouveautés » : notes de version (changelog) affichées EN JEU, version par version, la plus récente en tête. | 314 |
-| `CraftingOrderClassic_Social.lua` | couche sociale passive (socle). | 385 |
+| `CraftingOrderClassic_Social.lua` | couche sociale passive (socle). | 400 |
 | `CraftingOrderClassic_Social_Menu.lua` | entrées « Crafting Order » du menu contextuel joueur. | 101 |
 | `CraftingOrderClassic_Social_Roster.lua` | affichage des métiers sur les fenêtres NATIVES. | 130 |
 | `CraftingOrderClassic_Minimap.lua` | bouton minimap (toggle du carnet). | 137 |
@@ -90,15 +90,15 @@
 | `CraftingOrderClassic_ProfWindow_Orders_Card.lua` | vue SÉLECTIONNÉE de la colonne « Commandes » : la carte complète d'une commande (composants fournis, repères Lazy Gold, ACCEPTER / REFUSER / CHUCHOTER ; croix en haut à droite = retour liste). | 255 |
 | `CraftingOrderClassic_ProfWindow_LFW.lua` | config de l'OFFRE « recherche de travail » par métier. | 327 |
 | `CraftingOrderClassic_ProfWindow_Reroll.lua` | vue métier LECTURE SEULE d'un REROLL. | 119 |
-| `Directory.lua` | Crafting Order - Classic — Directory : l'annuaire des GENS (présence + qui peut crafter quoi). | 469 |
+| `Directory.lua` | Crafting Order - Classic — Directory : l'annuaire des GENS (présence + qui peut crafter quoi). | 470 |
 | `Directory_Presence.lua` | présence : la vérité JEU (amis/guilde) et sa fusion avec la vérité ADDON. | 76 |
-| `Directory_Recipes.lua` | COUTURE de lecture du registre « qui sait crafter quoi » d'un artisan. | 93 |
+| `Directory_Recipes.lua` | COUTURE de lecture du registre « qui sait crafter quoi » d'un artisan. | 129 |
 | `Directory_Confed.lua` | source « confédération » (GreenWall) de l'annuaire, DISPLAY-ONLY. | 51 |
 | `Directory_Skills.lua` | niveaux de compétence + réputation (couche « profil » de l'annuaire). | 126 |
 | `Directory_Version.lua` | détection « nouvelle version disponible » (100 % P2P, aucun serveur). | 138 |
 | `Directory_Cooldowns.lua` | cooldowns de recettes (couche « profil » de l'annuaire). | 82 |
-| `Directory_RelayCodec.lua` | codec du fil RLY : relais de la fiche d'un artisan HORS LIGNE par un de ses partenaires. | 63 |
-| `Directory_Relay.lua` | « contacts de confiance » : les données d'un joueur DÉCONNECTÉ restent servies par ses partenaires (r.isPartner). | 166 |
+| `Directory_RelayCodec.lua` | codec du fil RLY : relais de la fiche d'un artisan HORS LIGNE par un de ses partenaires. | 70 |
+| `Directory_Relay.lua` | « contacts de confiance » : les données d'un joueur DÉCONNECTÉ restent servies par ses partenaires (r.isPartner). | 180 |
 | `Directory_AltCodec.lua` | codec du fil ALT (liste des persos d'un même joueur) + vérification par réciprocité. | 115 |
 | `Directory_Alts.lua` | regroupement des rerolls : identité « joueur » multi-persos (verbe ALT). | 270 |
 | `Directory_LFW.lua` | statut « recherche de travail » (Looking For Work) + OFFRE par métier. | 314 |
@@ -1556,7 +1556,7 @@
 > roster ne mélange pas les formes en pratique. La couture reste écrite pour les deux — c'est ce
 > qui la rend indépendante de cette hypothèse.
 
-**API** : `Dir:RecipeForm(r, prof)` · `Dir:RecipeTester(r, prof)` · `Dir:RecipeKnownSet(r, prof)` · `Dir:HasRecipeData(r, prof)` · `Dir:RecipeFingerprint(r, prof)` · `Dir:HasAnyRecipeRecord(r, prof)`
+**API** : `Dir:RecipeForm(r, prof)` · `Dir:RecipeTester(r, prof)` · `Dir:RecipeKnownSet(r, prof)` · `Dir:HasRecipeData(r, prof)` · `Dir:RecipeFingerprint(r, prof)` · `Dir:RecipeMessage(prof)` · `Dir:OnRI(sender, message)` · `Dir:HasAnyRecipeRecord(r, prof)`
 
 ### `Directory_Confed.lua`
 > Directory_Confed.lua — source « confédération » (GreenWall) de l'annuaire, DISPLAY-ONLY.
@@ -1609,7 +1609,7 @@
 > RECALCULÉ au moment du relais → son restant est courant). AUCUNE règle d'acceptation ici :
 > whisper-only, origin≠sender, caps et rate-limit vivent dans Directory_Relay.OnRelay.
 
-**API** : `RelayCodec.Wrap(origin, age, inner)` · `RelayCodec.Parse(message)` · `RelayCodec.BuildSK(entry)` · `RelayCodec.BuildRK(prof, hex, dv)` · `RelayCodec.BuildCD(prof, cds, now)`
+**API** : `RelayCodec.Wrap(origin, age, inner)` · `RelayCodec.Parse(message)` · `RelayCodec.BuildSK(entry)` · `RelayCodec.BuildRK(prof, hex, dv)` · `RelayCodec.BuildRI(prof, payload)` · `RelayCodec.BuildCD(prof, cds, now)`
 
 ### `Directory_Relay.lua`
 > Directory_Relay.lua — « contacts de confiance » : les données d'un joueur DÉCONNECTÉ restent

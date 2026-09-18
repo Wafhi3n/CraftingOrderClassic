@@ -233,7 +233,7 @@ function Dir:Announce()
     if not (CraftLink and CraftLink:IsNetworkReady()) then return end
     self:AnnounceSkills()
     for _, prof in ipairs(CraftLink:MyProfessions()) do
-        local msg = CraftLink:BuildRK(prof)
+        local msg = self:RecipeMessage(prof)   -- RI sur Camelot, RK ailleurs
         if msg then CraftLink:Send(msg, "global") end
     end
     if self.AnnounceCooldowns then self:AnnounceCooldowns("global") end
@@ -247,7 +247,7 @@ function Dir:AnnounceTo(target)
     local sk = self:_SkillPayload()
     if sk then CraftLink:Send(sk, "whisper", target) end     -- SK d'abord (vérité terrain avant les RK)
     for _, prof in ipairs(CraftLink:MyProfessions()) do
-        local msg = CraftLink:BuildRK(prof)
+        local msg = self:RecipeMessage(prof)   -- RI sur Camelot, RK ailleurs
         if msg then CraftLink:Send(msg, "whisper", target) end
     end
     if self.AnnounceCooldowns then self:AnnounceCooldowns("whisper", target) end
@@ -381,6 +381,7 @@ function Dir:Start()
     if math.randomseed then math.randomseed((time and time() or 0) + Dir:CountOnline()) end
 
     CraftLink:RegisterHandler("RK",   function(s, m)    Dir:OnRK(s, m) end)
+    CraftLink:RegisterHandler("RI",   function(s, m)    Dir:OnRI(s, m) end)   -- registre par identifiants (Camelot)
     CraftLink:RegisterHandler("SK",   function(s, m)    Dir:OnSkill(s, m) end)
     CraftLink:RegisterHandler("HI",   function(s, m, d) Dir:OnHello(s, m, d) end)
     CraftLink:RegisterHandler("PING", function(s, m, d) Dir:OnPing(s, m, d) end)

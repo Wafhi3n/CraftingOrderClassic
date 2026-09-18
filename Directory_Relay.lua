@@ -64,6 +64,8 @@ function Dir:_SendRelay(target, name, r)
     end
     send(Codec.BuildSK(r))
     for prof, hex in pairs(r.recipes or {}) do send(Codec.BuildRK(prof, hex, r.recipeDV)) end
+    -- Registre par identifiants (Camelot) : même rediffusion, autre forme.
+    for prof, pay in pairs(r.recipeIDs or {}) do send(Codec.BuildRI(prof, pay)) end
     for prof, cds in pairs(r.cooldowns or {}) do send(Codec.BuildCD(prof, cds, ts)) end
 end
 
@@ -91,7 +93,7 @@ function Dir:OnRelay(sender, message, distribution)
     if not self:_RelayRateOk(sender) then return end
     local f = Codec and Codec.Parse(message)
     if not f or f.age > RELAY_MAX_AGE then return end
-    if f.verb ~= "SK" and f.verb ~= "RK" and f.verb ~= "CD" then return end
+    if f.verb ~= "SK" and f.verb ~= "RK" and f.verb ~= "RI" and f.verb ~= "CD" then return end
     local me = (UnitName and UnitName("player")) or ""
     if f.origin == me or f.origin == sender then return end
     if COC.IsMyChar and COC:IsMyChar(f.origin) then return end
@@ -106,6 +108,7 @@ function Dir:OnRelay(sender, message, distribution)
     end
     if f.verb == "SK" then self:_StoreRelayedSK(rel, f.inner)
     elseif f.verb == "RK" then self:_StoreRelayedRK(rel, f.inner)
+    elseif f.verb == "RI" then self:_StoreRelayedRI(rel, f.inner)
     else self:_StoreRelayedCD(rel, f.inner) end
     if COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end
 end
@@ -125,6 +128,17 @@ function Dir:_StoreRelayedRK(rel, inner)
     rel.recipes = rel.recipes or {}
     rel.recipes[prof] = hex
     rel.recipeDV = dv
+end
+
+-- Pendant identifiants de _StoreRelayedRK. ParseRI revalide la forme du message : un relayeur
+-- véreux ne peut pas injecter plus de junk qu'un émetteur direct.
+function Dir:_StoreRelayedRI(rel, inner)
+    local c = CraftLink
+    if not (c and c.ParseRI) then return end
+    local prof, payload = c:ParseRI(inner)
+    if not prof then return end
+    rel.recipeIDs = rel.recipeIDs or {}
+    rel.recipeIDs[prof] = payload
 end
 
 -- ParseCD (lib) revalide tout (métier catalogué à CD, spellID, bornes) : un relayeur véreux ne

@@ -23,7 +23,9 @@ function Social:MaybeDiscover(name)
     local D = COC.Directory
     if not (name and name ~= "" and D and D.DiscoverPlayer) then return end
     local r = D.roster and D.roster[name]
-    if r and (r.skill or r.recipes) then return end                 -- déjà connu → inutile
+    -- « Déjà connu » vaut pour les DEUX formes de registre : ne regarder que `recipes` ferait
+    -- re-pinger sans fin un artisan connu via identifiants (Camelot).
+    if r and (r.skill or r.recipes or r.recipeIDs) then return end   -- déjà connu → inutile
     local t = (GetTime and GetTime()) or 0
     if t - _lastInteractDiscover < 1.5 then return end              -- anti-rafale (sweep souris)
     _lastInteractDiscover = t
@@ -46,6 +48,19 @@ function Social:BNetCharFromAccount(acc)
     if not g or g.clientProgram ~= BNET_CLIENT_WOW then return nil end
     if WOW_PROJECT_ID and g.wowProjectID and g.wowProjectID ~= WOW_PROJECT_ID then return nil end
     return (g.characterName and g.characterName ~= "") and g.characterName or nil
+end
+
+-- Les métiers d'une fiche RELAYÉE, quelle que soit la FORME du registre. Ne regarder que
+-- `recipes` rendrait muet un artisan relayé depuis un client Camelot (registre par
+-- identifiants) : ici on ne cherche qu'à savoir quels métiers il exerce, pas ses recettes.
+local function relayedProfKeys(relayed)
+    local out, seen = {}, {}
+    for _, src in ipairs({ relayed.recipes, relayed.recipeIDs }) do
+        for key in pairs(src or {}) do
+            if not seen[key] then seen[key] = true; out[#out + 1] = key end
+        end
+    end
+    return out
 end
 
 -- =========================================================================
@@ -89,7 +104,7 @@ function Social:ProfSummary(name)
             if not HIDDEN_PROF[key] then parts[#parts + 1] = profMark(key) .. " " .. sv[1] .. "/" .. sv[2] end
         end
         if #parts == 0 then
-            for key in pairs(r.relayed.recipes or {}) do
+            for _, key in ipairs(relayedProfKeys(r.relayed)) do
                 if not HIDDEN_PROF[key] then parts[#parts + 1] = profMark(key) end
             end
         end
