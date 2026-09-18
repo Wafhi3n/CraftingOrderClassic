@@ -4,7 +4,7 @@
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
-118 modules + 4 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
+119 modules + 4 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
 
 ## Modules (ordre de chargement)
 
@@ -40,10 +40,11 @@
 | `CraftingOrderClassic_UI_Post_Paperdoll.lua` | onglet « Commande », vue SILHOUETTE de l'Enchantement. | 330 |
 | `CraftingOrderClassic_UI_Post_LazyGold.lua` | onglet « Commande » : couche Lazy Gold (lecture seule). | 151 |
 | `CraftingOrderClassic_UI_Gather_Layout.lua` | GÉOMÉTRIE de l'onglet « Récolte » : la SPEC (structure éditable, cf. | 66 |
-| `CraftingOrderClassic_UI_Gather.lua` | onglet « Récolte » : ressources de récolte (minéraux, herbes, cuirs, poissons) + demande de quantité + prix par pile + ciblage récolteur. | 501 |
+| `CraftingOrderClassic_UI_Gather_Build.lua` | onglet « Récolte », moitié CONSTRUCTION. | 231 |
+| `CraftingOrderClassic_UI_Gather.lua` | onglet « Récolte » : ressources de récolte (minéraux, herbes, cuirs, poissons) + demande de quantité + prix par pile + ciblage récolteur. | 286 |
 | `CraftingOrderClassic_UI_Gather_Categories.lua` | onglet « Récolte », panneau gauche : repliage des en-têtes et remplissage des lignes (en-tête de section/sous-catégorie, ou ressource). | 65 |
 | `CraftingOrderClassic_UI_Artisans_Layout.lua` | GÉOMÉTRIE de l'onglet « Artisans » (annuaire social). | 44 |
-| `CraftingOrderClassic_UI_Artisans.lua` | onglet « Artisans » : annuaire social. | 439 |
+| `CraftingOrderClassic_UI_Artisans.lua` | onglet « Artisans » : annuaire social. | 443 |
 | `CraftingOrderClassic_UI_Artisans_Groups.lua` | fusion « une ligne par JOUEUR » (rerolls). | 207 |
 | `CraftingOrderClassic_UI_Artisans_Icons.lua` | onglet « Artisans » : tout ce qui est ICÔNE de métier. | 190 |
 | `CraftingOrderClassic_UI_Artisans_Needs.lua` | la « BOURSE d'artisan » de l'onglet Artisans : pour un artisan du roster (partenaire, guildie, ami…), la LISTE DE COURSES des fournitures qu'il lui faut pour monter ses métiers — mats agrégés de SA route de progression (COC.Route, calculée 100 % en LOCAL depuis son rang SK diffusé + ses recettes décodées du bitfield RK ; prix Lazy Gold locaux, valables serveur entier). | 358 |
@@ -94,7 +95,7 @@
 | `Directory_Presence.lua` | présence : la vérité JEU (amis/guilde) et sa fusion avec la vérité ADDON. | 82 |
 | `Directory_Recipes.lua` | COUTURE de lecture du registre « qui sait crafter quoi » d'un artisan. | 129 |
 | `Directory_Confed.lua` | source « confédération » (GreenWall) de l'annuaire, DISPLAY-ONLY. | 51 |
-| `Directory_Club.lua` | source « cercle » (communautés WoW) de l'annuaire, DISPLAY-ONLY. | 264 |
+| `Directory_Club.lua` | source « cercle » (communautés WoW) de l'annuaire, DISPLAY-ONLY. | 279 |
 | `Directory_Skills.lua` | niveaux de compétence + réputation (couche « profil » de l'annuaire). | 126 |
 | `Directory_Version.lua` | détection « nouvelle version disponible » (100 % P2P, aucun serveur). | 138 |
 | `Directory_Cooldowns.lua` | cooldowns de recettes (couche « profil » de l'annuaire). | 82 |
@@ -847,6 +848,19 @@
 
 **API** : `UI:GatherSec(id)`
 
+### `CraftingOrderClassic_UI_Gather_Build.lua`
+> CraftingOrderClassic_UI_Gather_Build.lua — onglet « Récolte », moitié CONSTRUCTION.
+> 
+> Extrait de _UI_Gather.lua (plafond anti-monolithe de 500 lignes). La coupe suit une frontière
+> réelle et pas un simple compte de lignes : ici on POSE les cadres une fois, en face _UI_Gather.lua
+> les RAFRAÎCHIT à chaque changement d'état. Preuve que la frontière est la bonne — aucune des
+> locales de données (GLH, ARH, GATHER_PROFS, CL, knowsProf, inSource) n'était utilisée de ce côté.
+> 
+> GÉOMÉTRIE : SPEC déclarative dans _UI_Gather_Layout.lua (chargé avant) — zones via UI:GatherSec(id),
+> contenu en offsets RELATIFS à sa zone, largeurs LUES sur les zones.
+
+**API** : `UI:BuildGatherTab(f)`
+
 ### `CraftingOrderClassic_UI_Gather.lua`
 > CraftingOrderClassic_UI_Gather.lua — onglet « Récolte » : ressources de récolte (minéraux,
 > herbes, cuirs, poissons) + demande de quantité + prix par pile + ciblage récolteur.
@@ -854,7 +868,7 @@
 > contenu en offsets RELATIFS à sa zone, largeurs LUES sur les zones. Même modèle que l'onglet
 > Commande (validé 2026-07-12) : éditer la SPEC suffit pour bouger/padder les blocs.
 
-**API** : `UI:BuildGatherTab(f)` · `UI:RefreshGather()` · `UI:RefreshGatherList()` · `UI:SelectGatherItem(entry)` · `UI:DoGatherOrder()`
+**API** : `UI:RefreshGather()` · `UI:RefreshGatherList()` · `UI:SelectGatherItem(entry)` · `UI:DoGatherOrder()`
 
 ### `CraftingOrderClassic_UI_Gather_Categories.lua`
 > CraftingOrderClassic_UI_Gather_Categories.lua — onglet « Récolte », panneau gauche : repliage des
