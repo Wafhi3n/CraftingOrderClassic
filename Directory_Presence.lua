@@ -58,10 +58,18 @@ function Dir:DiscoverFriendsAndGuild()
     end
     self:ForEachBNetWoWFriend(function(n) consider(n, true) end)
     -- Membres de cercle en ligne (présence donnée par le CLUB, donc vérité du JEU — exactement la
-    -- même nature que la guilde ou la liste d'amis). Ils entrent par la même porte pour hériter des
-    -- garde-fous du sweep : publication dans `onlineGame`, et sondage des SEULS nouveaux connectés.
+    -- même nature que la guilde ou la liste d'amis). Même traitement que `consider`, à une nuance
+    -- près : un cercle n'a pas la taille bornée d'une guilde (capacité mesurée 1000), et au premier
+    -- balayage d'une session `prev` est vide, donc TOUT le monde partirait en découverte d'un seul
+    -- coup dans la file partagée de CraftLink. Le module cercle marque donc les sondables ; ici on
+    -- publie la présence de TOUS et on ne sonde que ceux-là.
     if self.ForEachCircleMemberOnline then
-        self:ForEachCircleMemberOnline(function(n) consider(n, true) end)
+        self:ForEachCircleMemberOnline(function(name, mayDiscover)
+            name = shortName(name)
+            if not name then return end
+            cur[name] = true
+            if mayDiscover and not prev[name] then self:DiscoverPlayer(name) end
+        end)
     end
     self._wasOnlineRel = cur
     self.onlineGame    = cur

@@ -39,9 +39,13 @@ end
 -- ------------------------------------------------------------------
 -- Disponibilité — une seule garde, tout le reste s'y adosse
 -- ------------------------------------------------------------------
--- Le verrou est SERVEUR (`ShouldAllowClubType`), pas client : le code d'interface est identique
--- entre Era et Forever. On interroge donc, on ne suppose pas. Rendre `false` ici suffit à éteindre
--- la feature entière — pas de fork, pas de .toc divergent, un seul paquet pour les 4 saveurs.
+-- Le verrou est SERVEUR : le code d'interface de Blizzard est identique entre Era et Forever (vérifié
+-- sur les deux copies de source), donc seul `ShouldAllowClubType` peut répondre, et seulement à
+-- l'exécution. Rendre `false` ici suffit à éteindre la feature entière — pas de fork, pas de .toc
+-- divergent, un seul paquet pour les 4 saveurs.
+-- ⚠️ Ce que rend réellement ce prédicat sur Era n'a PAS encore été mesuré en jeu (cf. la section
+-- « Non mesuré » de docs/COMMUNITIES-TRANSPORT.md). L'inertie, elle, est garantie autrement : double
+-- garde d'existence ci-dessous, et tous les appels club() passent par pcall.
 function Dir:_ClubsAvailable()
     if not (C_Club and C_Club.GetSubscribedClubs and Enum and Enum.ClubType) then return false end
     return club("ShouldAllowClubType", Enum.ClubType.Character) == true
@@ -64,7 +68,7 @@ function Dir:IsCircle(clubId) return self:CircleIds()[tostring(clubId)] == true 
 function Dir:SetCircle(clubId, on)
     local ids = self:CircleIds()
     ids[tostring(clubId)] = on and true or nil
-    if on then self:FocusCircles() end
+    self:FocusCircles()   -- AUSSI au retrait : la souscription de présence doit être ré-attribuée
     self:RefreshCircles()
 end
 
@@ -111,13 +115,22 @@ end
 -- demande donc le stream ici, et on relit sur événement (cf. _WireClubs).
 function Dir:FocusCircles()
     if not self:_ClubsAvailable() then return end
-    local first = true
+    -- Un SEUL club peut porter la souscription de présence (« You can only be subscribed to 0 or 1
+    -- clubs for presence », dixit l'API). Deux exigences en découlent :
+    --   * le choix doit être DÉTERMINISTE. `pairs` sur des clés chaîne rend un ordre qui change
+    --     d'une session à l'autre : le cercle suivi en temps réel n'aurait pas été le même deux
+    --     fois de suite, sans que rien ne l'explique côté joueur. On prend le plus petit clubId ;
+    --   * il doit être RÉ-ATTRIBUÉ à chaque appel, retrait compris. Sinon, démarquer le cercle qui
+    --     portait la souscription la laissait orpheline jusqu'au prochain login.
+    local chosen
     for clubId in pairs(self:CircleIds()) do
         local raw = tonumber(clubId) or clubId
         club("FocusMembers", raw)
-        -- « You can only be subscribed to 0 or 1 clubs for presence » : un seul, le premier venu.
-        if first then club("SetClubPresenceSubscription", raw); first = false end
+        if type(raw) == "number" and (chosen == nil or raw < chosen) then chosen = raw end
     end
+    if chosen then club("SetClubPresenceSubscription", chosen)
+    else club("ClearClubPresenceSubscription") end
+    self._presenceClub = chosen
 end
 
 -- Parcourt les membres d'un cercle prêt. Rend le nombre de membres vus (0 = pas encore streamé).
@@ -175,9 +188,16 @@ function Dir:RefreshCircles()
     for clubId in pairs(self:CircleIds()) do
         local raw = tonumber(clubId) or clubId
         self:_EachCircleMember(raw, function(name, realm, info)
+            -- MÊME ROYAUME uniquement. L'annuaire de COC est indexé par nom COURT : y faire entrer
+            -- un « Bob » d'un autre royaume le fusionnerait silencieusement avec le Bob d'ici —
+            -- mêmes recettes, mêmes niveaux, une seule fiche pour deux personnes. La limite existe
+            -- déjà pour les amis BNet, mais un cercle dépasse structurellement le royaume, donc il
+            -- la rendrait courante au lieu de théorique. Et on ne perd rien d'exploitable : un
+            -- cross-royaume n'est de toute façon pas joignable en whisper, donc pas commandable.
+            if realm then return end
             set[name] = raw
             noteMember(name)
-            if not realm and isOnline(info.presence) then online[name] = true end
+            if isOnline(info.presence) then online[name] = true end
         end)
     end
     -- Quitter un cercle doit RETIRER le classement : sans ça, `_ApplySource` retombe sur
@@ -204,8 +224,24 @@ end
 -- Consommé par Dir:DiscoverFriendsAndGuild (Directory_Presence.lua), au même titre que les amis, la
 -- guilde et les amis BNet : le sweep publie `onlineGame` et ne sonde QUE les nouveaux connectés.
 -- On hérite ainsi de tous ses garde-fous au lieu d'écrire une deuxième machinerie de découverte.
+--
+-- PLAFOND par balayage. Au tout premier sweep d'une session, `prev` est vide : TOUS les connectés
+-- partent en découverte d'un coup. Une guilde est bornée par nature, un cercle non — la capacité
+-- mesurée d'une communauté est de 1000. À 0,15 s par message dans la file partagée de CraftLink,
+-- un gros cercle repousserait de plusieurs dizaines de secondes les SK/RK et les commandes qui
+-- attendent derrière. Ce n'est pas un flood serveur, c'est une famine pour le reste du trafic.
+-- Le plafond ne porte QUE sur la découverte, jamais sur la présence : tous les membres sont rendus
+-- (leur pastille doit être juste), mais seuls les premiers sont marqués « sondable ». Plafonner
+-- l'affichage aurait échangé une vérité contre une économie de trafic, ce qui n'est pas un échange.
+-- L'ordre de `pairs` varie d'un balayage à l'autre : au fil des sweeps, tout le monde finit sondé.
+local DISCOVER_PER_SWEEP = 20
+
 function Dir:ForEachCircleMemberOnline(fn)
-    for name in pairs(self._circleOnline or {}) do fn(name) end
+    local n = 0
+    for name in pairs(self._circleOnline or {}) do
+        n = n + 1
+        fn(name, n <= DISCOVER_PER_SWEEP)
+    end
 end
 
 -- ------------------------------------------------------------------
