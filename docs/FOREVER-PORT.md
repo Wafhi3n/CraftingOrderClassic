@@ -377,11 +377,11 @@ l'annuaire. Chacun peut cacher un piège de la famille des six déjà trouvés.
 C'est du **repérage, pas du développement** — meilleur rapport information/effort, et le résultat
 peut réordonner tout le reste. Un `/cocprobe` complet au passage (39 événements) coûte 30 secondes.
 
-### 🟠 P2 — le registre réseau (codec Camelot)
+### ✅ FAIT — le registre réseau (codec Camelot)
 
-Le cœur du produit : sans lui, « qui sait crafter quoi » ne fonctionne pas sur Forever. Décision
-déjà prise (§ plus haut) : `recipeID` delta-base36 sur le fil, bitfield conservé sur Era. Autonome,
-testable en headless, ne dépend de personne.
+Codec `RI` (identifiants, delta-base36), couture `Directory_Recipes` (les lecteurs posent une
+question, ils ignorent la forme), émission/réception/**relais** branchés, garde anti-fuite d'alts
+répliquée. 635 vérifications headless.
 
 ### 🟡 P3 — les données Camelot
 
@@ -406,6 +406,22 @@ LootScan sous `C_Secrets` (le CLEU est restreint), et les voies réseau non prou
 CHANGELOG, `CURSEFORGE.md`, tag. **À vérifier tôt** : est-ce que CurseForge expose « WoW Forever »
 comme version de jeu, et comment le `.pkgmeta` doit la déclarer ? Ça gate la sortie et ça ne dépend
 pas de nous — autant le découvrir maintenant qu'en novembre.
+
+## 10 bis. Deux réflexes appris à la dure
+
+**Quand un résolveur ou une forme de donnée apparaît, chercher TOUS ses lecteurs.** Pas seulement
+celui qui a révélé le bug. Trois fois dans la même journée : le titre puis le portrait puis
+l'ancrage du menu de métier ; le registre `recipes` puis `relayed.recipes` puis `MaybeDiscover`.
+À chaque fois la correction ciblée a laissé des jumeaux silencieux derrière elle.
+
+**La beta plante toute seule — lire `_classic_beta_\Errors\` AVANT de suspecter notre code.**
+Assertions graphiques chroniques (`CAS_LOCALITY_ERROR`, `texture->GetSize() == texturePool…`,
+`GxResourceStateTracker`) et bugs Lua dans les fichiers Camelot de Blizzard, présents dès le premier
+soir, avant tout déploiement de COC. Symptôme typique : barres d'action et cadres d'unité qui
+« disparaissent » — en fait **présents mais vides** (liaison de texture en échec, pas un `Hide()`),
+et réparés par un `/reload`. Un bug d'addon, lui, se reproduit à l'identique.
+Coût de ne pas l'avoir fait : une matinée, et un correctif réel (`SetUIPanelAttribute`) retiré pour
+rien sur une attribution post hoc.
 
 ## 11. Plan du branchement réseau (codec `RI`)
 
