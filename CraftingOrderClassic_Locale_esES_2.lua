@@ -437,6 +437,20 @@ local es2 = {
     ["Choisis une entrée à gauche."] = "Elige una entrada a la izquierda.",
     ["journal parchemin : commandes et quêtes côte à côte (clic droit sur un en-tête du suivi)"] =
         "diario de pergamino: pedidos y misiones lado a lado (clic derecho en un encabezado del seguimiento)",
+
+    -- Círculos de artesanos (comunidades de WoW) — cf. Directory_Club.lua
+    ["CERCLE"] = "CÍRCULO",
+    ["Cercle"] = "Círculo",
+    ["%d membre(s) dans l'annuaire"] = "%d miembro(s) en el directorio",
+    ["les communautés ne sont pas disponibles sur ce client."] =
+        "las comunidades no están disponibles en este cliente.",
+    ["aucune communauté — crée ou rejoins un cercle dans Guilde & Communautés."] =
+        "ninguna comunidad - crea o únete a una en Hermandad y Comunidades.",
+    ["« /co circle <n°> » marque ou démarque un cercle d'artisans."] =
+        "'/co circle <n.>' marca o desmarca un círculo de artesanos.",
+    ["cercle ajouté : %s"] = "círculo añadido: %s",
+    ["cercle retiré : %s"] = "círculo eliminado: %s",
+    ["aucune communauté n° %s."] = "ninguna comunidad n.º %s.",
 }
 
 for k, v in pairs(es2) do L[k] = v end

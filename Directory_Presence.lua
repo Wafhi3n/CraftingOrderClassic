@@ -57,6 +57,12 @@ function Dir:DiscoverFriendsAndGuild()
         end
     end
     self:ForEachBNetWoWFriend(function(n) consider(n, true) end)
+    -- Membres de cercle en ligne (présence donnée par le CLUB, donc vérité du JEU — exactement la
+    -- même nature que la guilde ou la liste d'amis). Ils entrent par la même porte pour hériter des
+    -- garde-fous du sweep : publication dans `onlineGame`, et sondage des SEULS nouveaux connectés.
+    if self.ForEachCircleMemberOnline then
+        self:ForEachCircleMemberOnline(function(n) consider(n, true) end)
+    end
     self._wasOnlineRel = cur
     self.onlineGame    = cur
     if COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end

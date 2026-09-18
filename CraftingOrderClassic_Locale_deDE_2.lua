@@ -436,6 +436,20 @@ local de2 = {
     ["Choisis une entrée à gauche."] = "Wähle links einen Eintrag.",
     ["journal parchemin : commandes et quêtes côte à côte (clic droit sur un en-tête du suivi)"] =
         "Pergament-Journal: Aufträge und Quests nebeneinander (Rechtsklick auf eine Verfolgungs-Überschrift)",
+
+    -- Handwerkerkreise (WoW-Gemeinschaften) — vgl. Directory_Club.lua
+    ["CERCLE"] = "KREIS",
+    ["Cercle"] = "Kreis",
+    ["%d membre(s) dans l'annuaire"] = "%d Mitglied(er) im Verzeichnis",
+    ["les communautés ne sont pas disponibles sur ce client."] =
+        "Gemeinschaften sind auf diesem Client nicht verfügbar.",
+    ["aucune communauté — crée ou rejoins un cercle dans Guilde & Communautés."] =
+        "keine Gemeinschaft - erstelle oder tritt einer unter Gilde & Gemeinschaften bei.",
+    ["« /co circle <n°> » marque ou démarque un cercle d'artisans."] =
+        "'/co circle <Nr.>' markiert einen Handwerkerkreis oder hebt die Markierung auf.",
+    ["cercle ajouté : %s"] = "Kreis hinzugefügt: %s",
+    ["cercle retiré : %s"] = "Kreis entfernt: %s",
+    ["aucune communauté n° %s."] = "keine Gemeinschaft Nr. %s.",
 }
 
 for k, v in pairs(de2) do L[k] = v end

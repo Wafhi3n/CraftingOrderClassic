@@ -454,6 +454,20 @@ local en2 = {
     ["Choisis une entrée à gauche."] = "Pick an entry on the left.",
     ["journal parchemin : commandes et quêtes côte à côte (clic droit sur un en-tête du suivi)"] =
         "parchment journal: orders and quests side by side (right-click a tracker header)",
+
+    -- Cercles d'artisans (communautés WoW) — cf. Directory_Club.lua
+    ["CERCLE"] = "CIRCLE",
+    ["Cercle"] = "Circle",
+    ["%d membre(s) dans l'annuaire"] = "%d member(s) in the directory",
+    ["les communautés ne sont pas disponibles sur ce client."] =
+        "communities are not available on this client.",
+    ["aucune communauté — crée ou rejoins un cercle dans Guilde & Communautés."] =
+        "no community yet - create or join one in Guild & Communities.",
+    ["« /co circle <n°> » marque ou démarque un cercle d'artisans."] =
+        "'/co circle <n>' marks or unmarks a crafting circle.",
+    ["cercle ajouté : %s"] = "circle added: %s",
+    ["cercle retiré : %s"] = "circle removed: %s",
+    ["aucune communauté n° %s."] = "no community number %s.",
 }
 
 for k, v in pairs(en2) do L[k] = v end

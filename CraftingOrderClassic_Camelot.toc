@@ -114,6 +114,7 @@ Directory_Presence.lua
 # une question, ils n'ont plus a connaitre la FORME du payload ni a recopier la garde de version.
 Directory_Recipes.lua
 Directory_Confed.lua
+Directory_Club.lua
 Directory_Skills.lua
 Directory_Version.lua
 Directory_Cooldowns.lua
