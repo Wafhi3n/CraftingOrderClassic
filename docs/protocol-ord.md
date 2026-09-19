@@ -196,14 +196,18 @@ expiré** (`ORDER_TTL`), et la portée est respectée. `RebroadcastMine` est jit
 
 - **whisper 1:1** = canal FIABLE : ordres ciblés, transitions de cycle dirigées, forward. Zéro race au
   login, pas de dépendance guilde/canal.
-- **canal custom `CraftLinkNet`** (`JoinTemporaryChannel`) = portée « global », **best-effort** : la
-  distribution `CHAT_MSG_ADDON` sur CHANNEL est muette entre deux comptes d'un même Battle.net (PTR
-  2026-06-30). D'où le fanout whisper qui **double** chaque `NEW` vers les artisans connus en ligne.
+- **canal custom `CraftLinkNet`** (`JoinTemporaryChannel`) = portée « global ». **Le comportement dépend
+  du serveur** : sur **Classic Era** la distribution `CHAT_MSG_ADDON` sur CHANNEL est muette entre deux
+  comptes d'un même Battle.net (PTR 2026-06-30, 0 reçu sur 176) ; sur **WoW: Forever** elle **est
+  délivrée**, même Battle.net compris (2 comptes, 2026-09-19), et entre deux Battle.net différents
+  (un testeur extérieur reçu en CHANNEL le même jour). D'où, historiquement, le fanout whisper qui
+  **double** chaque `NEW` vers les artisans connus en ligne — il reste, c'est le seul chemin vers un
+  joueur qui a fait `/co channel off`.
 - **balise TEXTE `CLNK1`** (throttlée, hardware-event only) : découverte d'inconnus, puis tout le
   trafic de données bascule en whisper.
 - **canal-texte `CLD1`** (`BroadcastText`, confiné au royaume courant + royaumes connectés) : diffuse en
   TEXTE de canal (swap `|`↔`~`, le `|` casse le chat) pour une portée royaume réelle, au-delà du roster
-  whisperable. **Liste blanche de verbes : `NEW` et `CANCEL` seulement** (`CHANNEL_VERBS`, `Orders_Net`),
+  whisperable. **Liste blanche de verbes : `NEW`, `CANCEL` et `TTL`** (`CHANNEL_VERBS`, `Orders_Net`),
   et **commandes PUBLIQUES seulement** (`recipient == "Tous"`) — Guilde/Amis/nommé restent whisper-only
   (portée = vie privée), et ACK/DLV/DONE/NACK/SUGG restent dirigés (ils nomment un accepteur : les
   publier serait une fuite). La diffusion doit être **voulue** (`opts.channel`, posé par `Post`/
@@ -214,6 +218,19 @@ expiré** (`ORDER_TTL`), et la portée est respectée. `RebroadcastMine` est jit
     `OnKeyDown`, pattern Deathlog). L'appelant n'a donc plus à garantir le contexte d'input. FIFO garantit
     qu'un `NEW` part avant son `CANCEL`. La **balise `CLNK1` n'est PAS mise en file** : throttlée, elle
     doit être perdue (la rejouer plus tard ne vaut rien et floode).
+  - **Dédoublonnage (TRANSPORT_REV 13, v1.32.0)** : la ligne texte et l'AddonMessage `global` visent le
+    MÊME public (les membres du canal). Dès que `CraftLink:ChannelDelivers()` est vrai, `NEW` et `TTL`
+    ne partent plus en texte — ils se ré-émettent toutes les 2 h (`RebroadcastMine`), un doublon en moins
+    ne leur coûte rien. **`CANCEL` garde sa ligne texte dans tous les cas** : son whisper ne vise que
+    l'accepteur et le destinataire nommé, et `RebroadcastMine` ne réémet jamais une commande annulée ;
+    pour qui a seulement VU la commande, le canal est son seul chemin et il n'a aucune seconde chance.
+    Le constat est posé dans `onAddonMsg` et **nulle part ailleurs** : la voie texte appelle aussi
+    `_Dispatch` avec `"CHANNEL"`, elle se prouverait elle-même et serait coupée sur l'Era, où elle est
+    le seul chemin (verrouillé par `tests/test_transport_channel_proof.lua`, sur les vrais gestionnaires).
+    Constat par session, remis à zéro par `LeaveNetwork`. **Limite connue** : c'est un loquet unique,
+    acquis sur UN paquet d'un pair de mon royaume, et appliqué à tout le canal. Si Forever gagne des
+    royaumes connectés, rien ne garantit que la délivrance soit symétrique à travers cette frontière :
+    à corroborer ce jour-là.
   - **Reste best-effort** : `ACK`/`DLV`/`DONE` ne transitent pas par ce chemin. Un joueur atteint
     SEULEMENT par le canal peut donc voir un ordre « open » qu'un autre a accepté ailleurs, jusqu'au
     **TTL** (6 h). Depuis la diffusion de `CANCEL`, ce n'est plus le cas d'une commande **annulée** — sauf

@@ -130,9 +130,16 @@ function Orders:Broadcast(action, o, opts)
     --
     -- On ne touche PAS au fanout whisper : c'est le seul chemin vers un joueur qui a fait
     -- `/co channel off`. Le couper sur la foi d'un canal qui marche le priverait en silence.
+    --
+    -- Et CANCEL garde sa ligne texte QUOI QU'IL ARRIVE. Il n'a pas de filet : son whisper ne vise que
+    -- l'accepteur et le destinataire nommé (_CycleTargets), et RebroadcastMine ne réémet JAMAIS une
+    -- commande annulée. Pour un joueur qui a seulement VU la commande, le canal est le seul chemin, et
+    -- un paquet perdu la laisse « ouverte » chez lui jusqu'au TTL (6 h) — le défaut exact que cette ligne
+    -- texte a été ajoutée pour combler. NEW et TTL, eux, se ré-émettent toutes les 2 h : un doublon en
+    -- moins ne leur coûte rien. Un CANCEL est rare, sa ligne en plus non plus. (Revue protocole v1.32.0.)
     if opts and opts.channel and CHANNEL_VERBS[action]
        and (o.recipient or "Tous") == "Tous" and CraftLink.BroadcastText
-       and not (CraftLink.ChannelDelivers and CraftLink:ChannelDelivers()) then
+       and (action == "CANCEL" or not (CraftLink.ChannelDelivers and CraftLink:ChannelDelivers())) then
         CraftLink:BroadcastText(payload)
     end
 end
