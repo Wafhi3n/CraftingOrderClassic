@@ -121,8 +121,18 @@ function Orders:Broadcast(action, o, opts)
     -- Portée ROYAUME (texte-canal) : verbe en liste blanche + commande PUBLIQUE + diffusion demandée.
     -- Un récepteur atteint SEULEMENT par le canal reçoit ainsi le NEW *et* son CANCEL — sans quoi la
     -- commande resterait « open » chez lui jusqu'au TTL (6 h) après son annulation ailleurs.
+    --
+    -- … SAUF si l'AddonMessage CHANNEL (le `Send(payload, "global")` ci-dessus) est CONSTATÉ comme
+    -- délivré : les deux voies visent alors exactement le MÊME public — les membres du même canal —
+    -- et la ligne texte n'est plus qu'un doublon. Mesuré sur Forever le 2026-09-19 : un ordre public
+    -- arrivait en TRIPLE chez le destinataire (canal addon + canal texte + whisper). Sur Era la voie
+    -- addon reste morte, le constat ne se fait jamais, et le texte part comme avant.
+    --
+    -- On ne touche PAS au fanout whisper : c'est le seul chemin vers un joueur qui a fait
+    -- `/co channel off`. Le couper sur la foi d'un canal qui marche le priverait en silence.
     if opts and opts.channel and CHANNEL_VERBS[action]
-       and (o.recipient or "Tous") == "Tous" and CraftLink.BroadcastText then
+       and (o.recipient or "Tous") == "Tous" and CraftLink.BroadcastText
+       and not (CraftLink.ChannelDelivers and CraftLink:ChannelDelivers()) then
         CraftLink:BroadcastText(payload)
     end
 end
