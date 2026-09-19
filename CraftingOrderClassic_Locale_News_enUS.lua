@@ -286,6 +286,15 @@ local news = {
         "The recipe list is Forever's own, 2512 recipes from Wowhead's Forever pages instead of vanilla's 1230. Forever moved things around, so the healing potions are under First Aid now, not Alchemy.",
     ["Sur Forever, le clic droit sur le bouton de la minimap ouvre la fenêtre des métiers du jeu. Les métiers de tes rerolls se consultent désormais depuis « Mes artisans » (clic droit sur un métier). /co mute accepte les noms en prénom et nom, entre guillemets si l'addon n'a pas encore croisé le joueur."] =
         "On Forever, right-clicking the minimap button opens the game's Professions window. Your alts' professions now live in My Artisans (right-click a profession). /co mute takes first and last names, in quotes if the addon hasn't met that player yet.",
+    -- v1.32.1
+    ["La fenêtre de métier de Forever cesse de se plaindre"] =
+        "Forever's professions window stops complaining",
+    ["Sur WoW: Forever, la colonne des commandes s'invite dans la fenêtre de métier du jeu. Elle y est l'hôte d'un cadre que le jeu protège, et presque tout ce qu'elle y faisait était refusé dès que tu étais en combat : ouvrir ou fermer la fenêtre pendant un combat déclenchait une volée d'erreurs « action bloquée », avec l'addon nommé au passage. La colonne ne touche plus au cadre pendant le combat, et reprend sa place à la fin."] =
+        "On WoW: Forever, the orders column sits inside the game's own professions window. It's a guest in a frame the game protects, and nearly everything it did there was refused once you were in combat. Opening or closing the window mid-fight threw a wall of blocked-action errors, with the addon named in each one. The column leaves the frame alone during combat now, and takes its place back when the fight ends.",
+    ["Elle s'affiche aussi quand il faut. Il fallait deux passages : la fenêtre s'ouvre sur la page d'ensemble, où il n'y a aucun métier courant et donc rien à lister, si bien que la première visite semblait vide. Elle apparaît maintenant dès que tu es sur un métier, du premier coup."] =
+        "It also shows up when it should. It used to take two trips: the window opens on the overview page, where there's no current profession and nothing to list, so the first visit looked empty. It now appears as soon as you're on a profession, first time.",
+    ["Le reste : on ne peut plus la sortir de la fenêtre en la tirant, sa place appartient à son hôte ; les onglets de métier de Blizzard ne recouvrent plus son dernier onglet ; /co prof cuisine ouvre la Cuisine au lieu de la page d'ensemble ; et l'aide contextuelle n'entoure plus que ce qui est réellement affiché."] =
+        "The rest: you can't drag it out of the window any more, its place belongs to its host; Blizzard's profession tabs no longer cover its last tab; /co prof cooking opens Cooking instead of the overview page; and the help overlay only outlines what's actually on screen.",
 }
 
 for k, v in pairs(news) do L[k] = v end

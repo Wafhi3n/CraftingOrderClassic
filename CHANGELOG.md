@@ -1,5 +1,28 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.32.1 — Forever's professions window stops complaining
+
+On WoW: Forever, the orders column sits inside the game's own professions window. It's a guest in a
+frame the game protects, and nearly everything it did there was refused once you were in combat.
+Opening or closing the window mid-fight threw a wall of blocked-action errors, with the addon named
+in every one of them. The column leaves the frame alone during combat now, and takes its place back
+when the fight ends.
+
+It also shows up when it should. It used to take two trips. The window opens on the overview page,
+where there's no current profession and nothing to list, so the first visit looked empty and people
+closed and reopened until it appeared. It shows up as soon as you're on a profession, first time.
+
+The rest:
+
+- You can't drag the column out of the window any more. While it's docked in there, its place
+  belongs to its host.
+- Blizzard's profession tabs sit on the right edge of the frame and were covering the column's last
+  tab. The window makes room for them now, and it measures how much room rather than guessing, so
+  it still works with seven professions.
+- `/co prof cooking` opens Cooking instead of the overview page.
+- The help overlay only outlines what's actually on screen. It used to draw boxes around the recipe
+  and detail columns, which aren't there when the column is docked in the game's window.
+
 ## v1.32.0 — Forever finally reads your professions and recipes
 
 On WoW: Forever the addon couldn't see your professions. Forever runs the modern game's API under

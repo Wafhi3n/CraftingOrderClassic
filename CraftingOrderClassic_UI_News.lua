@@ -25,6 +25,14 @@ local BODY_W = 780
 local function versionsCurrent()
     return {
         {
+            v = "v1.32.1", title = L["La fenêtre de métier de Forever cesse de se plaindre"],
+            lines = {
+                L["Sur WoW: Forever, la colonne des commandes s'invite dans la fenêtre de métier du jeu. Elle y est l'hôte d'un cadre que le jeu protège, et presque tout ce qu'elle y faisait était refusé dès que tu étais en combat : ouvrir ou fermer la fenêtre pendant un combat déclenchait une volée d'erreurs « action bloquée », avec l'addon nommé au passage. La colonne ne touche plus au cadre pendant le combat, et reprend sa place à la fin."],
+                L["Elle s'affiche aussi quand il faut. Il fallait deux passages : la fenêtre s'ouvre sur la page d'ensemble, où il n'y a aucun métier courant et donc rien à lister, si bien que la première visite semblait vide. Elle apparaît maintenant dès que tu es sur un métier, du premier coup."],
+                L["Le reste : on ne peut plus la sortir de la fenêtre en la tirant, sa place appartient à son hôte ; les onglets de métier de Blizzard ne recouvrent plus son dernier onglet ; /co prof cuisine ouvre la Cuisine au lieu de la page d'ensemble ; et l'aide contextuelle n'entoure plus que ce qui est réellement affiché."],
+            },
+        },
+        {
             v = "v1.32.0", title = L["Forever lit enfin tes métiers et tes recettes"],
             lines = {
                 L["Sur WoW: Forever, l'addon ne voyait pas tes métiers : Forever tourne sur l'API du jeu moderne, et les fonctions qui lisaient tes compétences n'y existent pas. Rien ne plantait. L'annuaire t'annonçait simplement sans aucun métier, le clic droit disait que tu n'en avais pas, et « Mes artisans » restait vide. Tes recettes connues et leurs temps de recharge avaient le même problème. Tout est lu à la manière de Forever maintenant."],

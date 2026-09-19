@@ -283,6 +283,15 @@ local news = {
         "Die Rezeptliste ist die von Forever: 2512 Rezepte aus den Forever-Seiten von Wowhead statt der 1230 von Vanilla. Forever hat einiges verschoben, die Heiltränke stehen jetzt unter Erste Hilfe statt unter Alchemie.",
     ["Sur Forever, le clic droit sur le bouton de la minimap ouvre la fenêtre des métiers du jeu. Les métiers de tes rerolls se consultent désormais depuis « Mes artisans » (clic droit sur un métier). /co mute accepte les noms en prénom et nom, entre guillemets si l'addon n'a pas encore croisé le joueur."] =
         "Auf Forever öffnet ein Rechtsklick auf den Minimap-Button das Berufsfenster des Spiels. Die Berufe deiner Twinks findest du jetzt unter „Meine Handwerker“ (Rechtsklick auf einen Beruf). /co mute nimmt Vor- und Nachnamen an, in Anführungszeichen, wenn das Addon den Spieler noch nicht kennt.",
+    -- v1.32.1
+    ["La fenêtre de métier de Forever cesse de se plaindre"] =
+        "Das Berufsfenster von Forever beschwert sich nicht mehr",
+    ["Sur WoW: Forever, la colonne des commandes s'invite dans la fenêtre de métier du jeu. Elle y est l'hôte d'un cadre que le jeu protège, et presque tout ce qu'elle y faisait était refusé dès que tu étais en combat : ouvrir ou fermer la fenêtre pendant un combat déclenchait une volée d'erreurs « action bloquée », avec l'addon nommé au passage. La colonne ne touche plus au cadre pendant le combat, et reprend sa place à la fin."] =
+        "Auf WoW: Forever sitzt die Auftragsspalte im Berufsfenster des Spiels. Sie ist dort Gast in einem geschützten Rahmen, und fast alles, was sie darin tat, wurde im Kampf verweigert. Das Fenster mitten im Kampf zu öffnen oder zu schließen warf eine Flut von Fehlern über blockierte Aktionen, mit dem Addon jedes Mal namentlich genannt. Im Kampf rührt die Spalte den Rahmen nicht mehr an und nimmt danach ihren Platz wieder ein.",
+    ["Elle s'affiche aussi quand il faut. Il fallait deux passages : la fenêtre s'ouvre sur la page d'ensemble, où il n'y a aucun métier courant et donc rien à lister, si bien que la première visite semblait vide. Elle apparaît maintenant dès que tu es sur un métier, du premier coup."] =
+        "Sie erscheint jetzt auch dann, wenn sie soll. Bisher brauchte es zwei Anläufe: Das Fenster öffnet auf der Übersichtsseite, wo es keinen aktuellen Beruf und also nichts aufzulisten gibt, weshalb der erste Besuch leer wirkte. Nun erscheint sie beim ersten Mal, sobald du auf einem Beruf bist.",
+    ["Le reste : on ne peut plus la sortir de la fenêtre en la tirant, sa place appartient à son hôte ; les onglets de métier de Blizzard ne recouvrent plus son dernier onglet ; /co prof cuisine ouvre la Cuisine au lieu de la page d'ensemble ; et l'aide contextuelle n'entoure plus que ce qui est réellement affiché."] =
+        "Der Rest: Sie lässt sich nicht mehr aus dem Fenster ziehen, ihr Platz gehört ihrem Gastgeber; die Berufsreiter von Blizzard verdecken ihren letzten Reiter nicht mehr; /co prof kochkunst öffnet die Kochkunst statt der Übersichtsseite; und die Hilfe umrahmt nur noch das, was wirklich zu sehen ist.",
 }
 
 for k, v in pairs(news) do L[k] = v end
