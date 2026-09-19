@@ -26,8 +26,8 @@ local L    = COC.L
 local SF = {}
 COC.StatFilter = SF
 
--- Valeur « aucun filtre ». PAS `nil` ni `false` : UIDropDownMenu lit `false` comme « pas de
--- sélection » et afficherait un sélecteur vide (même piège que QUALITY_STEPS, cf. _UI_Post.lua).
+-- Valeur « aucun filtre ». Un vrai jeton plutôt que `nil`/`false`, qui se confondent avec « pas de
+-- sélection » (piège de l'ancien UIDropDownMenu, gardé par prudence : cf. QUALITY_STEPS, _UI_Post.lua).
 local ALL = "*"
 
 -- Choix courant PAR VUE : [viewKey] = token, ou nil pour « toutes ».
@@ -97,7 +97,7 @@ function SF:RefreshDropdown(dd)
     if token then
         local label = COC.Stats and COC.Stats:TokenLabel(token)
         if type(label) == "string" and label ~= "" then
-            UIDropDownMenu_SetText(dd, L["Stat"] .. " : " .. label)
+            dd:SetText(L["Stat"] .. " : " .. label)   -- plus d'UIDropDownMenu : cf. Skin.MakeDropdown
         end
     end
 end

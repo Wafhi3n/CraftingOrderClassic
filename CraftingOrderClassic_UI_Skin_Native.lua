@@ -9,8 +9,8 @@
 -- (médaillon-déclencheur + flèche) · MakeTabs (languettes natives TabButtonTemplate, en haut) · MakeGoldButton (bouton 3-tranches
 -- natif, anti-reskin, variante sécurisée) · MakeFlatRow (ligne de liste/flyout plate) · MakeIconButton
 -- (carré à icône, filtres/pills) · MakeFilterButton (bande de filtre style hôtel des ventes) · MakeFlyout
--- (dropdown maison : puits + closer + pool de lignes) · MakeDropdown (dropdown NATIF UIDropDownMenu,
--- le sélecteur gris de l'HdV) · MakeCheckButton (case à cocher NATIVE, style « Objets utilisables »
+-- (dropdown maison : puits + closer + pool de lignes) · MakeDropdown (selecteur MAISON sans
+-- UIDropDownMenu, qui teintait des globales partagees -- cf. _UI_Skin_Dropdown.lua) · MakeCheckButton (case à cocher NATIVE, style « Objets utilisables »
 -- de l'HdV) · FieldLabel (légende de champ style HdV). Les primitives de SECTIONS (MakeInset,
 -- MakeDivider, MakeDividerV) vivent dans _UI_Skin_Sections.lua (même table Skin, anti-monolithe).
 -- MakeFlyout vs MakeDropdown : le premier est un MENU maison (géométrie libre, lignes riches : métiers,
@@ -69,6 +69,12 @@ end
 -- → le Hide() déclenché par Échap serait bloqué en combat (ADDON_ACTION_BLOCKED, vu en jeu
 -- 2026-07-17). Un PROXY invisible et non protégé porte donc l'Échap et rejoue la logique du X.
 -- Garde alpha : une fenêtre escamotée en combat (alpha 0, cf. PW:Hide) ne doit pas « se fermer ».
+-- NE PAS REMPLACER CE MONTAGE PAR UNE CAPTURE DU CLAVIER. Tente le 2026-09-19 (EnableKeyboard +
+-- SetPropagateKeyboardInput sur la fenetre) pour sortir de UISpecialFrames : des que la propagation
+-- n'a pas pu etre posee, la fenetre AVALAIT TOUTES LES TOUCHES -- le joueur ne pouvait plus se
+-- deplacer. Et le motif etait faux : la lecture de notre nom par `CloseWindows()` se fait a
+-- l'interieur d'un `securecall`, precisement le mecanisme par lequel Blizzard CONFINE la
+-- contamination ; le journal la consigne, elle ne fuit pas. UISpecialFrames reste donc le bon outil.
 local function attachEscProxy(f, name, onClose)
     local esc = CreateFrame("Frame", name .. "EscProxy", UIParent)
     esc:Hide()
@@ -310,11 +316,18 @@ function Skin.MakeFlyout(name, w, opts)
     local pad  = opts.pad or 2
     local step = opts.rowStep or 20
     local rowH, rowW = opts.rowH or step, opts.rowW or (w - 2 * pad)
+    -- opts.strata : DIALOG par defaut (menu minimap). Un menu ouvert DEPUIS une fenetre plus haute
+    -- (FULLSCREEN_DIALOG, cf. ShareReagents) doit passer au-dessus d'elle, sinon il s'ouvre dessous.
+    local strata = opts.strata or "DIALOG"
     local fly = CreateFrame("Frame", name, UIParent, "BackdropTemplate")
-    fly:SetSize(w, 10); fly:SetFrameStrata("DIALOG"); fly:Hide(); Skin.SkinWell(fly)
+    fly:SetSize(w, 10); fly:SetFrameStrata(strata); fly:Hide(); Skin.SkinWell(fly)
+    -- Une longue liste pres du bas de l'ecran remonte au lieu de deborder (ses dernieres lignes
+    -- devenaient inatteignables : filtres de stat a 20-30 entrees).
+    fly:SetClampedToScreen(true)
     local closer = CreateFrame("Button", nil, UIParent)
-    closer:SetAllPoints(); closer:SetFrameStrata("DIALOG"); closer:Hide()
+    closer:SetAllPoints(); closer:SetFrameStrata(strata); closer:Hide()
     fly:SetFrameLevel(closer:GetFrameLevel() + 1)
+    fly.closer = closer                                      -- l'appelant peut regler les niveaux
     closer:SetScript("OnClick", function() fly:Hide() end)   -- OnHide masque le closer
     fly:SetScript("OnShow", function() closer:Show() end)
     fly:SetScript("OnHide", function() closer:Hide() end)
@@ -368,65 +381,6 @@ function Skin.MakeIconButton(parent, size, tex)
     b.SetSelected = function(self, on) self.selected = on and true or false; rest(self) end
     rest(b)
     return b
-end
-
--- =========================================================================
--- Dropdown natif (UIDropDownMenuTemplate) — le sélecteur gris de l'hôtel des ventes.
--- =========================================================================
--- Le widget EXACT du filtre « Rareté » de l'HdV : 3-tranches `CharacterCreate-LabelFrame` + flèche
--- dorée + liste déroulante à coches. On l'HÉRITE (cf. skill, piège n°9 : hériter le template XML natif,
--- ne pas en peindre un faux) — il existe bien en Era (SharedXML/Classic/UIDropDownMenuTemplates.xml:220)
--- et gère seul le survol, la coche de l'entrée active et la fermeture au clic ailleurs.
--- ⚠️ DEUX contraintes du template, toutes deux payées d'avance ici :
---  · il EXIGE un nom GLOBAL : ses tranches sont `$parentLeft/Middle/Right` et TOUS les helpers
---    UIDropDownMenu_* repassent par `frame:GetName()` → d'où `name` en 1er argument (comme MakeFlyout).
---  · son art porte une MARGE TRANSPARENTE (~15 px à gauche) et le cadre visible est centré dans les
---    32 px de haut de la frame : ancrer la frame « à x,y » ne pose donc PAS le bord visible à x,y.
---    D'où `:SetPointVisual`, qui prend les coordonnées du bord VISIBLE voulu et applique la compense.
--- Contrat : `dd:SetValue(v)` (coche + libellé) · `dd.value` · `items` = liste `{ {value=…, text=…}, … }`
--- ou FONCTION qui la rend (ré-évaluée à chaque ouverture : libellés localisés/dynamiques) ·
--- `opts.onSelect(v)` · `opts.label` (préfixe collé devant le libellé, ex. « Qualité : »).
--- NB : ne jamais utiliser `false` comme `value` (UIDropDownMenu_SetSelectedValue le traite comme
--- « pas de sélection ») — passer par un index ou 0, cf. le filtre qualité de l'onglet Commande.
-local DD_INSET_X, DD_INSET_Y = 15, 2   -- marge transparente de l'art (gauche / haut) — affinés en jeu
-function Skin.MakeDropdown(name, parent, w, items, opts)
-    opts = opts or {}
-    local dd = CreateFrame("Frame", name, parent, "UIDropDownMenuTemplate")
-    local function list() return (type(items) == "function") and items() or items end
-    -- Valeur absente de la liste (liste pas encore peuplée : rerolls pas encore scannés au 1er affichage)
-    -- → on affiche la valeur brute plutôt qu'un libellé VIDE, qui ferait croire à un sélecteur cassé.
-    local function textFor(v)
-        for _, it in ipairs(list()) do if it.value == v then return it.text or "" end end
-        return (type(v) == "string") and v or ""
-    end
-    function dd:SetValue(v)
-        self.value = v
-        UIDropDownMenu_SetSelectedValue(self, v)
-        UIDropDownMenu_SetText(self, (opts.label or "") .. textFor(v))
-    end
-    UIDropDownMenu_Initialize(dd, function(_, level)
-        for _, it in ipairs(list()) do
-            local info = UIDropDownMenu_CreateInfo()
-            info.text, info.value = it.text, it.value
-            info.checked = (it.value == dd.value)
-            info.func = function()
-                dd:SetValue(it.value)
-                if opts.onSelect then opts.onSelect(it.value) end
-                CloseDropDownMenus()
-            end
-            UIDropDownMenu_AddButton(info, level)
-        end
-    end)
-    UIDropDownMenu_SetWidth(dd, w)
-    UIDropDownMenu_JustifyText(dd, "LEFT")
-    -- Ancre le bord VISIBLE du cadre (et non la frame, cf. marge transparente ci-dessus). Le SIGNE de la
-    -- compense dépend du bord ancré : à GAUCHE il faut reculer la frame (−), à DROITE l'avancer (+) —
-    -- sinon un dropdown ancré TOPRIGHT part 15 px trop à gauche (vécu : la vitrine de « Mes artisans »).
-    function dd:SetPointVisual(point, rel, relPoint, x, y)
-        local dx = point:find("RIGHT") and DD_INSET_X or -DD_INSET_X
-        self:SetPoint(point, rel, relPoint, (x or 0) + dx, (y or 0) + DD_INSET_Y)
-    end
-    return dd
 end
 
 -- Case à cocher NATIVE (`UICheckButtonTemplate`, SharedUIPanelTemplates.xml:413) — le widget des

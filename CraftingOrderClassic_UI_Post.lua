@@ -138,9 +138,9 @@ function UI:_BuildPostPlanFilters()
     -- d'où le passage de `srch`, dont le bord droit recule quand le bouton est visible.
     self:_BuildPostDollToggle(sSlot, srch)
 
-    -- Qualité : le sélecteur gris natif de l'HdV, dans son slot. Les valeurs sont les INDEX de
-    -- QUALITY_STEPS, jamais `false` (UIDropDownMenu lit `false` comme « pas de sélection », cf.
-    -- contrat de Skin.MakeDropdown) — QUALITY_STEPS[1] = false = « Toutes ».
+    -- Qualité, dans son slot. Les valeurs sont les INDEX de QUALITY_STEPS, pas les pas eux-mêmes :
+    -- QUALITY_STEPS[1] = false = « Toutes », et une valeur `false` se confond trop vite avec « pas
+    -- de sélection » (c'était le piège d'UIDropDownMenu, remplacé depuis par Skin.MakeDropdown).
     self.postQualityIdx = 1
     local dd = Skin.MakeDropdown("COCPostQualityDD", self:PostSec("qualityDropDown"), 64, function()
         local out = {}

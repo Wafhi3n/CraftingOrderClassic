@@ -33,6 +33,7 @@ CraftingOrderClassic_Locale_News_esES.lua
 CraftingOrderClassic_Elemental.lua
 CraftingOrderClassic_UI_Skin.lua
 CraftingOrderClassic_UI_Skin_Native.lua
+CraftingOrderClassic_UI_Skin_Dropdown.lua
 CraftingOrderClassic_UI_Skin_Sections.lua
 CraftingOrderClassic_UI_Skin_HelpPlate.lua
 CraftingOrderClassic_ShareReagents.lua

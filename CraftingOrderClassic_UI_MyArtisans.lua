@@ -128,7 +128,7 @@ function UI:_BuildMyArtHeader()
         end,
     })
     dd:SetPointVisual("RIGHT", sc, "RIGHT", -8, -2)
-    self.myArtMainLbl:SetPoint("RIGHT", dd, "LEFT", 8, -2)   -- +8/−2 : compense la marge de l'art du dropdown
+    self.myArtMainLbl:SetPoint("RIGHT", dd, "LEFT", -6, 0)   -- le selecteur maison n'a plus de marge transparente
     self.myArtMainDD = dd
 end
 
