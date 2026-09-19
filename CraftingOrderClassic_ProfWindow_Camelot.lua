@@ -86,25 +86,6 @@ local function restoreChrome(f)
     f._cocChromeHidden, f._cocStripped = nil, nil
 end
 
--- Debord des ONGLETS LATERAUX de Blizzard sur l'interieur du cadre. Ils sont ancres au bord droit :
--- en elargissant, ils viennent se poser SUR notre colonne et masquaient le dernier onglet
--- (« Incoming », releve du 2026-09-19). On MESURE de combien ils mordent, au lieu de deviner une
--- marge qui serait fausse au prochain patch ou pour un joueur a 7 metiers.
-local function sideTabInset(native)
-    local right = native:GetRight()
-    if not right then return 0 end
-    local inset = 0
-    local tabs = { native.ProfessionsOverviewTab }
-    for i = 1, 7 do tabs[#tabs + 1] = native["Professions" .. i .. "Tab"] end
-    for _, t in ipairs(tabs) do
-        if t and t.IsShown and t:IsShown() and t.GetLeft and t:GetLeft() then
-            local over = right - t:GetLeft()
-            if over > inset then inset = over end
-        end
-    end
-    return inset
-end
-
 -- ---------------------------------------------------------------- greffe
 
 -- RIEN ne se greffe ni ne se degreffe EN COMBAT. Une fois notre colonne reparentee dans le panneau
@@ -172,8 +153,8 @@ end
 -- execute toute la chaine securisee en teinte -> la 1re lecture d'une valeur SECRETE leve. Sur l'Era
 -- une taint donnait au pire un ADDON_ACTION_BLOCKED ; ici elle fait planter le code de Blizzard, et
 -- le blame nous est impute nommement. Le chevauchement de panneaux est COSMETIQUE. On le garde.
-local function widenHost(native, colW, tabInset)
-    native:SetWidth(nativeBaseW + colW + GAP * 2 + tabInset)
+local function widenHost(native, colW)
+    native:SetWidth(nativeBaseW + colW + GAP * 2)
 end
 
 -- GREFFEE, ELLE N'EST PLUS UNE FENETRE.
@@ -184,18 +165,22 @@ end
 --    ~140 px de vide sous le pied de colonne, vu au 1er essai du POC).
 --  * `SetToplevel(true)` et la strata « HIGH » ont du sens pour un cadre flottant ; pour l'enfant
 --    d'un panneau GERE ils le decrochent de l'ordre d'affichage de son hote. Rang d'enfant ordinaire.
+--  * Les ONGLETS LATERAUX de Blizzard semblaient recouvrir le dernier onglet de la colonne. Ce
+--    n'etait pas geometrique mais un ordre d'AFFICHAGE : ils sont ancres HORS du cadre, et c'est
+--    le niveau qui reglait tout. Une marge de retrait a bien ete ecrite le 2026-09-19, mesuree a
+--    zero en jeu, donc sans effet : retiree plutot que laissee a faire illusion.
 --  * Niveau MESURE sur les enfants du cadre, pas suppose : releve du 2026-09-19, cadre=1 mais
 --    BookPage=100. Le +5 d'origine laissait la colonne 94 crans SOUS un fond opaque : affichee,
 --    complete, bien placee... et invisible. Ce qui ressemblait a une colonne absente etait une
 --    colonne enterree. Mesurer nous fait suivre un changement de numerotation Blizzard.
-local function dockColumn(self, native, tabInset)
+local function dockColumn(self, native)
     local f = self.frame
     f:SetMovable(false)
     f:RegisterForDrag()                   -- plus aucun bouton ne declenche le glisser
     f:SetParent(native)                   -- suit l'ouverture/fermeture et le deplacement du natif
     f:ClearAllPoints()
-    f:SetPoint("TOPRIGHT", native, "TOPRIGHT", -(GAP + tabInset), -TOP_INSET)
-    f:SetPoint("BOTTOMRIGHT", native, "BOTTOMRIGHT", -(GAP + tabInset), BOT_INSET)
+    f:SetPoint("TOPRIGHT", native, "TOPRIGHT", -GAP, -TOP_INSET)
+    f:SetPoint("BOTTOMRIGHT", native, "BOTTOMRIGHT", -GAP, BOT_INSET)
     if f.SetToplevel then f:SetToplevel(false) end
     f:SetFrameStrata(native:GetFrameStrata() or "MEDIUM")
     local top = native:GetFrameLevel() or 0
@@ -211,14 +196,14 @@ end
 -- d'une colonne absente : la geometrie et les niveaux sont donc les seuls temoins utiles.
 -- `ordRelTabs` est une TABLE de boutons, pas un cadre - une ligne de diagnostic qui l'a pris pour un
 -- cadre a casse l'attache le 2026-09-19. Une trace ne doit jamais faire tomber ce qu'elle observe.
-local function traceAttach(self, native, tabInset)
+local function traceAttach(self, native)
     if not (COC.Trace and COC.Trace:IsOn()) then return end
     local f, page = self.frame, native.BookPage or native
     tr("attach fini : shown=%s alpha=%s parent=%s protege=%s", tostring(f:IsShown()),
        tostring(f:GetAlpha()), tostring(f:GetParent() and f:GetParent():GetName()),
        tostring(f:IsProtected()))
-    tr("attach geo : debord onglets=%d | col %dx%d a x=%d | niveaux col=%d natif=%d page=%d",
-       tabInset, (f:GetWidth() or 0), (f:GetHeight() or 0), (f:GetLeft() or -1),
+    tr("attach geo : col %dx%d a x=%d | niveaux col=%d natif=%d page=%d",
+       (f:GetWidth() or 0), (f:GetHeight() or 0), (f:GetLeft() or -1),
        (f:GetFrameLevel() or 0), (native:GetFrameLevel() or 0),
        (page.GetFrameLevel and page:GetFrameLevel() or -1))
     local tabs, nb = self.ordRelTabs, 0
@@ -236,11 +221,10 @@ function PW:CamelotAttach(native)
     end
     self:Build()
     stripChrome(self.frame)
-    local colW     = sizeColumn(self)
-    local tabInset = sideTabInset(native)
-    widenHost(native, colW, tabInset)
-    dockColumn(self, native, tabInset)
-    traceAttach(self, native, tabInset)
+    local colW = sizeColumn(self)
+    widenHost(native, colW)
+    dockColumn(self, native)
+    traceAttach(self, native)
     self:Refresh()
 end
 
