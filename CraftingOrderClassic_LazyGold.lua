@@ -4,12 +4,23 @@
 -- réactifs, profit net — en réutilisant les prix que Lazy Gold calcule (via Auctionator + prix
 -- vendeur). On ne réimplémente PAS la collecte de prix : on lit sa primitive publique.
 --
--- DÉPENDANCE MOLLE : COC reste autonome. Si Lazy Gold (ou Auctionator) n'est pas là, IsAvailable()
--- est faux et la section « Rentabilité » ne s'affiche pas — aucun plantage. On lit UNE fonction
--- publique (LazyGold:GetItemCost), jamais l'UI ni les tables internes de LG.
+-- DÉPENDANCE MOLLE : COC reste autonome. Si aucun oracle de prix n'est là, IsAvailable() est faux et
+-- la section « Rentabilité » ne s'affiche pas — aucun plantage. On lit UNE fonction publique, jamais
+-- l'UI ni les tables internes des addons lus.
 --
--- PRIMITIVE LUE :
---   LazyGold:GetItemCost(itemID) -> cuivre (prix vendeur, sinon prix HV Auctionator), ou nil si inconnu.
+-- DEUX ORACLES, une seule façade. Lazy Gold Classic n'existe que sur Classic Era ; sur WoW: Forever
+-- (Camelot, API mainline) il n'y a qu'AUCTIONATOR, que Lazy Gold interroge d'ailleurs lui-même. On
+-- lit donc directement l'API publique versionnée d'Auctionator quand Lazy Gold manque — ce qui rend
+-- au portage Forever la rentabilité, le coût/point et le PLAN DE ROUTE, qui tous en dépendent.
+-- Lazy Gold garde la priorité là où il est : il connaît en plus une table de prix VENDEUR curée.
+--
+-- PRIMITIVES LUES :
+--   LazyGold:GetItemCost(itemID)                          -> cuivre (vendeur, sinon HV), nil si inconnu.
+--   Auctionator.API.v1.GetVendorPriceByItemID(id, itemID) -> prix d'ACHAT chez le PNJ, par unité,
+--       relevé à la visite d'un marchand à stock illimité (Source/CraftingInfo/Main.lua) — donc bien
+--       un coût d'approvisionnement, pas le prix de rachat. nil tant qu'aucun marchand n'a été vu.
+--   Auctionator.API.v1.GetAuctionPriceByItemID(id, itemID) -> prix HV scanné, nil si jamais scanné.
+-- L'API d'Auctionator LÈVE (error) sur un callerID vide ou un argument mal typé : tout passe en pcall.
 --
 -- Le COÛT des réactifs et l'objet produit viennent de NOS données CraftLink (RecipeReagents/RecipeProduct),
 -- pas des tables de LG : on reste maître de la recette, LG ne sert QUE d'oracle de prix.
@@ -20,14 +31,51 @@ COC.LazyGold = LG
 
 local AH_CUT = 0.05   -- coupe de l'hôtel des ventes, comme Lazy Gold (5 %)
 
-function LG:IsAvailable()
-    return type(_G.LazyGold) == "table" and type(_G.LazyGold.GetItemCost) == "function"
+-- Nom d'appelant exigé par l'API d'Auctionator (elle lève sur une chaîne vide).
+local CALLER = "CraftingOrderClassic"
+
+local function lazyGold()
+    local lg = _G.LazyGold
+    return (type(lg) == "table" and type(lg.GetItemCost) == "function") and lg or nil
 end
 
--- Prix d'un objet en cuivre (vendeur ou HV), ou nil si Lazy Gold ne le connaît pas.
+local function auctionator()
+    local a = _G.Auctionator
+    local v1 = a and a.API and a.API.v1
+    return (type(v1) == "table" and type(v1.GetAuctionPriceByItemID) == "function") and v1 or nil
+end
+
+-- Un oracle de prix, quel qu'il soit, répond-il ?
+function LG:IsAvailable()
+    return (lazyGold() or auctionator()) and true or false
+end
+
+-- Quel oracle sert ? Rend le NOM D'AFFICHAGE de l'addon, parce que c'est à ça que ça sert : les
+-- libellés qui citaient « Lazy Gold » en dur mentaient sur Forever, où les prix viennent
+-- d'Auctionator. Un pied de fenêtre qui nomme la mauvaise source envoie chercher le problème au
+-- mauvais endroit le jour où un prix semble faux.
+function LG:PriceSource()
+    if lazyGold() then return "Lazy Gold" end
+    if auctionator() then return "Auctionator" end
+    return nil
+end
+
+-- Prix d'un objet en cuivre (vendeur ou HV), ou nil si aucun oracle ne le connaît.
+-- Ordre VENDEUR puis HV dans les deux chemins : un réactif vendu à prix fixe en ville ne doit
+-- jamais être valorisé au cours de l'HV, sinon toute la route se trompe de recette.
 function LG:ItemValue(itemID)
-    if not (itemID and self:IsAvailable()) then return nil end
-    local ok, price = pcall(_G.LazyGold.GetItemCost, _G.LazyGold, itemID)
+    if not itemID then return nil end
+    local lg = lazyGold()
+    if lg then
+        local ok, price = pcall(lg.GetItemCost, lg, itemID)
+        if ok and type(price) == "number" and price > 0 then return price end
+        return nil
+    end
+    local v1 = auctionator()
+    if not v1 then return nil end
+    local ok, price = pcall(v1.GetVendorPriceByItemID, CALLER, itemID)
+    if ok and type(price) == "number" and price > 0 then return price end
+    ok, price = pcall(v1.GetAuctionPriceByItemID, CALLER, itemID)
     if ok and type(price) == "number" and price > 0 then return price end
     return nil
 end
@@ -36,9 +84,75 @@ end
 -- vendeur par unité — celle que GetItemCost consulte en premier). Sert à la bourse d'artisan : un
 -- composant vendeur ne vaut pas d'être fourni, l'artisan l'achètera en ville (retour user
 -- 2026-07-19 : Coarse Thread / Red Dye encombraient la grille).
+-- Auctionator répond à la même question, mais seulement pour les marchands DÉJÀ VISITÉS : sa réponse
+-- est donc sûre quand elle est positive, muette sinon. On ne comble pas ce trou par une devinette —
+-- au pire un composant vendeur reste dans la grille, ce qui est l'état d'avant la feature.
 function LG:IsVendorItem(itemID)
-    local t = self:IsAvailable() and _G.LazyGold.VENDOR_ITEMS
-    return (type(t) == "table" and itemID and t[itemID]) and true or false
+    if not itemID then return false end
+    local lg = lazyGold()
+    if lg then
+        local t = lg.VENDOR_ITEMS
+        return (type(t) == "table" and t[itemID]) and true or false
+    end
+    local v1 = auctionator()
+    if not v1 then return false end
+    local ok, price = pcall(v1.GetVendorPriceByItemID, CALLER, itemID)
+    return (ok and type(price) == "number" and price > 0) and true or false
+end
+
+-- ---------------------------------------------------------------------------
+-- Diagnostic « /co pricedump »
+-- ---------------------------------------------------------------------------
+-- Pourquoi ça existe. Une route dont tous les coûts valent 0 et qui s'affiche « partielle » a
+-- DEUX causes indiscernables à l'œil : l'oracle ne répond pas (mauvais addon, base non initialisée,
+-- API renommée), ou il répond honnêtement que l'hôtel des ventes ne connaît pas ces objets (serveur
+-- jeune, rien en vente). La première est un bug chez nous, la seconde n'en est pas un — et rien à
+-- l'écran ne les sépare. Cette sortie console les sépare en une ligne. Texte technique non
+-- localisé, comme /co lvldump.
+local function dumpItem(itemID)
+    local nm = COC.Api and COC.Api.GetItemInfo and COC.Api.GetItemInfo(itemID)
+    local v1 = auctionator()
+    local vend, ah
+    if v1 then
+        local ok, p2 = pcall(v1.GetVendorPriceByItemID, CALLER, itemID); vend = ok and p2 or nil
+        local ok2, p3 = pcall(v1.GetAuctionPriceByItemID, CALLER, itemID); ah = ok2 and p3 or nil
+    end
+    print(string.format("  %-28s id=%-7d vendeur=%-12s HV=%-12s -> %s",
+        tostring(nm or "?"), itemID,
+        vend and COC.Api.Coin(vend) or "nil", ah and COC.Api.Coin(ah) or "nil",
+        LG:ItemValue(itemID) and COC.Api.Coin(LG:ItemValue(itemID)) or "AUCUN PRIX"))
+end
+
+-- Réactifs DISTINCTS du métier ouvert, dans l'ordre des recettes, plafonnés (la console n'est pas
+-- un rapport) — ce sont exactement les objets dont dépend le coût de la route.
+local function openProfReagents(limit)
+    local lib = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
+    local prof = COC.Craft and COC.Craft:OpenProfessionKey()
+    if not (lib and prof and lib.GetRecipes) then return nil, prof end
+    local seen, out = {}, {}
+    for _, sid in ipairs(lib:GetRecipes(prof) or {}) do
+        for _, r in ipairs((lib.RecipeReagents and lib:RecipeReagents(prof, sid)) or {}) do
+            if r[1] and not seen[r[1]] then
+                seen[r[1]] = true; out[#out + 1] = r[1]
+                if #out >= limit then return out, prof end
+            end
+        end
+    end
+    return out, prof
+end
+
+function LG:PriceDump(arg)
+    local src = self:PriceSource()
+    local v1 = auctionator()
+    print("|cFF33DD88COC|r pricedump — oracle=" .. tostring(src or "AUCUN")
+        .. " | Auctionator.API=" .. tostring(v1 ~= nil)
+        .. " | base de prix=" .. tostring(v1 ~= nil and _G.Auctionator.Database ~= nil))
+    local id = tonumber(arg) or (type(arg) == "string" and tonumber(arg:match("|Hitem:(%d+)"))) or nil
+    if id then return dumpItem(id) end
+    local ids, prof = openProfReagents(12)
+    if not ids then print("  aucun métier ouvert (prof=" .. tostring(prof) .. ") — donne un itemID ou un lien d'objet") return end
+    print("  réactifs de " .. tostring(prof) .. " :")
+    for _, itemID in ipairs(ids) do dumpItem(itemID) end
 end
 
 -- Icônes NATIVES (textures du jeu, pas de fichier à embarquer). L'étoile « toast-star » marque les
@@ -84,7 +198,7 @@ function LG:SetExactMode(on) if COC.db then COC.db.lgExactProfit = on and true o
 -- deux modes (cf. ProfitTier) : la liste ne sert qu'à repérer ce qui rapporte.
 function LG:ProfitText(copper)
     if not copper or copper <= 0 then return "" end
-    if self:ExactMode() then return GetCoinTextureString(copper) end
+    if self:ExactMode() then return COC.Api.Coin(copper) end
     return self:CoinTier(copper)
 end
 
@@ -93,7 +207,7 @@ end
 function LG:Money(copper, colored)
     copper = math.floor((copper or 0) + 0.5)
     local sign = copper < 0 and "-" or "+"
-    local body = GetCoinTextureString and GetCoinTextureString(math.abs(copper)) or tostring(math.abs(copper))
+    local body = COC.Api.Coin and COC.Api.Coin(math.abs(copper)) or tostring(math.abs(copper))
     local txt = sign .. body
     if not colored then return txt end
     local c = copper < 0 and "|cFFFF5555" or (copper > 0 and "|cFF33DD33" or "|cFF888888")
@@ -337,7 +451,7 @@ if COC.ProfWindow and COC.ProfWindow.RegisterInfoSection then
         return {
             title = L["Rentabilité"],
             lines = {
-                { label = sellLbl,        value = GetCoinTextureString(p.sell) },
+                { label = sellLbl,        value = COC.Api.Coin(p.sell) },
                 { label = L["Réactifs"],  value = costVal },
                 { label = L["Profit net"], value = LG:Money(p.profit, true) },
             },

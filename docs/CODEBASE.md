@@ -10,8 +10,8 @@
 
 | Fichier | Rôle | Lignes |
 |---|---|---|
-| `CraftingOrderClassic.lua` | Crafting Order - Classic — réseau GLOBAL et SOCIAL de commandes de craft. | 448 |
-| `CraftingOrderClassic_Compat.lua` | couche d'adaptation d'API entre les SAVEURS de client. | 215 |
+| `CraftingOrderClassic.lua` | Crafting Order - Classic — réseau GLOBAL et SOCIAL de commandes de craft. | 471 |
+| `CraftingOrderClassic_Compat.lua` | couche d'adaptation d'API entre les SAVEURS de client. | 235 |
 | `CraftingOrderClassic_Trace.lua` | trace réseau PERSISTÉE, lisible hors-jeu. | 79 |
 | `CraftingOrderClassic_Migrations.lua` | versionnage du schéma SavedVariables. | 40 |
 | `CraftingOrderClassic_Locale.lua` | socle de localisation du CHROME de l'UI. | 12 |
@@ -48,7 +48,7 @@
 | `CraftingOrderClassic_UI_Artisans.lua` | onglet « Artisans » : annuaire social. | 443 |
 | `CraftingOrderClassic_UI_Artisans_Groups.lua` | fusion « une ligne par JOUEUR » (rerolls). | 207 |
 | `CraftingOrderClassic_UI_Artisans_Icons.lua` | onglet « Artisans » : tout ce qui est ICÔNE de métier. | 190 |
-| `CraftingOrderClassic_UI_Artisans_Needs.lua` | la « BOURSE d'artisan » de l'onglet Artisans : pour un artisan du roster (partenaire, guildie, ami…), la LISTE DE COURSES des fournitures qu'il lui faut pour monter ses métiers — mats agrégés de SA route de progression (COC.Route, calculée 100 % en LOCAL depuis son rang SK diffusé + ses recettes décodées du bitfield RK ; prix Lazy Gold locaux, valables serveur entier). | 358 |
+| `CraftingOrderClassic_UI_Artisans_Needs.lua` | la « BOURSE d'artisan » de l'onglet Artisans : pour un artisan du roster (partenaire, guildie, ami…), la LISTE DE COURSES des fournitures qu'il lui faut pour monter ses métiers — mats agrégés de SA route de progression (COC.Route, calculée 100 % en LOCAL depuis son rang SK diffusé + ses recettes décodées du bitfield RK ; prix Lazy Gold locaux, valables serveur entier). | 359 |
 | `CraftingOrderClassic_UI_Artisans_Muted.lua` | panel « En sourdine » de l'onglet Artisans. | 86 |
 | `CraftingOrderClassic_UI_MyArtisans_Layout.lua` | GÉOMÉTRIE de l'onglet « Mes artisans ». | 57 |
 | `CraftingOrderClassic_UI_MyArtisans.lua` | onglet « Mes artisans » : vue agrégée des métiers du COMPTE (tous mes rerolls du royaume), en mode « connu ». | 484 |
@@ -68,8 +68,8 @@
 | `CraftingOrderClassic_RecipeCats_Gathering.lua` | sous-catégories des métiers de RÉCOLTE. | 179 |
 | `CraftingOrderClassic_RecipeCats_Smelting.lua` | sous-catégorie « Lingots » du Minage (facette FONTE). | 39 |
 | `CraftingOrderClassic_RecipeCats_Enchanting.lua` | sous-catégories de l'ENCHANTEMENT. | 52 |
-| `CraftingOrderClassic_Craft.lua` | socle de lecture LIVE de la fenêtre métier (migration de la fenêtre custom depuis Guild Economy / TradeScanner_Craft.lua). | 230 |
-| `CraftingOrderClassic_Craft_Mainline.lua` | 3ᵉ backend de lecture de la fenêtre métier, pour les clients MAINLINE/Retail (WoW: Forever / Camelot, interface 16001). | 203 |
+| `CraftingOrderClassic_Craft.lua` | socle de lecture LIVE de la fenêtre métier (migration de la fenêtre custom depuis Guild Economy / TradeScanner_Craft.lua). | 235 |
+| `CraftingOrderClassic_Craft_Mainline.lua` | 3ᵉ backend de lecture de la fenêtre métier, pour les clients MAINLINE/Retail (WoW: Forever / Camelot, interface 16001). | 213 |
 | `CraftingOrderClassic_Enchant.lua` | spécifique à l'Enchantement (API Craft). | 385 |
 | `CraftingOrderClassic_Stats.lua` | STATS d'un objet : identité canonique + libellé localisé. | 366 |
 | `CraftingOrderClassic_Stats_Filter.lua` | sélecteur « ne montrer que ce qui donne <stat> ». | 103 |
@@ -86,11 +86,11 @@
 | `CraftingOrderClassic_ProfWindow_Recipes.lua` | colonne GAUCHE : liste de recettes virtualisée (scroll), recherche, couleur par difficulté, sélection, badge « demandé » (nb de commandes ouvertes pour l'objet). | 486 |
 | `CraftingOrderClassic_ProfWindow_Leveling.lua` | aide à la MONTÉE DE MÉTIER dans la liste de recettes : coût de progression (réactifs au prix Lazy Gold ÷ chance de point selon la couleur), badge « meilleur coût/point » sur la recette recommandée, icônes de SOURCE sur les manquantes (formateur / vendeur PNJ / coté à l'HV / à farmer) et tri « progression » affiné par coût. | 219 |
 | `CraftingOrderClassic_Route.lua` | cœur de CALCUL du plan de route de montée de métier, PARAMÉTRABLE : marche gloutonne rang par rang (recette au meilleur coût/point ESPÉRÉ), seuils réels CraftLink `skillColors` aux rangs futurs, amortissement du prix des plans à acheter, exclusion des recettes à cooldown et des coûts partiels. | 323 |
-| `CraftingOrderClassic_ProfWindow_Route.lua` | fenêtre « PLAN DE ROUTE » de montée de métier (étage ③ de l'aide à la progression) : « du rang actuel au plafond, quoi crafter, combien de fois, pour combien ». | 400 |
+| `CraftingOrderClassic_ProfWindow_Route.lua` | fenêtre « PLAN DE ROUTE » de montée de métier (étage ③ de l'aide à la progression) : « du rang actuel au plafond, quoi crafter, combien de fois, pour combien ». | 456 |
 | `CraftingOrderClassic_ProfWindow_Detail.lua` | colonne CENTRE : détail de la recette sélectionnée (icône, réactifs have/need) + boutons Créer / Créer tout. | 418 |
 | `CraftingOrderClassic_ProfWindow_Info.lua` | PANNEAU D'INFO en SECTIONS pour la colonne centrale de la vue métier. | 203 |
-| `CraftingOrderClassic_LazyGold.lua` | pont LECTURE SEULE vers l'addon « Lazy Gold Classic » (LG). | 346 |
-| `CraftingOrderClassic_ProfWindow_Orders.lua` | colonne « Commandes » de la vue métier (cabine de l'artisan) : construction (onglets de relation, en-tête, scroll), vue LISTE (une ligne par commande : demandeur + prix + âge ; une ligne sourdine cliquée se réaffiche), collecte/tri et rafraîchissement. | 398 |
+| `CraftingOrderClassic_LazyGold.lua` | pont LECTURE SEULE vers l'addon « Lazy Gold Classic » (LG). | 460 |
+| `CraftingOrderClassic_ProfWindow_Orders.lua` | colonne « Commandes » de la vue métier (cabine de l'artisan) : construction (onglets de relation, en-tête, scroll), vue LISTE (une ligne par commande : demandeur + prix + âge ; une ligne sourdine cliquée se réaffiche), collecte/tri et rafraîchissement. | 402 |
 | `CraftingOrderClassic_ProfWindow_Orders_Card.lua` | vue SÉLECTIONNÉE de la colonne « Commandes » : la carte complète d'une commande (composants fournis, repères Lazy Gold, ACCEPTER / REFUSER / CHUCHOTER ; croix en haut à droite = retour liste). | 255 |
 | `CraftingOrderClassic_ProfWindow_LFW.lua` | config de l'OFFRE « recherche de travail » par métier. | 327 |
 | `CraftingOrderClassic_ProfWindow_Reroll.lua` | vue métier LECTURE SEULE d'un REROLL. | 118 |
@@ -546,7 +546,7 @@
 > NB : la lib CraftLink charge AVANT COC et ne peut donc pas s'appuyer là-dessus — elle résout
 > ses propres appels chez elle.
 
-**API** : `A.GetSpellName(spellID)` · `A.GetBNetFriend(index)` · `A.GetNumQuestLogEntries()` · `A.GetQuestLogTitle(index)` · `A.GetQuestSelection()` · `A.RestoreQuestSelection(token)` · `A.SelectQuestLogEntry(index)` · `A.RegisterEventSafe(frame, event)` · `A.HookScriptSafe(frame, script, handler)` · `A.RegisterEventsSafe(frame, events)` · `A.TitleFontString(frame)` · `A.PortraitTexture(frame)` · `A.ChatMessagingBlocked()` · `A.CloseProfession()`
+**API** : `A.GetSpellName(spellID)` · `A.GetBNetFriend(index)` · `A.Coin(copper, fontHeight)` · `A.GetNumQuestLogEntries()` · `A.GetQuestLogTitle(index)` · `A.GetQuestSelection()` · `A.RestoreQuestSelection(token)` · `A.SelectQuestLogEntry(index)` · `A.RegisterEventSafe(frame, event)` · `A.HookScriptSafe(frame, script, handler)` · `A.RegisterEventsSafe(frame, events)` · `A.TitleFontString(frame)` · `A.PortraitTexture(frame)` · `A.ChatMessagingBlocked()` · `A.CloseProfession()`
 
 ### `CraftingOrderClassic_Trace.lua`
 > CraftingOrderClassic_Trace.lua — trace réseau PERSISTÉE, lisible hors-jeu.
@@ -1510,17 +1510,28 @@
 > réactifs, profit net — en réutilisant les prix que Lazy Gold calcule (via Auctionator + prix
 > vendeur). On ne réimplémente PAS la collecte de prix : on lit sa primitive publique.
 > 
-> DÉPENDANCE MOLLE : COC reste autonome. Si Lazy Gold (ou Auctionator) n'est pas là, IsAvailable()
-> est faux et la section « Rentabilité » ne s'affiche pas — aucun plantage. On lit UNE fonction
-> publique (LazyGold:GetItemCost), jamais l'UI ni les tables internes de LG.
+> DÉPENDANCE MOLLE : COC reste autonome. Si aucun oracle de prix n'est là, IsAvailable() est faux et
+> la section « Rentabilité » ne s'affiche pas — aucun plantage. On lit UNE fonction publique, jamais
+> l'UI ni les tables internes des addons lus.
 > 
-> PRIMITIVE LUE :
->   LazyGold:GetItemCost(itemID) -> cuivre (prix vendeur, sinon prix HV Auctionator), ou nil si inconnu.
+> DEUX ORACLES, une seule façade. Lazy Gold Classic n'existe que sur Classic Era ; sur WoW: Forever
+> (Camelot, API mainline) il n'y a qu'AUCTIONATOR, que Lazy Gold interroge d'ailleurs lui-même. On
+> lit donc directement l'API publique versionnée d'Auctionator quand Lazy Gold manque — ce qui rend
+> au portage Forever la rentabilité, le coût/point et le PLAN DE ROUTE, qui tous en dépendent.
+> Lazy Gold garde la priorité là où il est : il connaît en plus une table de prix VENDEUR curée.
+> 
+> PRIMITIVES LUES :
+>   LazyGold:GetItemCost(itemID)                          -> cuivre (vendeur, sinon HV), nil si inconnu.
+>   Auctionator.API.v1.GetVendorPriceByItemID(id, itemID) -> prix d'ACHAT chez le PNJ, par unité,
+>       relevé à la visite d'un marchand à stock illimité (Source/CraftingInfo/Main.lua) — donc bien
+>       un coût d'approvisionnement, pas le prix de rachat. nil tant qu'aucun marchand n'a été vu.
+>   Auctionator.API.v1.GetAuctionPriceByItemID(id, itemID) -> prix HV scanné, nil si jamais scanné.
+> L'API d'Auctionator LÈVE (error) sur un callerID vide ou un argument mal typé : tout passe en pcall.
 > 
 > Le COÛT des réactifs et l'objet produit viennent de NOS données CraftLink (RecipeReagents/RecipeProduct),
 > pas des tables de LG : on reste maître de la recette, LG ne sert QUE d'oracle de prix.
 
-**API** : `LG:IsAvailable()` · `LG:ItemValue(itemID)` · `LG:IsVendorItem(itemID)` · `LG:CoinTier(copper)` · `LG:ProfitTier(copper)` · `LG:ExactMode()` · `LG:SetExactMode(on)` · `LG:ProfitText(copper)` · `LG:Money(copper, colored)` · `LG:CraftProfit(profKey, spellID, numMade)` · `LG:EntryProfit(profKey, entry)` · `LG:CraftCost(profKey, spellID)` · `LG:EntryCost(profKey, entry)` · `LG:BestPlanFor(profKey, rank)` · `LG:BestProfitFor(profKey, rank)` · `LG:PlanName(profKey, plan)` · `LG:BestPlanName(profKey, rank)` · `LG:BestKnownPlanFor(profKey, r)` · `LG:MinProfit()` · `LG:HighlightTier(profit)`
+**API** : `LG:IsAvailable()` · `LG:PriceSource()` · `LG:ItemValue(itemID)` · `LG:IsVendorItem(itemID)` · `LG:PriceDump(arg)` · `LG:CoinTier(copper)` · `LG:ProfitTier(copper)` · `LG:ExactMode()` · `LG:SetExactMode(on)` · `LG:ProfitText(copper)` · `LG:Money(copper, colored)` · `LG:CraftProfit(profKey, spellID, numMade)` · `LG:EntryProfit(profKey, entry)` · `LG:CraftCost(profKey, spellID)` · `LG:EntryCost(profKey, entry)` · `LG:BestPlanFor(profKey, rank)` · `LG:BestProfitFor(profKey, rank)` · `LG:PlanName(profKey, plan)` · `LG:BestPlanName(profKey, rank)` · `LG:BestKnownPlanFor(profKey, r)` · `LG:MinProfit()` · `LG:HighlightTier(profit)`
 
 ### `CraftingOrderClassic_ProfWindow_Orders.lua`
 > CraftingOrderClassic_ProfWindow_Orders.lua — colonne « Commandes » de la vue métier (cabine de

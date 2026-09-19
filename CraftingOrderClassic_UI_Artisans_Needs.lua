@@ -157,7 +157,8 @@ function UI:_BuildNeedsWin()
     f.chk = chk
     local cav = inset:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
     cav:SetPoint("BOTTOMLEFT", 10, 7); cav:SetPoint("BOTTOMRIGHT", -10, 7); cav:SetJustifyH("LEFT")
-    cav:SetText(L["Estimation : chance de point par couleur, prix du dernier scan HV (Lazy Gold)."])
+    cav:SetText(string.format(L["Estimation : chance de point par couleur, prix du dernier scan HV (%s)."],
+        (COC.LazyGold and COC.LazyGold:PriceSource()) or "Auctionator"))
     self.needsWin = f
     return f
 end
@@ -191,7 +192,7 @@ local function slotTooltip(s)
     -- Repli nom via Skin.TipItem : un objet pas encore en cache rendait un tooltip vide.
     Skin.TipItem(GameTooltip, s.tipItemID, s.tipItemID and itemName(s.tipItemID) or "?")
     local total = s.tipCost and (s.tipCost * (s.tipPlan and 1 or (s.tipQty or 1)))
-    local cost = total and (" — ~" .. GetCoinTextureString(math.floor(total + 0.5))) or ""
+    local cost = total and (" — ~" .. COC.Api.Coin(math.floor(total + 0.5))) or ""
     GameTooltip:AddLine(string.format(L["Requis : ×%d"], s.tipQty or 1) .. cost, 0.60, 0.75, 0.91)
     if s.tipPlan then GameTooltip:AddLine(L["Plan à fournir (il ne le connaît pas encore)"], 0.91, 0.72, 0.29) end
     -- Composant de DÉSENCHANTEMENT : dire QUELS objets détruire pour l'obtenir (table curatée lib
@@ -250,7 +251,7 @@ end
 function UI:_NeedsPlanLines(f, used, y, profKey, plans)
     local M = COC.MTSL
     for _, pl in ipairs(plans) do
-        local price = (pl.price or 0) > 0 and (" — " .. GetCoinTextureString(pl.price)) or ""
+        local price = (pl.price or 0) > 0 and (" — " .. COC.Api.Coin(pl.price)) or ""
         local txt
         if pl.trainer then
             txt = "|cFF88CCFF" .. string.format(L["Au formateur : %s"], recipeName(pl.sid)) .. price .. "|r"
@@ -304,7 +305,7 @@ function UI:_FillNeedsProf(f, used, y, p)
     used.head = used.head + 1
     local h = f.heads[used.head]
     if not h then h = f.content:CreateFontString(nil, "OVERLAY", "GameFontNormal"); f.heads[used.head] = h end
-    local total = GetCoinTextureString(math.floor((route.mats or 0) + (route.plans or 0) + 0.5))
+    local total = COC.Api.Coin(math.floor((route.mats or 0) + (route.plans or 0) + 0.5))
     h:SetText(string.format("|T%s:14:14|t |cFFE8B84B%s|r  |cFF9AC0E8%d|r%s|cFF9AC0E8%d|r  %s",
         Skin.ProfIcon(p.key) or "Interface\\Icons\\INV_Misc_QuestionMark", Skin.ProfLabel(p.key),
         route.rank, ARROW, route.target,

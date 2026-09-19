@@ -157,6 +157,9 @@ function PW:_BuildOrders(col)
         GameTooltip:Show()
     end)
     lvl:SetScript("OnLeave", GameTooltip_Hide)
+    -- Accès au Plan de route pour les modes sans colonne Recettes (dock Era, greffe Forever), sous
+    -- garde nil : _ProfWindow_Route est une dépendance molle, son absence ne doit rien casser ici.
+    if self._BuildDockRouteBtn then self:_BuildDockRouteBtn(bz) end
     self.ordLevelBtn = lvl
     local scroll = CreateFrame("ScrollFrame", "CraftingOrderProfWinOrdScroll", bz, "UIPanelScrollFrameTemplate")
     scroll:SetPoint("TOPLEFT", 6, -26); scroll:SetPoint("BOTTOMRIGHT", -24, 0)
@@ -352,6 +355,7 @@ end
 
 function PW:RefreshOrders()
     if not self.ordContent then return end
+    if self._SyncDockRouteBtn then self:_SyncDockRouteBtn() end   -- soft-dep (_ProfWindow_Route)
     self._ordDiffMap = nil   -- couleurs de difficulté re-lues à chaque refresh (un skill-up les change)
     local list, pending, accepted, mutedN, canalN = self:_CollectOrders()
     -- Badge de l'onglet Entrantes : « Entrantes (2) » dès qu'il y a du chat capté pour ce métier —

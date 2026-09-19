@@ -21,7 +21,25 @@ local ARROW = "|TInterface\\ChatFrame\\ChatFrameExpandArrow:12:12|t"
 -- courant (les seuils Wowhead basculent à ±1 rang des couleurs réelles — dump user 2026-07-18,
 -- 4 recettes au rang pile sur un seuil ; les seuils data ne projettent que les rangs FUTURS),
 -- recettes apprises de la fenêtre native, plans achetables INCLUS. Calcul : COC.Route.
+-- La route se nourrit de `self.recipes` — rempli par `_DoRefresh` en VUE PLEINE, donc par la colonne
+-- Recettes. Or cette colonne n'existe pas dans les modes où la fenêtre de recettes est celle du JEU :
+-- le dock « Vue Blizzard » de l'Era, et la colonne greffée de WoW: Forever. Sans recettes, `known`
+-- ressort vide et la route croit devoir ACHETER chaque plan que le perso connaît déjà.
+-- On lit donc la session ouverte nous-mêmes dans ces modes. Cache court : `_SyncRouteBtn` re-remplit
+-- la fenêtre ouverte à la seconde, et `ReadRecipes` interroge le client recette par recette.
+local DOCK_RECIPES_TTL = 5
+function PW:_EnsureRecipesForRoute()
+    if not (self._compact or self.docked) then return end
+    local now = (GetTime and GetTime()) or 0
+    if self.recipes and #self.recipes > 0 and (now - (self._dockRecipesAt or 0)) < DOCK_RECIPES_TTL then return end
+    local craft = COC.Craft
+    if not (craft and craft:GetOpenProfessionInfo()) then return end
+    self.recipes = craft:ReadRecipes() or {}
+    self._dockRecipesAt = now
+end
+
 function PW:_ComputeRoute()
+    self:_EnsureRecipesForRoute()
     -- ⚠️ PAS de `X and X:f()` en assignation multiple : `and` TRONQUE le multi-retour (maxRank perdu
     -- → la route s'arrêtait au prochain palier CAPS au lieu du vrai plafond entraîné).
     local rank, maxRank
@@ -72,9 +90,9 @@ local function segTooltip(row)
         GameTooltip:AddLine(L["Aucune recette calculable sur ce segment (prix HV manquants, ou plans introuvables)."], 0.8, 0.8, 0.8, true)
     else
         GameTooltip:AddLine(string.format(L["Crafts attendus : ~%d"], math.ceil(s.crafts - 0.001)), 0.60, 0.75, 0.91)
-        GameTooltip:AddLine(L["Réactifs (espéré)"] .. " : " .. GetCoinTextureString(math.floor(s.cost + 0.5)), 0.60, 0.75, 0.91)
+        GameTooltip:AddLine(L["Réactifs (espéré)"] .. " : " .. COC.Api.Coin(math.floor(s.cost + 0.5)), 0.60, 0.75, 0.91)
         if (s.plan or 0) > 0 then
-            GameTooltip:AddLine(L["Plan à acheter"] .. " : " .. GetCoinTextureString(s.plan), 0.91, 0.72, 0.29)
+            GameTooltip:AddLine(L["Plan à acheter"] .. " : " .. COC.Api.Coin(s.plan), 0.91, 0.72, 0.29)
         end
         if s.partial then
             GameTooltip:AddLine(L["Coût partiel : au moins un réactif sans prix HV."], 0.8, 0.8, 0.8, true)
@@ -133,7 +151,8 @@ function PW:_BuildRouteWin()
     f.chk = chk
     local cav = inset:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
     cav:SetPoint("BOTTOMLEFT", 10, 7); cav:SetPoint("BOTTOMRIGHT", -10, 7); cav:SetJustifyH("LEFT")
-    cav:SetText(L["Estimation : chance de point par couleur, prix du dernier scan HV (Lazy Gold)."])
+    cav:SetText(string.format(L["Estimation : chance de point par couleur, prix du dernier scan HV (%s)."],
+        (COC.LazyGold and COC.LazyGold:PriceSource()) or "Auctionator"))
     -- Aide contextuelle « bouton i » (même mécanisme que la fenêtre principale ; soft-dep HelpPlate).
     if HelpPlate then
         f.helpBtn = Skin.MakeHelpButton(f, function() PW:_ToggleRouteHelp() end, {
@@ -194,7 +213,7 @@ local function fillSegRow(row, s)
         local plan = (s.plan or 0) > 0 and "|TInterface\\Icons\\INV_Scroll_03:12:12|t " or ""
         row.name:SetText(plan .. segName(s.sid, s.prod)
             .. string.format(" |cFFAAAAAA×~%d|r", math.ceil(s.crafts - 0.001)))
-        row.cost:SetText(GetCoinTextureString(math.floor(s.cost + (s.plan or 0) + 0.5))
+        row.cost:SetText(COC.Api.Coin(math.floor(s.cost + (s.plan or 0) + 0.5))
             .. (s.partial and " |cFF888888(?)|r" or ""))   -- coût partiel : réactif sans prix HV
     end
     row:Show()
@@ -266,7 +285,7 @@ function PW:_FillRoute()
     end
     local hasGap = false
     for _, s in ipairs(segs) do if s.gap then hasGap = true; break end end
-    local total = GetCoinTextureString(math.floor(route.mats + route.plans + 0.5))
+    local total = COC.Api.Coin(math.floor(route.mats + route.plans + 0.5))
     -- « > » (ASCII, le ≥ risque le tofu) : trous OU coûts partiels → le total est un plancher.
     f.sub:SetText(string.format(L["Total estimé : %s"], ((hasGap or route.partial) and "> " or "") .. total))
     f.msg:SetShown(#segs == 0)
@@ -332,7 +351,7 @@ function PW:_FillRouteGateway(f, used, y, route)
     y = U:_NeedsTextLine(f, used, y + 8, "|cFFE8B84B" .. L["Débloquer le palier suivant"] .. "|r")
     if g then
         local nm = (g.item and COC.Api.GetItemInfo and COC.Api.GetItemInfo(g.item)) or g.name or L["Livre de rang"]
-        local price = (g.price and g.price > 0) and (" — " .. GetCoinTextureString(g.price)) or ""
+        local price = (g.price and g.price > 0) and (" — " .. COC.Api.Coin(g.price)) or ""
         y = U:_NeedsTextLine(f, used, y, "|TInterface\\Icons\\INV_Scroll_03:12:12|t |cFFEEDD88"
             .. string.format(L["À apprendre : %s"], nm) .. price .. "|r")
         local M, npc = COC.MTSL, nil
@@ -372,6 +391,43 @@ function PW:_BuildRouteBtn(tz)
     map:SetTexture("Interface\\Icons\\INV_Misc_Map_01"); map:SetSize(15, 15)
     map:SetTexCoord(0.07, 0.93, 0.07, 0.93); map:SetPoint("CENTER"); b.map = map
     self.recRouteBtn = b
+end
+
+-- Deuxième point d'entrée, pour les modes SANS colonne Recettes (dock « Vue Blizzard » de l'Era et
+-- colonne greffée de Forever) : le bouton carte de la barre d'outils n'y existe pas, et la feature
+-- devenait inatteignable — c'est ce qui l'avait fait disparaître du portage Forever. Même icône, même
+-- infobulle, même action : une seule feature, deux accès selon qui dessine la liste de recettes.
+-- Posé dans l'en-tête de la colonne Commandes, à gauche du tri « progression d'abord ».
+function PW:_BuildDockRouteBtn(bz)
+    local b = Skin.MakeIconButton(bz, 16, "Interface\\Icons\\INV_Misc_Map_01")
+    b:SetPoint("TOPRIGHT", -26, -5)
+    b:SetScript("OnClick", function() PW:ToggleRoute() end)
+    b:SetScript("OnEnter", function(s)
+        GameTooltip:SetOwner(s, "ANCHOR_BOTTOMLEFT")
+        GameTooltip:SetText(L["Plan de route : quoi crafter pour monter au moins cher."], 1, 1, 1, 1, true)
+        GameTooltip:Show()
+    end)
+    b:SetScript("OnLeave", GameTooltip_Hide)
+    b:Hide()
+    self.ordRouteBtn = b
+end
+
+-- Visible seulement quand la colonne Recettes est absente ET qu'une session de métier est ouverte :
+-- sans rang courant la route n'a rien à calculer (vue compacte d'un métier de récolte, vue reroll
+-- d'un perso hors ligne). Appelé par RefreshOrders, qui tourne dans TOUS les modes.
+function PW:_SyncDockRouteBtn()
+    local b = self.ordRouteBtn
+    if not b then return end
+    local craft = COC.Craft
+    local show = (self._compact or self.docked) and self.profKey and not self.rerollKey
+        and craft and craft:GetOpenProfessionInfo() ~= nil
+    b:SetShown(show and true or false)
+    if not show then return end
+    local ok = COC.LazyGold and COC.LazyGold:IsAvailable()
+    local active = (self.routeWin and self.routeWin:IsShown()) and true or false
+    b:SetSelected(active)
+    b.icon:SetDesaturated((ok and not active) and true or false)
+    self:_SyncRouteBtn()   -- suivi live de la fenêtre ouverte (le bouton de la barre reste nil ici)
 end
 
 -- État du bouton (appelé par _SyncSortHeader à chaque refresh) : masqué en reroll ; coloré si Lazy

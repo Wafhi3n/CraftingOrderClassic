@@ -219,7 +219,13 @@ function COC:MissingAddon(displayName)
     }
     StaticPopup_Show("COC_MISSING_ADDON")
 end
-function COC:NeedLazyGold() self:MissingAddon("Lazy Gold Classic") end
+-- L'oracle de prix n'est pas le même selon la saveur : Lazy Gold Classic n'existe QUE sur Classic
+-- Era, et sur WoW: Forever c'est Auctionator qui tient ce rôle (cf. _LazyGold.lua). Conseiller un
+-- addon introuvable sur le client du joueur, c'est envoyer dans le mur.
+function COC:NeedLazyGold()
+    local mainline = COC.Api and COC.Api.IS_MAINLINE
+    self:MissingAddon(mainline and "Auctionator" or "Lazy Gold Classic")
+end
 function COC:NeedMTSL()     self:MissingAddon("Missing Trade Skills List") end
 
 -- Balise TEXTE de découverte. À n'appeler QUE depuis une action joueur (hardware event) — sinon
@@ -307,6 +313,25 @@ function COC:Help()
     print("  |cFFFFFFFF/co gwroster|r — |cFFFF8800" .. L["diag"] .. "|r : " .. L["confédérés GreenWall repérés (SoD live only)"])
 end
 
+-- Sous-commandes de DIAGNOSTIC : sorties console techniques, non localisées, absentes de l'aide.
+-- Groupées à part parce qu'elles n'ont pas la même durée de vie que les commandes de l'addon — et
+-- pour garder le dispatch principal sous le seuil anti-monolithe. Rend true si la commande était
+-- d'ici : l'appelant n'a alors plus rien à faire.
+local function diagCmd(cmd, rest)
+    if cmd == "socialdiag" or cmd == "sdiag" then
+        if COC.Social then COC.Social:Diag(rest) end
+    elseif cmd == "trace" then
+        if COC.Trace then COC.Trace:Cmd(rest) end
+    elseif cmd == "lvldump" then
+        if COC.ProfWindow and COC.ProfWindow._LevelDump then COC.ProfWindow:_LevelDump() end
+    elseif cmd == "pricedump" then
+        if COC.LazyGold and COC.LazyGold.PriceDump then COC.LazyGold:PriceDump(rest) end
+    else
+        return false
+    end
+    return true
+end
+
 -- Dispatch des sous-commandes /co (extrait de OnEvent pour rester sous le seuil anti-monolithe).
 function COC:Slash(msg)
     local cmd, rest = (msg or ""):match("^%s*(%S*)%s*(.-)%s*$")
@@ -361,9 +386,7 @@ function COC:Slash(msg)
             COC.db.verbose = (not COC.db.verbose) or nil
             p(COC.db.verbose and COC.L["messages verbeux : activés"] or COC.L["messages verbeux : désactivés"])
         end
-    elseif cmd == "socialdiag" or cmd == "sdiag" then if COC.Social then COC.Social:Diag(rest) end
-    elseif cmd == "trace"  then if COC.Trace then COC.Trace:Cmd(rest) end
-    elseif cmd == "lvldump" then if COC.ProfWindow and COC.ProfWindow._LevelDump then COC.ProfWindow:_LevelDump() end
+    elseif diagCmd(cmd, rest) then    -- socialdiag / trace / lvldump / pricedump
     elseif cmd == "version" or cmd == "ver" then if D and D.VersionCmd then D:VersionCmd(rest) end
     elseif cmd == "help"   then COC:Help()
     else COC:Status() end
