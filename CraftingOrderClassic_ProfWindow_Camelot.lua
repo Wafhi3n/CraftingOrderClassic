@@ -115,7 +115,6 @@ function PW:CamelotAttach(native)
     self.frame:SetWidth(colW)
     if self._PlaceOrdTabs then self:_PlaceOrdTabs(true) end   -- re-poser à la largeur définitive
 
-    nativeBaseW = nativeBaseW or native:GetWidth()
     local fullW = nativeBaseW + colW + GAP * 2
     -- Élargir SANS toucher aux enfants de Blizzard : eux sont ancrés TOPLEFT, ils ne bougent pas.
     native:SetWidth(fullW)
@@ -276,6 +275,11 @@ local function wire()
     local native = _G.ProfessionsFrame
     if not native or native._cocWired then return end
     native._cocWired = true
+    -- Largeur d'origine capturée ICI, à la première vue du cadre, et PLUS dans l'attache. Quand elle
+    -- vivait dans l'attache, un combat qui faisait sauter celle-ci laissait la valeur vide : le
+    -- détachement suivant ne restaurait alors JAMAIS la largeur, et on se retrouvait avec un cadre
+    -- natif resté large et notre colonne repartie sur UIParent (relevé en jeu le 2026-09-19).
+    nativeBaseW = nativeBaseW or native:GetWidth()
     Api.HookScriptSafe(native, "OnShow", function(f) PW:CamelotAttach(f) end)
     Api.HookScriptSafe(native, "OnHide", function(f) PW:CamelotDetach(f) end)
     if native:IsShown() then PW:CamelotAttach(native) end
