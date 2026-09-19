@@ -138,102 +138,109 @@ regen:SetScript("OnEvent", function()
     if native:IsShown() then PW:CamelotAttach(native) else PW:CamelotDetach(native) end
 end)
 
-function PW:CamelotAttach(native)
-    tr("attach appele : native=%s combat=%s baseW=%s", tostring(native ~= nil),
-       tostring(lockedDown() and true or false), tostring(nativeBaseW))
-    if not native or lockedDown() then return end
-    -- La colonne n'a de sens que sur la PAGE DE METIER. Sur la page d'ENSEMBLE (les vignettes des
-    -- cinq metiers), il n'y a pas de metier courant : la colonne s'y dessine vide et, comme on
-    -- elargissait le cadre quand meme, on obtenait une bande vide a droite. Diagnostic du
-    -- 2026-09-19 : ce n'etait pas "la 1re ouverture echoue" mais "la page d'ensemble n'a rien a
-    -- afficher" -- au 2e clic on atterrit sur un metier, d'ou l'illusion. CraftingPage est le
-    -- signal sur : Blizzard la masque sur l'ensemble (cf. Blizzard_ProfessionsFrame.lua, l'onglet
-    -- recettes est declare AddNamedTab(..., self.CraftingPage)).
-    if native.CraftingPage and not native.CraftingPage:IsShown() then
-        tr("attach refuse : page d'ensemble affichee, pas de metier courant")
-        return self:CamelotDetach(native)
-    end
-    self:Build()
-    stripChrome(self.frame)
+-- La colonne n'a de sens que sur la PAGE DE METIER. Sur la page d'ENSEMBLE (les vignettes des
+-- metiers) il n'y a pas de metier courant : la colonne s'y dessine vide et, comme on elargissait le
+-- cadre quand meme, on obtenait une bande vide a droite. Diagnostic du 2026-09-19 : ce n'etait pas
+-- « la 1re ouverture echoue » mais « la page d'ensemble n'a rien a afficher » - au 2e clic on
+-- atterrit sur un metier, d'ou l'illusion. `CraftingPage` est le signal sur : Blizzard la masque sur
+-- l'ensemble (Blizzard_ProfessionsFrame.lua declare l'onglet recettes AddNamedTab(.., CraftingPage)).
+local function onRecipesPage(native)
+    return not native.CraftingPage or native.CraftingPage:IsShown()
+end
 
-    -- Mode dock : colonne Commandes seule (réutilise le layout compact, comme le dock extérieur).
+-- Largeur de la colonne : au moins celle de sa barre d'onglets, sinon « Incoming » sort du cadre.
+local function sizeColumn(self)
     self.docked = true
     self.standaloneKey, self.rerollKey, self._compact = nil, nil, nil
     self:_ApplyMode(true)
     if self.vanillaBtn then self.vanillaBtn:Hide() end
-
-    -- La colonne doit être au moins aussi large que sa barre d'onglets, sinon « Incoming » sort.
     local colW = math.max(self.frame:GetWidth() or 310, tabRowWidth(self.ordRelTabs))
     self.frame:SetWidth(colW)
-    if self._PlaceOrdTabs then self:_PlaceOrdTabs(true) end   -- re-poser à la largeur définitive
+    if self._PlaceOrdTabs then self:_PlaceOrdTabs(true) end   -- re-poser a la largeur definitive
+    return colW
+end
 
-    local tabInset = sideTabInset(native)
-    local fullW = nativeBaseW + colW + GAP * 2 + tabInset
-    -- Élargir SANS toucher aux enfants de Blizzard : eux sont ancrés TOPLEFT, ils ne bougent pas.
-    native:SetWidth(fullW)
-    -- ⚠️ NE JAMAIS écrire dans le système de panneaux depuis du code addon.
-    -- On a tenté `SetUIPanelAttribute(native, "width", fullW)` pour que le gestionnaire réserve
-    -- notre largeur réelle (sinon la fiche de personnage s'ouvre par-dessus notre colonne).
-    -- Le jeu nous a nommés : « attempt to compare local 'oldR' (a secret number value, while
-    -- execution tainted by 'CraftingOrderClassic') », pile Menu → ShowUIPanel → EnterEditMode →
-    -- RefreshPartyFrames → CompactUnitFrame_UpdateHealthColor.
-    -- Mécanisme, lisible dans Blizzard_UIParentPanelManager : `RegisterUIPanel` remplit
-    -- `UIPanelWindows`, donc `SetUIPanelAttribute` va jusqu'à `SetFrameAttributes` →
-    -- `frame:SetAttributeNoHandler(...)` DEPUIS NOTRE CODE → les attributs sécurisés du cadre sont
-    -- teintés → le dispatch `FramePositionDelegate:SetAttribute(...)` exécute toute la chaîne
-    -- sécurisée en teinté → la première lecture d'une valeur SECRÈTE lève.
-    -- Sur l'Era une taint donnait au pire un ADDON_ACTION_BLOCKED ; sur Midnight elle fait planter
-    -- le code de Blizzard, et le blâme nous est imputé nommément.
-    -- Le chevauchement de panneaux est COSMÉTIQUE. On le garde.
+-- Elargir SANS toucher aux enfants de Blizzard : eux sont ancres TOPLEFT, ils ne bougent pas.
+-- NE JAMAIS ecrire dans le SYSTEME DE PANNEAUX depuis du code addon. On a tente
+-- `SetUIPanelAttribute(native, "width", fullW)` pour que le gestionnaire reserve notre largeur reelle
+-- (sinon la fiche de personnage s'ouvre par-dessus notre colonne). Le jeu nous a nommes : « attempt
+-- to compare local 'oldR' (a secret number value, while execution tainted by CraftingOrderClassic) »,
+-- pile Menu -> ShowUIPanel -> EnterEditMode -> RefreshPartyFrames. Mecanisme, lisible dans
+-- Blizzard_UIParentPanelManager : `RegisterUIPanel` remplit `UIPanelWindows`, donc
+-- `SetUIPanelAttribute` va jusqu'a `SetFrameAttributes` -> `SetAttributeNoHandler` DEPUIS NOTRE CODE
+-- -> les attributs securises du cadre sont teintes -> le dispatch `FramePositionDelegate:SetAttribute`
+-- execute toute la chaine securisee en teinte -> la 1re lecture d'une valeur SECRETE leve. Sur l'Era
+-- une taint donnait au pire un ADDON_ACTION_BLOCKED ; ici elle fait planter le code de Blizzard, et
+-- le blame nous est impute nommement. Le chevauchement de panneaux est COSMETIQUE. On le garde.
+local function widenHost(native, colW, tabInset)
+    native:SetWidth(nativeBaseW + colW + GAP * 2 + tabInset)
+end
 
-    -- GREFFÉE, ELLE NE SE DÉPLACE PLUS. Le kit rend toute fenêtre déplaçable (SetMovable +
-    -- RegisterForDrag) ; encastrée, la tirer la sort du cadre natif et laisse une bande vide
-    -- derrière elle (relevé en jeu le 2026-09-19). Sa position appartient désormais à son hôte.
-    -- Rendu au détachement, où elle redevient une vraie fenêtre (vue reroll, dock flottant).
-    self.frame:SetMovable(false)
-    self.frame:RegisterForDrag()          -- plus aucun bouton ne déclenche le glisser
-    self.frame:SetParent(native)          -- suit l'ouverture/fermeture et le déplacement du natif
-    self.frame:ClearAllPoints()
-    -- Ancrer HAUT **et** BAS : la colonne épouse la hauteur du cadre natif au lieu de garder la
-    -- sienne (sinon ~140 px de vide sous le pied de colonne — vu au 1er essai du POC).
-    self.frame:SetPoint("TOPRIGHT", native, "TOPRIGHT", -(GAP + tabInset), -TOP_INSET)
-    self.frame:SetPoint("BOTTOMRIGHT", native, "BOTTOMRIGHT", -(GAP + tabInset), BOT_INSET)
-    -- Greffée, notre fenêtre ne doit plus se comporter en FENÊTRE. `SetToplevel(true)` et une strata
-    -- « HIGH » ont du sens pour un cadre flottant sur UIParent — ils la font remonter au clic et la
-    -- placent au-dessus du reste. Pour l'enfant d'un panneau GÉRÉ, ils la décrochent de l'ordre
-    -- d'affichage de son hôte. On la remet au rang d'enfant ordinaire.
-    if self.frame.SetToplevel then self.frame:SetToplevel(false) end
-    self.frame:SetFrameStrata(native:GetFrameStrata() or "MEDIUM")
-    -- Niveau d'affichage MESURE sur les enfants du cadre natif, pas suppose. Blizzard pose ses pages
-    -- tres au-dessus de lui : releve du 2026-09-19 sur Forever, cadre=1 et BookPage=100. Le +5
-    -- d'origine (herite de l'ancienne fenetre) laissait donc la colonne 94 crans SOUS le contenu
-    -- natif, derriere un fond opaque : affichee, complete, bien placee... et invisible. Ce qui
-    -- ressemblait a une colonne absente etait une colonne enterree.
+-- GREFFEE, ELLE N'EST PLUS UNE FENETRE.
+--  * Plus deplacable : le kit rend toute fenetre draggable, et la tirer la sortait du cadre natif en
+--    laissant une bande vide derriere elle (releve du 2026-09-19). Sa place appartient a son hote.
+--    Rendu au detachement, ou elle redevient flottante (vue reroll, dock).
+--  * Ancree HAUT **et** BAS : elle epouse la hauteur du cadre au lieu de garder la sienne (sinon
+--    ~140 px de vide sous le pied de colonne, vu au 1er essai du POC).
+--  * `SetToplevel(true)` et la strata « HIGH » ont du sens pour un cadre flottant ; pour l'enfant
+--    d'un panneau GERE ils le decrochent de l'ordre d'affichage de son hote. Rang d'enfant ordinaire.
+--  * Niveau MESURE sur les enfants du cadre, pas suppose : releve du 2026-09-19, cadre=1 mais
+--    BookPage=100. Le +5 d'origine laissait la colonne 94 crans SOUS un fond opaque : affichee,
+--    complete, bien placee... et invisible. Ce qui ressemblait a une colonne absente etait une
+--    colonne enterree. Mesurer nous fait suivre un changement de numerotation Blizzard.
+local function dockColumn(self, native, tabInset)
+    local f = self.frame
+    f:SetMovable(false)
+    f:RegisterForDrag()                   -- plus aucun bouton ne declenche le glisser
+    f:SetParent(native)                   -- suit l'ouverture/fermeture et le deplacement du natif
+    f:ClearAllPoints()
+    f:SetPoint("TOPRIGHT", native, "TOPRIGHT", -(GAP + tabInset), -TOP_INSET)
+    f:SetPoint("BOTTOMRIGHT", native, "BOTTOMRIGHT", -(GAP + tabInset), BOT_INSET)
+    if f.SetToplevel then f:SetToplevel(false) end
+    f:SetFrameStrata(native:GetFrameStrata() or "MEDIUM")
     local top = native:GetFrameLevel() or 0
     for _, child in ipairs({ native:GetChildren() }) do
         local lv = (child.GetFrameLevel and child:GetFrameLevel()) or 0
         if lv > top then top = lv end
     end
-    self.frame:SetFrameLevel(top + 10)
-    self.frame:Show()
-    tr("attach fini : shown=%s alpha=%s parent=%s protege=%s",
-       tostring(self.frame:IsShown()), tostring(self.frame:GetAlpha()),
-       tostring(self.frame:GetParent() and self.frame:GetParent():GetName()),
-       tostring(self.frame:IsProtected()))
-    -- Geometrie et empilement : une colonne affichee mais DERRIERE le contenu natif, et depouillee
-    -- de son fond, est indiscernable d'une colonne absente (releve du 2024-09-19 : bande vide).
-    local page = native.BookPage or native
-    tr("attach geo : debord onglets=%d | col %dx%d a x=%d | niveaux col=%d natif=%d page=%d | strata col=%s natif=%s",
-       tabInset, (self.frame:GetWidth() or 0), (self.frame:GetHeight() or 0), (self.frame:GetLeft() or -1),
-       (self.frame:GetFrameLevel() or 0), (native:GetFrameLevel() or 0),
-       (page.GetFrameLevel and page:GetFrameLevel() or -1),
-       tostring(self.frame:GetFrameStrata()), tostring(native:GetFrameStrata()))
-    -- ordRelTabs est une TABLE de boutons, pas un cadre (pas de :IsShown dessus). Erreur commise
-    -- ici meme le 2026-09-19 en instrumentant : une ligne de diagnostic a casse l'attache juste
-    -- avant son Refresh. Une trace ne doit jamais pouvoir faire tomber ce qu'elle observe.
+    f:SetFrameLevel(top + 10)
+    f:Show()
+end
+
+-- Une colonne affichee mais DERRIERE le contenu natif, et depouillee de son fond, est indiscernable
+-- d'une colonne absente : la geometrie et les niveaux sont donc les seuls temoins utiles.
+-- `ordRelTabs` est une TABLE de boutons, pas un cadre - une ligne de diagnostic qui l'a pris pour un
+-- cadre a casse l'attache le 2026-09-19. Une trace ne doit jamais faire tomber ce qu'elle observe.
+local function traceAttach(self, native, tabInset)
+    if not (COC.Trace and COC.Trace:IsOn()) then return end
+    local f, page = self.frame, native.BookPage or native
+    tr("attach fini : shown=%s alpha=%s parent=%s protege=%s", tostring(f:IsShown()),
+       tostring(f:GetAlpha()), tostring(f:GetParent() and f:GetParent():GetName()),
+       tostring(f:IsProtected()))
+    tr("attach geo : debord onglets=%d | col %dx%d a x=%d | niveaux col=%d natif=%d page=%d",
+       tabInset, (f:GetWidth() or 0), (f:GetHeight() or 0), (f:GetLeft() or -1),
+       (f:GetFrameLevel() or 0), (native:GetFrameLevel() or 0),
+       (page.GetFrameLevel and page:GetFrameLevel() or -1))
     local tabs, nb = self.ordRelTabs, 0
     if type(tabs) == "table" then for _ in pairs(tabs.buttons or tabs) do nb = nb + 1 end end
     tr("attach contenu : %d onglets, largeur rangee=%d", nb, tabRowWidth(tabs))
+end
+
+function PW:CamelotAttach(native)
+    tr("attach appele : native=%s combat=%s baseW=%s", tostring(native ~= nil),
+       tostring(lockedDown() and true or false), tostring(nativeBaseW))
+    if not native or lockedDown() then return end
+    if not onRecipesPage(native) then
+        tr("attach refuse : page d'ensemble affichee, pas de metier courant")
+        return self:CamelotDetach(native)
+    end
+    self:Build()
+    stripChrome(self.frame)
+    local colW     = sizeColumn(self)
+    local tabInset = sideTabInset(native)
+    widenHost(native, colW, tabInset)
+    dockColumn(self, native, tabInset)
+    traceAttach(self, native, tabInset)
     self:Refresh()
 end
 

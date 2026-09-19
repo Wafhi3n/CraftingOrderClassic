@@ -71,6 +71,10 @@ local BTN = 46   -- côté de la pastille « i » d'une tuile (HelpPlateTile.But
 -- Ouvre le voile d'aide natif sur `win`, avec une tuile par entrée.
 -- entries : { { frame = <Region>, text = <string>, dir = "UP|DOWN|LEFT|RIGHT" }, ... }.
 -- La géométrie est LUE À CHAUD (positions réelles), donc appelable à chaque ouverture. Rend true si posé.
+-- Un cadre MASQUE garde ses coordonnees : sans le test IsVisible plus bas, une section absente de la
+-- vue courante se faisait quand meme entourer - des boites vides, parfois hors du cadre (releve du
+-- 2026-09-19 sur la fenetre greffee de Forever, ou seule la colonne Commandes subsiste : l'aide
+-- entourait encore Recettes et Detail). Generique : vaut pour la vue custom, le dock et la greffe.
 function Skin.ShowHelp(win, entries, mainButton)
     if not (win and HelpPlate and HelpPlateCanvas) then return false end
     local wl, wt = win:GetLeft(), win:GetTop()
@@ -86,12 +90,7 @@ function Skin.ShowHelp(win, entries, mainButton)
     }
     for _, e in ipairs(entries) do
         local fr = e.frame
-        -- IsVisible et pas seulement GetLeft : un cadre MASQUE garde ses coordonnees, donc une
-        -- section absente de la vue courante se voyait quand meme entourer -- des boites vides,
-        -- parfois hors du cadre (releve du 2026-09-19 sur la fenetre greffee de Forever, ou seule
-        -- la colonne Commandes subsiste : l'aide entourait encore les colonnes Recettes et Detail).
-        -- Generique a dessein : vaut pour la vue custom, le dock et la greffe, sans liste a tenir.
-        if fr and fr:IsVisible() and fr:GetLeft() then
+        if fr and fr:IsVisible() and fr:GetLeft() then   -- IsVisible : cf. en-tete de fonction
             local fs = fr:GetEffectiveScale()
             local x = (fr:GetLeft() * fs - wl) / scale
             local y = (fr:GetTop()  * fs - wt) / scale   -- ≤ 0 (section sous le haut de la fenêtre)
