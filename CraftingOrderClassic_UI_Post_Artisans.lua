@@ -25,7 +25,14 @@ local knowsProf, inSource = Skin.KnowsProf, Skin.InSource
 --     que Directory:WhoCanCraft. En cas de mismatch on ne jette pas la cible : on retombe sur le SK.
 --   * sinon SK reçu (niveau de métier, sk[1]=rang courant) → filtre par learnedAt <= rang : ce qu'il
 --     PEUT apprendre/faire à son niveau (masque les plans hors de portée — ex. plan 300 pour un
---     artisan niv. 40, cf. données learnedAt de CraftLink v6). Un plan sans learnedAt connu passe.
+--     artisan niv. 40, cf. données learnedAt de CraftLink v6). Un plan SANS learnedAt connu est
+--     ÉCARTÉ : c'est une ESTIMATION, et elle ne doit jamais affirmer « il sait le faire » sans
+--     preuve. L'ancienne règle (« seuil inconnu = atteignable ») était inoffensive tant que la
+--     base vanilla était presque complète ; sur Forever elle proposait les six pièces Stormcloth
+--     (niveau 40) à un couturier 13/75 (relevé du 2026-09-19). Les 29 recettes Camelot sans seuil
+--     sont des PATRONS de butin/marchand — vanilla ne les a pas non plus, on ne peut pas hériter.
+--     Un artisan à jour envoie sa vraie liste (RI/RK) : ses patrons connus réapparaissent alors par
+--     le 1er niveau, qui n'a pas besoin de seuil.
 -- Retourne aussi un libellé de mode ("connus" | "niv. N") pour l'en-tête de la liste.
 function UI:_TargetArtisanFilter(prof)
     local t = self.postTarget
@@ -42,7 +49,7 @@ function UI:_TargetArtisanFilter(prof)
         local cap = sk[1]
         return function(spellID)
             local at = c:RecipeLearnedAt(prof, spellID)
-            return (not at) or at <= cap
+            return at ~= nil and at <= cap   -- seuil inconnu = PAS de preuve = écarté (cf. en-tête)
         end, string.format(L["niv. %d"], cap)
     end
     return nil
