@@ -1,5 +1,34 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.32.0 — Forever finally reads your professions and recipes
+
+On WoW: Forever the addon couldn't see your professions. Forever runs the modern game's API under
+its vanilla content, and the calls CO-Classic used to read your skills simply aren't there. Nothing
+errored. The directory announced you with no professions at all, right-click said you didn't have
+any, and My Artisans stayed empty. Your known recipes and your recipe cooldowns had the same problem.
+All of it is read the Forever way now.
+
+That changes what people see when they target you in the Order tab. They get the recipes you
+actually know instead of a guess from your skill level. And the guess was too generous. A recipe
+with no known skill requirement counted as reachable, which is how a level 13 tailor got offered
+Stormcloth gear that needs level 40. Unknown now means not offered. On Forever, 29 recipes have no
+trainer level (they're patterns you find or buy), and they come back the moment a crafter's own list
+says they know them.
+
+The recipe list itself is Forever's, 2512 recipes built from Wowhead's Forever pages instead of
+vanilla's 1230. Forever moved a few things, so the healing potions sit under First Aid now, not
+Alchemy.
+
+A few smaller changes:
+
+- On Forever, right-clicking the minimap button opens the game's Professions window, and the button
+  sits on the edge of the bigger minimap instead of on top of it.
+- Your alts' professions moved from the minimap menu to My Artisans. Right-click a profession there.
+- `/co mute` understands Forever's first-and-last names. Put the name in quotes if the addon hasn't
+  met that player yet.
+- A public order was reaching people three times on Forever. It's down to two, and the second one is
+  there to make sure it arrives.
+
 ## v1.31.1 — New installs show up on their own
 
 Someone who had just installed the addon stayed invisible to everyone until they clicked Refresh

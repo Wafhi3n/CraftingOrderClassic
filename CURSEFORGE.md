@@ -125,8 +125,8 @@ The My Artisans tab gathers every profession on your account for the realm into 
 single character knew them all. Skill levels, known recipes grouped by category the way the profession
 window does it, active cooldowns pinned at the top, and which of your characters holds each recipe.
 
-Click an alt's profession from the minimap menu for a read-only look: recipes it knows, the reagents
-each one needs, and its skill level. No craft button, since you're not logged in as that character, and
+Right-click a profession in My Artisans and pick one of your characters for a read-only look at that
+alt: recipes it knows, the reagents each one needs, and its skill level. No craft button, since you're not logged in as that character, and
 no bag counts, just what's needed.
 
 ## Partners, loot alerts and gifts

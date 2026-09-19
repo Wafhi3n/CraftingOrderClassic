@@ -25,6 +25,15 @@ local BODY_W = 780
 local function versionsCurrent()
     return {
         {
+            v = "v1.32.0", title = L["Forever lit enfin tes métiers et tes recettes"],
+            lines = {
+                L["Sur WoW: Forever, l'addon ne voyait pas tes métiers : Forever tourne sur l'API du jeu moderne, et les fonctions qui lisaient tes compétences n'y existent pas. Rien ne plantait. L'annuaire t'annonçait simplement sans aucun métier, le clic droit disait que tu n'en avais pas, et « Mes artisans » restait vide. Tes recettes connues et leurs temps de recharge avaient le même problème. Tout est lu à la manière de Forever maintenant."],
+                L["Quand quelqu'un te cible dans l'onglet Commande, il voit ce que tu sais vraiment faire, plus une estimation. Et l'estimation elle-même était trop généreuse : une recette sans niveau connu comptait comme atteignable, si bien qu'un couturier niveau 13 se voyait proposer des pièces Stormcloth qui demandent le niveau 40. Un niveau inconnu veut dire « pas proposé » désormais."],
+                L["La liste des recettes est celle de Forever : 2512 recettes tirées des pages Forever de Wowhead, au lieu des 1230 de vanilla. Forever a déplacé des choses, et les potions de soin sont maintenant en Secourisme, plus en Alchimie."],
+                L["Sur Forever, le clic droit sur le bouton de la minimap ouvre la fenêtre des métiers du jeu. Les métiers de tes rerolls se consultent désormais depuis « Mes artisans » (clic droit sur un métier). /co mute accepte les noms en prénom et nom, entre guillemets si l'addon n'a pas encore croisé le joueur."],
+            },
+        },
+        {
             v = "v1.31.1", title = L["Les nouveaux venus apparaissent tout seuls"],
             lines = {
                 L["Quelqu'un qui venait d'installer l'addon restait invisible tant qu'il ne cliquait pas « Rafraîchir l'annuaire » — ce que personne ne pense à faire devant un annuaire qui a l'air vide, et avoir l'air vide était justement le problème."],
