@@ -261,8 +261,15 @@ function PW:Hide()
     end
     if not self.frame:IsShown() or self._hidePending then return end
     self._hidePending = true
-    self.frame:SetAlpha(0); self.frame:EnableMouse(false)
-    if self.frame.escProxy then self.frame.escProxy:Hide() end   -- Échap ne doit plus la « fermer »
+    self.frame:SetAlpha(0)
+    -- Sur un cadre PROTÉGÉ, seul SetAlpha passe : EnableMouse et Hide sont refusés (mémoire
+    -- wow-protected-frame-hide-combat, confirmé sur Forever le 2026-09-19 — EnableMouse bloqué en
+    -- fermant la fenêtre de métier en combat). Ce code datait de l'Era, où notre fenêtre n'était
+    -- jamais protégée ; greffée dans le panneau natif de Forever, elle l'est. On ne perd rien :
+    -- greffée, elle disparaît avec son parent quand la fenêtre native se ferme.
+    if not self.frame:IsProtected() then self.frame:EnableMouse(false) end
+    local esc = self.frame.escProxy
+    if esc and not esc:IsProtected() then esc:Hide() end         -- Échap ne doit plus la « fermer »
 end
 
 function PW:_DoRefresh()
