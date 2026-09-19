@@ -389,12 +389,34 @@ Codec `RI` (identifiants, delta-base36), couture `Directory_Recipes` (les lecteu
 question, ils ignorent la forme), émission/réception/**relais** branchés, garde anti-fuite d'alts
 répliquée. 635 vérifications headless.
 
-### 🟡 P3 — les données Camelot
+### ✅ FAIT — les données Camelot
 
-Le catalogue n'est plus nécessaire au REGISTRE, mais il l'est encore à la route, à la bourse et aux
-catégories. Deux pistes : générer une couche Camelot (`gen_season.lua`), **ou** lire les catégories
-du client (`categoryID` + noms sémantiques — « Camping », « Stamina Food »), qui sont meilleures que
-les nôtres. `relativeDifficulty` rend déjà nos `skillColors` inutiles sur cette cible.
+Set **COMPLET** de 2512 recettes sur 9 métiers (`Data/Camelot/`, chargé par `Camelot.xml` depuis
+`_Camelot.toc`), `dataVersion 1908807446` volontairement distincte de Vanilla. Pas une couche
+saisonnière : Forever **retire** des recettes autant qu'il en ajoute, et `ExtendProfession` est
+append-only par construction — il aurait laissé des recettes fantômes commandables. Généré par
+`CraftLink/tools/gen_flavor.lua`.
+
+**Correction d'une affirmation de ce document.** `relativeDifficulty` ne rend PAS nos `skillColors`
+inutiles sur cette cible. Il ne les remplace que pour l'**affichage d'une recette déjà connue**
+(`Craft_Mainline.lua`). Le Plan de route et la bourse lisent `lib:RecipeColors`
+(`ProfWindow_Leveling.lua`, `Route.lua`) pour des rangs **futurs** — ce que `relativeDifficulty` ne
+peut pas donner, puisqu'il ne décrit que ce qu'on sait déjà. Les `skillColors` restent donc
+nécessaires ici, et ils sont générés (2454 seuils, 58 recettes en repli heuristique).
+
+La table `enchants` (noms **anglais canoniques** des services sans objet) manquait au set : sans
+elle, le classement par emplacement de `_Enchant.lua` retombait sur le nom localisé du client et
+les 261 enchants de Forever finissaient tous en « Autres » hors client anglais — la régression vue
+en jeu le 2026-07-16 sur SoD. Réglée : 201 services nommés, dont 179 classables.
+
+**Ce qui reste ouvert** : lire les **catégories du client** (`categoryID` + noms sémantiques —
+« Camping », « Stamina Food »), qui sont meilleures que les nôtres, pour le classement d'objets.
+
+**La bêta bouge, et la base avec.** Blizzard offusque les données client ; Wowhead ne se remplit
+pas depuis les fichiers du jeu mais par **observation des joueurs**. Repasser souvent
+`CraftLink\tools\refresh_flavor.ps1` (fetch + contrôle, n'écrit aucune donnée). Sur un code de
+sortie **1** (perte), ne JAMAIS appliquer : c'est presque toujours un trou de collecte, pas un vrai
+retrait — refaire le fetch et regarder la page en cause à la main.
 
 ### 🟡 P4 — la barre d'outils dans la bande
 
