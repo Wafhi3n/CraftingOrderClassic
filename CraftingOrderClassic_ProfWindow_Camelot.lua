@@ -26,6 +26,14 @@ if not (PW and Api) then return end
 -- oblige — donc CHARGÉ sur l'Era aussi. Sans cette garde, il y désactiverait la vue custom.
 if not Api.IS_MAINLINE then return end
 
+-- Trace de diagnostic (catégorie « graft ») : l'auto-trace est active d'office sur Forever, donc
+-- ces lignes atterrissent dans la SavedVariable sans rien activer. Posées le 2026-09-19 parce que
+-- la colonne ne s'affichait plus et que l'inférence tournait en rond.
+local function tr(fmt, ...)
+    if not (COC.Trace and COC.Trace:IsOn()) then return end
+    COC.Trace:Log("graft", (select("#", ...) > 0) and string.format(fmt, ...) or fmt)
+end
+
 local GAP = 6          -- respiration entre le contenu natif et notre bande
 local TOP_INSET = 26   -- sous la barre de titre native
 local BOT_INSET = 34   -- au-dessus de la rangée « Create All / Create »
@@ -91,6 +99,18 @@ local function lockedDown()
     return InCombatLockdown and InCombatLockdown()
 end
 
+-- La greffe pilote, donc la greffe RAFRAICHIT. A la premiere ouverture d'un metier, le client n'a
+-- pas encore la liste : notre colonne se dessine VIDE, et depouillee de son fond elle est alors
+-- indiscernable d'une colonne absente (symptome vecu le 2026-09-19 : il fallait ouvrir-fermer une
+-- fois pour la voir). Les donnees arrivent avec TRADE_SKILL_LIST_UPDATE, juste apres. ProfOrders
+-- s'en chargeait ; depuis qu'il laisse la main a la greffe (pilote unique), plus personne ne le
+-- faisait. On le reprend ici, la ou vit desormais la responsabilite.
+local upd = CreateFrame("Frame")
+Api.RegisterEventsSafe(upd, { "TRADE_SKILL_LIST_UPDATE" })
+upd:SetScript("OnEvent", function()
+    if PW.docked and PW.frame and PW.frame:IsShown() then PW:Refresh() end
+end)
+
 local regen = CreateFrame("Frame")
 regen:RegisterEvent("PLAYER_REGEN_ENABLED")
 regen:SetScript("OnEvent", function()
@@ -100,7 +120,20 @@ regen:SetScript("OnEvent", function()
 end)
 
 function PW:CamelotAttach(native)
+    tr("attach appele : native=%s combat=%s baseW=%s", tostring(native ~= nil),
+       tostring(lockedDown() and true or false), tostring(nativeBaseW))
     if not native or lockedDown() then return end
+    -- La colonne n'a de sens que sur la PAGE DE METIER. Sur la page d'ENSEMBLE (les vignettes des
+    -- cinq metiers), il n'y a pas de metier courant : la colonne s'y dessine vide et, comme on
+    -- elargissait le cadre quand meme, on obtenait une bande vide a droite. Diagnostic du
+    -- 2026-09-19 : ce n'etait pas "la 1re ouverture echoue" mais "la page d'ensemble n'a rien a
+    -- afficher" -- au 2e clic on atterrit sur un metier, d'ou l'illusion. CraftingPage est le
+    -- signal sur : Blizzard la masque sur l'ensemble (cf. Blizzard_ProfessionsFrame.lua, l'onglet
+    -- recettes est declare AddNamedTab(..., self.CraftingPage)).
+    if native.CraftingPage and not native.CraftingPage:IsShown() then
+        tr("attach refuse : page d'ensemble affichee, pas de metier courant")
+        return self:CamelotDetach(native)
+    end
     self:Build()
     stripChrome(self.frame)
 
@@ -145,12 +178,41 @@ function PW:CamelotAttach(native)
     -- d'affichage de son hôte. On la remet au rang d'enfant ordinaire.
     if self.frame.SetToplevel then self.frame:SetToplevel(false) end
     self.frame:SetFrameStrata(native:GetFrameStrata() or "MEDIUM")
-    self.frame:SetFrameLevel((native:GetFrameLevel() or 0) + 5)
+    -- Niveau d'affichage MESURE sur les enfants du cadre natif, pas suppose. Blizzard pose ses pages
+    -- tres au-dessus de lui : releve du 2026-09-19 sur Forever, cadre=1 et BookPage=100. Le +5
+    -- d'origine (herite de l'ancienne fenetre) laissait donc la colonne 94 crans SOUS le contenu
+    -- natif, derriere un fond opaque : affichee, complete, bien placee... et invisible. Ce qui
+    -- ressemblait a une colonne absente etait une colonne enterree.
+    local top = native:GetFrameLevel() or 0
+    for _, child in ipairs({ native:GetChildren() }) do
+        local lv = (child.GetFrameLevel and child:GetFrameLevel()) or 0
+        if lv > top then top = lv end
+    end
+    self.frame:SetFrameLevel(top + 10)
     self.frame:Show()
+    tr("attach fini : shown=%s alpha=%s parent=%s protege=%s",
+       tostring(self.frame:IsShown()), tostring(self.frame:GetAlpha()),
+       tostring(self.frame:GetParent() and self.frame:GetParent():GetName()),
+       tostring(self.frame:IsProtected()))
+    -- Geometrie et empilement : une colonne affichee mais DERRIERE le contenu natif, et depouillee
+    -- de son fond, est indiscernable d'une colonne absente (releve du 2024-09-19 : bande vide).
+    local page = native.BookPage or native
+    tr("attach geo : col %dx%d a x=%d | niveaux col=%d natif=%d page=%d | strata col=%s natif=%s",
+       (self.frame:GetWidth() or 0), (self.frame:GetHeight() or 0), (self.frame:GetLeft() or -1),
+       (self.frame:GetFrameLevel() or 0), (native:GetFrameLevel() or 0),
+       (page.GetFrameLevel and page:GetFrameLevel() or -1),
+       tostring(self.frame:GetFrameStrata()), tostring(native:GetFrameStrata()))
+    -- ordRelTabs est une TABLE de boutons, pas un cadre (pas de :IsShown dessus). Erreur commise
+    -- ici meme le 2026-09-19 en instrumentant : une ligne de diagnostic a casse l'attache juste
+    -- avant son Refresh. Une trace ne doit jamais pouvoir faire tomber ce qu'elle observe.
+    local tabs, nb = self.ordRelTabs, 0
+    if type(tabs) == "table" then for _ in pairs(tabs.buttons or tabs) do nb = nb + 1 end end
+    tr("attach contenu : %d onglets, largeur rangee=%d", nb, tabRowWidth(tabs))
     self:Refresh()
 end
 
 function PW:CamelotDetach(native)
+    tr("detach appele : combat=%s baseW=%s", tostring(lockedDown() and true or false), tostring(nativeBaseW))
     if lockedDown() then return end            -- rejoue a PLAYER_REGEN_ENABLED (cf. CamelotAttach)
     if native and nativeBaseW then
         native:SetWidth(nativeBaseW)
@@ -280,8 +342,17 @@ local function wire()
     -- détachement suivant ne restaurait alors JAMAIS la largeur, et on se retrouvait avec un cadre
     -- natif resté large et notre colonne repartie sur UIParent (relevé en jeu le 2026-09-19).
     nativeBaseW = nativeBaseW or native:GetWidth()
+    tr("cablage : largeur d'origine=%s, deja ouverte=%s", tostring(nativeBaseW), tostring(native:IsShown()))
     Api.HookScriptSafe(native, "OnShow", function(f) PW:CamelotAttach(f) end)
     Api.HookScriptSafe(native, "OnHide", function(f) PW:CamelotDetach(f) end)
+    -- On suit aussi la PAGE : passer de l'ensemble a un metier (et l'inverse) ne rouvre pas la
+    -- fenetre, donc son OnShow ne suffit pas a nous prevenir.
+    local page = native.CraftingPage
+    if page then
+        Api.HookScriptSafe(page, "OnShow", function() PW:CamelotAttach(native) end)
+        Api.HookScriptSafe(page, "OnHide", function() PW:CamelotDetach(native) end)
+    end
+    tr("cablage page recettes : %s", tostring(page ~= nil))
     if native:IsShown() then PW:CamelotAttach(native) end
 end
 
