@@ -148,13 +148,50 @@ function Mod:MutedList()
     return out
 end
 
--- /co mute [nom [durée] [raison…]] : sans argument, liste les mutés. La durée (2e mot) est optionnelle
--- (« 1h », « 30m », « 2d », ou un nombre = minutes) ; si le 2e mot n'est pas une durée, tout le reste
--- est la raison. Ex. : « /co mute Bob 1h spam », « /co mute Bob usurpateur », « /co mute Bob ».
+-- Un nom DÉJÀ CONNU : annuaire, déjà muté, ou de confiance. Sert à lever l'ambiguïté du découpage
+-- ci-dessous — on met en sourdine quelqu'un qu'on a vu, presque par définition.
+local function isKnownName(n)
+    if not n or n == "" then return false end
+    local db = COC.db
+    if db and ((db.mutedPlayers and db.mutedPlayers[n]) or (db.trusted and db.trusted[n])) then return true end
+    local roster = (COC.Directory and COC.Directory.roster) or (db and db.roster)
+    return (roster and roster[n]) ~= nil
+end
+
+-- Découpe « nom [durée] [raison…] ». Sur WoW: Forever un personnage porte un PRÉNOM ET UN NOM
+-- séparés par une espace (« Rédemption Wafhien ») — impossible sur Era/retail, où le premier mot
+-- suffisait à nommer un joueur. Couper sur la 1re espace mutait donc « Rédemption » en classant
+-- « Wafhien » comme raison : la sourdine ne visait personne, et /co unmute (qui prend la chaîne
+-- entière) ne parlait même pas du même joueur. Mais tous les noms ne portent pas d'espace, même
+-- là-bas (« Dwad », « San » sur le même royaume) : la frontière est RÉELLEMENT ambiguë, on la
+-- lève par mesure et jamais par une règle de saveur. Dans l'ordre : guillemets (explicite) → plus
+-- long préfixe qui nomme un CONNU → ce qui précède la 1re durée → le 1er mot (comportement Era
+-- d'origine, donc jamais moins bon qu'avant).
+local function splitMuteArg(arg)
+    local quoted, after = arg:match('^"([^"]+)"%s*(.*)$')
+    if quoted then return quoted, after end
+    local w = {}
+    for word in arg:gmatch("%S+") do w[#w + 1] = word end
+    if #w == 0 then return nil, "" end
+    for i = #w, 2, -1 do
+        local cand = table.concat(w, " ", 1, i)
+        if isKnownName(cand) then return cand, table.concat(w, " ", i + 1) end
+    end
+    for i = 2, #w do
+        if parseDuration(w[i]) then return table.concat(w, " ", 1, i - 1), table.concat(w, " ", i) end
+    end
+    return w[1], table.concat(w, " ", 2)
+end
+
+-- /co mute [nom [durée] [raison…]] : sans argument, liste les mutés. La durée est optionnelle
+-- (« 1h », « 30m », « 2d », ou un nombre = minutes) ; ce qui suit est la raison. Un nom à espace
+-- encore inconnu de l'annuaire s'écrit entre guillemets.
+-- Ex. : « /co mute Bob 1h spam », « /co mute Bob usurpateur », « /co mute "Rédemption Wafhien" 2h ».
 function Mod:MuteCmd(arg)
     arg = arg and arg:match("^%s*(.-)%s*$") or ""
     if arg == "" then self:PrintMuted(); return end
-    local name, rest = arg:match("^(%S+)%s*(.*)$")
+    local name, rest = splitMuteArg(arg)
+    if not name then self:PrintMuted(); return end
     local durTok, tail = rest:match("^(%S*)%s*(.*)$")
     local dur = parseDuration(durTok)
     self:Mute(name, dur and tail or rest, dur)
