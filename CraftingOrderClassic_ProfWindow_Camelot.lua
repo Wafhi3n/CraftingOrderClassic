@@ -80,8 +80,27 @@ end
 
 -- ---------------------------------------------------------------- greffe
 
-function PW:CamelotAttach(native)
+-- RIEN ne se greffe ni ne se degreffe EN COMBAT. Une fois notre colonne reparentee dans le panneau
+-- natif, elle est PROTEGEE comme lui : SetWidth / SetPoint / SetParent / SetToplevel / Show y sont
+-- tous refuses, et le cadre natif lui-meme ne peut plus etre redimensionne. Releve du 2026-09-19
+-- (Logs	aint.log) : 15 blocages en une session, tous a l'attache, declenchee par l'ouverture de la
+-- fenetre en plein combat -- y compris quand c'est le micro-bouton de Blizzard qui l'ouvre, donc
+-- sans aucune action de l'addon. On repousse le travail a la sortie de combat et on le rejoue selon
+-- l'etat REEL de la fenetre a ce moment-la (elle a pu se fermer entre-temps).
+local function lockedDown()
+    return InCombatLockdown and InCombatLockdown()
+end
+
+local regen = CreateFrame("Frame")
+regen:RegisterEvent("PLAYER_REGEN_ENABLED")
+regen:SetScript("OnEvent", function()
+    local native = _G.ProfessionsFrame
     if not native then return end
+    if native:IsShown() then PW:CamelotAttach(native) else PW:CamelotDetach(native) end
+end)
+
+function PW:CamelotAttach(native)
+    if not native or lockedDown() then return end
     self:Build()
     stripChrome(self.frame)
 
@@ -133,6 +152,7 @@ function PW:CamelotAttach(native)
 end
 
 function PW:CamelotDetach(native)
+    if lockedDown() then return end            -- rejoue a PLAYER_REGEN_ENABLED (cf. CamelotAttach)
     if native and nativeBaseW then
         native:SetWidth(nativeBaseW)
     end
