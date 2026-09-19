@@ -468,6 +468,13 @@ local en2 = {
     ["cercle ajouté : %s"] = "circle added: %s",
     ["cercle retiré : %s"] = "circle removed: %s",
     ["aucune communauté n° %s."] = "no community number %s.",
+
+    -- Minimap Forever + rerolls dans « Mes artisans »
+    ["Clic droit : fenêtre des métiers"] = "Right click: professions window",
+    ["Voir chez un autre perso"] = "View on another character",
+    ["Clic : voir les recettes connues"] = "Click: see known recipes",
+    ["Clic droit : voir chez un autre perso"] = "Right click: view on another character",
+    ["Aucun autre perso avec ce métier : %s"] = "No other character has this profession: %s",
 }
 
 for k, v in pairs(en2) do L[k] = v end

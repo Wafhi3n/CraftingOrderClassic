@@ -451,6 +451,13 @@ local es2 = {
     ["cercle ajouté : %s"] = "círculo añadido: %s",
     ["cercle retiré : %s"] = "círculo eliminado: %s",
     ["aucune communauté n° %s."] = "ninguna comunidad n.º %s.",
+
+    -- Minimap Forever + rerolls dans « Mes artisans »
+    ["Clic droit : fenêtre des métiers"] = "Clic derecho: ventana de profesiones",
+    ["Voir chez un autre perso"] = "Ver en otro personaje",
+    ["Clic : voir les recettes connues"] = "Clic: ver las recetas conocidas",
+    ["Clic droit : voir chez un autre perso"] = "Clic derecho: ver en otro personaje",
+    ["Aucun autre perso avec ce métier : %s"] = "Ningún otro personaje tiene esta profesión: %s",
 }
 
 for k, v in pairs(es2) do L[k] = v end

@@ -51,15 +51,31 @@ end
 -- Notre fenêtre est un PortraitFrameTemplate complet. Posée DANS un autre cadre, elle ferait une
 -- fenêtre dans une fenêtre. On la dépouille : seule la colonne doit se voir, sur le fond natif.
 -- Chaque pièce est optionnelle et gardée — leur nom varie déjà entre saveurs (cf. Compat).
+local CHROME = { "NineSlice", "Bg", "TopTileStreaks", "PortraitContainer",
+                 "TitleContainer", "CloseButton", "Inset", "FrameGlow", "portrait" }
+
+-- Le dépouillement est RÉVERSIBLE, et il doit l'être : le même cadre sert encore de fenêtre
+-- FLOTTANTE pour la vue reroll (métiers d'un autre perso du compte, que le client ne connaît pas).
+-- Tant que strip était définitif, une vue reroll ouverte après un passage dans la fenêtre native
+-- sortait sans bordure, sans titre et sans croix. On mémorise donc ce qu'on a réellement masqué —
+-- et rien d'autre : une pièce déjà cachée par Blizzard ne doit pas réapparaître à cause de nous.
 local function stripChrome(f)
     if not f or f._cocStripped then return end
-    for _, key in ipairs({ "NineSlice", "Bg", "TopTileStreaks", "PortraitContainer",
-                           "TitleContainer", "CloseButton", "Inset", "FrameGlow" }) do
+    local hidden = {}
+    for _, key in ipairs(CHROME) do
         local part = f[key]
-        if part and part.Hide then pcall(part.Hide, part) end
+        if part and part.Hide and (not part.IsShown or part:IsShown()) then
+            hidden[#hidden + 1] = part
+            pcall(part.Hide, part)
+        end
     end
-    if f.portrait and f.portrait.Hide then pcall(f.portrait.Hide, f.portrait) end
-    f._cocStripped = true
+    f._cocChromeHidden, f._cocStripped = hidden, true
+end
+
+local function restoreChrome(f)
+    if not (f and f._cocStripped) then return end
+    for _, part in ipairs(f._cocChromeHidden or {}) do pcall(part.Show, part) end
+    f._cocChromeHidden, f._cocStripped = nil, nil
 end
 
 -- ---------------------------------------------------------------- greffe
@@ -123,6 +139,7 @@ function PW:CamelotDetach(native)
     self.docked = false
     if self.frame then
         self.frame:Hide()
+        restoreChrome(self.frame)   -- le cadre redevient une vraie fenêtre (vue reroll, cf. stripChrome)
         -- Rendre le parent ET les ancres : sans ça la colonne resterait liée au cadre natif (et
         -- étirée à SA hauteur) si on rebascule un jour sur la vue custom.
         self.frame:ClearAllPoints()
@@ -130,6 +147,87 @@ function PW:CamelotDetach(native)
         -- Redevenue flottante, elle retrouve son comportement de fenêtre (cf. CamelotAttach).
         if self.frame.SetToplevel then self.frame:SetToplevel(true) end
         self.frame:SetFrameStrata("HIGH")
+    end
+end
+
+-- ---------------------------------------------------------------- ouverture d'un métier
+
+-- Clé de métier COC → `skillLineID` du client, ce qu'attend l'ouvreur natif. Les valeurs rendues
+-- par `GetProfessions` sont des index de LIVRE DE SORTS, pas des métiers : seul
+-- `GetProfessionInfo` donne le nom localisé et la ligne de compétence. On repasse par
+-- `ResolveProfession` (alias FR/DE/ES de CraftLink), le même résolveur que Directory_Skills —
+-- jamais une comparaison de libellés écrite à la main.
+local function skillLineFor(profKey)
+    if not (profKey and _G.GetProfessions and _G.GetProfessionInfo and _G.CraftLink) then return nil end
+    local p1, p2, arch, fish, cook = GetProfessions()
+    for _, idx in pairs({ p1, p2, arch, fish, cook }) do    -- pairs : sauter les trous sans s'arrêter
+        local name, _, _, _, _, _, skillLine = GetProfessionInfo(idx)
+        if name and skillLine and CraftLink:ResolveProfession(name) == profKey then return skillLine end
+    end
+    return nil
+end
+
+-- Ouvre la fenêtre de métier NATIVE. **Aucun sort lancé depuis notre code** : `CastSpellByName`
+-- est PROTÉGÉE sur cette cible — vécu le 2026-09-19 au clic « Cuisine » du menu minimap
+-- (ADDON_ACTION_BLOCKED). Blizzard ouvre ses propres onglets latéraux avec
+-- `C_SpellBook.CastSpellBookItem`, protégée elle aussi : il n'existe aucun équivalent appelable
+-- depuis un addon. On passe donc par les globales FrameXML, qui ne font que charger le module et
+-- montrer le panneau.
+-- ⚠️ À ÉPROUVER EN JEU. `ProfessionsMixin:OnShow` déclenche `ProfessionsFrame.Show`, sur lequel
+-- CHAQUE onglet latéral rappelle `CastProfessionSpell()`. Si notre appel teinte cette chaîne, le
+-- blocage revient — déplacé, pas supprimé. Le chemin GARANTI est le clic SÉCURISÉ sur le
+-- micro-bouton « Métiers » de Blizzard (cf. _Minimap.lua) : c'est celui du bouton minimap. Cette
+-- fonction ne sert qu'aux entrées qui n'ont pas de bouton à elles : `/co métier`, clic du suivi.
+function PW:CamelotOpenNative(profKey)
+    local native = _G.ProfessionsFrame
+    if native and native:IsShown() then return true end     -- déjà ouverte : surtout ne pas la refermer
+    local line = skillLineFor(profKey)
+    if line and _G.OpenProfessionUIToSkillLine then
+        return (pcall(_G.OpenProfessionUIToSkillLine, line))
+    end
+    if _G.ToggleProfessionsBook then return (pcall(_G.ToggleProfessionsBook)) end
+    return false
+end
+
+-- Les surcharges ci-dessous visent des méthodes définies dans DEUX fichiers : `_ProfWindow.lua`
+-- (chargé avant celui-ci) et `_ProfWindow_Reroll.lua` (chargé APRÈS, cf. l'ordre des `.toc`). À la
+-- portée du fichier, la seconde serait réécrite au chargement. On les pose donc à PLAYER_LOGIN,
+-- comme `disarmCombatHide` : l'ordre des modules ne doit pas décider qui gagne.
+local function installOpeners()
+    if PW._cocCamelotOpeners then return end
+    PW._cocCamelotOpeners = true
+
+    -- Toutes les entrées « ouvre-moi ce métier » (bouton minimap, `/co métier`, clic du suivi)
+    -- mènent à la fenêtre native : elle a un onglet par métier, RÉCOLTES COMPRISES (l'Herboristerie
+    -- a de vraies recettes sur Forever) et FONTE comprise (elle vit dans l'onglet Minage, plus
+    -- besoin du détour par le sort 2656 de `PW:_OpenSmelting`).
+    function PW:OpenFor(profKey)
+        self.rerollKey, self.standaloneKey = nil, nil
+        return self:CamelotOpenNative(profKey)
+    end
+
+    -- Vue COMPACTE neutralisée. Elle n'existait que pour les métiers sans fenêtre en jeu (les
+    -- récoltes de l'Era) ; ici ils en ont une. Et notre cadre est GREFFÉ dans la native : l'ouvrir
+    -- en flottant le sortirait dépouillé de son chrome (cf. stripChrome).
+    function PW:_OpenCompact(profKey) return self:CamelotOpenNative(profKey) end
+
+    -- La vue REROLL, elle, reste la nôtre : le client ne sait rien des métiers d'un perso hors
+    -- ligne. Elle demande l'inverse de la greffe — une vraie fenêtre flottante, avec son chrome.
+    local baseReroll = PW.OpenForReroll
+    function PW:OpenForReroll(prof, rerollKey, name)
+        if not (prof and rerollKey and baseReroll) then return end
+        local native = _G.ProfessionsFrame
+        if native and native:IsShown() then
+            if _G.HideUIPanel then pcall(_G.HideUIPanel, native) else pcall(native.Hide, native) end
+        end
+        self:CamelotDetach(native)          -- rend parent, ancres ET chrome
+        Api.CloseProfession()               -- sinon `_DoRefresh` voit une session ouverte et la préfère au reroll
+        baseReroll(self, prof, rerollKey, name)
+        -- Sur l'Era le socle ferme la native et attend l'événement CLOSE pour rouvrir en reroll.
+        -- Ici les événements TRADE_SKILL_*/CRAFT_* n'existent pas (aucun ne s'enregistre, cf.
+        -- ProfOrders:Start) : personne ne rouvrirait. On montre donc nous-mêmes — idempotent.
+        if self.frame and not self.frame:IsShown() then self.frame:Show() end
+        self:Refresh()
     end
 end
 
@@ -165,7 +263,7 @@ local watcher = CreateFrame("Frame")
 Api.RegisterEventSafe(watcher, "ADDON_LOADED")
 Api.RegisterEventSafe(watcher, "PLAYER_LOGIN")
 watcher:SetScript("OnEvent", function(_, event, addon)
-    if event == "PLAYER_LOGIN" then disarmCombatHide(); wire(); return end
+    if event == "PLAYER_LOGIN" then disarmCombatHide(); installOpeners(); wire(); return end
     if addon == "Blizzard_Professions" then wire() end
 end)
 wire()   -- le module peut déjà être chargé (rechargement d'UI fenêtre ouverte)

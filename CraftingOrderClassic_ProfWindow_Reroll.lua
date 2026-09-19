@@ -26,8 +26,7 @@ function PW:OpenForReroll(prof, rerollKey, name)
     -- et repasserait en mode PLEIN natif. OnProfessionClose voit rerollKey → reste sur notre vue.
     local craft = COC.Craft
     if craft and craft:GetOpenProfessionInfo() then
-        if craft.IsCraftOpen and craft:IsCraftOpen() then if CloseCraft then CloseCraft() end
-        elseif CloseTradeSkill then CloseTradeSkill() end
+        COC.Api.CloseProfession()   -- la disjonction Craft/TradeSkill/C_TradeSkillUI vit dans le Compat
     else
         if not self.frame:IsShown() then self.frame:Show() end
         self:Refresh()

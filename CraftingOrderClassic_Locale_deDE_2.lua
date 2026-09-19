@@ -450,6 +450,13 @@ local de2 = {
     ["cercle ajouté : %s"] = "Kreis hinzugefügt: %s",
     ["cercle retiré : %s"] = "Kreis entfernt: %s",
     ["aucune communauté n° %s."] = "keine Gemeinschaft Nr. %s.",
+
+    -- Minimap Forever + rerolls dans « Mes artisans »
+    ["Clic droit : fenêtre des métiers"] = "Rechtsklick: Berufsfenster",
+    ["Voir chez un autre perso"] = "Bei einem anderen Charakter ansehen",
+    ["Clic : voir les recettes connues"] = "Klick: bekannte Rezepte ansehen",
+    ["Clic droit : voir chez un autre perso"] = "Rechtsklick: bei einem anderen Charakter ansehen",
+    ["Aucun autre perso avec ce métier : %s"] = "Kein anderer Charakter hat diesen Beruf: %s",
 }
 
 for k, v in pairs(de2) do L[k] = v end

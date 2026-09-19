@@ -38,7 +38,6 @@ local de = {
         "Keine Berufe. Öffne das Berufsfenster auf jedem Charakter einmal.",
     ["Partager mes rerolls sur le réseau"] = "Meine Twinks im Netzwerk teilen",
     ["Vitrine"] = "Aushängeschild",
-    ["Rerolls"] = "Twinks",
     ["%s — lecture seule"] = "%s — schreibgeschützt",
     ["Pas de recettes connues (métier de récolte ?)."] = "Keine bekannten Rezepte (Sammelberuf?).",
     ["Repérer les crafteurs autour (en ville)"] = "Handwerker in der Nähe erkennen (in Stadt)",

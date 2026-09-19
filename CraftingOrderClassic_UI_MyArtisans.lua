@@ -172,6 +172,7 @@ function UI:_MyArtProfRow(i)
     local lc = self.myArtProfContent
     local rw = self.myArtProfW or M.LEFT_W   -- largeur de la zone profsList (lue au build)
     r = CreateFrame("Button", nil, lc); r:SetSize(rw, PLH); r:SetPoint("TOPLEFT", 0, -(i - 1) * PLH)
+    r:RegisterForClicks("LeftButtonUp", "RightButtonUp")   -- droit = porteurs du métier (_MyArtisans_Reroll)
     local hi = r:CreateTexture(nil, "HIGHLIGHT"); hi:SetAllPoints(); hi:SetColorTexture(Skin.unpack(Skin.color.rowHover))
     local st = r:CreateTexture(nil, "BACKGROUND"); st:SetAllPoints()
     st:SetColorTexture(Skin.color.tabActive[1], Skin.color.tabActive[2], Skin.color.tabActive[3], 0.30)
@@ -200,7 +201,7 @@ function UI:_FillMyArtProfRow(row, e, selected)
     row.sub:SetText("|cFF888888" .. string.format(L["%d recettes"], nrec)
         .. "  ·  " .. bearers(e) .. "|r")
     row.selTex:SetShown(selected)
-    row:SetScript("OnClick", function() UI.myArtSelProf = e.profKey; UI:RefreshMyArtisans() end)
+    self:_WireMyArtRerollRow(row, e)   -- clics (gauche = sélection, droit = porteurs) + infobulle
     row:Show()
 end
 

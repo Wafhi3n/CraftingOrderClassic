@@ -77,8 +77,10 @@ function Tracker:ToggleSection(section)
     self:Refresh()
 end
 
--- Clic sur une entrée. Gauche = ouvrir la vue du métier concerné (PW:OpenFor lance le sort de métier
--- depuis le clic = événement matériel valable) ; droite = ouvrir le Carnet. Aucun craft d'ici.
+-- Clic sur une entrée. Gauche = ouvrir la vue du métier concerné ; droite = ouvrir le Carnet.
+-- Aucun craft d'ici. Sur l'Era `PW:OpenFor` lance le sort de métier depuis ce clic (événement
+-- matériel valable) ; sur Forever il ouvre la fenêtre native, ce sort y étant PROTÉGÉ (cf.
+-- _ProfWindow_Camelot.lua).
 function Tracker:OnEntryClick(e, button)
     if button == "RightButton" then
         if COC.UI and COC.UI.Toggle then COC.UI:Toggle("orders") end

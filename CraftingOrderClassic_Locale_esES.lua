@@ -39,7 +39,6 @@ local es = {
         "Sin profesiones. Abre la ventana de profesión en cada personaje una vez.",
     ["Partager mes rerolls sur le réseau"] = "Compartir mis alters en la red",
     ["Vitrine"] = "Escaparate",
-    ["Rerolls"] = "Alters",
     ["%s — lecture seule"] = "%s — solo lectura",
     ["Pas de recettes connues (métier de récolte ?)."] = "Sin recetas conocidas (¿profesión de recolección?).",
     ["Repérer les crafteurs autour (en ville)"] = "Detectar artesanos cercanos (en ciudad)",

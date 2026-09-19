@@ -40,7 +40,6 @@ local en = {
         "No professions. Open your profession window on each character once.",
     ["Partager mes rerolls sur le réseau"] = "Share my alts on the network",
     ["Vitrine"] = "Front",
-    ["Rerolls"] = "Alts",
     ["%s — lecture seule"] = "%s — read-only",
     ["Pas de recettes connues (métier de récolte ?)."] = "No known recipes (gathering profession?).",
     -- Repérage des crafteurs à proximité (opt-in, en ville) + bouton « Ajouter ami »

@@ -198,3 +198,18 @@ function A.ChatMessagingBlocked()
     local f = C_ChatInfo and C_ChatInfo.InChatMessagingLockdown
     return (f and f()) or false
 end
+
+-- ---------------------------------------------------------------- métiers
+
+-- Fermer la session de métier ouverte. Trois API selon la saveur : `CloseCraft` (Craft, Era),
+-- `CloseTradeSkill` (TradeSkill, Era) et `C_TradeSkillUI.CloseTradeSkill` (MAINLINE, la seule qui
+-- reste sur Forever). Les appelants Era écrivaient la disjonction à la main derrière une garde
+-- `if CloseCraft then` — garde qui, sur Forever, sort EN SILENCE : la fenêtre n'était jamais
+-- fermée et la vue qui attendait cette fermeture ne s'ouvrait pas.
+function A.CloseProfession()
+    local craft = COC.Craft
+    if craft and craft.IsCraftOpen and craft:IsCraftOpen() and _G.CloseCraft then return _G.CloseCraft() end
+    if _G.CloseTradeSkill then return _G.CloseTradeSkill() end
+    local f = C_TradeSkillUI and C_TradeSkillUI.CloseTradeSkill
+    if f then return (pcall(f)) end
+end
