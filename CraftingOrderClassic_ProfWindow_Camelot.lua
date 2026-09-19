@@ -38,6 +38,7 @@ local GAP = 6          -- respiration entre le contenu natif et notre bande
 local TOP_INSET = 26   -- sous la barre de titre native
 local BOT_INSET = 34   -- au-dessus de la rangée « Create All / Create »
 local nativeBaseW      -- largeur d'origine du cadre natif, capturée UNE fois
+local hostWidened      -- a-t-on REELLEMENT elargi le cadre natif ? (mode encastre seulement)
 
 -- Largeur RÉELLE de la barre d'onglets (All / Guild / Friends / Directory / Incoming). À 5
 -- languettes elle est plus large que la colonne Commandes : sans cette mesure, « Incoming » sort
@@ -67,31 +68,43 @@ local CHROME = { "NineSlice", "Bg", "TopTileStreaks", "PortraitContainer",
 -- Tant que strip était définitif, une vue reroll ouverte après un passage dans la fenêtre native
 -- sortait sans bordure, sans titre et sans croix. On mémorise donc ce qu'on a réellement masqué —
 -- et rien d'autre : une pièce déjà cachée par Blizzard ne doit pas réapparaître à cause de nous.
-local function stripChrome(f)
-    if not f or f._cocStripped then return end
-    local hidden = {}
-    for _, key in ipairs(CHROME) do
-        local part = f[key]
-        if part and part.Hide and (not part.IsShown or part:IsShown()) then
-            hidden[#hidden + 1] = part
-            pcall(part.Hide, part)
-        end
-    end
-    f._cocChromeHidden, f._cocStripped = hidden, true
-end
-
 local function restoreChrome(f)
     if not (f and f._cocStripped) then return end
     for _, part in ipairs(f._cocChromeHidden or {}) do pcall(part.Show, part) end
     f._cocChromeHidden, f._cocStripped = nil, nil
 end
 
+-- Masque les pieces `keys` et les NOTE, pour que restoreChrome les rende. `mode` dit quel habillage
+-- est pose ("full" encastre, "side" accole). Passer d'un mode a l'autre restaure d'abord : sinon le
+-- portrait masque par l'accole n'etait jamais rendu (vue reroll sans portrait), et un cadre deja
+-- marque « depouille » par l'accole sautait le vrai depouillement de l'encastre.
+local function hideChrome(f, keys, mode)
+    if not f or f._cocStripped == mode then return end
+    restoreChrome(f)
+    local hidden = {}
+    for _, key in ipairs(keys) do
+        local part = f[key]
+        if part and part.Hide and (not part.IsShown or part:IsShown()) then
+            hidden[#hidden + 1] = part
+            pcall(part.Hide, part)
+        end
+    end
+    f._cocChromeHidden, f._cocStripped = hidden, mode
+end
+
+local function stripChrome(f) hideChrome(f, CHROME, "full") end
+
+-- ACCOLEE : chrome complet (bordure, titre, croix) SAUF le portrait. Notre disposition a ete
+-- dessinee pour un cadre depouille : la rangee d'onglets commence en haut a gauche, la ou le
+-- portrait vient se poser -- il recouvrait l'onglet « All » (releve en jeu le 2026-09-19).
+local function sideChrome(f) hideChrome(f, { "PortraitContainer", "portrait" }, "side") end
+
 -- ---------------------------------------------------------------- greffe
 
 -- RIEN ne se greffe ni ne se degreffe EN COMBAT. Une fois notre colonne reparentee dans le panneau
 -- natif, elle est PROTEGEE comme lui : SetWidth / SetPoint / SetParent / SetToplevel / Show y sont
 -- tous refuses, et le cadre natif lui-meme ne peut plus etre redimensionne. Releve du 2026-09-19
--- (Logs	aint.log) : 15 blocages en une session, tous a l'attache, declenchee par l'ouverture de la
+-- (Logs\taint.log) : 15 blocages en une session, tous a l'attache, declenchee par l'ouverture de la
 -- fenetre en plein combat -- y compris quand c'est le micro-bouton de Blizzard qui l'ouvre, donc
 -- sans aucune action de l'addon. On repousse le travail a la sortie de combat et on le rejoue selon
 -- l'etat REEL de la fenetre a ce moment-la (elle a pu se fermer entre-temps).
@@ -157,6 +170,76 @@ local function widenHost(native, colW)
     native:SetWidth(nativeBaseW + colW + GAP * 2)
 end
 
+-- DEUX MODES, un seul drapeau (`COC.db.camelotAccole`, bascule : /co accole).
+--  * ENCASTRE (DEFAUT) : on elargit `ProfessionsFrame` et on reparente la colonne dedans. La colonne
+--    devient alors protegee comme son hote : en combat on ne l'attache ni ne la detache (cf. regen).
+--  * ACCOLE (option) : la colonne reste sur UIParent et s'ancre au bord droit du cadre, AU-DELA de la
+--    bande d'onglets verticale (ancree dehors). Aucune ecriture chez Blizzard, et la colonne n'est
+--    pas protegee : posee, elle reste utilisable en combat, et elle se cache si l'hote se ferme en
+--    combat. Comme la greffe, elle ne se POSE qu'hors combat. Contrepartie : l'ensemble est plus large.
+-- HISTOIRE, pour ne pas refaire l'erreur. Le 2026-09-19 l'accole est devenu le defaut parce qu'on
+-- accusait l'elargissement d'etre la cause des centaines de refus des barres d'action en combat.
+-- C'etait FAUX : les deux vraies causes, prouvees au journal puis au labo (TaintLab, COC desactive),
+-- etaient nos menus UIDropDownMenu et notre emprunt de HelpPlate.Show (cf. _UI_Skin_Dropdown.lua et
+-- _UI_Skin_HelpPlate.lua). Les deux corriges, l'encastre a repris sa place de defaut. Le drapeau a
+-- change de nom a cette occasion : l'ancien (`camelotSide`) portait les essais de ce jour-la.
+local function sideMode()
+    return COC.db ~= nil and COC.db.camelotAccole == true
+end
+
+-- Accolee, la colonne est COLLEE a une fenetre qui affiche deja « Cuisine 31/75 » : repeter metier et
+-- rang dans son titre ne dit rien de neuf. On nomme ce que la colonne EST, a CHAQUE ecriture du titre
+-- (chaque Refresh reecrivait « Cuisine 31/75 », signale en jeu le 2026-09-19). Encastree, elle n'a
+-- pas de titre du tout (chrome depouille). Surcharge posee ICI, comme les autres regles de Forever.
+local baseSetTitle = PW._SetTitle
+if baseSetTitle then
+    function PW:_SetTitle(label, suffix)
+        if self.docked and sideMode() then label, suffix = COC.L["Commandes"], nil end
+        return baseSetTitle(self, label, suffix)
+    end
+end
+
+-- De combien les onglets lateraux depassent A DROITE du cadre. Mesure, pas devinee : le nombre
+-- d'onglets depend des metiers du joueur.
+local function sideTabOverhang(native)
+    local right = native:GetRight()
+    if not right then return 0 end
+    local out = 0
+    local tabs = { native.ProfessionsOverviewTab }
+    for i = 1, 7 do tabs[#tabs + 1] = native["Professions" .. i .. "Tab"] end
+    for _, t in ipairs(tabs) do
+        if t and t.IsShown and t:IsShown() and t.GetRight and t:GetRight() then
+            local over = t:GetRight() - right
+            if over > out then out = over end
+        end
+    end
+    return out
+end
+
+-- Mode ACCOLE : on ne touche a rien chez Blizzard. Parent UIParent (donc jamais protegee), ancree au
+-- bord droit du cadre, au-dela des onglets. Non deplacable quand meme : elle doit suivre son hote,
+-- et la tirer romprait l'ancrage.
+local function sideColumn(self, native)
+    local f = self.frame
+    f:SetMovable(false)
+    f:RegisterForDrag()
+    f:SetParent(UIParent)
+    f:ClearAllPoints()
+    -- Colle a la bande d'onglets (2 px, pas le GAP de 6 : accolee, la colonne doit lire comme le
+    -- prolongement de la fenetre, pas comme un panneau qui flotte a cote). Et elle epouse la hauteur
+    -- EXACTE de l'hote : TOP_INSET / BOT_INSET servaient a tenir DANS le chrome natif, ils n'ont plus
+    -- de sens dehors -- ils laissaient la colonne plus courte en haut comme en bas.
+    -- L'ecart des onglets est mesure dans les unites du cadre natif, que le gestionnaire de panneaux
+    -- peut reduire (checkFit) ; l'ancre, elle, s'exprime dans celles de la colonne.
+    local x = 2 + sideTabOverhang(native) * native:GetEffectiveScale() / f:GetEffectiveScale()
+    f:SetPoint("TOPLEFT", native, "TOPRIGHT", x, 0)
+    f:SetPoint("BOTTOMLEFT", native, "BOTTOMRIGHT", x, 0)
+    if f.SetToplevel then f:SetToplevel(false) end
+    f:SetFrameStrata(native:GetFrameStrata() or "MEDIUM")
+    f:SetFrameLevel((native:GetFrameLevel() or 0) + 10)
+    f:Show()
+end
+
 -- GREFFEE, ELLE N'EST PLUS UNE FENETRE.
 --  * Plus deplacable : le kit rend toute fenetre draggable, et la tirer la sortait du cadre natif en
 --    laissant une bande vide derriere elle (releve du 2026-09-19). Sa place appartient a son hote.
@@ -220,19 +303,35 @@ function PW:CamelotAttach(native)
         return self:CamelotDetach(native)
     end
     self:Build()
-    stripChrome(self.frame)
+    -- Le depouillement n'a de sens qu'ENCASTREE : il sert a fondre la colonne dans le fond natif.
+    -- ACCOLEE, elle est un panneau a part entiere et doit porter sa bordure, son titre et sa croix,
+    -- sinon on obtient un cadre a moitie nu pose dans le vide (vu en jeu le 2026-09-19).
+    local side = sideMode()
+    if side then sideChrome(self.frame) else stripChrome(self.frame) end
     local colW = sizeColumn(self)
-    widenHost(native, colW)
-    dockColumn(self, native)
+    if side then
+        sideColumn(self, native)          -- accole : aucune ecriture chez Blizzard (titre : cf. _SetTitle)
+    else
+        widenHost(native, colW)           -- encastre : on elargit le cadre natif (cf. en-tete)
+        hostWidened = true
+        dockColumn(self, native)
+    end
     traceAttach(self, native)
     self:Refresh()
 end
 
 function PW:CamelotDetach(native)
     tr("detach appele : combat=%s baseW=%s", tostring(lockedDown() and true or false), tostring(nativeBaseW))
-    if lockedDown() then return end            -- rejoue a PLAYER_REGEN_ENABLED (cf. CamelotAttach)
-    if native and nativeBaseW then
-        native:SetWidth(nativeBaseW)
+    if lockedDown() then
+        -- Rejoue a PLAYER_REGEN_ENABLED (cf. regen). Une exception : ACCOLEE et jamais greffee, la
+        -- colonne n'est pas protegee, donc on la cache tout de suite ; sinon elle restait seule a
+        -- l'ecran quand l'hote se fermait en plein combat. Parent, ancres et chrome attendent la fin.
+        if self.frame and not hostWidened and not self.frame:IsProtected() then self.frame:Hide() end
+        return
+    end
+    if native and nativeBaseW and hostWidened then
+        native:SetWidth(nativeBaseW)      -- seulement si c'est NOUS qui l'avons elargi
+        hostWidened = nil
     end
     self.docked = false
     if self.frame then
@@ -247,103 +346,6 @@ function PW:CamelotDetach(native)
         self.frame:RegisterForDrag("LeftButton")
         if self.frame.SetToplevel then self.frame:SetToplevel(true) end
         self.frame:SetFrameStrata("HIGH")
-    end
-end
-
--- ---------------------------------------------------------------- ouverture d'un métier
-
--- Clé de métier COC → `skillLineID` du client, ce qu'attend l'ouvreur natif. Les valeurs rendues
--- par `GetProfessions` sont des index de LIVRE DE SORTS, pas des métiers : seul
--- `GetProfessionInfo` donne le nom localisé et la ligne de compétence. On repasse par
--- `ResolveProfession` (alias FR/DE/ES de CraftLink), le même résolveur que Directory_Skills —
--- jamais une comparaison de libellés écrite à la main.
--- CraftLink est une bibliothèque LibStub, JAMAIS une globale : la garde d'origine testait
--- `_G.CraftLink`, toujours nil, et la fonction rendait nil dès sa 1re ligne — l'ouverture directe
--- d'un métier n'a donc jamais été tentée, on tombait à chaque fois sur la page d'ensemble.
--- Relevé le 2026-09-19 : `/co métier cuisine` ouvrait « Professions » alors que GetProfessions()
--- rendait bien 6, 8, 5, 9, 7. Ordre sur Forever, lu dans le livre des métiers de Blizzard :
--- prof1, prof2, SECOURISME (pas d'archéologie), pêche, cuisine ; 7e retour de GetProfessionInfo
--- = identifiant de la ligne de métier.
-local function skillLineFor(profKey)
-    local lib = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
-    if not (profKey and lib and _G.GetProfessions and _G.GetProfessionInfo) then return nil end
-    local p1, p2, faid, fish, cook = GetProfessions()
-    for _, idx in pairs({ p1, p2, faid, fish, cook }) do    -- pairs : sauter les trous sans s'arrêter
-        local name, _, _, _, _, _, skillLine = GetProfessionInfo(idx)
-        if name and skillLine and lib:ResolveProfession(name) == profKey then return skillLine end
-    end
-    return nil
-end
-
--- Ouvre la fenêtre de métier NATIVE. **Aucun sort lancé depuis notre code** : `CastSpellByName`
--- est PROTÉGÉE sur cette cible — vécu le 2026-09-19 au clic « Cuisine » du menu minimap
--- (ADDON_ACTION_BLOCKED). Blizzard ouvre ses propres onglets latéraux avec
--- `C_SpellBook.CastSpellBookItem`, protégée elle aussi : il n'existe aucun équivalent appelable
--- depuis un addon. On passe donc par les globales FrameXML, qui ne font que charger le module et
--- montrer le panneau.
--- ⚠️ À ÉPROUVER EN JEU. `ProfessionsMixin:OnShow` déclenche `ProfessionsFrame.Show`, sur lequel
--- CHAQUE onglet latéral rappelle `CastProfessionSpell()`. Si notre appel teinte cette chaîne, le
--- blocage revient — déplacé, pas supprimé. Le chemin PROUVÉ est `ToggleProfessionsBook()` : c'est mot
--- pour mot ce qu'appelle le micro-bouton « Métiers » de Blizzard, et c'est celui du bouton minimap
--- (cf. _Minimap.lua, validé en jeu le 2026-09-19). Il ouvre la page d'ensemble au lieu du métier
--- visé, d'où l'essai d'`OpenProfessionUIToSkillLine` d'abord. Cette fonction ne sert qu'aux entrées
--- qui n'ont pas de bouton à elles : `/co métier`, clic du suivi.
--- Repli si le 1er chemin ÉCHOUE (revue API v1.32.0 : avant, on rendait `false` sans rien ouvrir, en
--- silence). Limite à connaître : `pcall` n'attrape PAS un ADDON_ACTION_BLOCKED, qui n'est pas une
--- erreur Lua ; ce repli couvre une erreur (module qui ne charge pas, ligne de métier inconnue),
--- pas un blocage de taint.
-function PW:CamelotOpenNative(profKey)
-    local native = _G.ProfessionsFrame
-    if native and native:IsShown() then return true end     -- déjà ouverte : surtout ne pas la refermer
-    local line = skillLineFor(profKey)
-    if line and _G.OpenProfessionUIToSkillLine then
-        if pcall(_G.OpenProfessionUIToSkillLine, line) then return true end
-        native = _G.ProfessionsFrame                          -- module chargé entre-temps : relire
-        if native and native:IsShown() then return true end   -- ouverte à mi-chemin : ne pas empiler
-    end
-    if _G.ToggleProfessionsBook then return (pcall(_G.ToggleProfessionsBook)) end
-    return false
-end
-
--- Les surcharges ci-dessous visent des méthodes définies dans DEUX fichiers : `_ProfWindow.lua`
--- (chargé avant celui-ci) et `_ProfWindow_Reroll.lua` (chargé APRÈS, cf. l'ordre des `.toc`). À la
--- portée du fichier, la seconde serait réécrite au chargement. On les pose donc à PLAYER_LOGIN,
--- comme `disarmCombatHide` : l'ordre des modules ne doit pas décider qui gagne.
-local function installOpeners()
-    if PW._cocCamelotOpeners then return end
-    PW._cocCamelotOpeners = true
-
-    -- Toutes les entrées « ouvre-moi ce métier » (bouton minimap, `/co métier`, clic du suivi)
-    -- mènent à la fenêtre native : elle a un onglet par métier, RÉCOLTES COMPRISES (l'Herboristerie
-    -- a de vraies recettes sur Forever) et FONTE comprise (elle vit dans l'onglet Minage, plus
-    -- besoin du détour par le sort 2656 de `PW:_OpenSmelting`).
-    function PW:OpenFor(profKey)
-        self.rerollKey, self.standaloneKey = nil, nil
-        return self:CamelotOpenNative(profKey)
-    end
-
-    -- Vue COMPACTE neutralisée. Elle n'existait que pour les métiers sans fenêtre en jeu (les
-    -- récoltes de l'Era) ; ici ils en ont une. Et notre cadre est GREFFÉ dans la native : l'ouvrir
-    -- en flottant le sortirait dépouillé de son chrome (cf. stripChrome).
-    function PW:_OpenCompact(profKey) return self:CamelotOpenNative(profKey) end
-
-    -- La vue REROLL, elle, reste la nôtre : le client ne sait rien des métiers d'un perso hors
-    -- ligne. Elle demande l'inverse de la greffe — une vraie fenêtre flottante, avec son chrome.
-    local baseReroll = PW.OpenForReroll
-    function PW:OpenForReroll(prof, rerollKey, name)
-        if not (prof and rerollKey and baseReroll) then return end
-        local native = _G.ProfessionsFrame
-        if native and native:IsShown() then
-            if _G.HideUIPanel then pcall(_G.HideUIPanel, native) else pcall(native.Hide, native) end
-        end
-        self:CamelotDetach(native)          -- rend parent, ancres ET chrome
-        Api.CloseProfession()               -- sinon `_DoRefresh` voit une session ouverte et la préfère au reroll
-        baseReroll(self, prof, rerollKey, name)
-        -- Sur l'Era le socle ferme la native et attend l'événement CLOSE pour rouvrir en reroll.
-        -- Ici les événements TRADE_SKILL_*/CRAFT_* n'existent pas (aucun ne s'enregistre, cf.
-        -- ProfOrders:Start) : personne ne rouvrirait. On montre donc nous-mêmes — idempotent.
-        if self.frame and not self.frame:IsShown() then self.frame:Show() end
-        self:Refresh()
     end
 end
 
@@ -362,6 +364,9 @@ local function wire()
     -- natif resté large et notre colonne repartie sur UIParent (relevé en jeu le 2026-09-19).
     nativeBaseW = nativeBaseW or native:GetWidth()
     tr("cablage : largeur d'origine=%s, deja ouverte=%s", tostring(nativeBaseW), tostring(native:IsShown()))
+    -- Appel DIRECT, sans report. On a cru un temps (2026-09-19) que ces hooks teintaient la pile du
+    -- clic d'onglet ; faux : ce clic cache le livre des metiers AVANT d'afficher la page de recettes,
+    -- et la ligne refusee venait avant nos hooks (la contamination venait de HelpPlate.Show).
     Api.HookScriptSafe(native, "OnShow", function(f) PW:CamelotAttach(f) end)
     Api.HookScriptSafe(native, "OnHide", function(f) PW:CamelotDetach(f) end)
     -- On suit aussi la PAGE : passer de l'ensemble a un metier (et l'inverse) ne rouvre pas la
@@ -393,7 +398,7 @@ local watcher = CreateFrame("Frame")
 Api.RegisterEventSafe(watcher, "ADDON_LOADED")
 Api.RegisterEventSafe(watcher, "PLAYER_LOGIN")
 watcher:SetScript("OnEvent", function(_, event, addon)
-    if event == "PLAYER_LOGIN" then disarmCombatHide(); installOpeners(); wire(); return end
+    if event == "PLAYER_LOGIN" then disarmCombatHide(); wire(); return end
     if addon == "Blizzard_Professions" then wire() end
 end)
 wire()   -- le module peut déjà être chargé (rechargement d'UI fenêtre ouverte)
@@ -402,3 +407,25 @@ wire()   -- le module peut déjà être chargé (rechargement d'UI fenêtre ouve
 -- s'ouvrir par-dessus (c'est ce qui donnait DEUX fenêtres). On force donc le mode « Vue Blizzard »,
 -- dont la greffe ci-dessus est la version « dedans » plutôt que « collée dehors ».
 function PW:IsEnabled() return false end
+
+-- /co accole : bascule entre colonne ENCASTREE et colonne ACCOLEE (cf. l'en-tete de sideMode).
+-- Re-greffe tout de suite si la fenetre est ouverte, pour voir le resultat sans /reload.
+function PW:CamelotSideCmd()
+    if not COC.db then return end
+    local L = COC.L
+    -- En combat ni l'attache ni le detachement ne passent : basculer quand meme laissait l'ancien
+    -- mode en place (cadre natif encore elargi) sous le nouveau a la sortie du combat.
+    if lockedDown() then
+        print("|cFF33DD88Crafting Order|r " .. L["Impossible en combat — réessaie après le combat."])
+        return
+    end
+    COC.db.camelotAccole = not sideMode()
+    local native = _G.ProfessionsFrame
+    if native and native:IsShown() then
+        self:CamelotDetach(native)
+        self:CamelotAttach(native)
+    end
+    print("|cFF33DD88Crafting Order|r " ..
+        (COC.db.camelotAccole and L["colonne ACCOLÉE à la fenêtre de métier"]
+                              or L["colonne ENCASTRÉE dans la fenêtre de métier"]))
+end

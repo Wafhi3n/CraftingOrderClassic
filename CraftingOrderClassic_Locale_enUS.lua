@@ -261,6 +261,9 @@ local en = {
     ["» Vue Crafting Order"] = "» Crafting Order view",
     ["Module Commandes non chargé — redémarre complètement WoW (quitter/relancer), pas un simple /reload."] =
         "Orders module not loaded — fully restart WoW (quit/relaunch), not just /reload.",
+    ["colonne ACCOLÉE à la fenêtre de métier"] = "orders column ALONGSIDE the professions window",
+    ["colonne ENCASTRÉE dans la fenêtre de métier"] = "orders column INSIDE the professions window",
+    ["Impossible en combat — réessaie après le combat."] = "Not possible in combat — try again after the fight.",
 }
 
 for k, v in pairs(en) do L[k] = v end

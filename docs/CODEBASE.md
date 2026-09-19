@@ -4,31 +4,32 @@
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
-120 modules + 4 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
+122 modules + 4 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
 
 ## Modules (ordre de chargement)
 
 | Fichier | Rôle | Lignes |
 |---|---|---|
-| `CraftingOrderClassic.lua` | Crafting Order - Classic — réseau GLOBAL et SOCIAL de commandes de craft. | 447 |
+| `CraftingOrderClassic.lua` | Crafting Order - Classic — réseau GLOBAL et SOCIAL de commandes de craft. | 448 |
 | `CraftingOrderClassic_Compat.lua` | couche d'adaptation d'API entre les SAVEURS de client. | 215 |
 | `CraftingOrderClassic_Trace.lua` | trace réseau PERSISTÉE, lisible hors-jeu. | 79 |
 | `CraftingOrderClassic_Migrations.lua` | versionnage du schéma SavedVariables. | 40 |
 | `CraftingOrderClassic_Locale.lua` | socle de localisation du CHROME de l'UI. | 12 |
-| `CraftingOrderClassic_Locale_enUS.lua` | overlay ANGLAIS (enUS/enGB). | 266 |
+| `CraftingOrderClassic_Locale_enUS.lua` | overlay ANGLAIS (enUS/enGB). | 269 |
 | `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 480 |
-| `CraftingOrderClassic_Locale_deDE.lua` | overlay ALLEMAND (deDE). | 268 |
+| `CraftingOrderClassic_Locale_deDE.lua` | overlay ALLEMAND (deDE). | 271 |
 | `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 462 |
-| `CraftingOrderClassic_Locale_esES.lua` | overlay ESPAGNOL (esES/esMX). | 269 |
+| `CraftingOrderClassic_Locale_esES.lua` | overlay ESPAGNOL (esES/esMX). | 272 |
 | `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 463 |
 | `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 300 |
 | `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 297 |
 | `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 297 |
 | `CraftingOrderClassic_Elemental.lua` | pseudo-« métier » de récolte « Élémentaire ». | 61 |
 | `CraftingOrderClassic_UI_Skin.lua` | tokens + helpers SÉMANTIQUES du skin (métiers, statuts, rareté, quantités, icônes natives) et petits widgets d'affichage. | 431 |
-| `CraftingOrderClassic_UI_Skin_Native.lua` | kit de chrome Blizzard NATIF (le « framework » UI de COC). | 496 |
+| `CraftingOrderClassic_UI_Skin_Native.lua` | kit de chrome Blizzard NATIF (le « framework » UI de COC). | 450 |
+| `CraftingOrderClassic_UI_Skin_Dropdown.lua` | menu deroulant (selecteur) du kit natif. | 93 |
 | `CraftingOrderClassic_UI_Skin_Sections.lua` | kit de chrome natif, volet SECTIONS : comment on découpe l'intérieur d'une fenêtre en blocs et en zones. | 247 |
-| `CraftingOrderClassic_UI_Skin_HelpPlate.lua` | kit d'AIDE CONTEXTUELLE (le « bouton i » de retail). | 142 |
+| `CraftingOrderClassic_UI_Skin_HelpPlate.lua` | kit d'AIDE CONTEXTUELLE (le « bouton i » de retail). | 258 |
 | `CraftingOrderClassic_ShareReagents.lua` | « liste de courses » : diffuser en un clic les réactifs d'une recette (vue métier) ou d'une commande (carte) dans un canal de discussion, avec le LIEN objet de chaque réactif. | 157 |
 | `CraftingOrderClassic_UI.lua` | fenêtre principale (chrome Blizzard natif, kit UI_Skin_Native). | 485 |
 | `CraftingOrderClassic_UI_HelpPlate.lua` | AIDE CONTEXTUELLE de la FENÊTRE PRINCIPALE (« bouton i »). | 166 |
@@ -79,7 +80,8 @@
 | `CraftingOrderClassic_ProfWindow_Layout.lua` | GÉOMÉTRIE de la vue métier (fenêtre 3 colonnes). | 81 |
 | `CraftingOrderClassic_ProfWindow_HelpPlate.lua` | AIDE CONTEXTUELLE de la Vue Métier (« bouton i »). | 82 |
 | `CraftingOrderClassic_ProfWindow_Dock.lua` | mode DOCK de la vue métier (« Vue Blizzard ») : la fenêtre native reste VISIBLE (non neutralisée) et NOTRE colonne Commandes s'épingle à sa droite. | 70 |
-| `CraftingOrderClassic_ProfWindow_Camelot.lua` | POC : notre colonne Commandes À L'INTÉRIEUR de la fenêtre de métier NATIVE de WoW: Forever (Camelot). | 404 |
+| `CraftingOrderClassic_ProfWindow_Camelot.lua` | POC : notre colonne Commandes À L'INTÉRIEUR de la fenêtre de métier NATIVE de WoW: Forever (Camelot). | 431 |
+| `CraftingOrderClassic_ProfWindow_Camelot_Open.lua` | OUVRIR un metier dans la fenetre NATIVE de WoW: Forever, et rediriger vers elle toutes nos entrees (bouton minimap, /co prof, clic du suivi). | 115 |
 | `CraftingOrderClassic_ProfWindow_Toolbar.lua` | barre d'outils de la colonne Recettes (vue métier) : les toggles de TRI (slot recTools, à gauche : rentabilité / valeurs exactes / progression — Lazy Gold) et de FILTRE (slot recFilterToggles, à droite : « j'ai les matériaux » / « montée de compétence »). | 245 |
 | `CraftingOrderClassic_ProfWindow_Recipes.lua` | colonne GAUCHE : liste de recettes virtualisée (scroll), recherche, couleur par difficulté, sélection, badge « demandé » (nb de commandes ouvertes pour l'objet). | 486 |
 | `CraftingOrderClassic_ProfWindow_Leveling.lua` | aide à la MONTÉE DE MÉTIER dans la liste de recettes : coût de progression (réactifs au prix Lazy Gold ÷ chance de point selon la couleur), badge « meilleur coût/point » sur la recette recommandée, icônes de SOURCE sur les manquantes (formateur / vendeur PNJ / coté à l'HV / à farmer) et tri « progression » affiné par coût. | 219 |
@@ -407,9 +409,6 @@
 > Icône native encadrée d'un liseré 1 px — même famille visuelle que Skin.MakeBadge. Contrat :
 > .icon (texture, désaturable par l'appelant), :SetSelected(on) = liseré doré vif.
 
-**`Skin.MakeDropdown(name, parent, w, items, opts)`**
-
-
 **`Skin.MakeCheckButton(parent, text, size)`**
 
 > Case à cocher NATIVE (`UICheckButtonTemplate`, SharedUIPanelTemplates.xml:413) — le widget des
@@ -437,6 +436,11 @@
 > ré-ancrable/mesurable), `b:SetText`, `b:SetSelected(on)` (verrou doré, reste CLIQUABLE).
 > ⚠️ `UI-AuctionFrame-FilterBg` est de l'art PEINT figé (ancien monde), pas une tuile native : à
 > réserver aux listes de filtres facettés type HdV — ne pas en faire le chrome général (cf. skill).
+
+### `CraftingOrderClassic_UI_Skin_Dropdown.lua`
+
+**`Skin.MakeDropdown(name, parent, w, items, opts)`**
+
 
 ### `CraftingOrderClassic_UI_Skin_Sections.lua`
 
@@ -495,15 +499,12 @@
 > (help-i + surbrillance) ; repli défensif si absent. `onToggle` au clic. opts : size · point (ancre
 > {p, rel, relP, x, y}) · tooltip.
 
-**`Skin.ShowHelp(win, entries, mainButton)`**
+**`Skin.ShowHelp(win, entries)`**
 
-> Ouvre le voile d'aide natif sur `win`, avec une tuile par entrée.
+> Ouvre le voile d'aide sur `win`, avec une tuile par entrée.
 > entries : { { frame = <Region>, text = <string>, dir = "UP|DOWN|LEFT|RIGHT" }, ... }.
-> La géométrie est LUE À CHAUD (positions réelles), donc appelable à chaque ouverture. Rend true si posé.
-> Un cadre MASQUE garde ses coordonnees : sans le test IsVisible plus bas, une section absente de la
-> vue courante se faisait quand meme entourer - des boites vides, parfois hors du cadre (releve du
-> 2026-09-19 sur la fenetre greffee de Forever, ou seule la colonne Commandes subsiste : l'aide
-> entourait encore Recettes et Detail). Generique : vaut pour la vue custom, le dock et la greffe.
+> La géométrie est LUE À CHAUD (positions réelles), donc appelable à chaque ouverture. Rend true si
+> posé. Un 3e argument (l'ancien bouton principal de HelpPlate) est accepté et ignoré.
 
 **`Skin.HideHelp()`**
 
@@ -669,8 +670,8 @@
 > (médaillon-déclencheur + flèche) · MakeTabs (languettes natives TabButtonTemplate, en haut) · MakeGoldButton (bouton 3-tranches
 > natif, anti-reskin, variante sécurisée) · MakeFlatRow (ligne de liste/flyout plate) · MakeIconButton
 > (carré à icône, filtres/pills) · MakeFilterButton (bande de filtre style hôtel des ventes) · MakeFlyout
-> (dropdown maison : puits + closer + pool de lignes) · MakeDropdown (dropdown NATIF UIDropDownMenu,
-> le sélecteur gris de l'HdV) · MakeCheckButton (case à cocher NATIVE, style « Objets utilisables »
+> (dropdown maison : puits + closer + pool de lignes) · MakeDropdown (selecteur MAISON sans
+> UIDropDownMenu, qui teintait des globales partagees -- cf. _UI_Skin_Dropdown.lua) · MakeCheckButton (case à cocher NATIVE, style « Objets utilisables »
 > de l'HdV) · FieldLabel (légende de champ style HdV). Les primitives de SECTIONS (MakeInset,
 > MakeDivider, MakeDividerV) vivent dans _UI_Skin_Sections.lua (même table Skin, anti-monolithe).
 > MakeFlyout vs MakeDropdown : le premier est un MENU maison (géométrie libre, lignes riches : métiers,
@@ -678,7 +679,15 @@
 > MakeDropdown dès qu'il s'agit de choisir UNE valeur dans une liste courte.
 > INTOUCHABLE ici aussi : le langage couleur (statuts d'ordre, rareté) n'est jamais recoloré.
 
-**API** : `Skin.MakeGoldButton(parent, w, h, text, template)` · `Skin.MakeWindow(name, w, h, opts)` · `Skin.SetWindowPortrait(f, tex)` · `Skin.SetPortraitClickable(f, onClick, tooltipText)` · `Skin.MakeTabs(f, defs, onSelect, opts)` · `Skin.MakeFlatRow(parent, w, h)` · `Skin.PersonHighlight(row)` · `Skin.MakeArtisanRow(parent, w, h)` · `Skin.MakeFlyout(name, w, opts)` · `Skin.MakeIconButton(parent, size, tex)` · `Skin.MakeDropdown(name, parent, w, items, opts)` · `Skin.MakeCheckButton(parent, text, size)` · `Skin.FieldLabel(parent, text, x, y)` · `Skin.MakeFilterButton(parent, w, h, text)`
+**API** : `Skin.MakeGoldButton(parent, w, h, text, template)` · `Skin.MakeWindow(name, w, h, opts)` · `Skin.SetWindowPortrait(f, tex)` · `Skin.SetPortraitClickable(f, onClick, tooltipText)` · `Skin.MakeTabs(f, defs, onSelect, opts)` · `Skin.MakeFlatRow(parent, w, h)` · `Skin.PersonHighlight(row)` · `Skin.MakeArtisanRow(parent, w, h)` · `Skin.MakeFlyout(name, w, opts)` · `Skin.MakeIconButton(parent, size, tex)` · `Skin.MakeCheckButton(parent, text, size)` · `Skin.FieldLabel(parent, text, x, y)` · `Skin.MakeFilterButton(parent, w, h, text)`
+
+### `CraftingOrderClassic_UI_Skin_Dropdown.lua`
+> CraftingOrderClassic_UI_Skin_Dropdown.lua — menu deroulant (selecteur) du kit natif.
+> Extrait de _UI_Skin_Native.lua le 2026-09-19 (anti-monolithe) en meme temps que sa reecriture
+> SANS UIDropDownMenu : c'est lui qui teintait l'interface de Blizzard (cf. l'en-tete ci-dessous).
+> Charge APRES _UI_Skin_Native.lua (il s'appuie sur Skin.MakeFlyout et Skin.SkinWell).
+
+**API** : `Skin.MakeDropdown(name, parent, w, items, opts)`
 
 ### `CraftingOrderClassic_UI_Skin_Sections.lua`
 > CraftingOrderClassic_UI_Skin_Sections.lua — kit de chrome natif, volet SECTIONS : comment on
@@ -701,22 +710,21 @@
 > c'est l'overlay EN PLACE : un clic fige la fenêtre et pose des bulles sur ses vrais contrôles. Le jeu
 > retail a les deux ; complémentaires (bulles courtes ici, détail dans l'onglet Aide).
 > 
-> Même table `Skin` que les autres _UI_Skin*. On EMPRUNTE le système natif `Blizzard_HelpPlate` (chargé
-> sur Era : dépendance dure de Blizzard_UIPanels_Game) : un voile plein écran `HelpPlateCanvas` capte
-> TOUS les clics de la fenêtre, et chaque « tuile » surligne un rectangle avec une bulle fléchée au
-> survol. Zéro asset (l'icône est `Interface\common\help-i`, celle de retail).
+> Même table `Skin` que les autres _UI_Skin*. Le RENDU est celui de l'aide native de retail (tuiles
+> surlignées, pastilles « i », bulles fléchées), mais ce sont NOS exemplaires des gabarits de
+> `Blizzard_HelpPlate`, pas le système lui-même : cf. « le voile, A NOUS » plus bas. Zéro asset.
 > 
 > LE PARI « aide sur les objets SPEC » (idée user) : `Skin.MakeSections` rend `{ [id] = frame }`, donc
 > chaque section EST une vraie frame positionnée. Au lieu de coder les coordonnées à la main (ce que
 > fait Blizzard), on TAGUE le nœud SPEC (`help = "<id>"`, `helpDir = "LEFT|RIGHT|UP|DOWN"`) et on dérive
-> la `HighLightBox` du rectangle RÉEL de la frame, à l'ouverture. Le TEXTE reste du contenu (locale),
+> la tuile du rectangle RÉEL de la frame, à l'ouverture. Le TEXTE reste du contenu (locale),
 > déclaré côté consommateur — la SPEC ne porte que le point d'accroche (cf. discipline SPEC=structure).
 > 
-> ⚠️ ÉCHELLES : le voile est reparenté sur UIParent (donc à l'échelle UIParent) mais ANCRÉ sur la
-> fenêtre. On normalise chaque rectangle en PIXELS ÉCRAN puis on divise par l'échelle du voile
-> (`HelpPlate.GetEffectiveScale`) → robuste quelle que soit l'échelle d'UI, sans supposer scale=1.
+> ⚠️ ÉCHELLES : le voile vit sur UIParent (il ne doit pas devenir l'enfant d'une fenêtre qui peut être
+> protégée, cf. la greffe de Forever) mais on lui donne l'échelle EFFECTIVE de la fenêtre : toutes ses
+> coordonnées sont alors celles de la fenêtre, quelle que soit l'échelle d'UI.
 
-**API** : `Skin.CollectHelp(spec)` · `Skin.MakeHelpButton(parent, onToggle, opts)` · `Skin.ShowHelp(win, entries, mainButton)` · `Skin.HideHelp()` · `Skin.HelpIsOpen()`
+**API** : `Skin.CollectHelp(spec)` · `Skin.MakeHelpButton(parent, onToggle, opts)` · `Skin.ShowHelp(win, entries)` · `Skin.HideHelp()` · `Skin.HelpIsOpen()`
 
 ### `CraftingOrderClassic_ShareReagents.lua`
 > CraftingOrderClassic_ShareReagents.lua — « liste de courses » : diffuser en un clic les réactifs
@@ -1411,7 +1419,15 @@
 > tableau et CACHE tout ce qui dépasse les métiers connus — notre onglet serait masqué à chaque
 > rafraîchissement. La bande élargie n'a pas besoin d'onglet.
 
-**API** : `PW:CamelotAttach(native)` · `PW:CamelotDetach(native)` · `PW:CamelotOpenNative(profKey)` · `PW:IsEnabled()`
+**API** : `PW:CamelotAttach(native)` · `PW:CamelotDetach(native)` · `PW:IsEnabled()` · `PW:CamelotSideCmd()`
+
+### `CraftingOrderClassic_ProfWindow_Camelot_Open.lua`
+> CraftingOrderClassic_ProfWindow_Camelot_Open.lua — OUVRIR un metier dans la fenetre NATIVE de
+> WoW: Forever, et rediriger vers elle toutes nos entrees (bouton minimap, /co prof, clic du suivi).
+> Extrait de _ProfWindow_Camelot.lua le 2026-09-19 (anti-monolithe : le fichier passait a 514 lignes).
+> La greffe (cette colonne cote a cote avec la fenetre) reste la-bas ; ici on ne fait qu'OUVRIR.
+
+**API** : `PW:CamelotOpenNative(profKey)`
 
 ### `CraftingOrderClassic_ProfWindow_Toolbar.lua`
 > CraftingOrderClassic_ProfWindow_Toolbar.lua — barre d'outils de la colonne Recettes (vue métier) :

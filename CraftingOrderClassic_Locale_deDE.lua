@@ -263,6 +263,9 @@ local de = {
         "|cFFFFFFFF%s|r als Partner markiert — Vorrang bei Geschenk-Warnungen.",
     ["|cFFFFFFFF%s|r n'est plus marqué comme partenaire."] = "|cFFFFFFFF%s|r ist nicht mehr als Partner markiert.",
     ["Marquer comme partenaire"] = "Als Partner markieren", ["Retirer des partenaires"] = "Aus Partnern entfernen",
+    ["colonne ACCOLÉE à la fenêtre de métier"] = "Auftragsspalte NEBEN dem Berufsfenster",
+    ["colonne ENCASTRÉE dans la fenêtre de métier"] = "Auftragsspalte IM Berufsfenster",
+    ["Impossible en combat — réessaie après le combat."] = "Im Kampf nicht möglich — versuche es nach dem Kampf erneut.",
 }
 
 for k, v in pairs(de) do L[k] = v end

@@ -352,6 +352,7 @@ function COC:Slash(msg)
     elseif cmd == "lfwchat" then if COC.LFWChat then COC.LFWChat:Cmd(rest) end
     elseif cmd == "beacon" then COC:BeaconDiag()
     elseif cmd == "gwroster" or cmd == "confed" then COC:GreenWallDiag()
+    elseif cmd == "accole" then if COC.ProfWindow and COC.ProfWindow.CamelotSideCmd then COC.ProfWindow:CamelotSideCmd() end
     elseif cmd == "circle" or cmd == "cercle" then if D and D.CircleCmd then D:CircleCmd(rest) end
     elseif cmd == "wipe"   then COC:WipeRoster()
     elseif cmd == "debug"  then if COC.Debug then COC.Debug:Toggle() end

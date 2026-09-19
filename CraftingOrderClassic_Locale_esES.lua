@@ -264,6 +264,9 @@ local es = {
         "|cFFFFFFFF%s|r marcado como socio — prioridad en las alertas de regalo.",
     ["|cFFFFFFFF%s|r n'est plus marqué comme partenaire."] = "|cFFFFFFFF%s|r ya no está marcado como socio.",
     ["Marquer comme partenaire"] = "Marcar como socio", ["Retirer des partenaires"] = "Quitar de socios",
+    ["colonne ACCOLÉE à la fenêtre de métier"] = "columna de pedidos JUNTO a la ventana de profesiones",
+    ["colonne ENCASTRÉE dans la fenêtre de métier"] = "columna de pedidos DENTRO de la ventana de profesiones",
+    ["Impossible en combat — réessaie après le combat."] = "No es posible en combate — inténtalo de nuevo después del combate.",
 }
 
 for k, v in pairs(es) do L[k] = v end

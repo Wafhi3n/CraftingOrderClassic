@@ -103,6 +103,7 @@ CraftingOrderClassic_ProfWindow_Dock.lua
 # POC Camelot : notre colonne Commandes DANS la fenetre de metier native de Forever
 # (elargissement du cadre). Garde de saveur en tete : inerte hors client MAINLINE.
 CraftingOrderClassic_ProfWindow_Camelot.lua
+CraftingOrderClassic_ProfWindow_Camelot_Open.lua
 CraftingOrderClassic_ProfWindow_Toolbar.lua
 CraftingOrderClassic_ProfWindow_Recipes.lua
 CraftingOrderClassic_ProfWindow_Leveling.lua
