@@ -197,7 +197,7 @@ PW:RegisterInfoSection(function(ctx)
     local LG = COC.LazyGold
     if LG and LG:IsAvailable() and d.itemID then
         local ah = LG:ItemValue(d.itemID)
-        if ah then d.lines[#d.lines + 1] = { label = L["Acheter à l'HV"], value = GetCoinTextureString(ah) } end
+        if ah then d.lines[#d.lines + 1] = { label = L["Acheter à l'HV"], value = COC.Api.Coin(ah) } end
     end
     return { title = L["Où l'obtenir"], lines = d.lines }
 end)

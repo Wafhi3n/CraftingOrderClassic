@@ -234,7 +234,7 @@ function Dir:LFWOfferLines(name)
         out[#out + 1] = string.format(L["fournit : %s"], table.concat(names, ", ") .. extra)
     end
     if o and o.fee and o.fee > 0 then
-        local money = (GetCoinTextureString and GetCoinTextureString(o.fee)) or tostring(o.fee)
+        local money = (COC.Api.Coin and COC.Api.Coin(o.fee)) or tostring(o.fee)
         out[#out + 1] = string.format(L["commission : %s par craft"], money)
     end
     if o and o.skillUpOnly then out[#out + 1] = L["composants fournis seulement si le plan fait progresser"] end

@@ -118,6 +118,16 @@ local MAINLINE_API = {
     -- `categoryID` sur chaque recette). Le socle filtre donc zéro ligne ici.
     isHeader = function() return false end,
 
+    -- ⚠️ Le client rend AUSSI les recettes NON APPRISES : `Professions.SetDefaultFilters`
+    -- (Blizzard_Professions.lua) pose `SetShowUnlearned(true)` À CHAQUE ouverture de la fenêtre, et
+    -- `GetFilteredRecipeIDs` respecte ce filtre. Sans ce témoin, le socle prenait tout pour acquis :
+    -- « ce que je sais faire » incluait ce que le perso ne sait PAS faire. `learned` est non-nilable
+    -- dans `TradeSkillRecipeInfo`, mais on ne suppose rien d'une fiche absente (= non apprise).
+    getLearned = function(i)
+        local info = infoOf(i)
+        return (info and info.learned == true) or false
+    end,
+
     getLink = function(i) local info = infoOf(i); return info and info.hyperlink or nil end,
     getIcon = function(i) local info = infoOf(i); return info and info.icon or nil end,
 

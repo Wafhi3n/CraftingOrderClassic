@@ -140,7 +140,7 @@ end
 function PW:_LevelingTooltip(e)
     local c = self:_LevelCost(e)
     if c then
-        local per = GetCoinTextureString(math.max(1, math.floor(c.perPoint + 0.5)))
+        local per = COC.Api.Coin(math.max(1, math.floor(c.perPoint + 0.5)))
         local q = c.missing and " |cFF888888(?)|r" or ""
         GameTooltip:AddLine(string.format(L["Progression : ~%s par point (estimation)"], per) .. q, 0.60, 0.75, 0.91)
         if self._lvlBest == e then
@@ -159,7 +159,7 @@ function PW:_PlanTooltip(e)
     local kind = M:SourceKind(self.profKey, e.spellID)
     if kind == "unknown" then return end
     local price = M:SourcePrice(self.profKey, e.spellID)
-    local ptxt = price and (" — " .. GetCoinTextureString(price)) or ""
+    local ptxt = price and (" — " .. COC.Api.Coin(price)) or ""
     local txt
     if kind == "trainer" then txt = string.format(L["Plan : au formateur%s"], ptxt)
     elseif kind == "vendor" then txt = string.format(L["Plan : chez un vendeur PNJ%s"], ptxt)
@@ -167,7 +167,7 @@ function PW:_PlanTooltip(e)
         local LG = COC.LazyGold
         local recItemID = M:RecipeItem(self.profKey, e.spellID)
         local ah = LG and LG:IsAvailable() and recItemID and LG:ItemValue(recItemID)
-        if ah then txt = string.format(L["Plan : coté à l'HV — %s"], GetCoinTextureString(ah))
+        if ah then txt = string.format(L["Plan : coté à l'HV — %s"], COC.Api.Coin(ah))
         else txt = L["Plan : à farmer (butin/quête — absent de l'HV)"] end
     end
     GameTooltip:AddLine(txt, 0.91, 0.72, 0.29)

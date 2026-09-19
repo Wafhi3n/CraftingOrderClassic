@@ -33,7 +33,7 @@ end
 function Comp.PriceLabel(o)
     if not (o and o.price) then return "" end
     local copper = Comp.PriceToCopper(o.price)
-    if copper and GetCoinTextureString then return GetCoinTextureString(copper) end
+    if copper and COC.Api.Coin then return COC.Api.Coin(copper) end
     return "|c" .. Skin.hex.price .. tostring(o.price) .. "|r"
 end
 

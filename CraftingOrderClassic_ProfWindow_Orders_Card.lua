@@ -207,8 +207,8 @@ function PW:_FillOrderProfit(card, o, hasPanel)
     local val = (LG:ItemValue(o.itemID) or 0) * (o.qty or 1)
     if val <= 0 and mine <= 0 then card.lgLine:Hide(); return 0 end
     local parts = {}
-    if val > 0 then parts[#parts + 1] = "|cFFE8B84B" .. L["Valeur HV"] .. ":|r " .. GetCoinTextureString(val) end
-    if mine > 0 then parts[#parts + 1] = "|cFFE8B84B" .. L["À ma charge"] .. ":|r " .. GetCoinTextureString(mine) end
+    if val > 0 then parts[#parts + 1] = "|cFFE8B84B" .. L["Valeur HV"] .. ":|r " .. COC.Api.Coin(val) end
+    if mine > 0 then parts[#parts + 1] = "|cFFE8B84B" .. L["À ma charge"] .. ":|r " .. COC.Api.Coin(mine) end
     card.lgLine:SetText(table.concat(parts, "   ")); card.lgLine:Show()
     return 16
 end

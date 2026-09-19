@@ -184,7 +184,7 @@ function MTSL:SkillDetail(profKey, spellID)
     if sk.trainers then
         lines[#lines + 1] = { label = L["Obtenu via"], value = "|cFF88CCFF" .. L["Formateur"] .. "|r" }
         if sk.trainers.price and sk.trainers.price > 0 then
-            lines[#lines + 1] = { label = L["Prix"], value = GetCoinTextureString(sk.trainers.price) }
+            lines[#lines + 1] = { label = L["Prix"], value = COC.Api.Coin(sk.trainers.price) }
         end
         addNpcLines(lines, L["Formateurs"], sk.trainers.sources, 4)
     else
@@ -198,7 +198,7 @@ function MTSL:SkillDetail(profKey, spellID)
         if item and item.vendors then
             lines[#lines + 1] = { label = L["Obtenu via"], value = "|cFFEEDD88" .. L["Vendeur"] .. "|r" }
             if item.vendors.price and item.vendors.price > 0 then
-                lines[#lines + 1] = { label = L["Prix"], value = GetCoinTextureString(item.vendors.price) }
+                lines[#lines + 1] = { label = L["Prix"], value = COC.Api.Coin(item.vendors.price) }
             end
             addNpcLines(lines, L["Vendu par"], item.vendors.sources, 4)
         elseif item and item.drops then

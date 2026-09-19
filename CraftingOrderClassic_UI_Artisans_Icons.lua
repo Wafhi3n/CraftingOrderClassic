@@ -115,7 +115,7 @@ function UI:_SetArtProfitBorder(ic, item, r)
     end
     -- On NOMME le plan quand on le peut : « 599 po » ne dit pas quoi commander, « Iron Buckle — 599 po » si.
     local nm = LG:PlanName(item.key, plan)
-    ic.tipProfit = L["Meilleur plan"] .. " : " .. (nm and (nm .. " — ") or "") .. GetCoinTextureString(best)
+    ic.tipProfit = L["Meilleur plan"] .. " : " .. (nm and (nm .. " — ") or "") .. COC.Api.Coin(best)
 end
 
 local function iconTooltip(self)

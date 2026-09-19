@@ -420,7 +420,7 @@ function UI:DoPostAsQuest()
     local cu  = tonumber(self.postCopper:GetText()) or 0
     local reward
     if g > 0 or s > 0 or cu > 0 then
-        reward = GetCoinTextureString and GetCoinTextureString(g * 10000 + s * 100 + cu) or nil
+        reward = COC.Api.Coin and COC.Api.Coin(g * 10000 + s * 100 + cu) or nil
     end
     COC.QuestSheet:Open({
         editable   = true,

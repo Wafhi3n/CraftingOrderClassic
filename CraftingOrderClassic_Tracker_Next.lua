@@ -85,8 +85,8 @@ local function planNote(profKey, step)
     if not step.plan then return nil end
     local M = COC.MTSL
     local kind = (M and M.IsAvailable and M:IsAvailable()) and M:SourceKind(profKey, step.sid) or "unknown"
-    local price = (step.plan.price or 0) > 0 and GetCoinTextureString
-        and (" — " .. GetCoinTextureString(step.plan.price)) or ""
+    local price = (step.plan.price or 0) > 0 and COC.Api.Coin
+        and (" — " .. COC.Api.Coin(step.plan.price)) or ""
     local name = recipeName(step.sid, step.prod)
     local txt
     if kind == "trainer" then
@@ -106,7 +106,7 @@ end
 local function costText(copper)
     local c = math.floor((copper or 0) + 0.5)
     if c >= 100 then c = math.floor(c / 100) * 100 end
-    return GetCoinTextureString and GetCoinTextureString(c) or tostring(c)
+    return COC.Api.Coin and COC.Api.Coin(c) or tostring(c)
 end
 
 -- Sous-titre : « 317 → 380 · ~41po/point ». Un coût PARTIEL (réactif sans prix coté) se dit « > »,

@@ -93,9 +93,9 @@ function UI:_RefreshPostPriceHint(e)
     local g = COC.LazyGold
     local val = g and e.itemID and g:ItemValue(e.itemID)
     if not val then hint:SetText(""); return end
-    local txt = "|cFFE8B84B" .. L["Valeur HV"] .. ":|r " .. GetCoinTextureString(val)
+    local txt = "|cFFE8B84B" .. L["Valeur HV"] .. ":|r " .. COC.Api.Coin(val)
     local p = e.spellID and g:CraftProfit(self.postProf, e.spellID, 1)
-    if p and p.cost > 0 then txt = txt .. "   |cFFE8B84B" .. L["Réactifs"] .. ":|r " .. GetCoinTextureString(p.cost) end
+    if p and p.cost > 0 then txt = txt .. "   |cFFE8B84B" .. L["Réactifs"] .. ":|r " .. COC.Api.Coin(p.cost) end
     hint:SetText(txt)
 end
 

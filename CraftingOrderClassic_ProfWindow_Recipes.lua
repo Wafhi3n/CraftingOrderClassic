@@ -120,7 +120,7 @@ function PW:_RecipeTooltip(row)
     -- si POSITIF : on ne met rien pour une recette non rentable (le but est d'être rentable).
     local prof = self:_RowProfit(e)
     if prof and prof > 0 then
-        GameTooltip:AddLine(L["Profit net"] .. " : |cFF33DD33" .. GetCoinTextureString(prof) .. "|r", 1, 1, 1)
+        GameTooltip:AddLine(L["Profit net"] .. " : |cFF33DD33" .. COC.Api.Coin(prof) .. "|r", 1, 1, 1)
     end
     if self._LevelingTooltip then self:_LevelingTooltip(e) end   -- coût/point + destination du plan (Leveling)
     GameTooltip:Show()

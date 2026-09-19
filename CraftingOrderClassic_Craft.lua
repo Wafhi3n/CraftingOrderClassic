@@ -147,14 +147,19 @@ function Craft:OpenRank()
     return nil
 end
 
--- Toute la liste de recettes (en-têtes inclus, isHeader=true), ou nil si fermé.
+-- Toute la liste de recettes APPRISES (en-têtes inclus, isHeader=true), ou nil si fermé.
+-- « Apprises » n'allait de soi que sur les deux backends Classic, où la fenêtre native ne connaît
+-- que ça. Sur MAINLINE le client rend aussi les NON apprises (cf. `getLearned` de Craft_Mainline) :
+-- un backend qui sait le dire les écarte ici, en amont, pour que tous les appelants gardent le sens
+-- qu'ils ont toujours eu — ce que CE perso sait faire. L'union avec les manquantes, elle, se
+-- construit dans la VUE (cf. _ProfWindow_Recipes), jamais dans la lecture.
 function Craft:ReadRecipes()
     local api = self:GetActiveAPI()
     if not api then return nil end
     local out, num = {}, api.getNum()
     for i = 1, num do
         local name, skillType, numAvailable = api.norm(i)
-        if name then
+        if name and (not api.getLearned or api.getLearned(i)) then
             if api.isHeader(skillType) then
                 out[#out + 1] = { index = i, name = name, isHeader = true }
             else

@@ -60,6 +60,26 @@ function A.GetBNetFriend(index)
     return game.characterName, game.clientProgram, game.isOnline
 end
 
+-- ---------------------------------------------------------------- argent
+
+-- `GetCoinTextureString` était une GLOBALE partout... sauf sur Forever, où elle a migré dans
+-- `C_CurrencyInfo` — même signature (montant, hauteur de police). COC l'appelait à 31 endroits :
+-- tout l'affichage d'argent de l'addon (rentabilité, coût/point, plan de route, bourse, cartes de
+-- commande, suivi…). Les appels gardés (`GetCoinTextureString and …`) rendaient le montant en
+-- cuivre BRUT, les autres levaient — vu en jeu le 2026-09-19 en ouvrant le Plan de route.
+-- Repli ultime volontairement NUMÉRIQUE plutôt que vide : un montant illisible vaut mieux qu'une
+-- ligne muette qui laisserait croire à un prix inconnu.
+function A.Coin(copper, fontHeight)
+    local n = tonumber(copper) or 0
+    local f = _G.GetCoinTextureString
+        or (C_CurrencyInfo and C_CurrencyInfo.GetCoinTextureString)
+    if f then
+        local ok, txt = pcall(f, n, fontHeight)
+        if ok and txt then return txt end
+    end
+    return tostring(math.floor(n + 0.5))
+end
+
 -- ---------------------------------------------------------------- journal de quêtes
 
 function A.GetNumQuestLogEntries()

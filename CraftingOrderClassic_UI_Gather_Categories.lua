@@ -59,7 +59,7 @@ function UI:_FillGatherRow(row, item)
     -- Valeur HV Lazy Gold (à droite) : prix vendeur ou hôtel des ventes. Vide si Lazy Gold absent ou
     -- prix inconnu. C'est l'usage phare de Lazy Gold pour la récolte (cf. sa vue Minage).
     local val = COC.LazyGold and COC.LazyGold:ItemValue(e.itemID)
-    row.stack:SetText(val and GetCoinTextureString(val) or "")
+    row.stack:SetText(val and COC.Api.Coin(val) or "")
     row.entry = e; row.tipItemID = e.itemID
     row:SetScript("OnClick", function() UI:SelectGatherItem(e) end)
 end
