@@ -175,15 +175,23 @@ end
 -- montrer le panneau.
 -- ⚠️ À ÉPROUVER EN JEU. `ProfessionsMixin:OnShow` déclenche `ProfessionsFrame.Show`, sur lequel
 -- CHAQUE onglet latéral rappelle `CastProfessionSpell()`. Si notre appel teinte cette chaîne, le
--- blocage revient — déplacé, pas supprimé. Le chemin GARANTI est le clic SÉCURISÉ sur le
--- micro-bouton « Métiers » de Blizzard (cf. _Minimap.lua) : c'est celui du bouton minimap. Cette
--- fonction ne sert qu'aux entrées qui n'ont pas de bouton à elles : `/co métier`, clic du suivi.
+-- blocage revient — déplacé, pas supprimé. Le chemin PROUVÉ est `ToggleProfessionsBook()` : c'est mot
+-- pour mot ce qu'appelle le micro-bouton « Métiers » de Blizzard, et c'est celui du bouton minimap
+-- (cf. _Minimap.lua, validé en jeu le 2026-09-19). Il ouvre la page d'ensemble au lieu du métier
+-- visé, d'où l'essai d'`OpenProfessionUIToSkillLine` d'abord. Cette fonction ne sert qu'aux entrées
+-- qui n'ont pas de bouton à elles : `/co métier`, clic du suivi.
+-- Repli si le 1er chemin ÉCHOUE (revue API v1.32.0 : avant, on rendait `false` sans rien ouvrir, en
+-- silence). Limite à connaître : `pcall` n'attrape PAS un ADDON_ACTION_BLOCKED, qui n'est pas une
+-- erreur Lua ; ce repli couvre une erreur (module qui ne charge pas, ligne de métier inconnue),
+-- pas un blocage de taint.
 function PW:CamelotOpenNative(profKey)
     local native = _G.ProfessionsFrame
     if native and native:IsShown() then return true end     -- déjà ouverte : surtout ne pas la refermer
     local line = skillLineFor(profKey)
     if line and _G.OpenProfessionUIToSkillLine then
-        return (pcall(_G.OpenProfessionUIToSkillLine, line))
+        if pcall(_G.OpenProfessionUIToSkillLine, line) then return true end
+        native = _G.ProfessionsFrame                          -- module chargé entre-temps : relire
+        if native and native:IsShown() then return true end   -- ouverte à mi-chemin : ne pas empiler
     end
     if _G.ToggleProfessionsBook then return (pcall(_G.ToggleProfessionsBook)) end
     return false
