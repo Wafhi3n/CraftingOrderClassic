@@ -108,7 +108,7 @@ function UI:_BuildMyArtHeader()
 
     -- Vitrine : c'était un FAUX dropdown (bouton rouge + flèche collée à la main + flyout maison) alors
     -- que c'est le cas d'école du vrai widget — UNE valeur (mon perso vitrine) parmi mes persos du
-    -- royaume. Passé au SÉLECTEUR NATIF (demande user 2026-07-12) : coche sur l'entrée active offerte.
+    -- royaume. Passé au sélecteur du kit (demande user 2026-07-12, Skin.MakeDropdown) : l'entrée active est surlignée.
     -- La liste est une FONCTION : mes persos changent (nouveau reroll scanné) entre deux ouvertures.
     local sc = self:MyArtSec("showcase")
     self.myArtMainLbl = Skin.FieldLabel(sc, L["Vitrine"], 0, 0)

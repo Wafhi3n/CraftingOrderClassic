@@ -22,6 +22,22 @@ local BODY_W = 780
 -- cette entrée (plafond 60/fonction). C'est exactement la manœuvre que son propre commentaire
 -- prévoit — un bloc de plus DEVANT, que versions() concatène en premier. À la prochaine release,
 -- ajouter ici ; quand celui-ci s'approchera à son tour de 60, en créer encore un devant.
+-- Bloc de tête NOUVEAU, créé pour v1.32.2 : versionsCurrent était à 53 lignes et l'entrée l'aurait
+-- poussé au-delà du plafond de 60. Même manœuvre que pour lui : un bloc de plus DEVANT, concaténé en
+-- premier par versions(). À la prochaine release, ajouter ici.
+local function versionsNewest()
+    return {
+        {
+            v = "v1.32.2", title = L["Tes barres d'action ne se bloquent plus en combat"],
+            lines = {
+                L["Sur WoW: Forever, passer d'un onglet à l'autre dans la fenêtre de métier pendant un combat faisait refuser au jeu tout geste sur tes barres d'action, avec l'addon nommé à chaque fois. La fenêtre de métier n'y était pour rien. Deux petites pièces de l'addon l'étaient : ses menus déroulants et son aide « i » empruntaient des systèmes que le jeu partage avec sa propre interface, et s'en servir une seule fois suffisait à marquer cette interface à notre nom jusqu'au prochain rechargement. Les deux sont faits maison maintenant : même rendu, et le jeu n'a plus rien à redire."],
+                L["La colonne des commandes peut aussi se poser à côté de la fenêtre de métier plutôt que dedans : /co accole passe d'un mode à l'autre. Dedans reste le mode par défaut."],
+                L["Petites retouches : une longue liste de stats ne sort plus par le bas de l'écran, et chaque liste prend la largeur de sa plus longue entrée ; la liste des canaux de la fenêtre de partage des composants s'ouvre au-dessus d'elle et non plus dessous ; et l'aide suit la fenêtre si le jeu la déplace pendant qu'elle est ouverte."],
+            },
+        },
+    }
+end
+
 local function versionsCurrent()
     return {
         {
@@ -302,7 +318,8 @@ local function versionsOldest()
 end
 
 local function versions()
-    local out = versionsCurrent()
+    local out = versionsNewest()
+    for _, e in ipairs(versionsCurrent()) do out[#out + 1] = e end
     for _, e in ipairs(versionsLatest()) do out[#out + 1] = e end
     for _, e in ipairs(versionsRecent()) do out[#out + 1] = e end
     for _, e in ipairs(versionsOlder()) do out[#out + 1] = e end

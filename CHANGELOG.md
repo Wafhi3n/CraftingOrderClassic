@@ -1,5 +1,24 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.32.2 — Your action bars stop getting blocked in combat
+
+On WoW: Forever, switching tabs in the professions window mid-fight made the game refuse to touch your
+action bars, and it named the addon every time. The professions window wasn't the problem. Two small
+pieces of the addon were: its dropdown menus and the help overlay behind its i button borrowed systems
+the game shares with its own interface, and using either of them once was enough to mark that
+interface as ours until the next reload. Both are built in-house now. They look the same, and the game
+has nothing left to object to.
+
+The orders column can also sit next to the professions window instead of inside it. `/co accole`
+switches between the two, and inside stays the default.
+
+Smaller fixes:
+
+- A long stat list no longer runs off the bottom of the screen, and each list is as wide as its
+  longest entry.
+- The channel list in the reagent-sharing window opens on top of that window instead of behind it.
+- The help overlay follows the window if the game moves it while the help is open.
+
 ## v1.32.1 — Forever's professions window stops complaining
 
 On WoW: Forever, the orders column sits inside the game's own professions window. It's a guest in a
