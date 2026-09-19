@@ -157,12 +157,20 @@ end
 -- `GetProfessionInfo` donne le nom localisé et la ligne de compétence. On repasse par
 -- `ResolveProfession` (alias FR/DE/ES de CraftLink), le même résolveur que Directory_Skills —
 -- jamais une comparaison de libellés écrite à la main.
+-- CraftLink est une bibliothèque LibStub, JAMAIS une globale : la garde d'origine testait
+-- `_G.CraftLink`, toujours nil, et la fonction rendait nil dès sa 1re ligne — l'ouverture directe
+-- d'un métier n'a donc jamais été tentée, on tombait à chaque fois sur la page d'ensemble.
+-- Relevé le 2026-09-19 : `/co métier cuisine` ouvrait « Professions » alors que GetProfessions()
+-- rendait bien 6, 8, 5, 9, 7. Ordre sur Forever, lu dans le livre des métiers de Blizzard :
+-- prof1, prof2, SECOURISME (pas d'archéologie), pêche, cuisine ; 7e retour de GetProfessionInfo
+-- = identifiant de la ligne de métier.
 local function skillLineFor(profKey)
-    if not (profKey and _G.GetProfessions and _G.GetProfessionInfo and _G.CraftLink) then return nil end
-    local p1, p2, arch, fish, cook = GetProfessions()
-    for _, idx in pairs({ p1, p2, arch, fish, cook }) do    -- pairs : sauter les trous sans s'arrêter
+    local lib = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
+    if not (profKey and lib and _G.GetProfessions and _G.GetProfessionInfo) then return nil end
+    local p1, p2, faid, fish, cook = GetProfessions()
+    for _, idx in pairs({ p1, p2, faid, fish, cook }) do    -- pairs : sauter les trous sans s'arrêter
         local name, _, _, _, _, _, skillLine = GetProfessionInfo(idx)
-        if name and skillLine and CraftLink:ResolveProfession(name) == profKey then return skillLine end
+        if name and skillLine and lib:ResolveProfession(name) == profKey then return skillLine end
     end
     return nil
 end
