@@ -86,7 +86,12 @@ function Skin.ShowHelp(win, entries, mainButton)
     }
     for _, e in ipairs(entries) do
         local fr = e.frame
-        if fr and fr:GetLeft() then
+        -- IsVisible et pas seulement GetLeft : un cadre MASQUE garde ses coordonnees, donc une
+        -- section absente de la vue courante se voyait quand meme entourer -- des boites vides,
+        -- parfois hors du cadre (releve du 2026-09-19 sur la fenetre greffee de Forever, ou seule
+        -- la colonne Commandes subsiste : l'aide entourait encore les colonnes Recettes et Detail).
+        -- Generique a dessein : vaut pour la vue custom, le dock et la greffe, sans liste a tenir.
+        if fr and fr:IsVisible() and fr:GetLeft() then
             local fs = fr:GetEffectiveScale()
             local x = (fr:GetLeft() * fs - wl) / scale
             local y = (fr:GetTop()  * fs - wt) / scale   -- ≤ 0 (section sous le haut de la fenêtre)

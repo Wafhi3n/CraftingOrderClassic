@@ -86,6 +86,25 @@ local function restoreChrome(f)
     f._cocChromeHidden, f._cocStripped = nil, nil
 end
 
+-- Debord des ONGLETS LATERAUX de Blizzard sur l'interieur du cadre. Ils sont ancres au bord droit :
+-- en elargissant, ils viennent se poser SUR notre colonne et masquaient le dernier onglet
+-- (« Incoming », releve du 2026-09-19). On MESURE de combien ils mordent, au lieu de deviner une
+-- marge qui serait fausse au prochain patch ou pour un joueur a 7 metiers.
+local function sideTabInset(native)
+    local right = native:GetRight()
+    if not right then return 0 end
+    local inset = 0
+    local tabs = { native.ProfessionsOverviewTab }
+    for i = 1, 7 do tabs[#tabs + 1] = native["Professions" .. i .. "Tab"] end
+    for _, t in ipairs(tabs) do
+        if t and t.IsShown and t:IsShown() and t.GetLeft and t:GetLeft() then
+            local over = right - t:GetLeft()
+            if over > inset then inset = over end
+        end
+    end
+    return inset
+end
+
 -- ---------------------------------------------------------------- greffe
 
 -- RIEN ne se greffe ni ne se degreffe EN COMBAT. Une fois notre colonne reparentee dans le panneau
@@ -148,7 +167,8 @@ function PW:CamelotAttach(native)
     self.frame:SetWidth(colW)
     if self._PlaceOrdTabs then self:_PlaceOrdTabs(true) end   -- re-poser à la largeur définitive
 
-    local fullW = nativeBaseW + colW + GAP * 2
+    local tabInset = sideTabInset(native)
+    local fullW = nativeBaseW + colW + GAP * 2 + tabInset
     -- Élargir SANS toucher aux enfants de Blizzard : eux sont ancrés TOPLEFT, ils ne bougent pas.
     native:SetWidth(fullW)
     -- ⚠️ NE JAMAIS écrire dans le système de panneaux depuis du code addon.
@@ -166,12 +186,18 @@ function PW:CamelotAttach(native)
     -- le code de Blizzard, et le blâme nous est imputé nommément.
     -- Le chevauchement de panneaux est COSMÉTIQUE. On le garde.
 
+    -- GREFFÉE, ELLE NE SE DÉPLACE PLUS. Le kit rend toute fenêtre déplaçable (SetMovable +
+    -- RegisterForDrag) ; encastrée, la tirer la sort du cadre natif et laisse une bande vide
+    -- derrière elle (relevé en jeu le 2026-09-19). Sa position appartient désormais à son hôte.
+    -- Rendu au détachement, où elle redevient une vraie fenêtre (vue reroll, dock flottant).
+    self.frame:SetMovable(false)
+    self.frame:RegisterForDrag()          -- plus aucun bouton ne déclenche le glisser
     self.frame:SetParent(native)          -- suit l'ouverture/fermeture et le déplacement du natif
     self.frame:ClearAllPoints()
     -- Ancrer HAUT **et** BAS : la colonne épouse la hauteur du cadre natif au lieu de garder la
     -- sienne (sinon ~140 px de vide sous le pied de colonne — vu au 1er essai du POC).
-    self.frame:SetPoint("TOPRIGHT", native, "TOPRIGHT", -GAP, -TOP_INSET)
-    self.frame:SetPoint("BOTTOMRIGHT", native, "BOTTOMRIGHT", -GAP, BOT_INSET)
+    self.frame:SetPoint("TOPRIGHT", native, "TOPRIGHT", -(GAP + tabInset), -TOP_INSET)
+    self.frame:SetPoint("BOTTOMRIGHT", native, "BOTTOMRIGHT", -(GAP + tabInset), BOT_INSET)
     -- Greffée, notre fenêtre ne doit plus se comporter en FENÊTRE. `SetToplevel(true)` et une strata
     -- « HIGH » ont du sens pour un cadre flottant sur UIParent — ils la font remonter au clic et la
     -- placent au-dessus du reste. Pour l'enfant d'un panneau GÉRÉ, ils la décrochent de l'ordre
@@ -197,8 +223,8 @@ function PW:CamelotAttach(native)
     -- Geometrie et empilement : une colonne affichee mais DERRIERE le contenu natif, et depouillee
     -- de son fond, est indiscernable d'une colonne absente (releve du 2024-09-19 : bande vide).
     local page = native.BookPage or native
-    tr("attach geo : col %dx%d a x=%d | niveaux col=%d natif=%d page=%d | strata col=%s natif=%s",
-       (self.frame:GetWidth() or 0), (self.frame:GetHeight() or 0), (self.frame:GetLeft() or -1),
+    tr("attach geo : debord onglets=%d | col %dx%d a x=%d | niveaux col=%d natif=%d page=%d | strata col=%s natif=%s",
+       tabInset, (self.frame:GetWidth() or 0), (self.frame:GetHeight() or 0), (self.frame:GetLeft() or -1),
        (self.frame:GetFrameLevel() or 0), (native:GetFrameLevel() or 0),
        (page.GetFrameLevel and page:GetFrameLevel() or -1),
        tostring(self.frame:GetFrameStrata()), tostring(native:GetFrameStrata()))
@@ -226,6 +252,8 @@ function PW:CamelotDetach(native)
         self.frame:ClearAllPoints()
         self.frame:SetParent(UIParent)
         -- Redevenue flottante, elle retrouve son comportement de fenêtre (cf. CamelotAttach).
+        self.frame:SetMovable(true)
+        self.frame:RegisterForDrag("LeftButton")
         if self.frame.SetToplevel then self.frame:SetToplevel(true) end
         self.frame:SetFrameStrata("HIGH")
     end
