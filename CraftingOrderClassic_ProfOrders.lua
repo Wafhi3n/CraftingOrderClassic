@@ -34,7 +34,16 @@ end
 -- referme AUTOMATIQUEMENT à l'entrée en combat. PW:Hide escamote notre frame (Hide direct bloqué en
 -- combat par le bouton « Créer » sécurisé affiché) et on tente de fermer la session native. La garde
 -- InCombatLockdown de OnProfessionShow empêche toute ré-ouverture intempestive tant que le combat dure.
+-- Sur FOREVER, la fenêtre de métier est pilotée par la GREFFE (OnShow/OnHide de ProfessionsFrame,
+-- cf. _ProfWindow_Camelot) : ce pilote-ci est celui de l'Era, et deux pilotes pour une même fenêtre
+-- se marchent dessus. Concrètement, `TRADE_SKILL_CLOSE` — émis AUSSI quand on change d'onglet dans
+-- la fenêtre native — appelait CloseDock() et refermait la colonne que la greffe venait d'ouvrir :
+-- cadre élargi, colonne absente, sur les trois onglets (relevé en jeu le 2026-09-19). La greffe est
+-- seule maîtresse à bord dès qu'elle est là.
+local function graftOwnsWindow() return COC.ProfWindow and COC.ProfWindow.CamelotAttach ~= nil end
+
 function ProfOrders:_OnCombat()
+    if graftOwnsWindow() then return end   -- greffée, la colonne est PROTÉGÉE : on n'y touche pas en combat
     local PW = COC.ProfWindow
     if not (PW and PW.frame and PW.frame:IsShown()) then return end
     if PW.docked then PW:CloseDock(); return end   -- Vue Blizzard : on masque NOTRE colonne, la native reste intacte
@@ -70,6 +79,7 @@ function ProfOrders:Start()
             elseif event:find("SHOW$") then ProfOrders:_OnShow(PW, event)
             elseif COC.Craft and COC.Craft:GetOpenProfessionInfo() then PW:OnProfessionShow()  -- autre métier ouvert
             else PW:OnProfessionClose() end
+        elseif graftOwnsWindow() then return             -- FOREVER : la greffe pilote, cf. en-tête
         else                                            -- VUE BLIZZARD (native intacte + dock Commandes à droite)
             if event:find("SHOW$") then
                 PW:EnsureNativeToggle(nativeFrame, craftEv and "craft" or "trade")
