@@ -109,7 +109,15 @@ function Skin.MakeWindow(name, w, h, opts)
     end)
     f:SetClampedToScreen(true); f:SetFrameStrata(opts.strata or "HIGH")
     f:SetToplevel(true)
-    f:SetScript("OnShow", function(fr) fr:Raise() end)
+    -- Raise() remonte la fenetre au premier plan a l'affichage. C'est une operation PROTEGEE des
+    -- que le cadre l'est : greffee dans le panneau natif de Forever, notre fenetre metier l'est en
+    -- permanence, et le jeu refusait l'appel quand le panneau se rouvrait EN COMBAT (releve du
+    -- 2026-09-19, pile : micro-bouton -> ToggleProfessionsBook -> ShowUIPanel -> notre OnShow).
+    -- Un cadre greffe n'a de toute facon rien a remonter : son rang vient de son parent.
+    f:SetScript("OnShow", function(fr)
+        if fr:IsProtected() and InCombatLockdown and InCombatLockdown() then return end
+        fr:Raise()
+    end)
     if f.SetTitle and opts.title then f:SetTitle(opts.title) end
     if opts.portrait then Skin.SetWindowPortrait(f, opts.portrait) end
     if opts.onClose and f.CloseButton then f.CloseButton:SetScript("OnClick", opts.onClose) end

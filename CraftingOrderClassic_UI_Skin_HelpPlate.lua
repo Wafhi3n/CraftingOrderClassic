@@ -108,12 +108,20 @@ function Skin.ShowHelp(win, entries, mainButton)
     -- la CONSOMME (SetPropagateKeyboardInput false) → l'Échap ne redescend pas jusqu'à l'EscProxy de la
     -- fenêtre. Les autres touches sont laissées passer (propagate true). Idempotent (re-Show OK).
     HelpPlateCanvas:EnableKeyboard(true)
+    -- SetPropagateKeyboardInput est PROTEGEE en combat : l'appeler la fait refuser l'action et
+    -- nomme l'addon (releve du 2026-09-19 sur Forever, aide ouverte pendant un combat). En combat
+    -- on ne touche donc pas a la propagation : Echap redescend jusqu'a l'EscProxy et ferme la
+    -- fenetre au lieu de ne fermer que l'aide. Degradation acceptable, et sans erreur.
+    local function propagate(canvas, on)
+        if InCombatLockdown and InCombatLockdown() then return end
+        canvas:SetPropagateKeyboardInput(on)
+    end
     HelpPlateCanvas:SetScript("OnKeyDown", function(self, key)
         if key == "ESCAPE" and Skin._helpOpen then
-            self:SetPropagateKeyboardInput(false)
+            propagate(self, false)
             Skin.HideHelp()
         else
-            self:SetPropagateKeyboardInput(true)
+            propagate(self, true)
         end
     end)
     Skin._helpOpen = true
