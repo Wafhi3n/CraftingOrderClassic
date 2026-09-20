@@ -18,7 +18,7 @@ COC.TradePanel = Trade
 local panel
 
 local function partnerName()
-    return (GetUnitName and GetUnitName("NPC")) or nil
+    return COC.Api.UnitNameSafe("NPC")
 end
 
 -- VENDEUR : marque « remise » (Orders:Deliver, statut delivered). Déclenché à la main — c'est le

@@ -256,7 +256,9 @@ local function OnUnitTooltip(tooltip)
     if tooltip ~= GameTooltip or tooltip._cocProfAdded then return end   -- _cocProfAdded : anti-doublon (2 chemins)
     local _, unit = tooltip:GetUnit()
     if not unit then return end
-    local name = UnitName(unit)
+    -- ⚠️ Nom SECRET en contexte restreint (donjon) : `Api.UnitNameSafe` rend nil plutôt qu'une
+    -- valeur qui explosera trois appels plus bas, à `roster[name]` (relevé en jeu 2026-09-20).
+    local name = COC.Api.UnitNameSafe(unit)
     local summary = name and Social:ProfSummary(name)
     local D = COC.Directory
     local lfwE = name and D and D.LFWOf and D:LFWOf(name)
@@ -320,8 +322,8 @@ local function discover(unit)
     if UnitIsUnit and UnitIsUnit(unit, "player") then return end
     -- Whisper addon-message ne traverse pas la faction adverse → on ne ping que les alliés potentiels.
     if UnitCanCooperate and not UnitCanCooperate("player", unit) then return end
-    local name = UnitName(unit)
-    if name and name ~= "" then COC.Directory:DiscoverPlayer(name) end
+    local name = COC.Api.UnitNameSafe(unit)
+    if name then COC.Directory:DiscoverPlayer(name) end
 end
 
 function Social:_WireDiscovery()
@@ -378,8 +380,8 @@ end
 function Social:Diag(name)
     local out = function(s) DEFAULT_CHAT_FRAME:AddMessage("|cFF33DD88[CO diag]|r " .. s) end
     if not (name and name ~= "") then
-        if UnitIsPlayer and UnitIsPlayer("target") then name = UnitName("target")
-        elseif UnitIsPlayer and UnitIsPlayer("mouseover") then name = UnitName("mouseover") end
+        if UnitIsPlayer and UnitIsPlayer("target") then name = COC.Api.UnitNameSafe("target")
+        elseif UnitIsPlayer and UnitIsPlayer("mouseover") then name = COC.Api.UnitNameSafe("mouseover") end
     end
     out("Start: " .. (self._startError and ("|cFFFF4444ERREUR|r " .. tostring(self._startError)) or "|cFF33DD33ok|r"))
     out(("UIPanels_Game=%s · FriendsFrameTooltip_Show=%s · GuildStatus_Update=%s"):format(

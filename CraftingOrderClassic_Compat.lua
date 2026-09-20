@@ -219,6 +219,37 @@ function A.ChatMessagingBlocked()
     return (f and f()) or false
 end
 
+-- ---------------------------------------------------------------- valeurs SECRÈTES
+
+-- Le client moderne rend des valeurs « SECRÈTES » pour certaines données d'unité dans les contextes
+-- restreints. Relevé en jeu le 2026-09-20, EN DONJON : `UnitName` sur l'infobulle du curseur monde
+-- rend un nom secret, et `roster[name]` lève « attempted to index a table that cannot be indexed
+-- with secret keys ». Une secrète circule sans bruit mais ne peut ni indexer une table, ni être
+-- comparée (même à ""), ni être persistée.
+--
+-- ⚠️ ON NE CHERCHE PAS À LA « DÉSECRÉTISER » : il n'y a rien à en tirer, c'est le but du mécanisme.
+-- On la traite comme une ABSENCE de nom, AU PLUS PRÈS de l'API qui l'a produite, pour que le reste
+-- du code ne manipule jamais que des chaînes ordinaires. C'est la seule discipline qui tienne : une
+-- secrète laissée circuler explose loin de son origine, dans du code qui n'a aucune raison de s'en
+-- méfier -- ici, trois appels plus haut, dans une fonction qui ne parle que d'annuaire.
+function A.IsSecret(v)
+    return (_G.issecretvalue and _G.issecretvalue(v)) == true
+end
+
+-- Nom d'une unité, ou nil : unité absente, nom vide, ou nom SECRET. TOUT appelant qui nomme une
+-- AUTRE unité que le joueur doit passer par ici (le joueur lui-même n'est jamais secret pour
+-- lui-même). L'ordre des tests n'est pas cosmétique : le test de secret vient AVANT toute
+-- comparaison, car comparer une secrète lève la même erreur que l'indexer.
+function A.UnitNameSafe(unit, getter)
+    if not unit then return nil end
+    local get = getter or _G.GetUnitName or _G.UnitName
+    if not get then return nil end
+    local ok, n = pcall(get, unit)
+    if not ok or A.IsSecret(n) then return nil end
+    if type(n) ~= "string" or n == "" then return nil end
+    return n
+end
+
 -- ---------------------------------------------------------------- métiers
 
 -- Fermer la session de métier ouverte. Trois API selon la saveur : `CloseCraft` (Craft, Era),

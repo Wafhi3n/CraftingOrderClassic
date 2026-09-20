@@ -62,8 +62,10 @@ end
 local lastAsk = 0
 
 function Ask:Request(label, token)
-    local target = GetUnitName and GetUnitName("NPC")
-    if not (target and target ~= "" and SendChatMessage) then return end
+    -- Le partenaire d'echange passe par le garde-fou des valeurs SECRETES comme toute autre unite :
+    -- un nom secret ferait lever la comparaison juste en dessous, avant meme le whisper.
+    local target = COC.Api.UnitNameSafe("NPC")
+    if not (target and SendChatMessage) then return end
     local now = GetTime and GetTime() or 0
     if now - lastAsk < 3 then return end
     lastAsk = now
@@ -176,8 +178,8 @@ end
 -- Nom court du partenaire d'échange COURANT, ou nil hors échange ouvert.
 local function tradePartner()
     if not (_G.TradeFrame and TradeFrame:IsShown()) then return nil end
-    local n = GetUnitName and GetUnitName("NPC")
-    return (n and n ~= "") and Comp.shortName(n) or nil
+    local n = COC.Api.UnitNameSafe("NPC")
+    return n and Comp.shortName(n) or nil
 end
 
 -- Pose effective (OnAccept du popup : le clic EST le hardware event ET le consentement). TOUT est
@@ -285,7 +287,7 @@ function Ask:Update()
     if not panel then return end
     panel:ClearAllPoints()
     panel:SetPoint("TOPLEFT", TradeFrame, "TOPRIGHT", 4, 0)
-    panel.partnerFS:SetText("|cFFFFFFFF" .. Comp.shortName((GetUnitName and GetUnitName("NPC")) or "?") .. "|r")
+    panel.partnerFS:SetText("|cFFFFFFFF" .. Comp.shortName(COC.Api.UnitNameSafe("NPC") or "?") .. "|r")
     if panel.model then
         if not pcall(function() panel.model:SetUnit("NPC") end) then panel.model:Hide() else panel.model:Show() end
     end

@@ -62,7 +62,9 @@ end
 -- Nom court du joueur d'un unit (nil si PNJ) → clé du roster / de la table LFW.
 local function playerName(unit)
     if not (UnitIsPlayer and UnitIsPlayer(unit)) then return nil end
-    return (GetUnitName and GetUnitName(unit, false)) or (UnitName and UnitName(unit)) or nil
+    -- Une plaque d'unité est exactement le contexte où le nom peut être SECRET : il sert ensuite
+    -- de clé dans le roster et la table LFW, donc il ne doit jamais en sortir tel quel.
+    return COC.Api.UnitNameSafe(unit)
 end
 
 -- (Re)peint la plaque d'un unit selon le statut LFW du joueur.

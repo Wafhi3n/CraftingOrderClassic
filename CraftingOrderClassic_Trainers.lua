@@ -122,7 +122,9 @@ end
 -- Identifiant de créature du PNJ en face. Le GUID est la seule voie : `UnitName` rend un nom
 -- localisé, qui ne fait pas une clé.
 local function npcIdentity()
-    local name = UnitName and UnitName("npc")
+    -- Un nom secret PERSISTERAIT dans la SavedVariable : on préfère un formateur sans nom à une
+    -- base empoisonnée, que plus rien ne pourrait relire (cf. Api.UnitNameSafe).
+    local name = COC.Api.UnitNameSafe("npc")
     local guid = UnitGUID and UnitGUID("npc")
     local id   = guid and tonumber(guid:match("Creature%-0%-%d+%-%d+%-%d+%-(%d+)")) or nil
     return id, name

@@ -196,7 +196,7 @@ function ET.Update()
         equipLoc, subclass = loc, sub
     end
     local crafts = COC.Enchant and COC.Enchant:CraftsForEquipLoc(equipLoc, subclass)
-    panel.partnerFS:SetText("|cFFFFFFFF" .. Comp.shortName((GetUnitName and GetUnitName("NPC")) or "?") .. "|r")
+    panel.partnerFS:SetText("|cFFFFFFFF" .. Comp.shortName(COC.Api.UnitNameSafe("NPC") or "?") .. "|r")
     panel.itemFS:SetText(link)
     if not (COC.Craft and COC.Craft:IsCraftOpen()) then      -- session de craft fermée : on ne peut rien lire
         panel.crafts = nil

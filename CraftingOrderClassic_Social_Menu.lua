@@ -33,8 +33,11 @@ local function targetName(contextData)
     if not contextData then return nil end
     -- BNet d'abord : contextData.name est le compte, pas le perso.
     if contextData.bnetIDAccount then return bnetCharacterName(contextData) end
-    if contextData.name and contextData.name ~= "" then return contextData.name end
-    if contextData.unit and UnitName then return UnitName(contextData.unit) end
+    -- Le test de SECRET passe avant la comparaison : comparer une secrète lève la même erreur
+    -- que l'indexer, et `contextData` vient du jeu comme le reste (cf. Api.UnitNameSafe).
+    local n = contextData.name
+    if n and not COC.Api.IsSecret(n) and n ~= "" then return n end
+    if contextData.unit then return COC.Api.UnitNameSafe(contextData.unit) end
     return nil
 end
 
