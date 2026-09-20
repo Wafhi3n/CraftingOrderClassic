@@ -184,6 +184,17 @@ function S:SourceOriginLine(profKey, spellID)
     local lib = CL(); if not lib or not lib.RecipeOrigin then return nil end
     local id, areaID, name, faction = lib:RecipeOrigin(profKey, spellID)
     local txt = line(name, areaID)
+    -- LES COORDONNEES quand on les a : elles rendent la ligne CLIQUABLE (repere TomTom ou epingle
+    -- native), ce que le panneau d'info sait faire depuis toujours mais que plus personne ne lui
+    -- fournissait depuis le retrait de MTSL.
+    local pin
+    if txt and id and lib.NpcSpot then
+        local mapID, x, y = lib:NpcSpot(profKey, id)
+        if mapID and x then
+            txt = txt .. string.format(" |cFF888888(%.0f, %.0f)|r", x, y)
+            pin = { name = name, mapID = mapID, x = x, y = y }
+        end
+    end
     -- ⚠️ LE CAMP D'EN FACE SE DIT. La lib rend le meilleur PNJ qu'elle a, et parfois le seul connu
     -- est chez l'adversaire : « Wulmort Jinglepocket — Forgefer » à un joueur de la Horde n'est pas
     -- une imprécision, c'est un aller simple en territoire ennemi. On ne le cache pas et on ne
@@ -192,7 +203,7 @@ function S:SourceOriginLine(profKey, spellID)
         local label = (faction == "A") and _G.FACTION_ALLIANCE or _G.FACTION_HORDE
         txt = txt .. " |cFFFF6666(" .. (label or faction) .. ")|r"
     end
-    return txt, id
+    return txt, id, pin
 end
 
 -- Le marchand, et lui seul : ce que demandent les vues qui parlent d'un ACHAT (liste de courses,
