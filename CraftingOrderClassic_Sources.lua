@@ -13,10 +13,12 @@
 --      sur chaque saveur, et rafraîchie par le même geste que le reste des données.
 --
 -- CE QU'ON PERD EN ABANDONNANT MTSL, et qu'il faut assumer plutôt que masquer :
---   · le PRIX au formateur (aucune source ne le donne) → SourcePrice rend nil, et nil veut dire
---     INCONNU, jamais zéro. Un appelant qui confondrait les deux conseillerait d'acheter un plan
---     « gratuit » qui ne l'est pas ;
---   · les COORDONNÉES exactes du PNJ (on donne son nom et sa zone) ;
+--   · le prix d'un plan de FORMATEUR : aucune source ne le donne, SourcePrice rend nil, et nil veut
+--     dire INCONNU, jamais zéro -- un appelant qui confondrait les deux conseillerait d'acheter un
+--     plan « gratuit » qui ne l'est pas. (Le prix chez un MARCHAND, lui, est revenu : les pages
+--     d'objet de Wowhead le portent, cf. tools/gen_origins.lua) ;
+--   · les COORDONNÉES d'un PNJ du catalogue : on donne son nom et sa zone, pas ses coordonnées.
+--     Seul un formateur qu'on a VU en jeu en a (cf. COC.Trainers -- on y était) ;
 --   · le nom du PNJ dans la langue du client : il arrive en anglais. La ZONE, elle, reste
 --     localisée — on ne stocke que son AreaID et `C_Map.GetAreaInfo` fait le reste ;
 --   · la distinction RÉPUTATION : un quartier-maître est annoncé comme un vendeur.
@@ -113,6 +115,13 @@ end
 -- a vu le marchand, sait répondre — et c'est déjà son rôle via COC.LazyGold, interrogé ici pour
 -- que les appelants n'aient qu'UN endroit à demander.
 function S:SourcePrice(profKey, spellID)
+    -- Le prix RELEVÉ chez le marchand d'abord : c'est un fait, il ne dépend d'aucun addon tiers, et
+    -- il vaut pour tout le monde. Ce qu'on avait perdu en abandonnant MTSL est revenu par les pages
+    -- d'objet de Wowhead (`buyprice`), pour les plans vendus.
+    local lib = CL()
+    local fixed = lib and lib.RecipePrice and lib:RecipePrice(profKey, spellID)
+    if fixed then return fixed end
+    -- Repli : l'oracle de prix, s'il a vu le marchand. nil reste nil -- jamais zéro.
     local itemID = recipeItemFor(profKey, spellID)
     local LG = COC.LazyGold
     if not (itemID and LG and LG.IsVendorItem and LG:IsVendorItem(itemID)) then return nil end
@@ -153,6 +162,13 @@ end
 -- ⚠️ LA NATURE N'EST PAS DANS LA CHAÎNE, et c'est volontaire : « Wastewander Bandit — Tanaris » ne
 -- dit pas s'il faut l'acheter ou le tuer. Tout appelant DOIT afficher la nature (`SourceKind`) à
 -- côté, sans quoi il enverra le joueur acheter son plan à un bandit.
+-- Le camp du joueur, pour savoir si l'entrée rendue par la lib est la sienne. Les libellés de
+-- faction viennent des globales du jeu : déjà traduits, et identiques à ce qu'il lit partout.
+local function myFaction()
+    local f = UnitFactionGroup and UnitFactionGroup("player")
+    return (f == "Alliance" and "A") or (f == "Horde" and "H") or nil
+end
+
 function S:SourceOriginLine(profKey, spellID)
     -- Le formateur observé ne vit pas dans le catalogue mais dans ce qu'on a vu : il passe devant,
     -- et c'est le seul cas où la ligne porte des COORDONNÉES — on y était.
@@ -166,8 +182,17 @@ function S:SourceOriginLine(profKey, spellID)
         end
     end
     local lib = CL(); if not lib or not lib.RecipeOrigin then return nil end
-    local id, areaID, name = lib:RecipeOrigin(profKey, spellID)
-    return line(name, areaID), id
+    local id, areaID, name, faction = lib:RecipeOrigin(profKey, spellID)
+    local txt = line(name, areaID)
+    -- ⚠️ LE CAMP D'EN FACE SE DIT. La lib rend le meilleur PNJ qu'elle a, et parfois le seul connu
+    -- est chez l'adversaire : « Wulmort Jinglepocket — Forgefer » à un joueur de la Horde n'est pas
+    -- une imprécision, c'est un aller simple en territoire ennemi. On ne le cache pas et on ne
+    -- l'efface pas non plus -- l'information reste utile, elle doit juste être étiquetée.
+    if txt and faction and faction ~= myFaction() then
+        local label = (faction == "A") and _G.FACTION_ALLIANCE or _G.FACTION_HORDE
+        txt = txt .. " |cFFFF6666(" .. (label or faction) .. ")|r"
+    end
+    return txt, id
 end
 
 -- Le marchand, et lui seul : ce que demandent les vues qui parlent d'un ACHAT (liste de courses,

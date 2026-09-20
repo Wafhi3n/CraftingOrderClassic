@@ -75,7 +75,7 @@
 | `CraftingOrderClassic_Stats_Filter.lua` | sélecteur « ne montrer que ce qui donne <stat> ». | 103 |
 | `CraftingOrderClassic_Gem.lua` | spécifique à la JOAILLERIE : sous-catégorise les GEMMES TAILLÉES par TAILLE (le mot qui porte la stat). | 226 |
 | `CraftingOrderClassic_Gem_Stats.lua` | correspondance TAILLE DE GEMME → STAT (données, éditées à la main). | 41 |
-| `CraftingOrderClassic_Sources.lua` | « où j'obtiens ce plan, et lesquels me manquent ». | 283 |
+| `CraftingOrderClassic_Sources.lua` | « où j'obtiens ce plan, et lesquels me manquent ». | 308 |
 | `CraftingOrderClassic_Trainers.lua` | « le formateur, vu de nos propres yeux ». | 270 |
 | `CraftingOrderClassic_ProfWindow.lua` | fenêtre métier custom 3 colonnes (migration depuis Guild Economy) : Recettes \| Détail+Craft \| Commandes du métier. | 483 |
 | `CraftingOrderClassic_ProfWindow_Layout.lua` | GÉOMÉTRIE de la vue métier (fenêtre 3 colonnes). | 165 |
@@ -1358,10 +1358,12 @@
 >      sur chaque saveur, et rafraîchie par le même geste que le reste des données.
 > 
 > CE QU'ON PERD EN ABANDONNANT MTSL, et qu'il faut assumer plutôt que masquer :
->   · le PRIX au formateur (aucune source ne le donne) → SourcePrice rend nil, et nil veut dire
->     INCONNU, jamais zéro. Un appelant qui confondrait les deux conseillerait d'acheter un plan
->     « gratuit » qui ne l'est pas ;
->   · les COORDONNÉES exactes du PNJ (on donne son nom et sa zone) ;
+>   · le prix d'un plan de FORMATEUR : aucune source ne le donne, SourcePrice rend nil, et nil veut
+>     dire INCONNU, jamais zéro -- un appelant qui confondrait les deux conseillerait d'acheter un
+>     plan « gratuit » qui ne l'est pas. (Le prix chez un MARCHAND, lui, est revenu : les pages
+>     d'objet de Wowhead le portent, cf. tools/gen_origins.lua) ;
+>   · les COORDONNÉES d'un PNJ du catalogue : on donne son nom et sa zone, pas ses coordonnées.
+>     Seul un formateur qu'on a VU en jeu en a (cf. COC.Trainers -- on y était) ;
 >   · le nom du PNJ dans la langue du client : il arrive en anglais. La ZONE, elle, reste
 >     localisée — on ne stocke que son AreaID et `C_Map.GetAreaInfo` fait le reste ;
 >   · la distinction RÉPUTATION : un quartier-maître est annoncé comme un vendeur.
