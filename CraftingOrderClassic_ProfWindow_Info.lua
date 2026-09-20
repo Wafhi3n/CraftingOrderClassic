@@ -180,13 +180,15 @@ function PW:_HideInfoPanel()
     for _, row in ipairs(self.infoRows) do row:Hide() end
 end
 
--- Section INTÉGRÉE : « Où l'obtenir » via le pont MTSL (formateur/vendeur/butin + PNJ, zone, coords).
--- Nil si MTSL absent ou si la recette n'a pas de fiche → la section ne s'affiche simplement pas.
+-- Section INTÉGRÉE : « Où l'obtenir » via COC.Sources (formateur/vendeur/butin/quête + le marchand
+-- et sa zone quand on les connaît). Nil si la recette n'a pas de fiche → la section ne s'affiche pas.
+-- Les COORDONNÉES ne sont plus disponibles depuis l'abandon de MTSL : le repère de carte ne se pose
+-- donc plus (aucune ligne ne porte de `pin`), mais rien ne casse -- la ligne reste simplement inerte.
 -- UNIQUEMENT pour une recette NON apprise (isMissing) : « où l'obtenir » n'a aucun sens sur un plan qu'on
 -- possède déjà. NB : depuis que ReadRecipes capture le spellID des recettes APPRISES (pour le rang MTSL),
 -- ce garde `isMissing` est indispensable — sans lui la fiche source réapparaîtrait sur les recettes connues.
 PW:RegisterInfoSection(function(ctx)
-    local M = COC.MTSL
+    local M = COC.Sources
     if not (M and M:IsAvailable() and ctx.entry and ctx.entry.isMissing and ctx.entry.spellID) then return nil end
     local d = M:SkillDetail(ctx.profKey, ctx.entry.spellID)
     if not (d and d.lines and #d.lines > 0) then return nil end

@@ -13,24 +13,50 @@ local PW   = COC.ProfWindow
 local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true) end
 
 local CARD_W     = PW.ORD_CARD_W or 280
-local REAG_RH    = 50        -- hauteur d'une ligne de réactif dans le panneau « composants »
+-- Une ligne de reactif tient sur UNE ligne (coche + nom + qte). Elle a longtemps valu 50 px, soit
+-- ~36 px d'air chacune : avec un seul composant, le panneau faisait 72 px pour 14 px de texte, et
+-- la carte se lisait comme un formulaire vide (constat en jeu 2026-09-20).
+local REAG_RH    = 20        -- hauteur d'une ligne de réactif dans le panneau « composants »
 local MAX_REAG   = 8         -- plafond d'affichage (au-delà : tronqué ; rare en Classic)
 local PANEL_HDR  = 16        -- hauteur de l'en-tête du panneau « COMPOSANTS FOURNIS »
-
--- Mini-SPEC de la CARTE de commande — même grammaire que les vues (h / bg / pad éditables ici).
--- Trois zones : en-tête (demandeur + âge + inviter), corps FLEX (objet, prix, composants, Lazy Gold),
--- pied (Accepter / Refuser / Chuchoter). Le flex est ancré haut ET bas → quand la carte change de
--- hauteur (panneau composants variable), le pied reste collé en bas tout seul.
 local CARD_HDR, CARD_FOOT = 20, 24
 local CARD_COMPACT = CARD_HDR + 26 + CARD_FOOT   -- carte sans plan connu (objet seul / récolte)
-local CARD = {
-    x1 = 0, x2 = CARD_W, sepInset = 6 ,
-    { top = 0, bottom = 0, left = 2,
-        { id = "hdr",  h = CARD_HDR, bg = true },
-        { id = "body" },
-        { id = "foot", h = CARD_FOOT , bg = true},
-    },
-}
+
+-- Les TROIS BANDES de la carte : en-tête (demandeur + âge + inviter), corps FLEX (objet, prix,
+-- composants, Lazy Gold), pied (Accepter / Refuser / Chuchoter). Ancrées GAUCHE **et** DROITE sur
+-- l'hôte, donc élastiques.
+--
+-- POURQUOI PLUS DE MINI-SPEC ICI. `Skin.MakeSections` est un découpage à coordonnées ABSOLUES : il
+-- pose `SetWidth(x2 - x1)` sur chaque zone, et jusqu'aux feuilles. C'est le bon outil pour la
+-- fenêtre principale, dont la largeur est fixe par construction. La carte, elle, vit dans un
+-- viewport dont la largeur a CHANGÉ le jour où la colonne s'est encastrée dans la fenêtre native de
+-- Forever — ~200 px au lieu des 300 pour lesquels elle avait été dessinée. Personne n'a rouvert ce
+-- fichier depuis : la carte est restée large de 280 px dans un trou de 200, d'où la croix de
+-- fermeture hors champ, le prix tronqué et le panneau composants coupé à droite (constat en jeu
+-- 2026-09-20). Trois bandes empilées ne valaient pas cette rigidité — on les ancre à la main, et la
+-- carte épouse désormais ce qu'on lui donne.
+local BAND = { 0.80, 0.80, 0.85, 0.08 }   -- même fond de bande que Skin.MakeSections (bg = true)
+
+local function cardZone(host, h, bg)
+    local f = CreateFrame("Frame", nil, host)
+    if bg then
+        local t = f:CreateTexture(nil, "BACKGROUND")
+        t:SetAllPoints(); t:SetColorTexture(BAND[1], BAND[2], BAND[3], BAND[4])
+    end
+    if h then f:SetHeight(h) end
+    return f
+end
+
+local function buildCardZones(host)
+    local hdr = cardZone(host, CARD_HDR, true)
+    hdr:SetPoint("TOPLEFT", 2, 0); hdr:SetPoint("TOPRIGHT", 0, 0)
+    local foot = cardZone(host, CARD_FOOT, true)
+    foot:SetPoint("BOTTOMLEFT", 2, 0); foot:SetPoint("BOTTOMRIGHT", 0, 0)
+    local body = cardZone(host, nil, false)
+    body:SetPoint("TOPLEFT", hdr, "BOTTOMLEFT", 0, 0)
+    body:SetPoint("BOTTOMRIGHT", foot, "TOPRIGHT", 0, 0)
+    return { hdr = hdr, body = body, foot = foot }
+end
 
 -- ------------------------------------------------------------------
 -- Construction (pool, hauteur variable)
@@ -55,11 +81,18 @@ local function buildReagPanel(c, bz)
         local r = CreateFrame("Frame", nil, p)
         r:SetSize(200, REAG_RH); r:SetPoint("TOPLEFT", 6, -PANEL_HDR - (j - 1) * REAG_RH); r:SetPoint("RIGHT", p, "RIGHT", -6, 0)
         r.mark = r:CreateTexture(nil, "ARTWORK"); r.mark:SetSize(11, 11); r.mark:SetPoint("LEFT", 0, 0)
+        -- ICÔNE du composant. Un nom de réactif dans une colonne étroite se tronque (« Strange
+        -- Du… ») ; l'icône, elle, ne se tronque pas et se reconnaît d'un coup d'œil dans le sac.
+        r.icon = r:CreateTexture(nil, "ARTWORK"); r.icon:SetSize(REAG_RH - 6, REAG_RH - 6)
+        r.icon:SetPoint("LEFT", r.mark, "RIGHT", 3, 0)
         r.info = r:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
         r.info:SetPoint("RIGHT", 0, 0); r.info:SetJustifyH("RIGHT"); Skin.ApplyShadow(r.info)
         r.name = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-        r.name:SetPoint("LEFT", r.mark, "RIGHT", 4, 0); r.name:SetPoint("RIGHT", r.info, "LEFT", -4, 0)
+        r.name:SetPoint("LEFT", r.icon, "RIGHT", 4, 0); r.name:SetPoint("RIGHT", r.info, "LEFT", -4, 0)
         r.name:SetJustifyH("LEFT"); r.name:SetWordWrap(false); Skin.ApplyShadow(r.name)
+        -- Survol = infobulle de l'objet, shift-clic = lien de chat. La ligne PORTE l'objet, donc
+        -- elle doit se comporter comme un objet partout ailleurs dans l'addon.
+        r:EnableMouse(true); Skin.WireItemTooltip(r); Skin.WireItemLink(r)
         r:Hide(); p.rows[j] = r
     end
     p:Hide(); c.reagPanel = p
@@ -72,7 +105,10 @@ local function buildCardHeader(c, hz)
     c.who = hz:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     c.who:SetPoint("LEFT", c.dot, "RIGHT", 4, 0); Skin.ApplyShadow(c.who)
     c.closeSel = CreateFrame("Button", nil, hz, "UIPanelCloseButton")
-    c.closeSel:SetSize(24, 24); c.closeSel:SetPoint("RIGHT", 2, 0)
+    -- DEDANS, pas dehors : le +2 d'origine la faisait mordre hors de la carte — tolérable sur une
+    -- fenêtre, fatal dans un viewport qui découpe (elle disparaissait purement et simplement).
+    c.closeSel:SetSize(20, 20); c.closeSel:SetPoint("RIGHT", -2, 0)
+    c.closeSel:SetFrameLevel(hz:GetFrameLevel() + 5)
     c.closeSel:SetScript("OnClick", function() PW.ordSelected = nil; PW:RefreshOrders() end)
     -- Bouton « Inviter en groupe » (visible si l'acheteur est en ligne) → l'artisan l'invite pour
     -- lui remettre les composants / la marchandise via l'échange.
@@ -92,10 +128,15 @@ end
 -- CORPS de la carte : rangée objet (badge + nom + prix) puis panneau composants + ligne Lazy Gold.
 local function buildCardBody(c, bz)
     c.badge = Skin.MakeBadge(bz, 16); c.badge:SetPoint("TOPLEFT", 8, -4)
-    c.item = bz:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    c.item:SetPoint("LEFT", c.badge, "RIGHT", 4, 0); c.item:SetWidth(140); c.item:SetJustifyH("LEFT"); Skin.ApplyShadow(c.item)
+    -- Le PRIX d'abord, le nom s'ancre sur lui : le nom se rétrécit AVANT le prix, comme la ligne de
+    -- liste. Une largeur FIXE (140) dans une carte devenue élastique faisait passer les noms longs à
+    -- la ligne — sauf que la rangée fait 26 px, donc ils débordaient sur le panneau composants.
     c.price = bz:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     c.price:SetPoint("TOPRIGHT", -8, -6); Skin.ApplyShadow(c.price)
+    c.item = bz:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    c.item:SetPoint("LEFT", c.badge, "RIGHT", 4, 0)
+    c.item:SetPoint("RIGHT", c.price, "LEFT", -6, 0)
+    c.item:SetJustifyH("LEFT"); c.item:SetWordWrap(false); Skin.ApplyShadow(c.item)
     buildReagPanel(c, bz)
     -- Ligne « dois-je accepter ? » (Lazy Gold) : sous le panneau composants, au-dessus du pied.
     c.lgLine = bz:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
@@ -109,8 +150,14 @@ function PW:_OrdCard(i)
     c = CreateFrame("Frame", nil, self.ordContent, "BackdropTemplate")
     c:SetSize(CARD_W, CARD_COMPACT); c:SetPoint("TOPLEFT", 0, 0); Skin.SkinWell(c)
     -- Zones de la mini-SPEC sur une frame hôte dédiée (isole le découpage du puits de fond).
+    -- Niveaux EXPLICITES. Le puits de la carte (Skin.SkinWell) peint un fond opaque à 95 % : tout
+    -- ce qui se retrouve dessous ne disparaît pas, il devient un FANTÔME — on le devine en
+    -- transparence sans pouvoir le cliquer. C'est ce qui arrivait à la croix de retour (relevé en
+    -- jeu le 2026-09-20). Troisième fois que ce piège mord ici (colonne sous BookPage, onglets de
+    -- relation sous la section) : on ne suppose plus l'empilement, on le pose.
     local host = CreateFrame("Frame", nil, c); host:SetAllPoints(); c.zones = host
-    local z = Skin.MakeSections(host, CARD)
+    host:SetFrameLevel(c:GetFrameLevel() + 2)
+    local z = buildCardZones(host)
     buildCardHeader(c, z.hdr)
     buildCardBody(c, z.body)
     -- PIED : 3 boutons compacts (≈208 px) qui tiennent dans la largeur VISIBLE de la colonne
@@ -174,6 +221,8 @@ function PW:_FillReagPanel(card, o)
         local nm = (c and c:ItemName(iid)) or ("item:" .. iid)
         local cr, cg, cb = Skin.RarityColor(iid)
         row.name:SetText(nm:match("^item:") and L["Chargement…"] or nm); row.name:SetTextColor(cr, cg, cb)
+        row.icon:SetTexture(Skin.Icon(iid) or Skin.tex.unknown)
+        row.tipItemID = iid
         row.mark:SetTexture(prov and Skin.tex.checkMark or Skin.tex.checkBox)
         row.info:SetText(prov and ("|cFF999999×" .. need .. "|r")
             or ("|cFFCCCCCC×" .. need .. "|r  |cFFFF6060" .. L["À FOURNIR"] .. "|r"))
@@ -249,7 +298,11 @@ function PW:_RenderOrdSelected(it)
     for i = 2, #self.ordCards do self.ordCards[i]:Hide() end
     local card = self:_OrdCard(1); self:_FillCard(card, it)
     card:ClearAllPoints(); card:SetPoint("TOPLEFT", 0, 0)
-    local vh = self.ordScroll and self.ordScroll:GetHeight() or 0
-    if card:GetHeight() < vh then card:SetHeight(vh) end
+    -- Largeur : celle du CONTENU, comme les lignes de liste (elles, l'ont toujours fait). C'est ce
+    -- point manquant qui laissait la carte large de 280 px dans un viewport de ~200.
+    card:SetPoint("RIGHT", self.ordContent, "RIGHT", 0, 0)
+    -- Et PLUS d'étirement à la hauteur du viewport. Le pied étant collé au bas de la carte, étirer
+    -- ouvrait un trou de ~180 px entre les composants et les boutons dans la colonne greffée, haute
+    -- et étroite. Une carte a la taille de son contenu ; le marbre en dessous est du marbre.
     self.ordContent:SetHeight(card:GetHeight())
 end

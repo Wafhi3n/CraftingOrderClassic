@@ -187,7 +187,7 @@ function PW:_KnownRecipeSet()
     return known
 end
 
--- true si la « manquante » MTSL m est en réalité DÉJÀ apprise (présente dans le set known). MTSL laisse
+-- true si la « manquante » m est en réalité DÉJÀ apprise (présente dans le set known). Le registre laisse
 -- parfois de tels faux manquants dans MISSING_SKILLS (calcul pas rafraîchi, ou matching de sa base raté
 -- sur l'Anniversary/TBC) → sans ce filtre la recette s'affiche EN DOUBLE : apprise + rouge « (niv. X) ».
 local function knownAlready(known, m)
@@ -202,23 +202,23 @@ end
 -- injection (repli = liste des apprises). La vue par familles reste pur « ce que je sais faire ».
 function PW:_ActiveRecipes()
     local mode = (self.missingMode and "all") or (self.recipeSortLevel and "learnable") or nil
-    if not (mode and COC.MTSL) then return self.recipes or {} end
+    if not (mode and COC.Sources) then return self.recipes or {} end
     local out, known = {}, self:_KnownRecipeSet()
     for _, r in ipairs(self.recipes or {}) do out[#out + 1] = r end
-    for _, m in ipairs(COC.MTSL:MissingRecipes(self.profKey) or {}) do
+    for _, m in ipairs(COC.Sources:MissingRecipes(self.profKey) or {}) do
         if not knownAlready(known, m)
             and (mode == "all" or (self._MissingProgresses and self:_MissingProgresses(m))) then out[#out + 1] = m end
     end
     return out
 end
 
--- Nombre RÉEL de recettes manquantes APRÈS dédup (le MissingCount brut de MTSL compte les faux manquants
+-- Nombre RÉEL de recettes manquantes APRÈS dédup (le compte brut inclut les faux manquants
 -- déjà appris → le libellé « Manquantes (N) » surestimerait). Chemin froid (bascule/refresh), jamais au
--- scroll. 0 si MTSL absent / métier inconnu.
+-- scroll. 0 si le métier est hors catalogue.
 function PW:MissingCount()
-    if not (COC.MTSL and COC.MTSL:IsAvailable() and self.profKey) then return 0 end
+    if not (COC.Sources and COC.Sources:IsAvailable() and self.profKey) then return 0 end
     local known, n = self:_KnownRecipeSet(), 0
-    for _, m in ipairs(COC.MTSL:MissingRecipes(self.profKey) or {}) do
+    for _, m in ipairs(COC.Sources:MissingRecipes(self.profKey) or {}) do
         if not knownAlready(known, m) then n = n + 1 end
     end
     return n
@@ -238,7 +238,7 @@ end
 -- SEULEMENT sous le filtre acquérables (mode manquantes) : coût nul le reste du temps.
 function PW:_IsAcquirable(e)
     if not e.isMissing then return false end
-    local M = COC.MTSL
+    local M = COC.Sources
     local kind = M and M:SourceKind(self.profKey, e.spellID) or "unknown"
     if kind == "trainer" or kind == "vendor" then return true end
     local LG = COC.LazyGold
@@ -257,7 +257,7 @@ function PW:_RecipeDisplayList()
     local skillUp  = self.recipeSkillUp    -- masquer le palier gris (trivial) : ne reste que ce qui progresse
     -- Filtre « acquérables » : n'a de sens qu'en mode manquantes (il ne garde QUE des manquantes achetables,
     -- masquant même les apprises de l'union). Désarmé hors mode par _SyncFilterButtons.
-    local acquirable = self.missingMode and self.recipeAcquirable and COC.MTSL
+    local acquirable = self.missingMode and self.recipeAcquirable and COC.Sources
     local items = {}
     for _, r in ipairs(raw) do
         if not r.isHeader
@@ -436,9 +436,9 @@ end
 -- gauche. Rétrécit le nom jusqu'au premier élément présent pour éviter le chevauchement.
 function PW:_FillRecipeRight(row, e)
     -- Rang requis MTSL à l'extrême droite, UNIQUEMENT sous le filtre « montée de compétence » (le seul
-    -- contexte où le niveau de skill est pertinent). Nil sans MTSL / hors base / recette manquante.
+    -- contexte où le niveau de skill est pertinent). Nil hors catalogue / recette manquante.
     local anchor
-    local ms = self.recipeSkillUp and not e.isMissing and COC.MTSL and e.spellID and COC.MTSL:MinSkill(self.profKey, e.spellID)
+    local ms = self.recipeSkillUp and not e.isMissing and COC.Sources and e.spellID and COC.Sources:MinSkill(self.profKey, e.spellID)
     if ms then row.niv:SetText("|cFF9AC0E8" .. ms .. "|r"); row.niv:Show(); anchor = row.niv else row.niv:Hide() end
     local prof = self:_RowProfit(e)
     -- Indicateur COMPACT (paliers de pièces) par défaut : la liste reste lisible. Le bouton « 123 »

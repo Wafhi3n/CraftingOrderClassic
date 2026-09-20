@@ -206,7 +206,8 @@ function COC:ChannelNotice()
     StaticPopup_Show("COC_CHANNEL_NOTICE")
 end
 
--- Popup « dépendance optionnelle manquante ». Les boutons Lazy Gold / MissingTradeSkillsList restent
+-- Popup « dépendance optionnelle manquante ». Le bouton concerné (aujourd'hui : l'oracle de prix)
+-- reste
 -- VISIBLES et NORMAUX (colorés, pour donner envie de cliquer) même sans l'addon ; un clic sans l'addon
 -- explique alors la dépendance au lieu d'un no-op silencieux. Le nom de l'addon est un nom propre (non
 -- localisé) réinjecté à chaque appel dans le même dialogue (comme COC_SPAM_MUTE).
@@ -226,7 +227,6 @@ function COC:NeedLazyGold()
     local mainline = COC.Api and COC.Api.IS_MAINLINE
     self:MissingAddon(mainline and "Auctionator" or "Lazy Gold Classic")
 end
-function COC:NeedMTSL()     self:MissingAddon("Missing Trade Skills List") end
 
 -- Balise TEXTE de découverte. À n'appeler QUE depuis une action joueur (hardware event) — sinon
 -- ADDON_ACTION_BLOCKED (SendChatMessage interdit hors input). Émise au clic Poster et sur /co refresh.
@@ -326,6 +326,8 @@ local function diagCmd(cmd, rest)
         if COC.ProfWindow and COC.ProfWindow._LevelDump then COC.ProfWindow:_LevelDump() end
     elseif cmd == "pricedump" then
         if COC.LazyGold and COC.LazyGold.PriceDump then COC.LazyGold:PriceDump(rest) end
+    elseif cmd == "geo" then
+        if COC.ProfWindow and COC.ProfWindow._GeoDump then COC.ProfWindow:_GeoDump() end
     else
         return false
     end
@@ -386,7 +388,7 @@ function COC:Slash(msg)
             COC.db.verbose = (not COC.db.verbose) or nil
             p(COC.db.verbose and COC.L["messages verbeux : activés"] or COC.L["messages verbeux : désactivés"])
         end
-    elseif diagCmd(cmd, rest) then    -- socialdiag / trace / lvldump / pricedump
+    elseif diagCmd(cmd, rest) then    -- socialdiag / trace / lvldump / pricedump / geo
     elseif cmd == "version" or cmd == "ver" then if D and D.VersionCmd then D:VersionCmd(rest) end
     elseif cmd == "help"   then COC:Help()
     else COC:Status() end

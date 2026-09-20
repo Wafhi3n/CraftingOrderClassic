@@ -34,6 +34,7 @@ function PW:_BuildHelp(f)
         point   = { "CENTER", f, "TOPLEFT", 8, 6 },
         tooltip = L["Aide : survole les zones surlignées pour comprendre chaque fonction."],
     })
+    self:_PlaceHelpBtn()
     -- Tutoriel one-shot : au TOUT PREMIER affichage de la fenêtre (jamais vu → l'aide s'ouvre seule).
     -- Flag persistant compte db.profHelpSeen. Différé (positions valides seulement APRÈS le Show) et
     -- jamais en vue réduite (compact/dock) ; marqué « vu » uniquement quand on l'affiche réellement.
@@ -71,10 +72,30 @@ function PW:_ShowHelp()
         "DOWN")
     add(self.missingBtn, L["Affiche AUSSI les recettes non apprises (en rouge) et où les obtenir."], "DOWN")
     add(self.vanillaBtn, L["Vue Blizzard : rebascule sur la fenêtre de métier native de Blizzard."], "DOWN")
-    add(self.ordRelTabs and self.ordRelTabs.buttons and self.ordRelTabs.buttons.all,
-        L["Filtre les commandes par source : tous, ta guilde, tes amis, ou ton annuaire d'artisans."], "DOWN")
+    local relHelp = L["Filtre les commandes par source : tous, ta guilde, tes amis, ou ton annuaire d'artisans."]
+    add(self.ordRelTabs and self.ordRelTabs.buttons and self.ordRelTabs.buttons.all, relHelp, "DOWN")
+    add(self.ordRelDD, relHelp, "DOWN")   -- même filtre, autre présentation (la garde IsShown tranche)
+    add(self.viewTabs and self.viewTabs.buttons and self.viewTabs.buttons.orders,
+        L["Change ce que montre la colonne : les commandes reçues, le plan de route du métier, ou les recettes qui te manquent."],
+        "DOWN")
 
     Skin.ShowHelp(self.frame, entries, self.helpBtn)
+end
+
+-- Le « i » est posé un peu HORS CADRE en haut à gauche : sur une fenêtre titrée il se pose sur la
+-- barre de titre, où il ne gêne rien. Une fois la colonne ENCASTRÉE, cette barre n'existe plus et la
+-- rangée d'onglets remonte à sa place : le bouton tombait alors sur la languette « Commandes ». Il
+-- passe au bout DROIT de la rangée, centré sur elle — la seule portion vraiment vide de la bande, et
+-- dégagée de la croix native, qui vit plus haut, dans le cadre hôte.
+function PW:_PlaceHelpBtn()
+    local b = self.helpBtn
+    if not b then return end
+    b:ClearAllPoints()
+    if self:_ChromeStripped() then
+        b:SetPoint("CENTER", self.frame, "TOPRIGHT", -16, self:_TabTop() - PW.TAB_ROW_H / 2)
+    else
+        b:SetPoint("CENTER", self.frame, "TOPLEFT", 8, 6)
+    end
 end
 
 function PW:_ToggleHelp()

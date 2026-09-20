@@ -49,7 +49,11 @@ function Skin.MakeHelpButton(parent, onToggle, opts)
         b:SetNormalTexture("Interface\\common\\help-i")
         b:SetHighlightTexture("Interface\\common\\help-i", "ADD")
     end
-    b:SetSize(opts.size or 28, opts.size or 28)
+    -- 24, pas 28 : c'est la taille de la CROIX de fermeture native, à côté de laquelle ce bouton se
+    -- pose. À 28 il était plus gros que le bouton de Blizzard juste au-dessus (mesuré 2026-09-20 :
+    -- 20 px écran contre 17) — exactement le genre d'écart qui trahit l'addon quand le cahier des
+    -- charges est « qu'on ne nous distingue pas du jeu ».
+    b:SetSize(opts.size or 24, opts.size or 24)
     local a = opts.point or { "CENTER", parent, "TOPLEFT", 8, 6 }
     b:ClearAllPoints(); b:SetPoint(a[1], a[2], a[3], a[4], a[5])
     b:SetFrameStrata("HIGH"); b:SetFrameLevel(parent:GetFrameLevel() + 20)

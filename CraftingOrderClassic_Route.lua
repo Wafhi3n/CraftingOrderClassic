@@ -47,7 +47,7 @@ end
 -- nil si les briques manquent (lib sans seuils, Lazy Gold absent).
 function Route:Candidates(profKey, opts)
     local lib = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
-    local LG, M = COC.LazyGold, COC.MTSL
+    local LG, M = COC.LazyGold, COC.Sources
     if not (lib and lib.RecipeColors and LG and LG:IsAvailable() and profKey) then return nil end
     local known, live = opts.known or {}, opts.live or {}
     local out = {}
@@ -65,11 +65,16 @@ function Route:Candidates(profKey, opts)
         if cost then
             local prod = lib.RecipeProduct and lib:RecipeProduct(profKey, sid)
             local isKnown = (known["s" .. sid] or (prod and known["i" .. prod])) and true or false
-            local planPrice
+            local planPrice, planUnknown
             if not isKnown and opts.plans then
                 local kind = (M and M:IsAvailable()) and M:SourceKind(profKey, sid) or "unknown"
                 if kind == "trainer" or kind == "vendor" then
-                    planPrice = (M and M:SourcePrice(profKey, sid)) or 0
+                    planPrice = M and M:SourcePrice(profKey, sid)
+                    -- Prix INCONNU (le cas de tous les plans de formateur : aucune source ne les
+                    -- donne). On garde la recette candidate -- « va l'apprendre au formateur » reste
+                    -- le bon conseil -- mais on ne fait PAS passer l'inconnu pour de la gratuité :
+                    -- le segment est marqué partiel, donc le total s'affiche comme sous-évalué.
+                    if not planPrice then planPrice, planUnknown = 0, true end
                 else   -- butin/quête/inconnu : achetable seulement si l'objet-plan est coté à l'HV
                     local ri = M and M:RecipeItem(profKey, sid)
                     planPrice = ri and LG:ItemValue(ri) or nil
@@ -78,7 +83,8 @@ function Route:Candidates(profKey, opts)
             if isKnown or planPrice then
                 out[#out + 1] = {
                     sid = sid, colors = colors, cost = cost.cost, prod = prod,
-                    known = isKnown, planPrice = planPrice, partial = cost.missing or nil,
+                    known = isKnown, planPrice = planPrice,
+                    partial = cost.missing or planUnknown or nil,
                     live = live["s" .. sid] or (prod and live["i" .. prod]) or nil,
                     learnAt = (lib.RecipeLearnedAt and lib:RecipeLearnedAt(profKey, sid)) or colors[1],
                 }
@@ -257,7 +263,7 @@ end
 function Route:Materials(profKey, route)
     local lib = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
     if not (lib and route) then return nil end
-    local LG, M = COC.LazyGold, COC.MTSL
+    local LG, M = COC.LazyGold, COC.Sources
     local acc = { qty = {}, order = {}, produced = {},
         i2s = (lib.ItemToSpell and lib:ItemToSpell(profKey)) or {} }
     for _, s in ipairs(route.segments or {}) do

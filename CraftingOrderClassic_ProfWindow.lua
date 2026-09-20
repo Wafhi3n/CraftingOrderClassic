@@ -77,8 +77,8 @@ function PW:_BuildHeader(f)
     self.vanillaBtn = vanilla
 
     -- Toggle « Manquantes » : bascule la liste de gauche entre les recettes APPRISES (défaut) et celles
-    -- qui MANQUENT au perso, avec leur source (formateur/butin/quête…). Alimenté par le pont MTSL ;
-    -- masqué si l'addon n'est pas là (dépendance molle) et hors mode plein (n'a de sens que sur ton métier).
+    -- qui MANQUENT au perso, avec leur source (formateur/butin/quête…). Alimenté par NOTRE
+    -- catalogue (COC.Sources) ; masqué hors mode plein (n'a de sens que sur ton métier).
     local missing = Skin.MakeGoldButton(f, 110, 20, L["Manquantes"])
     missing:SetPoint("RIGHT", vanilla, "LEFT", 0, 0)
     missing:SetScript("OnClick", function() PW:_ToggleMissing() end)
@@ -112,7 +112,12 @@ function PW:_BuildHeader(f)
     if self._BuildLFWGear then self:_BuildLFWGear(f, lfw) end
 
     -- (Bouton fermer : le natif de MakeWindow porte la logique dock/CloseCraft via opts.onClose.)
-    Skin.MakeSeparator(f, -(self.HEADER_H - 2))
+    -- Filet sous la barre de titre. Il fait partie du CHROME de la fenêtre autonome — mais c'est une
+    -- texture nue, pas une pièce nommée : `stripChrome` ne pouvait pas le connaître, et il survivait
+    -- à l'encastrement. Il traversait alors la ligne d'en-tête de la liste en dépassant de part et
+    -- d'autre (relevé en jeu 2026-09-20, `y = -54` contre un sélecteur à −52..−68). On le garde donc
+    -- sous la main pour le masquer avec le reste.
+    self.hdrSep = Skin.MakeSeparator(f, -(self.HEADER_H - 2))
 
     -- Aide contextuelle « bouton i » hors-cadre (dépendance molle : _ProfWindow_HelpPlate.lua).
     if self._BuildHelp then self:_BuildHelp(f) end
@@ -145,10 +150,11 @@ function PW:_ToggleLFW()
 end
 
 -- Bascule liste apprises <-> manquantes. Réinitialise la sélection (une recette d'un mode n'existe pas
--- dans l'autre) puis rafraîchit liste + détail. Sans effet si MTSL absent.
+-- dans l'autre) puis rafraîchit liste + détail. La liste des manquantes vient de NOTRE catalogue
+-- (COC.Sources) : plus aucune dépendance à un addon tiers, donc plus de clic sans effet à expliquer.
 function PW:_ToggleMissing()
     if self.rerollKey then return end
-    if not (COC.MTSL and COC.MTSL:IsAvailable()) then COC:NeedMTSL(); return end
+    if not (COC.Sources and COC.Sources:IsAvailable()) then return end
     self.missingMode = not self.missingMode
     self.selectedKey, self.selectedIndex = nil, nil
     self:_SyncMissingBtn()
@@ -156,22 +162,22 @@ function PW:_ToggleMissing()
     if self.RefreshDetail  then self:RefreshDetail()  end
 end
 
--- Le bouton « Manquantes » n'apparaît qu'en VUE PLEINE d'un métier À MOI et si MTSL est chargé. Libellé
+-- Le bouton « Manquantes » n'apparaît qu'en VUE PLEINE d'un métier À MOI. Libellé
 -- enrichi du nombre de recettes manquantes. Désarme le mode si le contexte ne s'y prête plus (reroll…).
 function PW:_SyncMissingBtn()
     local b = self.missingBtn; if not b then return end
-    local ok = COC.MTSL and COC.MTSL:IsAvailable()
-    -- Visibilité CONTEXTUELLE seule (plein écran de MON métier) — plus gatée par MTSL : le bouton reste
-    -- affiché sans l'addon (enticing), le clic déclenche alors la popup de dépendance (cf. _ToggleMissing).
+    local ok = COC.Sources and COC.Sources:IsAvailable()
+    -- Visibilité CONTEXTUELLE seule (plein écran de MON métier). Le repli « libellé nu » ne vise plus
+    -- un addon absent mais un métier hors catalogue (Poisons vanilla) : le bouton reste, sans compte.
     local show = self.profKey and not self.rerollKey and not self._compact and not self.docked
     b:SetShown(show and true or false)
     if not show then self.missingMode = false; return end
-    if not ok then   -- MTSL absent : bouton normal, libellé nu, aucun mode manquantes
+    if not ok then   -- catalogue indisponible : bouton normal, libellé nu, aucun mode manquantes
         self.missingMode = false
         b:SetText(L["Manquantes"]); if b.SetSelected then b:SetSelected(false) end
         return
     end
-    local n = self:MissingCount()   -- compte DÉDUPÉ (écarte les faux manquants MTSL déjà appris)
+    local n = self:MissingCount()   -- compte DÉDUPÉ (écarte ce que le perso connaît déjà)
     b:SetText(self.missingMode and L["‹ Apprises seules"] or string.format(L["Manquantes (%d)"], n))
     if b.SetSelected then b:SetSelected(self.missingMode and true or false) end
 end
@@ -322,13 +328,17 @@ function PW:_ApplyMode(compact)
     if self._compact == compact then return end
     self._compact = compact
     if self._PlaceOrdTabs then self:_PlaceOrdTabs(compact) end   -- onglets de relation : suivent le mode
+    if self._PlaceViewTabs then self:_PlaceViewTabs() end       -- rangée de vues (soft-dep _DockViews)
+    if self._PlaceHelpBtn then self:_PlaceHelpBtn() end         -- le « i » suit la bande d'en-tête
+    if self.hdrSep then self.hdrSep:SetShown(not self:_ChromeStripped()) end
     self.ordCol:ClearAllPoints()
     if compact then
         self.frame:SetWidth(300)
         if self.secPanel then self.secPanel:Hide() end
         self.ordCol:SetParent(self.frame)
-        -- Même bande d'onglets qu'en vue pleine : 60 = sommet du marbre, ORD_TOP (négatif) = la bande.
-        self.ordCol:SetPoint("TOPLEFT", self.frame, "TOPLEFT", self.PAD, -(60 - PW.ORD_TOP))
+        -- Sous la rangée d'onglets, dont la hauteur dépend de la bande d'en-tête : pleine sur une
+        -- fenêtre titrée, presque nulle une fois la colonne encastrée (cf. PW:_TabBand).
+        self.ordCol:SetPoint("TOPLEFT", self.frame, "TOPLEFT", self.PAD, self:_BodyTop())
         self.ordCol:SetPoint("BOTTOM", self.frame, "BOTTOM", 0, self.PAD)
         self.ordCol:SetWidth(300 - 2 * self.PAD)
     else
@@ -339,6 +349,7 @@ function PW:_ApplyMode(compact)
         self.ordCol:SetPoint("BOTTOMLEFT", self.secPanel, "BOTTOMLEFT", PW.ORD_X, PW.ORD_BOTTOM)
         self.ordCol:SetWidth(PW.ORD_W)
     end
+    self:_SyncOrdWidth()
 end
 
 -- Ouvre la vue métier pour une CLÉ de métier (menu minimap / récolte / /co métier).

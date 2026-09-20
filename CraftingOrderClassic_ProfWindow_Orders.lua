@@ -66,10 +66,31 @@ function PW:_OrderReagents(o)
 end
 
 -- Nom lisible du PRODUIT d'une commande (repli « item:ID » tant que le client charge l'objet).
+--
+-- ⚠️ `lib:ItemName` REND UN REPLI NON NIL (« ? ») quand il ne sait pas. Enchaîné en `or`, ce repli
+-- est ABSORBANT : il est vrai, donc la suite n'est jamais atteinte. Une commande d'ENCHANTEMENT n'a
+-- pas d'objet produit (o.itemID nil) — son nom de sort était là, disponible, et la carte affichait
+-- « ? » par-dessus (relevé en jeu le 2026-09-20, commande passée depuis un reroll). Même famille que
+-- le prix inconnu rendu 0 au lieu de nil : un repli doit se taire, pas répondre à côté.
+--
+-- « ? », « item:123 » et « spell:456 » sont tous des AVEUX D'IGNORANCE, pas des noms : aucun ne doit
+-- arrêter la recherche. Seul le dernier recours en émet un, une fois toutes les sources épuisées —
+-- et la vue le reconnaît pour afficher « Chargement… ».
+local function known(n, marker)
+    return n and n ~= "?" and not n:match("^" .. marker .. ":") and n or nil
+end
+
 function PW:_OrderItemName(o, c)
-    return (c and c:ItemName(o.itemID, o.itemName))
-        or (o.spellID and c and c:RecipeName(o.spellID))
-        or ("item:" .. (o.itemID or 0))
+    if c and o.itemID then
+        -- `o.itemName` est le nom envoyé par l'acheteur : un VRAI nom, il passe le filtre.
+        local n = known(c:ItemName(o.itemID, o.itemName), "item")
+        if n then return n end
+    end
+    if c and o.spellID then
+        local n = known(c:RecipeName(o.spellID), "spell")
+        if n then return n end
+    end
+    return o.itemName or ("item:" .. (o.itemID or 0))
 end
 
 -- Difficulté (couleur de plan) d'une commande POUR MOI : résolue par l'objet produit (métiers
@@ -93,40 +114,105 @@ function PW:_OrderDifficulty(o)
 end
 
 -- ------------------------------------------------------------------
--- Construction (onglets de relation + en-tête + scroll de cartes)
+-- Le filtre de relation : DEUX présentations du MÊME état
 -- ------------------------------------------------------------------
--- Onglets de RELATION (Tous / Guilde / Amis / Annuaire) : languettes NATIVES (MakeTabs — le rendu
--- du volet Amis), posées au niveau du header AU-DESSUS de la colonne Commandes ; la SPEC lui réserve
--- la bande dessous (orders.top, cf. _ProfWindow_Layout.lua). Parentés à la FENÊTRE, pas à la
--- colonne : ils survivent au re-parentage compact/dock, seul leur X change (_PlaceOrdTabs).
+-- Vue PLEINE (3 colonnes, 800 px) : cinq LANGUETTES, calées à DROITE du cadre — calées à gauche de
+-- la colonne elles débordaient (retour terrain 2026-07-23) ; en grandissant vers la gauche elles
+-- mordent sur le marbre au-dessus du détail, où il y a la place. Là, elles se lisent d'un coup d'œil.
+--
+-- Colonne SEULE (compact, et la greffe de Forever) : un SÉLECTEUR. Cinq languettes dans 221 px ne
+-- tenaient qu'en les réduisant à ~60 %, pour filtrer une liste qui est vide la plupart du temps —
+-- cinq façons de filtrer zéro élément. Le sélecteur dit la même chose sur une ligne, à taille
+-- normale, et il supprime au passage la mise à l'échelle : c'est elle qui faisait varier la hauteur
+-- de la rangée, et donc coïncider par HASARD avec la bande réservée à la liste (relevé 2026-09-20,
+-- un pixel de recouvrement). Une géométrie qui ne dépend plus d'un facteur variable n'a plus de
+-- hasard à corriger.
+local function relItems()
+    local out = {}
+    for _, d in ipairs(REL) do
+        local n = (d.id == "inbound") and (PW.ordInboundN or 0) or 0
+        out[#out + 1] = { value = d.id, text = (n > 0) and (d.label .. " (" .. n .. ")") or d.label }
+    end
+    return out
+end
+
+function PW:_BuildRelDD()
+    if self.ordRelDD then return end
+    -- Parenté à la FENÊTRE comme les languettes : il survit au re-parentage compact/dock, seule son
+    -- ancre change. Contrepartie, déjà connue : posé au-dessus d'une zone de section, il lui faut un
+    -- niveau explicite, sinon il passe DESSOUS (cf. _PlaceRelDD).
+    self.ordRelDD = Skin.MakeDropdown("CraftingOrderProfWinRelDD", self.frame, 100, relItems,
+        { onSelect = function(v)
+            PW.ordRelTab = v; PW:_RefreshRelTabs(); PW:RefreshOrders()
+        end })
+    self.ordRelDD:Hide()
+end
+
 function PW:_BuildRelTabs()
     self.ordRelTabs = Skin.MakeTabs(self.frame, REL, function(id)
         PW.ordRelTab = id; PW:_RefreshRelTabs(); PW:RefreshOrders()
     end)
+    self:_BuildRelDD()
     self:_PlaceOrdTabs(self._compact)
 end
 
--- Vue pleine : barre calée à DROITE du cadre — à 5 languettes elle est PLUS LARGE que la colonne
--- Commandes, calée à gauche de la colonne elle débordait du cadre (retour terrain 2026-07-23) ; en
--- grandissant vers la gauche elle mord sur le marbre au-dessus du détail, où il y a la place.
--- Compact/dock (fenêtre 300 px) : bord gauche + rétrécissement à l'échelle si la barre dépasse
--- (les offsets sont re-divisés par l'échelle : un SetPoint s'exprime dans l'espace LOCAL du frame).
--- Re-appelée après chaque badge « Entrantes (N) » (RefreshOrders) : la largeur de la barre vit.
+-- Pose le sélecteur dans la ligne d'en-tête de la liste, en réservant 34 px à droite pour le tri
+-- « progression d'abord ». Rend la hauteur de bande à réserver au-dessus de la liste.
+function PW:_PlaceRelDD(bz)
+    local T, dd = PW.TUNE, self.ordRelDD
+    -- La place gardée à droite ne l'est QUE si le bouton de tri s'y trouve. Sinon le sélecteur
+    -- s'arrêtait 27 px avant le bord pour rien — relevé 2026-09-20 : 532..695 dans une zone qui va
+    -- jusqu'à 722, soit un trou visible dans une colonne où chaque pixel de large compte.
+    local sorting = self.ordLevelBtn and self.ordLevelBtn:IsShown()
+    local reserve = sorting and T.selReserveR or T.selLeft
+    local avail = (bz:GetWidth() or 0) - T.selLeft * 2 - reserve
+    if avail > 40 then dd:SetSize(avail, T.selHeight) end
+    dd:ClearAllPoints()
+    dd:SetFrameLevel((bz:GetFrameLevel() or 0) + 5)
+    dd:SetPoint("TOPLEFT", bz, "TOPLEFT", T.selLeft, -T.selTop)
+    return math.max(T.listBand, T.selTop + T.selHeight + 2)
+end
+
+-- Pose la rangée de languettes (vue pleine, ou build avant dimensionnement). Rend la bande.
+function PW:_PlaceRelTabs(bar, first)
+    local total = -4 * (#REL - 1)                     -- chevauchement natif des languettes (−4 px)
+    for _, d in ipairs(REL) do
+        bar.buttons[d.id]:SetScale(1)
+        total = total + bar.buttons[d.id]:GetWidth()
+    end
+    local fw = self.frame:GetWidth() or 0
+    first:ClearAllPoints()
+    if fw == 0 then                                   -- build avant sizing (re-posée au 1er refresh)
+        first:SetPoint("TOPLEFT", self.frame, "TOPLEFT", 8, self:_TabTop())
+    else
+        first:SetPoint("TOPLEFT", self.frame, "TOPLEFT", fw - total - 12, self:_TabTop())
+    end
+    return PW.TUNE.listBand
+end
+
+-- Re-appelée à chaque changement de mode ET après chaque badge « Entrantes (N) » (RefreshOrders).
 function PW:_PlaceOrdTabs(compact)
     local bar = self.ordRelTabs
     local first = bar and bar.buttons[REL[1].id]
     if not first then return end
-    local total = -4 * (#REL - 1)                     -- chevauchement natif des languettes (−4 px)
-    for _, d in ipairs(REL) do total = total + bar.buttons[d.id]:GetWidth() end
-    local fw = self.frame:GetWidth() or 0
-    local s = (compact and fw > 0 and total > fw - 16) and math.max((fw - 16) / total, 0.7) or 1
-    for _, d in ipairs(REL) do bar.buttons[d.id]:SetScale(s) end
-    first:ClearAllPoints()
-    if compact or fw == 0 then                        -- fw 0 = build avant sizing (re-posée au 1er refresh)
-        first:SetPoint("TOPLEFT", self.frame, "TOPLEFT", 8 / s, -28 / s)
-    else
-        first:SetPoint("TOPLEFT", self.frame, "TOPLEFT", fw - total - 12, -28)
-    end
+    self:_BuildRelDD()
+    local bz = compact and self:Sec("ordBody") or nil
+    if bz and (bz:GetWidth() or 0) <= 0 then bz = nil end
+    for _, d in ipairs(REL) do bar.buttons[d.id]:SetShown(bz == nil) end
+    self.ordRelDD:SetShown(bz ~= nil and not self.dockView)
+    local band = bz and self:_PlaceRelDD(bz) or self:_PlaceRelTabs(bar, first)
+    -- Le titre de la liste ne sert plus en mode colonne : la languette de vue le dit déjà, et il
+    -- coûterait une ligne à une liste qui n'en a pas de trop.
+    if self.ordHdr then self.ordHdr:SetShown(not compact) end
+    self:_ReserveOrdHeaderLine(band)
+end
+
+-- La bande réservée au-dessus de la liste. Elle valait 26 en dur face à une rangée dont la hauteur
+-- variait avec son facteur d'échelle : au relevé du 2026-09-20 les deux coïncidaient à UN pixel
+-- près, par hasard. Le sélecteur ayant une hauteur fixe, le hasard a disparu — la valeur vient
+-- maintenant de celui qui pose la rangée, et un seul endroit en décide.
+function PW:_ReserveOrdHeaderLine(band)
+    if self.ordScroll then self.ordScroll:SetPoint("TOPLEFT", 6, -(band or PW.TUNE.listBand)) end
 end
 
 -- Zones SPEC de la colonne (cf. _ProfWindow_Layout.lua) : ordBody (en-tête + scroll liste/carte) /
@@ -157,9 +243,9 @@ function PW:_BuildOrders(col)
         GameTooltip:Show()
     end)
     lvl:SetScript("OnLeave", GameTooltip_Hide)
-    -- Accès au Plan de route pour les modes sans colonne Recettes (dock Era, greffe Forever), sous
-    -- garde nil : _ProfWindow_Route est une dépendance molle, son absence ne doit rien casser ici.
-    if self._BuildDockRouteBtn then self:_BuildDockRouteBtn(bz) end
+    -- Bascules de VUE de la colonne (route / manquantes) pour les modes sans colonne Recettes
+    -- (dock Era, greffe Forever), sous garde nil : _ProfWindow_DockViews est une dépendance molle.
+    if self._BuildDockViewBtns then self:_BuildDockViewBtns() end
     self.ordLevelBtn = lvl
     local scroll = CreateFrame("ScrollFrame", "CraftingOrderProfWinOrdScroll", bz, "UIPanelScrollFrameTemplate")
     scroll:SetPoint("TOPLEFT", 6, -26); scroll:SetPoint("BOTTOMRIGHT", -24, 0)
@@ -175,6 +261,7 @@ end
 
 function PW:_RefreshRelTabs()
     if self.ordRelTabs then self.ordRelTabs:Select(self.ordRelTab or "all") end
+    if self.ordRelDD then self.ordRelDD:SetValue(self.ordRelTab or "all") end
 end
 
 function PW:_Age(ts)
@@ -355,15 +442,17 @@ end
 
 function PW:RefreshOrders()
     if not self.ordContent then return end
-    if self._SyncDockRouteBtn then self:_SyncDockRouteBtn() end   -- soft-dep (_ProfWindow_Route)
+    if self._SyncDockViewBtns then self:_SyncDockViewBtns() end   -- soft-dep (_ProfWindow_DockViews)
     self._ordDiffMap = nil   -- couleurs de difficulté re-lues à chaque refresh (un skill-up les change)
     local list, pending, accepted, mutedN, canalN = self:_CollectOrders()
     -- Badge de l'onglet Entrantes : « Entrantes (2) » dès qu'il y a du chat capté pour ce métier —
     -- visible depuis n'importe quel onglet (MakeTabs:SetText re-mesure la languette).
+    PW.ordInboundN = canalN                      -- lu par relItems() pour le libellé du sélecteur
     if self.ordRelTabs then
         self.ordRelTabs:SetText("inbound",
             canalN > 0 and (L["Entrantes"] .. " (" .. canalN .. ")") or L["Entrantes"])
     end
+    if self.ordRelDD and self.ordRelDD:IsShown() then self.ordRelDD:SetValue(self.ordRelTab or "all") end
     -- La largeur de contenu suit le viewport (mode compact plus étroit → les lignes suivent).
     local sw = self.ordScroll and self.ordScroll:GetWidth() or 0
     if sw > 0 then self.ordContent:SetWidth(sw) end
@@ -374,6 +463,14 @@ function PW:RefreshOrders()
             if not it.muted and it.o.id == self.ordSelected then sel = it; break end
         end
         if not sel then self.ordSelected = nil end
+    end
+    -- Trier une liste d'UN élément ne fait rien, et une icône sans libellé posée à côté du sélecteur
+    -- se fait lire comme un bouton de ce sélecteur (retour user 2026-09-20 : prise pour un tri des
+    -- « missing »). Elle n'apparaît donc que quand elle a réellement prise sur quelque chose.
+    if self.ordLevelBtn then
+        self.ordLevelBtn:SetShown(not self.dockView and #list > 1)
+        -- Le sélecteur se re-mesure derrière : sa largeur dépend de la présence du bouton de tri.
+        if self._compact and self._PlaceOrdTabs then self:_PlaceOrdTabs(true) end
     end
     if sel then self:_RenderOrdSelected(sel) else self:_RenderOrdList(list) end
     Skin.AutoHideScroll("CraftingOrderProfWinOrdScroll", self.ordContent)

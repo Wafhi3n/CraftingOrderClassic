@@ -1,35 +1,35 @@
 # CraftingOrderClassic — carte du code
 
-> **GÉNÉRÉ** le 2026-09-19 (v1.32.2) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
+> **GÉNÉRÉ** le 2026-09-20 (v1.32.2) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
-122 modules + 4 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
+126 modules + 4 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
 
 ## Modules (ordre de chargement)
 
 | Fichier | Rôle | Lignes |
 |---|---|---|
-| `CraftingOrderClassic.lua` | Crafting Order - Classic — réseau GLOBAL et SOCIAL de commandes de craft. | 471 |
+| `CraftingOrderClassic.lua` | Crafting Order - Classic — réseau GLOBAL et SOCIAL de commandes de craft. | 473 |
 | `CraftingOrderClassic_Compat.lua` | couche d'adaptation d'API entre les SAVEURS de client. | 235 |
 | `CraftingOrderClassic_Trace.lua` | trace réseau PERSISTÉE, lisible hors-jeu. | 79 |
 | `CraftingOrderClassic_Migrations.lua` | versionnage du schéma SavedVariables. | 40 |
 | `CraftingOrderClassic_Locale.lua` | socle de localisation du CHROME de l'UI. | 12 |
 | `CraftingOrderClassic_Locale_enUS.lua` | overlay ANGLAIS (enUS/enGB). | 269 |
-| `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 480 |
+| `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 483 |
 | `CraftingOrderClassic_Locale_deDE.lua` | overlay ALLEMAND (deDE). | 271 |
-| `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 462 |
+| `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 463 |
 | `CraftingOrderClassic_Locale_esES.lua` | overlay ESPAGNOL (esES/esMX). | 272 |
-| `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 463 |
+| `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 464 |
 | `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 309 |
 | `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 306 |
 | `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 306 |
 | `CraftingOrderClassic_Elemental.lua` | pseudo-« métier » de récolte « Élémentaire ». | 61 |
 | `CraftingOrderClassic_UI_Skin.lua` | tokens + helpers SÉMANTIQUES du skin (métiers, statuts, rareté, quantités, icônes natives) et petits widgets d'affichage. | 431 |
-| `CraftingOrderClassic_UI_Skin_Native.lua` | kit de chrome Blizzard NATIF (le « framework » UI de COC). | 450 |
+| `CraftingOrderClassic_UI_Skin_Native.lua` | kit de chrome Blizzard NATIF (le « framework » UI de COC). | 455 |
 | `CraftingOrderClassic_UI_Skin_Dropdown.lua` | menu deroulant (selecteur) du kit natif. | 93 |
-| `CraftingOrderClassic_UI_Skin_Sections.lua` | kit de chrome natif, volet SECTIONS : comment on découpe l'intérieur d'une fenêtre en blocs et en zones. | 247 |
-| `CraftingOrderClassic_UI_Skin_HelpPlate.lua` | kit d'AIDE CONTEXTUELLE (le « bouton i » de retail). | 258 |
+| `CraftingOrderClassic_UI_Skin_Sections.lua` | kit de chrome natif, volet SECTIONS : comment on découpe l'intérieur d'une fenêtre en blocs et en zones. | 254 |
+| `CraftingOrderClassic_UI_Skin_HelpPlate.lua` | kit d'AIDE CONTEXTUELLE (le « bouton i » de retail). | 262 |
 | `CraftingOrderClassic_ShareReagents.lua` | « liste de courses » : diffuser en un clic les réactifs d'une recette (vue métier) ou d'une commande (carte) dans un canal de discussion, avec le LIEN objet de chaque réactif. | 157 |
 | `CraftingOrderClassic_UI.lua` | fenêtre principale (chrome Blizzard natif, kit UI_Skin_Native). | 485 |
 | `CraftingOrderClassic_UI_HelpPlate.lua` | AIDE CONTEXTUELLE de la FENÊTRE PRINCIPALE (« bouton i »). | 166 |
@@ -75,23 +75,27 @@
 | `CraftingOrderClassic_Stats_Filter.lua` | sélecteur « ne montrer que ce qui donne <stat> ». | 103 |
 | `CraftingOrderClassic_Gem.lua` | spécifique à la JOAILLERIE : sous-catégorise les GEMMES TAILLÉES par TAILLE (le mot qui porte la stat). | 226 |
 | `CraftingOrderClassic_Gem_Stats.lua` | correspondance TAILLE DE GEMME → STAT (données, éditées à la main). | 41 |
-| `CraftingOrderClassic_MTSL.lua` | pont LECTURE SEULE vers l'addon « Missing TradeSkills List » (MTSL). | 330 |
-| `CraftingOrderClassic_ProfWindow.lua` | fenêtre métier custom 3 colonnes (migration depuis Guild Economy) : Recettes \| Détail+Craft \| Commandes du métier. | 472 |
-| `CraftingOrderClassic_ProfWindow_Layout.lua` | GÉOMÉTRIE de la vue métier (fenêtre 3 colonnes). | 81 |
-| `CraftingOrderClassic_ProfWindow_HelpPlate.lua` | AIDE CONTEXTUELLE de la Vue Métier (« bouton i »). | 82 |
+| `CraftingOrderClassic_Sources.lua` | « où j'obtiens ce plan, et lesquels me manquent ». | 230 |
+| `CraftingOrderClassic_ProfWindow.lua` | fenêtre métier custom 3 colonnes (migration depuis Guild Economy) : Recettes \| Détail+Craft \| Commandes du métier. | 483 |
+| `CraftingOrderClassic_ProfWindow_Layout.lua` | GÉOMÉTRIE de la vue métier (fenêtre 3 colonnes). | 165 |
+| `CraftingOrderClassic_ProfWindow_HelpPlate.lua` | AIDE CONTEXTUELLE de la Vue Métier (« bouton i »). | 103 |
 | `CraftingOrderClassic_ProfWindow_Dock.lua` | mode DOCK de la vue métier (« Vue Blizzard ») : la fenêtre native reste VISIBLE (non neutralisée) et NOTRE colonne Commandes s'épingle à sa droite. | 70 |
-| `CraftingOrderClassic_ProfWindow_Camelot.lua` | POC : notre colonne Commandes À L'INTÉRIEUR de la fenêtre de métier NATIVE de WoW: Forever (Camelot). | 431 |
+| `CraftingOrderClassic_ProfWindow_Camelot.lua` | POC : notre colonne Commandes À L'INTÉRIEUR de la fenêtre de métier NATIVE de WoW: Forever (Camelot). | 445 |
 | `CraftingOrderClassic_ProfWindow_Camelot_Open.lua` | OUVRIR un metier dans la fenetre NATIVE de WoW: Forever, et rediriger vers elle toutes nos entrees (bouton minimap, /co prof, clic du suivi). | 115 |
+| `CraftingOrderClassic_ProfWindow_Camelot_PageArt.lua` | prolonger le FOND de la page native dans la bande que notre greffe ajoute à droite de la fenêtre de métier de WoW: Forever. | 80 |
 | `CraftingOrderClassic_ProfWindow_Toolbar.lua` | barre d'outils de la colonne Recettes (vue métier) : les toggles de TRI (slot recTools, à gauche : rentabilité / valeurs exactes / progression — Lazy Gold) et de FILTRE (slot recFilterToggles, à droite : « j'ai les matériaux » / « montée de compétence »). | 245 |
 | `CraftingOrderClassic_ProfWindow_Recipes.lua` | colonne GAUCHE : liste de recettes virtualisée (scroll), recherche, couleur par difficulté, sélection, badge « demandé » (nb de commandes ouvertes pour l'objet). | 486 |
 | `CraftingOrderClassic_ProfWindow_Leveling.lua` | aide à la MONTÉE DE MÉTIER dans la liste de recettes : coût de progression (réactifs au prix Lazy Gold ÷ chance de point selon la couleur), badge « meilleur coût/point » sur la recette recommandée, icônes de SOURCE sur les manquantes (formateur / vendeur PNJ / coté à l'HV / à farmer) et tri « progression » affiné par coût. | 219 |
-| `CraftingOrderClassic_Route.lua` | cœur de CALCUL du plan de route de montée de métier, PARAMÉTRABLE : marche gloutonne rang par rang (recette au meilleur coût/point ESPÉRÉ), seuils réels CraftLink `skillColors` aux rangs futurs, amortissement du prix des plans à acheter, exclusion des recettes à cooldown et des coûts partiels. | 323 |
-| `CraftingOrderClassic_ProfWindow_Route.lua` | fenêtre « PLAN DE ROUTE » de montée de métier (étage ③ de l'aide à la progression) : « du rang actuel au plafond, quoi crafter, combien de fois, pour combien ». | 456 |
+| `CraftingOrderClassic_Route.lua` | cœur de CALCUL du plan de route de montée de métier, PARAMÉTRABLE : marche gloutonne rang par rang (recette au meilleur coût/point ESPÉRÉ), seuils réels CraftLink `skillColors` aux rangs futurs, amortissement du prix des plans à acheter, exclusion des recettes à cooldown et des coûts partiels. | 329 |
+| `CraftingOrderClassic_ProfWindow_Route.lua` | fenêtre « PLAN DE ROUTE » de montée de métier (étage ③ de l'aide à la progression) : « du rang actuel au plafond, quoi crafter, combien de fois, pour combien ». | 487 |
+| `CraftingOrderClassic_ProfWindow_Learn.lua` | section « À apprendre maintenant » du Plan de route : les recettes NON APPRISES que ton rang permet déjà d'apprendre ET qui rapportent encore un point, classées par coût espéré par point, avec l'icône de leur source. | 113 |
+| `CraftingOrderClassic_ProfWindow_DockViews.lua` | la colonne Commandes CHANGE DE CONTENU au lieu d'ouvrir des fenêtres par-dessus. | 299 |
+| `CraftingOrderClassic_ProfWindow_Geo.lua` | `/co geo` : le RELEVÉ de la colonne, en pixels écran, écrit dans la SavedVariable pour être relu HORS DU JEU. | 261 |
 | `CraftingOrderClassic_ProfWindow_Detail.lua` | colonne CENTRE : détail de la recette sélectionnée (icône, réactifs have/need) + boutons Créer / Créer tout. | 418 |
-| `CraftingOrderClassic_ProfWindow_Info.lua` | PANNEAU D'INFO en SECTIONS pour la colonne centrale de la vue métier. | 203 |
+| `CraftingOrderClassic_ProfWindow_Info.lua` | PANNEAU D'INFO en SECTIONS pour la colonne centrale de la vue métier. | 205 |
 | `CraftingOrderClassic_LazyGold.lua` | pont LECTURE SEULE vers l'addon « Lazy Gold Classic » (LG). | 460 |
-| `CraftingOrderClassic_ProfWindow_Orders.lua` | colonne « Commandes » de la vue métier (cabine de l'artisan) : construction (onglets de relation, en-tête, scroll), vue LISTE (une ligne par commande : demandeur + prix + âge ; une ligne sourdine cliquée se réaffiche), collecte/tri et rafraîchissement. | 402 |
-| `CraftingOrderClassic_ProfWindow_Orders_Card.lua` | vue SÉLECTIONNÉE de la colonne « Commandes » : la carte complète d'une commande (composants fournis, repères Lazy Gold, ACCEPTER / REFUSER / CHUCHOTER ; croix en haut à droite = retour liste). | 255 |
+| `CraftingOrderClassic_ProfWindow_Orders.lua` | colonne « Commandes » de la vue métier (cabine de l'artisan) : construction (onglets de relation, en-tête, scroll), vue LISTE (une ligne par commande : demandeur + prix + âge ; une ligne sourdine cliquée se réaffiche), collecte/tri et rafraîchissement. | 499 |
+| `CraftingOrderClassic_ProfWindow_Orders_Card.lua` | vue SÉLECTIONNÉE de la colonne « Commandes » : la carte complète d'une commande (composants fournis, repères Lazy Gold, ACCEPTER / REFUSER / CHUCHOTER ; croix en haut à droite = retour liste). | 308 |
 | `CraftingOrderClassic_ProfWindow_LFW.lua` | config de l'OFFRE « recherche de travail » par métier. | 327 |
 | `CraftingOrderClassic_ProfWindow_Reroll.lua` | vue métier LECTURE SEULE d'un REROLL. | 118 |
 | `Directory.lua` | Crafting Order - Classic — Directory : l'annuaire des GENS (présence + qui peut crafter quoi). | 485 |
@@ -364,6 +368,10 @@
 > son bas ouvert plonge vers le contenu — le rendu « onglets sur la barre grise » demandé. La fenêtre
 > réserve la bande dessous (PAD_TOP, UI.lua). Contrat `bar` inchangé : .buttons[id], :Select, :SetText.
 > Le gabarit d'onglet natif change de nom selon la saveur — résolu dans Compat (COC.Api).
+> `opts.namePrefix` : OBLIGATOIRE dès qu'un même cadre porte DEUX barres. Les gabarits d'onglet
+> résolvent leurs pièces par clé parent, mais retombent sur le NOM GLOBAL (`PanelTemplates_TabResize`
+> lit `tab.Text or _G[name.."Text"]`) : deux barres sur le même cadre produiraient deux boutons
+> nommés pareil, et le second écraserait les globales du premier. On ne parie pas là-dessus.
 
 **`Skin.MakeFlatRow(parent, w, h)`**
 
@@ -525,7 +533,7 @@
 > État actuel : capture AUTONOME des recettes (scan des fenêtres métier via CraftLink) +
 > persistance propre (CraftingOrderClassicDB). Le carnet d'ordres et le social arrivent (C/D).
 
-**API** : `COC:Scan()` · `COC:ScanSoon()` · `COC:Status()` · `COC:ChannelCmd(arg)` · `COC:NotifyCmd(arg)` · `COC:ScanCmd(arg)` · `COC:CrafterScanCmd(arg)` · `COC:ChannelNotice()` · `COC:MissingAddon(displayName)` · `COC:NeedLazyGold()` · `COC:NeedMTSL()` · `COC:Beacon()` · `COC:BeaconDiag()` · `COC:WipeRoster()` · `COC:GreenWallDiag()` · `COC:Help()` · `COC:Slash(msg)`
+**API** : `COC:Scan()` · `COC:ScanSoon()` · `COC:Status()` · `COC:ChannelCmd(arg)` · `COC:NotifyCmd(arg)` · `COC:ScanCmd(arg)` · `COC:CrafterScanCmd(arg)` · `COC:ChannelNotice()` · `COC:MissingAddon(displayName)` · `COC:NeedLazyGold()` · `COC:Beacon()` · `COC:BeaconDiag()` · `COC:WipeRoster()` · `COC:GreenWallDiag()` · `COC:Help()` · `COC:Slash(msg)`
 
 ### `CraftingOrderClassic_Compat.lua`
 > CraftingOrderClassic_Compat.lua — couche d'adaptation d'API entre les SAVEURS de client.
@@ -1333,29 +1341,34 @@
 > Forme attendue :
 >   { stat = "Pénétration des sorts", cuts = { "Stormy" } },
 
-### `CraftingOrderClassic_MTSL.lua`
-> CraftingOrderClassic_MTSL.lua — pont LECTURE SEULE vers l'addon « Missing TradeSkills List » (MTSL).
+### `CraftingOrderClassic_Sources.lua`
+> CraftingOrderClassic_Sources.lua — « où j'obtiens ce plan, et lesquels me manquent ».
 > 
-> BUT : afficher, dans la vue métier, les recettes que le personnage courant N'A PAS encore apprises,
-> et d'où elles viennent (formateur/prix, butin, quête, réputation…). Ces recettes sont par définition
-> ABSENTES de la fenêtre de métier native, donc invisibles pour COC.Craft:ReadRecipes() — seule une
-> base de données externe les connaît. MTSL en fournit une, complète et localisée.
+> CE MODULE REMPLACE LE PONT MTSL, et le remplace ENTIÈREMENT. Raisons, dans l'ordre :
+>   1. MTSL n'est plus maintenu. Une fonctionnalité de COC ne doit pas mourir avec un addon tiers.
+>   2. Sa base décrit Vanilla + TBC. Or WoW: Forever a profondément remanié la base d'objets :
+>      894 objets-recette n'existent QUE sur Forever (la moitié des siens), 173 objets de Classic
+>      en ont disparu, et 24 identifiants communs désignent un AUTRE objet (6342 passe de
+>      « Minor Mana » à « Minor Intellect », 3831 de « Mighty Troll's Blood Potion » à
+>      « Troll's Blood Elixir »). Ces derniers sont les pires : ils ne se taisent pas, ils
+>      répondent à côté, avec assurance. Un annuaire périmé est pire qu'un annuaire absent.
+>   3. La donnée dont on a besoin est déjà dans NOTRE catalogue CraftLink, généré depuis la même
+>      source que les recettes elles-mêmes (tools/gen_sources.lua) — donc juste par construction
+>      sur chaque saveur, et rafraîchie par le même geste que le reste des données.
 > 
-> DÉPENDANCE MOLLE, JAMAIS DURE : COC reste autonome. Si MTSL n'est pas installé (ou pas encore
-> chargé), IsAvailable() renvoie false et la fonctionnalité s'efface — aucun plantage, aucun toc à
-> modifier. On lit ses globales, on n'appelle JAMAIS son UI ni sa logique interne.
+> CE QU'ON PERD EN ABANDONNANT MTSL, et qu'il faut assumer plutôt que masquer :
+>   · le PRIX au formateur (aucune source ne le donne) → SourcePrice rend nil, et nil veut dire
+>     INCONNU, jamais zéro. Un appelant qui confondrait les deux conseillerait d'acheter un plan
+>     « gratuit » qui ne l'est pas ;
+>   · les COORDONNÉES exactes du PNJ (on donne son nom et sa zone) ;
+>   · le nom du PNJ dans la langue du client : il arrive en anglais. La ZONE, elle, reste
+>     localisée — on ne stocke que son AreaID et `C_Map.GetAreaInfo` fait le reste ;
+>   · la distinction RÉPUTATION : un quartier-maître est annoncé comme un vendeur.
 > 
-> CE QU'ON LIT (globales publiques de MTSL) :
->   MTSL_DATA.skills[prof]                          toutes les recettes : { id=spellID, min_skill,
->                                                    name={langue=…}, phase, trainers/reputation/… }
->   MTSL_CURRENT_PLAYER.TRADESKILLS[prof].MISSING_SKILLS   spellID manquants pour CE perso (calculé
->                                                    par MTSL au login à partir des skills appris)
->   MTSL_DATA.npcs / zones / factions / reputation_levels   pour résoudre les sources en texte lisible.
-> 
-> CE QU'ON NE BAKE JAMAIS : les noms restent puisés dans MTSL au runtime selon la langue du client —
-> rien n'est figé en anglais, cohérent avec le reste de l'écosystème.
+> Contrat identique à l'ancien pont (mêmes noms, mêmes retours) : les appelants n'ont eu qu'à
+> changer de table. « unknown » reste la réponse honnête quand on ne sait pas.
 
-**API** : `MTSL:IsAvailable()` · `MTSL:SkillDetail(profKey, spellID)` · `MTSL:MissingRecipes(profKey)` · `MTSL:MinSkill(profKey, spellID)` · `MTSL:RecipeItem(profKey, spellID)` · `MTSL:SourceKind(profKey, spellID)` · `MTSL:SourceNpcLine(profKey, spellID)` · `MTSL:SourcePrice(profKey, spellID)` · `MTSL:NpcLine(npcId)`
+**API** : `S:IsAvailable()` · `S:RecipeItem(profKey, spellID)` · `S:SourceKind(profKey, spellID)` · `S:IsInferred(profKey, spellID)` · `S:MinSkill(profKey, spellID)` · `S:SourcePrice(profKey, spellID)` · `S:SourceText(profKey, spellID)` · `S:SourceNpcLine(profKey, spellID)` · `S:MissingRecipes(profKey)` · `S:SkillDetail(profKey, spellID)`
 
 ### `CraftingOrderClassic_ProfWindow.lua`
 > CraftingOrderClassic_ProfWindow.lua — fenêtre métier custom 3 colonnes (migration depuis
@@ -1429,6 +1442,15 @@
 
 **API** : `PW:CamelotOpenNative(profKey)`
 
+### `CraftingOrderClassic_ProfWindow_Camelot_PageArt.lua`
+> CraftingOrderClassic_ProfWindow_Camelot_PageArt.lua — prolonger le FOND de la page native dans
+> la bande que notre greffe ajoute à droite de la fenêtre de métier de WoW: Forever.
+> 
+> Extrait de _ProfWindow_Camelot.lua le 2026-09-20 (anti-monolithe : le fichier repassait à 508
+> lignes — même motif qu'au 2026-09-19 pour _Camelot_Open). Ici, une seule chose : de l'art.
+> 
+> Appelé en dépendance MOLLE depuis la greffe : sans ce fichier la bande reste nue, rien ne casse.
+
 ### `CraftingOrderClassic_ProfWindow_Toolbar.lua`
 > CraftingOrderClassic_ProfWindow_Toolbar.lua — barre d'outils de la colonne Recettes (vue métier) :
 > les toggles de TRI (slot recTools, à gauche : rentabilité / valeurs exactes / progression — Lazy Gold)
@@ -1450,8 +1472,8 @@
 > (formateur / vendeur PNJ / coté à l'HV / à farmer) et tri « progression » affiné par coût.
 > Les guides statiques se trompent quand l'économie du serveur diverge (vécu : shards à 10 pc alors
 > que le guide dit d'acheter de la dust) — ici tout est au prix RÉEL (Auctionator via Lazy Gold).
-> Tout est soft-dep : sans Lazy Gold le coût disparaît (les icônes de source restent, MTSL suffit) ;
-> sans MTSL, pas d'icônes (les manquantes n'existent pas). Appelé par _ProfWindow_Recipes sous garde
+> Sans oracle de prix le coût disparaît, les icônes de source restent : elles viennent de notre
+> catalogue (COC.Sources), sans aucun addon tiers. Appelé par _ProfWindow_Recipes sous garde
 > nil (`self._FillLevelingRight and …`) : l'absence de ce fichier ne casse rien.
 
 ### `CraftingOrderClassic_Route.lua`
@@ -1479,6 +1501,72 @@
 > rien ne change (hooks sous garde nil dans _ProfWindow_Toolbar).
 
 **API** : `PW:ToggleRoute()`
+
+### `CraftingOrderClassic_ProfWindow_Learn.lua`
+> CraftingOrderClassic_ProfWindow_Learn.lua — section « À apprendre maintenant » du Plan de route :
+> les recettes NON APPRISES que ton rang permet déjà d'apprendre ET qui rapportent encore un point,
+> classées par coût espéré par point, avec l'icône de leur source.
+> 
+> POURQUOI CETTE VUE ET PAS UN MODE « MANQUANTES » COMPLET. Sur WoW: Forever la fenêtre native
+> affiche DÉJÀ les recettes non apprises (séparateur « Unlearned », filtre actif par défaut) et
+> donne leur source en toutes lettres dans la langue du client (`GetRecipeSourceText`). Refaire la
+> liste par-dessus, dans une colonne trois fois plus étroite, donnerait une version moins bonne de
+> ce que le joueur a sous les yeux. Ce que la native ne fait PAS, c'est répondre à la seule
+> question qui compte quand on monte un métier : « parmi tout ça, qu'est-ce que je peux apprendre
+> MAINTENANT, qui me fera encore progresser, et au meilleur prix ? » C'est cette question-là qu'on
+> traite — le reste, on le laisse à Blizzard.
+> 
+> La route ne retient qu'UNE recette par rang (la meilleure) : elle dit quoi faire, pas ce qu'il y
+> avait à choisir. Cette section montre le champ des possibles, au rang courant seulement.
+> 
+> Soft-dep dans les deux sens : appelée sous garde nil par _FillRouteSupply (sans ce fichier, la
+> fenêtre garde ses segments), et sans oracle de prix elle s'affiche quand même — le classement
+> retombe sur le rang requis, la liste reste utile.
+
+### `CraftingOrderClassic_ProfWindow_DockViews.lua`
+> CraftingOrderClassic_ProfWindow_DockViews.lua — la colonne Commandes CHANGE DE CONTENU au lieu
+> d'ouvrir des fenêtres par-dessus. Trois vues, deux boutons dans son en-tête :
+>   · Commandes (défaut)   · Plan de route   · Manquantes
+> 
+> POURQUOI. Greffée dans la fenêtre native de Forever, la colonne est haute, étroite et le plus
+> souvent presque vide — « Orders (0) » et vingt centimètres de marbre. Faire surgir une fenêtre
+> flottante par-dessus elle pour montrer la route gaspillait deux fois la même place, et cassait
+> l'illusion que la colonne fait partie de la fenêtre du jeu. La place est déjà là : on s'en sert.
+> La largeur, elle, se rattrape par les INFOBULLES — une ligne affiche un nom et un rang, le détail
+> (source, PNJ, zone, prix) vit au survol.
+> 
+> En vue PLEINE (l'Era, 3 colonnes), rien de tout ça : la colonne Recettes occupe déjà l'espace et
+> la route garde sa fenêtre flottante. Ces vues n'existent que là où la colonne est SEULE.
+> 
+> ⚠️ LE COMBAT. Greffée, la colonne est enfant de `ProfessionsFrame` : elle en hérite la PROTECTION.
+> `Show`/`Hide` sur ses enfants sont donc refusés en combat (piège wow-protected-frame-hide-combat,
+> reconfirmé sur Forever). Changer de vue est un geste de confort, jamais urgent : on le refuse
+> franchement, avec un mot, plutôt que de laisser le jeu bloquer l'action sans explication.
+
+### `CraftingOrderClassic_ProfWindow_Geo.lua`
+> CraftingOrderClassic_ProfWindow_Geo.lua — `/co geo` : le RELEVÉ de la colonne, en pixels écran,
+> écrit dans la SavedVariable pour être relu HORS DU JEU.
+> 
+> POURQUOI CE FICHIER EXISTE. Toute la mise au point de la colonne greffée s'est faite en calculant
+> sur des captures d'écran : « les trois languettes tiennent-elles ? », « le bouton d'aide touche-t-il
+> la croix native ? ». Ces questions-là ne sont pas des questions de goût — ce sont des mesures, et
+> les faire juger à l'œil, puis recopier à la main, est une perte de temps pour tout le monde. Le
+> relevé part donc sur le DISQUE (`COC.db.geo`), seul canal qu'un addon peut écrire ; la sortie
+> chat n'est qu'un confort de contrôle immédiat.
+> 
+> ⚠️ La SavedVariable n'est écrite qu'au `/reload` ou à la déconnexion. Le relevé vit donc en
+> mémoire jusque-là : ouvrir un métier, `/co geo`, PUIS `/reload`.
+> 
+> ⚠️ TOUT EST RAMENÉ EN PIXELS ÉCRAN (× GetEffectiveScale). C'est LE point qui rend ce relevé
+> utilisable : `GetLeft()` rend une coordonnée dans l'espace du frame, et nos rangées d'onglets sont
+> justement RÉDUITES À L'ÉCHELLE quand elles ne tiennent pas (cf. _PlaceOrdTabs). Comparer deux
+> rectangles sans normaliser, c'est comparer des centimètres à des pouces — le même piège que
+> l'écart des onglets latéraux mesuré dans les unités du cadre natif (cf. _ProfWindow_Camelot).
+> 
+> Un relevé est une MESURE DATÉE, pas un état courant : chaque passage écrase le précédent ET
+> réécrit son horodatage, pour qu'un vieux relevé ne puisse jamais se faire passer pour le dernier.
+> 
+> Sortie brute et technique, jamais localisée : c'est un instrument, pas du chrome.
 
 ### `CraftingOrderClassic_ProfWindow_Detail.lua`
 > CraftingOrderClassic_ProfWindow_Detail.lua — colonne CENTRE : détail de la recette sélectionnée

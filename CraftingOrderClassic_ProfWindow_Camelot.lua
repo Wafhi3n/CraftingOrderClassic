@@ -34,9 +34,10 @@ local function tr(fmt, ...)
     COC.Trace:Log("graft", (select("#", ...) > 0) and string.format(fmt, ...) or fmt)
 end
 
-local GAP = 6          -- respiration entre le contenu natif et notre bande
-local TOP_INSET = 26   -- sous la barre de titre native
-local BOT_INSET = 34   -- au-dessus de la rangée « Create All / Create »
+-- Réglages au pixel : ils vivent tous dans PW.TUNE (cf. _ProfWindow_Layout) pour qu'on puisse les
+-- pinailler d'un seul endroit, relevé `/co geo` à l'appui. Lus à CHAQUE usage, jamais recopiés dans
+-- un local : une valeur recopiée est une valeur qui ne suit plus la table.
+local function T() return PW.TUNE end
 local nativeBaseW      -- largeur d'origine du cadre natif, capturée UNE fois
 local hostWidened      -- a-t-on REELLEMENT elargi le cadre natif ? (mode encastre seulement)
 
@@ -148,8 +149,15 @@ local function sizeColumn(self)
     self.standaloneKey, self.rerollKey, self._compact = nil, nil, nil
     self:_ApplyMode(true)
     if self.vanillaBtn then self.vanillaBtn:Hide() end
-    local colW = math.max(self.frame:GetWidth() or 310, tabRowWidth(self.ordRelTabs))
+    -- Seule la rangée des VUES contraint encore la largeur. Les languettes de relation, elles, ont
+    -- cédé la place à un sélecteur qui s'adapte à la colonne au lieu de la forcer à s'élargir : on
+    -- ne mesure plus une rangée qui ne s'affiche pas ici (elle réclamait ~40 px pour rien).
+    local colW = math.max(self.frame:GetWidth() or 310,
+        (self._ViewTabsWidth and self:_ViewTabsWidth()) or 0)
     self.frame:SetWidth(colW)
+    -- Dans CET ordre : la largeur du cadre est definitive, on recale les zones dessus, ET SEULEMENT
+    -- APRES on pose la rangee -- elle se mesure sur `ordBody`, qui vient d'etre recale.
+    if self._SyncOrdWidth then self:_SyncOrdWidth() end
     if self._PlaceOrdTabs then self:_PlaceOrdTabs(true) end   -- re-poser a la largeur definitive
     return colW
 end
@@ -167,7 +175,7 @@ end
 -- une taint donnait au pire un ADDON_ACTION_BLOCKED ; ici elle fait planter le code de Blizzard, et
 -- le blame nous est impute nommement. Le chevauchement de panneaux est COSMETIQUE. On le garde.
 local function widenHost(native, colW)
-    native:SetWidth(nativeBaseW + colW + GAP * 2)
+    native:SetWidth(nativeBaseW + colW + T().graftGap * 2)
 end
 
 -- DEUX MODES, un seul drapeau (`COC.db.camelotAccole`, bascule : /co accole).
@@ -262,8 +270,8 @@ local function dockColumn(self, native)
     f:RegisterForDrag()                   -- plus aucun bouton ne declenche le glisser
     f:SetParent(native)                   -- suit l'ouverture/fermeture et le deplacement du natif
     f:ClearAllPoints()
-    f:SetPoint("TOPRIGHT", native, "TOPRIGHT", -GAP, -TOP_INSET)
-    f:SetPoint("BOTTOMRIGHT", native, "BOTTOMRIGHT", -GAP, BOT_INSET)
+    f:SetPoint("TOPRIGHT", native, "TOPRIGHT", -T().graftGap, -T().graftTopInset)
+    f:SetPoint("BOTTOMRIGHT", native, "BOTTOMRIGHT", -T().graftGap, T().graftBotInset)
     if f.SetToplevel then f:SetToplevel(false) end
     f:SetFrameStrata(native:GetFrameStrata() or "MEDIUM")
     local top = native:GetFrameLevel() or 0
@@ -289,9 +297,12 @@ local function traceAttach(self, native)
        (f:GetWidth() or 0), (f:GetHeight() or 0), (f:GetLeft() or -1),
        (f:GetFrameLevel() or 0), (native:GetFrameLevel() or 0),
        (page.GetFrameLevel and page:GetFrameLevel() or -1))
-    local tabs, nb = self.ordRelTabs, 0
+    -- La rangée qui compte ICI est celle des VUES : c'est elle qui dimensionne la colonne depuis que
+    -- la relation est passée au sélecteur. Tracer l'autre rapporterait la largeur d'une rangée qui
+    -- ne s'affiche même pas en greffe — une mesure vraie, au sujet de la mauvaise chose.
+    local tabs, nb = self.viewTabs, 0
     if type(tabs) == "table" then for _ in pairs(tabs.buttons or tabs) do nb = nb + 1 end end
-    tr("attach contenu : %d onglets, largeur rangee=%d", nb, tabRowWidth(tabs))
+    tr("attach contenu : %d onglets de vue, largeur rangee=%d", nb, tabRowWidth(tabs))
 end
 
 function PW:CamelotAttach(native)
@@ -316,6 +327,8 @@ function PW:CamelotAttach(native)
         hostWidened = true
         dockColumn(self, native)
     end
+    -- Le prolongement du fond n'a de sens qu'ENCASTRÉ : accolée, la bande n'existe pas.
+    if PW._FillPageArt then PW:_FillPageArt(native, not side and T().pageFill ~= false) end
     traceAttach(self, native)
     self:Refresh()
 end
@@ -329,6 +342,7 @@ function PW:CamelotDetach(native)
         if self.frame and not hostWidened and not self.frame:IsProtected() then self.frame:Hide() end
         return
     end
+    if PW._FillPageArt then PW:_FillPageArt(native, false) end   -- la bande part avec l'elargissement
     if native and nativeBaseW and hostWidened then
         native:SetWidth(nativeBaseW)      -- seulement si c'est NOUS qui l'avons elargi
         hostWidened = nil

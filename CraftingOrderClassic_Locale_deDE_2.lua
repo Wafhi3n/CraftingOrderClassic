@@ -284,10 +284,7 @@ local de2 = {
     ["Appris de"] = "Gelernt von",
     ["Vendeur"] = "Händler",
     ["Vendu par"] = "Verkauft von",
-    ["Butin sur"] = "Beute von",
-    ["Formateurs"] = "Lehrer",
     ["Formateur"] = "Lehrer",
-    ["Réputation"] = "Ruf",
     ["Quête"] = "Quest",
     ["Butin"] = "Beute",
     ["Source inconnue"] = "Unbekannte Quelle",
@@ -338,12 +335,12 @@ local de2 = {
     ["Un segment par ligne : plage de rangs, recette au meilleur coût par point espéré, « ×~N » = crafts attendus, et le coût du segment (parchemin = plan à acheter d'abord, compté dedans). Survole une ligne pour le détail. La route se recalcule à chaque point gagné."] =
         "Ein Abschnitt pro Zeile: Rangbereich, das Rezept mit den besten erwarteten Kosten pro Punkt, „×~N“ = erwartete Crafts, und die Kosten des Abschnitts (Schriftrolle = zuerst zu kaufendes Rezept, eingerechnet). Für Details mit der Maus über eine Zeile fahren. Die Route wird bei jedem Punkt neu berechnet.",
     ["Total estimé : %s"] = "Geschätzte Summe: %s",
+    ["Total estimé : inconnu"] = "Geschätzte Summe: unbekannt",
+    ["Change ce que montre la colonne : les commandes reçues, le plan de route du métier, ou les recettes qui te manquent."] = "Wechselt den Inhalt der Spalte: eingehende Aufträge, die Aufstiegsroute des Berufs oder die Rezepte, die dir fehlen.",
     ["Rang au plafond — c'est le maximum ici."] = "Maximaler Rang — das ist hier das Maximum.",
     ["Débloquer le palier suivant"] = "Nächste Stufe freischalten",
     ["À apprendre : %s"] = "Zu erlernen: %s",
-    ["Vendu par : %s"] = "Verkauft von: %s",
     ["Livre de rang"] = "Rangbuch",
-    ["Vendu chez un PNJ — installe MTSL pour voir où."] = "Bei einem NSC-Händler erhältlich — installiere MTSL, um zu sehen wo.",
     ["Entraîne le rang supérieur chez ton formateur de métier."] = "Erlerne den nächsten Rang bei deinem Berufslehrer.",
     ["Formateur : %s"] = "Lehrer: %s",
     ["aucune recette calculable"] = "kein berechenbares Rezept",
@@ -457,6 +454,10 @@ local de2 = {
     ["Clic : voir les recettes connues"] = "Klick: bekannte Rezepte ansehen",
     ["Clic droit : voir chez un autre perso"] = "Rechtsklick: bei einem anderen Charakter ansehen",
     ["Aucun autre perso avec ce métier : %s"] = "Kein anderer Charakter hat diesen Beruf: %s",
+    ["À apprendre maintenant (%d)"] = "Jetzt erlernbar (%d)",
+    ["… et %d autres"] = "… und %d weitere",
+    ["Niveau requis : %d"] = "Benötigter Skill: %d",
+    ["Rien ne manque dans ce métier."] = "In diesem Beruf fehlt nichts.",
 }
 
 for k, v in pairs(de2) do L[k] = v end

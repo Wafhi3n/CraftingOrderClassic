@@ -217,12 +217,17 @@ end
 -- son bas ouvert plonge vers le contenu — le rendu « onglets sur la barre grise » demandé. La fenêtre
 -- réserve la bande dessous (PAD_TOP, UI.lua). Contrat `bar` inchangé : .buttons[id], :Select, :SetText.
 -- Le gabarit d'onglet natif change de nom selon la saveur — résolu dans Compat (COC.Api).
+-- `opts.namePrefix` : OBLIGATOIRE dès qu'un même cadre porte DEUX barres. Les gabarits d'onglet
+-- résolvent leurs pièces par clé parent, mais retombent sur le NOM GLOBAL (`PanelTemplates_TabResize`
+-- lit `tab.Text or _G[name.."Text"]`) : deux barres sur le même cadre produiraient deux boutons
+-- nommés pareil, et le second écraserait les globales du premier. On ne parie pas là-dessus.
 function Skin.MakeTabs(f, defs, onSelect, opts)
     local x = (opts and opts.tabX) or 62
     local y = (opts and opts.tabY) or -28
+    local prefix = (opts and opts.namePrefix) or (f:GetName() or "COCWin")
     local bar, prev = { buttons = {} }, nil
     for i, d in ipairs(defs) do
-        local b = CreateFrame("Button", (f:GetName() or "COCWin") .. "Tab" .. i, f, COC.Api.TabTemplate)
+        local b = CreateFrame("Button", prefix .. "Tab" .. i, f, COC.Api.TabTemplate)
         b:SetText(d.label)
         PanelTemplates_TabResize(b, 0)
         if prev then b:SetPoint("LEFT", prev, "RIGHT", -4, 0)

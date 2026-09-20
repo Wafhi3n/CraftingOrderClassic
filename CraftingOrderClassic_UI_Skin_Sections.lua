@@ -73,6 +73,13 @@ function Skin.MakeDivider(parent, x1, x2, y, heavy, opts)
     t:SetTexCoord(u0, u1, 0, d.v1 or 1)
     t:SetSize(x2 - x1, d.th)
     t:SetPoint("TOPLEFT", x1, y + d.th / 2)
+    -- Bord droit ANCRÉ, pas seulement dimensionné : le filet suit son parent quand celui-ci
+    -- rétrécit. Les zones de section, elles, sont dimensionnées en absolu au build — sans cet
+    -- ancrage un filet dessiné pour 310 px dépasse de 20 px une colonne réduite à 272 (relevé
+    -- 2026-09-20). Un `x2` au-delà de la largeur du parent reste un DÉBORDEMENT voulu (bleed) :
+    -- l'offset devient positif et le filet mord dehors, exactement comme avant.
+    local pw = (parent.GetWidth and parent:GetWidth()) or 0
+    if pw > 0 then t:SetPoint("TOPRIGHT", -(pw - x2), y + d.th / 2) end
     return t
 end
 

@@ -101,24 +101,26 @@ local function segTooltip(row)
     GameTooltip:Show()
 end
 
--- Fenêtre (construction paresseuse) : en-tête « rang → cible » + total, liste scrollée de segments,
--- note d'estimation en pied. Position persistée (db.routeWinPos). Échap la ferme (proxy MakeWindow).
-function PW:_BuildRouteWin()
-    local f = Skin.MakeWindow("CraftingOrderRouteWindow", 430, 400, {
-        title = L["Plan de route"], portrait = "Interface\\Icons\\INV_Misc_Map_01",
-        strata = "FULLSCREEN_DIALOG",
-        pos = COC.db and COC.db.routeWinPos,
-        onMoved = function(p, rp, x, y) if COC.db then COC.db.routeWinPos = { p, rp, x, y } end end,
-    })
+-- CORPS de la route, indépendant de son contenant. Il vit dans DEUX endroits : la fenêtre
+-- flottante et le panneau de la colonne greffée (_ProfWindow_DockViews). Un seul peintre, une seule
+-- vérité : le dupliquer, c'est se garantir deux routes qui divergent à la première correction faite
+-- d'un seul côté. `f` porte les pièces, `inset` est le cadre où les poser, et `scrollName` doit être
+-- UNIQUE : les helpers de skin adressent la barre de défilement par son nom GLOBAL.
+-- Haut du corps scrollé selon que le titre et le total tiennent sur UNE ligne ou DEUX
+-- (cf. setRouteSub). Déclaré ici parce que le BUILD s'en sert déjà : en Lua un local
+-- n'existe pas avant sa déclaration, et le poser plus bas le rendait nil au build.
+local HEAD_ONE, HEAD_TWO = 30, 44
+
+function PW:_BuildRouteBody(f, inset, scrollName, bottomInset)
     local inset = f.Inset or f
     local head = inset:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     head:SetPoint("TOPLEFT", 10, -9); f.head = head
     local sub = inset:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     sub:SetPoint("TOPRIGHT", -30, -10); sub:SetJustifyH("RIGHT"); f.sub = sub
-    local scroll = CreateFrame("ScrollFrame", "CraftingOrderRouteScroll", inset, "UIPanelScrollFrameTemplate")
+    local scroll = CreateFrame("ScrollFrame", scrollName, inset, "UIPanelScrollFrameTemplate")
     -- Bas relevé (46) : place pour la case « inclure les plans » sous la zone scrollée.
-    scroll:SetPoint("TOPLEFT", 6, -30); scroll:SetPoint("BOTTOMRIGHT", -26, 46)
-    Skin.ScrollTrack("CraftingOrderRouteScroll")
+    scroll:SetPoint("TOPLEFT", 6, -HEAD_ONE); scroll:SetPoint("BOTTOMRIGHT", -26, bottomInset or 46)
+    Skin.ScrollTrack(scrollName)
     local content = CreateFrame("Frame", nil, scroll)
     content:SetSize(370, 1); scroll:SetScrollChild(content)
     f.scroll, f.content, f.rows = scroll, content, {}
@@ -153,6 +155,19 @@ function PW:_BuildRouteWin()
     cav:SetPoint("BOTTOMLEFT", 10, 7); cav:SetPoint("BOTTOMRIGHT", -10, 7); cav:SetJustifyH("LEFT")
     cav:SetText(string.format(L["Estimation : chance de point par couleur, prix du dernier scan HV (%s)."],
         (COC.LazyGold and COC.LazyGold:PriceSource()) or "Auctionator"))
+    return f
+end
+
+-- Fenêtre FLOTTANTE (construction paresseuse) : le contenant par défaut en vue PLEINE, où la colonne
+-- Commandes n'est qu'une des trois et n'a pas la place d'accueillir la route.
+function PW:_BuildRouteWin()
+    local f = Skin.MakeWindow("CraftingOrderRouteWindow", 430, 400, {
+        title = L["Plan de route"], portrait = "Interface\\Icons\\INV_Misc_Map_01",
+        strata = "FULLSCREEN_DIALOG",
+        pos = COC.db and COC.db.routeWinPos,
+        onMoved = function(p, rp, x, y) if COC.db then COC.db.routeWinPos = { p, rp, x, y } end end,
+    })
+    self:_BuildRouteBody(f, f.Inset or f, "CraftingOrderRouteScroll", 46)
     -- Aide contextuelle « bouton i » (même mécanisme que la fenêtre principale ; soft-dep HelpPlate).
     if HelpPlate then
         f.helpBtn = Skin.MakeHelpButton(f, function() PW:_ToggleRouteHelp() end, {
@@ -167,7 +182,7 @@ end
 -- Voile d'aide de la fenêtre Route : deux bulles (en-tête rang/total + liste des segments).
 function PW:_ToggleRouteHelp()
     if Skin.HelpIsOpen() then Skin.HideHelp(); return end
-    local f = self.routeWin; if not f then return end
+    local f = self.routeWin; if not (f and f.helpBtn) then return end   -- voile propre à la FENÊTRE
     Skin.ShowHelp(f, {
         { frame = f.head, dir = "DOWN",
           text = L["En tête : rang actuel, plafond entraînable, et coût total estimé (« > » = des rangs sans recette calculable, total incomplet)."] },
@@ -178,8 +193,13 @@ end
 
 -- Ligne de segment du pool (créée à la demande) : plage de rangs, icône, nom ×~N, coût à droite.
 -- La position VERTICALE est posée par _FillRoute (elle dépend du bandeau repliable + de l'index).
+--
+-- Le pool appartient au CONTENANT, pas à la fenêtre : depuis que la route se peint aussi dans la
+-- colonne greffée, viser `self.routeWin` en dur levait dès la première ligne (la fenêtre n'existe
+-- pas si on n'a jamais ouvert la version flottante). Chaque contenant a ses lignes, comme il a déjà
+-- ses `slots` et ses `lines`.
 function PW:_RouteRow(i)
-    local f = self.routeWin
+    local f = self:_RouteTarget(); if not f then return nil end
     if f.rows[i] then return f.rows[i] end
     local row = CreateFrame("Button", nil, f.content)
     row:SetHeight(ROW_H)
@@ -234,11 +254,53 @@ end
 
 -- (Re)calcule et peint la route. Mémorise (métier, rang) du calcul — _SyncRouteBtn re-remplit
 -- quand l'un des deux change (la route avance en direct à chaque point gagné).
+-- Où peindre : le panneau de la colonne quand la vue « route » y est active, la fenêtre sinon. UN
+-- seul point de décision — tous les appelants existants (_SyncRouteBtn, la case à cocher, le bandeau
+-- repliable) continuent d'appeler `_FillRoute()` sans argument et visent automatiquement le bon.
+-- Ligne d'estimation sous le titre. Un total de ZÉRO affublé d'un « > » (« > 0 ») est vrai au sens
+-- strict et ne dit rien du tout : c'est ce qui sort quand AUCUN segment n'est chiffrable — la Pêche,
+-- qui ne monte pas en craftant (capture user 2026-09-20). On avoue alors le trou plutôt que
+-- d'afficher un plancher vide, qui se lit comme un bug.
+local function routeSubText(route, segs)
+    local floorOnly = route.partial and true or false
+    for _, s in ipairs(segs) do if s.gap then floorOnly = true; break end end
+    local cost = math.floor(route.mats + route.plans + 0.5)
+    if cost <= 0 and floorOnly then return "|cFF888888" .. L["Total estimé : inconnu"] .. "|r" end
+    -- « > » (ASCII, le ≥ risque le tofu) : trous OU coûts partiels → le total est un plancher.
+    return string.format(L["Total estimé : %s"], (floorOnly and "> " or "") .. COC.Api.Coin(cost))
+end
+
+-- Titre et total sur la MÊME ligne, ou l'un sous l'autre : ça dépend de la place, donc ça se
+-- MESURE. La fenêtre flottante a la largeur pour les deux ; la colonne greffée, non — et
+-- « Estimated total: unknown » se posait alors par-dessus le nom du métier (constat en jeu
+-- 2026-09-20). Empiler coûte une ligne, que le corps scrollé récupère en descendant d'autant.
+local function setRouteSub(f, txt)
+    f.sub:SetText(txt or "")
+    local inset = f.Inset or f
+    local avail = inset:GetWidth() or 0
+    local need = (f.head:GetStringWidth() or 0) + (f.sub:GetStringWidth() or 0) + 50
+    local stacked = avail > 0 and need > avail
+    f.sub:ClearAllPoints()
+    if stacked then
+        f.sub:SetPoint("TOPLEFT", f.head, "BOTTOMLEFT", 0, -3); f.sub:SetJustifyH("LEFT")
+    else
+        f.sub:SetPoint("TOPRIGHT", inset, "TOPRIGHT", -30, -10); f.sub:SetJustifyH("RIGHT")
+    end
+    if f.scroll then f.scroll:SetPoint("TOPLEFT", 6, -(stacked and HEAD_TWO or HEAD_ONE)) end
+end
+
+function PW:_RouteTarget()
+    if self.dockView == "route" and self.routePanel then return self.routePanel end
+    return self.routeWin
+end
+
 function PW:_FillRoute()
-    local f = self.routeWin; if not f then return end
+    local f = self:_RouteTarget(); if not f then return end
     local route = self:_ComputeRoute()
     self._routeProf, self._routeRank = self.profKey, route and route.rank or nil
     self._routeAt = GetTime and GetTime() or 0
+    -- Le panneau de colonne n'a ni médaillon ni titre : les deux helpers sortent d'eux-mêmes
+    -- quand la pièce n'existe pas, aucun garde à écrire ici.
     Skin.SetWindowPortrait(f, Skin.ProfIcon(self.profKey) or "Interface\\Icons\\INV_Misc_Map_01")
     if f.SetTitle then f:SetTitle(L["Plan de route"] .. " — " .. Skin.ProfLabel(self.profKey)) end
     if f.chk then f.chk:SetChecked(not (COC.db and COC.db.routePlans == false)) end
@@ -251,6 +313,7 @@ function PW:_FillRoute()
     else
         for i, s in ipairs(segs) do
             local row = self:_RouteRow(i)
+            if not row then break end
             row:ClearAllPoints()
             row:SetPoint("TOPLEFT", 0, -(baseY + (i - 1) * ROW_H))
             row:SetPoint("RIGHT", f.content, "RIGHT", 0, 0)
@@ -260,13 +323,13 @@ function PW:_FillRoute()
     end
     self:_FillRouteSupply(f, route, baseY + (collapsed and 0 or #segs * ROW_H))
     if not route then
-        f.head:SetText(""); f.sub:SetText("")
+        f.head:SetText(""); setRouteSub(f, "")
         f.msg:SetText(L["Rien à calculer — scanne l'HV (Auctionator) puis rouvre ce panneau."]); f.msg:Show()
         return
     end
     f.head:SetText(headText(self.profKey, route.rank, route.target))
     if route.done then
-        f.sub:SetText("")
+        setRouteSub(f, "")
         local R = COC.Route
         local g = (R and R.Gateway) and R:Gateway(self.profKey, route.rank)
         local higher = (R and R.HasHigherTier) and R:HasHigherTier(self.profKey, route.rank)
@@ -283,11 +346,7 @@ function PW:_FillRoute()
         end
         return
     end
-    local hasGap = false
-    for _, s in ipairs(segs) do if s.gap then hasGap = true; break end end
-    local total = COC.Api.Coin(math.floor(route.mats + route.plans + 0.5))
-    -- « > » (ASCII, le ≥ risque le tofu) : trous OU coûts partiels → le total est un plancher.
-    f.sub:SetText(string.format(L["Total estimé : %s"], ((hasGap or route.partial) and "> " or "") .. total))
+    setRouteSub(f, routeSubText(route, segs))
     f.msg:SetShown(#segs == 0)
     if #segs == 0 then f.msg:SetText(L["Rien à calculer — scanne l'HV (Auctionator) puis rouvre ce panneau."]) end
 end
@@ -310,16 +369,28 @@ function PW:_FillRouteSupply(f, route, startY)
             y = U:_FillSupplyBlock(f, used, y, self.profKey, m)
         end
     end
+    -- « À apprendre maintenant » (soft-dep _ProfWindow_Learn) : ce que la route ne montre pas, parce
+    -- qu'elle ne retient qu'UNE recette par rang -- le champ des possibles au rang courant.
+    if self._FillRouteLearn then y = self:_FillRouteLearn(f, used, y) end
     for i = used.slot + 1, #(f.slots or {}) do f.slots[i]:Hide() end
     for i = used.line + 1, #(f.lines or {}) do f.lines[i]:Hide() end
+    -- Le contenu suit la largeur du VIEWPORT. Il était figé à 370 au build : juste pour la fenêtre
+    -- flottante, deux fois trop large pour la colonne greffée — les lignes débordaient et se
+    -- faisaient couper à droite. Et l'ascenseur se masque quand il n'y a rien à faire défiler :
+    -- deux flèches au-dessus d'une route de deux étapes n'indiquent rien (constat 2026-09-20).
+    local sw = (f.scroll and f.scroll:GetWidth()) or 0
+    if sw > 0 then f.content:SetWidth(sw) end
     f.content:SetHeight(math.max(y, 1))
+    local nm = f.scroll and f.scroll.GetName and f.scroll:GetName()
+    if nm then Skin.AutoHideScroll(nm, f.content) end
 end
 
 -- PNJ formateur du PALIER SUIVANT : première recette apprise plus haut que `rank` ET enseignée au
--- FORMATEUR (SourceKind), résolue en ligne PNJ MTSL « [niv] Nom — Zone (x, y) ». C'est le même PNJ
--- qui débloque le rang supérieur (ex. Artisan Joaillerie). nil si MTSL absent ou rien de résolu.
+-- FORMATEUR (SourceKind), résolue en ligne PNJ « Nom — Zone ». C'est le même PNJ qui débloque le rang
+-- supérieur (ex. Artisan Joaillerie). nil si rien n'est résolu -- et c'est le cas le plus fréquent
+-- depuis l'abandon de MTSL : notre catalogue ne nomme que les VENDEURS, jamais les formateurs.
 local function nextTrainerLine(profKey, rank)
-    local M = COC.MTSL
+    local M = COC.Sources
     local lib = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
     if not (M and M.SourceNpcLine and M.SourceKind and lib and lib.GetRecipes and lib.RecipeLearnedAt) then return nil end
     local cands = {}
@@ -354,14 +425,10 @@ function PW:_FillRouteGateway(f, used, y, route)
         local price = (g.price and g.price > 0) and (" — " .. COC.Api.Coin(g.price)) or ""
         y = U:_NeedsTextLine(f, used, y, "|TInterface\\Icons\\INV_Scroll_03:12:12|t |cFFEEDD88"
             .. string.format(L["À apprendre : %s"], nm) .. price .. "|r")
-        local M, npc = COC.MTSL, nil
-        for _, id in ipairs(g.vendors or {}) do
-            npc = (M and M.NpcLine) and M:NpcLine(id) or nil
-            if npc then break end
-        end
-        y = U:_NeedsTextLine(f, used, y, "|cFF888888" .. (npc
-            and string.format(L["Vendu par : %s"], npc)
-            or L["Vendu chez un PNJ — installe MTSL pour voir où."]) .. "|r")
+        -- La passerelle ne porte que des IDENTIFIANTS de PNJ, et aucune API ne rend le nom d'un PNJ
+        -- depuis son id. On ne dit donc plus rien ici plutôt que de renvoyer vers un annuaire
+        -- externe : la ligne « installe tel addon pour voir où » désignait MTSL, qui n'est plus
+        -- maintenu et dont la base décrit un autre jeu que Forever.
     else
         y = U:_NeedsTextLine(f, used, y, "|cFF88CCFF"
             .. L["Entraîne le rang supérieur chez ton formateur de métier."] .. "|r")
@@ -393,43 +460,6 @@ function PW:_BuildRouteBtn(tz)
     self.recRouteBtn = b
 end
 
--- Deuxième point d'entrée, pour les modes SANS colonne Recettes (dock « Vue Blizzard » de l'Era et
--- colonne greffée de Forever) : le bouton carte de la barre d'outils n'y existe pas, et la feature
--- devenait inatteignable — c'est ce qui l'avait fait disparaître du portage Forever. Même icône, même
--- infobulle, même action : une seule feature, deux accès selon qui dessine la liste de recettes.
--- Posé dans l'en-tête de la colonne Commandes, à gauche du tri « progression d'abord ».
-function PW:_BuildDockRouteBtn(bz)
-    local b = Skin.MakeIconButton(bz, 16, "Interface\\Icons\\INV_Misc_Map_01")
-    b:SetPoint("TOPRIGHT", -26, -5)
-    b:SetScript("OnClick", function() PW:ToggleRoute() end)
-    b:SetScript("OnEnter", function(s)
-        GameTooltip:SetOwner(s, "ANCHOR_BOTTOMLEFT")
-        GameTooltip:SetText(L["Plan de route : quoi crafter pour monter au moins cher."], 1, 1, 1, 1, true)
-        GameTooltip:Show()
-    end)
-    b:SetScript("OnLeave", GameTooltip_Hide)
-    b:Hide()
-    self.ordRouteBtn = b
-end
-
--- Visible seulement quand la colonne Recettes est absente ET qu'une session de métier est ouverte :
--- sans rang courant la route n'a rien à calculer (vue compacte d'un métier de récolte, vue reroll
--- d'un perso hors ligne). Appelé par RefreshOrders, qui tourne dans TOUS les modes.
-function PW:_SyncDockRouteBtn()
-    local b = self.ordRouteBtn
-    if not b then return end
-    local craft = COC.Craft
-    local show = (self._compact or self.docked) and self.profKey and not self.rerollKey
-        and craft and craft:GetOpenProfessionInfo() ~= nil
-    b:SetShown(show and true or false)
-    if not show then return end
-    local ok = COC.LazyGold and COC.LazyGold:IsAvailable()
-    local active = (self.routeWin and self.routeWin:IsShown()) and true or false
-    b:SetSelected(active)
-    b.icon:SetDesaturated((ok and not active) and true or false)
-    self:_SyncRouteBtn()   -- suivi live de la fenêtre ouverte (le bouton de la barre reste nil ici)
-end
-
 -- État du bouton (appelé par _SyncSortHeader à chaque refresh) : masqué en reroll ; coloré si Lazy
 -- Gold absent (incite au clic → popup) ou panneau ouvert, grisé sinon. Fenêtre ouverte : re-remplit
 -- à chaque refresh de la liste (throttle 1 s) — même cadence que le badge « meilleur coût/point »,
@@ -445,7 +475,8 @@ function PW:_SyncRouteBtn()
         if b.onBG then b.onBG:SetShown(active) end
         if b.map then b.map:SetDesaturated((ok and not active) and true or false) end
     end
-    local f = self.routeWin
+    -- Suivi live : la FENÊTRE si elle est ouverte, sinon le PANNEAU de colonne s'il porte la route.
+    local f = self:_RouteTarget()
     if f and f:IsShown() then
         local rank = COC.Craft and COC.Craft:OpenRank()
         local fresh = ((GetTime and GetTime() or 0) - (self._routeAt or 0)) < 1

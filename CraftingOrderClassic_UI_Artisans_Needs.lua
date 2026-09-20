@@ -247,9 +247,9 @@ function UI:_NeedsGrid(f, used, y, items)
 end
 
 -- Lignes « plan à acheter » : une par plan de la route — au formateur ou en objet (vendeur/HV),
--- prix, et le PNJ À ALLER VOIR quand MTSL le résout (« [niv] Nom — Zone (x, y) », compact).
+-- prix, et le PNJ À ALLER VOIR quand le catalogue le nomme (« Nom — Zone », compact).
 function UI:_NeedsPlanLines(f, used, y, profKey, plans)
-    local M = COC.MTSL
+    local M = COC.Sources
     for _, pl in ipairs(plans) do
         local price = (pl.price or 0) > 0 and (" — " .. COC.Api.Coin(pl.price)) or ""
         local txt

@@ -66,6 +66,65 @@ PW.ORD_W      = (SPEC.x2 - SPEC.x1) - SPEC[1].w - SPEC[2].w
 PW.ORD_TOP    = SPEC[3].top
 PW.ORD_BOTTOM = SPEC[3].bottom
 
+-- BANDE D'EN-TÊTE, au-dessus de la rangée d'onglets : la place du chrome (titre, portrait,
+-- contrôles) sur une vraie fenêtre. ENCASTRÉE dans la fenêtre native de Forever, la colonne n'a
+-- plus de chrome DU TOUT (cf. stripChrome) : cette bande n'était plus qu'un trou de 28 px, et tout
+-- le bloc d'onglets y flottait sans rien au-dessus de lui (relevé sur capture en jeu, 2026-09-20).
+-- `frame._cocStripped` est posé par la greffe (_ProfWindow_Camelot, hideChrome) : "full" = chrome
+-- entièrement retiré (encastré), "side" = portrait seul (accolé — le titre, lui, reste). C'est le
+-- SEUL témoin fiable de « cette colonne a-t-elle encore un en-tête » : le mode ne suffit pas, car
+-- l'accolé est greffé ET titré.
+PW.TAB_BAND  = 28    -- vide réservé au chrome au-dessus des languettes
+PW.TAB_ROW_H = 32    -- hauteur d'une languette native (Api.TabTemplate)
+
+-- =========================================================================
+-- RÉGLAGES AU PIXEL — la table à éditer pour pinailler, sans toucher à la logique.
+-- =========================================================================
+-- Tout est en UNITÉS DE CADRE, pas en pixels écran : le client applique ensuite son échelle
+-- d'interface (≈ 0,71 sur le poste de test — une valeur de 28 ici sort à 20 px à l'écran).
+-- `/co geo` mesure le résultat en pixels écran et l'écrit dans la SavedVariable : éditer une valeur
+-- ici puis relancer le relevé donne l'aller-retour complet sans avoir à juger à l'œil.
+--
+-- Pourquoi une table Lua et pas du JSON : **un addon WoW ne peut lire aucun fichier**. Il n'y a pas
+-- d'E/S disque, et seuls les `.lua`/`.xml` déclarés dans le `.toc` sont chargés — par le client,
+-- comme du code. Un fichier de réglages JSON devrait donc être converti en Lua au build pour
+-- finir… exactement ici. La table EST le format de réglage ; le JSON n'ajouterait qu'une étape.
+PW.TUNE = {
+    -- La colonne greffée dans la fenêtre native de Forever (cf. _ProfWindow_Camelot).
+    graftGap      = 6,    -- respiration entre le contenu natif et notre bande
+    graftTopInset = 26,   -- retrait sous la barre de titre native
+    graftBotInset = 34,   -- retrait au-dessus de la rangée « Create All / Create »
+    -- La colonne elle-même.
+    colPad        = 14,   -- marge latérale de la zone Commandes dans le cadre
+    -- La ligne d'en-tête de la liste (sélecteur de relation + bouton de tri).
+    selTop        = 15,    -- écart AU-DESSUS du sélecteur
+    selLeft       = 4,    -- écart à gauche
+    selHeight     = 22,   -- hauteur du sélecteur
+    selReserveR   = 34,   -- place gardée à droite pour le bouton de tri
+    listBand      = 26,   -- bande réservée au-dessus de la liste
+    viewTop       = 8,    -- marge en haut des vues Plan de route / Manquantes
+    -- Prolonger le fond de page natif dans la bande ajoutée (false = bande laissée nue).
+    pageFill      = true,
+}
+
+-- `PW.PAD` est posé dans ProfWindow.lua, qui se charge AVANT ce fichier : on l'aligne ici pour que
+-- la table reste la seule source. Deux constantes qui disent la même chose finissent toujours par
+-- ne plus la dire.
+PW.PAD = PW.TUNE.colPad
+
+function PW:_ChromeStripped()
+    return (self.frame and self.frame._cocStripped == "full") and true or false
+end
+
+function PW:_TabBand()
+    return self:_ChromeStripped() and 4 or PW.TAB_BAND
+end
+
+-- Y de la rangée d'onglets, et Y du contenu qui commence sous elle. Dérivés tous les deux : régler
+-- la bande suffit, rien d'autre n'est à retoucher.
+function PW:_TabTop()  return -self:_TabBand() end
+function PW:_BodyTop() return -(self:_TabBand() + PW.TAB_ROW_H - PW.ORD_TOP) end
+
 -- Panneau hôte des sections : couvre le marbre de la fenêtre (mêmes marges que l'inset natif),
 -- sous la bande d'en-tête (titre + contrôles, qui restent du chrome).
 function PW:_BuildSections(f)
@@ -73,6 +132,31 @@ function PW:_BuildSections(f)
     panel:SetPoint("TOPLEFT", 4, -60); panel:SetPoint("BOTTOMRIGHT", -6, 2)
     self.secPanel = panel
     self.pwSec = Skin.MakeSections(panel, SPEC)
+end
+
+-- ⚠️ Les zones de la SPEC sont dimensionnées en ABSOLU au build (`SetWidth`, cf. MakeSections) :
+-- elles gardent la largeur de la VUE PLEINE et ne suivent pas la colonne qui rétrécit. Relevé du
+-- 2026-09-20 : `ordBody` débordait de 28 px à droite de la colonne, et le bouton de tri, ancré à
+-- SON bord droit, se retrouvait purement et simplement HORS du cadre.
+--
+-- Recalage par LARGEUR, pas par ancre. Un point RIGHT porte aussi un centre en Y : ajouté à
+-- `ordFoot`, qui est ancré BOTTOMLEFT, il sur-déterminait sa position verticale et la faisait
+-- dépendre de l'ordre de résolution des ancres. Ça « marchait », ce qui est précisément le genre de
+-- chose qui cesse de marcher un jour, ailleurs, sans qu'on sache pourquoi.
+--
+-- Et la colonne elle-même suit la largeur RÉELLE du cadre, pas le 300 nominal : la greffe l'élargit
+-- après coup pour que la rangée de vues tienne.
+function PW:_SyncOrdWidth()
+    if not self.ordCol then return end
+    if self._compact then
+        self.ordCol:SetWidth((self.frame:GetWidth() or 300) - 2 * self.PAD)
+    end
+    local w = self.ordCol:GetWidth() or 0
+    if w <= 0 then return end
+    for _, id in ipairs({ "ordBody", "ordFoot" }) do
+        local z = self:Sec(id)
+        if z then z:SetWidth(w) end
+    end
 end
 
 -- Frame d'une zone de la vue métier (parent + repère d'ancrage de son contenu).

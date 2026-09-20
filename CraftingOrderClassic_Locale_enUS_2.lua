@@ -312,8 +312,7 @@ local en2 = {
     ["Obtenu via"] = "Obtained via",
     ["Prix"] = "Price", ["Appris de"] = "Learned from",
     ["Vendeur"] = "Vendor", ["Vendu par"] = "Sold by",
-    ["Butin sur"] = "Drops from", ["Formateurs"] = "Trainers",
-    ["Formateur"] = "Trainer", ["Réputation"] = "Reputation",
+    ["Formateur"] = "Trainer",
     ["Quête"] = "Quest", ["Butin"] = "Drop",
     ["Source inconnue"] = "Unknown source",
     ["Acheter à l'HV"] = "Buy at AH",
@@ -356,12 +355,12 @@ local en2 = {
     ["Un segment par ligne : plage de rangs, recette au meilleur coût par point espéré, « ×~N » = crafts attendus, et le coût du segment (parchemin = plan à acheter d'abord, compté dedans). Survole une ligne pour le détail. La route se recalcule à chaque point gagné."] =
         "One segment per line: rank range, the recipe with the best expected cost per point, \"×~N\" = expected crafts, and the segment cost (scroll = recipe to buy first, included). Hover a line for details. The route recomputes with every point you gain.",
     ["Total estimé : %s"] = "Estimated total: %s",
+    ["Total estimé : inconnu"] = "Estimated total: unknown",
+    ["Change ce que montre la colonne : les commandes reçues, le plan de route du métier, ou les recettes qui te manquent."] = "Switches what this column shows: incoming orders, the profession leveling route, or the recipes you are missing.",
     ["Rang au plafond — c'est le maximum ici."] = "Rank at cap — this is the maximum here.",
     ["Débloquer le palier suivant"] = "Unlock the next tier",
     ["À apprendre : %s"] = "To learn: %s",
-    ["Vendu par : %s"] = "Sold by: %s",
     ["Livre de rang"] = "Rank book",
-    ["Vendu chez un PNJ — installe MTSL pour voir où."] = "Sold by an NPC vendor — install MTSL to see where.",
     ["Entraîne le rang supérieur chez ton formateur de métier."] = "Train the next rank at your profession trainer.",
     ["Formateur : %s"] = "Trainer: %s",
     ["aucune recette calculable"] = "no computable recipe",
@@ -475,6 +474,10 @@ local en2 = {
     ["Clic : voir les recettes connues"] = "Click: see known recipes",
     ["Clic droit : voir chez un autre perso"] = "Right click: view on another character",
     ["Aucun autre perso avec ce métier : %s"] = "No other character has this profession: %s",
+    ["À apprendre maintenant (%d)"] = "Learn now (%d)",
+    ["… et %d autres"] = "… and %d more",
+    ["Niveau requis : %d"] = "Required skill: %d",
+    ["Rien ne manque dans ce métier."] = "Nothing missing in this profession.",
 }
 
 for k, v in pairs(en2) do L[k] = v end

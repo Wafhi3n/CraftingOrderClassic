@@ -4,8 +4,8 @@
 -- (formateur / vendeur PNJ / coté à l'HV / à farmer) et tri « progression » affiné par coût.
 -- Les guides statiques se trompent quand l'économie du serveur diverge (vécu : shards à 10 pc alors
 -- que le guide dit d'acheter de la dust) — ici tout est au prix RÉEL (Auctionator via Lazy Gold).
--- Tout est soft-dep : sans Lazy Gold le coût disparaît (les icônes de source restent, MTSL suffit) ;
--- sans MTSL, pas d'icônes (les manquantes n'existent pas). Appelé par _ProfWindow_Recipes sous garde
+-- Sans oracle de prix le coût disparaît, les icônes de source restent : elles viennent de notre
+-- catalogue (COC.Sources), sans aucun addon tiers. Appelé par _ProfWindow_Recipes sous garde
 -- nil (`self._FillLevelingRight and …`) : l'absence de ce fichier ne casse rien.
 
 local COC = CraftingOrderClassic
@@ -104,7 +104,7 @@ end
 -- panneau d'info au clic). « ah » = l'objet-plan est coté à l'HV en ce moment (dernier scan
 -- Auctionator) ; butin/quête hors HV = « à farmer ». nil si source inconnue (pas de fausse icône).
 function PW:_MissingSourceIcon(e)
-    local M = COC.MTSL
+    local M = COC.Sources
     if not (M and M:IsAvailable() and e.spellID) then return nil end
     local kind = M:SourceKind(self.profKey, e.spellID)
     if kind == "trainer" then return ICON.trainer end
@@ -154,7 +154,7 @@ end
 -- l'HV (cote Lazy Gold), ou à farmer. Même logique que l'icône de source — les deux doivent raconter
 -- la même histoire.
 function PW:_PlanTooltip(e)
-    local M = COC.MTSL
+    local M = COC.Sources
     if not (M and M:IsAvailable() and e.spellID) then return end
     local kind = M:SourceKind(self.profKey, e.spellID)
     if kind == "unknown" then return end
