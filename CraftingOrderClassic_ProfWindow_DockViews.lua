@@ -144,26 +144,73 @@ end
 -- Vue « Manquantes »
 -- ------------------------------------------------------------------
 
--- L'infobulle porte TOUT ce que la ligne n'a pas la place de dire. Priorité au texte du CLIENT
--- (autoritaire sur Forever, déjà traduit) ; notre nature déduite ne sert que de repli, et elle
--- s'annonce comme telle.
+-- L'infobulle porte TOUT ce que la ligne n'a pas la place de dire, et elle répond à DEUX questions
+-- qu'il ne faut pas confondre : « qu'est-ce que c'est, et est-ce que ça vaut le coup ? », à quoi le
+-- CLIENT répond même sur une recette pas apprise ; et « où je vais le chercher ? », à quoi il ne
+-- répond pas du tout sur cette saveur (cf. Craft:MainlineRecipeFacts) — ça, c'est notre catalogue.
+
+-- Fiche CLIENT de la recette (lien de l'objet produit, couleur, points), ou nil hors mainline.
+local function factsOf(sid)
+    local C = COC.Craft
+    return (C and C.RecipeFacts) and C:RecipeFacts(sid) or nil
+end
+
+-- En-tête : l'objet PRODUIT, avec son infobulle NATIVE. Devant une recette qu'on n'a pas, la
+-- première question est « ça fait quoi ? », et le jeu y répond mieux que nous (buff de cuisine,
+-- stats, niveau de l'objet). Le client rend ce lien même sur une recette NON APPRISE. Sans lui
+-- (Era, ou recette hors de la ligne ouverte) on retombe sur le nom seul, comme avant.
+local function missHead(row, facts)
+    if facts and facts.link then
+        GameTooltip:SetHyperlink(facts.link)
+        GameTooltip:AddLine(" ")
+    else
+        GameTooltip:SetText(row.rname or "?", 1, 1, 1, 1, true)
+    end
+end
+
+-- « Il me manque combien, et est-ce que ça me fera encore progresser ? » Le rang requis vient du
+-- catalogue ; le VERDICT vient du client, qui donne la couleur et le nombre de points AU RANG
+-- COURANT, y compris sur une recette pas apprise. Nos seuils générés ne sont plus consultés ici :
+-- deux réponses qui peuvent diverger valent moins qu'une.
+local function missWorth(row, facts)
+    local lvl  = row.rlevel or 0
+    local rank = (COC.Craft and COC.Craft.OpenRank) and COC.Craft:OpenRank() or nil
+    local miss = (rank and lvl > rank) and (lvl - rank) or nil
+    GameTooltip:AddLine(string.format(L["Niveau requis : %d"], lvl)
+        .. (miss and (" |cFFFF6666" .. string.format(L["il t'en manque %d"], miss) .. "|r") or ""),
+        0.6, 0.75, 0.91)
+    if not (facts and facts.difficulty) then return end
+    if facts.skillUps > 0 then
+        local r, g, b = COC.Craft:DifficultyColor(facts.difficulty)
+        GameTooltip:AddLine(string.format(L["+%d point de métier"], facts.skillUps), r, g, b)
+    else
+        GameTooltip:AddLine(L["Ne rapporte plus de point"], 0.5, 0.5, 0.5)
+    end
+end
+
+-- Le « où aller ». Priorité au texte du CLIENT (autoritaire sur Forever, déjà traduit) ; notre
+-- nature déduite ne sert que de repli, et elle s'annonce comme telle.
+local function missWhere(prof, sid)
+    local S = COC.Sources
+    local fromGame = S.SourceText and S:SourceText(prof, sid)
+    if fromGame then GameTooltip:AddLine(fromGame, 0.91, 0.72, 0.29, true); return end
+    local kind = S:SourceKind(prof, sid)
+    local txt = KIND_TEXT[kind] and KIND_TEXT[kind]() or L["Source inconnue"]
+    if kind == "trainer" and S:IsInferred(prof, sid) then txt = txt .. " |cFF888888?|r" end
+    GameTooltip:AddLine(txt, 0.91, 0.72, 0.29)
+    local npc = S.SourceNpcLine and S:SourceNpcLine(prof, sid)
+    if npc then GameTooltip:AddLine(npc, 0.8, 0.8, 0.8) end
+end
+
 local function missTooltip(row)
     local S, prof, sid = COC.Sources, PW.profKey, row.sid
     if not (S and sid) then return end
+    local facts = factsOf(sid)
+    row.rlink = facts and facts.link or nil   -- mémorisé ici pour le shift-clic (cf. missRow)
     GameTooltip:SetOwner(row, "ANCHOR_LEFT")
-    GameTooltip:SetText(row.rname or "?", 1, 1, 1, 1, true)
-    GameTooltip:AddLine(string.format(L["Niveau requis : %d"], row.rlevel or 0), 0.6, 0.75, 0.91)
-    local fromGame = S.SourceText and S:SourceText(prof, sid)
-    if fromGame then
-        GameTooltip:AddLine(fromGame, 0.91, 0.72, 0.29, true)
-    else
-        local kind = S:SourceKind(prof, sid)
-        local txt = KIND_TEXT[kind] and KIND_TEXT[kind]() or L["Source inconnue"]
-        if kind == "trainer" and S:IsInferred(prof, sid) then txt = txt .. " |cFF888888?|r" end
-        GameTooltip:AddLine(txt, 0.91, 0.72, 0.29)
-        local npc = S.SourceNpcLine and S:SourceNpcLine(prof, sid)
-        if npc then GameTooltip:AddLine(npc, 0.8, 0.8, 0.8) end
-    end
+    missHead(row, facts)
+    missWorth(row, facts)
+    missWhere(prof, sid)
     local price = S.SourcePrice and S:SourcePrice(prof, sid)
     if price then GameTooltip:AddLine(L["Prix"] .. " : " .. COC.Api.Coin(price), 1, 1, 1) end
     GameTooltip:Show()
@@ -187,6 +234,13 @@ local function missRow(i)
     row:SetHighlightTexture("Interface\\Buttons\\UI-Listbox-Highlight", "ADD")
     row:SetScript("OnEnter", missTooltip)
     row:SetScript("OnLeave", GameTooltip_Hide)
+    -- Shift-clic = lier l'objet produit en chat, comme n'importe quelle ligne de recette du jeu.
+    -- Le lien est posé au SURVOL (missTooltip) : on ne clique pas une ligne sans l'avoir survolée,
+    -- et ça évite un `GetRecipeInfo` par ligne à chaque remplissage de la liste.
+    row:RegisterForClicks("LeftButtonUp")
+    row:SetScript("OnClick", function(r)
+        if IsShiftKeyDown() and r.rlink and ChatEdit_InsertLink then ChatEdit_InsertLink(r.rlink) end
+    end)
     mp.rows[i] = row
     return row
 end
@@ -211,6 +265,7 @@ function PW:_FillDockMissing()
     for i, e in ipairs(list) do
         local row = missRow(i)
         row.sid, row.rname, row.rlevel = e.spellID, e.name, e.level
+        row.rlink = nil   -- ligne poolée : le lien de la recette précédente ne survit pas
         row.ic:SetTexture(ICON[S:SourceKind(self.profKey, e.spellID)] or ICON.unknown)
         local reachable = (e.level or 0) <= rank
         row.ic:SetDesaturated(not reachable)

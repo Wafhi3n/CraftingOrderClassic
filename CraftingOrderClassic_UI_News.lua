@@ -39,7 +39,10 @@ local function versionsNewest()
     }
 end
 
-local function versionsCurrent()
+-- Scindée en deux moitiés PAR LA TAILLE, pas par le sens : la liste de versions dépassait le
+-- plafond anti-monolithe (60 l/fonction) à force d'entrées. La coupure suit la frontière de
+-- version la plus proche du milieu ; tout ajout futur se fait dans A, qui reste la plus jeune.
+local function versionsCurrentA()
     return {
         {
             v = "v1.32.2", title = L["Tes barres d'action ne se bloquent plus en combat"],
@@ -66,6 +69,11 @@ local function versionsCurrent()
                 L["Sur Forever, le clic droit sur le bouton de la minimap ouvre la fenêtre des métiers du jeu. Les métiers de tes rerolls se consultent désormais depuis « Mes artisans » (clic droit sur un métier). /co mute accepte les noms en prénom et nom, entre guillemets si l'addon n'a pas encore croisé le joueur."],
             },
         },
+    }
+end
+
+local function versionsCurrentB()
+    return {
         {
             v = "v1.31.1", title = L["Les nouveaux venus apparaissent tout seuls"],
             lines = {
@@ -99,6 +107,12 @@ local function versionsCurrent()
             },
         },
     }
+end
+
+local function versionsCurrent()
+    local out = versionsCurrentA()
+    for _, e in ipairs(versionsCurrentB()) do out[#out + 1] = e end
+    return out
 end
 
 local function versionsLatest()

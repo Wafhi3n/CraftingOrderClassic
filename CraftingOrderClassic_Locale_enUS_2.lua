@@ -478,6 +478,10 @@ local en2 = {
     ["… et %d autres"] = "… and %d more",
     ["Niveau requis : %d"] = "Required skill: %d",
     ["Rien ne manque dans ce métier."] = "Nothing missing in this profession.",
+    -- Manquantes : le verdict du client (cf. Craft:MainlineRecipeFacts)
+    ["il t'en manque %d"] = "you're %d short",
+    ["+%d point de métier"] = "+%d skill point",
+    ["Ne rapporte plus de point"] = "No longer gives a point",
 }
 
 for k, v in pairs(en2) do L[k] = v end

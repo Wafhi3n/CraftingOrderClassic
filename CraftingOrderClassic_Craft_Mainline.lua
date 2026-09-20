@@ -211,3 +211,32 @@ function Craft:MainlineOpen()
     end
     return (MAINLINE_API.getSkillName() ~= nil)
 end
+
+-- ---------------------------------------------------------------- fiche d'une recette PAR SON SORT
+
+-- `GetRecipeInfo` répond pour un recipeSpellID QUELCONQUE, appris ou NON. Mesuré en jeu le
+-- 2026-09-20 sur le sort 2539 (« Spiced Wolf Meat », pas apprise) : fiche complète, avec le lien de
+-- l'objet produit, son icône, la couleur de la recette AU RANG COURANT et le nombre de points
+-- qu'elle rapporte encore. Sur une saveur jeune c'est la seule référence qui ne peut pas être
+-- périmée, et elle répond sur une recette MANQUANTE là où nos données générées ne font qu'estimer.
+--
+-- ⚠️ CE QU'ELLE NE DIT PAS : LA PROVENANCE. `sourceType` est absent de la fiche (champ nilable non
+-- renseigné) et `GetRecipeSourceText(2539)` rend vide ALORS QUE le client connaît parfaitement la
+-- recette — ce n'est donc pas un raté de lookup, le client n'a rien à dire là-dessus. Le « où
+-- aller » reste au catalogue et à l'observation ; ici on ne récolte que le « quoi » et le « est-ce
+-- que ça vaut le coup ».
+function Craft:MainlineRecipeFacts(spellID)
+    if not (spellID and C_TradeSkillUI and C_TradeSkillUI.GetRecipeInfo) then return nil end
+    local ok, i = pcall(C_TradeSkillUI.GetRecipeInfo, spellID)
+    -- Un id hors de la ligne ouverte (recette fantôme du catalogue, métier d'à côté) rend nil ou
+    -- une fiche qui parle d'AUTRE CHOSE : on exige que le client réponde bien sur CE sort-là.
+    if not (ok and type(i) == "table" and i.recipeID == spellID and i.name) then return nil end
+    return {
+        name  = i.name, link = i.hyperlink, icon = i.icon,
+        difficulty = DIFF[i.relativeDifficulty],
+        learned = i.learned == true,
+        -- `canSkillUp` false ⇒ 0 point, sans se fier à `numSkillUps` qui garde sa dernière valeur.
+        skillUps = (i.canSkillUp and (i.numSkillUps or 1)) or 0,
+        trivialAt = i.maxTrivialLevel,
+    }
+end

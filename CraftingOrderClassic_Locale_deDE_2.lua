@@ -458,6 +458,10 @@ local de2 = {
     ["… et %d autres"] = "… und %d weitere",
     ["Niveau requis : %d"] = "Benötigter Skill: %d",
     ["Rien ne manque dans ce métier."] = "In diesem Beruf fehlt nichts.",
+    -- Manquantes : le verdict du client (cf. Craft:MainlineRecipeFacts)
+    ["il t'en manque %d"] = "dir fehlen %d",
+    ["+%d point de métier"] = "+%d Berufspunkt",
+    ["Ne rapporte plus de point"] = "Bringt keinen Punkt mehr",
 }
 
 for k, v in pairs(de2) do L[k] = v end

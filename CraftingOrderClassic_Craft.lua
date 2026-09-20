@@ -147,6 +147,15 @@ function Craft:OpenRank()
     return nil
 end
 
+-- Ce que le CLIENT sait d'une recette désignée par son SORT, apprise ou NON :
+-- { name, link, icon, difficulty, learned, skillUps, trivialAt } ou nil.
+-- Seul le backend MAINLINE sait répondre — les deux API Classic ne lisent que par INDEX, et leur
+-- liste ne contient que les recettes apprises. nil veut donc dire « pas d'avis », jamais « non ».
+function Craft:RecipeFacts(spellID)
+    if self.MainlineRecipeFacts then return self:MainlineRecipeFacts(spellID) end
+    return nil
+end
+
 -- Toute la liste de recettes APPRISES (en-têtes inclus, isHeader=true), ou nil si fermé.
 -- « Apprises » n'allait de soi que sur les deux backends Classic, où la fenêtre native ne connaît
 -- que ça. Sur MAINLINE le client rend aussi les NON apprises (cf. `getLearned` de Craft_Mainline) :

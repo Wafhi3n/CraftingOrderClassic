@@ -459,6 +459,10 @@ local es2 = {
     ["… et %d autres"] = "… y %d más",
     ["Niveau requis : %d"] = "Nivel requerido: %d",
     ["Rien ne manque dans ce métier."] = "No falta nada en esta profesión.",
+    -- Manquantes : le verdict du client (cf. Craft:MainlineRecipeFacts)
+    ["il t'en manque %d"] = "te faltan %d",
+    ["+%d point de métier"] = "+%d punto de profesión",
+    ["Ne rapporte plus de point"] = "Ya no da puntos",
 }
 
 for k, v in pairs(es2) do L[k] = v end
