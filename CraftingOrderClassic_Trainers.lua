@@ -107,6 +107,27 @@ local function readServices()
     return out, seen, sample
 end
 
+-- ⚠️ LES FILTRES DU FORMATEUR BORNENT CE QU'ON PEUT VOIR, et c'est invisible depuis le résultat :
+-- une moisson filtrée a exactement l'air d'une moisson complète. Vécu le 2026-09-20 -- le joueur
+-- n'affichait que « déjà connu », on a donc noté 6 recettes... qu'il savait déjà faire, donc
+-- absentes des Manquantes, donc sans le moindre effet visible. Une donnée juste et inutile.
+--
+-- On NE TOUCHE PAS à ses filtres : ce n'est pas notre fenêtre, et les remettre d'aplomb sous ses
+-- yeux serait plus intrusif que le service rendu. On lui DIT ce qu'on n'a pas pu voir, une fois par
+-- visite, et il décide. Les libellés viennent des globales du jeu : déjà traduites, gratuitement.
+local FILTERS = { available = "AVAILABLE", unavailable = "UNAVAILABLE", used = "USED" }
+local FILTER_ORDER = { "available", "unavailable", "used" }
+local function hiddenFilters()
+    local get = _G.GetTrainerServiceTypeFilter
+    if not get then return nil end
+    local off = {}
+    for _, f in ipairs(FILTER_ORDER) do
+        local ok, on = pcall(get, f)
+        if ok and not on then off[#off + 1] = _G[FILTERS[f]] or f end
+    end
+    return (#off > 0) and table.concat(off, ", ") or nil
+end
+
 -- Le métier du formateur : celui que DÉSIGNENT le plus de ses services. On ne le demande pas au
 -- client — `GetTrainerServiceSkillLine` existe mais n'est documentée nulle part et ne répond pas la
 -- même chose chez un formateur de classe. Compter est robuste et se raconte : un formateur de
@@ -159,6 +180,15 @@ function T:Harvest()
         st.npc = { id = id, name = name, mapID = map, x = x, y = y, at = time() }
     end
     if COC.Trace then COC.Trace:Log("trainer", (name or "?") .. " / " .. prof .. " : " .. n .. " services") end
+    -- Une fois par fenêtre (le drapeau tombe au TRAINER_SHOW) : TRAINER_UPDATE se déclenche à chaque
+    -- clic et à chaque changement de filtre, on ne va pas le répéter à chacun.
+    self._hidden = hiddenFilters()
+    if self._hidden and not self._warned then
+        self._warned = true
+        print("|cFF33DD88Crafting Order|r "
+            .. string.format(COC.L["Formateur : %d recette(s) notée(s), mais ton filtre en cache (%s)."],
+                             n, self._hidden))
+    end
     return prof, n, seen
 end
 
@@ -209,6 +239,7 @@ function T:Dump(rest)
             tostring(_G.IsTradeskillTrainer and _G.IsTradeskillTrainer()),
             tostring(_G.GetNumTrainerServices and _G.GetNumTrainerServices()),
             tostring(seen or 0), tostring(n or 0), tostring(self._lastIndex or 0)))
+        print("|cFF33DD88COC|r   filtres masques: " .. (self._hidden or "aucun"))
         if self._lastSample then print("|cFF33DD88COC|r   1er nom non reconnu: " .. self._lastSample) end
         if prof then print("|cFF33DD88COC|r   metier retenu: " .. prof) end
         return
@@ -233,4 +264,7 @@ end
 local f = CreateFrame("Frame")
 f:RegisterEvent("TRAINER_SHOW")
 f:RegisterEvent("TRAINER_UPDATE")
-f:SetScript("OnEvent", function() T:Harvest() end)
+f:SetScript("OnEvent", function(_, event)
+    if event == "TRAINER_SHOW" then T._warned = nil end   -- un avertissement par fenêtre, pas par clic
+    T:Harvest()
+end)

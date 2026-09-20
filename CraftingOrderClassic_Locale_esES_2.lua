@@ -459,6 +459,7 @@ local es2 = {
     ["… et %d autres"] = "… y %d más",
     ["Niveau requis : %d"] = "Nivel requerido: %d",
     ["Rien ne manque dans ce métier."] = "No falta nada en esta profesión.",
+    ["Formateur : %d recette(s) notée(s), mais ton filtre en cache (%s)."] = "Maestro: %d receta(s) anotada(s), pero tu filtro oculta algunas (%s).",
     -- Manquantes : le verdict du client (cf. Craft:MainlineRecipeFacts)
     ["il t'en manque %d"] = "te faltan %d",
     ["+%d point de métier"] = "+%d punto de profesión",

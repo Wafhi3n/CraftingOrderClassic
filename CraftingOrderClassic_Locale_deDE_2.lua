@@ -458,6 +458,7 @@ local de2 = {
     ["… et %d autres"] = "… und %d weitere",
     ["Niveau requis : %d"] = "Benötigter Skill: %d",
     ["Rien ne manque dans ce métier."] = "In diesem Beruf fehlt nichts.",
+    ["Formateur : %d recette(s) notée(s), mais ton filtre en cache (%s)."] = "Lehrer: %d Rezept(e) notiert, aber dein Filter verbirgt welche (%s).",
     -- Manquantes : le verdict du client (cf. Craft:MainlineRecipeFacts)
     ["il t'en manque %d"] = "dir fehlen %d",
     ["+%d point de métier"] = "+%d Berufspunkt",
