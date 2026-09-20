@@ -1,4 +1,4 @@
-﻿## Interface: 11509
+﻿## Interface: 16001
 ## Title: Crafting & Gathering Order - Classic
 ## Notes: Réseau global et social de commandes de craft ET de récolte (autonome — sans guilde). /co pour le statut.
 ## Author: Wafhi3n
@@ -13,11 +13,20 @@
 # synchronisée par sync-libs.ps1. Rend cet addon AUTONOME (n'a pas besoin de Guild Economy).
 Libs\LibStub\LibStub.lua
 Libs\CraftLink-1.0\lib.xml
-Libs\CraftLink-1.0\Data\Vanilla.xml
-# Couche saisonnière : ÉTEND Vanilla (append-only) et reste INERTE hors de sa saison, donc ce même
-# .toc sert Era classique ET Saison de la Découverte. Doit venir APRÈS Vanilla.xml. Pas de couche
-# pour TBC/Wrath (pas de saison) → les .toc de saveur ne la listent pas.
-Libs\CraftLink-1.0\Data\SoD.xml
+Libs\CraftLink-1.0\Data\Camelot.xml
+
+# SEUL .toc de l'addon depuis le 2026-09-20 : COC ne cible plus que WoW: FOREVER (nom de code
+# CAMELOT, client _classic_beta_, interface 16001). Les .toc Era/TBC/Wrath ont ete retires --
+# ils faisaient apparaitre ces saveurs sur CurseForge, qu'il fallait ensuite corriger a la main
+# a chaque publication. Une saveur declaree = une saveur maintenue.
+# ATTENTION : ce client est MAINLINE/Retail (WOW_PROJECT_ID == 1), pas Classic. Les API de
+# metier Classic n'y existent pas. Voir docs/FOREVER-PORT.md et CraftingOrderClassic_Compat.lua.
+# Dataset CAMELOT (Data/Camelot.xml, 2512 recettes) et NON Vanilla : Forever ne fait pas
+# qu'ajouter, il RETIRE -- les 6 potions de soin ont quitte l'Alchimie (sorts 2330/2337/3447/
+# 7181/11457/17556) pour Premiers soins avec de nouveaux sorts. Une couche additive ne sait pas
+# retirer, d'ou un set complet genere par CraftLink/tools/gen_flavor.lua. Pas de Poisons : Forever
+# en a fait des sorts sans reactif. dataVersion 1908807446, volontairement != Vanilla (un client
+# Forever et un client Era ne doivent jamais comparer leurs bitfields de registre).
 
 CraftingOrderClassic.lua
 # Couche d'adaptation d'API entre SAVEURS (Classic vs MAINLINE/Forever). Doit venir juste

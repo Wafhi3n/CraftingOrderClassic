@@ -1,5 +1,11 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## Unreleased
+
+Forever only from here on. The Era, TBC and Wrath .toc files are gone, so the next build won't show
+up on those clients at all. Nothing changed in the code they were running, and the last build that
+supports them stays on CurseForge if you still need it.
+
 ## v1.33.0 — Where recipes come from, without MTSL
 
 The addon doesn't ask for MTSL anymore. MTSL's database describes Vanilla and TBC, and Forever rewrote
