@@ -28,11 +28,12 @@ local BODY_W = 780
 local function versionsNewest()
     return {
         {
-            v = "v1.32.2", title = L["Tes barres d'action ne se bloquent plus en combat"],
+            v = "v1.33.0", title = L["D'où vient une recette, sans MTSL"],
             lines = {
-                L["Sur WoW: Forever, passer d'un onglet à l'autre dans la fenêtre de métier pendant un combat faisait refuser au jeu tout geste sur tes barres d'action, avec l'addon nommé à chaque fois. La fenêtre de métier n'y était pour rien. Deux petites pièces de l'addon l'étaient : ses menus déroulants et son aide « i » empruntaient des systèmes que le jeu partage avec sa propre interface, et s'en servir une seule fois suffisait à marquer cette interface à notre nom jusqu'au prochain rechargement. Les deux sont faits maison maintenant : même rendu, et le jeu n'a plus rien à redire."],
-                L["La colonne des commandes peut aussi se poser à côté de la fenêtre de métier plutôt que dedans : /co accole passe d'un mode à l'autre. Dedans reste le mode par défaut."],
-                L["Petites retouches : une longue liste de stats ne sort plus par le bas de l'écran, et chaque liste prend la largeur de sa plus longue entrée ; la liste des canaux de la fenêtre de partage des composants s'ouvre au-dessus d'elle et non plus dessous ; et l'aide suit la fenêtre si le jeu la déplace pendant qu'elle est ouverte."],
+                L["L'addon ne réclame plus MTSL. Sa base décrit Vanilla et TBC, or Forever a refait les tables d'objets dessous : 894 objets-recette qui n'existent que là, 173 disparus de Classic, et 24 identifiants communs qui désignent aujourd'hui un tout autre objet. Un annuaire périmé est pire qu'un annuaire absent, parce qu'il répond avec assurance. Les sources de recettes viennent maintenant de nos propres données, tirées des pages Forever de Wowhead."],
+                L["Survole une recette que tu n'as pas apprise : elle te dit si le plan tombe en butin, s'il se vend ou s'il vient d'une quête, et elle nomme le PNJ et la zone quand elle les connaît. Sur Forever, le jeu le dit mieux que nous : sa formulation l'emporte dès qu'il en a une. Une recette de formateur est une déduction et non un fait, alors elle porte un « ? » plutôt que de faire semblant."],
+                L["Le Plan de route remarche sur Forever, chiffré sur ton dernier scan Auctionator (Lazy Gold reste sur l'Era). Et la colonne des commandes change de contenu au lieu d'ouvrir des fenêtres par-dessus elle : trois onglets en haut, Commandes, Plan de route et Manquantes. Manquantes liste toutes les recettes que tu n'as pas apprises avec le rang qu'elles demandent, grisées tant que tu ne peux pas les prendre."],
+                L["Corrections : sur Forever la colonne comptait comme connues des recettes non apprises, et la route, les badges et ce que les autres artisans voyaient de toi reposaient là-dessus ; les prix sortaient vides ; la carte d'une commande sélectionnée était dessinée pour une fenêtre moitié plus large que la colonne, donc sa croix, son prix et le bord droit du panneau des composants étaient coupés ; une commande d'enchantement affichait « ? » au lieu de son nom."],
             },
         },
     }
@@ -40,6 +41,14 @@ end
 
 local function versionsCurrent()
     return {
+        {
+            v = "v1.32.2", title = L["Tes barres d'action ne se bloquent plus en combat"],
+            lines = {
+                L["Sur WoW: Forever, passer d'un onglet à l'autre dans la fenêtre de métier pendant un combat faisait refuser au jeu tout geste sur tes barres d'action, avec l'addon nommé à chaque fois. La fenêtre de métier n'y était pour rien. Deux petites pièces de l'addon l'étaient : ses menus déroulants et son aide « i » empruntaient des systèmes que le jeu partage avec sa propre interface, et s'en servir une seule fois suffisait à marquer cette interface à notre nom jusqu'au prochain rechargement. Les deux sont faits maison maintenant : même rendu, et le jeu n'a plus rien à redire."],
+                L["La colonne des commandes peut aussi se poser à côté de la fenêtre de métier plutôt que dedans : /co accole passe d'un mode à l'autre. Dedans reste le mode par défaut."],
+                L["Petites retouches : une longue liste de stats ne sort plus par le bas de l'écran, et chaque liste prend la largeur de sa plus longue entrée ; la liste des canaux de la fenêtre de partage des composants s'ouvre au-dessus d'elle et non plus dessous ; et l'aide suit la fenêtre si le jeu la déplace pendant qu'elle est ouverte."],
+            },
+        },
         {
             v = "v1.32.1", title = L["La fenêtre de métier de Forever cesse de se plaindre"],
             lines = {

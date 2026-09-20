@@ -1,5 +1,40 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.33.0 — Where recipes come from, without MTSL
+
+The addon doesn't ask for MTSL anymore. MTSL's database describes Vanilla and TBC, and Forever rewrote
+the item tables underneath it. Measured against Forever's own data: 894 recipe items that exist
+nowhere else, 173 from Classic that are gone, and 24 shared ids that now point at a completely
+different item. An out-of-date directory is worse than no directory at all, because it answers with
+confidence, so it's out.
+
+Recipe sources come from the addon's own data now, generated from Wowhead's Forever pages. Hover a
+recipe you haven't learned and it tells you whether the plan drops, is sold, or comes from a quest,
+and it names the vendor and the zone when it knows them. On Forever the game itself says it better,
+so its wording wins whenever it has one. A trainer recipe is a deduction rather than something we
+read, and it carries a question mark instead of pretending otherwise.
+
+The leveling route works on Forever again, priced from your last Auctionator scan. Lazy Gold still
+handles Era. It tells you what to craft from here to the cap, how many times, and roughly what that
+costs. When nothing in a profession can be costed, Fishing for one, it says the total is unknown
+instead of showing you a floor of zero.
+
+The orders column changes what it shows instead of opening windows on top of itself. Three tabs at the
+top now: Orders, Leveling route, and Missing. Missing lists every recipe you haven't learned with the
+level it needs, greyed out until you can take it, and hovering a line tells you where to get it.
+
+Fixes:
+
+- On Forever the column counted recipes you hadn't learned as if you knew them. The route, the badges
+  and what other crafters saw of you were all built on that.
+- Prices came out blank on Forever. The function the addon used to draw coins doesn't exist there.
+- The card for a selected order was drawn for a window half again as wide as the column it sits in, so
+  its close button, its price and the right edge of the components panel were cut off.
+- An enchanting order showed "?" instead of its name. Enchants have no crafted item, and the lookup
+  stopped at a placeholder rather than falling through to the spell.
+- Route steps were cut off on the right, and two scroll arrows sat above a route of two steps.
+- Each component in an order now shows its icon, and hovering it opens the item tooltip.
+
 ## v1.32.2 — Your action bars stop getting blocked in combat
 
 On WoW: Forever, switching tabs in the professions window mid-fight made the game refuse to touch your
