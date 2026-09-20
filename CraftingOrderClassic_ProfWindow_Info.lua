@@ -47,17 +47,20 @@ local function buildRow(col)
     row:SetScript("OnEnter", function(r)
         if not r.pin then return end
         GameTooltip:SetOwner(r, "ANCHOR_RIGHT")
-        GameTooltip:SetText(L["Clic : poser un repère sur ce PNJ (TomTom ou épingle de carte)."], 1, 1, 1, 1, true)
+        GameTooltip:SetText(L["Clic : poser un repère sur ce PNJ."], 1, 1, 1, 1, true)
         GameTooltip:Show()
     end)
     row:SetScript("OnLeave", GameTooltip_Hide)
     row:Hide(); return row
 end
 
--- Un repère est-il posable ? TomTom (flèche) en priorité, sinon l'épingle NATIVE de la carte.
+-- Un repère est-il posable ? L'ÉPINGLE NATIVE suffit sur cette saveur : `SetUserWaypoint` pose le
+-- point et `C_SuperTrack.SetSuperTrackedUserWaypoint` allume la flèche et la distance, c'est-à-dire
+-- ce qu'on allait chercher chez TomTom. Un addon tiers de moins à interroger, et un seul chemin à
+-- maintenir -- le repli TomTom ne servait que l'Era, qui n'est plus une cible.
 local function canPin()
-    if _G.TomTom and _G.TomTom.AddWaypoint then return true end
-    return (C_Map and C_Map.SetUserWaypoint and UiMapPoint and UiMapPoint.CreateFromCoordinates) and true or false
+    return (C_Map and C_Map.SetUserWaypoint and UiMapPoint and UiMapPoint.CreateFromCoordinates)
+        and true or false
 end
 
 -- Zone LOCALISÉE → uiMapID : scan paresseux de l'arbre C_Map (les noms C_Map sont localisés comme
@@ -93,13 +96,15 @@ function PW:_SetNpcPin(pin)
         print("|cFF33DD88Crafting Order|r " .. string.format(L["zone introuvable sur la carte : %s"], pin.zone or "?"))
         return
     end
-    if _G.TomTom and _G.TomTom.AddWaypoint then
-        pcall(_G.TomTom.AddWaypoint, _G.TomTom, mapID, pin.x / 100, pin.y / 100,
-            { title = pin.name, minimap = true, world = true })
-    elseif C_Map and C_Map.SetUserWaypoint and UiMapPoint and UiMapPoint.CreateFromCoordinates then
-        pcall(C_Map.SetUserWaypoint, UiMapPoint.CreateFromCoordinates(mapID, pin.x / 100, pin.y / 100))
-    else
+    if not (C_Map and C_Map.SetUserWaypoint and UiMapPoint and UiMapPoint.CreateFromCoordinates) then
         return
+    end
+    -- Poser le point ne le SUIT pas : sans le super-suivi, le joueur a une épingle sur sa carte et
+    -- rien à l'écran. Les deux gestes vont ensemble, et le second est facultatif (garde nil) parce
+    -- qu'il n'existe pas partout.
+    pcall(C_Map.SetUserWaypoint, UiMapPoint.CreateFromCoordinates(mapID, pin.x / 100, pin.y / 100))
+    if C_SuperTrack and C_SuperTrack.SetSuperTrackedUserWaypoint then
+        pcall(C_SuperTrack.SetSuperTrackedUserWaypoint, true)
     end
     print("|cFF33DD88Crafting Order|r " .. string.format(L["repère posé : %s — %s (%.0f, %.0f)"],
         pin.name or "?", pin.zone or "?", pin.x, pin.y))

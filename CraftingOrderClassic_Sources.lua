@@ -87,6 +87,11 @@ function S:SourceKind(profKey, spellID)
     if observed(profKey, spellID) then return "trainer" end
     local kind = lib.RecipeSource and lib:RecipeSource(profKey, spellID)
     if kind then return kind end
+    -- La nature DEDUITE de la page de l'objet ou du sort, quand la page de metier se taisait. Sans
+    -- cette ligne on affichait « Source inconnue » AVEC le nom du marchand juste en dessous -- une
+    -- contradiction que le joueur voit tout de suite (releve en jeu le 2026-09-20).
+    kind = lib.RecipeOriginKind and lib:RecipeOriginKind(profKey, spellID)
+    if kind then return kind end
     if recipeItemFor(profKey, spellID) then return "unknown" end   -- objet connu, source inconnue
     -- Aucun objet-recette : la recette s'apprend en principe au formateur. On ne le dit que si la
     -- recette est bien de NOTRE catalogue — sinon on ne sait rien d'elle du tout.
