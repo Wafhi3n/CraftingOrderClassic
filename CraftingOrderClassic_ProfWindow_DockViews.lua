@@ -198,8 +198,11 @@ local function missWhere(prof, sid)
     local txt = KIND_TEXT[kind] and KIND_TEXT[kind]() or L["Source inconnue"]
     if kind == "trainer" and S:IsInferred(prof, sid) then txt = txt .. " |cFF888888?|r" end
     GameTooltip:AddLine(txt, 0.91, 0.72, 0.29)
-    local npc = S.SourceNpcLine and S:SourceNpcLine(prof, sid)
-    if npc then GameTooltip:AddLine(npc, 0.8, 0.8, 0.8) end
+    -- L'ORIGINE, pas seulement le marchand : la créature qui lâche le plan et la quête qui le donne
+    -- répondent aussi à « où je vais le chercher ? ». La nature est écrite juste au-dessus, donc la
+    -- ligne peut rester un nom nu sans qu'on confonde « aller voir » et « aller tuer ».
+    local from = S.SourceOriginLine and S:SourceOriginLine(prof, sid)
+    if from then GameTooltip:AddLine(from, 0.8, 0.8, 0.8) end
 end
 
 local function missTooltip(row)

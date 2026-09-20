@@ -123,16 +123,32 @@ end
 -- Le PNJ qui vend le plan
 -- ------------------------------------------------------------------
 
--- « Nom — Zone », ou juste « Nom » si la zone est inconnue. nil si la recette ne s'achète pas chez
--- un PNJ ou si le marchand n'est pas nommé (un tiers des plans vendus). Le nom de zone est rendu
--- par le CLIENT, donc dans sa langue ; le nom du PNJ arrive en anglais, faute d'API pour le
--- résoudre depuis son identifiant.
+-- « Nom — Zone », ou juste « Nom » si la zone est inconnue. Le nom de zone est rendu par le CLIENT,
+-- donc dans sa langue ; le nom du PNJ arrive en anglais, faute d'API pour le résoudre par id.
+local function line(name, areaID)
+    if not name then return nil end
+    local zone = areaID and C_Map and C_Map.GetAreaInfo and C_Map.GetAreaInfo(areaID) or nil
+    return zone and (name .. " — " .. zone) or name
+end
+
+-- CE QUI est derrière le plan, quelle que soit sa nature : le marchand qui le vend, la créature qui
+-- le lâche, ou la quête qui le donne. nil quand la donnée ne le nomme pas (plus d'un plan sur deux).
+--
+-- ⚠️ LA NATURE N'EST PAS DANS LA CHAÎNE, et c'est volontaire : « Wastewander Bandit — Tanaris » ne
+-- dit pas s'il faut l'acheter ou le tuer. Tout appelant DOIT afficher la nature (`SourceKind`) à
+-- côté, sans quoi il enverra le joueur acheter son plan à un bandit.
+function S:SourceOriginLine(profKey, spellID)
+    local lib = CL(); if not lib or not lib.RecipeOrigin then return nil end
+    local id, areaID, name = lib:RecipeOrigin(profKey, spellID)
+    return line(name, areaID), id
+end
+
+-- Le marchand, et lui seul : ce que demandent les vues qui parlent d'un ACHAT (liste de courses,
+-- fournitures du Plan de route). La lib filtre déjà sur la nature — on ne refait pas le tri ici.
 function S:SourceNpcLine(profKey, spellID)
     local lib = CL(); if not lib or not lib.RecipeVendor then return nil end
     local npcID, areaID, name = lib:RecipeVendor(profKey, spellID)
-    if not name then return nil end
-    local zone = areaID and C_Map and C_Map.GetAreaInfo and C_Map.GetAreaInfo(areaID) or nil
-    return zone and (name .. " — " .. zone) or name, npcID
+    return line(name, areaID), npcID
 end
 
 -- ------------------------------------------------------------------
