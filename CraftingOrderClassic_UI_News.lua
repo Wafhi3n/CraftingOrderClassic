@@ -45,6 +45,15 @@ end
 local function versionsCurrentA()
     return {
         {
+            v = "v1.34.0", title = L["L'onglet Manquantes te dit enfin où aller"],
+            lines = {
+                L["Survoler une recette que tu n'as pas te donnait son nom et son rang, c'est-à-dire ce que la ligne affichait déjà. Tu as maintenant l'infobulle de l'objet lui-même, puis ce qu'il te manque en points de métier, si la recette rapporte encore quelque chose à ton rang, et d'où vient le plan."],
+                L["Ce dernier point a beaucoup changé. L'addon connaissait un seul nom par plan et rien de son camp : « Recipe: Gingerbread Cookie » envoyait tout le monde chez Wulmort Jinglepocket, à Forgefer, Horde comprise. 1565 recettes nomment quelqu'un contre 337 avant, le marchand affiché est de ta faction, 719 donnent le prix réel du marchand sans aucun addon de prix, et 846 PNJ ont des coordonnées : un clic pose un repère, ce qui ne marchait plus depuis MTSL."],
+                L["Les formateurs. Aucune page ne dit « ça s'apprend au formateur » : l'addon le déduisait de l'absence d'objet-recette et affichait un point d'interrogation, sur 788 recettes. Wowhead le publie en fait sur la page du sort et pas celle de l'objet, ce qui en a nommé 398. Et quand tu parles à un formateur de métier, l'addon note ce qu'il enseigne et où il se tient : le point d'interrogation disparaît et tu récupères ses coordonnées. Si ta fenêtre de formateur filtre ce qu'elle affiche, il te le dit au lieu de n'en moissonner qu'un tiers en silence."],
+                L["Corrigé : un plantage en donjon (le client rend des valeurs « secrètes » pour certaines données d'unité, et l'une d'elles finissait en clé de table trois appels plus loin, dans une fonction d'annuaire qui n'avait aucune raison de se méfier d'un nom), et le changement d'onglet de métier qui laissait la liste d'un métier avec les infobulles d'un autre."],
+            },
+        },
+        {
             v = "v1.32.2", title = L["Tes barres d'action ne se bloquent plus en combat"],
             lines = {
                 L["Sur WoW: Forever, passer d'un onglet à l'autre dans la fenêtre de métier pendant un combat faisait refuser au jeu tout geste sur tes barres d'action, avec l'addon nommé à chaque fois. La fenêtre de métier n'y était pour rien. Deux petites pièces de l'addon l'étaient : ses menus déroulants et son aide « i » empruntaient des systèmes que le jeu partage avec sa propre interface, et s'en servir une seule fois suffisait à marquer cette interface à notre nom jusqu'au prochain rechargement. Les deux sont faits maison maintenant : même rendu, et le jeu n'a plus rien à redire."],

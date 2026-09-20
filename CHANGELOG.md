@@ -1,10 +1,40 @@
 # Changelog — Crafting & Gathering Order — Classic
 
-## Unreleased
+## v1.34.0 - The Missing tab tells you where to go
 
-Forever only from here on. The Era, TBC and Wrath .toc files are gone, so the next build won't show
-up on those clients at all. Nothing changed in the code they were running, and the last build that
-supports them stays on CurseForge if you still need it.
+Hovering a recipe you haven't learned used to give you its name and its rank, which is exactly what
+the line already showed you. The game's own item tooltip comes up first now, so you see what the
+thing actually does, and under it, how much skill you're still short, whether the recipe still earns
+you a point at your rank, and where the plan comes from.
+
+That last part got a lot better. The addon knew one name per plan and nothing about which side that
+name was on, so "Recipe: Gingerbread Cookie" sent everyone to Wulmort Jinglepocket in Ironforge,
+Horde included. It reads the item's own page now instead of the profession list, and that page
+carries the whole roster. 1565 recipes name someone, against 337 before. The vendor you're shown is
+on your faction, and if the only one we know about isn't, the line says so rather than walking you
+into their capital. 719 recipes show what the merchant actually charges with no price addon
+installed, and 846 npcs come with coordinates, so clicking the line drops a waypoint. That hasn't
+worked since MTSL left.
+
+Then there are trainers. No page anywhere says "you learn this one from a trainer", so the addon
+deduced it from the absence of a recipe item and showed a question mark, on 788 recipes. Two things
+changed. Wowhead does publish it, on the spell's page rather than the item's, which named the trainer
+for 398 of them. And when you talk to a profession trainer, the addon writes down what he teaches and
+where he stands, which turns a deduction into something it watched happen. The question mark goes
+away and you get his coordinates. If your trainer window is filtering what it shows you, it says so
+instead of quietly harvesting a third of the list and calling it done.
+
+Fixed: a crash in dungeons. The modern client hands back "secret" values for some unit data in
+restricted places, and one of them was ending up as a table key three calls later, in an address-book
+function that had no reason to distrust a name. They're stopped at the door now.
+
+Fixed: changing profession tab left the column showing the old profession's list while its tooltips
+answered for the new one. The same recipe would say "+1 skill point" and then "no longer gives a
+point" depending on which tab happened to be open.
+
+Forever only from here on. The Era, TBC and Wrath .toc files are gone, so this build won't show up on
+those clients at all. Nothing changed in the code they were running, and the last build that supports
+them stays on CurseForge if you still need it.
 
 ## v1.33.0 — Where recipes come from, without MTSL
 
