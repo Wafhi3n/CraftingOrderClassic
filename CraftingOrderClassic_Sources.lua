@@ -211,9 +211,15 @@ function S:SourceOriginLine(profKey, spellID)
         -- liste alors que je suis humain »). On ne l'EFFACE pas pour autant : c'est tout ce qu'on
         -- sait, ca vaut pour un reroll du camp d'en face, et le masquer ramenerait le « Vendeur »
         -- suivi de rien qu'on vient justement de faire disparaitre.
-        local label = (faction == "A") and _G.FACTION_ALLIANCE or _G.FACTION_HORDE
-        txt = "|cFF888888" .. (label or faction) .. " : " .. txt .. "|r"
-        pin = nil   -- aucun repere vers un PNJ a qui on ne peut pas parler
+        -- On ne NOMME plus le PNJ du camp d'en face : le joueur ne peut pas lui parler, et le lire
+        -- sur sa ligne le faisait chercher un marchand inaccessible (relevé en jeu le 2026-09-20,
+        -- « j'ai ça dans ma liste alors que je suis humain »). On dit l'ABSENCE plutôt que de
+        -- laisser « Vendeur » suivi de rien, qui était l'état qu'on vient de corriger.
+        --
+        -- La donnée reste en place et reste lisible par `RecipeOrigins` : elle vaut pour un reroll
+        -- du camp adverse, que l'addon sait déjà suivre. C'est l'AFFICHAGE qui se tait, pas nous.
+        txt = "|cFF888888" .. COC.L["Aucune source connue de ton camp."] .. "|r"
+        pin = nil   -- aucun repère vers un PNJ à qui on ne peut pas parler
     end
     return txt, id, pin
 end

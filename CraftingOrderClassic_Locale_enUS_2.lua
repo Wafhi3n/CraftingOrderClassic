@@ -479,6 +479,7 @@ local en2 = {
     ["Niveau requis : %d"] = "Required skill: %d",
     ["Rien ne manque dans ce métier."] = "Nothing missing in this profession.",
     ["Formateur : %d recette(s) notée(s), mais ton filtre en cache (%s)."] = "Trainer: %d recipe(s) noted, but your filter is hiding some (%s).",
+    ["Aucune source connue de ton camp."] = "No source known on your side.",
     -- Manquantes : le verdict du client (cf. Craft:MainlineRecipeFacts)
     ["il t'en manque %d"] = "you're %d short",
     ["+%d point de métier"] = "+%d skill point",
