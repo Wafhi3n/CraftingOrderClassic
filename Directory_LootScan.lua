@@ -125,6 +125,12 @@ end
 local function onCLEU()
     local _, sub, _, srcGUID, srcName, _, _, _, _, _, _, spellID = CombatLogGetCurrentEventInfo()
     if sub ~= "SPELL_CAST_SUCCESS" or not (srcGUID and srcGUID:find("^Player")) then return end
+    -- ⚠️ Le journal de combat est un des contextes ou le client rend des valeurs SECRETES. `srcName`
+    -- descend jusqu'a `_NoteSeen`, qui en fait une CLE de roster : exactement la forme du plantage
+    -- corrige ailleurs dans cette version. On teste le secret AVANT toute comparaison -- comparer
+    -- une secrete leve la meme erreur que l'indexer. `UnitNameSafe` ne s'applique pas ici : `srcName`
+    -- est deja un nom, pas un token d'unite.
+    if COC.Api and COC.Api.IsSecret and COC.Api.IsSecret(srcName) then return end
     local _, bs = ensureReverse(); local prof = bs and spellID and bs[spellID]
     if prof then Dir:_NoteSeen(srcName, prof, spellID) end
 end

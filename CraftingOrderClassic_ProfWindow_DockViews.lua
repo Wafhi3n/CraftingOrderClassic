@@ -160,8 +160,11 @@ end
 -- stats, niveau de l'objet). Le client rend ce lien même sur une recette NON APPRISE. Sans lui
 -- (Era, ou recette hors de la ligne ouverte) on retombe sur le nom seul, comme avant.
 local function missHead(row, facts)
-    if facts and facts.link then
-        GameTooltip:SetHyperlink(facts.link)
+    -- ⚠️ `SetHyperlink` SOUS pcall, comme les six autres appels du dépôt. Un lien que le client
+    -- refuse leve une erreur, et ici on est dans le `OnEnter` d'une ligne de liste : l'erreur
+    -- emporterait tout ce qui suit dans l'infobulle -- le rang, les points, la source, le prix --
+    -- ET le `Show()` final. Le joueur verrait une infobulle vide sans savoir pourquoi.
+    if facts and facts.link and pcall(GameTooltip.SetHyperlink, GameTooltip, facts.link) then
         GameTooltip:AddLine(" ")
     else
         GameTooltip:SetText(row.rname or "?", 1, 1, 1, 1, true)

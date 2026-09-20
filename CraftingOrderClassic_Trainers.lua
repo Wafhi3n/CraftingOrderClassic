@@ -176,7 +176,10 @@ function T:Harvest()
     end
     local id, name = npcIdentity()
     if name then
+        -- Une position a MOITIE resolue (carte sans coordonnees) ne vaut pas mieux que pas de
+        -- position : elle passe les gardes en aval et casse l'arithmetique du poseur de repere.
         local map, x, y = herePosition()
+        if not (x and y) then map = nil end
         st.npc = { id = id, name = name, mapID = map, x = x, y = y, at = time() }
     end
     if COC.Trace then COC.Trace:Log("trainer", (name or "?") .. " / " .. prof .. " : " .. n .. " services") end

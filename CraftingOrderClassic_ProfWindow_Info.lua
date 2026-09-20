@@ -84,6 +84,10 @@ function PW:_SetNpcPin(pin)
     -- Un repère posé depuis une OBSERVATION porte déjà son uiMapID : on y était, le client nous l'a
     -- donné. Il n'y a alors rien à retrouver par nom -- et c'est tant mieux, le scan par nom de zone
     -- échoue dès que deux libellés divergent d'une lettre.
+    -- ⚠️ `pin.x / 100` est evalue AVANT que `pcall` ne soit appele : le pcall protege l'APPEL, pas
+    -- la construction de ses arguments. Une position partielle (carte connue, coordonnees non
+    -- resolues) leverait donc une erreur non rattrapee sur le clic. On exige les deux.
+    if not (pin.x and pin.y) then return end
     local mapID = pin.mapID or zoneMapID(pin.zone)
     if not mapID then
         print("|cFF33DD88Crafting Order|r " .. string.format(L["zone introuvable sur la carte : %s"], pin.zone or "?"))
