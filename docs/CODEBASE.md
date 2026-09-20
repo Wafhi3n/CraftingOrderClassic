@@ -76,7 +76,7 @@
 | `CraftingOrderClassic_Gem.lua` | spécifique à la JOAILLERIE : sous-catégorise les GEMMES TAILLÉES par TAILLE (le mot qui porte la stat). | 226 |
 | `CraftingOrderClassic_Gem_Stats.lua` | correspondance TAILLE DE GEMME → STAT (données, éditées à la main). | 41 |
 | `CraftingOrderClassic_Sources.lua` | « où j'obtiens ce plan, et lesquels me manquent ». | 283 |
-| `CraftingOrderClassic_Trainers.lua` | « le formateur, vu de nos propres yeux ». | 207 |
+| `CraftingOrderClassic_Trainers.lua` | « le formateur, vu de nos propres yeux ». | 236 |
 | `CraftingOrderClassic_ProfWindow.lua` | fenêtre métier custom 3 colonnes (migration depuis Guild Economy) : Recettes \| Détail+Craft \| Commandes du métier. | 483 |
 | `CraftingOrderClassic_ProfWindow_Layout.lua` | GÉOMÉTRIE de la vue métier (fenêtre 3 colonnes). | 165 |
 | `CraftingOrderClassic_ProfWindow_HelpPlate.lua` | AIDE CONTEXTUELLE de la Vue Métier (« bouton i »). | 103 |
@@ -1392,7 +1392,7 @@
 > reste doit continuer à marcher sans elle : l'observation ENRICHIT la déduction, elle ne la
 > remplace pas. Tant qu'aucun formateur n'a été vu, rien ne change nulle part.
 
-**API** : `T:Harvest()` · `T:Teaches(profKey, spellID)` · `T:Npc(profKey)` · `T:Line(profKey)` · `T:Dump()`
+**API** : `T:Harvest()` · `T:Teaches(profKey, spellID)` · `T:Npc(profKey)` · `T:Line(profKey)` · `T:Dump(rest)`
 
 ### `CraftingOrderClassic_ProfWindow.lua`
 > CraftingOrderClassic_ProfWindow.lua — fenêtre métier custom 3 colonnes (migration depuis

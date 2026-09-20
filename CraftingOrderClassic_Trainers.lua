@@ -58,20 +58,25 @@ end
 --
 -- Construit UNE fois, à la première visite d'un formateur : quelques milliers d'appels C payés une
 -- seule fois dans la session, et jamais au login.
-local byName
+-- ⚠️ UN INDEX VIDE NE SE MET PAS EN CACHE. `GetSpellName` peut rendre nil sur un sort que le client
+-- n'a pas encore résolu : construire l'index à ce moment-là le figerait VIDE pour toute la session,
+-- et plus aucune visite de formateur ne reconnaîtrait quoi que ce soit. On garde le compte et on
+-- reconstruit tant qu'il est à zéro.
+local byName, byNameN = nil, 0
 local function nameIndex()
-    if byName then return byName end
-    byName = {}
+    if byName and byNameN > 0 then return byName, byNameN end
+    local idx, n = {}, 0
     local lib = CL()
     for _, prof in ipairs((lib and lib.Professions and lib:Professions()) or {}) do
         for _, sid in ipairs((lib.GetRecipes and lib:GetRecipes(prof)) or {}) do
             local nm = COC.Api and COC.Api.GetSpellName and COC.Api.GetSpellName(sid)
             -- Premier arrivé, premier servi : deux métiers peuvent produire le même nom (Fonte,
             -- Prospection), et le vote par métier ci-dessous rattrape le mauvais aiguillage.
-            if nm and nm ~= "" and not byName[nm] then byName[nm] = { prof, sid } end
+            if nm and nm ~= "" and not idx[nm] then idx[nm] = { prof, sid }; n = n + 1 end
         end
     end
-    return byName
+    byName, byNameN = idx, n
+    return byName, byNameN
 end
 
 -- ------------------------------------------------------------------
@@ -81,20 +86,25 @@ end
 -- Les services affichés, en paires { profKey, spellID }. Les en-têtes de catégorie sont des lignes
 -- comme les autres dans cette API (`serviceType == "header"`) : les compter ferait entrer des noms
 -- de rubrique dans le catalogue.
+-- Rend AUSSI le nombre de services vus et un exemple de nom non reconnu. Sans ça un échec est
+-- muet : « rien de moissonné » ne dit pas si le client n'a rien donné, ou si c'est nous qui n'avons
+-- rien su lire -- et ces deux pannes ne se réparent pas au même endroit.
 local function readServices()
-    local out = {}
+    local out, seen, sample = {}, 0, nil
     local num  = _G.GetNumTrainerServices and _G.GetNumTrainerServices() or 0
     local info = _G.GetTrainerServiceInfo
-    if not info or num == 0 then return out end
+    if not info or num == 0 then return out, 0, nil end
     local idx = nameIndex()
     for i = 1, num do
         local ok, name, sType = pcall(info, i)
         if ok and name and sType ~= "header" then
+            seen = seen + 1
             local hit = idx[name]
-            if hit then out[#out + 1] = hit end
+            if hit then out[#out + 1] = hit
+            elseif not sample then sample = name end
         end
     end
-    return out
+    return out, seen, sample
 end
 
 -- Le métier du formateur : celui que DÉSIGNENT le plus de ses services. On ne le demande pas au
@@ -135,9 +145,10 @@ end
 function T:Harvest()
     if not COC.db then return nil end
     if _G.IsTradeskillTrainer and not _G.IsTradeskillTrainer() then return nil end
-    local list = readServices()
+    local list, seen, sample = readServices()
+    self._lastSeen, self._lastSample, self._lastIndex = seen, sample, select(2, nameIndex())
     local prof, n = winningProf(list)
-    if not prof then return nil end
+    if not prof then return nil, 0, seen end
     local st = store(prof, true)
     for _, p in ipairs(list) do
         if p[1] == prof then st.teaches[p[2]] = true end
@@ -148,7 +159,7 @@ function T:Harvest()
         st.npc = { id = id, name = name, mapID = map, x = x, y = y, at = time() }
     end
     if COC.Trace then COC.Trace:Log("trainer", (name or "?") .. " / " .. prof .. " : " .. n .. " services") end
-    return prof, n
+    return prof, n, seen
 end
 
 -- ------------------------------------------------------------------
@@ -188,10 +199,23 @@ end
 -- Sortie de DIAGNOSTIC (`/co trainers`), non localisée comme les autres dumps. Elle répond à la
 -- seule question qu'on se pose en jeu après une visite — « est-ce que la moisson a pris ? » — sans
 -- avoir à la deviner depuis une infobulle dont on ne sait pas si elle a changé.
-function T:Dump()
+function T:Dump(rest)
+    -- `/co trainers scan` : refaire la moisson MAINTENANT, fenetre de formateur ouverte, et dire ce
+    -- que le client a donne. C'est le seul moyen de distinguer « le client ne repond pas » de
+    -- « on ne sait pas lire ce qu'il repond ».
+    if rest == "scan" then
+        local prof, n, seen = self:Harvest()
+        print(string.format("|cFF33DD88COC|r scan: tradeskill=%s services=%s vus=%s reconnus=%s index=%s",
+            tostring(_G.IsTradeskillTrainer and _G.IsTradeskillTrainer()),
+            tostring(_G.GetNumTrainerServices and _G.GetNumTrainerServices()),
+            tostring(seen or 0), tostring(n or 0), tostring(self._lastIndex or 0)))
+        if self._lastSample then print("|cFF33DD88COC|r   1er nom non reconnu: " .. self._lastSample) end
+        if prof then print("|cFF33DD88COC|r   metier retenu: " .. prof) end
+        return
+    end
     local db = COC.db and COC.db.trainers
     if not (db and next(db)) then
-        print("|cFF33DD88COC|r trainers: rien de moissonne (parle a un formateur de METIER)")
+        print("|cFF33DD88COC|r trainers: rien de moissonne -- fenetre de formateur ouverte, fais |cFFFFFFFF/co trainers scan|r")
         return
     end
     for prof, st in pairs(db) do
@@ -202,6 +226,11 @@ function T:Dump()
     end
 end
 
+-- DEUX évènements, et le second n'est pas du zèle : à `TRAINER_SHOW` la liste de services peut
+-- n'être pas encore bâtie (l'UI de Blizzard se redessine elle-même sur `TRAINER_UPDATE`, et ses
+-- filtres s'appliquent là). Moissonner deux fois ne coûte rien -- `teaches` accumule, et le second
+-- passage ne fait qu'ajouter ce que le premier n'a pas pu voir.
 local f = CreateFrame("Frame")
 f:RegisterEvent("TRAINER_SHOW")
+f:RegisterEvent("TRAINER_UPDATE")
 f:SetScript("OnEvent", function() T:Harvest() end)

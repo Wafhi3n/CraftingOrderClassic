@@ -327,7 +327,7 @@ local function diagCmd(cmd, rest)
     elseif cmd == "pricedump" then
         if COC.LazyGold and COC.LazyGold.PriceDump then COC.LazyGold:PriceDump(rest) end
     elseif cmd == "trainers" then
-        if COC.Trainers and COC.Trainers.Dump then COC.Trainers:Dump() end
+        if COC.Trainers and COC.Trainers.Dump then COC.Trainers:Dump(rest) end
     elseif cmd == "geo" then
         if COC.ProfWindow and COC.ProfWindow._GeoDump then COC.ProfWindow:_GeoDump() end
     else
