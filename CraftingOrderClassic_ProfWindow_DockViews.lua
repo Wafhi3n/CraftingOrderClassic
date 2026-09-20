@@ -206,7 +206,11 @@ local function missWhere(prof, sid)
 end
 
 local function missTooltip(row)
-    local S, prof, sid = COC.Sources, PW.profKey, row.sid
+    -- Le métier vient de la LIGNE, pas de `PW.profKey` : le joueur peut changer d'onglet de métier
+    -- entre le remplissage et le survol, et une ligne de Cuisine interrogée comme de l'Herboristerie
+    -- répond « source inconnue » avec aplomb (relevé en jeu 2026-09-20). Une ligne et sa clé de
+    -- métier partent ensemble ou pas du tout.
+    local S, prof, sid = COC.Sources, row.prof or PW.profKey, row.sid
     if not (S and sid) then return end
     local facts = factsOf(sid)
     row.rlink = facts and facts.link or nil   -- mémorisé ici pour le shift-clic (cf. missRow)
@@ -269,6 +273,7 @@ function PW:_FillDockMissing()
         local row = missRow(i)
         row.sid, row.rname, row.rlevel = e.spellID, e.name, e.level
         row.rlink = nil   -- ligne poolée : le lien de la recette précédente ne survit pas
+        row.prof = self.profKey   -- la ligne emporte le métier qui l'a produite (cf. missTooltip)
         row.ic:SetTexture(ICON[S:SourceKind(self.profKey, e.spellID)] or ICON.unknown)
         local reachable = (e.level or 0) <= rank
         row.ic:SetDesaturated(not reachable)
@@ -344,6 +349,16 @@ end
 function PW:_SyncDockViewBtns()
     local bar = self.viewTabs
     if not bar then return end
+    -- ⚠️ LE MÉTIER PEUT CHANGER SOUS LA VUE. L'onglet natif passe de la Cuisine à l'Herboristerie,
+    -- `_RefreshDock` met `profKey` à jour, et la vue affichée continue d'afficher la liste de
+    -- l'ANCIEN métier -- que les infobulles interrogent alors avec la clé du NOUVEAU. On repeint sur
+    -- le CHANGEMENT seulement : `RefreshOrders` tourne à chaque mouvement de commande, et refaire
+    -- 128 lignes à chaque fois pour rien serait payer cher une bascule qui arrive une fois par heure.
+    if self._dockViewProf ~= self.profKey then
+        self._dockViewProf = self.profKey
+        if self.dockView == "learn" then self:_FillDockMissing()
+        elseif self.dockView == "route" then self:_FillRoute() end
+    end
     local craft = COC.Craft
     local show = (self._compact or self.docked) and self.profKey and not self.rerollKey
         and craft and craft:GetOpenProfessionInfo() ~= nil

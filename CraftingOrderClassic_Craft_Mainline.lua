@@ -225,18 +225,38 @@ end
 -- recette — ce n'est donc pas un raté de lookup, le client n'a rien à dire là-dessus. Le « où
 -- aller » reste au catalogue et à l'observation ; ici on ne récolte que le « quoi » et le « est-ce
 -- que ça vaut le coup ».
+-- La recette appartient-elle au métier OUVERT ? `relativeDifficulty`, `canSkillUp` et
+-- `maxTrivialLevel` sont des valeurs RELATIVES : le client les calcule contre la ligne de métier
+-- OUVERTE, pas contre celle de la recette. Mesuré en jeu le 2026-09-20 -- la même recette de Cuisine
+-- passe de « +1 point » à « ne rapporte plus de point » selon qu'on a la Cuisine ou l'Herboristerie
+-- devant soi. L'IDENTITÉ (nom, lien, icône), elle, reste vraie quoi qu'il arrive : un objet est un
+-- objet. On rend donc l'une toujours, et l'autre seulement quand elle veut dire quelque chose.
+local function judgesThisLine(spellID)
+    local byRecipe = C_TradeSkillUI and C_TradeSkillUI.GetProfessionInfoByRecipeID
+    local open     = C_TradeSkillUI and C_TradeSkillUI.GetBaseProfessionInfo
+    if not (byRecipe and open) then return false end
+    local ok1, a = pcall(byRecipe, spellID)
+    local ok2, b = pcall(open)
+    if not (ok1 and ok2 and type(a) == "table" and type(b) == "table") then return false end
+    return a.professionID ~= nil and a.professionID == b.professionID
+end
+
 function Craft:MainlineRecipeFacts(spellID)
     if not (spellID and C_TradeSkillUI and C_TradeSkillUI.GetRecipeInfo) then return nil end
     local ok, i = pcall(C_TradeSkillUI.GetRecipeInfo, spellID)
     -- Un id hors de la ligne ouverte (recette fantôme du catalogue, métier d'à côté) rend nil ou
     -- une fiche qui parle d'AUTRE CHOSE : on exige que le client réponde bien sur CE sort-là.
     if not (ok and type(i) == "table" and i.recipeID == spellID and i.name) then return nil end
+    -- Hors du métier ouvert, le verdict de progression n'a AUCUN sens : `difficulty` reste nil, et
+    -- les appelants qui s'en servent de garde ne diront donc rien plutôt que de dire faux.
+    local judges = judgesThisLine(spellID)
     return {
         name  = i.name, link = i.hyperlink, icon = i.icon,
-        difficulty = DIFF[i.relativeDifficulty],
+        difficulty = judges and DIFF[i.relativeDifficulty] or nil,
         learned = i.learned == true,
         -- `canSkillUp` false ⇒ 0 point, sans se fier à `numSkillUps` qui garde sa dernière valeur.
-        skillUps = (i.canSkillUp and (i.numSkillUps or 1)) or 0,
-        trivialAt = i.maxTrivialLevel,
+        skillUps = (judges and i.canSkillUp and (i.numSkillUps or 1)) or 0,
+        trivialAt = judges and i.maxTrivialLevel or nil,
+        judgesThisLine = judges,
     }
 end
