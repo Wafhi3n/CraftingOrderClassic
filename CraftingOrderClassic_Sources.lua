@@ -174,7 +174,13 @@ local function myFaction()
     return (f == "Alliance" and "A") or (f == "Horde" and "H") or nil
 end
 
-function S:SourceOriginLine(profKey, spellID)
+-- ⚠️ REND UNE TABLE, PAS TROIS VALEURS, et c'est délibéré. Un multi-retour invite à écrire
+-- `local a, b, c = X and X:f()` — qui TRONQUE à une seule valeur en Lua. Ce piège maison est tombé
+-- TROIS fois dans la même journée, la dernière sur la ligne qui portait justement le repère : le
+-- clic ne pouvait pas marcher, et rien ne le signalait. Une table ne se tronque pas.
+--
+-- { text = <libellé>, id = <npcID/questID>, pin = { name, mapID, x, y } } ou nil.
+function S:SourceOrigin(profKey, spellID)
     -- Le formateur observé ne vit pas dans le catalogue mais dans ce qu'on a vu : il passe devant,
     -- et c'est le seul cas où la ligne porte des COORDONNÉES — on y était.
     if observed(profKey, spellID) then
@@ -183,7 +189,7 @@ function S:SourceOriginLine(profKey, spellID)
         -- multiple (piège maison, vécu deux fois) — on y perdrait le PNJ, donc le repère de carte.
         if T and T.Line then
             local ln, npc = T:Line(profKey)
-            if ln then return ln, nil, npc end
+            if ln then return { text = ln, pin = npc } end
         end
     end
     local lib = CL(); if not lib or not lib.RecipeOrigin then return nil end
@@ -221,7 +227,8 @@ function S:SourceOriginLine(profKey, spellID)
         txt = "|cFF888888" .. COC.L["Aucune source connue de ton camp."] .. "|r"
         pin = nil   -- aucun repère vers un PNJ à qui on ne peut pas parler
     end
-    return txt, id, pin
+    if not txt then return nil end
+    return { text = txt, id = id, pin = pin }
 end
 
 -- Le marchand, et lui seul : ce que demandent les vues qui parlent d'un ACHAT (liste de courses,
@@ -324,10 +331,10 @@ function S:SkillDetail(profKey, spellID)
     --
     -- `pin` n'est rempli que pour un formateur observé (on y était, donc on a les coordonnées) : il
     -- rallume le repère de carte de la fiche d'info, resté sans fournisseur depuis MTSL.
-    local originLine, _, pin = self:SourceOriginLine(profKey, spellID)
-    if originLine then
+    local origin = self:SourceOrigin(profKey, spellID)
+    if origin then
         lines[#lines + 1] = { label = (kind == "vendor") and L["Vendu par"] or "",
-                              value = originLine, npc = pin }
+                              value = origin.text, npc = origin.pin }
     end
 
     local price = self:SourcePrice(profKey, spellID)

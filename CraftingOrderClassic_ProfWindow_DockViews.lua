@@ -204,9 +204,13 @@ local function missWhere(prof, sid)
     -- L'ORIGINE, pas seulement le marchand : la créature qui lâche le plan et la quête qui le donne
     -- répondent aussi à « où je vais le chercher ? ». La nature est écrite juste au-dessus, donc la
     -- ligne peut rester un nom nu sans qu'on confonde « aller voir » et « aller tuer ».
-    local from, _, pin = S.SourceOriginLine and S:SourceOriginLine(prof, sid)
-    if from then GameTooltip:AddLine(from, 0.8, 0.8, 0.8) end
-    return pin
+    -- La garde SORT de l'assignation, et la fonction rend une TABLE : deux ceintures pour le même
+    -- piège. Écrit `local a, b = S.f and S:f()`, `b` était toujours nil et le clic ne marchait pas.
+    if not S.SourceOrigin then return nil end
+    local origin = S:SourceOrigin(prof, sid)
+    if not origin then return nil end
+    GameTooltip:AddLine(origin.text, 0.8, 0.8, 0.8)
+    return origin.pin
 end
 
 local function missTooltip(row)
