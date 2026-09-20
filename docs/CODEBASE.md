@@ -4,13 +4,13 @@
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
-126 modules + 4 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
+127 modules + 4 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
 
 ## Modules (ordre de chargement)
 
 | Fichier | Rôle | Lignes |
 |---|---|---|
-| `CraftingOrderClassic.lua` | Crafting Order - Classic — réseau GLOBAL et SOCIAL de commandes de craft. | 473 |
+| `CraftingOrderClassic.lua` | Crafting Order - Classic — réseau GLOBAL et SOCIAL de commandes de craft. | 475 |
 | `CraftingOrderClassic_Compat.lua` | couche d'adaptation d'API entre les SAVEURS de client. | 235 |
 | `CraftingOrderClassic_Trace.lua` | trace réseau PERSISTÉE, lisible hors-jeu. | 79 |
 | `CraftingOrderClassic_Migrations.lua` | versionnage du schéma SavedVariables. | 40 |
@@ -75,7 +75,8 @@
 | `CraftingOrderClassic_Stats_Filter.lua` | sélecteur « ne montrer que ce qui donne <stat> ». | 103 |
 | `CraftingOrderClassic_Gem.lua` | spécifique à la JOAILLERIE : sous-catégorise les GEMMES TAILLÉES par TAILLE (le mot qui porte la stat). | 226 |
 | `CraftingOrderClassic_Gem_Stats.lua` | correspondance TAILLE DE GEMME → STAT (données, éditées à la main). | 41 |
-| `CraftingOrderClassic_Sources.lua` | « où j'obtiens ce plan, et lesquels me manquent ». | 246 |
+| `CraftingOrderClassic_Sources.lua` | « où j'obtiens ce plan, et lesquels me manquent ». | 283 |
+| `CraftingOrderClassic_Trainers.lua` | « le formateur, vu de nos propres yeux ». | 205 |
 | `CraftingOrderClassic_ProfWindow.lua` | fenêtre métier custom 3 colonnes (migration depuis Guild Economy) : Recettes \| Détail+Craft \| Commandes du métier. | 483 |
 | `CraftingOrderClassic_ProfWindow_Layout.lua` | GÉOMÉTRIE de la vue métier (fenêtre 3 colonnes). | 165 |
 | `CraftingOrderClassic_ProfWindow_HelpPlate.lua` | AIDE CONTEXTUELLE de la Vue Métier (« bouton i »). | 103 |
@@ -92,7 +93,7 @@
 | `CraftingOrderClassic_ProfWindow_DockViews.lua` | la colonne Commandes CHANGE DE CONTENU au lieu d'ouvrir des fenêtres par-dessus. | 357 |
 | `CraftingOrderClassic_ProfWindow_Geo.lua` | `/co geo` : le RELEVÉ de la colonne, en pixels écran, écrit dans la SavedVariable pour être relu HORS DU JEU. | 261 |
 | `CraftingOrderClassic_ProfWindow_Detail.lua` | colonne CENTRE : détail de la recette sélectionnée (icône, réactifs have/need) + boutons Créer / Créer tout. | 418 |
-| `CraftingOrderClassic_ProfWindow_Info.lua` | PANNEAU D'INFO en SECTIONS pour la colonne centrale de la vue métier. | 205 |
+| `CraftingOrderClassic_ProfWindow_Info.lua` | PANNEAU D'INFO en SECTIONS pour la colonne centrale de la vue métier. | 208 |
 | `CraftingOrderClassic_LazyGold.lua` | pont LECTURE SEULE vers l'addon « Lazy Gold Classic » (LG). | 460 |
 | `CraftingOrderClassic_ProfWindow_Orders.lua` | colonne « Commandes » de la vue métier (cabine de l'artisan) : construction (onglets de relation, en-tête, scroll), vue LISTE (une ligne par commande : demandeur + prix + âge ; une ligne sourdine cliquée se réaffiche), collecte/tri et rafraîchissement. | 499 |
 | `CraftingOrderClassic_ProfWindow_Orders_Card.lua` | vue SÉLECTIONNÉE de la colonne « Commandes » : la carte complète d'une commande (composants fournis, repères Lazy Gold, ACCEPTER / REFUSER / CHUCHOTER ; croix en haut à droite = retour liste). | 308 |
@@ -1369,6 +1370,29 @@
 > changer de table. « unknown » reste la réponse honnête quand on ne sait pas.
 
 **API** : `S:IsAvailable()` · `S:RecipeItem(profKey, spellID)` · `S:SourceKind(profKey, spellID)` · `S:IsInferred(profKey, spellID)` · `S:MinSkill(profKey, spellID)` · `S:SourcePrice(profKey, spellID)` · `S:SourceText(profKey, spellID)` · `S:SourceOriginLine(profKey, spellID)` · `S:SourceNpcLine(profKey, spellID)` · `S:MissingRecipes(profKey)` · `S:SkillDetail(profKey, spellID)`
+
+### `CraftingOrderClassic_Trainers.lua`
+> CraftingOrderClassic_Trainers.lua — « le formateur, vu de nos propres yeux ».
+> 
+> POURQUOI CE MODULE EXISTE. « Formateur » est la seule nature de source que PERSONNE ne publie :
+> aucune page Wowhead ne l'affirme, et notre catalogue ne la DÉDUIT que d'une absence (aucun
+> objet-recette connu). Or une absence a deux causes indiscernables — la recette s'apprend bien au
+> formateur, ou la source n'est pas encore connue de la source de données. D'où le « ? » affiché
+> partout, et l'aveu d'impuissance qu'il représente : 788 des 2512 recettes du set Camelot.
+> 
+> Une source, pourtant, le sait sans hésiter : LE FORMATEUR LUI-MÊME. Quand le joueur lui parle, le
+> client énumère tout ce qu'il enseigne — rangs supérieurs compris, dans la langue du joueur. C'est
+> un FAIT, daté, observé sur le serveur où l'on joue, et il vaut mieux que n'importe quel annuaire.
+> 
+> CE QU'ON MOISSONNE, ET RIEN DE PLUS : le PNJ (nom, carte, position du joueur pendant qu'il lui
+> parle) et la liste de ce qu'il enseigne. Aucun achat, aucun clic, aucune modification de ses
+> filtres d'affichage — on lit ce qui est là, on note, on se tait.
+> 
+> ⚠️ ON NE VOIT QUE CE QUE LE JOUEUR A VISITÉ. Cette table est donc TOUJOURS partielle, et tout le
+> reste doit continuer à marcher sans elle : l'observation ENRICHIT la déduction, elle ne la
+> remplace pas. Tant qu'aucun formateur n'a été vu, rien ne change nulle part.
+
+**API** : `T:Harvest()` · `T:Teaches(profKey, spellID)` · `T:Npc(profKey)` · `T:Line(profKey)` · `T:Dump()`
 
 ### `CraftingOrderClassic_ProfWindow.lua`
 > CraftingOrderClassic_ProfWindow.lua — fenêtre métier custom 3 colonnes (migration depuis

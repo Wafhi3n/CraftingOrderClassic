@@ -326,6 +326,8 @@ local function diagCmd(cmd, rest)
         if COC.ProfWindow and COC.ProfWindow._LevelDump then COC.ProfWindow:_LevelDump() end
     elseif cmd == "pricedump" then
         if COC.LazyGold and COC.LazyGold.PriceDump then COC.LazyGold:PriceDump(rest) end
+    elseif cmd == "trainers" then
+        if COC.Trainers and COC.Trainers.Dump then COC.Trainers:Dump() end
     elseif cmd == "geo" then
         if COC.ProfWindow and COC.ProfWindow._GeoDump then COC.ProfWindow:_GeoDump() end
     else
@@ -388,7 +390,7 @@ function COC:Slash(msg)
             COC.db.verbose = (not COC.db.verbose) or nil
             p(COC.db.verbose and COC.L["messages verbeux : activés"] or COC.L["messages verbeux : désactivés"])
         end
-    elseif diagCmd(cmd, rest) then    -- socialdiag / trace / lvldump / pricedump / geo
+    elseif diagCmd(cmd, rest) then    -- socialdiag / trace / lvldump / pricedump / trainers / geo
     elseif cmd == "version" or cmd == "ver" then if D and D.VersionCmd then D:VersionCmd(rest) end
     elseif cmd == "help"   then COC:Help()
     else COC:Status() end

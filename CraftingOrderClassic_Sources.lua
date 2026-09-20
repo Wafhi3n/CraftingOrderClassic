@@ -67,9 +67,22 @@ function S:RecipeItem(profKey, spellID) return recipeItemFor(profKey, spellID) e
 -- recettes que MTSL donnait au formateur n'ont effectivement aucun objet) et ça l'est moins sur
 -- une saveur jeune, où l'objet peut exister sans qu'on le sache encore. D'où l'ordre des tests :
 -- un FAIT (la nature générée) l'emporte toujours sur la déduction.
+-- A-t-on VU un formateur enseigner cette recette ? (cf. COC.Trainers, moisson sur TRAINER_SHOW.)
+-- Soft-dep : sans le module, tout se comporte exactement comme avant.
+local function observed(profKey, spellID)
+    local T = COC.Trainers
+    return (T and T.Teaches and T:Teaches(profKey, spellID)) == true
+end
+
 function S:SourceKind(profKey, spellID)
     if not spellID then return "unknown" end
     local lib = CL(); if not lib then return "unknown" end
+    -- CE QU'ON A VU DE NOS PROPRES YEUX PASSE DEVANT, y compris devant une nature générée. Les deux
+    -- peuvent être vraies -- un plan se vend ET s'apprend -- et de ces deux vérités, celle sur
+    -- laquelle le joueur peut agir sans or et sans farm est la plus utile. Surtout, c'est la seule
+    -- qui ne puisse pas être périmée : elle vient du serveur où il joue, pas d'une page écrite
+    -- pour un autre. C'est la même règle que `SourceText` applique déjà au texte du client.
+    if observed(profKey, spellID) then return "trainer" end
     local kind = lib.RecipeSource and lib:RecipeSource(profKey, spellID)
     if kind then return kind end
     if recipeItemFor(profKey, spellID) then return "unknown" end   -- objet connu, source inconnue
@@ -82,6 +95,9 @@ end
 -- Cette nature a-t-elle été LUE, ou seulement déduite ? Les vues qui annoncent une source doivent
 -- pouvoir nuancer (« probablement au formateur ») plutôt que d'affirmer ce qu'on ignore.
 function S:IsInferred(profKey, spellID)
+    -- Vu de nos yeux = ce n'est plus une déduction, et le « ? » n'a plus lieu d'être. C'est toute la
+    -- récompense de la moisson : le doute disparaît là où l'on est allé voir.
+    if observed(profKey, spellID) then return false end
     local lib = CL()
     return not (lib and lib.RecipeSource and lib:RecipeSource(profKey, spellID))
 end
@@ -138,6 +154,17 @@ end
 -- dit pas s'il faut l'acheter ou le tuer. Tout appelant DOIT afficher la nature (`SourceKind`) à
 -- côté, sans quoi il enverra le joueur acheter son plan à un bandit.
 function S:SourceOriginLine(profKey, spellID)
+    -- Le formateur observé ne vit pas dans le catalogue mais dans ce qu'on a vu : il passe devant,
+    -- et c'est le seul cas où la ligne porte des COORDONNÉES — on y était.
+    if observed(profKey, spellID) then
+        local T = COC.Trainers
+        -- ⚠️ La garde SORT de l'assignation : `X and X:f()` ne rend qu'UNE valeur en assignation
+        -- multiple (piège maison, vécu deux fois) — on y perdrait le PNJ, donc le repère de carte.
+        if T and T.Line then
+            local ln, npc = T:Line(profKey)
+            if ln then return ln, nil, npc end
+        end
+    end
     local lib = CL(); if not lib or not lib.RecipeOrigin then return nil end
     local id, areaID, name = lib:RecipeOrigin(profKey, spellID)
     return line(name, areaID), id
@@ -236,8 +263,18 @@ function S:SkillDetail(profKey, spellID)
         lines[#lines + 1] = { label = L["Obtenu via"], value = "|cFF888888" .. L["Source inconnue"] .. "|r" }
     end
 
-    local npcLine = self:SourceNpcLine(profKey, spellID)
-    if npcLine then lines[#lines + 1] = { label = L["Vendu par"], value = npcLine } end
+    -- OÙ aller le chercher, quelle que soit la nature : le marchand, la créature qui lâche le plan,
+    -- la quête, ou le formateur qu'on a rencontré. Le libellé « Vendu par » ne survit que sur un
+    -- ACHAT — il serait un contresens sur une créature — et les autres natures s'écrivent en ligne
+    -- de CONTINUATION, dont la nature est déjà donnée juste au-dessus.
+    --
+    -- `pin` n'est rempli que pour un formateur observé (on y était, donc on a les coordonnées) : il
+    -- rallume le repère de carte de la fiche d'info, resté sans fournisseur depuis MTSL.
+    local originLine, _, pin = self:SourceOriginLine(profKey, spellID)
+    if originLine then
+        lines[#lines + 1] = { label = (kind == "vendor") and L["Vendu par"] or "",
+                              value = originLine, npc = pin }
+    end
 
     local price = self:SourcePrice(profKey, spellID)
     if price then lines[#lines + 1] = { label = L["Prix"], value = COC.Api.Coin(price) } end

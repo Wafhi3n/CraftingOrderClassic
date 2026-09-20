@@ -81,7 +81,10 @@ end
 -- TomTom si présent (flèche + minimap), sinon l'épingle native de la carte. Message si la zone
 -- MTSL n'a pas d'équivalent C_Map (rare : libellés divergents) — plutôt qu'un clic muet.
 function PW:_SetNpcPin(pin)
-    local mapID = zoneMapID(pin.zone)
+    -- Un repère posé depuis une OBSERVATION porte déjà son uiMapID : on y était, le client nous l'a
+    -- donné. Il n'y a alors rien à retrouver par nom -- et c'est tant mieux, le scan par nom de zone
+    -- échoue dès que deux libellés divergent d'une lettre.
+    local mapID = pin.mapID or zoneMapID(pin.zone)
     if not mapID then
         print("|cFF33DD88Crafting Order|r " .. string.format(L["zone introuvable sur la carte : %s"], pin.zone or "?"))
         return
