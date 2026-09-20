@@ -204,8 +204,9 @@ local function missWhere(prof, sid)
     -- L'ORIGINE, pas seulement le marchand : la créature qui lâche le plan et la quête qui le donne
     -- répondent aussi à « où je vais le chercher ? ». La nature est écrite juste au-dessus, donc la
     -- ligne peut rester un nom nu sans qu'on confonde « aller voir » et « aller tuer ».
-    local from = S.SourceOriginLine and S:SourceOriginLine(prof, sid)
+    local from, _, pin = S.SourceOriginLine and S:SourceOriginLine(prof, sid)
     if from then GameTooltip:AddLine(from, 0.8, 0.8, 0.8) end
+    return pin
 end
 
 local function missTooltip(row)
@@ -220,9 +221,12 @@ local function missTooltip(row)
     GameTooltip:SetOwner(row, "ANCHOR_LEFT")
     missHead(row, facts)
     missWorth(row, facts)
-    missWhere(prof, sid)
+    row.pin = missWhere(prof, sid)
     local price = S.SourcePrice and S:SourcePrice(prof, sid)
     if price then GameTooltip:AddLine(L["Prix"] .. " : " .. COC.Api.Coin(price), 1, 1, 1) end
+    -- L'invite n'apparait que s'il y a vraiment un repere a poser : annoncer un clic qui ne fait
+    -- rien est pire que de ne rien annoncer.
+    if row.pin then GameTooltip:AddLine(L["Clic : poser un repère sur ce PNJ."], 0.55, 0.75, 0.55) end
     GameTooltip:Show()
 end
 
@@ -247,9 +251,17 @@ local function missRow(i)
     -- Shift-clic = lier l'objet produit en chat, comme n'importe quelle ligne de recette du jeu.
     -- Le lien est posé au SURVOL (missTooltip) : on ne clique pas une ligne sans l'avoir survolée,
     -- et ça évite un `GetRecipeInfo` par ligne à chaque remplissage de la liste.
+    -- Deux gestes sur la meme ligne : Maj pour lier l'objet en chat, clic simple pour poser le
+    -- repere sur le PNJ. Les deux s'appuient sur ce que le SURVOL a resolu (cf. missTooltip) -- on
+    -- ne clique pas une ligne sans l'avoir survolee, et ca evite de calculer tout ca par ligne a
+    -- chaque remplissage de la liste.
     row:RegisterForClicks("LeftButtonUp")
     row:SetScript("OnClick", function(r)
-        if IsShiftKeyDown() and r.rlink and ChatEdit_InsertLink then ChatEdit_InsertLink(r.rlink) end
+        if IsShiftKeyDown() then
+            if r.rlink and ChatEdit_InsertLink then ChatEdit_InsertLink(r.rlink) end
+        elseif r.pin and PW._SetNpcPin then
+            PW:_SetNpcPin(r.pin)
+        end
     end)
     mp.rows[i] = row
     return row
@@ -275,7 +287,7 @@ function PW:_FillDockMissing()
     for i, e in ipairs(list) do
         local row = missRow(i)
         row.sid, row.rname, row.rlevel = e.spellID, e.name, e.level
-        row.rlink = nil   -- ligne poolée : le lien de la recette précédente ne survit pas
+        row.rlink, row.pin = nil, nil   -- ligne poolée : rien de la précédente ne survit
         row.prof = self.profKey   -- la ligne emporte le métier qui l'a produite (cf. missTooltip)
         row.ic:SetTexture(ICON[S:SourceKind(self.profKey, e.spellID)] or ICON.unknown)
         local reachable = (e.level or 0) <= rank

@@ -205,8 +205,15 @@ function S:SourceOriginLine(profKey, spellID)
     -- une imprécision, c'est un aller simple en territoire ennemi. On ne le cache pas et on ne
     -- l'efface pas non plus -- l'information reste utile, elle doit juste être étiquetée.
     if txt and faction and faction ~= myFaction() then
+        -- ⚠️ LE CAMP EN PREMIER, ET TOUT EN GRIS. La marque etait en fin de ligne, apres le nom et la
+        -- zone : ca se lisait comme une destination assortie d'une note, alors que c'est une IMPASSE
+        -- -- le joueur ne peut pas parler a ce PNJ. Releve en jeu le 2026-09-20 (« j'ai ca dans ma
+        -- liste alors que je suis humain »). On ne l'EFFACE pas pour autant : c'est tout ce qu'on
+        -- sait, ca vaut pour un reroll du camp d'en face, et le masquer ramenerait le « Vendeur »
+        -- suivi de rien qu'on vient justement de faire disparaitre.
         local label = (faction == "A") and _G.FACTION_ALLIANCE or _G.FACTION_HORDE
-        txt = txt .. " |cFFFF6666(" .. (label or faction) .. ")|r"
+        txt = "|cFF888888" .. (label or faction) .. " : " .. txt .. "|r"
+        pin = nil   -- aucun repere vers un PNJ a qui on ne peut pas parler
     end
     return txt, id, pin
 end
