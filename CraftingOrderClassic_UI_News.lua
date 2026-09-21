@@ -25,8 +25,28 @@ local BODY_W = 780
 -- Bloc de tête NOUVEAU, créé pour v1.32.2 : versionsCurrent était à 53 lignes et l'entrée l'aurait
 -- poussé au-delà du plafond de 60. Même manœuvre que pour lui : un bloc de plus DEVANT, concaténé en
 -- premier par versions(). À la prochaine release, ajouter ici.
+-- ⚠️ L'ORDRE D'AFFICHAGE est celui des blocs puis des entrées : la version la plus récente va EN TÊTE
+-- de CE bloc. La v1.34.0 avait été rangée en tête de versionsCurrentA et s'affichait donc SOUS la
+-- v1.33.0 (corrigé avec la v1.34.1). Le lint de bump_version.ps1 ne voit pas l'ordre, seulement la présence.
 local function versionsNewest()
     return {
+        {
+            v = "v1.34.1", title = L["Plus d'erreur en entrant en ville"],
+            lines = {
+                L["Avec la détection des artisans sans l'addon activée (/co crafters on), chaque entrée en ville déclenchait une erreur « action interdite » au nom de l'addon. Sur Forever, le jeu n'autorise plus les addons à écouter le journal de combat, et l'addon s'y abonnait quand même. C'est fini : la détection passe désormais par les messages de fabrication du chat (« Untel crée … »), qui restent ouverts aux addons."],
+                L["Le panneau d'enchantement qui s'ouvre à côté de la fenêtre d'échange disait toujours « Ouvre ta fenêtre d'Enchantement », même ouverte : il cherchait une fenêtre qui n'existe pas sur Forever. Il liste maintenant tes enchantements pour la pièce posée, classés comme avant, et il remarque quand tu ouvres l'Enchantement en plein échange. Cliquer une ligne ne lance pas encore l'enchantement."],
+                L["Sous le capot : l'addon ne transporte plus rien du code de Classic Era (cette version reste figée en 1.30.0), et il lit ton journal de quêtes directement dans le jeu, sans passer par les copies des anciennes fonctions que Questie installe quand il est présent."],
+            },
+        },
+        {
+            v = "v1.34.0", title = L["L'onglet Manquantes te dit enfin où aller"],
+            lines = {
+                L["Survoler une recette que tu n'as pas te donnait son nom et son rang, c'est-à-dire ce que la ligne affichait déjà. Tu as maintenant l'infobulle de l'objet lui-même, puis ce qu'il te manque en points de métier, si la recette rapporte encore quelque chose à ton rang, et d'où vient le plan."],
+                L["Ce dernier point a beaucoup changé. L'addon connaissait un seul nom par plan et rien de son camp : « Recipe: Gingerbread Cookie » envoyait tout le monde chez Wulmort Jinglepocket, à Forgefer, Horde comprise. 1565 recettes nomment quelqu'un contre 337 avant, le marchand affiché est de ta faction, 719 donnent le prix réel du marchand sans aucun addon de prix, et 846 PNJ ont des coordonnées : un clic pose un repère, ce qui ne marchait plus depuis MTSL."],
+                L["Les formateurs. Aucune page ne dit « ça s'apprend au formateur » : l'addon le déduisait de l'absence d'objet-recette et affichait un point d'interrogation, sur 788 recettes. Wowhead le publie en fait sur la page du sort et pas celle de l'objet, ce qui en a nommé 398. Et quand tu parles à un formateur de métier, l'addon note ce qu'il enseigne et où il se tient : le point d'interrogation disparaît et tu récupères ses coordonnées. Si ta fenêtre de formateur filtre ce qu'elle affiche, il te le dit au lieu de n'en moissonner qu'un tiers en silence."],
+                L["Corrigé : un plantage en donjon (le client rend des valeurs « secrètes » pour certaines données d'unité, et l'une d'elles finissait en clé de table trois appels plus loin, dans une fonction d'annuaire qui n'avait aucune raison de se méfier d'un nom), et le changement d'onglet de métier qui laissait la liste d'un métier avec les infobulles d'un autre."],
+            },
+        },
         {
             v = "v1.33.0", title = L["D'où vient une recette, sans MTSL"],
             lines = {
@@ -44,15 +64,6 @@ end
 -- version la plus proche du milieu ; tout ajout futur se fait dans A, qui reste la plus jeune.
 local function versionsCurrentA()
     return {
-        {
-            v = "v1.34.0", title = L["L'onglet Manquantes te dit enfin où aller"],
-            lines = {
-                L["Survoler une recette que tu n'as pas te donnait son nom et son rang, c'est-à-dire ce que la ligne affichait déjà. Tu as maintenant l'infobulle de l'objet lui-même, puis ce qu'il te manque en points de métier, si la recette rapporte encore quelque chose à ton rang, et d'où vient le plan."],
-                L["Ce dernier point a beaucoup changé. L'addon connaissait un seul nom par plan et rien de son camp : « Recipe: Gingerbread Cookie » envoyait tout le monde chez Wulmort Jinglepocket, à Forgefer, Horde comprise. 1565 recettes nomment quelqu'un contre 337 avant, le marchand affiché est de ta faction, 719 donnent le prix réel du marchand sans aucun addon de prix, et 846 PNJ ont des coordonnées : un clic pose un repère, ce qui ne marchait plus depuis MTSL."],
-                L["Les formateurs. Aucune page ne dit « ça s'apprend au formateur » : l'addon le déduisait de l'absence d'objet-recette et affichait un point d'interrogation, sur 788 recettes. Wowhead le publie en fait sur la page du sort et pas celle de l'objet, ce qui en a nommé 398. Et quand tu parles à un formateur de métier, l'addon note ce qu'il enseigne et où il se tient : le point d'interrogation disparaît et tu récupères ses coordonnées. Si ta fenêtre de formateur filtre ce qu'elle affiche, il te le dit au lieu de n'en moissonner qu'un tiers en silence."],
-                L["Corrigé : un plantage en donjon (le client rend des valeurs « secrètes » pour certaines données d'unité, et l'une d'elles finissait en clé de table trois appels plus loin, dans une fonction d'annuaire qui n'avait aucune raison de se méfier d'un nom), et le changement d'onglet de métier qui laissait la liste d'un métier avec les infobulles d'un autre."],
-            },
-        },
         {
             v = "v1.32.2", title = L["Tes barres d'action ne se bloquent plus en combat"],
             lines = {

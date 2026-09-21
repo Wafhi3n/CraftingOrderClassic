@@ -1,5 +1,23 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.34.1 - No more error when you walk into town
+
+If you turned on crafter spotting (`/co crafters on`), walking into a city threw an "action
+forbidden" error with the addon's name on it. On Forever, addons aren't allowed to listen to the
+combat log anymore, and the addon kept trying. It doesn't now. Spotting crafters who don't run the
+addon goes through the "X creates Y" messages in chat instead, which addons can still read.
+
+The enchanting panel next to the trade window always told you to open your Enchanting window, even
+when it was open, because it was looking for a window Forever doesn't have. It lists your enchants
+for the item on the table now, ranked the same way as before, and it notices when you open
+Enchanting in the middle of a trade. Clicking a line doesn't cast the enchant yet.
+
+The What's New tab listed 1.33.0 above 1.34.0. That's sorted too.
+
+Under the hood, the addon no longer carries any Classic Era code (that version stays frozen at
+1.30.0), and it reads your quest log straight from the game instead of going through the stand-ins
+for the old functions that Questie installs when it's there.
+
 ## v1.34.0 - The Missing tab tells you where to go
 
 Hovering a recipe you haven't learned used to give you its name and its rank, which is exactly what
