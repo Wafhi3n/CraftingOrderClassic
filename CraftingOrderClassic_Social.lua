@@ -135,7 +135,7 @@ end
 
 -- Lignes cooldown d'un artisan (ENTRÉE ROSTER, pas un nom) : { { text=, ready= } } triées prêtes
 -- d'abord puis par échéance, ou nil. Sources par priorité : r.cooldowns (réseau direct) >
--- r.relayed.cooldowns (relais partenaire) > r.cdSeen (estimation CLEU) — les deux dernières avec
+-- r.relayed.cooldowns (relais partenaire) > r.cdSeen (estimation par le message de craft) — les deux dernières avec
 -- suffixe « (estimé) ». `profFilter` limite à un métier (tooltips d'icône de l'annuaire).
 function Social:CooldownLines(r, cap, profFilter)
     if not (r and CraftLink and CraftLink.RecipeCdGroup) then return nil end

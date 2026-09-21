@@ -15,7 +15,6 @@ local de = {
     ["alerte de version oubliée — elle reviendra si le réseau la re-confirme."] = "Versionshinweis vergessen. Er kommt wieder, wenn das Netzwerk ihn erneut bestätigt.",
     ["(/co version reset si cette alerte est erronée)"] = "(/co version reset, falls dieser Hinweis falsch ist)",
     ["Crafting Order — version %s"] = "Crafting Order — Version %s",
-    ["Enchanter équipé"] = "Ausgerüstetes verzaubern", ["Enchante directement la pièce équipée — sans cibler."] = "Verzaubert direkt das ausgerüstete Teil — ohne Zielauswahl.",
     ["Enchanter cet objet"] = "Diesen Gegenstand verzaubern", ["Ouvre ta fenêtre d'Enchantement."] = "Öffne dein Verzauberkunst-Fenster.", ["Aucun enchantement connu pour cet emplacement."] = "Keine bekannte Verzauberung für diesen Platz.",
     ["Choisir par emplacement"] = "Nach Platz auswählen", ["Retour"] = "Zurück",   -- vue silhouette (onglet Commande)
     -- Onglets / fenêtre
@@ -232,7 +231,6 @@ local de = {
     ["Créer"] = "Herstellen", ["Créer tout"] = "Alle herstellen", ["Vue Blizzard"] = "Blizzard-Ansicht",
     ["Sélectionne une recette."] = "Wähle ein Rezept.", ["Produit "] = "Ergibt ",
     ["réactifs insuffisants."] = "nicht genug Materialien.",
-    ["Sélection changée en combat — réessaie après le combat."] = "Auswahl im Kampf geändert — versuche es nach dem Kampf erneut.",
     ["fenêtre métier custom |cFF33DD33activée|r — ouvre un métier. (Guild Economy laisse la main.)"] =
         "eigenes Berufsfenster |cFF33DD33aktiviert|r — öffne einen Beruf. (Guild Economy tritt zurück.)",
     ["fenêtre métier custom |cFFFFCC00désactivée|r (vue Blizzard)."] =

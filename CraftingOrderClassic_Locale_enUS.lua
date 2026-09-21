@@ -17,7 +17,6 @@ local en = {
     ["alerte de version oubliée — elle reviendra si le réseau la re-confirme."] = "version alert forgotten. It'll come back if the network confirms it again.",
     ["(/co version reset si cette alerte est erronée)"] = "(/co version reset if this alert is wrong)",
     ["Crafting Order — version %s"] = "Crafting Order — version %s",
-    ["Enchanter équipé"] = "Enchant equipped", ["Enchante directement la pièce équipée — sans cibler."] = "Enchants the equipped item directly — no targeting.",
     ["Enchanter cet objet"] = "Enchant this item", ["Ouvre ta fenêtre d'Enchantement."] = "Open your Enchanting window.", ["Aucun enchantement connu pour cet emplacement."] = "No known enchant for that slot.",
     ["Choisir par emplacement"] = "Pick by slot", ["Retour"] = "Back",   -- vue silhouette (onglet Commande)
     -- Onglets / fenêtre
@@ -253,7 +252,6 @@ local en = {
     ["Créer"] = "Create", ["Créer tout"] = "Create All", ["Vue Blizzard"] = "Blizzard view",
     ["Sélectionne une recette."] = "Select a recipe.", ["Produit "] = "Makes ",
     ["réactifs insuffisants."] = "not enough reagents.",
-    ["Sélection changée en combat — réessaie après le combat."] = "Selection changed in combat — try again after combat.",
     ["fenêtre métier custom |cFF33DD33activée|r — ouvre un métier. (Guild Economy laisse la main.)"] =
         "custom profession window |cFF33DD33enabled|r — open a profession. (Guild Economy stands down.)",
     ["fenêtre métier custom |cFFFFCC00désactivée|r (vue Blizzard)."] =

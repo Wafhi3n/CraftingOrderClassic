@@ -113,7 +113,6 @@ function PW:_RecipeTooltip(row)
     -- sans lui le survol semblait mort, vécu 2026-07-19).
     elseif e.isMissing then
         Skin.TipItem(GameTooltip, e.itemID, e.name); ok = true
-    elseif e.index and COC.Craft:IsCraftOpen() then ok = pcall(GameTooltip.SetCraftSpell, GameTooltip, e.index)
     elseif e.index then ok = pcall(GameTooltip.SetTradeSkillItem, GameTooltip, e.index) end
     if not ok or GameTooltip:NumLines() == 0 then GameTooltip:SetText(e.name or "?", 1, 1, 1) end
     -- Valeur EXACTE du profit au survol (l'indicateur de ligne n'est qu'un palier compact). Uniquement
@@ -465,7 +464,7 @@ function PW:_FillRecipeRight(row, e)
 end
 
 -- Sélection par ENTRÉE (plus par index) : robuste aux recettes manquantes sans index d'API. On garde
--- selectedIndex à jour pour le craft (DoTradeSkill/SelectCraft l'utilisent) — nil pour une manquante,
+-- selectedIndex à jour pour le craft (COC.Craft:Do l'utilise) — nil pour une manquante,
 -- ce qui est correct : on ne peut pas crafter une recette qu'on n'a pas apprise.
 function PW:SelectRecipe(e)
     if type(e) == "number" then   -- rétro-compat : ancien appel par index (aucun appelant restant, par sûreté)

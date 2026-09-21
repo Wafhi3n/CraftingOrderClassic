@@ -10,7 +10,7 @@ local Skin = COC.UI.Skin
 local L    = COC.L
 
 -- Bouton de retour sur la fenêtre NATIVE (vue Blizzard) : pose un petit bouton doré sur
--- TradeSkillFrame / CraftFrame pour rebasculer vers la vue custom sans passer par /co profwindow.
+-- TradeSkillFrame pour rebasculer vers la vue custom sans passer par /co profwindow.
 function PW:EnsureNativeToggle(frame, key)
     if not frame then return end
     self._nativeToggle = self._nativeToggle or {}

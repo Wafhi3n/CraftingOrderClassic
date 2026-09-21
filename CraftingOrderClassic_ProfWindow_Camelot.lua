@@ -22,8 +22,9 @@ local PW   = COC.ProfWindow
 local Api  = COC.Api
 if not (PW and Api) then return end
 
--- GARDE DE SAVEUR (cf. le backend métier) : ce fichier est listé dans les QUATRE `.toc` — parité
--- oblige — donc CHARGÉ sur l'Era aussi. Sans cette garde, il y désactiverait la vue custom.
+-- GARDE DE SAVEUR (cf. le backend métier) : elle date des QUATRE `.toc` — parité oblige, ce fichier
+-- était CHARGÉ sur l'Era aussi, où il désactivait la vue custom. Depuis le 2026-09-20 il n'y a plus
+-- qu'UN `.toc` (16001) : l'exposition a disparu, la garde reste (on ne greffe que sur du MAINLINE).
 if not Api.IS_MAINLINE then return end
 
 -- Trace de diagnostic (catégorie « graft ») : l'auto-trace est active d'office sur Forever, donc

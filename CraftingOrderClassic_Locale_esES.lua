@@ -16,7 +16,6 @@ local es = {
     ["alerte de version oubliée — elle reviendra si le réseau la re-confirme."] = "aviso de versión olvidado. Volverá si la red lo confirma de nuevo.",
     ["(/co version reset si cette alerte est erronée)"] = "(/co version reset si este aviso es erróneo)",
     ["Crafting Order — version %s"] = "Crafting Order — versión %s",
-    ["Enchanter équipé"] = "Encantar equipado", ["Enchante directement la pièce équipée — sans cibler."] = "Encanta directamente la pieza equipada — sin apuntar.",
     ["Enchanter cet objet"] = "Encantar este objeto", ["Ouvre ta fenêtre d'Enchantement."] = "Abre tu ventana de Encantamiento.", ["Aucun enchantement connu pour cet emplacement."] = "Ningún encantamiento conocido para esa ranura.",
     ["Choisir par emplacement"] = "Elegir por ranura", ["Retour"] = "Volver",   -- vue silhouette (onglet Commande)
     -- Onglets / fenêtre
@@ -233,7 +232,6 @@ local es = {
     ["Créer"] = "Crear", ["Créer tout"] = "Crear todo", ["Vue Blizzard"] = "Vista Blizzard",
     ["Sélectionne une recette."] = "Selecciona una receta.", ["Produit "] = "Produce ",
     ["réactifs insuffisants."] = "reactivos insuficientes.",
-    ["Sélection changée en combat — réessaie après le combat."] = "La selección cambió en combate: inténtalo de nuevo tras el combate.",
     ["fenêtre métier custom |cFF33DD33activée|r — ouvre un métier. (Guild Economy laisse la main.)"] =
         "ventana de profesión propia |cFF33DD33activada|r — abre una profesión. (Guild Economy cede el paso.)",
     ["fenêtre métier custom |cFFFFCC00désactivée|r (vue Blizzard)."] =

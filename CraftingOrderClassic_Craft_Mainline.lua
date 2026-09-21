@@ -1,13 +1,10 @@
--- CraftingOrderClassic_Craft_Mainline.lua — 3ᵉ backend de lecture de la fenêtre métier, pour les
--- clients MAINLINE/Retail (WoW: Forever / Camelot, interface 16001).
+-- CraftingOrderClassic_Craft_Mainline.lua — backend de lecture de la fenêtre métier, pour les
+-- clients MAINLINE/Retail (WoW: Forever / Camelot, interface 16001). Le SEUL depuis le 2026-09-21 :
+-- les deux backends Classic (TradeSkill, Craft) ont été retirés avec l'Era.
 --
--- Le socle `_Craft.lua` sait lire deux API indexées : TradeSkill (métiers normaux) et Craft
--- (Enchantement en Classic Era). Sur Forever AUCUNE des deux n'existe — tout passe par
--- `C_TradeSkillUI`, et surtout le modèle change : les recettes ne sont plus des INDEX dans une
--- liste, elles sont clefées par **`recipeSpellID`**.
---
--- Ce fichier réconcilie les deux mondes : il tient une liste ORDONNÉE de recipeID et expose la
--- même table d'API indexée que les deux autres backends. Le socle et tous ses appelants
+-- Tout passe par `C_TradeSkillUI`, et le modèle n'est plus celui de l'Era : les recettes ne sont
+-- plus des INDEX dans une liste, elles sont clefées par **`recipeSpellID`**. Ce fichier tient une
+-- liste ORDONNÉE de recipeID et expose une table d'API INDEXÉE : le socle et tous ses appelants
 -- (ProfWindow, ProfOrders, Enchant_Trade…) continuent de raisonner en index, sans le savoir.
 --
 -- Deux simplifications offertes par le client, à ne pas réimplémenter :
@@ -24,12 +21,13 @@ if not Craft then return end
 
 local Api = COC.Api
 
--- ⚠️ GARDE DE SAVEUR, non négociable. La parité des `.toc` impose que ce fichier soit listé dans
--- les QUATRE (base / _TBC / _Wrath / _Camelot) — il est donc CHARGÉ sur l'Era aussi. Or le socle
--- teste `Craft.MAINLINE_API` en PREMIER : s'il était posé sur un client Classic, tout le produit
--- live basculerait sur une API qui n'y existe pas. On ne s'enregistre que sur un vrai client
--- MAINLINE, et on exige en plus l'énumérateur moderne (ceinture et bretelles : `C_TradeSkillUI`
--- existe aussi en Era, ce n'est donc PAS un discriminant valable).
+-- ⚠️ GARDE DE SAVEUR, non négociable. Elle datait de l'époque où la parité des `.toc` imposait que
+-- ce fichier soit listé dans les QUATRE (base / _TBC / _Wrath / _Camelot), donc CHARGÉ sur l'Era
+-- aussi. Depuis le 2026-09-20 il n'y a plus qu'UN SEUL `.toc` (16001) et cette exposition a disparu
+-- — la garde RESTE quand même : le socle teste `Craft.MAINLINE_API` en PREMIER, et se poser sur un
+-- client Classic basculerait tout le produit sur une API qui n'y existe pas. On ne s'enregistre que
+-- sur un vrai client MAINLINE, et on exige en plus l'énumérateur moderne (ceinture et bretelles :
+-- `C_TradeSkillUI` existe aussi en Era, ce n'est donc PAS un discriminant valable).
 local IS_MAINLINE = Api and Api.IS_MAINLINE
 local HAS_MODERN  = C_TradeSkillUI
     and (C_TradeSkillUI.GetFilteredRecipeIDs or C_TradeSkillUI.GetAllRecipeIDs) ~= nil
@@ -37,11 +35,15 @@ if not (IS_MAINLINE and HAS_MODERN) then return end
 
 -- ---------------------------------------------------------------- cache de la liste
 
--- `GetFilteredRecipeIDs` rend les recettes APPRISES de la ligne ouverte, dans l'ordre d'affichage.
+-- `GetFilteredRecipeIDs` rend les recettes de la ligne ouverte — apprises ET non apprises (cf.
+-- `getLearned`) — dans l'ordre d'affichage.
 -- On la relit à chaque `getNum()` (début de passe de lecture) et on sert le reste depuis le cache :
 -- sans ça, `ReadRecipes` la rappellerait à chaque ligne, soit du O(n²) pour rien.
 local ids, infoCache, schemCache = {}, {}, {}
 
+-- La FILTRÉE d'abord, à dessein : cette liste alimente une VUE qui reproduit ce que la fenêtre
+-- native affiche (recherche et catégories du joueur comprises). La lib CraftLink, qui CAPTE le
+-- registre, prend l'inverse (`GetAllRecipeIDs` d'abord) : une capture ne doit pas dépendre d'un filtre.
 local function refresh()
     local get = C_TradeSkillUI
         and (C_TradeSkillUI.GetFilteredRecipeIDs or C_TradeSkillUI.GetAllRecipeIDs)

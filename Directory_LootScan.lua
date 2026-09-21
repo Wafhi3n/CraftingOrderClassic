@@ -1,10 +1,16 @@
 -- Directory_LootScan.lua — découverte PASSIVE des artisans NON-porteurs de l'addon qui craftent à
--- proximité. Deux chemins :
---   1. COMBAT_LOG_EVENT_UNFILTERED / SPELL_CAST_SUCCESS (PRINCIPAL) : le journal de combat voit les
---      casts des joueurs alentour avec le spellID de la recette → identification directe (recettes
---      CraftLink indexées par spellID), indépendante de la LANGUE et du cache objets.
---   2. CHAT_MSG_TRADESKILLS « X creates Y. » (repli) : nom d'objet BRUT (TRADESKILL_LOG_THIRDPERSON,
---      SANS deux-points ni lien) → itemID seulement si l'objet est déjà en cache client.
+-- proximité, par CHAT_MSG_TRADESKILLS « X creates Y. » : nom d'objet BRUT (TRADESKILL_LOG_THIRDPERSON,
+-- SANS deux-points ni lien) → itemID seulement si l'objet est déjà en cache client.
+--
+-- ⚠️ Il y avait un chemin PRINCIPAL par le journal de combat (COMBAT_LOG_EVENT_UNFILTERED /
+-- SPELL_CAST_SUCCESS, spellID direct, indépendant de la langue). Il a été RETIRÉ le 2026-09-21 :
+-- sur Forever cet événement porte `HasRestrictions = true` (doc d'API du client) et le simple
+-- `RegisterEvent` déclenche ADDON_ACTION_FORBIDDEN imputé à COC — mesuré par COCProbe. `pcall` ne le
+-- voit pas : un blocage n'est pas une erreur Lua. Avec `/co crafters on`, CHAQUE entrée en ville
+-- levait l'interdiction, et la voie était morte de toute façon.
+-- Y revenir un jour : `C_CombatLog.IsCombatLogRestricted()` rendait `true` au moment même où
+-- l'abonnement était interdit (mesuré par COCProbe le 2026-09-21, en ville). C'est le candidat pour
+-- garder un futur abonnement — à revalider s'il passe un jour à `false`. Ne jamais s'abonner pour « voir ».
 -- Plancher de skill = RecipeLearnedAt (il sait le faire → skill ≥ niveau d'apprentissage de la recette).
 -- OPT-IN : désactivé par défaut, activable par case à cocher (onglet Artisans) ou « /co crafters on » ;
 -- n'écoute le journal de combat qu'EN VILLE (IsResting) — voir bloc « Activation » en bas de fichier.
@@ -19,22 +25,20 @@ local Dir = COC.Directory
 
 local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true) end
 
--- Maps inverses depuis les catalogues CraftLink : bySpell[spellID]=prof (chemin CLEU) ;
--- byItem[itemID]={prof,spellID} (chemin chat). Construites une fois.
-local byItem, bySpell
+-- Map inverse depuis les catalogues CraftLink : byItem[itemID]={prof,spellID}. Construite une fois.
+local byItem
 local function ensureReverse()
-    if byItem then return byItem, bySpell end
+    if byItem then return byItem end
     local c = CL(); if not c then return nil end          -- lib pas prête → réessai au prochain event
-    byItem, bySpell = {}, {}
+    byItem = {}
     for _, prof in ipairs(c:Professions()) do
         for _, e in ipairs(c:ProfessionCatalogue(prof)) do
-            if e.spellID then
-                if not bySpell[e.spellID] then bySpell[e.spellID] = prof end
-                if e.itemID and not byItem[e.itemID] then byItem[e.itemID] = { prof = prof, spellID = e.spellID } end
+            if e.spellID and e.itemID and not byItem[e.itemID] then
+                byItem[e.itemID] = { prof = prof, spellID = e.spellID }
             end
         end
     end
-    return byItem, bySpell
+    return byItem
 end
 
 -- Recette à COOLDOWN vue partir → estimation « indispo jusqu'à » (readyAt = cast + durée Wowhead),
@@ -121,26 +125,10 @@ local function onChat(msg)
     end
 end
 
--- Chemin principal : SPELL_CAST_SUCCESS d'un JOUEUR alentour dont le spellID est une recette connue.
-local function onCLEU()
-    local _, sub, _, srcGUID, srcName, _, _, _, _, _, _, spellID = CombatLogGetCurrentEventInfo()
-    if sub ~= "SPELL_CAST_SUCCESS" or not (srcGUID and srcGUID:find("^Player")) then return end
-    -- ⚠️ Le journal de combat est un des contextes ou le client rend des valeurs SECRETES. `srcName`
-    -- descend jusqu'a `_NoteSeen`, qui en fait une CLE de roster : exactement la forme du plantage
-    -- corrige ailleurs dans cette version. On teste le secret AVANT toute comparaison -- comparer
-    -- une secrete leve la meme erreur que l'indexer. `UnitNameSafe` ne s'applique pas ici : `srcName`
-    -- est deja un nom, pas un token d'unite.
-    if COC.Api and COC.Api.IsSecret and COC.Api.IsSecret(srcName) then return end
-    local _, bs = ensureReverse(); local prof = bs and spellID and bs[spellID]
-    if prof then Dir:_NoteSeen(srcName, prof, spellID) end
-end
-
 -- ------------------------------------------------------------------
--- Activation : CONFIGURABLE (défaut OFF) + limitée à la VILLE. Le journal de combat fire en rafale
--- pour tous les joueurs alentour → on ne l'écoute QUE si (a) l'utilisateur l'a activée (case à cocher
--- de l'onglet Artisans / « /co crafters on ») ET (b) on est en zone de repos (IsResting = auberge ou
--- ville, là où l'on croise les crafteurs) — jamais en plein combat ni en pleine nature, pour ne pas
--- cramer de CPU inutilement. CHAT_MSG_TRADESKILLS (repli) suit la même règle.
+-- Activation : CONFIGURABLE (défaut OFF) + limitée à la VILLE : on n'écoute QUE si (a) l'utilisateur
+-- l'a activée (case à cocher de l'onglet Artisans / « /co crafters on ») ET (b) on est en zone de
+-- repos (IsResting = auberge ou ville, là où l'on croise les crafteurs).
 -- ------------------------------------------------------------------
 local scanFrame = CreateFrame("Frame")
 local registered = false
@@ -153,20 +141,14 @@ local function applyReg()
     local want = shouldScan()
     if want == registered then return end
     registered = want
-    if want then
-        scanFrame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-        scanFrame:RegisterEvent("CHAT_MSG_TRADESKILLS")
-    else
-        scanFrame:UnregisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-        scanFrame:UnregisterEvent("CHAT_MSG_TRADESKILLS")
-    end
+    if want then scanFrame:RegisterEvent("CHAT_MSG_TRADESKILLS")
+    else scanFrame:UnregisterEvent("CHAT_MSG_TRADESKILLS") end
 end
 
 scanFrame:RegisterEvent("PLAYER_ENTERING_WORLD")    -- changement de zone → réévalue « suis-je en ville ? »
 scanFrame:RegisterEvent("PLAYER_UPDATE_RESTING")
 scanFrame:SetScript("OnEvent", function(_, event, msg)
-    if event == "COMBAT_LOG_EVENT_UNFILTERED" then onCLEU()
-    elseif event == "CHAT_MSG_TRADESKILLS" then onChat(msg)
+    if event == "CHAT_MSG_TRADESKILLS" then onChat(msg)
     else applyReg() end                             -- PLAYER_ENTERING_WORLD / PLAYER_UPDATE_RESTING
 end)
 

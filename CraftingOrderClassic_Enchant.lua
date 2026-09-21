@@ -11,6 +11,7 @@ local COC     = CraftingOrderClassic
 local Enchant = {}
 COC.Enchant   = Enchant
 local L       = COC.L
+local Api     = COC.Api   -- `GetInventorySlotInfo` a migré dans C_PaperDollInfo sur Forever
 
 local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true) end
 
@@ -181,9 +182,10 @@ function Enchant:SlotFor(spellID)
     local w = slotWordOf(spellID)
     local slotName = w and SLOT_NAME[w]
     if not slotName then return nil end
-    local slot = GetInventorySlotInfo and GetInventorySlotInfo(slotName) or nil
+    local getSlot = Api.GetInventorySlotInfo
+    local slot = getSlot and getSlot(slotName) or nil
     if w == "Ring" and slot and GetInventoryItemLink and not GetInventoryItemLink("player", slot) then
-        local s1 = GetInventorySlotInfo("Finger1Slot")
+        local s1 = getSlot("Finger1Slot")
         if s1 and GetInventoryItemLink("player", s1) then return s1 end
     end
     return slot
@@ -270,13 +272,18 @@ local EQUIP_WORDS = {
 -- manque (le champ existe en Era/TBC/Wrath, mais la table n'a rien de garanti côté client).
 local STAFF_SUBCLASS = (Enum and Enum.ItemWeaponSubclass and Enum.ItemWeaponSubclass.Staff) or 10
 
--- Mes enchants APPLICABLES à un objet d'emplacement `equipLoc`, lus dans la fenêtre de craft OUVERTE
--- (l'API Craft ne répond que fenêtre ouverte → nil si elle est fermée, l'appelant le signale).
--- `subclassID` (optionnel) = sous-classe de l'objet ciblé, seul moyen de reconnaître un bâton.
--- Triés du plus haut niveau au plus bas (la meilleure version d'abord), puis par nom.
+-- Mes enchants APPLICABLES à un objet d'emplacement `equipLoc`, lus dans la fenêtre de métier
+-- OUVERTE (la lecture de recettes ne répond que fenêtre ouverte → nil si elle est fermée,
+-- l'appelant le signale). `subclassID` (optionnel) = sous-classe de l'objet ciblé, seul moyen de
+-- reconnaître un bâton. Triés du plus haut niveau au plus bas (la meilleure d'abord), puis par nom.
+--
+-- La garde testait `Craft:IsCraftOpen()` — la fenêtre de l'API Craft de l'Era, qui n'existe plus.
+-- Elle rendait donc TOUJOURS nil sur la cible. Son équivalent MAINLINE : l'Enchantement est-il le
+-- métier ouvert ?
 function Enchant:CraftsForEquipLoc(equipLoc, subclassID)
     local words = EQUIP_WORDS[equipLoc or ""]
-    if not (words and COC.Craft and COC.Craft:IsCraftOpen()) then return nil end
+    local craft = COC.Craft
+    if not (words and craft and craft:OpenProfessionKey() == "Enchanting") then return nil end
     local ok = {}
     for _, w in ipairs(words) do ok[w] = true end
     -- Un bâton accepte EN PLUS sa propre famille (les enchants « 2H Weapon »/« Weapon » lui vont déjà).

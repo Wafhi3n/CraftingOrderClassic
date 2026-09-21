@@ -110,7 +110,11 @@ local function freeze(list)
     return out
 end
 
-local API = GetItemStats or (C_Item and C_Item.GetItemStats)
+-- MODERNE D'ABORD, comme partout ailleurs (cf. `pick` dans le Compat) : `GetItemStats` n'est plus
+-- appelée nulle part dans le FrameXML de Forever, `C_Item.GetItemStats` l'est. Écrit dans l'autre
+-- sens, ce genre de repli passe sous le radar d'un relevé d'API — il ne se présente pas comme un
+-- APPEL, juste comme une valeur.
+local API = (C_Item and C_Item.GetItemStats) or GetItemStats
 
 local TIP_NAME = "COCStatScanTip"
 local scanTip

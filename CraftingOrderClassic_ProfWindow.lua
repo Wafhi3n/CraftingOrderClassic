@@ -44,7 +44,7 @@ local uiPanelDetached = false
 local function detachUIPanels()
     if uiPanelDetached then return end
     uiPanelDetached = true
-    if _G.UIPanelWindows then UIPanelWindows["TradeSkillFrame"] = nil; UIPanelWindows["CraftFrame"] = nil end
+    if _G.UIPanelWindows then UIPanelWindows["TradeSkillFrame"] = nil end
 end
 local function neutralize(frame, key)
     if not frame then return end
@@ -55,10 +55,12 @@ local function restore(frame, key)
     if not frame or not NATIVE[key] then return end
     frame:SetAlpha(NATIVE[key].alpha or 1); frame:EnableMouse(NATIVE[key].mouse ~= false); NATIVE[key] = nil
 end
+-- `CraftFrame` (l'API Craft de l'Era) et le musellement des boutons de réactifs natifs
+-- (CraftReagentN / TradeSkillReagentN, cliquables même à alpha 0) ont disparu avec l'Era.
 function PW:NeutralizeNative()
-    detachUIPanels(); neutralize(_G.TradeSkillFrame, "trade"); neutralize(_G.CraftFrame, "craft"); if COC.Craft then COC.Craft:MuteNativeReagents(true) end
+    detachUIPanels(); neutralize(_G.TradeSkillFrame, "trade")
 end
-function PW:RestoreNative() restore(_G.TradeSkillFrame, "trade"); restore(_G.CraftFrame, "craft"); if COC.Craft then COC.Craft:MuteNativeReagents(false) end end
+function PW:RestoreNative() restore(_G.TradeSkillFrame, "trade") end
 
 -- ------------------------------------------------------------------
 -- Construction du shell
@@ -111,7 +113,7 @@ function PW:_BuildHeader(f)
     -- Engrenage de config de l'OFFRE LFW (composants fournis, commission) — cf. _ProfWindow_LFW.lua.
     if self._BuildLFWGear then self:_BuildLFWGear(f, lfw) end
 
-    -- (Bouton fermer : le natif de MakeWindow porte la logique dock/CloseCraft via opts.onClose.)
+    -- (Bouton fermer : le natif de MakeWindow porte la logique dock/fermeture via opts.onClose.)
     -- Filet sous la barre de titre. Il fait partie du CHROME de la fenêtre autonome — mais c'est une
     -- texture nue, pas une pièce nommée : `stripChrome` ne pouvait pas le connaître, et il survivait
     -- à l'encastrement. Il traversait alors la ligne d'en-tête de la liste en dépassant de part et
@@ -204,8 +206,7 @@ function PW:Build()
         onMoved = function(p, rp, x, y) if COC.db then COC.db.profWinPos = { p, rp, x, y } end end,
         onClose = function()
             if PW.docked then PW:CloseDock(); return end
-            if COC.Craft and COC.Craft:IsCraftOpen() then if CloseCraft then CloseCraft() end
-            elseif CloseTradeSkill then CloseTradeSkill() end
+            COC.Api.CloseProfession()   -- la disjonction Craft/TradeSkill/C_TradeSkillUI vit dans le Compat
             PW:Hide()
         end,
     })
@@ -397,11 +398,7 @@ function PW:_OpenCompact(profKey)
     self:Build()
     local craft = COC.Craft
     if craft and craft:GetOpenProfessionInfo() then
-        if craft.IsCraftOpen and craft:IsCraftOpen() then
-            if CloseCraft then CloseCraft() end
-        else
-            if CloseTradeSkill then CloseTradeSkill() end
-        end
+        COC.Api.CloseProfession()   -- la disjonction Craft/TradeSkill/C_TradeSkillUI vit dans le Compat
         -- OnProfessionClose prend le relais (voit standaloneKey → reste en compact)
     else
         if not self.frame:IsShown() then self.frame:Show() end
@@ -436,9 +433,8 @@ function PW:SetEnabled(on)
         -- Vue Blizzard : si un métier est ouvert, épingle tout de suite le dock Commandes à sa droite.
         local craft = COC.Craft
         if craft and craft:GetOpenProfessionInfo() then
-            local isCraft = craft.IsCraftOpen and craft:IsCraftOpen()
-            local nf = (isCraft and _G.CraftFrame) or _G.TradeSkillFrame
-            self:EnsureNativeToggle(nf, isCraft and "craft" or "trade")
+            local nf = _G.TradeSkillFrame
+            self:EnsureNativeToggle(nf, "trade")
             self:OpenDock(nf)
         end
     end

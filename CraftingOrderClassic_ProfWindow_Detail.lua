@@ -1,6 +1,6 @@
 -- CraftingOrderClassic_ProfWindow_Detail.lua — colonne CENTRE : détail de la recette sélectionnée
--- (icône, réactifs have/need) + boutons Créer / Créer tout. Craft via COC.Craft:Do (DoTradeSkill /
--- DoCraft). Port de TradeScanner_ProfWindow_Detail.lua adapté à COC.
+-- (icône, réactifs have/need) + boutons Créer / Créer tout. Craft via COC.Craft:Do.
+-- Port de TradeScanner_ProfWindow_Detail.lua adapté à COC.
 
 local COC  = CraftingOrderClassic
 local UI   = COC.UI
@@ -9,15 +9,6 @@ local L    = COC.L
 local PW   = COC.ProfWindow
 
 local REAG_H, MAX_REAG = 18, 8
-
--- Redirection sécurisée vers un bouton natif DÉSACTIVÉ (réactifs manquants) = no-op SILENCIEUX (le
--- natif n'affiche pas d'erreur) → on prévient. Partagé par les PreClick de Créer et Enchanter équipé.
-local function warnIfNativeDisabled()
-    local cb = _G.CraftCreateButton
-    if cb and cb.IsEnabled and not cb:IsEnabled() then
-        print("|cFF33DD88Crafting Order|r " .. L["réactifs insuffisants."])
-    end
-end
 
 function PW:_BuildReagentRow(parent, i)
     local row = CreateFrame("Frame", nil, parent)
@@ -89,31 +80,17 @@ function PW:_BuildDetail(col)
 end
 
 -- Bande PIED du détail : Créer / Créer tout / Qté. Extrait de _BuildDetail (anti-monolithe).
+--
+-- Le bouton « Créer » héritait de `SecureActionButtonTemplate` et redirigeait le clic vers le
+-- bouton natif `CraftCreateButton` : le seul moyen de crafter un enchant sur l'Era, où `DoCraft`
+-- est PROTÉGÉE. Sur la cible, `C_TradeSkillUI.CraftRecipe` ne l'est pas — bouton ORDINAIRE, clic
+-- direct, et avec lui disparaissent la redirection, l'armement de la sélection native, le
+-- cadre de rejeu en sortie de combat et l'avertissement « bouton natif désactivé ».
 function PW:_BuildDetailFooter(fz)
-    -- DoCraft (Enchantement) est PROTÉGÉE : un addon ne peut pas l'appeler. Le bouton « Créer » est
-    -- donc SÉCURISÉ et redirige le clic vers le bouton natif de Blizzard quand un Craft (enchant) est
-    -- ouvert (cf. _WireCreateButton). Métier normal → DoTradeSkill n'est pas protégé : on crafte en
-    -- PostClick. On ne pose PAS de OnClick (le template sécurisé s'en sert pour la redirection).
-    local createBtn = Skin.MakeGoldButton(fz, 72, 22, L["Créer"], "SecureActionButtonTemplate")
+    local createBtn = Skin.MakeGoldButton(fz, 72, 22, L["Créer"])
     createBtn:SetPoint("RIGHT", -10, 0)
-    createBtn:RegisterForClicks("AnyUp")
-    -- ⚠️ AUCUN SelectCraft au PreClick (prouvé en jeu : le bouton natif « Enchant » marche au 1er clic ;
-    -- notre redirection demandait un spam). Cause : Blizzard DÉSACTIVE CraftCreateButton à CHAQUE
-    -- CRAFT_UPDATE (`Blizzard_CraftUI.lua`), et SelectCraft() FIRE CRAFT_UPDATE. Un SelectCraft au
-    -- PreClick re-désactivait donc le bouton natif juste AVANT que le clic sécurisé ne lui soit redirigé
-    -- → clic dans le vide. La sélection native est DÉJÀ alignée à l'affichage de la recette
-    -- (RefreshDetail → _SyncNativeCraftSelection), donc le PreClick est inutile : on le supprime, le
-    -- bouton natif reste ACTIVÉ, le 1er clic crafte. (PostClick reste pour le métier normal, DoTradeSkill.)
-    createBtn:SetScript("PostClick", function()
-        if not COC.Craft:IsCraftOpen() then PW:_CraftSelected(false) end   -- TradeSkill : DoTradeSkill
-    end)
-    -- Enchant (craft) : le clic est redirigé vers le bouton natif — s'il est désactivé, on prévient.
-    -- PreClick est non sécurisé (autorisé) et n'altère pas le clic sécurisé.
-    createBtn:SetScript("PreClick", function()
-        if COC.Craft:IsCraftOpen() then warnIfNativeDisabled() end
-    end)
+    createBtn:SetScript("OnClick", function() PW:_CraftSelected(false) end)
     self.detCreateBtn = createBtn
-    self:_BuildEquipButton(fz)
 
     local allBtn = Skin.MakeGoldButton(fz, 86, 22, L["Créer tout"])
     allBtn:SetPoint("RIGHT", createBtn, "LEFT", -6, 0)
@@ -128,56 +105,15 @@ function PW:_BuildDetailFooter(fz)
     qtyLbl:SetPoint("RIGHT", qtyBox, "LEFT", -4, 0); qtyLbl:SetText(L["Qté"]); self.detQtyLbl = qtyLbl
 end
 
--- Bouton « Enchanter équipé » (enchants d'équipement seulement) : bouton SÉCURISÉ qui, dans le MÊME clic,
--- lance le DoCraft ET applique l'enchant sur la pièce PORTÉE via l'attribut `target-slot` (cf.
--- SecureTemplates OnActionButtonClick : après DoCraft, si SpellCanTargetItem() → UseInventoryItem(slot)).
--- Câblé/affiché par _SyncEquipButton selon la recette. PreClick : arme l'auto-accept de la popup
--- « Remplacer » + prévient si réactifs manquants (redirection sur bouton désactivé = no-op silencieux).
-function PW:_BuildEquipButton(fz)
-    local b = Skin.MakeGoldButton(fz, 132, 22, L["Enchanter équipé"], "SecureActionButtonTemplate")
-    b:SetPoint("RIGHT", self.detCreateBtn, "LEFT", -6, 0)
-    b:RegisterForClicks("AnyUp")
-    -- Sélection changée EN COMBAT : SetAttribute est verrouillé → `target-slot` arme encore l'ANCIENNE
-    -- pièce alors que DoCraft partirait sur la NOUVELLE sélection native (CraftFrame_SetSelection n'est
-    -- pas protégée, elle, et RefreshDetail continue de l'appeler). On NEUTRALISE le clic via le bouton
-    -- natif (Enable/Disable ne sont PAS protégés) plutôt que de laisser partir un couple incohérent ;
-    -- PostClick ré-arme aussitôt la sélection courante (le bouton Créer reste fonctionnel).
-    b:SetScript("PreClick", function(btn)
-        local cur = GetCraftSelectionIndex and GetCraftSelectionIndex()
-        if InCombatLockdown() and btn._armedIndex and cur and cur ~= btn._armedIndex then
-            btn._blocked = true
-            local cb = _G.CraftCreateButton
-            if cb and cb.Disable then cb:Disable() end
-            print("|cFF33DD88Crafting Order|r " .. L["Sélection changée en combat — réessaie après le combat."])
-            return
-        end
-        warnIfNativeDisabled()
-    end)
-    b:SetScript("PostClick", function(btn)
-        if not btn._blocked then return end
-        btn._blocked = nil
-        local cur = GetCraftSelectionIndex and GetCraftSelectionIndex()
-        if cur then COC.Craft:ArmNativeSelection(cur) end
-    end)
-    b:SetScript("OnEnter", function(btn)
-        GameTooltip:SetOwner(btn, "ANCHOR_TOP")
-        GameTooltip:SetText(L["Enchante directement la pièce équipée — sans cibler."], 1, 1, 1, 1, true)
-        GameTooltip:Show()
-    end)
-    b:SetScript("OnLeave", GameTooltip_Hide)
-    b:Hide(); self.detEquipBtn = b
-end
-
 -- Tooltip de l'objet PRODUIT (en-tête du détail : icône + nom). Même logique que la ligne de
 -- recette : hyperlien si connu, MANQUANTE par itemID (repli nom via Skin.TipItem — objet pas
--- encore en cache = tooltip vide sinon), sinon SetCraftSpell/SetTradeSkillItem par index.
+-- encore en cache = tooltip vide sinon), sinon SetTradeSkillItem par index.
 function PW:_ProductTooltip(anchor)
     local e = self:GetSelectedRecipe(); if not e then return end
     GameTooltip:SetOwner(anchor, "ANCHOR_RIGHT"); GameTooltip:ClearLines()
     local ok = false
     if e.link then ok = pcall(GameTooltip.SetHyperlink, GameTooltip, e.link)
     elseif e.isMissing then Skin.TipItem(GameTooltip, e.itemID, e.name); ok = true
-    elseif e.index and COC.Craft:IsCraftOpen() then ok = pcall(GameTooltip.SetCraftSpell, GameTooltip, e.index)
     elseif e.index then ok = pcall(GameTooltip.SetTradeSkillItem, GameTooltip, e.index) end
     if not ok or GameTooltip:NumLines() == 0 then GameTooltip:SetText(e.name or "?", 1, 1, 1) end
     GameTooltip:Show()
@@ -195,12 +131,9 @@ function PW:_ClearDetail()
     -- Ré-affiche les boutons hors mode reroll (une visite en vue reroll a pu les masquer) — sinon ils
     -- restaient invisibles jusqu'à la prochaine sélection. En reroll : lecture seule, on les laisse cachés.
     if not self.rerollKey then
-        local isCraft = COC.Craft and COC.Craft:IsCraftOpen()
         self:_SetCreateShown(true)
-        self.detAllBtn:SetShown(not isCraft)
-        self.detQtyBox:SetShown(not isCraft); self.detQtyLbl:SetShown(not isCraft)
+        self.detAllBtn:Show(); self.detQtyBox:Show(); self.detQtyLbl:Show()
     end
-    self:_SyncEquipButton(nil)   -- aucune recette sélectionnée → pas d'enchant équipé
     self:_SetCraftButtons(false, false)
 end
 
@@ -213,79 +146,18 @@ function PW:_SetCraftButtons(canCreate, canAll)
     paint(self.detCreateBtn, canCreate); paint(self.detAllBtn, canAll)
 end
 
--- Le bouton « Créer » hérite de SecureActionButtonTemplate → il est PROTÉGÉ, donc Show/Hide DESSUS
--- lèvent ADDON_ACTION_BLOCKED en combat — et masquer la FENÊTRE qui l'héberge affiché le lève AUSSI
--- (vu en jeu ; PW:Hide escamote alors via SetAlpha). On mémorise l'état voulu et on le rejoue à la
--- sortie de combat. En attendant, le bouton reste visible mais inoffensif : _SetCraftButtons le grise et
--- _CraftSelected refuse (numAvailable nil hors fenêtre native = 0 réactif).
--- `wireCraft` nil = ne pas toucher à la redirection sécurisée.
--- Cadre de rejeu en sortie de combat, PARTAGÉ par les 2 boutons sécurisés (Créer + Enchanter équipé) :
--- Show/Hide/SetAttribute sur un bouton protégé sont VERROUILLÉS en combat → on mémorise l'état voulu
--- (_createWant / _equipSlot+_equipIndex) et on le rejoue à PLAYER_REGEN_ENABLED.
-function PW:_EnsureRegenFrame()
-    if self._regenFrame then return end
-    local rf = CreateFrame("Frame")
-    rf:RegisterEvent("PLAYER_REGEN_ENABLED")
-    rf:SetScript("OnEvent", function()
-        PW:_SetCreateShown(PW._createWant, PW._createWire)
-        PW:_SyncEquipButton(PW._equipSlot, PW._equipIndex)
-    end)
-    self._regenFrame = rf
-end
-
-function PW:_SetCreateShown(shown, wireCraft)
-    self._createWant, self._createWire = shown, wireCraft
+-- Simple affichage/masquage du bouton « Créer ». Il y avait ici tout un appareil de rejeu en
+-- sortie de combat (_EnsureRegenFrame, _WireCreateButton, bouton « Enchanter équipé ») : Show/Hide et
+-- SetAttribute sont VERROUILLÉS sur un bouton protégé en combat, il fallait mémoriser l'état
+-- voulu et le rejouer à PLAYER_REGEN_ENABLED. Le bouton n'est plus protégé, tout ça a disparu.
+--
+-- ⚠️ La FENÊTRE, elle, reste protégée : `SetParent` dans `ProfessionsFrame` rend le cadre
+-- `IsProtected()` DÉFINITIVEMENT, même re-parenté sur UIParent (mesuré, cf. taint.log). Le
+-- masquage par SetAlpha de PW:Hide reste donc indispensable — ne pas le « simplifier » aussi.
+-- Le 2ᵉ paramètre est ignoré : il disait s'il fallait câbler la redirection sécurisée.
+function PW:_SetCreateShown(shown)
     local b = self.detCreateBtn
-    if not b then return end
-    if InCombatLockdown() then self:_EnsureRegenFrame(); return end
-    b:SetShown(shown)
-    if wireCraft ~= nil then self:_WireCreateButton(wireCraft) end
-end
-
--- Affiche/masque + câble le bouton « Enchanter équipé ». `slot` = id d'emplacement d'inventaire ciblé
--- (nil = pas un enchant d'équipement → masqué) ; `index` = recette de craft armée, mémorisée sur le
--- bouton (le PreClick s'en sert pour détecter un `target-slot` périmé en combat). Câblage sécurisé :
--- type=click + clickbutton natif + target-slot → un seul clic fait DoCraft PUIS UseInventoryItem(slot)
--- (application auto sur la pièce portée). Différé en combat comme le bouton Créer (SetAttribute/Show
--- verrouillés) : l'état VOULU (_equipSlot/_equipIndex) est rejoué à PLAYER_REGEN_ENABLED.
-function PW:_SyncEquipButton(slot, index)
-    self._equipSlot, self._equipIndex = slot, index
-    local b = self.detEquipBtn
-    if not b then return end
-    if InCombatLockdown() then self:_EnsureRegenFrame(); return end
-    b:SetShown(slot and true or false)
-    if slot then
-        b:SetAttribute("type", "click")
-        b:SetAttribute("clickbutton", _G.CraftCreateButton)
-        b:SetAttribute("target-slot", slot)
-        b._armedIndex = index
-    else
-        b:SetAttribute("type", nil); b:SetAttribute("clickbutton", nil); b:SetAttribute("target-slot", nil)
-        b._armedIndex = nil
-    end
-end
-
--- Branche/débranche la redirection sécurisée du bouton « Créer » selon le métier ouvert. À n'appeler
--- QUE hors combat (SetAttribute est verrouillé en combat — de toute façon on ne crafte pas en combat).
-function PW:_WireCreateButton(isCraft)
-    local b = self.detCreateBtn
-    if not b or InCombatLockdown() then return end
-    if isCraft then
-        b:SetAttribute("type", "click")
-        b:SetAttribute("clickbutton", _G.CraftCreateButton)   -- bouton natif « Enchanter » (sécurisé)
-    else
-        b:SetAttribute("type", nil)
-        b:SetAttribute("clickbutton", nil)
-    end
-end
-
--- Aligne la sélection native (et l'ARMEMENT de CraftCreateButton) sur la recette affichée. Toute la
--- mécanique — et l'historique du bug intermittent « Créer ne crafte pas » (SelectCraft n'émet pas de
--- CRAFT_UPDATE) — vit dans COC.Craft:ArmNativeSelection, PARTAGÉ avec le panneau d'échange
--- (_Enchant_Trade). Nos `e` ne sont jamais des en-têtes (filtrés en amont, cf. GetSelectedRecipe).
-function PW:_SyncNativeCraftSelection(e)
-    if not (e and e.index) then return end
-    COC.Craft:ArmNativeSelection(e.index)
+    if b then b:SetShown(shown and true or false) end
 end
 
 -- Détail d'une recette MANQUANTE : pas de réactifs ni de bouton Créer (on ne l'a pas apprise). À la
@@ -303,8 +175,7 @@ function PW:_ShowMissingDetail(e)
     self:_RenderInfoPanel(e)
 
     -- Aucun craft possible : on masque Créer/Créer tout/Qté (differé en combat pour le bouton sécurisé).
-    self:_SetCreateShown(false, false)
-    self:_SyncEquipButton(nil)
+    self:_SetCreateShown(false)
     self.detAllBtn:Hide(); self.detQtyBox:Hide(); self.detQtyLbl:Hide()
 end
 
@@ -375,30 +246,21 @@ function PW:RefreshDetail()
     self:_FillReagentRows(e)
 
     -- Vue reroll = LECTURE SEULE : aucun bouton créer (on n'est pas sur ce perso). Le Hide() EST la
-    -- protection (un bouton caché n'est pas cliquable) et le désarmement de l'attribut sécurisé évite
-    -- qu'un futur réaffichage hérite d'un clickbutton pointant sur CraftCreateButton natif. Les deux
-    -- sont DIFFÉRÉS en combat (bouton protégé) → _SetCreateShown les rejoue à PLAYER_REGEN_ENABLED.
+    -- protection : un bouton caché n'est pas cliquable.
     if self.rerollKey then
-        self:_SetCreateShown(false, false)
-        self:_SyncEquipButton(nil)
+        self:_SetCreateShown(false)
         self.detAllBtn:Hide()
         self.detQtyBox:Hide(); self.detQtyLbl:Hide()
         return
     end
 
-    local avail   = e.numAvailable or 0
-    local isCraft = COC.Craft:IsCraftOpen()
-    self:_SetCraftButtons(avail > 0, (not isCraft) and avail > 1)
-    self.detAllBtn:SetShown(not isCraft)
-    -- Craft (enchant) = 1 par clic (l'API n'a pas de compteur, comme l'UI Blizzard) → pas de Qté.
-    self.detQtyBox:SetShown(not isCraft)
-    self.detQtyLbl:SetShown(not isCraft)
-    if isCraft then self:_SyncNativeCraftSelection(e) end   -- active CraftCreateButton pour CETTE recette
-    self:_SetCreateShown(true, isCraft)
-    -- Enchant d'équipement (slot résolu) → bouton « Enchanter équipé » (application directe sur la pièce
-    -- portée). Huiles/baguettes/métier normal → pas de slot → masqué.
-    local slot = isCraft and COC.Enchant and COC.Enchant:SlotFor(e.spellID) or nil
-    self:_SyncEquipButton(slot, e.index)
+    local avail = e.numAvailable or 0
+    -- Plus de dichotomie Craft/TradeSkill : un seul comportement. L'API Craft de l'Era craftait
+    -- 1 par clic (pas de compteur, comme l'UI Blizzard) et masquait donc « Créer tout » + la Qté ;
+    -- `C_TradeSkillUI.CraftRecipe` prend un nombre de lancers, ils restent visibles partout.
+    self:_SetCraftButtons(avail > 0, avail > 1)
+    self.detAllBtn:Show(); self.detQtyBox:Show(); self.detQtyLbl:Show()
+    self:_SetCreateShown(true)
 end
 
 function PW:_CraftSelected(all)
@@ -407,7 +269,6 @@ function PW:_CraftSelected(all)
     if avail <= 0 then print("|cFF33DD88Crafting Order|r " .. L["réactifs insuffisants."]); return end
     local qty
     if all then
-        if COC.Craft:IsCraftOpen() then return end
         qty = avail
     else
         qty = tonumber(self.detQtyBox:GetText()) or 1

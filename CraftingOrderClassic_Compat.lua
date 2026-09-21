@@ -35,6 +35,15 @@ A.InviteUnit         = pick(C_PartyInfo and C_PartyInfo.InviteUnit, _G.InviteUni
 A.GetSpellLink       = pick(C_Spell and C_Spell.GetSpellLink,      _G.GetSpellLink)
 A.GetSpellTexture    = pick(C_Spell and C_Spell.GetSpellTexture,   _G.GetSpellTexture)
 
+-- `GetInventorySlotInfo` (id d'emplacement, texture, checkRelic) : la globale est VIVANTE sur le
+-- client (mesuré par COCProbe le 2026-09-21, build 69913), mais le FrameXML de Forever ne l'appelle
+-- plus — Blizzard est passé à `C_PaperDollInfo.GetInventorySlotInfo`, de signature IDENTIQUE. On
+-- prend la moderne d'abord, comme partout ici : si la globale disparaît un jour, trois
+-- fonctionnalités ne tomberont pas en silence (silhouette d'enchant, résolution d'emplacement, pose
+-- verrouillée de « demande-lui une pièce »).
+A.GetInventorySlotInfo = pick(C_PaperDollInfo and C_PaperDollInfo.GetInventorySlotInfo,
+                              _G.GetInventorySlotInfo)
+
 -- ---------------------------------------------------------------- signatures divergentes
 
 -- `GetSpellInfo` rend un TUPLE en Classic et une TABLE en Retail. Partout dans COC on ne se sert
@@ -49,15 +58,17 @@ end
 -- `BNGetFriendInfo` (tuple de 8) devient `C_BattleNet.GetFriendAccountInfo` (table imbriquée).
 -- On ne rend que ce que COC utilise vraiment : nom du perso, client, en ligne.
 function A.GetBNetFriend(index)
+    local get = C_BattleNet and C_BattleNet.GetFriendAccountInfo
+    if get then
+        local acc = get(index)
+        local game = acc and acc.gameAccountInfo
+        if not game then return nil end
+        return game.characterName, game.clientProgram, game.isOnline
+    end
     if _G.BNGetFriendInfo then
         local _, _, _, _, characterName, _, client, isOnline = _G.BNGetFriendInfo(index)
         return characterName, client, isOnline
     end
-    local get = C_BattleNet and C_BattleNet.GetFriendAccountInfo
-    local acc = get and get(index)
-    local game = acc and acc.gameAccountInfo
-    if not game then return nil end
-    return game.characterName, game.clientProgram, game.isOnline
 end
 
 -- ---------------------------------------------------------------- argent
@@ -71,8 +82,8 @@ end
 -- ligne muette qui laisserait croire à un prix inconnu.
 function A.Coin(copper, fontHeight)
     local n = tonumber(copper) or 0
-    local f = _G.GetCoinTextureString
-        or (C_CurrencyInfo and C_CurrencyInfo.GetCoinTextureString)
+    local f = (C_CurrencyInfo and C_CurrencyInfo.GetCoinTextureString)
+        or _G.GetCoinTextureString
     if f then
         local ok, txt = pcall(f, n, fontHeight)
         if ok and txt then return txt end
@@ -82,18 +93,30 @@ end
 
 -- ---------------------------------------------------------------- journal de quêtes
 
+-- ⚠️ MODERNE D'ABORD, sans exception. Ces cinq fonctions testaient l'ancienne globale en premier —
+-- inoffensif tant qu'elle était absente de Forever (mesuré le 2026-09-18 : 44 API mortes sur 44).
+-- Le 2026-09-21, la sonde en a retrouvé SIX « vivantes » sur le même build : QUESTIE les réinjecte
+-- (`Questie/Modules/ForeverCompat.lua` repose ~35 globaux Classic dans `_G`). Legacy d'abord, COC
+-- exécutait donc le shim d'un AUTRE addon, et son comportement dépendait de sa présence — le genre
+-- de différence qui rend un bug irreproductible d'un client à l'autre. Sur Forever, la PRÉSENCE
+-- d'une globale Classic ne prouve plus qu'elle vient de Blizzard (`issecurevariable` le dit).
+
 function A.GetNumQuestLogEntries()
-    if _G.GetNumQuestLogEntries then return (_G.GetNumQuestLogEntries()) end
     local f = C_QuestLog and C_QuestLog.GetNumQuestLogEntries
-    return (f and f()) or 0
+    if f then return (f()) or 0 end
+    if _G.GetNumQuestLogEntries then return (_G.GetNumQuestLogEntries()) end
+    return 0
 end
 
 -- Rend le tuple Classic. Seule perte côté Retail : `rawTag`, qui n'a pas d'équivalent — les
 -- appelants le traitent déjà comme facultatif (l'étiquette devient simplement absente).
 function A.GetQuestLogTitle(index)
-    if _G.GetQuestLogTitle then return _G.GetQuestLogTitle(index) end
     local f = C_QuestLog and C_QuestLog.GetInfo
-    local q = f and f(index)
+    if not f then
+        if _G.GetQuestLogTitle then return _G.GetQuestLogTitle(index) end
+        return nil
+    end
+    local q = f(index)
     if not q then return nil end
     local complete = q.isComplete
     if complete == nil and q.questID and C_QuestLog.IsComplete then
@@ -105,25 +128,33 @@ end
 -- ATTENTION : la sélection du journal se fait par INDEX en Classic et par questID en Retail.
 -- Un index passé tel quel à l'API Retail viserait la mauvaise quête. D'où ce couple : le jeton
 -- rendu par GetQuestSelection est OPAQUE et ne se relit que via RestoreQuestSelection.
+-- Les deux branches doivent rester APPARIÉES : un questID rendu par la moderne ne doit jamais
+-- repartir dans le `SelectQuestLogEntry` d'un shim qui attend un INDEX — d'où le même test
+-- (`C_QuestLog.GetSelectedQuest`) des deux côtés.
 function A.GetQuestSelection()
-    if _G.GetQuestLogSelection then return _G.GetQuestLogSelection() end
     local f = C_QuestLog and C_QuestLog.GetSelectedQuest
-    return f and f() or nil
+    if f then return f() or nil end
+    if _G.GetQuestLogSelection then return _G.GetQuestLogSelection() end
+    return nil
 end
 
 function A.RestoreQuestSelection(token)
     if not token or token == 0 then return end
+    if C_QuestLog and C_QuestLog.GetSelectedQuest and C_QuestLog.SetSelectedQuest then
+        return C_QuestLog.SetSelectedQuest(token)
+    end
     if _G.SelectQuestLogEntry then return _G.SelectQuestLogEntry(token) end
-    local f = C_QuestLog and C_QuestLog.SetSelectedQuest
-    if f then return f(token) end
 end
 
 -- Sélectionne par index de journal, des deux côtés.
 function A.SelectQuestLogEntry(index)
-    if _G.SelectQuestLogEntry then return _G.SelectQuestLogEntry(index) end
-    local info = C_QuestLog and C_QuestLog.GetInfo and C_QuestLog.GetInfo(index)
     local f = C_QuestLog and C_QuestLog.SetSelectedQuest
-    if info and info.questID and f then return f(info.questID) end
+    if f and C_QuestLog.GetInfo then
+        local info = C_QuestLog.GetInfo(index)
+        if info and info.questID then return f(info.questID) end
+        return
+    end
+    if _G.SelectQuestLogEntry then return _G.SelectQuestLogEntry(index) end
 end
 
 -- ---------------------------------------------------------------- événements
@@ -252,15 +283,13 @@ end
 
 -- ---------------------------------------------------------------- métiers
 
--- Fermer la session de métier ouverte. Trois API selon la saveur : `CloseCraft` (Craft, Era),
--- `CloseTradeSkill` (TradeSkill, Era) et `C_TradeSkillUI.CloseTradeSkill` (MAINLINE, la seule qui
--- reste sur Forever). Les appelants Era écrivaient la disjonction à la main derrière une garde
--- `if CloseCraft then` — garde qui, sur Forever, sort EN SILENCE : la fenêtre n'était jamais
--- fermée et la vue qui attendait cette fermeture ne s'ouvrait pas.
+-- Fermer la session de métier ouverte. Il y avait trois API selon la saveur — `CloseCraft` (Craft,
+-- Era), `CloseTradeSkill` (TradeSkill, Era) et `C_TradeSkillUI.CloseTradeSkill` — et les appelants
+-- écrivaient la disjonction à la main derrière une garde `if CloseCraft then`, qui sur Forever sort
+-- EN SILENCE : la fenêtre n'était jamais fermée et la vue qui attendait cette fermeture ne s'ouvrait
+-- pas. Il n'en reste qu'une, mais le point d'entrée unique RESTE : c'est lui qui a rendu la
+-- suppression des deux autres mécanique plutôt que risquée.
 function A.CloseProfession()
-    local craft = COC.Craft
-    if craft and craft.IsCraftOpen and craft:IsCraftOpen() and _G.CloseCraft then return _G.CloseCraft() end
-    if _G.CloseTradeSkill then return _G.CloseTradeSkill() end
     local f = C_TradeSkillUI and C_TradeSkillUI.CloseTradeSkill
     if f then return (pcall(f)) end
 end

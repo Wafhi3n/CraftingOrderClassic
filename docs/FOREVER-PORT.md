@@ -145,6 +145,35 @@ Confirmations, sans écart :
 | `SelectCraft` | `C_TradeSkillUI.OpenRecipe` | `CraftingOrderClassic_Craft.lua` |
 | `SelectQuestLogEntry` | `C_QuestLog.SetSelectedQuest` | `CraftingOrderClassic_JournalQuests.lua` |
 
+> ⚠️ **Correction du 2026-09-21 — la colonne « remplaçant » de CE tableau est un relevé
+> de 2026-09-18, pas une vérité.** Verdict MESURÉ sur le client (COCProbe, build 69913) :
+> `C_TradeSkillUI.GetRecipeNumReagents`, `.GetRecipeReagentInfo`, `.GetRecipeReagentItemLink`,
+> `.GetRecipeNumItemsProduced` et `.GetSelectedRecipeID` **n'existent pas** ; `.GetRecipeItemLink`
+> et `.GetRecipeLink` **existent**. Le portage est passé par **`GetRecipeInfo`** (41 champs) et
+> **`GetRecipeSchematic`**, qui portent toute cette information — c'est ce que fait
+> `CraftingOrderClassic_Craft_Mainline.lua`, et c'est bon. Ne pas repartir du tableau.
+>
+> **La doc d'API générée ne prouve JAMAIS une absence.** Elle ne couvre que **89 des 146**
+> membres réels de `C_TradeSkillUI` — `GetFilteredRecipeIDs`, `GetAllRecipeIDs` et
+> `GetRecipeCooldown` n'y figurent pas, et toutes les trois sont vivantes. `GetAllRecipeIDs` a
+> même été retirée du code le 2026-09-21 sur la foi de la doc, puis rétablie le même jour
+> après mesure : c'est elle qu'il faut pour CAPTER (elle ignore la recherche et les catégories
+> du joueur, `GetFilteredRecipeIDs` non). Seule source de vérité sur l'existence d'une API :
+> la liste `globals` / `namespaces` que `/cocprobe` écrit dans `COCProbeDB`.
+>
+> **Et la présence d'une globale ne prouve plus qu'elle vient de Blizzard.** Questie
+> (`Modules/ForeverCompat.lua`) réinjecte ~35 globaux Classic sur Forever (`GetQuestLogTitle`,
+> `GetNumSkillLines`, `UnitAura`…) : la sonde en a compté 6 « ressuscités » parmi les 44 API
+> mortes du 2026-09-18, sur le même build. La sonde les range désormais à part
+> (`issecurevariable` nomme l'addon qui a posé la globale), et le Compat interroge TOUJOURS la
+> forme moderne en premier.
+>
+> **Événement restreint :** `COMBAT_LOG_EVENT_UNFILTERED` porte `HasRestrictions = true` ; s'y
+> abonner déclenche `ADDON_ACTION_FORBIDDEN` (invisible à `pcall`), et
+> `CombatLogGetCurrentEventInfo` est morte. La voie « journal de combat » de
+> `Directory_LootScan` levait donc l'interdiction à chaque entrée en ville avec `/co crafters on`
+> — retirée, le repli par `CHAT_MSG_TRADESKILLS` reste.
+
 ### Les trois chantiers réels
 
 1. **`CraftingOrderClassic_Craft.lua` (23)** — la couture Craft vs TradeSkill qu'on avait écrite

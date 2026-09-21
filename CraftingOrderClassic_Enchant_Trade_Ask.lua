@@ -37,6 +37,7 @@ local COC  = CraftingOrderClassic
 local Comp = COC.Companion
 local Skin = COC.UI.Skin
 local L    = COC.L
+local Api  = COC.Api   -- `GetInventorySlotInfo` a migré dans C_PaperDollInfo sur Forever
 
 local CraftLink = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
 
@@ -195,7 +196,7 @@ local function placeItem(data)
     if GetTradePlayerItemInfo and GetTradePlayerItemInfo(TRADE_SAFE_SLOT) then
         traceAsk("pose annulée — emplacement " .. TRADE_SAFE_SLOT .. " déjà pris"); return
     end
-    local inv = GetInventorySlotInfo and GetInventorySlotInfo(data.token)
+    local inv = Api.GetInventorySlotInfo and Api.GetInventorySlotInfo(data.token)
     if not (inv and GetInventoryItemLink and GetInventoryItemLink("player", inv)) then
         traceAsk("pose annulée — rien d'équipé en " .. tostring(data.token)); return
     end
@@ -229,7 +230,7 @@ local function askGuards(sender, message)
         return nil, "émetteur ≠ partenaire d'échange ouvert (reçu=" .. tostring(from) ..
                     ", partenaire=" .. tostring(partner) .. ")"
     end
-    local inv  = GetInventorySlotInfo and GetInventorySlotInfo(def.slot)
+    local inv  = Api.GetInventorySlotInfo and Api.GetInventorySlotInfo(def.slot)
     local link = inv and GetInventoryItemLink and GetInventoryItemLink("player", inv)
     if not link then return nil, "rien d'équipé en " .. tostring(def.slot) end
     if GetTradePlayerItemInfo and GetTradePlayerItemInfo(TRADE_SAFE_SLOT) then

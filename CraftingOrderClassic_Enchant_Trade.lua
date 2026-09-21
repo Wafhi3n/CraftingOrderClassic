@@ -5,13 +5,13 @@
 -- désignent d'abord, puis ce que mes sacs permettent, et seulement ensuite l'ordre catalogue (rang de
 -- métier décroissant). Le surplus se parcourt à la MOLETTE — le classement rapproche la bonne recette,
 -- il ne la garantit pas : rien ne doit rester hors d'atteinte.
--- Chaque ligne est un bouton SÉCURISÉ qui crafte l'enchant directement :
---   PreClick → CraftFrame_SetSelection(index) : sélectionne ET ARME le bouton natif, de façon SYNCHRONE
---   (⚠️ SelectCraft ne l'arme PAS : il n'émet aucun CRAFT_UPDATE — cf. _ProfWindow_Detail) ;
---   puis le clic sécurisé est redirigé vers CraftCreateButton → DoCraft de CET enchant.
--- L'enchant se pose alors sur le curseur : le joueur clique l'objet dans l'échange (l'appliquer nous-mêmes
--- n'est pas possible — l'API de ciblage sécurisée ne couvre que sacs/équipement, pas la fenêtre d'échange).
--- CONTRAINTE : l'API Craft ne répond que si la fenêtre d'Enchantement est OUVERTE → sinon on l'indique.
+-- Chaque ligne était un bouton SÉCURISÉ dont le clic était redirigé vers `CraftCreateButton` : le
+-- seul moyen de lancer un `DoCraft` PROTÉGÉ sur l'Era. Ce montage a disparu avec l'Era — les lignes
+-- sont des boutons ORDINAIRES qui sélectionnent et montrent l'infobulle.
+-- ⚠️ Le CRAFT lui-même n'est pas (re)branché ici : sur la cible il passerait par
+-- `C_TradeSkillUI.CraftEnchant(recipeID, 1, nil, itemLocation)`, qui n'est pas protégée. À porter
+-- si on veut le clic-pour-crafter ; en l'état le panneau CLASSE et RENSEIGNE, il ne crafte pas.
+-- CONTRAINTE : la lecture des recettes ne répond que fenêtre d'Enchantement OUVERTE → sinon on l'indique.
 -- On AJOUTE un panneau à côté du natif (jamais de Hide/neutralisation), à DROITE pour ne pas heurter le
 -- greffon Commandes (_Companion_Trade) qui vit SOUS la fenêtre d'échange.
 
@@ -91,19 +91,13 @@ local function rankCrafts(crafts)
 end
 
 local function makeRow(i)
-    local b = Skin.MakeGoldButton(panel.well, 10, 20, "", "SecureActionButtonTemplate")
+    local b = Skin.MakeGoldButton(panel.well, 10, 20, "")
     b:SetPoint("TOPLEFT", 5, -(4 + (i - 1) * ROW_H))
     b:SetPoint("TOPRIGHT", -5, -(4 + (i - 1) * ROW_H))
-    b:RegisterForClicks("AnyUp")
-    b:SetScript("PreClick", function(self)
-        -- Sélectionne + ARME le bouton natif, de façon synchrone — helper PARTAGÉ avec la vue métier
-        -- (toute la mécanique et son historique vivent dans COC.Craft:ArmNativeSelection).
-        if self.craftIndex then COC.Craft:ArmNativeSelection(self.craftIndex) end
-    end)
     b:SetScript("OnEnter", function(self)
         if not self.tipIndex then return end
         GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
-        if not pcall(GameTooltip.SetCraftSpell, GameTooltip, self.tipIndex) then GameTooltip:Hide(); return end
+        if not pcall(GameTooltip.SetTradeSkillItem, GameTooltip, self.tipIndex) then GameTooltip:Hide(); return end
         GameTooltip:Show()
     end)
     b:SetScript("OnLeave", GameTooltip_Hide)
@@ -111,21 +105,20 @@ local function makeRow(i)
     return b
 end
 
--- ⚠️ COMBAT — les lignes du puits héritent de SecureActionButtonTemplate : Show / Hide / SetAttribute
--- dessus lèvent ADDON_ACTION_BLOCKED en combat (constaté EN JEU, cf. l'en-tête de _ProfWindow_Detail
--- vers _SetCreateShown). On ne peint donc RIEN en combat, pas seulement les attributs : la fenêtre
--- d'échange survit au combat (TradeFrame n'a aucune garde de régénération), et nos déclencheurs y
--- tombent pour de vrai — CRAFT_UPDATE, TRADE_TARGET_ITEM_CHANGED, et surtout la MOLETTE, qui est
--- actionnable à tout moment. ET.Update est idempotent et ET:Start le rejoue à PLAYER_REGEN_ENABLED →
--- l'affichage se répare tout seul à la sortie de combat.
+-- COMBAT — les lignes du puits héritaient de SecureActionButtonTemplate : Show / Hide / SetAttribute
+-- dessus levaient ADDON_ACTION_BLOCKED en combat (constaté EN JEU). Elles sont ordinaires depuis la
+-- suppression du montage sécurisé, mais on GARDE l'abstention : la fenêtre d'échange survit au
+-- combat (TradeFrame n'a aucune garde de régénération) et nos déclencheurs y tombent pour de vrai —
+-- TRADE_TARGET_ITEM_CHANGED, et surtout la MOLETTE, actionnable à tout moment. ET.Update est
+-- idempotent et ET:Start le rejoue à PLAYER_REGEN_ENABLED → l'affichage se répare tout seul.
 --
 -- Remplit le puits à partir de `panel.offset` (fenêtre glissante — cf. la molette dans build()).
--- Grise la ligne dont les réactifs manquent DANS MES SACS (le bouton natif sera désactivé → le clic
--- sécurisé serait un no-op silencieux ; on le montre plutôt que de laisser croire à une panne).
+-- Grise la ligne dont les réactifs manquent DANS MES SACS : le joueur voit tout de suite ce qu'il ne
+-- peut pas faire. (Les lignes craftaient l'enchant sur l'Era via un clic sécurisé ; ce montage est
+-- parti avec la purge du 2026-09-21, le craft depuis ce panneau est un chantier à spécifier.)
 -- ⚠️ Le gris se lit sur `numAvailable`, JAMAIS sur `_rank` : un enchant de rang 3 (mats posés dans
--- l'échange, pas encore reçus) n'est PAS craftable tant que l'échange n'est pas validé — le teindre en
--- disponible rendrait le no-op silencieux au lieu de l'expliquer. Il est en tête de liste, en gris :
--- « c'est bien celui-là, valide l'échange et il s'allume ».
+-- l'échange, pas encore reçus) n'est PAS craftable tant que l'échange n'est pas validé. Il est en tête
+-- de liste, en gris : « c'est bien celui-là, valide l'échange et il s'allume ».
 local function fillRows(crafts)
     if InCombatLockdown and InCombatLockdown() then return end
     panel.rows = panel.rows or {}
@@ -142,8 +135,6 @@ local function fillRows(crafts)
         local avail = (e.numAvailable or 0) > 0
         r:SetText(short)
         r.text:SetTextColor(avail and 0.941 or 0.45, avail and 0.776 or 0.45, avail and 0.455 or 0.45)
-        r:SetAttribute("type", "click")
-        r:SetAttribute("clickbutton", _G.CraftCreateButton)
         r:Show()
     end
     for i = n + 1, #panel.rows do panel.rows[i]:Hide() end
@@ -198,7 +189,9 @@ function ET.Update()
     local crafts = COC.Enchant and COC.Enchant:CraftsForEquipLoc(equipLoc, subclass)
     panel.partnerFS:SetText("|cFFFFFFFF" .. Comp.shortName(COC.Api.UnitNameSafe("NPC") or "?") .. "|r")
     panel.itemFS:SetText(link)
-    if not (COC.Craft and COC.Craft:IsCraftOpen()) then      -- session de craft fermée : on ne peut rien lire
+    -- Métier fermé : on ne peut rien lire. Le test portait sur `Craft:IsCraftOpen()` (fenêtre de
+    -- l'API Craft de l'Era, disparue) ⇒ il tombait TOUJOURS ici sur la cible.
+    if not (COC.Craft and COC.Craft:OpenProfessionKey() == "Enchanting") then
         panel.crafts = nil
         hideRows(); panel.hintFS:SetText("|cFFFF8855" .. L["Ouvre ta fenêtre d'Enchantement."] .. "|r")
         panel.hintFS:Show(); showPanel(); return
@@ -254,7 +247,7 @@ end
 
 -- COALESCE les rafales d'événements (CRAFT_UPDATE spamme pendant les crafts en série — cf. le même
 -- pattern pending-flag dans PW:Refresh) : un seul ET.Update() par fenêtre de 0,1 s. Sans ça, chaque
--- pulse refaisait un ReadRecipes() complet (boucle GetNumCrafts + tables neuves + tri) + repaint.
+-- pulse refaisait un ReadRecipes() complet (énumération + tables neuves + tri) + repaint.
 local pendingUpdate
 local function updateSoon()
     if pendingUpdate then return end
@@ -265,10 +258,12 @@ end
 function ET:Start()
     build()
     local f = CreateFrame("Frame")
-    -- CRAFT_* n'existe pas sur un client MAINLINE (Forever) et RegisterEvent lève sur un
-    -- événement inconnu → enregistrement gardé (cf. COC.Api.RegisterEventsSafe).
+    -- Ouvrir / fermer / rafraîchir la fenêtre de métier doit relancer le panneau : il ne lit les
+    -- recettes que fenêtre d'Enchantement OUVERTE. On écoutait CRAFT_SHOW/CLOSE/UPDATE — l'API Craft
+    -- de l'Era, REFUSÉS par le client Forever (mesuré, COCProbe) : ouvrir l'Enchantement PENDANT un
+    -- échange ne rafraîchissait donc jamais rien. Ce sont les TRADE_SKILL_* qui portent ce signal ici.
     COC.Api.RegisterEventsSafe(f, { "TRADE_SHOW", "TRADE_CLOSED", "TRADE_TARGET_ITEM_CHANGED",
-                                    "CRAFT_SHOW", "CRAFT_CLOSE", "CRAFT_UPDATE",
+                                    "TRADE_SKILL_SHOW", "TRADE_SKILL_CLOSE", "TRADE_SKILL_LIST_UPDATE",
                                     "PLAYER_REGEN_ENABLED" })
     f:SetScript("OnEvent", function(_, ev)
         if ev == "TRADE_CLOSED" then
@@ -280,10 +275,9 @@ function ET:Start()
             panel:ClearAllPoints()                                -- Commandes occupe le dessous)
             panel:SetPoint("TOPLEFT", TradeFrame, "TOPRIGHT", 4, 0)
         end
-        -- ⚠️ Sortie de combat : en combat, fillRows/hideRows/hidePanel ne peignent RIEN (lignes
-        -- sécurisées → Show/Hide/SetAttribute verrouillés, cf. l'en-tête de fillRows), ce qui laisse
-        -- l'affichage périmé : lignes non câblées (clic = no-op silencieux), ou panneau simplement
-        -- escamoté à l'alpha alors que l'échange est clos. ET.Update() est idempotent → un rejeu
+        -- ⚠️ Sortie de combat : en combat, fillRows/hideRows/hidePanel ne peignent RIEN (cf.
+        -- l'en-tête de fillRows), ce qui laisse l'affichage périmé : liste d'un autre objet, ou
+        -- panneau escamoté à l'alpha alors que l'échange est clos. ET.Update() est idempotent → un rejeu
         -- IMMÉDIAT ici répare tout (pas de coalescence : 0,1 s plus tard on pourrait être RE-rentré en
         -- combat et rater la fenêtre).
         if ev == "PLAYER_REGEN_ENABLED" then ET.Update() else updateSoon() end

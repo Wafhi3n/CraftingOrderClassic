@@ -16,7 +16,7 @@ local CraftLink = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
 
 -- Métiers SECONDAIRES (WoW) — ne sert plus QU'À la découverte passive de crafteurs sans l'addon
 -- (Directory_LootScan). Motif : cuisiner au feu de camp ou se bander le bras est trop banal pour
--- peupler l'annuaire depuis un CLEU — on noierait les vrais artisans sous le bruit de la capitale.
+-- peupler l'annuaire depuis un message de craft — on noierait les vrais artisans sous le bruit de la capitale.
 -- Ce n'est PAS un filtre d'affichage : Cuisine/Secourisme/Pêche se montrent comme les autres métiers
 -- (icône de ligne, pastille, tooltip, « Commander … »). Clés CraftLink exactes (cf.
 -- Libs/CraftLink-1.0/Data/*/{Cooking,FirstAid}.lua et Data/Gathering.lua pour la Pêche).
@@ -68,8 +68,10 @@ function COC:Scan()
         local store = self:_MyKnownStore()
         if store then CraftLink:SaveMyRecipes(store) end     -- persiste à chaque plan appris
     end
-    -- Cooldowns de recettes : une transmutation castée déclenche TRADE_SKILL_UPDATE → ce même
-    -- scan relit GetTradeSkillCooldown et détecte le départ du CD (pas besoin de combat log).
+    -- Cooldowns de recettes : ce même scan relit `C_TradeSkillUI.GetRecipeCooldown` et détecte le
+    -- départ du CD. Sur l'Era, une transmutation castée déclenchait TRADE_SKILL_UPDATE ; sur Forever
+    -- on écoute TRADE_SKILL_LIST_UPDATE, et qu'un CAST le déclenche n'est PAS mesuré : si non, le
+    -- départ du CD n'est vu qu'à la prochaine ouverture de la fenêtre.
     local cdChanged = false
     if CraftLink.ScanOpenCooldowns then
         local _, c = CraftLink:ScanOpenCooldowns()
@@ -82,7 +84,7 @@ function COC:Scan()
     if (changed or cdChanged) and self.Directory then self.Directory:AnnounceThrottled() end   -- rediffuse aux autres
 end
 
--- Scan DÉBOUNCÉ : TRADE_SKILL_UPDATE / CRAFT_UPDATE spamment pendant un craft en série (20 objets =
+-- Scan DÉBOUNCÉ : les événements de liste spamment pendant un craft en série (20 objets =
 -- 20+ events) → on regroupe en une seule capture sous 0,3 s (l'union est idempotente de toute façon).
 -- pcall : un pépin de lecture de la fenêtre ne doit pas remonter en erreur Lua visible au joueur.
 function COC:ScanSoon()
@@ -178,7 +180,7 @@ function COC:ScanCmd(arg)
 end
 
 -- /co crafters [on|off] : (dés)active le repérage passif des crafteurs NON-porteurs à proximité (lit
--- le journal de combat EN VILLE seulement — cf. Directory_LootScan). Persistant via COC.db.crafterScan.
+-- les messages de craft EN VILLE seulement — cf. Directory_LootScan). Persistant via COC.db.crafterScan.
 -- Défaut off. Même réglage que la case à cocher de l'onglet Artisans.
 function COC:CrafterScanCmd(arg)
     local L, D = COC.L, COC.Directory
@@ -399,18 +401,16 @@ end
 local f = CreateFrame("Frame")
 f:RegisterEvent("ADDON_LOADED")
 f:RegisterEvent("PLAYER_LOGIN")
--- Capture autonome : on scanne à l'ouverture/maj des fenêtres TradeSkill ET Craft (Enchantement),
--- plus le gain de skill (SKILL_LINES_CHANGED → recapture + rediffusion, Étape D).
+-- Capture autonome : on scanne à l'ouverture/maj de la fenêtre de métier, plus le gain de skill
+-- (SKILL_LINES_CHANGED → recapture + rediffusion, Étape D). TRADE_SKILL_UPDATE et CRAFT_* (Era)
+-- ont disparu : le client Forever les REFUSE (mesuré, COCProbe) ; c'est TRADE_SKILL_LIST_UPDATE
+-- qui rafraîchit la liste ici.
 --
--- Ces événements N'EXISTENT PAS sur un client MAINLINE (WoW: Forever), et `RegisterEvent` LÈVE
--- sur un événement inconnu au lieu de l'ignorer — une seule ligne non gardée fait tomber tout le
--- chargement. Ce fichier CRÉE le namespace et se charge donc AVANT Compat : il ne peut pas
--- utiliser COC.Api.RegisterEventSafe, d'où ce garde-fou local au même contrat.
+-- `RegisterEvent` LÈVE sur un événement inconnu au lieu de l'ignorer — une seule ligne non gardée
+-- fait tomber tout le chargement. Ce fichier CRÉE le namespace et se charge donc AVANT Compat : il
+-- ne peut pas utiliser COC.Api.RegisterEventSafe, d'où ce garde-fou local au même contrat.
 local function regSafe(ev) return (pcall(f.RegisterEvent, f, ev)) and true or false end
--- TRADE_SKILL_LIST_UPDATE existe des DEUX cotes (Era et Forever) et remplace TRADE_SKILL_UPDATE,
--- qui n'existe pas sur Mainline : sans lui, la liste ne se rafraichirait jamais sur Forever.
-for _, ev in ipairs({ "TRADE_SKILL_SHOW", "TRADE_SKILL_UPDATE", "TRADE_SKILL_LIST_UPDATE",
-                      "CRAFT_SHOW", "CRAFT_UPDATE", "SKILL_LINES_CHANGED" }) do
+for _, ev in ipairs({ "TRADE_SKILL_SHOW", "TRADE_SKILL_LIST_UPDATE", "SKILL_LINES_CHANGED" }) do
     regSafe(ev)
 end
 f:SetScript("OnEvent", function(_, event, arg1)
@@ -449,11 +449,9 @@ f:SetScript("OnEvent", function(_, event, arg1)
     elseif event == "SKILL_LINES_CHANGED" then
         -- Gain de point / apprentissage. Si la fenêtre métier est OUVERTE : CAPTURE locale +
         -- rafraîchissement UI IMMÉDIATS, pour que la route/le badge « coût/point » suivent l'événement
-        -- AUTORITAIRE du point. Sans ça, ils ne suivaient que les proxys TRADE_SKILL_UPDATE/CRAFT_UPDATE
-        -- (qui ne tombent pas à chaque gain, surtout côté Craft), et côté ENCHANTEMENT le rang lu par
-        -- Craft:OpenRank vient du CACHE Directory.mySkills (l'API Craft n'expose pas le rang) → il doit
-        -- être frais tout de suite. Gaté sur la fenêtre ouverte : en Era, les compétences d'ARME montent
-        -- en plein combat (même événement) — inutile de recapturer à chaque coup fenêtre fermée.
+        -- AUTORITAIRE du point. Sans ça, ils ne suivaient que les événements de liste, qui ne tombent
+        -- pas à chaque gain. Gaté sur la fenêtre ouverte : les compétences d'ARME montent en plein
+        -- combat (même événement) — inutile de recapturer à chaque coup fenêtre fermée.
         local PW = COC.ProfWindow
         if COC.Directory and PW and PW.frame and PW.frame:IsShown() then
             COC.Directory:CaptureSkills()
@@ -469,7 +467,7 @@ f:SetScript("OnEvent", function(_, event, arg1)
             end)
         end
     else
-        -- TRADE_SKILL_* / CRAFT_* : la fenêtre est lisible → on capte (débouncé, cf. COC:ScanSoon).
+        -- TRADE_SKILL_* : la fenêtre est lisible → on capte (débouncé, cf. COC:ScanSoon).
         COC:ScanSoon()
     end
 end)

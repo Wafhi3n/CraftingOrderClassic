@@ -11,7 +11,8 @@
 -- d'emplacement — ils n'existent pas ici et resteraient introuvables sans la liste.
 --
 -- Deux appuis natifs, donc zéro asset à livrer et zéro clé de locale pour le chrome d'emplacement :
---   · `GetInventorySlotInfo(slotName)` rend le chemin de la TEXTURE en 2ᵉ retour (PaperDollFrame.lua:711) ;
+--   · `GetInventorySlotInfo(slotName)` rend le chemin de la TEXTURE en 2ᵉ retour (PaperDollFrame.lua:711)
+--     — passer par `COC.Api.GetInventorySlotInfo` : sur Forever elle vit dans C_PaperDollInfo ;
 --   · `_G[strupper(slotName)]` rend son LIBELLÉ déjà localisé (PaperDollFrame.lua:873).
 -- Ce que le métier sait enchanter se DÉRIVE du catalogue (Enchant:HasCatalogFor), jamais d'une liste
 -- en dur : ça change d'une couche à l'autre, et ni la tête ni les épaules n'ont d'enchant nulle part
@@ -66,8 +67,9 @@ local BOTTOM_ROW = {
 -- multireturn) → on perdrait précisément la texture, qui est le 2ᵉ retour.
 local function slotArt(slotName)
     local tex
-    if GetInventorySlotInfo then
-        local _, t = GetInventorySlotInfo(slotName)
+    local getSlot = COC.Api.GetInventorySlotInfo
+    if getSlot then
+        local _, t = getSlot(slotName)
         tex = t
     end
     return tex, _G[strupper(slotName)] or slotName

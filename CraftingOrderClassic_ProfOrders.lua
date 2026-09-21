@@ -1,33 +1,25 @@
 -- CraftingOrderClassic_ProfOrders.lua — COORDINATEUR d'événements de la fenêtre métier.
 -- La vue métier custom (3 colonnes, _ProfWindow*) est désormais la vue PAR DÉFAUT (maquette
--- designer) : ce module ne rend plus d'overlay flottant. Il route les events TRADE_SKILL_* /
--- CRAFT_* vers COC.ProfWindow (neutralise le natif, ouvre / rafraîchit / ferme notre fenêtre).
+-- designer) : ce module ne rend plus d'overlay flottant. Il route les events TRADE_SKILL_*
+-- vers COC.ProfWindow (neutralise le natif, ouvre / rafraîchit / ferme notre fenêtre).
+-- Les CRAFT_* (API Craft de l'Era) ont disparu avec elle.
 -- « Vue Blizzard » (PW:IsEnabled()==false) → on laisse la fenêtre native, on ne fait rien.
 
 local COC = CraftingOrderClassic
 local ProfOrders = {}
 COC.ProfOrders = ProfOrders
 
--- Mutex métier : on a détaché les frames natives de UIPanelWindows → on refait la fermeture mutuelle
--- à la main (un seul métier ouvert à la fois). Renvoie true si on a fermé l'AUTRE métier.
-local function closeOtherProfession(event)
-    if event:find("^CRAFT") then
-        if _G.TradeSkillFrame and TradeSkillFrame:IsShown() and CloseTradeSkill then CloseTradeSkill(); return true end
-    elseif _G.CraftFrame and CraftFrame:IsShown() and CloseCraft then CloseCraft(); return true end
-    return false
-end
-
--- SHOW : neutralise le natif (zéro flash), ferme l'autre métier, ouvre notre fenêtre custom.
+-- SHOW : neutralise le natif (zéro flash), ouvre notre fenêtre custom. Le mutex métier qui vivait
+-- ici (une fenêtre TradeSkill et une fenêtre Craft pouvaient coexister une fois détachées de
+-- UIPanelWindows) n'a plus d'objet : il n'y a plus qu'une fenêtre de métier.
 -- REPLI COMBAT : la fenêtre custom est protégée (interdite d'ouverture en combat, OnProfessionShow
 -- return alors sans rien afficher). Si on neutralisait quand même le natif, on finirait sur un écran
 -- VIDE (native masquée + custom non ouverte). En combat on laisse donc la fenêtre Blizzard native
 -- s'afficher telle quelle — repli natif. Sortie de combat → la prochaine ouverture rendra la custom.
 function ProfOrders:_OnShow(PW, event)
     if InCombatLockdown and InCombatLockdown() then return end   -- repli natif : ne pas museler la fenêtre Blizzard
-    local switched = closeOtherProfession(event)
     PW:NeutralizeNative()
-    if switched and C_Timer then C_Timer.After(0.1, function() PW:OnProfessionShow() end)
-    else PW:OnProfessionShow() end
+    PW:OnProfessionShow()
 end
 
 -- Combat : la fenêtre métier custom ne se ferme pas au clic en combat (le natif est protégé) → on la
@@ -48,8 +40,7 @@ function ProfOrders:_OnCombat()
     if not (PW and PW.frame and PW.frame:IsShown()) then return end
     if PW.docked then PW:CloseDock(); return end   -- Vue Blizzard : on masque NOTRE colonne, la native reste intacte
     PW:Hide()                                      -- Vue custom : on ferme aussi la session native (fenêtre neutralisée)
-    if COC.Craft and COC.Craft:IsCraftOpen() then if CloseCraft then CloseCraft() end
-    elseif CloseTradeSkill then CloseTradeSkill() end
+    COC.Api.CloseProfession()                      -- la disjonction Craft/TradeSkill/C_TradeSkillUI vit dans le Compat
 end
 
 function ProfOrders:Start()
@@ -57,8 +48,7 @@ function ProfOrders:Start()
     local f = CreateFrame("Frame")
     -- Les événements de métier Classic n'existent pas sur un client MAINLINE (Forever) et
     -- RegisterEvent lève sur un inconnu → enregistrement gardé (cf. COC.Api.RegisterEventsSafe).
-    COC.Api.RegisterEventsSafe(f, { "TRADE_SKILL_SHOW", "TRADE_SKILL_UPDATE", "TRADE_SKILL_LIST_UPDATE", "TRADE_SKILL_CLOSE",
-                                    "CRAFT_SHOW", "CRAFT_UPDATE", "CRAFT_CLOSE",
+    COC.Api.RegisterEventsSafe(f, { "TRADE_SKILL_SHOW", "TRADE_SKILL_LIST_UPDATE", "TRADE_SKILL_CLOSE",
                                     "PLAYER_REGEN_DISABLED", "PLAYER_REGEN_ENABLED" })
     f:SetScript("OnEvent", function(_, event)
         if event == "PLAYER_REGEN_DISABLED" then ProfOrders:_OnCombat(); return end
@@ -67,8 +57,7 @@ function ProfOrders:Start()
             local PW = COC.ProfWindow; if PW and PW._hidePending then PW:Hide() end; return
         end
         local PW = COC.ProfWindow; if not PW then return end
-        local craftEv = event:find("^CRAFT")
-        local nativeFrame = craftEv and _G.CraftFrame or _G.TradeSkillFrame
+        local nativeFrame = _G.TradeSkillFrame
         -- Skill-up / plan appris : recapture mon niveau + ré-annonce (les autres voient mon skill).
         if event:find("UPDATE$") and COC.Directory then
             COC.Directory:CaptureSkills(); COC.Directory:AnnounceThrottled()
@@ -82,7 +71,7 @@ function ProfOrders:Start()
         elseif graftOwnsWindow() then return             -- FOREVER : la greffe pilote, cf. en-tête
         else                                            -- VUE BLIZZARD (native intacte + dock Commandes à droite)
             if event:find("SHOW$") then
-                PW:EnsureNativeToggle(nativeFrame, craftEv and "craft" or "trade")
+                PW:EnsureNativeToggle(nativeFrame, "trade")
                 if not (InCombatLockdown and InCombatLockdown()) then PW:OpenDock(nativeFrame) end
             elseif event:find("UPDATE$") then
                 if PW.docked then PW:Refresh() end
