@@ -262,3 +262,46 @@ function Craft:MainlineRecipeFacts(spellID)
         judgesThisLine = judges,
     }
 end
+
+-- ---------------------------------------------------------------- SCHÉMA de fabrication PAR SON SORT
+
+-- Ce qu'une recette COÛTE et ce qu'elle PRODUIT, lu sur le client : `GetRecipeSchematic` rend
+-- l'objet produit, la taille du lot et les emplacements de réactifs, pour tout sort que le client
+-- connaît. C'est la même source que le panneau de détail de Blizzard — donc la plus à jour qui
+-- soit, là où nos données générées ont 357 recettes SANS objet produit sur Camelot (Wowhead se
+-- remplit encore par observation). Les deux ne se remplacent pas : le client fait foi, le
+-- catalogue reste le repli (cf. COC.LazyGold, qui arbitre champ par champ).
+--
+-- ⚠️ Rend une TABLE, jamais une suite de valeurs. `local a, b = X and X:f()` n'en rendrait qu'UNE
+-- (piège payé quatre fois dans ce dépôt), et ce schéma a justement trois champs à porter.
+--
+-- Les emplacements MODIFIANTS / de FINITION (qualités Retail) ne sont pas un coût de fabrication :
+-- ils sont facultatifs. Forever ne s'en sert pas (`supportsQualities` false partout, mesuré
+-- 2026-09-18), mais on filtre quand même — le jour où ça change, le coût ne se mettra pas à
+-- compter des réactifs que personne ne pose.
+-- Le repli `or 1` n'est pas une supposition : `Enum.CraftingReagentType` est déclaré dans le source
+-- du client lui-même (`Blizzard_APIDocumentationGenerated/ProfessionConstantsDocumentation.lua`,
+-- worktree `wow-ui-source-forever` épinglé sur la build live) avec Modifying=0, **Basic=1**,
+-- Finishing=2, Automatic=3. On lit la table quand elle est là, et le repli porte la MÊME valeur —
+-- pas un nombre choisi parce qu'il tombait bien.
+local BASIC_REAGENT = (Enum and Enum.CraftingReagentType and Enum.CraftingReagentType.Basic) or 1
+
+function Craft:MainlineRecipeCraft(spellID)
+    local get = C_TradeSkillUI and C_TradeSkillUI.GetRecipeSchematic
+    if not (spellID and get) then return nil end
+    local ok, s = pcall(get, spellID, false)
+    -- Même exigence que MainlineRecipeFacts : on veut une réponse SUR CE SORT-LÀ, pas la fiche
+    -- résiduelle d'un autre (un id hors catalogue du client rend nil ou parle d'autre chose).
+    if not (ok and type(s) == "table" and s.recipeID == spellID) then return nil end
+    local reagents = {}
+    for _, slot in ipairs(s.reagentSlotSchematics or {}) do
+        local kind = slot.reagentType
+        local itemID = (kind == nil or kind == BASIC_REAGENT) and reagentItemID(slot) or nil
+        if itemID then reagents[#reagents + 1] = { itemID, slot.quantityRequired or 1 } end
+    end
+    -- `quantityMin` et non la moyenne min/max : sur un lot variable, la borne basse est la seule
+    -- qu'on soit sûr d'obtenir. Un profit annoncé plus bas que le réel se corrige tout seul à la
+    -- première fabrication ; l'inverse fait fabriquer à perte.
+    return { productID = s.outputItemID, numMade = s.quantityMin or 1,
+             numMadeMax = s.quantityMax or s.quantityMin or 1, reagents = reagents }
+end

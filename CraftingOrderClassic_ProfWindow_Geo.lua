@@ -170,6 +170,7 @@ local function snapshot(self)
             tri     = rect(self.ordLevelBtn),    route = rect(self.routePanel),
             ordFoot = rect(self:Sec("ordFoot")),
             manquantes = rect(self.missPanel),
+            profit     = rect(self.profitPanel),
             -- La CARTE d'une commande sélectionnée, et sa croix de retour : la croix passait sous
             -- le fond opaque du puits. Un niveau se mesure, il ne se suppose pas.
             fondNatif  = pageArt(native),
@@ -198,8 +199,8 @@ local function out(fmt, ...)
 end
 
 local FRAME_ORDER = { "colonne", "hote", "page", "croix", "aide", "ordBody", "liste", "tri",
-                      "ordFoot", "route", "manquantes", "fondNatif", "fondAjoute", "selecteur",
-                      "carte", "croixCarte" }
+                      "ordFoot", "route", "manquantes", "profit", "fondNatif", "fondAjoute",
+                      "selecteur", "carte", "croixCarte" }
 
 local function render(snap)
     local m = snap.mode

@@ -336,7 +336,7 @@ local de2 = {
         "Ein Abschnitt pro Zeile: Rangbereich, das Rezept mit den besten erwarteten Kosten pro Punkt, „×~N“ = erwartete Crafts, und die Kosten des Abschnitts (Schriftrolle = zuerst zu kaufendes Rezept, eingerechnet). Für Details mit der Maus über eine Zeile fahren. Die Route wird bei jedem Punkt neu berechnet.",
     ["Total estimé : %s"] = "Geschätzte Summe: %s",
     ["Total estimé : inconnu"] = "Geschätzte Summe: unbekannt",
-    ["Change ce que montre la colonne : les commandes reçues, le plan de route du métier, ou les recettes qui te manquent."] = "Wechselt den Inhalt der Spalte: eingehende Aufträge, die Aufstiegsroute des Berufs oder die Rezepte, die dir fehlen.",
+    ["Change ce que montre la colonne : les commandes reçues, le plan de route du métier, les recettes qui te manquent, ou les plus rentables."] = "Wechselt den Inhalt der Spalte: eingehende Aufträge, die Aufstiegsroute des Berufs, die Rezepte, die dir fehlen, oder die lohnendsten.",
     ["Rang au plafond — c'est le maximum ici."] = "Maximaler Rang — das ist hier das Maximum.",
     ["Débloquer le palier suivant"] = "Nächste Stufe freischalten",
     ["À apprendre : %s"] = "Zu erlernen: %s",

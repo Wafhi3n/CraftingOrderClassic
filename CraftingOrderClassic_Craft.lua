@@ -76,6 +76,16 @@ function Craft:RecipeFacts(spellID)
     return nil
 end
 
+-- Ce que la recette COÛTE et ce qu'elle PRODUIT, désignée par son SORT :
+-- { productID, numMade, numMadeMax, reagents = { {itemID, qty}, ... } } ou nil.
+-- Même contrat que RecipeFacts — seul le backend MAINLINE sait répondre, et nil veut dire « pas
+-- d'avis », jamais « rien ». Les deux backends Classic ne lisent que par INDEX : leur appelant
+-- passe déjà par Craft:Reagents(index), qui répond pour la recette SÉLECTIONNÉE et pour elle seule.
+function Craft:RecipeCraft(spellID)
+    if self.MainlineRecipeCraft then return self:MainlineRecipeCraft(spellID) end
+    return nil
+end
+
 -- Toute la liste de recettes APPRISES (en-têtes inclus, isHeader=true), ou nil si fermé.
 -- « Apprises » n'allait de soi que sur les deux backends Classic, où la fenêtre native ne connaît
 -- que ça. Sur MAINLINE le client rend aussi les NON apprises (cf. `getLearned` de Craft_Mainline) :

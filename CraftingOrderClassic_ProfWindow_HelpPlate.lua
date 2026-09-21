@@ -76,7 +76,7 @@ function PW:_ShowHelp()
     add(self.ordRelTabs and self.ordRelTabs.buttons and self.ordRelTabs.buttons.all, relHelp, "DOWN")
     add(self.ordRelDD, relHelp, "DOWN")   -- même filtre, autre présentation (la garde IsShown tranche)
     add(self.viewTabs and self.viewTabs.buttons and self.viewTabs.buttons.orders,
-        L["Change ce que montre la colonne : les commandes reçues, le plan de route du métier, ou les recettes qui te manquent."],
+        L["Change ce que montre la colonne : les commandes reçues, le plan de route du métier, les recettes qui te manquent, ou les plus rentables."],
         "DOWN")
 
     Skin.ShowHelp(self.frame, entries, self.helpBtn)

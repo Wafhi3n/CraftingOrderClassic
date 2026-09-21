@@ -271,6 +271,12 @@ local de = {
     ["colonne ACCOLÉE à la fenêtre de métier"] = "Auftragsspalte NEBEN dem Berufsfenster",
     ["colonne ENCASTRÉE dans la fenêtre de métier"] = "Auftragsspalte IM Berufsfenster",
     ["Impossible en combat — réessaie après le combat."] = "Im Kampf nicht möglich — versuche es nach dem Kampf erneut.",
+    -- Vue « Profit » de la colonne (_ProfWindow_DockProfit)
+    ["Profit"] = "Gewinn",
+    ["Rentables (%d)"] = "Rentabel (%d)",
+    ["Aucune recette rentable (prix : %s)."] = "Kein rentables Rezept (Preise: %s).",
+    ["Clic : ouvrir cette recette."] = "Klick: dieses Rezept öffnen.",
+    ["Un réactif sans prix : coût sous-estimé."] = "Eine Reagenz ohne Preis: Kosten zu niedrig angesetzt.",
 }
 
 for k, v in pairs(de) do L[k] = v end

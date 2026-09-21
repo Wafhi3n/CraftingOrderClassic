@@ -272,6 +272,12 @@ local es = {
     ["colonne ACCOLÉE à la fenêtre de métier"] = "columna de pedidos JUNTO a la ventana de profesiones",
     ["colonne ENCASTRÉE dans la fenêtre de métier"] = "columna de pedidos DENTRO de la ventana de profesiones",
     ["Impossible en combat — réessaie après le combat."] = "No es posible en combate — inténtalo de nuevo después del combate.",
+    -- Vue « Profit » de la colonne (_ProfWindow_DockProfit)
+    ["Profit"] = "Beneficio",
+    ["Rentables (%d)"] = "Rentables (%d)",
+    ["Aucune recette rentable (prix : %s)."] = "Ninguna receta rentable (precios: %s).",
+    ["Clic : ouvrir cette recette."] = "Clic: abrir esta receta.",
+    ["Un réactif sans prix : coût sous-estimé."] = "Un componente sin precio: coste subestimado.",
 }
 
 for k, v in pairs(es) do L[k] = v end

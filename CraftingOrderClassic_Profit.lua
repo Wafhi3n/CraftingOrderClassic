@@ -205,26 +205,52 @@ function PR:Money(copper, colored)
     return c .. txt .. "|r"
 end
 
+-- ---------------------------------------------------------------------------
+-- SCHÉMA d'une recette : le CLIENT d'abord, NOS données ensuite
+-- ---------------------------------------------------------------------------
+-- Le calcul n'a jamais su faire que ce que la donnée lui permettait, et sur Camelot 357 recettes
+-- n'ont AUCUN objet produit dans notre catalogue : pour elles la rentabilité ne pouvait pas exister,
+-- quel que soit l'oracle de prix. Le client, lui, donne le schéma exact en direct (cf.
+-- Craft:RecipeCraft). Pour une recette qu'il connaît, il fait donc FOI ; le catalogue reste le repli.
+--
+-- Arbitré CHAMP PAR CHAMP, jamais en bloc. Une réponse partielle du client (l'objet produit connu,
+-- la liste de réactifs vide parce que la recette n'est pas dans la ligne ouverte) effacerait sinon
+-- ce que le catalogue sait encore dire. Et une liste de réactifs VIDE n'est pas une réponse : c'est
+-- une absence de réponse — un coût de zéro rendrait toute recette « rentable ».
+local function recipeSchema(profKey, spellID)
+    local lib  = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
+    local game = (COC.Craft and COC.Craft.RecipeCraft) and COC.Craft:RecipeCraft(spellID) or nil
+    local reagents = (game and game.reagents and #game.reagents > 0) and game.reagents
+        or (lib and lib.RecipeReagents and lib:RecipeReagents(profKey, spellID)) or {}
+    return {
+        productID = (game and game.productID)
+            or (lib and lib.RecipeProduct and lib:RecipeProduct(profKey, spellID)) or nil,
+        reagents = reagents,
+        numMade  = game and game.numMade or nil,
+    }
+end
+
 -- Rentabilité d'une recette : { sell, cost, profit, missing } en cuivre, ou nil si le prix de VENTE
 -- du produit est inconnu (sans lui, aucun calcul n'a de sens). `missing` = au moins un réactif sans
--- prix (coût sous-estimé). numMade = nb d'objets produits par craft (défaut 1). Formule identique à
--- Vente × quantité × (1 − coupe HV) − coût des réactifs.
+-- prix (coût sous-estimé). numMade = nb d'objets produits par craft (défaut 1).
+-- Formule, inchangée depuis l'origine : vente × quantité × (1 − coupe HV) − coût des réactifs.
 function PR:CraftProfit(profKey, spellID, numMade)
     if not (self:IsAvailable() and profKey and spellID) then return nil end
-    local lib = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
-    if not lib then return nil end
-    local productID = lib.RecipeProduct and lib:RecipeProduct(profKey, spellID)
-    local sell = productID and self:ItemValue(productID)
+    local sch = recipeSchema(profKey, spellID)
+    local sell = sch.productID and self:ItemValue(sch.productID)
     if not sell then return nil end
 
     local cost, missing = 0, false
-    for _, reag in ipairs((lib.RecipeReagents and lib:RecipeReagents(profKey, spellID)) or {}) do
+    for _, reag in ipairs(sch.reagents) do
         local id, qty = reag[1], reag[2] or 1
         local p = self:ItemValue(id)
         if p then cost = cost + p * qty else missing = true end
     end
 
-    local n = numMade and numMade > 0 and numMade or 1
+    -- Quantité produite : ce que l'APPELANT sait prime (une ligne de liste la porte déjà, lue sur
+    -- la même session de métier), puis ce que le client dit du lot, puis 1.
+    local n = numMade or sch.numMade
+    n = (n and n > 0) and n or 1
     local profit = sell * n * (1 - AH_CUT) - cost
     return { sell = sell, cost = cost, profit = profit, missing = missing, numMade = n }
 end

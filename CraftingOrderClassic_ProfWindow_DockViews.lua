@@ -85,9 +85,11 @@ function PW:_SetDockView(view)
     if self.missPanel then self.missPanel:SetShown(view == "learn") end
     if view == "trade" and self._BuildTradeView then self:_BuildTradeView() end
     if self.tradePanel then self.tradePanel:SetShown(view == "trade") end
+    if self.profitPanel then self.profitPanel:SetShown(view == "profit") end
     if view == "route" then self:_FillRoute()
     elseif view == "learn" then self:_FillDockMissing()
     elseif view == "trade" then self:_FillTradeView()
+    elseif view == "profit" then self:_FillDockProfit()
     else self:RefreshOrders() end
     self:_SyncDockViewBtns()
 end
@@ -103,6 +105,7 @@ function PW:_ResetDockView()
     if self.routePanel then self.routePanel:Hide() end
     if self.missPanel then self.missPanel:Hide() end
     if self.tradePanel then self.tradePanel:Hide() end
+    if self.profitPanel then self.profitPanel:Hide() end
     setOrdersShown(self, true)
 end
 
@@ -143,6 +146,11 @@ function PW:_BuildDockViews()
     local msg = mp:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
     msg:SetPoint("CENTER", 0, 10); msg:SetWidth(180); msg:Hide(); mp.msg = msg
     self.missPanel = mp
+
+    -- Panneau RENTABILITÉ : même contenant, même gabarit, son propre fichier (_DockProfit).
+    -- Construit ici pour que les trois panneaux naissent dans la même passe et partagent l'ancre —
+    -- un 4ᵉ panneau posé ailleurs finirait par dériver de 2 px et personne ne saurait pourquoi.
+    if self._BuildDockProfit then self:_BuildDockProfit(host, rp) end
 end
 
 -- ------------------------------------------------------------------
@@ -326,24 +334,36 @@ end
 -- Les deux boutons de l'en-tête
 -- ------------------------------------------------------------------
 
--- Les TROIS vues, dans l'ordre de lecture. À languettes et pas à interrupteurs, et c'est le fond du
--- sujet : trois états exclusifs dont un est TOUJOURS vrai ne se dessinent pas avec des bascules.
+-- Les vues, dans l'ordre de lecture. À languettes et pas à interrupteurs, et c'est le fond du
+-- sujet : des états exclusifs dont un est TOUJOURS vrai ne se dessinent pas avec des bascules.
 -- Deux icônes 16 px posées dans une bande vide se lisaient comme des boutons secondaires oubliés là,
 -- et les désaturer pour dire « inactive » les faisait passer pour INDISPONIBLES (relevé sur capture
 -- en jeu, 2026-09-19). Une languette sélectionnée dit la même chose sans ambiguïté, et c'est le
 -- vocabulaire du jeu.
+--
+-- « Profit » est CONDITIONNELLE : sans oracle de prix il n'y a pas de rentabilité à trier, et une
+-- languette qui n'ouvre qu'un message d'absence est un onglet vide. La règle vit déjà dans
+-- PR:IsAvailable() — ici on ne fait que la consulter. Libellé court à dessein : la rangée est la
+-- SEULE chose qui contraint encore la largeur de la colonne (sizeColumn prend le max), donc chaque
+-- caractère de plus élargit la fenêtre native de Forever d'autant (arbitrage du user, 2026-09-21).
 local VIEWS = {
     { id = "orders", label = function() return L["Commandes"] end },
     { id = "route",  label = function() return L["Plan de route"] end },
     { id = "learn",  label = function() return L["Manquantes"] end },
+    { id = "profit", label = function() return L["Profit"] end,
+      shown = function() return (COC.Profit and COC.Profit:IsAvailable()) and true or false end },
 }
 
 -- Construite par _BuildOrders (garde nil). Occupe la rangée du HAUT : les onglets de relation, eux,
 -- descendent dans la vue Commandes à laquelle ils appartiennent (cf. _PlaceOrdTabs).
+-- Une vue écartée ici n'est pas MASQUÉE, elle n'est pas CONSTRUITE : _ViewTabsWidth somme les
+-- boutons qui existent, et un bouton caché lui ferait réserver une largeur que rien n'occupe.
 function PW:_BuildDockViewBtns()
     if self.viewTabs then return end
     local defs = {}
-    for i, v in ipairs(VIEWS) do defs[i] = { id = v.id, label = v.label() } end
+    for _, v in ipairs(VIEWS) do
+        if not v.shown or v.shown() then defs[#defs + 1] = { id = v.id, label = v.label() } end
+    end
     self.viewTabs = Skin.MakeTabs(self.frame, defs, function(id)
         PW:_SetDockView(id ~= "orders" and id or nil)
     end, { tabX = 8, tabY = self:_TabTop(),
@@ -400,10 +420,15 @@ function PW:_SyncDockViewBtns()
     -- l'ANCIEN métier -- que les infobulles interrogent alors avec la clé du NOUVEAU. On repeint sur
     -- le CHANGEMENT seulement : `RefreshOrders` tourne à chaque mouvement de commande, et refaire
     -- 128 lignes à chaque fois pour rien serait payer cher une bascule qui arrive une fois par heure.
-    if self._dockViewProf ~= self.profKey then
+    -- ⚠️ ET PAS EN COMBAT. Repeindre veut dire CRÉER et AFFICHER des lignes, et greffée la colonne
+    -- est protégée comme son hôte : Show/SetPoint y sont refusés (cf. l'en-tête). Le témoin de
+    -- métier reste donc EN RETARD exprès — c'est lui qui déclenchera le repaint à la première
+    -- synchro hors combat. L'avancer sans repeindre figerait la vue sur l'ancien métier pour de bon.
+    if self._dockViewProf ~= self.profKey and not lockedDown() then
         self._dockViewProf = self.profKey
         if self.dockView == "learn" then self:_FillDockMissing()
-        elseif self.dockView == "route" then self:_FillRoute() end
+        elseif self.dockView == "route" then self:_FillRoute()
+        elseif self.dockView == "profit" then self:_FillDockProfit() end
     end
     local craft = COC.Craft
     local show = (self._compact or self.docked) and self.profKey and not self.rerollKey

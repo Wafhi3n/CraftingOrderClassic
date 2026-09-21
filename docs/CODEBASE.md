@@ -4,7 +4,7 @@
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
-132 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
+133 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
 
 ## Modules (ordre de chargement)
 
@@ -15,11 +15,11 @@
 | `CraftingOrderClassic_Trace.lua` | trace réseau PERSISTÉE, lisible hors-jeu. | 79 |
 | `CraftingOrderClassic_Migrations.lua` | versionnage du schéma SavedVariables. | 40 |
 | `CraftingOrderClassic_Locale.lua` | socle de localisation du CHROME de l'UI. | 12 |
-| `CraftingOrderClassic_Locale_enUS.lua` | overlay ANGLAIS (enUS/enGB). | 274 |
+| `CraftingOrderClassic_Locale_enUS.lua` | overlay ANGLAIS (enUS/enGB). | 280 |
 | `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 493 |
-| `CraftingOrderClassic_Locale_deDE.lua` | overlay ALLEMAND (deDE). | 276 |
+| `CraftingOrderClassic_Locale_deDE.lua` | overlay ALLEMAND (deDE). | 282 |
 | `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 473 |
-| `CraftingOrderClassic_Locale_esES.lua` | overlay ESPAGNOL (esES/esMX). | 277 |
+| `CraftingOrderClassic_Locale_esES.lua` | overlay ESPAGNOL (esES/esMX). | 283 |
 | `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 474 |
 | `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 356 |
 | `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 353 |
@@ -68,8 +68,8 @@
 | `CraftingOrderClassic_RecipeCats_Gathering.lua` | sous-catégories des métiers de RÉCOLTE. | 179 |
 | `CraftingOrderClassic_RecipeCats_Smelting.lua` | sous-catégorie « Lingots » du Minage (facette FONTE). | 39 |
 | `CraftingOrderClassic_RecipeCats_Enchanting.lua` | sous-catégories de l'ENCHANTEMENT. | 52 |
-| `CraftingOrderClassic_Craft.lua` | socle de lecture LIVE de la fenêtre métier. | 133 |
-| `CraftingOrderClassic_Craft_Mainline.lua` | backend de lecture de la fenêtre métier, pour les clients MAINLINE/Retail (WoW: Forever / Camelot, interface 16001). | 264 |
+| `CraftingOrderClassic_Craft.lua` | socle de lecture LIVE de la fenêtre métier. | 143 |
+| `CraftingOrderClassic_Craft_Mainline.lua` | backend de lecture de la fenêtre métier, pour les clients MAINLINE/Retail (WoW: Forever / Camelot, interface 16001). | 307 |
 | `CraftingOrderClassic_Enchant.lua` | spécifique à l'Enchantement (API Craft). | 409 |
 | `CraftingOrderClassic_Enchant_Filter.lua` | le filtre natif « Filter → Slots » de l'Enchantement (Forever). | 130 |
 | `CraftingOrderClassic_Enchant_Filter_Pilot.lua` | pose et rend le filtre natif « Slots » (T2). | 195 |
@@ -93,12 +93,13 @@
 | `CraftingOrderClassic_ProfWindow_Route.lua` | fenêtre « PLAN DE ROUTE » de montée de métier (étage ③ de l'aide à la progression) : « du rang actuel au plafond, quoi crafter, combien de fois, pour combien ». | 413 |
 | `CraftingOrderClassic_ProfWindow_Route_Supply.lua` | ce qui se peint SOUS les segments du plan de route : le bloc « FOURNITURES » (composants agrégés de toute la route, plans à acheter) et, quand le rang est AU PLAFOND, le bloc « débloquer le palier suivant » (livre de rang curaté, ou renvoi vers le formateur de métier). | 111 |
 | `CraftingOrderClassic_ProfWindow_Learn.lua` | section « À apprendre maintenant » du Plan de route : les recettes NON APPRISES que ton rang permet déjà d'apprendre ET qui rapportent encore un point, classées par coût espéré par point, avec l'icône de leur source. | 113 |
-| `CraftingOrderClassic_ProfWindow_DockViews.lua` | la colonne Commandes CHANGE DE CONTENU au lieu d'ouvrir des fenêtres par-dessus. | 422 |
+| `CraftingOrderClassic_ProfWindow_DockViews.lua` | la colonne Commandes CHANGE DE CONTENU au lieu d'ouvrir des fenêtres par-dessus. | 447 |
+| `CraftingOrderClassic_ProfWindow_DockProfit.lua` | la 4ᵉ vue de la colonne : « Profit ». | 214 |
 | `CraftingOrderClassic_ProfWindow_Trade.lua` | le mode ÉCHANGE de la colonne de métier (T3). | 277 |
-| `CraftingOrderClassic_ProfWindow_Geo.lua` | `/co geo` : le RELEVÉ de la colonne, en pixels écran, écrit dans la SavedVariable pour être relu HORS DU JEU. | 261 |
+| `CraftingOrderClassic_ProfWindow_Geo.lua` | `/co geo` : le RELEVÉ de la colonne, en pixels écran, écrit dans la SavedVariable pour être relu HORS DU JEU. | 262 |
 | `CraftingOrderClassic_ProfWindow_Detail.lua` | colonne CENTRE : détail de la recette sélectionnée (icône, réactifs have/need) + boutons Créer / Créer tout. | 279 |
 | `CraftingOrderClassic_ProfWindow_Info.lua` | PANNEAU D'INFO en SECTIONS pour la colonne centrale de la vue métier. | 217 |
-| `CraftingOrderClassic_Profit.lua` | pont LECTURE SEULE vers l'oracle de prix, AUCTIONATOR. | 451 |
+| `CraftingOrderClassic_Profit.lua` | pont LECTURE SEULE vers l'oracle de prix, AUCTIONATOR. | 477 |
 | `CraftingOrderClassic_ProfWindow_Orders.lua` | colonne « Commandes » de la vue métier (cabine de l'artisan) : construction (onglets de relation, en-tête, scroll), vue LISTE (une ligne par commande : demandeur + prix + âge ; une ligne sourdine cliquée se réaffiche), collecte/tri et rafraîchissement. | 499 |
 | `CraftingOrderClassic_ProfWindow_Orders_Card.lua` | vue SÉLECTIONNÉE de la colonne « Commandes » : la carte complète d'une commande (composants fournis, repères Auctionator, ACCEPTER / REFUSER / CHUCHOTER ; croix en haut à droite = retour liste). | 315 |
 | `CraftingOrderClassic_ProfWindow_LFW.lua` | config de l'OFFRE « recherche de travail » par métier. | 327 |
@@ -1227,7 +1228,7 @@
 > (`DoCraft` protégé, bouton sécurisé redirigé, réactifs natifs à museler) — n'existe plus.
 > Y revenir un jour = rajouter un BACKEND (patron : _Craft_Mainline.lua), pas rouvrir ces branches.
 
-**API** : `Craft:GetOpenProfessionInfo()` · `Craft:GetActiveAPI()` · `Craft:OpenProfessionKey()` · `Craft:DifficultyColor(difficulty)` · `Craft:OpenRank()` · `Craft:RecipeFacts(spellID)` · `Craft:ReadRecipes()` · `Craft:Reagents(index)` · `Craft:Do(index, count)`
+**API** : `Craft:GetOpenProfessionInfo()` · `Craft:GetActiveAPI()` · `Craft:OpenProfessionKey()` · `Craft:DifficultyColor(difficulty)` · `Craft:OpenRank()` · `Craft:RecipeFacts(spellID)` · `Craft:RecipeCraft(spellID)` · `Craft:ReadRecipes()` · `Craft:Reagents(index)` · `Craft:Do(index, count)`
 
 ### `CraftingOrderClassic_Craft_Mainline.lua`
 > CraftingOrderClassic_Craft_Mainline.lua — backend de lecture de la fenêtre métier, pour les
@@ -1247,7 +1248,7 @@
 > Mesuré en jeu le 2026-09-18 (Cuisine) : `supportsQualities = false` partout — Forever n'utilise
 > PAS les paliers de qualité Dragonflight, le modèle d'ordre de COC passe intact.
 
-**API** : `Craft:MainlineRank()` · `Craft:MainlineOpen()` · `Craft:MainlineRecipeFacts(spellID)`
+**API** : `Craft:MainlineRank()` · `Craft:MainlineOpen()` · `Craft:MainlineRecipeFacts(spellID)` · `Craft:MainlineRecipeCraft(spellID)`
 
 ### `CraftingOrderClassic_Enchant.lua`
 > CraftingOrderClassic_Enchant.lua — spécifique à l'Enchantement (API Craft).
@@ -1661,6 +1662,30 @@
 > `Show`/`Hide` sur ses enfants sont donc refusés en combat (piège wow-protected-frame-hide-combat,
 > reconfirmé sur Forever). Changer de vue est un geste de confort, jamais urgent : on le refuse
 > franchement, avec un mot, plutôt que de laisser le jeu bloquer l'action sans explication.
+
+### `CraftingOrderClassic_ProfWindow_DockProfit.lua`
+> CraftingOrderClassic_ProfWindow_DockProfit.lua — la 4ᵉ vue de la colonne : « Profit ».
+> 
+> CE QU'ELLE RÉPARE. Sur Classic Era, la vue métier custom affichait le profit net de chaque
+> recette et savait TRIER la liste par rentabilité : c'est comme ça qu'on décidait quoi fabriquer
+> pour gagner de l'or. Le portage Forever n'a rien retiré de ce calcul — il a retiré sa SURFACE.
+> Là-bas on ne remplace pas la fenêtre de métier native (elle est meilleure que la nôtre), on lui
+> accole seulement la colonne Commandes : notre liste de recettes, et le tri avec elle, ne
+> s'affiche plus nulle part. Ce fichier ne réimplémente donc aucun calcul, il rend une surface.
+> 
+> CE QU'ELLE NE FAIT PAS, et c'est le fond du sujet. Elle ne TRIE PAS la liste de Blizzard et
+> n'écrit rien dans ses lignes — elles sont recyclées, et écrire dans le cadre hôte le teinte (on a
+> déjà payé ~800 actions de barres d'action refusées pour cette leçon). Elle liste à CÔTÉ, dans
+> notre colonne, et le clic repasse la main au jeu par sa propre voie (cf. openRecipe).
+> 
+> Elle ne liste que les recettes APPRISES du métier ouvert, et seulement celles qui RAPPORTENT :
+> « est-ce que ça vaudrait le coup d'aller l'apprendre » est une question voisine mais différente,
+> et elle vit déjà dans la vue « Manquantes ». Une recette à perte n'affiche rien — c'était déjà la
+> règle de l'ancienne liste (PR:ProfitText rend une chaîne vide sous zéro), et une ligne avec un nom
+> et une colonne vide ne dit pas « à perte », elle dit « prix inconnu ».
+> 
+> ⚠️ Elle n'existe PAS sans oracle de prix : la languette n'est même pas construite (cf. VIEWS dans
+> _DockViews). Un onglet qui ne sait ouvrir qu'un message d'absence est un onglet vide.
 
 ### `CraftingOrderClassic_ProfWindow_Trade.lua`
 > CraftingOrderClassic_ProfWindow_Trade.lua — le mode ÉCHANGE de la colonne de métier (T3).

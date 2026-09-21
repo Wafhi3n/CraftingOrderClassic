@@ -337,7 +337,7 @@ local es2 = {
         "Un tramo por línea: rango, la receta con el mejor coste esperado por punto, «×~N» = fabricaciones esperadas, y el coste del tramo (pergamino = receta a comprar primero, incluida). Pasa el ratón por una línea para el detalle. La ruta se recalcula con cada punto ganado.",
     ["Total estimé : %s"] = "Total estimado: %s",
     ["Total estimé : inconnu"] = "Total estimado: desconocido",
-    ["Change ce que montre la colonne : les commandes reçues, le plan de route du métier, ou les recettes qui te manquent."] = "Cambia lo que muestra la columna: los pedidos recibidos, la ruta de subida de la profesión o las recetas que te faltan.",
+    ["Change ce que montre la colonne : les commandes reçues, le plan de route du métier, les recettes qui te manquent, ou les plus rentables."] = "Cambia lo que muestra la columna: los pedidos recibidos, la ruta de subida de la profesión, las recetas que te faltan o las más rentables.",
     ["Rang au plafond — c'est le maximum ici."] = "Rango al máximo — este es el máximo aquí.",
     ["Débloquer le palier suivant"] = "Desbloquear el siguiente nivel",
     ["À apprendre : %s"] = "Para aprender: %s",

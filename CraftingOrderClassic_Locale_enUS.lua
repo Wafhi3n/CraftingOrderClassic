@@ -269,6 +269,12 @@ local en = {
     ["colonne ACCOLÉE à la fenêtre de métier"] = "orders column ALONGSIDE the professions window",
     ["colonne ENCASTRÉE dans la fenêtre de métier"] = "orders column INSIDE the professions window",
     ["Impossible en combat — réessaie après le combat."] = "Not possible in combat — try again after the fight.",
+    -- Vue « Profit » de la colonne (_ProfWindow_DockProfit)
+    ["Profit"] = "Profit",
+    ["Rentables (%d)"] = "Profitable (%d)",
+    ["Aucune recette rentable (prix : %s)."] = "No profitable recipe (prices: %s).",
+    ["Clic : ouvrir cette recette."] = "Click: open this recipe.",
+    ["Un réactif sans prix : coût sous-estimé."] = "One reagent has no price: cost is understated.",
 }
 
 for k, v in pairs(en) do L[k] = v end

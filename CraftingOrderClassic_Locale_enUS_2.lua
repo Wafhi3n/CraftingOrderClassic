@@ -356,7 +356,7 @@ local en2 = {
         "One segment per line: rank range, the recipe with the best expected cost per point, \"×~N\" = expected crafts, and the segment cost (scroll = recipe to buy first, included). Hover a line for details. The route recomputes with every point you gain.",
     ["Total estimé : %s"] = "Estimated total: %s",
     ["Total estimé : inconnu"] = "Estimated total: unknown",
-    ["Change ce que montre la colonne : les commandes reçues, le plan de route du métier, ou les recettes qui te manquent."] = "Switches what this column shows: incoming orders, the profession leveling route, or the recipes you are missing.",
+    ["Change ce que montre la colonne : les commandes reçues, le plan de route du métier, les recettes qui te manquent, ou les plus rentables."] = "Switches what this column shows: incoming orders, the profession leveling route, the recipes you are missing, or the most profitable ones.",
     ["Rang au plafond — c'est le maximum ici."] = "Rank at cap — this is the maximum here.",
     ["Débloquer le palier suivant"] = "Unlock the next tier",
     ["À apprendre : %s"] = "To learn: %s",
