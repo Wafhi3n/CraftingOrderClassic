@@ -5,7 +5,8 @@
 -- Parse le nom ANGLAIS canonique du catalogue CraftLink (« Enchant <Slot> - <Effet> ») → slot + effet,
 -- indépendamment de la langue du client. Sert AUSSI au classement de la liste de recettes :
 -- Emplacement (section) › Stat de base (sous-catégorie) › variantes triées par niveau.
--- API publique : Enchant:Parse · Enchant:SlotFor · Enchant:SectionFor · Enchant:StatFor · Enchant:ShortName.
+-- API publique : Enchant:Parse · Enchant:SlotFor · Enchant:SectionFor · Enchant:StatFor · Enchant:ShortName
+-- · Enchant:WordsForEquipLoc · Enchant:SlotNameOf.
 
 local COC     = CraftingOrderClassic
 local Enchant = {}
@@ -272,6 +273,24 @@ local EQUIP_WORDS = {
 -- manque (le champ existe en Era/TBC/Wrath, mais la table n'a rien de garanti côté client).
 local STAFF_SUBCLASS = (Enum and Enum.ItemWeaponSubclass and Enum.ItemWeaponSubclass.Staff) or 10
 
+-- Mots d'emplacement dont les enchants s'appliquent à un objet d'emplacement `equipLoc` (liste neuve,
+-- l'appelant peut la modifier), ou nil si rien ne l'enchante. Seule porte d'entrée vers EQUIP_WORDS :
+-- le filtre natif de l'échange (_Enchant_Filter) en dérive ses cases, sans recopier la table.
+function Enchant:WordsForEquipLoc(equipLoc, subclassID)
+    local words = EQUIP_WORDS[equipLoc or ""]
+    if not words then return nil end
+    local out = {}
+    for i, w in ipairs(words) do out[i] = w end
+    -- Un bâton accepte EN PLUS sa propre famille (les enchants « 2H Weapon »/« Weapon » lui vont déjà).
+    if equipLoc == "INVTYPE_2HWEAPON" and subclassID == STAFF_SUBCLASS then out[#out + 1] = "Staff" end
+    return out
+end
+
+-- Emplacement d'inventaire (« WristSlot »…) d'un mot d'emplacement, ou nil s'il est inconnu.
+function Enchant:SlotNameOf(word)
+    return SLOT_NAME[word or ""]
+end
+
 -- Mes enchants APPLICABLES à un objet d'emplacement `equipLoc`, lus dans la fenêtre de métier
 -- OUVERTE (la lecture de recettes ne répond que fenêtre ouverte → nil si elle est fermée,
 -- l'appelant le signale). `subclassID` (optionnel) = sous-classe de l'objet ciblé, seul moyen de
@@ -281,13 +300,11 @@ local STAFF_SUBCLASS = (Enum and Enum.ItemWeaponSubclass and Enum.ItemWeaponSubc
 -- Elle rendait donc TOUJOURS nil sur la cible. Son équivalent MAINLINE : l'Enchantement est-il le
 -- métier ouvert ?
 function Enchant:CraftsForEquipLoc(equipLoc, subclassID)
-    local words = EQUIP_WORDS[equipLoc or ""]
+    local words = self:WordsForEquipLoc(equipLoc, subclassID)
     local craft = COC.Craft
     if not (words and craft and craft:OpenProfessionKey() == "Enchanting") then return nil end
     local ok = {}
     for _, w in ipairs(words) do ok[w] = true end
-    -- Un bâton accepte EN PLUS sa propre famille (les enchants « 2H Weapon »/« Weapon » lui vont déjà).
-    if equipLoc == "INVTYPE_2HWEAPON" and subclassID == STAFF_SUBCLASS then ok["Staff"] = true end
     local c, out = CL(), {}
     for _, r in ipairs(COC.Craft:ReadRecipes() or {}) do
         if not r.isHeader and r.spellID and ok[slotWordOf(r.spellID) or ""] then

@@ -94,6 +94,8 @@ CraftingOrderClassic_Craft.lua
 # clefees par recipeSpellID. Inerte ailleurs. Doit venir APRES le socle _Craft.lua.
 CraftingOrderClassic_Craft_Mainline.lua
 CraftingOrderClassic_Enchant.lua
+CraftingOrderClassic_Enchant_Filter.lua
+CraftingOrderClassic_Enchant_Filter_Pilot.lua
 CraftingOrderClassic_Stats.lua
 CraftingOrderClassic_Stats_Filter.lua
 CraftingOrderClassic_Gem.lua

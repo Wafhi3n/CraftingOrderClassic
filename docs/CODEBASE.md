@@ -1,16 +1,16 @@
 # CraftingOrderClassic — carte du code
 
-> **GÉNÉRÉ** le 2026-09-21 (v1.34.1) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
+> **GÉNÉRÉ** le 2026-09-22 (v1.34.1) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
-127 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
+129 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
 
 ## Modules (ordre de chargement)
 
 | Fichier | Rôle | Lignes |
 |---|---|---|
-| `CraftingOrderClassic.lua` | Crafting Order - Classic — réseau GLOBAL et SOCIAL de commandes de craft. | 473 |
+| `CraftingOrderClassic.lua` | Crafting Order - Classic — réseau GLOBAL et SOCIAL de commandes de craft. | 474 |
 | `CraftingOrderClassic_Compat.lua` | couche d'adaptation d'API entre les SAVEURS de client. | 295 |
 | `CraftingOrderClassic_Trace.lua` | trace réseau PERSISTÉE, lisible hors-jeu. | 79 |
 | `CraftingOrderClassic_Migrations.lua` | versionnage du schéma SavedVariables. | 40 |
@@ -70,7 +70,9 @@
 | `CraftingOrderClassic_RecipeCats_Enchanting.lua` | sous-catégories de l'ENCHANTEMENT. | 52 |
 | `CraftingOrderClassic_Craft.lua` | socle de lecture LIVE de la fenêtre métier. | 133 |
 | `CraftingOrderClassic_Craft_Mainline.lua` | backend de lecture de la fenêtre métier, pour les clients MAINLINE/Retail (WoW: Forever / Camelot, interface 16001). | 264 |
-| `CraftingOrderClassic_Enchant.lua` | spécifique à l'Enchantement (API Craft). | 392 |
+| `CraftingOrderClassic_Enchant.lua` | spécifique à l'Enchantement (API Craft). | 409 |
+| `CraftingOrderClassic_Enchant_Filter.lua` | le filtre natif « Filter → Slots » de l'Enchantement (Forever). | 130 |
+| `CraftingOrderClassic_Enchant_Filter_Pilot.lua` | pose et rend le filtre natif « Slots » (T2). | 159 |
 | `CraftingOrderClassic_Stats.lua` | STATS d'un objet : identité canonique + libellé localisé. | 370 |
 | `CraftingOrderClassic_Stats_Filter.lua` | sélecteur « ne montrer que ce qui donne <stat> ». | 103 |
 | `CraftingOrderClassic_Gem.lua` | spécifique à la JOAILLERIE : sous-catégorise les GEMMES TAILLÉES par TAILLE (le mot qui porte la stat). | 226 |
@@ -1237,9 +1239,60 @@
 > Parse le nom ANGLAIS canonique du catalogue CraftLink (« Enchant <Slot> - <Effet> ») → slot + effet,
 > indépendamment de la langue du client. Sert AUSSI au classement de la liste de recettes :
 > Emplacement (section) › Stat de base (sous-catégorie) › variantes triées par niveau.
-> API publique : Enchant:Parse · Enchant:SlotFor · Enchant:SectionFor · Enchant:StatFor · Enchant:ShortName.
+> API publique : Enchant:Parse · Enchant:SlotFor · Enchant:SectionFor · Enchant:StatFor · Enchant:ShortName
+> · Enchant:WordsForEquipLoc · Enchant:SlotNameOf.
 
-**API** : `Enchant:Parse(name)` · `Enchant:SlotFor(spellID)` · `Enchant:SectionFor(spellID)` · `Enchant:StatFor(spellID)` · `Enchant:CraftsForEquipLoc(equipLoc, subclassID)` · `Enchant:HasCatalogFor(word)` · `Enchant:CatalogGroups(words)` · `Enchant:ShortName(name, spellID)`
+**API** : `Enchant:Parse(name)` · `Enchant:SlotFor(spellID)` · `Enchant:SectionFor(spellID)` · `Enchant:StatFor(spellID)` · `Enchant:WordsForEquipLoc(equipLoc, subclassID)` · `Enchant:SlotNameOf(word)` · `Enchant:CraftsForEquipLoc(equipLoc, subclassID)` · `Enchant:HasCatalogFor(word)` · `Enchant:CatalogGroups(words)` · `Enchant:ShortName(name, spellID)`
+
+### `CraftingOrderClassic_Enchant_Filter.lua`
+> CraftingOrderClassic_Enchant_Filter.lua — le filtre natif « Filter → Slots » de l'Enchantement (Forever).
+> Spec : docs/specs/enchant-echange-forever.md. Pendant un échange, COC coche dans ce filtre la case de
+> la pièce du partenaire. Ce fichier relie une CASE du filtre à ce qu'elle représente (T1) ; le pilote
+> qui pose et rend le filtre vit dans _Enchant_Filter_Pilot.lua (T2).
+> 
+> Le problème : les noms de case sont LOCALISÉS (« Wrist » sur un client anglais) et le jeu ne dit pas
+> quel emplacement porte chaque case. Mais le client fabrique ces noms à partir de ses propres chaînes
+> globales : relevé T1 (2026-09-21, build 69913, enUS), chacune des 14 cases de l'Enchantement porte
+> EXACTEMENT le texte d'une clé d'emplacement (`WRISTSLOT`, `ENCHSLOT_WEAPON`, `NONEQUIPSLOT`…). Une clé
+> ne dépend pas de la langue : on compare `_G[clé]` au nom de la case, sur le client, dans sa langue.
+> 
+> Deux familles de clés :
+>   · les emplacements de la SILHOUETTE : clé = jeton en majuscules (« WristSlot » → `WRISTSLOT`),
+>     comme le libellé que la silhouette affiche déjà (`_G[strupper(slot)]`, _UI_Post_Paperdoll) ;
+>   · les catégories d'enchant, qui ne sont pas des emplacements : « Weapon », « 2H Weapon »,
+>     « Shield », et « Created Items » (objets produits, aucun emplacement).
+> Le chemin d'une pièce vers ses cases passe par les MOTS d'enchant (« Bracer », « 2H Weapon »…) : une
+> arme à deux mains coche « 2H Weapon » ET « Weapon », une arme à une main « Weapon » seulement.
+> Les cases d'objets produits (« Main Hand », « Ranged »… : baguettes, etc.) ne sont jamais cochées :
+> aucun mot d'enchant n'y mène.
+> 
+> Chargé après _Enchant.lua et _UI_Post_Paperdoll.lua ; ne lit COC.Enchant et COC.UI.DOLL qu'à l'appel.
+> API : Filter.Resolve(names) · Filter.ReadCases() · Filter.CasesForWords · Filter.CasesForItem ·
+> Filter.CasesForSlot.
+
+**API** : `Filter.Resolve(names)` · `Filter.ReadCases()` · `Filter.CasesForWords(res, words)` · `Filter.CasesForItem(res, equipLoc, subclassID)` · `Filter.CasesForSlot(res, slot)`
+
+### `CraftingOrderClassic_Enchant_Filter_Pilot.lua`
+> CraftingOrderClassic_Enchant_Filter_Pilot.lua — pose et rend le filtre natif « Slots » (T2).
+> Spec : docs/specs/enchant-echange-forever.md. Pendant un échange, la liste native de l'Enchantement
+> suit la pièce que le partenaire a RÉELLEMENT posée dans l'emplacement 7 ; à la fin, elle retrouve
+> ses filtres d'avant. Les cases viennent de _Enchant_Filter.lua (T1).
+> 
+> Trois pièces, les deux premières sans aucun accès au jeu (testées hors jeu) :
+>   · le PILOTE écrit le filtre et se souvient de l'état d'avant, case par case ;
+>   · le SUIVEUR décide QUAND écrire : quand la pièce change, ou quand l'Enchantement réapparaît ;
+>   · le branchement (Filter:Start) relie le suiveur aux événements du jeu.
+> 
+> Sens de l'API, lu dans Blizzard_Professions.lua (InitSlotsFilter, ApplyfilterSet) :
+> `IsInventorySlotFiltered(i)` vrai = case DÉCOCHÉE (recettes cachées) ; le 2ᵉ argument de
+> `SetInventorySlotFilter(i, coche)` = case COCHÉE. On écrit case par case, comme ApplyfilterSet, et
+> seulement les cases qui changent. « Have Materials » n'est jamais touché : les composants du
+> partenaire ne sont pas dans nos sacs, ce filtre cacherait précisément le bon enchant.
+> 
+> Le filtre est propre au métier affiché : on n'écrit QUE si l'Enchantement est affiché. Ailleurs
+> (fenêtre fermée, autre métier), on attend qu'il revienne.
+
+**API** : `Filter.NewPilot(ts)` · `Pilot:Holding()` · `Pilot:Apply(cases)` · `Pilot:Release()` · `Filter.NewFollower(deps)` · `Follower:Refresh()` · `Filter:Start()`
 
 ### `CraftingOrderClassic_Stats.lua`
 > CraftingOrderClassic_Stats.lua — STATS d'un objet : identité canonique + libellé localisé.

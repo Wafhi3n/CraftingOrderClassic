@@ -1,0 +1,159 @@
+-- CraftingOrderClassic_Enchant_Filter_Pilot.lua — pose et rend le filtre natif « Slots » (T2).
+-- Spec : docs/specs/enchant-echange-forever.md. Pendant un échange, la liste native de l'Enchantement
+-- suit la pièce que le partenaire a RÉELLEMENT posée dans l'emplacement 7 ; à la fin, elle retrouve
+-- ses filtres d'avant. Les cases viennent de _Enchant_Filter.lua (T1).
+--
+-- Trois pièces, les deux premières sans aucun accès au jeu (testées hors jeu) :
+--   · le PILOTE écrit le filtre et se souvient de l'état d'avant, case par case ;
+--   · le SUIVEUR décide QUAND écrire : quand la pièce change, ou quand l'Enchantement réapparaît ;
+--   · le branchement (Filter:Start) relie le suiveur aux événements du jeu.
+--
+-- Sens de l'API, lu dans Blizzard_Professions.lua (InitSlotsFilter, ApplyfilterSet) :
+-- `IsInventorySlotFiltered(i)` vrai = case DÉCOCHÉE (recettes cachées) ; le 2ᵉ argument de
+-- `SetInventorySlotFilter(i, coche)` = case COCHÉE. On écrit case par case, comme ApplyfilterSet, et
+-- seulement les cases qui changent. « Have Materials » n'est jamais touché : les composants du
+-- partenaire ne sont pas dans nos sacs, ce filtre cacherait précisément le bon enchant.
+--
+-- Le filtre est propre au métier affiché : on n'écrit QUE si l'Enchantement est affiché. Ailleurs
+-- (fenêtre fermée, autre métier), on attend qu'il revienne.
+
+local COC    = CraftingOrderClassic
+local Filter = COC.EnchantFilter
+
+-- ---------------------------------------------------------------- le pilote
+
+local Pilot = {}
+Pilot.__index = Pilot
+
+-- `ts` = C_TradeSkillUI, ou un faux pour les tests.
+function Filter.NewPilot(ts) return setmetatable({ ts = ts }, Pilot) end
+
+-- État des cases : { n = nombre, [i] = vrai si la case est décochée }.
+local function snapshot(ts)
+    local s = { n = ts.GetAllFilterableInventorySlotsCount() or 0 }
+    for i = 1, s.n do s[i] = ts.IsInventorySlotFiltered(i) == true end
+    return s
+end
+
+-- COC tient-il un filtre (posé, et pas encore rendu) ?
+function Pilot:Holding() return self.saved ~= nil end
+
+-- Ne garde cochées QUE les cases `cases`. L'état d'avant n'est mémorisé qu'au PREMIER passage : une
+-- pièce qui en remplace une autre ne doit pas faire oublier le filtre du joueur. Rend vrai si le
+-- client tient exactement ce filtre à la relecture.
+function Pilot:Apply(cases)
+    if #cases == 0 then return self:Release() end
+    local ts = self.ts
+    local cur = snapshot(ts)
+    if not self.saved or self.saved.n ~= cur.n then self.saved = cur end
+    local keep = {}
+    for _, i in ipairs(cases) do keep[i] = true end
+    for i = 1, cur.n do
+        if cur[i] == (keep[i] == true) then ts.SetInventorySlotFilter(i, keep[i] == true) end
+    end
+    self.applied = snapshot(ts)
+    for i = 1, cur.n do
+        if self.applied[i] == (keep[i] == true) then return false end
+    end
+    return true
+end
+
+-- Rend le filtre d'avant. Seulement les cases que COC tient encore : une case que le joueur a
+-- changée lui-même depuis notre pose garde SON choix.
+function Pilot:Release()
+    local saved, applied = self.saved, self.applied
+    self.saved, self.applied = nil, nil
+    if not (saved and applied) then return true end
+    local ts = self.ts
+    local cur = snapshot(ts)
+    if cur.n ~= saved.n then return false end
+    for i = 1, cur.n do
+        if cur[i] == applied[i] and cur[i] ~= saved[i] then ts.SetInventorySlotFilter(i, not saved[i]) end
+    end
+    return true
+end
+
+-- ---------------------------------------------------------------- le suiveur
+
+local Follower = {}
+Follower.__index = Follower
+
+-- deps = { pilot =, shown = fn() → Enchantement affiché ?,
+--          item = fn() → clé, equipLoc, subclassID de la pièce posée (nil si rien),
+--          cases = fn() → cases lues sur le client (Filter.ReadCases) }
+function Filter.NewFollower(deps) return setmetatable({ d = deps, dirty = true }, Follower) end
+
+-- À appeler sur chaque événement utile. N'écrit que si quelque chose a VRAIMENT changé : la pièce, ou
+-- le retour de l'Enchantement à l'écran. Jamais sur un simple rafraîchissement de la liste : ce serait
+-- se battre avec le joueur qui décoche une case pendant l'échange (et nos propres écritures en
+-- provoquent un). Rend l'action faite ("apply", "release"), ou nil.
+function Follower:Refresh()
+    local d = self.d
+    local shown = d.shown() and true or false
+    if self.wasShown and not shown then self.dirty = true end   -- au retour, Blizzard a pu tout remettre
+    self.wasShown = shown
+    local key, equipLoc, subclassID = d.item()
+    if key ~= self.key then self.key, self.dirty = key, true end
+    if not (shown and self.dirty) then return nil end
+    self.dirty = false
+    if key then
+        local cases = Filter.CasesForItem(d.cases(), equipLoc, subclassID)
+        if #cases > 0 then return "apply", d.pilot:Apply(cases), cases end
+    end
+    if not d.pilot:Holding() then return nil end
+    return "release", d.pilot:Release()
+end
+
+-- ---------------------------------------------------------------- branchement
+
+local function trace(msg) if COC.Trace then COC.Trace:Log("enchfilter", msg) end end
+
+local function enchantingShown()
+    local pf = _G.ProfessionsFrame
+    return pf and pf:IsShown() and COC.Craft and COC.Craft:OpenProfessionKey() == "Enchanting"
+end
+
+-- Pièce posée par le PARTENAIRE dans l'emplacement « ne sera pas échangé ». Clé = son lien.
+-- ⚠️ Pas de `GetItemInfoInstant and GetItemInfoInstant(link)` : `and` tronque le multi-retour.
+local function tradeItem()
+    if not (_G.TradeFrame and TradeFrame:IsShown() and GetTradeTargetItemLink) then return nil end
+    local link = GetTradeTargetItemLink(_G.TRADE_ENCHANT_SLOT or 7)
+    if not link then return nil end
+    local equipLoc, subclassID
+    if COC.Api.GetItemInfoInstant then
+        local _, _, _, loc, _, _, sub = COC.Api.GetItemInfoInstant(link)
+        equipLoc, subclassID = loc, sub
+    end
+    return link, equipLoc, subclassID
+end
+
+function Filter:Start()
+    if not (C_TradeSkillUI and C_TradeSkillUI.SetInventorySlotFilter) then return end
+    local follower = Filter.NewFollower({
+        pilot = Filter.NewPilot(C_TradeSkillUI), shown = enchantingShown,
+        item = tradeItem, cases = Filter.ReadCases,
+    })
+    Filter.follower = follower
+    local pending
+    local function refresh()
+        pending = nil
+        local ok, what, done, cases = pcall(follower.Refresh, follower)
+        if not ok then return trace("erreur : " .. tostring(what)) end
+        if what == "apply" then
+            trace(string.format("filtre posé sur les cases %s (%s)", table.concat(cases, ","),
+                  done and "relu OK" or "relu DIFFÉRENT"))
+        elseif what == "release" then
+            trace("filtre rendu" .. (done and "" or " (métier différent : rien touché)"))
+        end
+    end
+    local f = CreateFrame("Frame")
+    COC.Api.RegisterEventsSafe(f, { "TRADE_SHOW", "TRADE_CLOSED", "TRADE_TARGET_ITEM_CHANGED",
+                                    "TRADE_SKILL_SHOW", "TRADE_SKILL_CLOSE", "TRADE_SKILL_LIST_UPDATE" })
+    -- Coalescé : l'ouverture de la fenêtre enchaîne plusieurs événements, et la pièce n'est lisible
+    -- qu'un instant après TRADE_TARGET_ITEM_CHANGED.
+    f:SetScript("OnEvent", function()
+        if pending then return end
+        pending = true
+        C_Timer.After(0.1, refresh)
+    end)
+end
