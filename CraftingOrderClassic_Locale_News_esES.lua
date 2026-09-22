@@ -321,6 +321,13 @@ local news = {
         "Y los maestros. Ninguna página dice «esto se aprende con el maestro»: el addon lo deducía de la ausencia de objeto-receta y mostraba un interrogante, en 788 recetas. Wowhead sí lo publica, en la página del hechizo y no en la del objeto, lo que dio nombre a 398. Y cuando hablas con un maestro de profesión, el addon anota qué enseña y dónde está: el interrogante desaparece y te quedas con sus coordenadas. Si tu ventana de maestro está filtrando lo que muestra, te lo dice en vez de recoger solo un tercio en silencio.",
     ["Corrigé : un plantage en donjon (le client rend des valeurs « secrètes » pour certaines données d'unité, et l'une d'elles finissait en clé de table trois appels plus loin, dans une fonction d'annuaire qui n'avait aucune raison de se méfier d'un nom), et le changement d'onglet de métier qui laissait la liste d'un métier avec les infobulles d'un autre."] =
         "Corregido: un cuelgue en mazmorras (el cliente devuelve valores «secretos» para ciertos datos de unidad, y uno acababa de clave de tabla tres llamadas más tarde, en una función de directorio que no tenía por qué desconfiar de un nombre), y el cambio de pestaña de profesión que dejaba la lista de una profesión con los tooltips de otra.",
+    -- v1.35.1
+    ["Un niveau qu'on ne connaît pas n'est pas un niveau 0"] =
+        "Un nivel que no conocemos no es un cero",
+    ["La vue Manquantes plaçait huit recettes de Couture en tête de liste en te disant qu'elles étaient à ta portée, affichées « niveau requis 0 ». 29 recettes réparties sur six métiers n'ont aucun niveau dans les données, et l'addon lisait cette absence comme un zéro — qui se classe en tête et passe tous les tests de « peux-tu l'apprendre »."] =
+        "La vista Faltantes ponía ocho recetas de Sastrería al principio de la lista y las declaraba a tu alcance, todas con «nivel requerido 0». 29 recetas de seis profesiones no tienen ningún nivel en los datos, y el addon leía esa ausencia como un cero, que se ordena primero y supera cualquier prueba de «¿ya puedes aprenderlo?».",
+    ["Elles affichent « ? » maintenant, elles descendent en fin de liste, et l'addon ne les dit ni à ta portée ni hors de portée, puisqu'il l'ignore. L'infobulle le dit franchement. Les niveaux eux-mêmes manquent toujours : c'est un travail de données, pas d'affichage."] =
+        "Ahora muestran «?», bajan al final de la lista, y el addon no dice ni que están a tu alcance ni que no lo están, porque no lo sabe. La descripción lo dice. Los niveles en sí siguen faltando: eso es trabajo de datos, no de presentación.",
     -- v1.35.0
     ["Enchanter la pièce d'un autre, depuis l'échange"] =
         "Encantar el objeto de otro, desde la ventana de intercambio",

@@ -1,5 +1,19 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.35.1 - A skill level we don't know isn't zero
+
+The Missing view put eight Tailoring recipes at the top of the list and told you they were within
+reach, Boots of Darkness, Green Woolen Robe and the six Stormcloth pieces, all reading "required
+skill 0". They aren't. Twenty-nine recipes across six professions carry no skill level in the data,
+and the addon read that absence as a zero, which sorts first and passes every "can you learn this
+yet" test there is.
+
+They show a "?" now, they sit at the bottom of the list, and the addon says neither that they're in
+reach nor that they're out of it, because it doesn't know. The tooltip says as much.
+
+The levels themselves are still missing. That's a data job, not a display one: what the addon knows
+comes from pages that fill in over time on a beta, and from what it sees when you talk to a trainer.
+
 ## v1.35.0 - Enchanting someone else's gear over the trade window
 
 The floating enchant panel is gone. On Forever it sat exactly where the game puts the profession

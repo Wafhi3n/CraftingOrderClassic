@@ -31,6 +31,13 @@ local BODY_W = 780
 local function versionsNewest()
     return {
         {
+            v = "v1.35.1", title = L["Un niveau qu'on ne connaît pas n'est pas un niveau 0"],
+            lines = {
+                L["La vue Manquantes plaçait huit recettes de Couture en tête de liste en te disant qu'elles étaient à ta portée, affichées « niveau requis 0 ». 29 recettes réparties sur six métiers n'ont aucun niveau dans les données, et l'addon lisait cette absence comme un zéro — qui se classe en tête et passe tous les tests de « peux-tu l'apprendre »."],
+                L["Elles affichent « ? » maintenant, elles descendent en fin de liste, et l'addon ne les dit ni à ta portée ni hors de portée, puisqu'il l'ignore. L'infobulle le dit franchement. Les niveaux eux-mêmes manquent toujours : c'est un travail de données, pas d'affichage."],
+            },
+        },
+        {
             v = "v1.35.0", title = L["Enchanter la pièce d'un autre, depuis l'échange"],
             lines = {
                 L["Le panneau flottant d'enchantement a disparu : sur Forever, la fenêtre de métier se dessinait exactement par-dessus. Son rôle revient à la colonne de métier, qui passe en mode Échange dès qu'un échange s'ouvre avec ton Enchantement affiché — la silhouette du partenaire, la pièce qu'il a posée dans l'emplacement « ne sera pas échangé », et ce que ses composants désignent."],
