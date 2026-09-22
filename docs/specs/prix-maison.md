@@ -1,6 +1,6 @@
 # Les prix : une seule source, Auctionator
 
-> État : **brouillon** · Rédigée le 2026-09-22 · Arbitrages du user le 2026-09-22
+> État : **implémentée** (retrait du pont + renommage, 2026-09-22 ; reste à voir en jeu) · Rédigée le 2026-09-22 · Arbitrages du user le 2026-09-22
 > Cible : WoW: Forever / Camelot · Addon : Crafting Order - Classic
 
 ## Le problème
@@ -54,15 +54,15 @@ pas une, et un pied de fenêtre peut nommer « Lazy Gold » là où le chiffre v
 - 2026-09-22, user — **Lazy Gold est décommissionné** : il ne faisait que relire Auctionator.
 - 2026-09-22, user — **rien ne vient des autres joueurs.** Les sources sont Auctionator pour les
   prix, Wowhead et notre propre addon pour le reste.
-- 2026-09-22, agent (à confirmer) — on garde la couche de calcul existante (`COC.LazyGold`, dont le
-  nom ment désormais) et on ne touche qu'à sa source.
+- 2026-09-22, user — la couche s'appelle **`COC.Profit`** (`_Profit.lua`, `_UI_Post_Profit.lua`,
+  `_UI_MyArtisans_Profit.lua`). « Rentabilité » reste le mot côté joueur, `Profit` le mot côté code.
+  La clé persistée `lgExactProfit` garde son nom : la renommer demanderait une migration de schéma
+  pour un confort d'écriture.
 
 ### Décisions ouvertes
 
-1. **Le nom** de la couche une fois le pont retiré (`COC.Price` ?) — cosmétique, mais elle est citée
-   dans une douzaine de fichiers.
-2. **Ce qu'on affiche à la place d'un prix absent** : rien, un tiret, ou une ligne qui nomme la cause
-   (« installe Auctionator pour les prix de l'hôtel des ventes »).
+Aucune : les deux dernières (le nom de la couche, l'affichage d'un prix absent) ont été tranchées par
+le user le 2026-09-22 et sont implémentées.
 
 ## Critères d'acceptation
 
@@ -78,7 +78,7 @@ pas une, et un pied de fenêtre peut nommer « Lazy Gold » là où le chiffre v
 
 ## Contrat
 
-`ItemValue(itemID)` reste la **seule** porte d'entrée et rend des cuivres ou `nil`. Le reste de COC
+`COC.Profit:ItemValue(itemID)` reste la **seule** porte d'entrée et rend des cuivres ou `nil`. Le reste de COC
 n'a pas à savoir d'où vient un prix. Rien n'est persisté : COC ne tient pas de relevé, il demande au
 moment où il affiche.
 

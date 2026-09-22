@@ -154,7 +154,7 @@ function PW:_BuildRouteBody(f, inset, scrollName, bottomInset)
     local cav = inset:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
     cav:SetPoint("BOTTOMLEFT", 10, 7); cav:SetPoint("BOTTOMRIGHT", -10, 7); cav:SetJustifyH("LEFT")
     cav:SetText(string.format(L["Estimation : chance de point par couleur, prix du dernier scan HV (%s)."],
-        (COC.LazyGold and COC.LazyGold:PriceSource()) or "Auctionator"))
+        (COC.Profit and COC.Profit:PriceSource()) or "Auctionator"))
     return f
 end
 
@@ -441,8 +441,8 @@ end
 -- Ouvre/ferme le panneau (bouton carte de la barre d'outils Recettes). Sans Lazy Gold : popup
 -- d'incitation (même pattern que les toggles de tri).
 function PW:ToggleRoute()
-    local LG = COC.LazyGold
-    if not (LG and LG:IsAvailable()) then COC:NeedPriceAddon(); return end
+    local PR = COC.Profit
+    if not (PR and PR:IsAvailable()) then COC:NeedPriceAddon(); return end
     local f = self.routeWin or self:_BuildRouteWin()
     if f:IsShown() then f:Hide() else self:_FillRoute(); f:Show() end
     self:_SyncRouteBtn()
@@ -470,7 +470,7 @@ function PW:_SyncRouteBtn()
     if b then
         local show = not self.rerollKey
         b:SetShown(show and true or false)
-        local ok = COC.LazyGold and COC.LazyGold:IsAvailable()
+        local ok = COC.Profit and COC.Profit:IsAvailable()
         local active = (self.routeWin and self.routeWin:IsShown()) and true or false
         if b.onBG then b.onBG:SetShown(active) end
         if b.map then b.map:SetDesaturated((ok and not active) and true or false) end

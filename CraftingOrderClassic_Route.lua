@@ -47,8 +47,8 @@ end
 -- nil si les briques manquent (lib sans seuils, Lazy Gold absent).
 function Route:Candidates(profKey, opts)
     local lib = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
-    local LG, M = COC.LazyGold, COC.Sources
-    if not (lib and lib.RecipeColors and LG and LG:IsAvailable() and profKey) then return nil end
+    local PR, M = COC.Profit, COC.Sources
+    if not (lib and lib.RecipeColors and PR and PR:IsAvailable() and profKey) then return nil end
     local known, live = opts.known or {}, opts.live or {}
     local out = {}
     for _, sid in ipairs((lib.GetRecipes and lib:GetRecipes(profKey)) or {}) do
@@ -61,7 +61,7 @@ function Route:Candidates(profKey, opts)
         -- sous-estimé ne doit jamais rivaliser avec un coût sûr) ; le total passe en « > ».
         local reags = (colors and not cd) and lib.RecipeReagents and lib:RecipeReagents(profKey, sid) or nil
         local cost = (reags and #reags > 0)
-            and (LG:CraftCost(profKey, sid) or { cost = 0, missing = true }) or nil
+            and (PR:CraftCost(profKey, sid) or { cost = 0, missing = true }) or nil
         if cost then
             local prod = lib.RecipeProduct and lib:RecipeProduct(profKey, sid)
             local isKnown = (known["s" .. sid] or (prod and known["i" .. prod])) and true or false
@@ -77,7 +77,7 @@ function Route:Candidates(profKey, opts)
                     if not planPrice then planPrice, planUnknown = 0, true end
                 else   -- butin/quête/inconnu : achetable seulement si l'objet-plan est coté à l'HV
                     local ri = M and M:RecipeItem(profKey, sid)
-                    planPrice = ri and LG:ItemValue(ri) or nil
+                    planPrice = ri and PR:ItemValue(ri) or nil
                 end
             end
             if isKnown or planPrice then
@@ -176,7 +176,7 @@ end
 -- Candidates() balaie TOUTES les recettes du métier et interroge Lazy Gold pour chacune. Compute()
 -- paie ça une fois puis marche rang par rang jusqu'au plafond : c'est un chemin FROID (on ouvre une
 -- fenêtre). Le suivi à l'écran, lui, se recalcule à chaque BAG_UPDATE — d'où ce cache, même patron
--- que LG:BestPlanFor (clé + TTL). Clé : métier + inclusion des plans + version de données + nombre
+-- que PR:BestPlanFor (clé + TTL). Clé : métier + inclusion des plans + version de données + nombre
 -- de recettes connues (apprendre un plan doit rebattre les candidates).
 local CANDS, CANDS_TTL = {}, 120
 
@@ -263,7 +263,7 @@ end
 function Route:Materials(profKey, route)
     local lib = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
     if not (lib and route) then return nil end
-    local LG, M = COC.LazyGold, COC.Sources
+    local PR, M = COC.Profit, COC.Sources
     local acc = { qty = {}, order = {}, produced = {},
         i2s = (lib.ItemToSpell and lib:ItemToSpell(profKey)) or {} }
     for _, s in ipairs(route.segments or {}) do
@@ -288,8 +288,8 @@ function Route:Materials(profKey, route)
     local mats = {}
     for _, id in ipairs(acc.order) do
         local n = math.ceil(acc.qty[id] - 0.001)
-        if n > 0 then mats[#mats + 1] = { itemID = id, qty = n, cost = LG and LG:ItemValue(id) or nil,
-            vendor = (LG and LG.IsVendorItem) and LG:IsVendorItem(id) or false } end
+        if n > 0 then mats[#mats + 1] = { itemID = id, qty = n, cost = PR and PR:ItemValue(id) or nil,
+            vendor = (PR and PR.IsVendorItem) and PR:IsVendorItem(id) or false } end
     end
     table.sort(mats, function(a, b) return ((a.cost or 0) * a.qty) > ((b.cost or 0) * b.qty) end)
     return { mats = mats, plans = plans, gaps = gapPts > 0, gapPts = gapPts, partial = partial }

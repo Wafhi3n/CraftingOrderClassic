@@ -240,10 +240,10 @@ function PW:_IsAcquirable(e)
     local M = COC.Sources
     local kind = M and M:SourceKind(self.profKey, e.spellID) or "unknown"
     if kind == "trainer" or kind == "vendor" then return true end
-    local LG = COC.LazyGold
-    if LG and LG:IsAvailable() then
+    local PR = COC.Profit
+    if PR and PR:IsAvailable() then
         local recItemID = M and M:RecipeItem(self.profKey, e.spellID)
-        if recItemID and LG:ItemValue(recItemID) then return true end
+        if recItemID and PR:ItemValue(recItemID) then return true end
     end
     return false
 end
@@ -251,7 +251,7 @@ end
 function PW:_RecipeDisplayList()
     local raw, search = self:_ActiveRecipes(), self.recipeSearch
     self._active = raw   -- mémorisé pour GetSelectedRecipe (résolution par clé, cf. entryKey)
-    local sortProfit = self.recipeSortProfit and COC.LazyGold and COC.LazyGold:IsAvailable()
+    local sortProfit = self.recipeSortProfit and COC.Profit and COC.Profit:IsAvailable()
     local haveMats = self.recipeHaveMats   -- ne garder que les recettes craftables MAINTENANT (mats en sac)
     local skillUp  = self.recipeSkillUp    -- masquer le palier gris (trivial) : ne reste que ce qui progresse
     -- Filtre « acquérables » : n'a de sens qu'en mode manquantes (il ne garde QUE des manquantes achetables,
@@ -421,13 +421,13 @@ end
 -- éviterait sinon de rappeler Auctionator en boucle). `false` = calculé, sans valeur. Rien pour les
 -- recettes manquantes (on ne peut pas les fabriquer) ni si Lazy Gold est absent.
 function PW:_RowProfit(e)
-    if not (COC.LazyGold and COC.LazyGold:IsAvailable()) then return nil end
+    if not (COC.Profit and COC.Profit:IsAvailable()) then return nil end
     -- Les recettes MANQUANTES ont aussi un profit : c'est même l'info qui décide si ça vaut le coup
     -- d'aller l'apprendre.
     self._profitCache = self._profitCache or {}
     local k = e.itemID or 0
     local v = self._profitCache[k]
-    if v == nil then v = COC.LazyGold:EntryProfit(self.profKey, e) or false; self._profitCache[k] = v end
+    if v == nil then v = COC.Profit:EntryProfit(self.profKey, e) or false; self._profitCache[k] = v end
     return v or nil
 end
 
@@ -441,8 +441,8 @@ function PW:_FillRecipeRight(row, e)
     if ms then row.niv:SetText("|cFF9AC0E8" .. ms .. "|r"); row.niv:Show(); anchor = row.niv else row.niv:Hide() end
     local prof = self:_RowProfit(e)
     -- Indicateur COMPACT (paliers de pièces) par défaut : la liste reste lisible. Le bouton « 123 »
-    -- passe aux valeurs exactes en po/pa/pc (LG:ProfitText arbitre). Une perte n'affiche rien.
-    local tier = prof and COC.LazyGold:ProfitText(prof) or ""
+    -- passe aux valeurs exactes en po/pa/pc (PR:ProfitText arbitre). Une perte n'affiche rien.
+    local tier = prof and COC.Profit:ProfitText(prof) or ""
     if tier ~= "" then
         row.profit:ClearAllPoints()
         if anchor then row.profit:SetPoint("RIGHT", anchor, "LEFT", -4, 0) else row.profit:SetPoint("RIGHT", -2, 0) end

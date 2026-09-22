@@ -45,7 +45,7 @@ function PW:_BuildRecipeTools(tz)
     self.recSortBtn = sortBtn
 
     local exactBtn = self:_MakeToolBtn(tz, function()
-        return (COC.LazyGold and COC.LazyGold:ExactMode()) and L["Valeurs exactes — clic pour l'affichage compact."]
+        return (COC.Profit and COC.Profit:ExactMode()) and L["Valeurs exactes — clic pour l'affichage compact."]
             or L["Afficher les valeurs exactes (po/pa/pc)."]
     end, function() PW:_ToggleProfitExact() end)
     exactBtn:SetPoint("LEFT", 2, 0)
@@ -132,7 +132,7 @@ end
 -- Bascule le tri par rentabilité (sans effet si Lazy Gold absent). Met à jour l'en-tête + rafraîchit.
 -- Exclusif avec le tri progression : un seul à-plat à la fois.
 function PW:_ToggleRecipeSort()
-    if not (COC.LazyGold and COC.LazyGold:IsAvailable()) then COC:NeedPriceAddon(); return end
+    if not (COC.Profit and COC.Profit:IsAvailable()) then COC:NeedPriceAddon(); return end
     self.recipeSortProfit = not self.recipeSortProfit
     if self.recipeSortProfit then self.recipeSortLevel = nil end
     self:_SyncSortHeader()
@@ -150,9 +150,9 @@ end
 -- Bascule l'affichage compact ↔ valeurs exactes (po/pa/pc). Préférence PERSISTÉE (db.lgExactProfit) :
 -- c'est un confort de lecture, il doit survivre au /reload.
 function PW:_ToggleProfitExact()
-    local LG = COC.LazyGold
-    if not (LG and LG:IsAvailable()) then COC:NeedPriceAddon(); return end
-    LG:SetExactMode(not LG:ExactMode())
+    local PR = COC.Profit
+    if not (PR and PR:IsAvailable()) then COC:NeedPriceAddon(); return end
+    PR:SetExactMode(not PR:ExactMode())
     self:_SyncSortHeader()
     self:RefreshRecipes()
 end
@@ -178,8 +178,8 @@ end
 -- masqués si l'addon est absent — inutile de proposer un tri ou des prix sans données ; la ▲
 -- progression reste, elle ne dépend que des couleurs de difficulté du client.
 function PW:_SyncSortHeader()
-    local LG = COC.LazyGold
-    local ok = LG and LG:IsAvailable()
+    local PR = COC.Profit
+    local ok = PR and PR:IsAvailable()
     local on = self.recipeSortProfit and ok
     if self.recSortBtn then
         self.recSortBtn:SetShown(true)   -- toujours visible (enticing) ; clic sans Lazy Gold → popup
@@ -188,7 +188,7 @@ function PW:_SyncSortHeader()
         if self.recSortBtn.coin then self.recSortBtn.coin:SetDesaturated(ok and not on or false) end
     end
     if self.recExactBtn then
-        local ex = ok and LG:ExactMode()
+        local ex = ok and PR:ExactMode()
         self.recExactBtn:SetShown(true)
         self.recExactBtn.onBG:SetShown(ex and true or false)
         if not ok then self.recExactBtn.num:SetTextColor(1, 0.82, 0.29)   -- doré : incite au clic (popup)

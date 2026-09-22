@@ -117,7 +117,7 @@ end
 
 -- PRIX du plan chez son vendeur. `nil` = INCONNU, et les appelants doivent le traiter comme tel :
 -- on ne connaît ni les prix de formateur, ni les prix fixes des marchands. Seul Auctionator, s'il
--- a vu le marchand, sait répondre — et c'est déjà son rôle via COC.LazyGold, interrogé ici pour
+-- a vu le marchand, sait répondre — et c'est déjà son rôle via COC.Profit, interrogé ici pour
 -- que les appelants n'aient qu'UN endroit à demander.
 function S:SourcePrice(profKey, spellID)
     -- Le prix RELEVÉ chez le marchand d'abord : c'est un fait, il ne dépend d'aucun addon tiers, et
@@ -128,9 +128,9 @@ function S:SourcePrice(profKey, spellID)
     if fixed then return fixed end
     -- Repli : l'oracle de prix, s'il a vu le marchand. nil reste nil -- jamais zéro.
     local itemID = recipeItemFor(profKey, spellID)
-    local LG = COC.LazyGold
-    if not (itemID and LG and LG.IsVendorItem and LG:IsVendorItem(itemID)) then return nil end
-    return LG:ItemValue(itemID)
+    local PR = COC.Profit
+    if not (itemID and PR and PR.IsVendorItem and PR:IsVendorItem(itemID)) then return nil end
+    return PR:ItemValue(itemID)
 end
 
 -- LE TEXTE DE SOURCE DU CLIENT, quand il existe : autoritaire, localisé, et complet.

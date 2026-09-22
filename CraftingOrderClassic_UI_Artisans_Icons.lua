@@ -91,12 +91,12 @@ end
 -- base configurable, db.lgMinProfit). Lazy Gold absent → aucune désaturation.
 -- `r` = fiche roster de l'artisan (nil si indisponible → on saute direct à l'approximation).
 function UI:_SetArtProfitBorder(ic, item, r)
-    local LG = COC.LazyGold
-    if not (LG and ic.border) then return end
-    local on = LG:IsAvailable()
-    local plan = on and (LG:BestKnownPlanFor(item.key, r) or LG:BestPlanFor(item.key, item.sv and item.sv[1])) or nil
+    local PR = COC.Profit
+    if not (PR and ic.border) then return end
+    local on = PR:IsAvailable()
+    local plan = on and (PR:BestKnownPlanFor(item.key, r) or PR:BestPlanFor(item.key, item.sv and item.sv[1])) or nil
     local best = plan and plan.profit
-    local tier = LG:HighlightTier(best)
+    local tier = PR:HighlightTier(best)
     ic.tex:SetDesaturated(on and tier == 0)
     ic.tex:SetAlpha((on and tier == 0) and 0.55 or 1)
     if tier == 0 then
@@ -104,17 +104,17 @@ function UI:_SetArtProfitBorder(ic, item, r)
         ic.tipProfit = nil
         return
     end
-    local c = LG.TIER_COLOR[tier]
-    ic.border:SetTexCoord(unpack(LG.ALERT_BORDER))
+    local c = PR.TIER_COLOR[tier]
+    ic.border:SetTexCoord(unpack(PR.ALERT_BORDER))
     ic.border:SetVertexColor(c[1], c[2], c[3])
     ic.border:Show()
     if ic.glow then
-        ic.glow:SetTexCoord(unpack(LG.ALERT_GLOW))
+        ic.glow:SetTexCoord(unpack(PR.ALERT_GLOW))
         ic.glow:SetVertexColor(c[1], c[2], c[3])
         ic.glow:SetShown(tier >= 3)   -- halo réservé au palier du haut
     end
     -- On NOMME le plan quand on le peut : « 599 po » ne dit pas quoi commander, « Iron Buckle — 599 po » si.
-    local nm = LG:PlanName(item.key, plan)
+    local nm = PR:PlanName(item.key, plan)
     ic.tipProfit = L["Meilleur plan"] .. " : " .. (nm and (nm .. " — ") or "") .. COC.Api.Coin(best)
 end
 
@@ -144,7 +144,7 @@ local function newProfIcon(row)
     local ic = CreateFrame("Button", nil, row.profsFrame); ic:SetSize(18, 18)
     -- Halo (palier 3) DERRIÈRE l'icône, en additif : c'est un glow, pas un aplat.
     local glow = ic:CreateTexture(nil, "BACKGROUND")
-    glow:SetTexture(COC.LazyGold and COC.LazyGold.ALERT_TEX)
+    glow:SetTexture(COC.Profit and COC.Profit.ALERT_TEX)
     glow:SetPoint("CENTER"); glow:SetSize(30, 30); glow:SetBlendMode("ADD"); glow:Hide()
     ic.glow = glow
     local tex = ic:CreateTexture(nil, "ARTWORK"); tex:SetAllPoints()
@@ -153,7 +153,7 @@ local function newProfIcon(row)
     hi:SetColorTexture(1, 1, 1, 0.25)
     -- Contour de RENTABILITÉ par-dessus l'icône (teinté selon le palier).
     local bd = ic:CreateTexture(nil, "OVERLAY")
-    bd:SetTexture(COC.LazyGold and COC.LazyGold.ALERT_TEX)
+    bd:SetTexture(COC.Profit and COC.Profit.ALERT_TEX)
     bd:SetPoint("CENTER"); bd:SetSize(24, 24); bd:Hide()
     ic.border = bd
     ic:SetScript("OnEnter", iconTooltip)

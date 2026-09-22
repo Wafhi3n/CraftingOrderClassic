@@ -246,11 +246,11 @@ end
 -- TEXTE LIBRE (« 15po », « 2 stacks de fer »…), le parser serait un devin — l'artisan compare lui-même
 -- le prix proposé à ces repères. Renvoie la hauteur consommée (0 = rien).
 function PW:_FillOrderProfit(card, o, hasPanel)
-    local LG = COC.LazyGold
+    local PR = COC.Profit
     if not hasPanel then card.lgLine:Hide(); return 0 end
     -- Aucun oracle : on le DIT au lieu de laisser un trou. Une ligne absente se lit comme « cette
     -- commande ne vaut rien », alors qu'on n'en sait simplement rien (décision du user 2026-09-22).
-    if not (LG and LG:IsAvailable()) then
+    if not (PR and PR:IsAvailable()) then
         card.lgLine:SetText("|cFF888888" .. L["Installe Auctionator pour voir les prix."] .. "|r")
         card.lgLine:Show()
         return 16
@@ -258,9 +258,9 @@ function PW:_FillOrderProfit(card, o, hasPanel)
     local list = self:_OrderReagents(o)
     local mine = 0
     for _, rg in ipairs(list or {}) do
-        if not rg[3] then mine = mine + (LG:ItemValue(rg[1]) or 0) * (rg[2] or 1) end   -- non fourni = à moi
+        if not rg[3] then mine = mine + (PR:ItemValue(rg[1]) or 0) * (rg[2] or 1) end   -- non fourni = à moi
     end
-    local val = (LG:ItemValue(o.itemID) or 0) * (o.qty or 1)
+    local val = (PR:ItemValue(o.itemID) or 0) * (o.qty or 1)
     if val <= 0 and mine <= 0 then card.lgLine:Hide(); return 0 end
     local parts = {}
     if val > 0 then parts[#parts + 1] = "|cFFE8B84B" .. L["Valeur HV"] .. ":|r " .. COC.Api.Coin(val) end

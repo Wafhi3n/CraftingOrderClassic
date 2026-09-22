@@ -1,4 +1,4 @@
--- CraftingOrderClassic_UI_MyArtisans_LazyGold.lua — onglet « Mes artisans » : couche Lazy Gold.
+-- CraftingOrderClassic_UI_MyArtisans_Profit.lua — onglet « Mes artisans » : couche Lazy Gold.
 --   * barre d'outils : pièce (tri rentabilité), « 123 » (valeurs exactes, réglage PARTAGÉ avec la
 --     vue métier), et « Tout le royaume » ;
 --   * « Tout le royaume » = TOUS les métiers du compte fusionnés en une seule liste à plat triée par
@@ -9,14 +9,14 @@ local COC  = CraftingOrderClassic
 local UI   = COC.UI
 local L    = COC.L
 
-local function LG() local g = COC.LazyGold; return (g and g:IsAvailable()) and g or nil end
+local function PR() local g = COC.Profit; return (g and g:IsAvailable()) and g or nil end
 
 -- Profit d'une recette, MÉMORISÉ le temps du refresh (« Tout le royaume » balaie des centaines de
 -- plans : sans mémo on interrogerait Auctionator autant de fois).
 -- `rc` = entrée de la liste. Sans spellID (essence de désenchantement, poisson…) il n'y a pas de
 -- « profit de craft » : la valeur de vente EST le gain (le coût, c'est du temps, pas des réactifs).
 function UI:_MyArtProfit(rc)
-    local g = LG()
+    local g = PR()
     if not (g and rc) then return nil end
     self._myArtProfitCache = self._myArtProfitCache or {}
     local k = rc.sid and ((rc.profKey or "?") .. ":" .. rc.sid) or ("i" .. (rc.itemID or 0))
@@ -59,7 +59,7 @@ function UI:_BuildMyArtLGBar(panel, anchor)
         return UI.myArtSortProfit and L["Tri par rentabilité — clic pour A-Z."]
             or L["Trier par rentabilité (Lazy Gold)."]
     end, function()
-        if not LG() then COC:NeedPriceAddon(); return end
+        if not PR() then COC:NeedPriceAddon(); return end
         UI.myArtSortProfit = not UI.myArtSortProfit
         UI:RefreshMyArtisans()
     end)
@@ -70,11 +70,11 @@ function UI:_BuildMyArtLGBar(panel, anchor)
     self.myArtSortBtn = sortBtn
 
     local exactBtn = makeToolBtn(panel, function()
-        local g = COC.LazyGold
+        local g = COC.Profit
         return (g and g:ExactMode()) and L["Valeurs exactes — clic pour l'affichage compact."]
             or L["Afficher les valeurs exactes (po/pa/pc)."]
     end, function()
-        local g = LG(); if not g then COC:NeedPriceAddon(); return end
+        local g = PR(); if not g then COC:NeedPriceAddon(); return end
         g:SetExactMode(not g:ExactMode())
         UI:RefreshMyArtisans()
     end)
@@ -85,7 +85,7 @@ function UI:_BuildMyArtLGBar(panel, anchor)
 end
 
 function UI:_SyncMyArtLGBar()
-    local g = LG()
+    local g = PR()
     if self.myArtAllBtn then
         self.myArtAllBtn:SetShown(true)   -- toujours visible (enticing) ; clic sans Lazy Gold → popup
         self.myArtAllBtn:SetSelected(self.myArtAllProfs and true or false)

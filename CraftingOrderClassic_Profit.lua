@@ -1,4 +1,4 @@
--- CraftingOrderClassic_LazyGold.lua — pont LECTURE SEULE vers l'oracle de prix, AUCTIONATOR.
+-- CraftingOrderClassic_Profit.lua — pont LECTURE SEULE vers l'oracle de prix, AUCTIONATOR.
 -- Spec : docs/specs/prix-maison.md.
 --
 -- BUT : afficher la RENTABILITÉ d'une recette dans la vue métier — prix de vente à l'HV, coût des
@@ -22,11 +22,11 @@
 -- L'API d'Auctionator LÈVE (error) sur un callerID vide ou un argument mal typé : tout passe en pcall.
 --
 -- Le COÛT des réactifs et l'objet produit viennent de NOS données CraftLink (RecipeReagents/RecipeProduct),
--- pas des tables de LG : on reste maître de la recette, LG ne sert QUE d'oracle de prix.
+-- pas des tables de PR : on reste maître de la recette, PR ne sert QUE d'oracle de prix.
 
 local COC = CraftingOrderClassic
-local LG  = {}
-COC.LazyGold = LG
+local PR  = {}
+COC.Profit = PR
 
 local AH_CUT = 0.05   -- coupe de l'hôtel des ventes (5 %)
 
@@ -40,20 +40,20 @@ local function auctionator()
 end
 
 -- L'oracle de prix répond-il ?
-function LG:IsAvailable()
+function PR:IsAvailable()
     return auctionator() ~= nil
 end
 
 -- Le NOM D'AFFICHAGE de l'oracle, ou nil s'il n'est pas là. Un pied de fenêtre qui nomme la source
 -- envoie chercher au bon endroit le jour où un prix semble faux.
-function LG:PriceSource()
+function PR:PriceSource()
     return auctionator() and "Auctionator" or nil
 end
 
 -- Prix d'un objet en cuivre (vendeur ou HV), ou nil si aucun oracle ne le connaît.
 -- Ordre VENDEUR puis HV dans les deux chemins : un réactif vendu à prix fixe en ville ne doit
 -- jamais être valorisé au cours de l'HV, sinon toute la route se trompe de recette.
-function LG:ItemValue(itemID)
+function PR:ItemValue(itemID)
     if not itemID then return nil end
     local v1 = auctionator()
     if not v1 then return nil end
@@ -70,7 +70,7 @@ end
 -- Auctionator ne répond que pour les marchands DÉJÀ VISITÉS : sa réponse est sûre quand elle est
 -- positive, muette sinon. On ne comble pas ce trou par une devinette — au pire un composant vendeur
 -- reste dans la grille, ce qui est l'état d'avant la feature.
-function LG:IsVendorItem(itemID)
+function PR:IsVendorItem(itemID)
     if not itemID then return false end
     local v1 = auctionator()
     if not v1 then return false end
@@ -98,7 +98,7 @@ local function dumpItem(itemID)
     print(string.format("  %-28s id=%-7d vendeur=%-12s HV=%-12s -> %s",
         tostring(nm or "?"), itemID,
         vend and COC.Api.Coin(vend) or "nil", ah and COC.Api.Coin(ah) or "nil",
-        LG:ItemValue(itemID) and COC.Api.Coin(LG:ItemValue(itemID)) or "AUCUN PRIX"))
+        PR:ItemValue(itemID) and COC.Api.Coin(PR:ItemValue(itemID)) or "AUCUN PRIX"))
 end
 
 -- Réactifs DISTINCTS du métier ouvert, dans l'ordre des recettes, plafonnés (la console n'est pas
@@ -119,7 +119,7 @@ local function openProfReagents(limit)
     return out, prof
 end
 
-function LG:PriceDump(arg)
+function PR:PriceDump(arg)
     local src = self:PriceSource()
     local v1 = auctionator()
     print("|cFF33DD88COC|r pricedump — oracle=" .. tostring(src or "AUCUN")
@@ -146,7 +146,7 @@ local STAR_ICON   = "|TInterface\\LootFrame\\toast-star:14:14:0:0:32:32:0:21:1:2
 --   0/nil → rien ; < 1 po → 1 pièce d'argent ; 1-10 po → 1 or ; 10-100 po → 2 or ; 100-1000 po → 3 or ;
 --   1000-2000 → 1 ★ ; 2000-3000 → 2 ★ ; 3000-4000 → 3 ★ (max, pour ne pas surcharger) ;
 --   ≥ 4000 po → valeur compacte « NK » (4K, 10K, 100K…). Valeur EXACTE au clic (détail) et au survol.
-function LG:CoinTier(copper)
+function PR:CoinTier(copper)
     local v = math.abs(math.floor((copper or 0) + 0.5))
     if v == 0 then return "" end
     local gold = v / 10000
@@ -162,19 +162,22 @@ end
 
 -- Palier compact d'un PROFIT. Les PERTES ne s'affichent PAS (rien), et aucun signe +/- : seul un gain
 -- positif est indiqué, par ses pièces/étoiles/valeur.
-function LG:ProfitTier(copper)
+function PR:ProfitTier(copper)
     if not copper or copper <= 0 then return "" end
     return self:CoinTier(copper)
 end
 
 -- Mode d'affichage du profit dans les listes : compact (paliers de pièces) ou VALEUR EXACTE en
 -- po/pa/pc. Préférence de lecture persistée (bouton « 123 » de la barre d'outils Recettes).
-function LG:ExactMode() return (COC.db and COC.db.lgExactProfit) and true or false end
-function LG:SetExactMode(on) if COC.db then COC.db.lgExactProfit = on and true or false end end
+-- ⚠️ `lgExactProfit` garde son nom : c'est une clé PERSISTÉE dans la SavedVariable du joueur. La
+-- renommer demanderait une migration de schéma pour un confort d'écriture, et perdrait le réglage de
+-- ceux qui ne migreraient pas. Le nom d'une donnée sur disque n'est pas un détail de style.
+function PR:ExactMode() return (COC.db and COC.db.lgExactProfit) and true or false end
+function PR:SetExactMode(on) if COC.db then COC.db.lgExactProfit = on and true or false end end
 
 -- Texte de profit d'une LIGNE de liste, selon le mode courant. Une perte n'affiche RIEN dans les
 -- deux modes (cf. ProfitTier) : la liste ne sert qu'à repérer ce qui rapporte.
-function LG:ProfitText(copper)
+function PR:ProfitText(copper)
     if not copper or copper <= 0 then return "" end
     if self:ExactMode() then return COC.Api.Coin(copper) end
     return self:CoinTier(copper)
@@ -182,7 +185,7 @@ end
 
 -- Montant formaté avec signe : « +3g 50s », « -1g », « 0 ». GetCoinTextureString n'accepte pas le
 -- négatif → on formate la valeur absolue et on préfixe le signe et une couleur (vert/rouge).
-function LG:Money(copper, colored)
+function PR:Money(copper, colored)
     copper = math.floor((copper or 0) + 0.5)
     local sign = copper < 0 and "-" or "+"
     local body = COC.Api.Coin and COC.Api.Coin(math.abs(copper)) or tostring(math.abs(copper))
@@ -196,7 +199,7 @@ end
 -- du produit est inconnu (sans lui, aucun calcul n'a de sens). `missing` = au moins un réactif sans
 -- prix (coût sous-estimé). numMade = nb d'objets produits par craft (défaut 1). Formule identique à
 -- Vente × quantité × (1 − coupe HV) − coût des réactifs.
-function LG:CraftProfit(profKey, spellID, numMade)
+function PR:CraftProfit(profKey, spellID, numMade)
     if not (self:IsAvailable() and profKey and spellID) then return nil end
     local lib = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
     if not lib then return nil end
@@ -229,7 +232,7 @@ end
 
 -- Profit d'une ENTRÉE de recette (résout le spellID toute seule), ou nil. Pour la liste de gauche et
 -- le tri par rentabilité — même calcul que CraftProfit. numMade lu sur l'entrée si connu.
-function LG:EntryProfit(profKey, entry)
+function PR:EntryProfit(profKey, entry)
     local spellID = entrySpell(profKey, entry)
     if not spellID then return nil end
     local p = self:CraftProfit(profKey, spellID, entry and entry.numMade)
@@ -240,7 +243,7 @@ end
 -- pricé / recette hors catalogue. Contrairement à CraftProfit, PAS besoin du prix de vente du produit
 -- — les enchants (services sans objet produit) ont donc aussi un coût. Sert au coût de PROGRESSION
 -- (montée de métier, cf. _ProfWindow_Leveling), pas à la rentabilité.
-function LG:CraftCost(profKey, spellID)
+function PR:CraftCost(profKey, spellID)
     if not (self:IsAvailable() and profKey and spellID) then return nil end
     local lib = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
     local reags = lib and (lib.RecipeReagents and lib:RecipeReagents(profKey, spellID)) or {}
@@ -255,7 +258,7 @@ function LG:CraftCost(profKey, spellID)
 end
 
 -- Coût réactifs d'une ENTRÉE de liste (résout le spellID comme EntryProfit), ou nil.
-function LG:EntryCost(profKey, entry)
+function PR:EntryCost(profKey, entry)
     local spellID = entrySpell(profKey, entry)
     if not spellID then return nil end
     return self:CraftCost(profKey, spellID)
@@ -281,7 +284,7 @@ local function buildBest(profKey)
     -- Meilleur plan par niveau d'apprentissage EXACT, puis propagation en max cumulé.
     local atRank = {}
     for _, spellID in ipairs((lib and lib.GetRecipes and lib:GetRecipes(profKey)) or {}) do
-        local p = LG:CraftProfit(profKey, spellID, nil)
+        local p = PR:CraftProfit(profKey, spellID, nil)
         if p and p.profit and p.profit > 0 then
             local at = (lib.RecipeLearnedAt and lib:RecipeLearnedAt(profKey, spellID)) or 1
             if at < 0 then at = 0 elseif at > MAX_RANK then at = MAX_RANK end
@@ -300,7 +303,7 @@ end
 
 -- Entrée { profit, sid } du meilleur plan d'un métier pour un artisan de niveau `rank`, ou nil.
 -- rank nil → on suppose le niveau max (on ne sait pas, autant ne pas sous-estimer).
-function LG:BestPlanFor(profKey, rank)
+function PR:BestPlanFor(profKey, rank)
     if not (self:IsAvailable() and profKey) then return nil end
     local now = GetTime and GetTime() or 0
     local c = bestCache[profKey]
@@ -314,13 +317,13 @@ function LG:BestPlanFor(profKey, rank)
 end
 
 -- Montant seul (nil si aucun plan rentable / pas de prix).
-function LG:BestProfitFor(profKey, rank)
+function PR:BestProfitFor(profKey, rank)
     local e = self:BestPlanFor(profKey, rank)
     return e and e.profit or nil
 end
 
 -- Nom de l'objet produit par un plan { profit, sid } (« Iron Buckle »), ou nil.
-function LG:PlanName(profKey, plan)
+function PR:PlanName(profKey, plan)
     local lib = plan and LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
     if not lib then return nil end
     local itemID = lib.RecipeProduct and lib:RecipeProduct(profKey, plan.sid)
@@ -332,7 +335,7 @@ end
 -- Nom du meilleur plan ATTEIGNABLE à un rang (approximation, cf. BestPlanFor). Conservé pour les
 -- appelants qui n'ont pas de fiche artisan (rang seul) — préférer BestKnownPlanFor + PlanName quand
 -- une fiche `r` est disponible : plus honnête (ne nomme que ce que l'artisan a RÉELLEMENT appris).
-function LG:BestPlanName(profKey, rank)
+function PR:BestPlanName(profKey, rank)
     return self:PlanName(profKey, self:BestPlanFor(profKey, rank))
 end
 
@@ -352,7 +355,7 @@ local function buildBestKnown(profKey, known)
     if not known then return nil end
     local best
     for sid in pairs(known) do
-        local p = LG:CraftProfit(profKey, sid, nil)
+        local p = PR:CraftProfit(profKey, sid, nil)
         if p and p.profit and p.profit > 0 and (not best or p.profit > best.profit) then
             best = { profit = p.profit, sid = sid }
         end
@@ -364,7 +367,7 @@ end
 -- métier (jamais croisé en direct, ou bitfield d'une autre version du catalogue) — dans ce cas
 -- l'appelant retombe sur BestPlanFor(profKey, rank), une approximation moins fiable mais
 -- toujours disponible. La forme du registre est l'affaire de la couture, pas la nôtre.
-function LG:BestKnownPlanFor(profKey, r)
+function PR:BestKnownPlanFor(profKey, r)
     if not (self:IsAvailable() and profKey and r) then return nil end
     local D = COC.Directory
     -- La clé de cache vient de la couture : elle intègre la FORME du registre, donc deux
@@ -381,7 +384,7 @@ function LG:BestKnownPlanFor(profKey, r)
 end
 
 -- Seuil de mise en avant (configurable) : par défaut 10 po. Les paliers en découlent (×10, ×100).
-function LG:MinProfit()
+function PR:MinProfit()
     local db = COC.db
     return (db and tonumber(db.lgMinProfit)) or (10 * 10000)
 end
@@ -392,7 +395,7 @@ end
 -- 30 po est utile à voir, même s'il n'est pas le plus rentable du roster. Le seuil de base (db.lgMinProfit)
 -- filtre le bruit — le monter éteint les petits profits. La COULEUR reste toujours dorée (pas d'argent).
 -- (Les numéros 2/3 sont conservés — TIER_COLOR et les vues sont indexées dessus.)
-function LG:HighlightTier(profit)
+function PR:HighlightTier(profit)
     if not profit or profit <= 0 then return 0 end
     local m = self:MinProfit()
     if profit >= m * 100 then return 3 end
@@ -404,10 +407,10 @@ end
 -- La planche IconAlert (128×256) contient 3 sprites empilés : un HALO large (haut), un contour DORÉ
 -- (milieu) et un contour BLANC (bas). On n'utilise que le BLANC — il se teinte à volonté (argent/or) —
 -- plus le HALO en additif pour le palier du haut. Coords en fractions de la planche.
-LG.ALERT_TEX    = "Interface\\SpellActivationOverlay\\IconAlert"
-LG.ALERT_BORDER = { 0.078125, 0.4375, 0.5703125, 0.75 }        -- contour blanc, teintable
-LG.ALERT_GLOW   = { 0.015625, 0.609375, 0.0078125, 0.265625 }  -- halo (palier 3)
-LG.TIER_COLOR   = {                                            -- teinte du contour par palier
+PR.ALERT_TEX    = "Interface\\SpellActivationOverlay\\IconAlert"
+PR.ALERT_BORDER = { 0.078125, 0.4375, 0.5703125, 0.75 }        -- contour blanc, teintable
+PR.ALERT_GLOW   = { 0.015625, 0.609375, 0.0078125, 0.265625 }  -- halo (palier 3)
+PR.TIER_COLOR   = {                                            -- teinte du contour par palier
     [1] = { 0.78, 0.82, 0.90 },   -- argent
     [2] = { 1.00, 0.82, 0.25 },   -- or
     [3] = { 1.00, 0.82, 0.25 },   -- or + halo
@@ -417,21 +420,21 @@ LG.TIER_COLOR   = {                                            -- teinte du cont
 -- — apprise ou manquante — dont on connaît le prix de vente. Nil sinon (oracle absent, prix inconnu…).
 if COC.ProfWindow and COC.ProfWindow.RegisterInfoSection then
     COC.ProfWindow:RegisterInfoSection(function(ctx)
-        if not LG:IsAvailable() then return nil end
+        if not PR:IsAvailable() then return nil end
         local spellID = entrySpell(ctx.profKey, ctx.entry)
         local numMade = ctx.entry and ctx.entry.numMade
-        local p = spellID and LG:CraftProfit(ctx.profKey, spellID, numMade)
+        local p = spellID and PR:CraftProfit(ctx.profKey, spellID, numMade)
         if not p then return nil end
         local L = COC.L
         local sellLbl = L["Vente HV"] .. (p.numMade > 1 and (" ×" .. p.numMade) or "")
-        local costVal = LG:Money(-p.cost, true)
+        local costVal = PR:Money(-p.cost, true)
         if p.missing then costVal = costVal .. " |cFF888888(?)|r" end   -- un réactif sans prix : coût partiel
         return {
             title = L["Rentabilité"],
             lines = {
                 { label = sellLbl,        value = COC.Api.Coin(p.sell) },
                 { label = L["Réactifs"],  value = costVal },
-                { label = L["Profit net"], value = LG:Money(p.profit, true) },
+                { label = L["Profit net"], value = PR:Money(p.profit, true) },
             },
         }
     end)

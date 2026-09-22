@@ -208,9 +208,9 @@ PW:RegisterInfoSection(function(ctx)
     -- répond à « combien coûte cette recette à l'hôtel des ventes ». On lit le DERNIER prix connu (le pont
     -- est en lecture seule — jamais de scan à la demande) ; rien pour une recette de formateur (pas d'objet)
     -- ou qu'Auctionator n'a jamais croisée.
-    local LG = COC.LazyGold
-    if LG and LG:IsAvailable() and d.itemID then
-        local ah = LG:ItemValue(d.itemID)
+    local PR = COC.Profit
+    if PR and PR:IsAvailable() and d.itemID then
+        local ah = PR:ItemValue(d.itemID)
         if ah then d.lines[#d.lines + 1] = { label = L["Acheter à l'HV"], value = COC.Api.Coin(ah) } end
     end
     return { title = L["Où l'obtenir"], lines = d.lines }

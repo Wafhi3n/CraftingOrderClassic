@@ -347,7 +347,7 @@ function UI:_PostPlanRow(i)
     r.hdrLine:SetPoint("BOTTOMLEFT", 2, 3); r.hdrLine:SetPoint("BOTTOMRIGHT", -2, 3); r.hdrLine:Hide()
     -- Chevron +/- des en-têtes : TEXTURE native (la police rend « ▾ » en tofu).
     r.expand = r:CreateTexture(nil, "ARTWORK"); r.expand:SetSize(14, 14); r.expand:Hide()
-    -- Indicateur de rentabilité Lazy Gold (cf. _UI_Post_LazyGold.lua) : le plus à droite, masqué
+    -- Indicateur de rentabilité Lazy Gold (cf. _UI_Post_Profit.lua) : le plus à droite, masqué
     -- si Lazy Gold est absent ou si le plan n'est pas rentable.
     r.profit = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     r.profit:SetPoint("RIGHT", -4, 0); r.profit:SetJustifyH("RIGHT"); Skin.ApplyShadow(r.profit); r.profit:Hide()

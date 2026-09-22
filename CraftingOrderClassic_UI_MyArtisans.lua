@@ -34,7 +34,7 @@ function UI:BuildMyArtisansTab(f)
     local allBtn = Skin.MakeGoldButton(az, azw - 36, 20, L["Tous les plans du royaume"])
     allBtn:SetPoint("LEFT", 12, 0); self.myArtAllBtn = allBtn
     allBtn:SetScript("OnClick", function()
-        if not (COC.LazyGold and COC.LazyGold:IsAvailable()) then COC:NeedPriceAddon(); return end
+        if not (COC.Profit and COC.Profit:IsAvailable()) then COC:NeedPriceAddon(); return end
         UI.myArtAllProfs = not UI.myArtAllProfs
         UI:RefreshMyArtisans()
     end)
@@ -239,8 +239,8 @@ end
 -- Profit Lazy Gold d'une ligne (mémorisé le temps du refresh). Renvoie la largeur consommée, pour
 -- que le nom se rétrécisse d'autant.
 function UI:_FillMyArtProfit(row, rc)
-    local LG = COC.LazyGold
-    local txt = LG and LG:ProfitText(self:_MyArtProfit(rc)) or ""
+    local PR = COC.Profit
+    local txt = PR and PR:ProfitText(self:_MyArtProfit(rc)) or ""
     row.profit:SetText(txt)
     row.profit:SetShown(txt ~= "")
     return (txt ~= "") and (row.profit:GetStringWidth() + 6) or 0
@@ -369,7 +369,7 @@ function UI:_MyArtDisplayList(e, profs)
         recs = COC.StatFilter:Apply("myart", recs, function(rc) return rc.itemID end)
     end
     -- Tri par rentabilité : liste à PLAT (les catégories disparaissent), comme la vue métier.
-    if self.myArtSortProfit and COC.LazyGold and COC.LazyGold:IsAvailable() then
+    if self.myArtSortProfit and COC.Profit and COC.Profit:IsAvailable() then
         local flat = self:_MyArtCooldownItems(e)
         for _, rc in ipairs(self:_MyArtSortByProfit(recs)) do flat[#flat + 1] = rc end
         return flat

@@ -1,4 +1,4 @@
--- CraftingOrderClassic_UI_Post_LazyGold.lua — onglet « Commande » : couche Lazy Gold (lecture seule).
+-- CraftingOrderClassic_UI_Post_Profit.lua — onglet « Commande » : couche Lazy Gold (lecture seule).
 --   * barre d'outils (pièce = tri par rentabilité, « 123 » = valeurs exactes) — mêmes codes que la
 --     vue métier, et le mode exact est le MÊME réglage partagé (db.lgExactProfit) ;
 --   * indicateur de profit sur chaque ligne de la LISTE DES PLANS ;
@@ -9,7 +9,7 @@ local COC  = CraftingOrderClassic
 local UI   = COC.UI
 local L    = COC.L
 
-local function LG() local g = COC.LazyGold; return (g and g:IsAvailable()) and g or nil end
+local function PR() local g = COC.Profit; return (g and g:IsAvailable()) and g or nil end
 
 -- =========================================================================
 -- Barre d'outils (au-dessus de la liste des plans, à droite de « LISTE DES PLANS »)
@@ -38,7 +38,7 @@ function UI:_BuildPostLGBar(sec)
         return UI.postSortProfit and L["Tri par rentabilité — clic pour A-Z."]
             or L["Trier par rentabilité (Lazy Gold)."]
     end, function()
-        if not LG() then COC:NeedPriceAddon(); return end
+        if not PR() then COC:NeedPriceAddon(); return end
         UI.postSortProfit = not UI.postSortProfit
         UI:_SyncPostLGBar(); UI:RefreshPostPlans()
     end)
@@ -50,11 +50,11 @@ function UI:_BuildPostLGBar(sec)
 
     -- (bug payé : `panel` traînait ici après le passage aux slots → parent nil, bouton jamais rendu)
     local exactBtn = makeToolBtn(sec, function()
-        local g = COC.LazyGold
+        local g = COC.Profit
         return (g and g:ExactMode()) and L["Valeurs exactes — clic pour l'affichage compact."]
             or L["Afficher les valeurs exactes (po/pa/pc)."]
     end, function()
-        local g = LG(); if not g then COC:NeedPriceAddon(); return end
+        local g = PR(); if not g then COC:NeedPriceAddon(); return end
         g:SetExactMode(not g:ExactMode())
         UI:_SyncPostLGBar(); UI:RefreshPostPlans(); UI:_RefreshPostPriceHint(UI.postEntry)
     end)
@@ -66,7 +66,7 @@ function UI:_BuildPostLGBar(sec)
 end
 
 function UI:_SyncPostLGBar()
-    local g = LG()
+    local g = PR()
     if self.postSortBtn then
         self.postSortBtn:SetShown(true)   -- toujours visible (enticing) ; clic sans Lazy Gold → popup
         self.postSortBtn.onBG:SetShown((g and self.postSortProfit) and true or false)
@@ -90,7 +90,7 @@ end
 function UI:_RefreshPostPriceHint(e)
     local hint = self.postPriceHint; if not hint then return end
     if not e then hint:SetText(""); return end   -- bascule « 123 » sans plan sélectionné
-    local g = COC.LazyGold
+    local g = COC.Profit
     local val = g and e.itemID and g:ItemValue(e.itemID)
     if not val then hint:SetText(""); return end
     local txt = "|cFFE8B84B" .. L["Valeur HV"] .. ":|r " .. COC.Api.Coin(val)
@@ -105,7 +105,7 @@ end
 -- MÉMORISÉ le temps du refresh : le rendu se refait à chaque scroll (pool virtualisé), on
 -- interrogerait sinon Auctionator en boucle. `false` = calculé, sans valeur exploitable.
 function UI:_PostRowProfit(e)
-    local g = LG()
+    local g = PR()
     if not (g and e and e.spellID and self.postProf) then return nil end
     self._postProfitCache = self._postProfitCache or {}
     local k = e.spellID
@@ -121,7 +121,7 @@ end
 -- Colonne de droite d'une ligne de plan. Rétrécit le nom pour ne pas chevaucher.
 function UI:_FillPostPlanProfit(row, item)
     if not row.profit then return end
-    local g = LG()
+    local g = PR()
     local txt = g and item.e and g:ProfitText(self:_PostRowProfit(item.e)) or ""
     if txt == "" then
         row.profit:Hide()
@@ -137,7 +137,7 @@ end
 -- =========================================================================
 -- Renvoie nil si le tri n'est pas actif : l'appelant retombe alors sur le regroupement normal.
 function UI:_PostProfitFlat(list)
-    if not (self.postSortProfit and LG()) then return nil end
+    if not (self.postSortProfit and PR()) then return nil end
     local items = {}
     for _, it in ipairs(list) do
         it._profit = self:_PostRowProfit(it.e) or 0

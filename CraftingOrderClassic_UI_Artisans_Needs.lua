@@ -115,8 +115,8 @@ end
 -- Ouvre la bourse d'un artisan. Sans Lazy Gold : popup d'incitation (le bouton reste visible pour
 -- inciter au clic — même pattern que les toggles de tri, cf. coc-optional-dep-discoverability).
 function UI:OpenNeeds(name)
-    local LG = COC.LazyGold
-    if not (LG and LG:IsAvailable()) then
+    local PR = COC.Profit
+    if not (PR and PR:IsAvailable()) then
         if COC.NeedPriceAddon then COC:NeedPriceAddon() end
         return
     end
@@ -158,7 +158,7 @@ function UI:_BuildNeedsWin()
     local cav = inset:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
     cav:SetPoint("BOTTOMLEFT", 10, 7); cav:SetPoint("BOTTOMRIGHT", -10, 7); cav:SetJustifyH("LEFT")
     cav:SetText(string.format(L["Estimation : chance de point par couleur, prix du dernier scan HV (%s)."],
-        (COC.LazyGold and COC.LazyGold:PriceSource()) or "Auctionator"))
+        (COC.Profit and COC.Profit:PriceSource()) or "Auctionator"))
     self.needsWin = f
     return f
 end

@@ -56,7 +56,7 @@ function PW:_LearnableNow()
     if not (S and lib and self.profKey) then return {} end
     local rank = COC.Craft and COC.Craft:OpenRank()
     if not rank then return {} end
-    local LG, out = COC.LazyGold, {}
+    local PR, out = COC.Profit, {}
     for _, m in ipairs(S:MissingRecipes(self.profKey) or {}) do
         local lvl = m.level or 0
         -- Le rang requis est un préalable DUR : conseiller un plan qu'on ne peut pas apprendre est
@@ -64,7 +64,7 @@ function PW:_LearnableNow()
         if lvl > 0 and lvl <= rank then
             local diff = colorAt(lib.RecipeColors and lib:RecipeColors(self.profKey, m.spellID), rank)
             if diff then
-                local c = LG and LG.CraftCost and LG:CraftCost(self.profKey, m.spellID)
+                local c = PR and PR.CraftCost and PR:CraftCost(self.profKey, m.spellID)
                 out[#out + 1] = {
                     sid = m.spellID, name = m.name, level = lvl, diff = diff,
                     kind = S:SourceKind(self.profKey, m.spellID),

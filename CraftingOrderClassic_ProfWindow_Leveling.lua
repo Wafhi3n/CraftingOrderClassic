@@ -64,7 +64,7 @@ end
 -- réactif sans prix (coût sous-estimé). Cache par refresh (posé dans RefreshRecipes, le rendu se
 -- rejoue à chaque scroll).
 function PW:_LevelCost(e)
-    if e.isHeader or not (COC.LazyGold and COC.LazyGold:IsAvailable()) then return nil end
+    if e.isHeader or not (COC.Profit and COC.Profit:IsAvailable()) then return nil end
     self._lvlCache = self._lvlCache or {}
     -- Clé PRÉFIXÉE : spellID et itemID sont deux espaces d'ID qui se recouvrent — une clé nue
     -- ferait partager son coût à deux recettes différentes (même patron que `live` dans Route).
@@ -78,7 +78,7 @@ function PW:_LevelCost(e)
     else
         chance = CHANCE[e.difficulty]
     end
-    local c = chance and COC.LazyGold:EntryCost(self.profKey, e)
+    local c = chance and COC.Profit:EntryCost(self.profKey, e)
     v = c and { perPoint = c.cost / chance, cost = c.cost, chance = chance, missing = c.missing } or false
     self._lvlCache[k] = v
     return v or nil
@@ -89,7 +89,7 @@ end
 -- Recalculée à chaque refresh (RefreshRecipes) ; nil si rien de calculable.
 function PW:_ComputeLevelBest()
     self._lvlBest = nil
-    if not (COC.LazyGold and COC.LazyGold:IsAvailable()) then return end
+    if not (COC.Profit and COC.Profit:IsAvailable()) then return end
     local best, bestPer
     for _, e in ipairs(self.recDisplay or {}) do
         if not e.isHeader then
@@ -110,9 +110,9 @@ function PW:_MissingSourceIcon(e)
     if kind == "trainer" then return ICON.trainer end
     if kind == "vendor" then return ICON.vendor end
     if kind == "unknown" then return nil end
-    local LG = COC.LazyGold
+    local PR = COC.Profit
     local recItemID = M:RecipeItem(self.profKey, e.spellID)
-    if LG and LG:IsAvailable() and recItemID and LG:ItemValue(recItemID) then return ICON.ah end
+    if PR and PR:IsAvailable() and recItemID and PR:ItemValue(recItemID) then return ICON.ah end
     return ICON.farm
 end
 
@@ -164,9 +164,9 @@ function PW:_PlanTooltip(e)
     if kind == "trainer" then txt = string.format(L["Plan : au formateur%s"], ptxt)
     elseif kind == "vendor" then txt = string.format(L["Plan : chez un vendeur PNJ%s"], ptxt)
     else
-        local LG = COC.LazyGold
+        local PR = COC.Profit
         local recItemID = M:RecipeItem(self.profKey, e.spellID)
-        local ah = LG and LG:IsAvailable() and recItemID and LG:ItemValue(recItemID)
+        local ah = PR and PR:IsAvailable() and recItemID and PR:ItemValue(recItemID)
         if ah then txt = string.format(L["Plan : coté à l'HV — %s"], COC.Api.Coin(ah))
         else txt = L["Plan : à farmer (butin/quête — absent de l'HV)"] end
     end
