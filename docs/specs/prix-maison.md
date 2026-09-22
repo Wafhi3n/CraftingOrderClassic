@@ -67,21 +67,21 @@ devenir une donnée à nous.
 - 2026-09-22, user — Lazy Gold est décommissionné ; le prix devient une fonctionnalité de COC.
 - 2026-09-22, agent (à confirmer) — on garde la couche existante (`COC.LazyGold`, à renommer) et on
   ne remplace que sa source de valeur. Le reste du code n'a pas à savoir d'où vient un prix.
+- 2026-09-22, user — **le prix de marché vient d'un SCAN de l'hôtel des ventes, fait par nous.**
+  Constat qui tranche la question : Lazy Gold ne calcule rien, il relit Auctionator. Les deux ponts
+  d'aujourd'hui mènent donc à la même donnée, produite par un scan qu'un autre addon a fait. Autant
+  le faire, le dater et le posséder. Le prix VENDEUR reste prioritaire sur le marché pour un réactif
+  achetable en ville (règle existante, elle ne change pas).
 
 ### Décisions ouvertes, à trancher par le user
 
-1. **Jusqu'où on va.** Trois paliers possibles, et on peut s'arrêter à n'importe lequel :
-   (a) **vendeur seulement** — relevé à l'ouverture d'une fenêtre de marchand, plus les prix de plans
-   déjà générés dans nos données ; simple, exact, mais muet sur tout ce qui ne se vend pas en ville ;
-   (b) **+ hôtel des ventes**, par un balayage que le joueur déclenche quand il est devant l'HV ;
-   (c) **+ ce que le client sait déjà** (le prix de revente d'un objet, connu sans rien scanner), qui
-   ne vaut pas le prix d'achat mais donne un plancher.
-2. **Qui gagne** quand le joueur a aussi Auctionator ou Lazy Gold : notre relevé, le leur, ou le plus
-   frais ?
-3. **Où vivent les relevés** : dans la SavedVariable du compte, partagés entre tous les personnages
+1. **Qui gagne** quand le joueur a aussi Auctionator : notre relevé, le sien, ou le plus frais ?
+2. **Où vivent les relevés** : dans la SavedVariable du compte, partagés entre tous les personnages
    d'un même royaume, ou par personnage ?
-4. **Combien de temps on garde** un prix d'hôtel des ventes avant de le déclarer périmé plutôt que
-   de l'afficher tel quel.
+3. **Combien de temps on garde** un prix de marché avant de le déclarer périmé plutôt que de
+   l'afficher tel quel.
+4. **Qui déclenche le scan** : le joueur devant l'hôtel des ventes, ou l'addon dès que la fenêtre
+   s'ouvre ?
 
 ## Critères d'acceptation
 
