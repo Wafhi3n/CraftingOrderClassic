@@ -80,26 +80,40 @@ Follower.__index = Follower
 
 -- deps = { pilot =, shown = fn() → Enchantement affiché ?,
 --          item = fn() → clé, equipLoc, subclassID de la pièce posée (nil si rien),
---          cases = fn() → cases lues sur le client (Filter.ReadCases) }
+--          cases = fn() → cases lues sur le client (Filter.ReadCases),
+--          trading = fn() → un échange est-il ouvert ? (facultatif) }
 function Filter.NewFollower(deps) return setmetatable({ d = deps, dirty = true }, Follower) end
+
+-- L'enchanteur a cliqué un emplacement de la silhouette : filtrer là-dessus tant qu'aucune pièce
+-- n'est posée. Une pièce posée l'emporte toujours — le filtre suit ce qui est RÉELLEMENT sur la
+-- table, pas ce qu'on a demandé (spec). nil = plus de demande.
+function Follower:SetRequest(slot)
+    if self.request == slot then return end
+    self.request, self.dirty = slot, true
+end
 
 -- À appeler sur chaque événement utile. N'écrit que si quelque chose a VRAIMENT changé : la pièce, ou
 -- le retour de l'Enchantement à l'écran. Jamais sur un simple rafraîchissement de la liste : ce serait
 -- se battre avec le joueur qui décoche une case pendant l'échange (et nos propres écritures en
--- provoquent un). Rend l'action faite ("apply", "release"), ou nil.
+-- provoquent un). Rend l'action faite ("apply", "release"), ou nil, puis d'où vient le filtre —
+-- la pièce posée ou l'emplacement demandé au clic. La trace le dit : les deux mènent souvent à la
+-- MÊME case, et « c'est parti de mon clic » ou « ça suit sa pièce » ne se relisent plus autrement.
 function Follower:Refresh()
     local d = self.d
     local shown = d.shown() and true or false
     if self.wasShown and not shown then self.dirty = true end   -- au retour, Blizzard a pu tout remettre
     self.wasShown = shown
+    -- L'échange fermé emporte la demande : sans ça, le filtre resterait accroché à l'emplacement
+    -- cliqué bien après le départ du partenaire.
+    if d.trading and not d.trading() and self.request then self.request, self.dirty = nil, true end
     local key, equipLoc, subclassID = d.item()
     if key ~= self.key then self.key, self.dirty = key, true end
     if not (shown and self.dirty) then return nil end
     self.dirty = false
-    if key then
-        local cases = Filter.CasesForItem(d.cases(), equipLoc, subclassID)
-        if #cases > 0 then return "apply", d.pilot:Apply(cases), cases end
-    end
+    local cases, from
+    if key then cases, from = Filter.CasesForItem(d.cases(), equipLoc, subclassID), "pièce posée"
+    elseif self.request then cases, from = Filter.CasesForSlot(d.cases(), self.request), "emplacement demandé" end
+    if cases and #cases > 0 then return "apply", d.pilot:Apply(cases), cases, from end
     if not d.pilot:Holding() then return nil end
     return "release", d.pilot:Release()
 end
@@ -132,20 +146,22 @@ function Filter:Start()
     local follower = Filter.NewFollower({
         pilot = Filter.NewPilot(C_TradeSkillUI), shown = enchantingShown,
         item = tradeItem, cases = Filter.ReadCases,
+        trading = function() return (_G.TradeFrame and TradeFrame:IsShown()) and true or false end,
     })
     Filter.follower = follower
     local pending
     local function refresh()
         pending = nil
-        local ok, what, done, cases = pcall(follower.Refresh, follower)
+        local ok, what, done, cases, from = pcall(follower.Refresh, follower)
         if not ok then return trace("erreur : " .. tostring(what)) end
         if what == "apply" then
-            trace(string.format("filtre posé sur les cases %s (%s)", table.concat(cases, ","),
-                  done and "relu OK" or "relu DIFFÉRENT"))
+            trace(string.format("filtre posé sur les cases %s — %s (%s)", table.concat(cases, ","),
+                  tostring(from), done and "relu OK" or "relu DIFFÉRENT"))
         elseif what == "release" then
             trace("filtre rendu" .. (done and "" or " (métier différent : rien touché)"))
         end
     end
+    Filter._refresh = refresh
     local f = CreateFrame("Frame")
     COC.Api.RegisterEventsSafe(f, { "TRADE_SHOW", "TRADE_CLOSED", "TRADE_TARGET_ITEM_CHANGED",
                                     "TRADE_SKILL_SHOW", "TRADE_SKILL_CLOSE", "TRADE_SKILL_LIST_UPDATE" })
@@ -156,4 +172,14 @@ function Filter:Start()
         pending = true
         C_Timer.After(0.1, refresh)
     end)
+end
+
+-- Clic sur un emplacement de la silhouette (colonne en mode Échange, _ProfWindow_Trade) : le filtre
+-- passe par le MÊME pilote que la pièce posée. Deux écrivains sur le filtre en feraient deux qui se
+-- battent, et l'état d'avant l'échange serait perdu par l'un des deux.
+function Filter.Request(slot)
+    local fw = Filter.follower
+    if not fw then return end
+    fw:SetRequest(slot)
+    if Filter._refresh then Filter._refresh() end
 end

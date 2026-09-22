@@ -17,7 +17,7 @@ local en = {
     ["alerte de version oubliée — elle reviendra si le réseau la re-confirme."] = "version alert forgotten. It'll come back if the network confirms it again.",
     ["(/co version reset si cette alerte est erronée)"] = "(/co version reset if this alert is wrong)",
     ["Crafting Order — version %s"] = "Crafting Order — version %s",
-    ["Enchanter cet objet"] = "Enchant this item", ["Ouvre ta fenêtre d'Enchantement."] = "Open your Enchanting window.", ["Aucun enchantement connu pour cet emplacement."] = "No known enchant for that slot.",
+    ["Aucun enchantement connu pour cet emplacement."] = "No known enchant for that slot.",
     ["Choisir par emplacement"] = "Pick by slot", ["Retour"] = "Back",   -- vue silhouette (onglet Commande)
     -- Onglets / fenêtre
     ["Carnet"] = "Ledger", ["Commande"] = "Order", ["Récolte"] = "Gather", ["Artisans"] = "Artisans",
@@ -233,8 +233,7 @@ local en = {
     ["Commandes pour ce joueur"] = "Orders for this player",
     ["Commandes à livrer"] = "Orders to deliver",
     ["+%d autre(s)"] = "+%d more",
-    ["Molette : %d/%d"] = "Scroll: %d/%d",
-    ["Demande-lui une pièce"] = "Ask them for an item",
+
     ["Clic : lui demander cette pièce."] = "Click: ask them for this item.",
     ["Échange avec %s"] = "Trade with %s",
     ["Pièce à enchanter"] = "Item to enchant",

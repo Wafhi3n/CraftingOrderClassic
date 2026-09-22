@@ -4,9 +4,9 @@
 > Cible : WoW: Forever / Camelot (16001) uniquement · Addon : Crafting Order - Classic
 >
 > Les cinq mesures préalables sont faites (2026-09-21) ; `ASKE` a enfin été vu fonctionner de bout en
-> bout. T1, T2 et T3 sont faites et validées en jeu à deux comptes le 2026-09-22 : la liste native
-> suit la pièce posée, et la colonne passe en mode Échange. Le reste du plan (T4 à T7), en fin de
-> document, n'est pas commencé.
+> bout. T1 à T4 sont faites et validées en jeu à deux comptes le 2026-09-22 : la liste native suit la
+> pièce posée, la colonne passe en mode Échange, le clic sur la silhouette demande la pièce ET filtre,
+> et le panneau flottant a disparu. Reste T5 à T7, en fin de document.
 
 ## Le problème
 
@@ -311,6 +311,22 @@ se mélangent dans les mêmes fichiers.
 4. **T4 — Demande de pièce depuis la colonne**, puis suppression du panneau flottant
    (`_Enchant_Trade`) et de l'état vide de `_Enchant_Trade_Ask` ; le chemin réseau et les gardes de
    réception ne bougent pas. Critère 2.
+   **Validée en jeu le 2026-09-22** (trace : clic → cases 4, plastron posé → case 2, pièce retirée →
+   case 4, main droite → cases 11+12, fin d'échange → filtre rendu). Le clic passe par le MÊME
+   suiveur que la pièce posée (`Filter.Request`) : deux écrivains sur le filtre en feraient deux qui
+   se battent, et l'état d'avant l'échange serait perdu. Une pièce posée l'emporte toujours sur la
+   demande ; la fin de l'échange l'oublie. De `_Enchant_Trade` il ne reste que ce que la liste native
+   ne sait pas faire — lire l'offre du partenaire et classer (`ET.Rank`), pour l'indice de T5.
+   **Deux leçons du terrain, payées ici** :
+   · une vue pilotée par ÉVÉNEMENTS doit aussi se redécider à chaque rafraîchissement de son hôte —
+     la silhouette n'apparaissait qu'après un aller-retour sur un autre onglet, faute d'événement
+     retombé APRÈS que la colonne fut prête (corrigé dans `_SyncDockViewBtns`) ;
+   · le garde-fou anti-rafale de 3 s d'`Ask:Request` avalait des demandes EN SILENCE depuis que le
+     clic sert aussi à filtrer (on clique bien plus souvent). Il reste, mais il se nomme dans la
+     trace, comme les refus de réception.
+   Le refus « rien d'équipé en WristSlot » a été vu tracé des DEUX côtés (envoi à 11:25:05, refus à
+   11:25:06) : le mécanisme est sain, c'est le trou connu de la v1 — l'enchanteur ne peut pas savoir
+   que le partenaire n'a rien à cet emplacement, faute de réponse du partenaire.
 5. **T5 — Indice « ses composants correspondent à »** (réutilise `offerRank`) et clic → la recette
    s'ouvre dans la fenêtre native (`C_TradeSkillUI.OpenRecipe`, vivante, jamais appelée par nous :
    à éprouver). Critère 5.

@@ -373,6 +373,16 @@ end
 function PW:_SyncDockViewBtns()
     local bar = self.viewTabs
     if not bar then return end
+    -- Le mode Échange se redécide ICI, à chaque rafraîchissement de la colonne — et pas seulement
+    -- sur les événements d'échange écoutés par _ProfWindow_Trade. Vécu en jeu le 2026-09-22 : la
+    -- silhouette n'apparaissait qu'après un aller-retour sur un autre onglet, parce qu'aucun
+    -- événement n'était retombé APRÈS que la colonne fut prête. Garde de ré-entrance : la bascule
+    -- de vue repasse par RefreshOrders, donc par ici.
+    if self._SyncTradeView and not self._inTradeSync then
+        self._inTradeSync = true
+        self:_SyncTradeView()
+        self._inTradeSync = nil
+    end
     -- ⚠️ LE MÉTIER PEUT CHANGER SOUS LA VUE. L'onglet natif passe de la Cuisine à l'Herboristerie,
     -- `_RefreshDock` met `profKey` à jour, et la vue affichée continue d'afficher la liste de
     -- l'ANCIEN métier -- que les infobulles interrogent alors avec la clé du NOUVEAU. On repeint sur

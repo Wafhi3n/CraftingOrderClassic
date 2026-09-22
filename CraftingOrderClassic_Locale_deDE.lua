@@ -15,7 +15,7 @@ local de = {
     ["alerte de version oubliée — elle reviendra si le réseau la re-confirme."] = "Versionshinweis vergessen. Er kommt wieder, wenn das Netzwerk ihn erneut bestätigt.",
     ["(/co version reset si cette alerte est erronée)"] = "(/co version reset, falls dieser Hinweis falsch ist)",
     ["Crafting Order — version %s"] = "Crafting Order — Version %s",
-    ["Enchanter cet objet"] = "Diesen Gegenstand verzaubern", ["Ouvre ta fenêtre d'Enchantement."] = "Öffne dein Verzauberkunst-Fenster.", ["Aucun enchantement connu pour cet emplacement."] = "Keine bekannte Verzauberung für diesen Platz.",
+    ["Aucun enchantement connu pour cet emplacement."] = "Keine bekannte Verzauberung für diesen Platz.",
     ["Choisir par emplacement"] = "Nach Platz auswählen", ["Retour"] = "Zurück",   -- vue silhouette (onglet Commande)
     -- Onglets / fenêtre
     ["Carnet"] = "Auftragsbuch", ["Commande"] = "Bestellen", ["Récolte"] = "Sammeln", ["Artisans"] = "Handwerker",
@@ -213,8 +213,7 @@ local de = {
     ["Commandes pour ce joueur"] = "Aufträge für diesen Spieler",
     ["Commandes à livrer"] = "Zu liefernde Aufträge",
     ["+%d autre(s)"] = "+%d weitere",
-    ["Molette : %d/%d"] = "Mausrad: %d/%d",
-    ["Demande-lui une pièce"] = "Gegenstand anfragen",
+
     ["Clic : lui demander cette pièce."] = "Klick: diesen Gegenstand anfragen.",
     ["Échange avec %s"] = "Handel mit %s",
     ["Pièce à enchanter"] = "Zu verzaubernder Gegenstand",

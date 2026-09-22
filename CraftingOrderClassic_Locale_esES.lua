@@ -16,7 +16,7 @@ local es = {
     ["alerte de version oubliée — elle reviendra si le réseau la re-confirme."] = "aviso de versión olvidado. Volverá si la red lo confirma de nuevo.",
     ["(/co version reset si cette alerte est erronée)"] = "(/co version reset si este aviso es erróneo)",
     ["Crafting Order — version %s"] = "Crafting Order — versión %s",
-    ["Enchanter cet objet"] = "Encantar este objeto", ["Ouvre ta fenêtre d'Enchantement."] = "Abre tu ventana de Encantamiento.", ["Aucun enchantement connu pour cet emplacement."] = "Ningún encantamiento conocido para esa ranura.",
+    ["Aucun enchantement connu pour cet emplacement."] = "Ningún encantamiento conocido para esa ranura.",
     ["Choisir par emplacement"] = "Elegir por ranura", ["Retour"] = "Volver",   -- vue silhouette (onglet Commande)
     -- Onglets / fenêtre
     ["Carnet"] = "Libro", ["Commande"] = "Pedir", ["Récolte"] = "Recolectar", ["Artisans"] = "Artesanos",
@@ -214,8 +214,7 @@ local es = {
     ["Commandes pour ce joueur"] = "Pedidos para este jugador",
     ["Commandes à livrer"] = "Pedidos por entregar",
     ["+%d autre(s)"] = "+%d más",
-    ["Molette : %d/%d"] = "Rueda: %d/%d",
-    ["Demande-lui une pièce"] = "Pídele un objeto",
+
     ["Clic : lui demander cette pièce."] = "Clic: pedirle este objeto.",
     ["Échange avec %s"] = "Comercio con %s",
     ["Pièce à enchanter"] = "Objeto a encantar",

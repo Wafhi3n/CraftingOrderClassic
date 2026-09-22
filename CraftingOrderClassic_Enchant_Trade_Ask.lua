@@ -1,9 +1,10 @@
--- CraftingOrderClassic_Enchant_Trade_Ask.lua — greffon ÉCHANGE : « demande-lui la pièce ».
--- L'ÉTAT VIDE de _Enchant_Trade : tant que le partenaire n'a rien posé dans l'emplacement « ne sera pas
--- échangé », l'enchanteur ne voyait RIEN (panel:Hide()) — or c'est précisément le moment où le client
--- débutant ignore que cet emplacement existe. On y met la silhouette : clic sur un emplacement → on lui
--- chuchote de poser CETTE pièce-là. C'est un bouton « explique l'emplacement d'enchant au débutant »,
--- pas de l'automatisation.
+-- CraftingOrderClassic_Enchant_Trade_Ask.lua — « demande-lui la pièce » : la SILHOUETTE et le verbe ASKE.
+-- Clic sur un emplacement → on chuchote au partenaire de poser CETTE pièce-là. C'est un bouton
+-- « explique l'emplacement d'enchant au débutant », pas de l'automatisation.
+--
+-- Ce fichier n'a plus de fenêtre à lui. La silhouette est construite ICI (Ask:BuildSilhouette) mais
+-- vit dans la COLONNE de métier, en mode Échange (_ProfWindow_Trade, T3/T4) : le panneau flottant
+-- qui la portait a été supprimé — la fenêtre de métier de Forever se dessinait par-dessus.
 --
 -- CHUCHOTEMENT, jamais /s : le destinataire est en face et il est le SEUL concerné — écrire en public
 -- spammerait tout le district des enchanteurs à chaque clic, à rebours de la discipline anti-spam de COC
@@ -44,16 +45,16 @@ local CraftLink = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
 local Ask = {}
 COC.EnchantTradeAsk = Ask
 
-local panel
-
 -- COC.UI.DOLL est posé au CHARGEMENT de _UI_Post_Paperdoll ; on ne le lit qu'au RUNTIME pour rester
 -- insensible à l'ordre exact des .toc (même précaution que le paperdoll vis-à-vis de COC.Enchant).
 local function doll() return COC.UI and COC.UI.DOLL end
 
-local function isEnchanter()
-    local D = COC.Directory
-    return (D and D.mySkills and D.mySkills["Enchanting"]) ~= nil
-end
+-- Silencieux pour le JOUEUR ≠ silencieux pour le DIAGNOSTIC. Retour terrain du 1er test réel
+-- (2026-07-21 : l'ami enchanteur clique, le partenaire reçoit le chuchotement texte et AUCUNE invite) :
+-- rien ne permettait de distinguer « le verbe n'est jamais arrivé » de « une garde l'a refusé », les
+-- deux se présentent identiquement — un silence. Chaque refus se NOMME donc dans /co trace, des DEUX
+-- côtés : l'envoi ici, la réception plus bas. Rien n'est affiché au joueur.
+local function traceAsk(msg) if COC.Trace then COC.Trace:Log("aske", msg) end end
 
 -- ------------------------------------------------------------------
 -- Le message
@@ -66,9 +67,16 @@ function Ask:Request(label, token)
     -- Le partenaire d'echange passe par le garde-fou des valeurs SECRETES comme toute autre unite :
     -- un nom secret ferait lever la comparaison juste en dessous, avant meme le whisper.
     local target = COC.Api.UnitNameSafe("NPC")
-    if not (target and SendChatMessage) then return end
+    if not (target and SendChatMessage) then
+        return traceAsk("envoi annulé — aucun partenaire d'échange lisible")
+    end
     local now = GetTime and GetTime() or 0
-    if now - lastAsk < 3 then return end
+    -- Depuis T4 le clic sert AUSSI à filtrer la liste native : on clique donc bien plus souvent, et
+    -- ce garde-fou avale des demandes que le joueur croit parties. Il reste (on ne spamme pas un
+    -- autre joueur), mais il se nomme.
+    if now - lastAsk < 3 then
+        return traceAsk("envoi avalé — moins de 3 s depuis la demande précédente (" .. tostring(token) .. ")")
+    end
     lastAsk = now
     SendChatMessage(string.format(
         L["Mets ton objet « %s » dans l'emplacement du bas de la fenêtre d'échange (« ne sera pas échangé ») — je l'enchante, tu le gardes."],
@@ -81,12 +89,13 @@ function Ask:Request(label, token)
     if COC.UI and COC.UI.Toast then
         COC.UI:Toast(string.format(L["Demande envoyée à %s."], Comp.shortName(target)))
     end
+    traceAsk("demande ENVOYÉE : " .. tostring(token) .. " à " .. Comp.shortName(target))
 end
 
 -- ------------------------------------------------------------------
 -- La silhouette
 -- ------------------------------------------------------------------
-local function makeSlot(root, def, D)
+local function makeSlot(root, def, D, onPick)
     local tex, label = D.SlotArt(def.slot)
     local b = Skin.MakeIconButton(root, D.ICON, tex)
     b:SetFrameLevel(root:GetFrameLevel() + 4)   -- au-dessus du modèle 3D (frame sœur, cf. build)
@@ -99,14 +108,17 @@ local function makeSlot(root, def, D)
     end)
     b:SetScript("OnLeave", GameTooltip_Hide)
     b:SetScript("OnClick", function(self)
-        if self.live then Ask:Request(self.label, self.def and self.def.slot) end
+        if not self.live then return end
+        Ask:Request(self.label, self.def and self.def.slot)
+        -- L'appelant en fait ce qu'il veut : la colonne y filtre la liste native sur cet emplacement.
+        if onPick then onPick(self.def) end
     end)
     return b
 end
 
-local function buildRun(root, list, point, x, y, dx, dy, D, store)
+local function buildRun(root, list, point, x, y, dx, dy, D, store, onPick)
     for i, def in ipairs(list) do
-        local b = makeSlot(root, def, D)
+        local b = makeSlot(root, def, D, onPick)
         b:SetPoint(point, root, point, x + (i - 1) * dx, y - (i - 1) * dy)
         store[#store + 1] = b
     end
@@ -123,7 +135,6 @@ function Ask:RefreshSlots(btns)
         b.icon:SetAlpha(live and 1 or 0.45)
     end
 end
-function Ask:Refresh() self:RefreshSlots(self.btns) end
 
 -- La silhouette dans un puits `well` : modèle 3D du partenaire DERRIÈRE, icônes d'emplacement
 -- DEVANT. Partagée par ce panneau et par la colonne de métier en mode Échange
@@ -132,15 +143,16 @@ function Ask:Refresh() self:RefreshSlots(self.btns) end
 -- largeur supposée : la colonne n'a pas la largeur du panneau.
 -- Le modèle est le PARTENAIRE (unité « NPC » pendant un échange), pas moi — on demande SON
 -- équipement, montrer mon perso serait un contresens. Décoratif : cf. Ask:ShowPartnerModel.
-function Ask:BuildSilhouette(well)
+function Ask:BuildSilhouette(well, onPick)
     local D = doll(); if not D then return nil end
     local m = CreateFrame("PlayerModel", nil, well)
     m:SetPoint("TOPLEFT", 50, -10); m:SetPoint("BOTTOMRIGHT", -50, 46)
     m:SetFrameLevel(well:GetFrameLevel())
     local btns, step = {}, D.ICON + 6
-    buildRun(well, D.LEFT,  "TOPLEFT",  10, -10, 0, D.STEP, D, btns)
-    buildRun(well, D.RIGHT, "TOPRIGHT", -10, -10, 0, D.STEP, D, btns)
-    buildRun(well, D.BOTTOM, "TOP", -(#D.BOTTOM - 1) * step / 2, -(10 + 8 * D.STEP + 8), step, 0, D, btns)
+    buildRun(well, D.LEFT,  "TOPLEFT",  10, -10, 0, D.STEP, D, btns, onPick)
+    buildRun(well, D.RIGHT, "TOPRIGHT", -10, -10, 0, D.STEP, D, btns, onPick)
+    buildRun(well, D.BOTTOM, "TOP", -(#D.BOTTOM - 1) * step / 2, -(10 + 8 * D.STEP + 8), step, 0, D,
+             btns, onPick)
     return { model = m, btns = btns, height = 10 + 8 * D.STEP + 8 + D.ICON + 10 }
 end
 
@@ -150,20 +162,6 @@ function Ask:ShowPartnerModel(model)
     if pcall(function() model:SetUnit("NPC") end) then model:Show() else model:Hide() end
 end
 
-local function build()
-    if panel then return end
-    if not doll() then return end
-    panel = Comp.MakePanel("COCEnchantAskPanel", UIParent, 240, 0)
-    panel.subFS:SetText("|c" .. Skin.hex.gold .. L["Demande-lui une pièce"] .. "|r")
-    panel.well:ClearAllPoints()
-    panel.well:SetPoint("TOPLEFT", 12, -66); panel.well:SetPoint("TOPRIGHT", -12, -66)
-    local sil = Ask:BuildSilhouette(panel.well)
-    panel.well:SetHeight(sil.height)
-    panel:SetHeight(66 + sil.height + 12)
-    panel.model, Ask.btns = sil.model, sil.btns
-    panel:Hide()
-end
-
 -- ------------------------------------------------------------------
 -- Étage 2, côté RECEVEUR : un enchanteur me demande une pièce (verbe ASKE)
 -- ------------------------------------------------------------------
@@ -171,12 +169,6 @@ end
 -- l'emplacement « ne sera pas échangé ».
 local TRADE_SAFE_SLOT = 7
 
--- Silencieux pour le JOUEUR ≠ silencieux pour le DIAGNOSTIC. Retour terrain du 1er test réel
--- (2026-07-21 : l'ami enchanteur clique, le partenaire reçoit le chuchotement texte et AUCUNE invite) :
--- rien ne permettait de distinguer « le verbe n'est jamais arrivé » de « une garde l'a refusé », les
--- deux se présentent identiquement — un silence. Chaque refus se NOMME donc dans /co trace (même
--- discipline que _Inbound:Alert pour ses entrantes silencées). Rien n'est affiché au joueur.
-local function traceAsk(msg) if COC.Trace then COC.Trace:Log("aske", msg) end end
 
 -- Jeton d'emplacement du payload → def de la silhouette. Whitelist DOLL au runtime : un payload
 -- forgé avec un jeton hors silhouette est jeté ici.
@@ -286,22 +278,3 @@ if CraftLink and CraftLink.RegisterHandler then
     CraftLink:RegisterHandler("ASKE", function(sender, message) Ask:OnAsk(sender, message) end)
 end
 
--- ------------------------------------------------------------------
--- Pilotage (appelé par _Enchant_Trade, qui possède les events d'échange)
--- ------------------------------------------------------------------
-function Ask:Hide() if panel then panel:Hide() end end
-
--- Visible SEULEMENT si : échange ouvert, je suis enchanteur, et il n'a encore rien posé. Pas besoin de
--- la fenêtre d'Enchantement ici : demander une pièce ne lit aucune recette (le niveau de métier, lui,
--- est lisible à tout moment — cf. Directory_Skills).
-function Ask:Update()
-    if not (_G.TradeFrame and TradeFrame:IsShown() and isEnchanter()) then self:Hide(); return end
-    build()
-    if not panel then return end
-    panel:ClearAllPoints()
-    panel:SetPoint("TOPLEFT", TradeFrame, "TOPRIGHT", 4, 0)
-    panel.partnerFS:SetText("|cFFFFFFFF" .. Comp.shortName(COC.Api.UnitNameSafe("NPC") or "?") .. "|r")
-    self:ShowPartnerModel(panel.model)
-    self:Refresh()
-    panel:Show()
-end
