@@ -22,7 +22,6 @@ local es = {
     ["Aucun enchantement connu pour cet emplacement."] = "Ningún encantamiento conocido para esa ranura.",
     ["Ses composants désignent : %s"] = "Sus materiales apuntan a: %s",
     ["Ses composants vont à %d enchantements — à toi de choisir."] = "Sus materiales encajan con %d encantamientos: tú decides.",
-    ["Clic : ouvrir cette recette dans la fenêtre."] = "Clic: abrir esta receta en la ventana.",
     ["Choisir par emplacement"] = "Elegir por ranura", ["Retour"] = "Volver",   -- vue silhouette (onglet Commande)
     -- Onglets / fenêtre
     ["Carnet"] = "Libro", ["Commande"] = "Pedir", ["Récolte"] = "Recolectar", ["Artisans"] = "Artesanos",

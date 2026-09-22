@@ -137,7 +137,6 @@ local function fillHint(tp, loc, sub)
     local key = tostring(loc) .. "|" .. ET.OfferKey(offer)
     if tp.hintKey == key then return end
     tp.hintKey = key
-    row.recipeID = nil
     if not loc then
         row.sub:SetText("|cFF888888" .. L["Rien de posé. Clique un emplacement pour lui demander sa pièce."] .. "|r")
         return
@@ -145,7 +144,6 @@ local function fillHint(tp, loc, sub)
     local guess = ET.GuessFromOffer(E:CraftsForEquipLoc(loc, sub), offer)
     if #guess == 1 then
         local e = guess[1]
-        row.recipeID = e.spellID
         row.sub:SetText("|cFFE8B84B" .. string.format(L["Ses composants désignent : %s"],
                         E:ShortName(e.name, e.spellID) or e.name or "?") .. "|r")
     elseif #guess > 1 then
@@ -187,36 +185,27 @@ end
 -- Construction (paresseuse, au premier échange)
 -- ------------------------------------------------------------------
 
--- Ouvrir la recette dans la fenêtre native. DEUX chemins, dans cet ordre :
---   1. la LISTE de Blizzard (`RecipeList:SelectRecipe`) — exactement ce que fait un clic du joueur
---      sur une ligne : la sélection déclenche sa chaîne native jusqu'au panneau de détail ;
---   2. `C_TradeSkillUI.OpenRecipe`, qui passe par le SERVEUR (événement OPEN_RECIPE_RESPONSE).
--- Le repli est nécessaire dans l'autre sens que prévu : sur ce client, OpenRecipe ne sélectionne
--- RIEN quand la fenêtre est déjà ouverte sur le bon métier — mesuré le 2026-09-22, le clic partait
--- bien (trace) et le panneau de détail ne bougeait pas. Il reste utile si la recette n'est pas dans
--- la liste affichée (filtre, recherche du joueur), cas où la liste ne peut pas la sélectionner.
-local function openRecipe(recipeID)
-    local page = _G.ProfessionsFrame and ProfessionsFrame.CraftingPage
-    local list = page and page.RecipeList
-    local info = C_TradeSkillUI and C_TradeSkillUI.GetRecipeInfo and C_TradeSkillUI.GetRecipeInfo(recipeID)
-    if info and list and list.SelectRecipe then
-        local ok, elementData = pcall(list.SelectRecipe, list, info, true)
-        if ok and elementData then return "liste native" end
-    end
-    if C_TradeSkillUI and C_TradeSkillUI.OpenRecipe then
-        C_TradeSkillUI.OpenRecipe(recipeID)
-        return "OpenRecipe (serveur)"
-    end
-    return "aucun chemin"
-end
+-- ⚠️ ON N'OUVRE PLUS LA RECETTE D'UN CLIC, ET ON NE LE REFERA PAS. Livré à T5, ce clic appelait
+-- `ProfessionsFrame.CraftingPage.RecipeList:SelectRecipe(info, true)` — le chemin d'un clic du
+-- joueur. Mesuré le 2026-09-22 : la sélection porte alors NOTRE teinte, et le craft lancé ensuite
+-- par le bouton de Blizzard la traîne jusqu'à `HandleEnchantSpellSelected` →
+-- `OpenAndFilterCharacterFrame` → la fiche de personnage, qui compare une valeur SECRÈTE (la vie du
+-- joueur) et LÈVE, nommément imputée à COC. Le même parcours sans notre clic passe de bout en bout.
+-- `C_TradeSkillUI.OpenRecipe`, l'autre chemin, ne fait rien fenêtre déjà ouverte (elle attend une
+-- réponse serveur qui ne vient pas). Il ne reste donc RIEN de sûr pour sélectionner une recette
+-- depuis notre code : l'indice NOMME l'enchant, et le joueur clique la ligne dans la liste de
+-- Blizzard — elle est déjà filtrée sur le bon emplacement, la bonne recette est à deux lignes.
 
 -- La rangée du bas : l'icône de la pièce posée, son nom, et dessous l'indice. Cliquable quand
 -- l'indice nomme UN enchant — le clic l'ouvre dans la fenêtre native (`OpenRecipe`, ordinaire).
 local function buildRow(tp, well)
-    local row = Skin.MakeFlatRow(tp, 10, 44)
+    -- Un CADRE, pas un bouton : plus rien à cliquer ici (voir ci-dessus), et une surbrillance de
+    -- survol sur une ligne inerte ferait croire le contraire. Le survol sert l'infobulle de la pièce.
+    local row = CreateFrame("Frame", nil, tp)
+    row:SetHeight(44)
+    row:EnableMouse(true)
     row:SetPoint("TOPLEFT", well, "BOTTOMLEFT", 0, -4)
     row:SetPoint("RIGHT", tp, "RIGHT", -6, 0)
-    row.text:Hide()
     local icon = row:CreateTexture(nil, "ARTWORK")
     icon:SetSize(32, 32); icon:SetPoint("TOPLEFT", 4, -4); icon:SetTexture(EMPTY_ICON)
     local top = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
@@ -226,21 +215,10 @@ local function buildRow(tp, well)
     sub:SetPoint("TOPLEFT", top, "BOTTOMLEFT", 0, -3); sub:SetPoint("RIGHT", row, "RIGHT", -4, 0)
     sub:SetJustifyH("LEFT"); sub:SetJustifyV("TOP")
     row.icon, row.top, row.sub = icon, top, sub
-    row:SetScript("OnClick", function(b)
-        if not b.recipeID then return end
-        local how = openRecipe(b.recipeID)
-        trace("recette " .. tostring(b.recipeID) .. " ouverte par " .. how .. " (indice cliqué)")
-    end)
     row:SetScript("OnEnter", function(b)
+        if not tp.itemLink then return end
         GameTooltip:SetOwner(b, "ANCHOR_RIGHT")
-        if b.recipeID then
-            GameTooltip:SetText(L["Clic : ouvrir cette recette dans la fenêtre."], 1, 1, 1, 1, true)
-        elseif tp.itemLink and not pcall(GameTooltip.SetHyperlink, GameTooltip, tp.itemLink) then
-            return GameTooltip:Hide()
-        elseif not tp.itemLink then
-            return GameTooltip:Hide()
-        end
-        GameTooltip:Show()
+        if pcall(GameTooltip.SetHyperlink, GameTooltip, tp.itemLink) then GameTooltip:Show() end
     end)
     row:SetScript("OnLeave", GameTooltip_Hide)
     tp.row = row

@@ -44,9 +44,13 @@ Du point de vue de l'**enchanteur** :
      « Filter → Slots » de Blizzard, coché comme si le joueur l'avait fait lui-même).
 3. La pièce est posée : le filtre suit la pièce **réellement posée**, même si ce n'est pas celle
    demandée. Si les composants que le partenaire a posés dans l'échange correspondent à un enchant
-   précis, la colonne l'indique (« ses composants correspondent à : Arme de feu ») ; un clic ouvre
-   cette recette dans la fenêtre native.
-4. Il enchante avec le **bouton de Blizzard**, qui sait déjà cibler l'objet de l'échange.
+   précis, la colonne l'**indique** (« ses composants désignent : Arme de feu »). L'indice ne se
+   clique pas : sélectionner une recette depuis notre code teinte le craft (voir T5, 2026-09-22).
+   La liste étant filtrée sur l'emplacement, la bonne recette est à deux lignes.
+4. Il enchante avec le **bouton de Blizzard**. **Vérifié le 2026-09-22** : « Créer » ouvre un mode de
+   CIBLAGE — la fiche de personnage s'ouvre comme aide — et l'enchanteur clique la pièce **dans la
+   fenêtre d'échange** ; l'enchant s'y applique. Le bouton ne cible donc pas l'objet de l'échange
+   tout seul, contrairement à ce que cette spec supposait : il faut ce clic de ciblage.
 5. L'échange se ferme ou la pièce est retirée : la liste native retrouve ses filtres d'avant.
 6. Un échange s'ouvre alors que son Enchantement est fermé : un petit bouton **« Enchantement »**
    apparaît sur la fenêtre d'échange et ouvre la fenêtre de métier.
@@ -363,16 +367,21 @@ se mélangent dans les mêmes fichiers.
    que le partenaire n'a rien à cet emplacement, faute de réponse du partenaire.
 5. **T5 — Indice « ses composants correspondent à »** (réutilise `offerRank`) et clic → la recette
    s'ouvre dans la fenêtre native. Critère 5.
-   **Validée en jeu le 2026-09-22** (trace : « recette 7457 ouverte par liste native »).
+   **Validée en jeu le 2026-09-22** pour la DÉDUCTION ; le clic d'ouverture a été **retiré le jour
+   même** (voir plus bas).
    Règle de déduction : on lit SON intention — ce qu'il pose —, jamais MES sacs ; un composant
    étranger à la recette fait taire l'indice ; la quantité JUSTE prime sur le simplement couvert
    (deux poussières couvrent aussi l'enchant qui n'en demande qu'une) ; plusieurs recettes également
    désignées → « plusieurs », sans clic, plutôt qu'un nom au hasard.
-   **`C_TradeSkillUI.OpenRecipe` ne sélectionne RIEN** quand la fenêtre est déjà ouverte sur le bon
-   métier : elle demande au SERVEUR (`OPEN_RECIPE_RESPONSE`), qui ne répond pas ici. Mesuré : le clic
-   partait bien (trace), le panneau de détail ne bougeait pas. On passe donc par
-   `ProfessionsFrame.CraftingPage.RecipeList:SelectRecipe(info, true)` — le chemin d'un clic du
-   joueur — et `OpenRecipe` reste en repli pour une recette absente de la liste affichée.
+   **Aucun chemin sûr pour sélectionner une recette depuis notre code — l'indice ne se clique plus.**
+   Deux mesures, le même jour : `C_TradeSkillUI.OpenRecipe` ne sélectionne RIEN fenêtre déjà ouverte
+   (elle attend `OPEN_RECIPE_RESPONSE`, qui ne vient pas) ; et
+   `ProfessionsFrame.CraftingPage.RecipeList:SelectRecipe(info, true)`, qui marche, **TEINTE la
+   sélection** : le craft lancé ensuite par le bouton de Blizzard traîne notre teinte jusqu'à
+   `HandleEnchantSpellSelected` → `OpenAndFilterCharacterFrame` → la fiche de personnage, qui compare
+   une valeur SECRÈTE et LÈVE, imputée nommément à COC (BugSack + `taint.log` du user, 12:32:58).
+   Le MÊME parcours sans notre clic passe de bout en bout, sans une ligne dans le journal. L'indice
+   nomme donc l'enchant, et le joueur clique la ligne dans la liste native.
    **Mise en page, arbitrée par le user en jeu** : silhouette à taille pleine, aucun fond de puits
    (elle se pose sur l'art natif), titre « Échange avec … » remonté dans l'EN-TÊTE à la place des
    onglets, pièce posée et indice réunis sur UNE rangée. Et une **bande de 46 px réservée en bas** :

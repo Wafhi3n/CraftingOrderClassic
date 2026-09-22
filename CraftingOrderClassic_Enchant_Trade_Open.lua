@@ -127,9 +127,12 @@ function Open:Update()
     if enchantingShown() then return self:Hide() end
     local spellName, texture = enchantingSpell()
     if not spellName then return self:Hide() end   -- pas enchanteur : ni bouton ni rappel
+    -- La garde de combat vient AVANT la construction : `build` crée un cadre SÉCURISÉ et le masque
+    -- aussitôt, deux gestes refusés en combat. Un échange qui s'ouvre pendant un combat n'est pas
+    -- rare ; la sortie de combat rejoue tout.
+    if lockedDown() then return end
     build(spellName, texture)
     if not btn then return end
-    if lockedDown() then return end                -- rien ne bouge en combat ; rejoué à la sortie
     local armed = configure(spellName)
     btn:SetShown(armed)
     hint:SetShown(not armed)

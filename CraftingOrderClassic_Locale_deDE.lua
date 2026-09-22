@@ -21,7 +21,6 @@ local de = {
     ["Aucun enchantement connu pour cet emplacement."] = "Keine bekannte Verzauberung für diesen Platz.",
     ["Ses composants désignent : %s"] = "Seine Materialien deuten auf: %s",
     ["Ses composants vont à %d enchantements — à toi de choisir."] = "Seine Materialien passen zu %d Verzauberungen — du entscheidest.",
-    ["Clic : ouvrir cette recette dans la fenêtre."] = "Klick: dieses Rezept im Fenster öffnen.",
     ["Choisir par emplacement"] = "Nach Platz auswählen", ["Retour"] = "Zurück",   -- vue silhouette (onglet Commande)
     -- Onglets / fenêtre
     ["Carnet"] = "Auftragsbuch", ["Commande"] = "Bestellen", ["Récolte"] = "Sammeln", ["Artisans"] = "Handwerker",
