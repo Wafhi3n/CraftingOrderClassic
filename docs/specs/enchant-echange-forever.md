@@ -91,7 +91,11 @@ clic et la pièce se pose dans l'emplacement 7. Sans COC, il ne reçoit que le c
 - **Enchantement fermé puis rouvert** pendant l'échange : Blizzard remet ses filtres par défaut à
   chaque ouverture ; on ré-applique celui de la pièce posée.
 - **Combat** : la colonne greffée est un cadre protégé ; rien ne se repeint en combat, tout se rejoue
-  à la sortie (règle existante de la colonne).
+  à la sortie (règle existante de la colonne). Le FILTRE natif, lui, continue de suivre la pièce
+  posée EN COMBAT — mesuré le 2026-09-22, échange ouvert et combat engagé : la liste a suivi, sans
+  erreur ni ligne dans `taint.log`. Écrire le filtre est un appel C, pas un geste sur un cadre. Une
+  garde de combat y avait été ajoutée par cohérence puis RETIRÉE : elle ne protégeait de rien et
+  cassait la feature pendant un combat.
 - **Pas enchanteur** : ni mode Échange ni bouton.
 - **Demandes en rafale** : une seule alerte à la fois chez le partenaire, et le délai de 5 s par
   émetteur déjà en place.

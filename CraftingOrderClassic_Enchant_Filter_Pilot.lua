@@ -152,14 +152,6 @@ function Filter:Start()
     local pending
     local function refresh()
         pending = nil
-        -- RIEN NE S'ÉCRIT EN COMBAT. Le filtre appartient à la fenêtre de métier, un cadre protégé,
-        -- et l'écriture partirait de NOTRE pile : c'est la famille de bug prouvée le 2026-09-22 avec
-        -- `OpenTradeSkill` (bloquée, imputée à COC, et le pcall n'attrape rien). Un échange n'est pas
-        -- fermé par le combat, donc le cas arrive pour de vrai. L'intention reste marquée « à
-        -- refaire » dans le suiveur : la sortie de combat la rejoue. Même discipline que la colonne.
-        if InCombatLockdown and InCombatLockdown() then
-            return trace("combat : écriture du filtre différée")
-        end
         local ok, what, done, cases, from = pcall(follower.Refresh, follower)
         if not ok then return trace("erreur : " .. tostring(what)) end
         if what == "apply" then
@@ -175,8 +167,15 @@ function Filter:Start()
                                     "TRADE_SKILL_SHOW", "TRADE_SKILL_CLOSE", "TRADE_SKILL_LIST_UPDATE",
                                     "PLAYER_REGEN_ENABLED" })
     -- Coalescé : l'ouverture de la fenêtre enchaîne plusieurs événements, et la pièce n'est lisible
-    -- qu'un instant après TRADE_TARGET_ITEM_CHANGED. La sortie de combat, elle, se rejoue TOUT DE
-    -- SUITE : le filtre est resté figé pendant le combat, il doit rattraper la pièce réelle au plus tôt.
+    -- qu'un instant après TRADE_TARGET_ITEM_CHANGED.
+    --
+    -- PAS DE GARDE DE COMBAT ICI, et c'est mesuré, pas supposé. `api-gotcha-reviewer` en réclamait
+    -- une le 2026-09-22 par cohérence avec la colonne et le bouton sécurisé, qui en ont une. Mais
+    -- écrire le filtre est un appel C, pas un geste sur un cadre : en jeu, échange ouvert et combat
+    -- engagé, la liste native a continué de suivre la pièce posée — aucune erreur, aucune ligne dans
+    -- `taint.log`. Ce qui gèle en combat, c'est NOTRE colonne (cadre protégé, cf. _ProfWindow_Trade),
+    -- pas le filtre. Une garde ici ne protégerait de rien et casserait la feature pendant un combat.
+    -- PLAYER_REGEN_ENABLED reste écouté : la colonne, elle, a du retard à rattraper.
     f:SetScript("OnEvent", function(_, ev)
         if ev == "PLAYER_REGEN_ENABLED" then return refresh() end
         if pending then return end
