@@ -4,8 +4,9 @@
 > Cible : WoW: Forever / Camelot (16001) uniquement · Addon : Crafting Order - Classic
 >
 > Les cinq mesures préalables sont faites (2026-09-21) ; `ASKE` a enfin été vu fonctionner de bout en
-> bout. T1 et T2 sont codées ; T2 (le filtre suit la pièce posée) est validée en jeu à deux comptes
-> le 2026-09-22. Le reste du plan, en fin de document, n'est pas commencé.
+> bout. T1, T2 et T3 sont faites et validées en jeu à deux comptes le 2026-09-22 : la liste native
+> suit la pièce posée, et la colonne passe en mode Échange. Le reste du plan (T4 à T7), en fin de
+> document, n'est pas commencé.
 
 ## Le problème
 
@@ -294,6 +295,19 @@ se mélangent dans les mêmes fichiers.
 3. **T3 — Mode Échange de la colonne** (après le préalable). Masquer les onglets, afficher la
    silhouette (réutilise `COC.UI.DOLL`), la pièce posée et la place de l'indice ; rendre l'onglet
    d'avant à la fin. Critère 1.
+   **Validée en jeu le 2026-09-22** (capture du user : onglets remplacés par « Trade with Gnomi
+   Short », silhouette et modèle 3D du partenaire, « Item to enchant [Frayed Bracers] », et la liste
+   native réduite aux trois enchants de bracelet — T2 et T3 ensemble). Reste visible derrière la
+   fenêtre de métier : l'ancien panneau flottant, que T4 supprime. `_ProfWindow_Trade.lua`. Le mode
+   est une vue de plus de la colonne (`dockView = "trade"`) : la bascule existante masque les autres
+   vues et tait les onglets. Une session par échange retient l'onglet d'avant ; un autre métier ou
+   la fenêtre refermée ne font que sortir de la vue, seule la fin de l'échange clôt la session.
+   Échange fini pendant que la fenêtre est fermée : retour sur Commandes, pas sur l'onglet d'avant
+   (rien à remplir sans métier ouvert). La silhouette est sortie de `_Enchant_Trade_Ask`
+   (`Ask:BuildSilhouette`), donc son clic demande déjà la pièce (chuchotement + `ASKE`) : de T4, il
+   reste le filtre au clic et la suppression du panneau flottant. `tests/test_trade_view.lua`
+   (17 vérifications) verrouille l'entrée, la sortie, l'aller-retour de métier, la fenêtre refermée
+   et le combat.
 4. **T4 — Demande de pièce depuis la colonne**, puis suppression du panneau flottant
    (`_Enchant_Trade`) et de l'état vide de `_Enchant_Trade_Ask` ; le chemin réseau et les gardes de
    réception ne bougent pas. Critère 2.

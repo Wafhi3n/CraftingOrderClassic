@@ -69,8 +69,9 @@ local function setOrdersShown(self, on)
     if on and self._PlaceOrdTabs then self:_PlaceOrdTabs(self._compact) end
 end
 
--- view = nil (commandes) | "route" | "learn". Repasser la vue ACTIVE la referme : les deux boutons
--- sont des bascules, comme partout ailleurs dans COC.
+-- view = nil (commandes) | "route" | "learn" | "trade". Repasser la vue ACTIVE la referme : les deux
+-- boutons sont des bascules, comme partout ailleurs dans COC. « trade » (mode Échange) n'a pas de
+-- bouton : c'est _ProfWindow_Trade qui y entre et en sort, selon l'échange.
 function PW:_SetDockView(view)
     if self.dockView == view then view = nil end
     if lockedDown() then
@@ -82,8 +83,11 @@ function PW:_SetDockView(view)
     setOrdersShown(self, view == nil)
     if self.routePanel then self.routePanel:SetShown(view == "route") end
     if self.missPanel then self.missPanel:SetShown(view == "learn") end
+    if view == "trade" and self._BuildTradeView then self:_BuildTradeView() end
+    if self.tradePanel then self.tradePanel:SetShown(view == "trade") end
     if view == "route" then self:_FillRoute()
     elseif view == "learn" then self:_FillDockMissing()
+    elseif view == "trade" then self:_FillTradeView()
     else self:RefreshOrders() end
     self:_SyncDockViewBtns()
 end
@@ -98,6 +102,7 @@ function PW:_ResetDockView()
     if lockedDown() then return end
     if self.routePanel then self.routePanel:Hide() end
     if self.missPanel then self.missPanel:Hide() end
+    if self.tradePanel then self.tradePanel:Hide() end
     setOrdersShown(self, true)
 end
 
@@ -381,11 +386,15 @@ function PW:_SyncDockViewBtns()
     local craft = COC.Craft
     local show = (self._compact or self.docked) and self.profKey and not self.rerollKey
         and craft and craft:GetOpenProfessionInfo() ~= nil
-    for _, b in pairs(bar.buttons) do b:SetShown(show and true or false) end
+    -- En mode Échange, la colonne ne montre QUE l'échange : ses onglets se taisent (spec
+    -- enchant-echange-forever, décision du 2026-09-21).
+    local trade = self.dockView == "trade"
+    for _, b in pairs(bar.buttons) do b:SetShown((show and not trade) and true or false) end
     if not show then
         if self.dockView then self:_ResetDockView() end
         return
     end
+    if trade then return end
     bar:Select(self.dockView or "orders")
     if self.dockView == "route" then self:_SyncRouteBtn() end
 end

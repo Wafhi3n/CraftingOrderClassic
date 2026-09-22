@@ -114,41 +114,53 @@ end
 
 -- Désature ce que le catalogue de la couche courante ne sert pas — idempotent, rejoué à chaque
 -- affichage (le catalogue de la lib peut n'être pas prêt au build).
-function Ask:Refresh()
+function Ask:RefreshSlots(btns)
     local D = doll(); if not D then return end
-    for _, b in ipairs(self.btns or {}) do
+    for _, b in ipairs(btns or {}) do
         local live = #D.LiveWords(b.def) > 0
         b.live = live
         b.icon:SetDesaturated(not live)
         b.icon:SetAlpha(live and 1 or 0.45)
     end
 end
+function Ask:Refresh() self:RefreshSlots(self.btns) end
+
+-- La silhouette dans un puits `well` : modèle 3D du partenaire DERRIÈRE, icônes d'emplacement
+-- DEVANT. Partagée par ce panneau et par la colonne de métier en mode Échange
+-- (_ProfWindow_Trade) : même disposition, même clic. Rend { model, btns, height }, height étant la
+-- hauteur que le puits doit prendre. La rangée du bas est CENTRÉE par ancre, pas par calcul sur une
+-- largeur supposée : la colonne n'a pas la largeur du panneau.
+-- Le modèle est le PARTENAIRE (unité « NPC » pendant un échange), pas moi — on demande SON
+-- équipement, montrer mon perso serait un contresens. Décoratif : cf. Ask:ShowPartnerModel.
+function Ask:BuildSilhouette(well)
+    local D = doll(); if not D then return nil end
+    local m = CreateFrame("PlayerModel", nil, well)
+    m:SetPoint("TOPLEFT", 50, -10); m:SetPoint("BOTTOMRIGHT", -50, 46)
+    m:SetFrameLevel(well:GetFrameLevel())
+    local btns, step = {}, D.ICON + 6
+    buildRun(well, D.LEFT,  "TOPLEFT",  10, -10, 0, D.STEP, D, btns)
+    buildRun(well, D.RIGHT, "TOPRIGHT", -10, -10, 0, D.STEP, D, btns)
+    buildRun(well, D.BOTTOM, "TOP", -(#D.BOTTOM - 1) * step / 2, -(10 + 8 * D.STEP + 8), step, 0, D, btns)
+    return { model = m, btns = btns, height = 10 + 8 * D.STEP + 8 + D.ICON + 10 }
+end
+
+-- Sous pcall : la silhouette reste utilisable si le modèle ne rend rien.
+function Ask:ShowPartnerModel(model)
+    if not model then return end
+    if pcall(function() model:SetUnit("NPC") end) then model:Show() else model:Hide() end
+end
 
 local function build()
     if panel then return end
-    local D = doll(); if not D then return end
-    local wellH = 10 + 8 * D.STEP + 8 + D.ICON + 10
+    if not doll() then return end
     panel = Comp.MakePanel("COCEnchantAskPanel", UIParent, 240, 0)
-    panel:SetHeight(66 + wellH + 12)
     panel.subFS:SetText("|c" .. Skin.hex.gold .. L["Demande-lui une pièce"] .. "|r")
     panel.well:ClearAllPoints()
     panel.well:SetPoint("TOPLEFT", 12, -66); panel.well:SetPoint("TOPRIGHT", -12, -66)
-    panel.well:SetHeight(wellH)
-
-    -- Modèle 3D au centre, DERRIÈRE les icônes : c'est lui qui fait la silhouette. Ici c'est le
-    -- PARTENAIRE (unité « NPC » pendant un échange), pas moi — on demande SON équipement, montrer mon
-    -- perso serait un contresens. Purement décoratif : sous pcall, la vue reste utilisable s'il ne rend rien.
-    local m = CreateFrame("PlayerModel", nil, panel.well)
-    m:SetPoint("TOPLEFT", 50, -10); m:SetPoint("BOTTOMRIGHT", -50, 46)
-    m:SetFrameLevel(panel.well:GetFrameLevel())
-    panel.model = m
-
-    Ask.btns = {}
-    buildRun(panel.well, D.LEFT,  "TOPLEFT",  10, -10, 0, D.STEP, D, Ask.btns)
-    buildRun(panel.well, D.RIGHT, "TOPRIGHT", -10, -10, 0, D.STEP, D, Ask.btns)
-    local w3 = 3 * D.ICON + 2 * 6
-    buildRun(panel.well, D.BOTTOM, "TOPLEFT", (240 - 24 - w3) / 2, -(10 + 8 * D.STEP + 8),
-             D.ICON + 6, 0, D, Ask.btns)
+    local sil = Ask:BuildSilhouette(panel.well)
+    panel.well:SetHeight(sil.height)
+    panel:SetHeight(66 + sil.height + 12)
+    panel.model, Ask.btns = sil.model, sil.btns
     panel:Hide()
 end
 
@@ -289,9 +301,7 @@ function Ask:Update()
     panel:ClearAllPoints()
     panel:SetPoint("TOPLEFT", TradeFrame, "TOPRIGHT", 4, 0)
     panel.partnerFS:SetText("|cFFFFFFFF" .. Comp.shortName(COC.Api.UnitNameSafe("NPC") or "?") .. "|r")
-    if panel.model then
-        if not pcall(function() panel.model:SetUnit("NPC") end) then panel.model:Hide() else panel.model:Show() end
-    end
+    self:ShowPartnerModel(panel.model)
     self:Refresh()
     panel:Show()
 end
