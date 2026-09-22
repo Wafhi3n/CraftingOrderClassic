@@ -6,7 +6,8 @@
 > Les cinq mesures préalables sont faites (2026-09-21) ; `ASKE` a enfin été vu fonctionner de bout en
 > bout. T1 à T4 sont faites et validées en jeu à deux comptes le 2026-09-22 : la liste native suit la
 > pièce posée, la colonne passe en mode Échange, le clic sur la silhouette demande la pièce ET filtre,
-> et le panneau flottant a disparu. Reste T5 à T7, en fin de document.
+> le panneau flottant a disparu, et l'indice nomme l'enchant que ses composants désignent. Reste T6
+> (bouton sur l'échange) et T7 (clôture), en fin de document.
 
 ## Le problème
 
@@ -357,8 +358,22 @@ se mélangent dans les mêmes fichiers.
    11:25:06) : le mécanisme est sain, c'est le trou connu de la v1 — l'enchanteur ne peut pas savoir
    que le partenaire n'a rien à cet emplacement, faute de réponse du partenaire.
 5. **T5 — Indice « ses composants correspondent à »** (réutilise `offerRank`) et clic → la recette
-   s'ouvre dans la fenêtre native (`C_TradeSkillUI.OpenRecipe`, vivante, jamais appelée par nous :
-   à éprouver). Critère 5.
+   s'ouvre dans la fenêtre native. Critère 5.
+   **Validée en jeu le 2026-09-22** (trace : « recette 7457 ouverte par liste native »).
+   Règle de déduction : on lit SON intention — ce qu'il pose —, jamais MES sacs ; un composant
+   étranger à la recette fait taire l'indice ; la quantité JUSTE prime sur le simplement couvert
+   (deux poussières couvrent aussi l'enchant qui n'en demande qu'une) ; plusieurs recettes également
+   désignées → « plusieurs », sans clic, plutôt qu'un nom au hasard.
+   **`C_TradeSkillUI.OpenRecipe` ne sélectionne RIEN** quand la fenêtre est déjà ouverte sur le bon
+   métier : elle demande au SERVEUR (`OPEN_RECIPE_RESPONSE`), qui ne répond pas ici. Mesuré : le clic
+   partait bien (trace), le panneau de détail ne bougeait pas. On passe donc par
+   `ProfessionsFrame.CraftingPage.RecipeList:SelectRecipe(info, true)` — le chemin d'un clic du
+   joueur — et `OpenRecipe` reste en repli pour une recette absente de la liste affichée.
+   **Mise en page, arbitrée par le user en jeu** : silhouette à taille pleine, aucun fond de puits
+   (elle se pose sur l'art natif), titre « Échange avec … » remonté dans l'EN-TÊTE à la place des
+   onglets, pièce posée et indice réunis sur UNE rangée. Et une **bande de 46 px réservée en bas** :
+   en élargissant le cadre natif, les boutons « Créer » de Blizzard se sont décalés SOUS notre
+   colonne — rien de cliquable à nous ne doit les couvrir.
 6. **T6 — Bouton « Enchantement » sur l'échange** : bouton sécurisé de type « sort », configuré hors
    combat, visible tant que l'Enchantement n'est pas affiché (second clic = bascule, M2b).
    Indépendante des autres : peut passer tôt. Critère 8.

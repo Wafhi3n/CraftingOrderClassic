@@ -24,6 +24,12 @@ if not PW then return end
 
 local EMPTY_ICON = "Interface\\PaperDoll\\UI-Backpack-EmptySlot"
 
+-- Bande du BAS réservée aux boutons de Blizzard. En élargissant le cadre natif (cf. _Camelot), ses
+-- boutons « Créer »/« Créer tout » — ancrés au coin bas DROIT — se sont décalés SOUS notre colonne.
+-- Rien de cliquable à nous ne doit les couvrir : c'est avec eux que l'enchanteur lance l'enchant.
+-- Vécu le 2026-09-22 : l'indice posé là ne réagissait pas au clic, et masquait « Créer ».
+local BOTTOM_BAND = 46
+
 local function lockedDown() return InCombatLockdown and InCombatLockdown() end
 
 -- Un silence doit se NOMMER (même discipline que la trace `aske`) : sans ça, « la silhouette ne
@@ -118,17 +124,47 @@ local function hasEnchant(loc, sub)
     return false
 end
 
+-- L'indice se recalcule seulement si l'offre ou la pièce a changé : la déduction relit TOUTES mes
+-- recettes, et la vue se remplit à chaque rafraîchissement de la colonne.
+-- Il occupe la 2ᵉ ligne de la rangée du bas — celle qui porte déjà la pièce posée. Une ligne de plus
+-- ne rentrerait pas : la silhouette prend 400 px et la colonne n'en offre que ~440 une fois la bande
+-- des boutons de Blizzard réservée.
+local function fillHint(tp, loc, sub)
+    local E, ET = COC.Enchant, COC.EnchantTrade
+    local row = tp.row
+    if not (row and E and ET) then return end
+    local offer = ET.PartnerOffer()
+    local key = tostring(loc) .. "|" .. ET.OfferKey(offer)
+    if tp.hintKey == key then return end
+    tp.hintKey = key
+    row.recipeID = nil
+    if not loc then
+        row.sub:SetText("|cFF888888" .. L["Rien de posé. Clique un emplacement pour lui demander sa pièce."] .. "|r")
+        return
+    end
+    local guess = ET.GuessFromOffer(E:CraftsForEquipLoc(loc, sub), offer)
+    if #guess == 1 then
+        local e = guess[1]
+        row.recipeID = e.spellID
+        row.sub:SetText("|cFFE8B84B" .. string.format(L["Ses composants désignent : %s"],
+                        E:ShortName(e.name, e.spellID) or e.name or "?") .. "|r")
+    elseif #guess > 1 then
+        row.sub:SetText("|cFF888888" .. string.format(
+            L["Ses composants vont à %d enchantements — à toi de choisir."], #guess) .. "|r")
+    elseif not hasEnchant(loc, sub) then
+        row.sub:SetText("|cFF888888" .. L["Aucun enchantement connu pour cet emplacement."] .. "|r")
+    else
+        row.sub:SetText("")
+    end
+end
+
 local function fillItem(tp)
     local link, loc, sub, icon = tradeItem()
     tp.itemLink = link
-    tp.itemBtn.icon:SetTexture(icon or EMPTY_ICON)
-    if not link then
-        tp.itemFS:SetText("|cFF888888—|r")
-        tp.noteFS:SetText(L["Rien de posé. Clique un emplacement pour lui demander sa pièce."])
-    else
-        tp.itemFS:SetText(link)
-        tp.noteFS:SetText(hasEnchant(loc, sub) and "" or L["Aucun enchantement connu pour cet emplacement."])
-    end
+    tp.row.icon:SetTexture(icon or EMPTY_ICON)
+    tp.row.icon:SetDesaturated(link == nil)
+    tp.row.top:SetText(link or ("|cFF888888" .. L["Pièce à enchanter"] .. "|r"))
+    fillHint(tp, link and loc or nil, sub)
 end
 
 function PW:_FillTradeView()
@@ -151,35 +187,68 @@ end
 -- Construction (paresseuse, au premier échange)
 -- ------------------------------------------------------------------
 
-local function buildItemRow(tp, well)
-    local ib = Skin.MakeIconButton(tp, 32, EMPTY_ICON)
-    ib:SetPoint("TOPLEFT", well, "BOTTOMLEFT", 4, -10)
-    ib:SetScript("OnEnter", function(b)
-        if not tp.itemLink then return end
-        GameTooltip:SetOwner(b, "ANCHOR_RIGHT")
-        if pcall(GameTooltip.SetHyperlink, GameTooltip, tp.itemLink) then GameTooltip:Show() end
-    end)
-    ib:SetScript("OnLeave", GameTooltip_Hide)
-    tp.itemBtn = ib
-    local hdr = tp:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    hdr:SetPoint("TOPLEFT", ib, "TOPRIGHT", 8, -1); hdr:SetPoint("RIGHT", tp, "RIGHT", -8, 0)
-    hdr:SetJustifyH("LEFT"); hdr:SetText(L["Pièce à enchanter"])
-    local fs = tp:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    fs:SetPoint("TOPLEFT", hdr, "BOTTOMLEFT", 0, -3); fs:SetPoint("RIGHT", tp, "RIGHT", -8, 0)
-    fs:SetJustifyH("LEFT"); fs:SetWordWrap(false)
-    tp.itemFS = fs
-    local note = tp:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    note:SetPoint("TOPLEFT", ib, "BOTTOMLEFT", 0, -8); note:SetPoint("RIGHT", tp, "RIGHT", -8, 0)
-    note:SetJustifyH("LEFT")
-    tp.noteFS = note
-    -- La place de l'indice « ses composants correspondent à » (T5) : réservée, vide pour l'instant.
-    local hint = tp:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    hint:SetPoint("TOPLEFT", note, "BOTTOMLEFT", 0, -8); hint:SetPoint("RIGHT", tp, "RIGHT", -8, 0)
-    hint:SetJustifyH("LEFT"); hint:Hide()
-    tp.hintFS = hint
+-- Ouvrir la recette dans la fenêtre native. DEUX chemins, dans cet ordre :
+--   1. la LISTE de Blizzard (`RecipeList:SelectRecipe`) — exactement ce que fait un clic du joueur
+--      sur une ligne : la sélection déclenche sa chaîne native jusqu'au panneau de détail ;
+--   2. `C_TradeSkillUI.OpenRecipe`, qui passe par le SERVEUR (événement OPEN_RECIPE_RESPONSE).
+-- Le repli est nécessaire dans l'autre sens que prévu : sur ce client, OpenRecipe ne sélectionne
+-- RIEN quand la fenêtre est déjà ouverte sur le bon métier — mesuré le 2026-09-22, le clic partait
+-- bien (trace) et le panneau de détail ne bougeait pas. Il reste utile si la recette n'est pas dans
+-- la liste affichée (filtre, recherche du joueur), cas où la liste ne peut pas la sélectionner.
+local function openRecipe(recipeID)
+    local page = _G.ProfessionsFrame and ProfessionsFrame.CraftingPage
+    local list = page and page.RecipeList
+    local info = C_TradeSkillUI and C_TradeSkillUI.GetRecipeInfo and C_TradeSkillUI.GetRecipeInfo(recipeID)
+    if info and list and list.SelectRecipe then
+        local ok, elementData = pcall(list.SelectRecipe, list, info, true)
+        if ok and elementData then return "liste native" end
+    end
+    if C_TradeSkillUI and C_TradeSkillUI.OpenRecipe then
+        C_TradeSkillUI.OpenRecipe(recipeID)
+        return "OpenRecipe (serveur)"
+    end
+    return "aucun chemin"
 end
 
--- Même emprise que les vues Plan de route et Manquantes (cf. PW:_BuildDockViews).
+-- La rangée du bas : l'icône de la pièce posée, son nom, et dessous l'indice. Cliquable quand
+-- l'indice nomme UN enchant — le clic l'ouvre dans la fenêtre native (`OpenRecipe`, ordinaire).
+local function buildRow(tp, well)
+    local row = Skin.MakeFlatRow(tp, 10, 44)
+    row:SetPoint("TOPLEFT", well, "BOTTOMLEFT", 0, -4)
+    row:SetPoint("RIGHT", tp, "RIGHT", -6, 0)
+    row.text:Hide()
+    local icon = row:CreateTexture(nil, "ARTWORK")
+    icon:SetSize(32, 32); icon:SetPoint("TOPLEFT", 4, -4); icon:SetTexture(EMPTY_ICON)
+    local top = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    top:SetPoint("TOPLEFT", icon, "TOPRIGHT", 8, -1); top:SetPoint("RIGHT", row, "RIGHT", -4, 0)
+    top:SetJustifyH("LEFT"); top:SetWordWrap(false)
+    local sub = row:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    sub:SetPoint("TOPLEFT", top, "BOTTOMLEFT", 0, -3); sub:SetPoint("RIGHT", row, "RIGHT", -4, 0)
+    sub:SetJustifyH("LEFT"); sub:SetJustifyV("TOP")
+    row.icon, row.top, row.sub = icon, top, sub
+    row:SetScript("OnClick", function(b)
+        if not b.recipeID then return end
+        local how = openRecipe(b.recipeID)
+        trace("recette " .. tostring(b.recipeID) .. " ouverte par " .. how .. " (indice cliqué)")
+    end)
+    row:SetScript("OnEnter", function(b)
+        GameTooltip:SetOwner(b, "ANCHOR_RIGHT")
+        if b.recipeID then
+            GameTooltip:SetText(L["Clic : ouvrir cette recette dans la fenêtre."], 1, 1, 1, 1, true)
+        elseif tp.itemLink and not pcall(GameTooltip.SetHyperlink, GameTooltip, tp.itemLink) then
+            return GameTooltip:Hide()
+        elseif not tp.itemLink then
+            return GameTooltip:Hide()
+        end
+        GameTooltip:Show()
+    end)
+    row:SetScript("OnLeave", GameTooltip_Hide)
+    tp.row = row
+end
+
+-- Même emprise que les vues Plan de route et Manquantes (cf. PW:_BuildDockViews), moins la bande du
+-- bas. Le titre, lui, monte dans l'EN-TÊTE, à la place laissée libre par les onglets : c'est de la
+-- hauteur gagnée pour la silhouette, et ça se lit comme un titre de vue.
 function PW:_BuildTradeView()
     if self.tradePanel or not self.ordScroll then return end
     local Ask = COC.EnchantTradeAsk
@@ -187,15 +256,16 @@ function PW:_BuildTradeView()
     local host = self.ordScroll:GetParent()
     local tp = CreateFrame("Frame", nil, host)
     tp:SetPoint("TOPLEFT", host, "TOPLEFT", 0, -PW.TUNE.viewTop)
-    tp:SetPoint("BOTTOMRIGHT", host, "BOTTOMRIGHT", 0, 0)
+    tp:SetPoint("BOTTOMRIGHT", host, "BOTTOMRIGHT", 0, BOTTOM_BAND)
     tp:Hide()
     local title = tp:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    title:SetPoint("TOPLEFT", 8, 0); title:SetPoint("RIGHT", tp, "RIGHT", -8, 0)
+    title:SetPoint("TOPLEFT", self.frame, "TOPLEFT", 10, self:_TabTop() - 3)
     title:SetJustifyH("LEFT"); title:SetWordWrap(false)
     tp.title = title
-    local well = CreateFrame("Frame", nil, tp, "BackdropTemplate")
-    well:SetPoint("TOPLEFT", 6, -20); well:SetPoint("TOPRIGHT", -6, -20)
-    Skin.SkinWell(well)
+    -- Puits SANS fond : la silhouette se pose sur l'art natif de la page, comme le reste de la
+    -- colonne. Un aplat gris clair ici faisait une boîte dans la fenêtre (retour user 2026-09-22).
+    local well = CreateFrame("Frame", nil, tp)
+    well:SetPoint("TOPLEFT", 6, -2); well:SetPoint("TOPRIGHT", -6, -2)
     -- Le clic demande la pièce au partenaire (Ask:Request) ET filtre la liste native sur cet
     -- emplacement : la main droite coche « Weapon » et « 2H Weapon », puisqu'on ne sait pas encore
     -- ce qu'il tient. Dès qu'une pièce est posée, c'est ELLE qui commande (cf. _Enchant_Filter_Pilot).
@@ -206,7 +276,7 @@ function PW:_BuildTradeView()
     if not sil then return end
     well:SetHeight(sil.height)
     tp.model, tp.btns = sil.model, sil.btns
-    buildItemRow(tp, well)
+    buildRow(tp, well)
     self.tradePanel = tp
 end
 

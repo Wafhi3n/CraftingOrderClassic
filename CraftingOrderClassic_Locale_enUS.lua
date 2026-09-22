@@ -18,6 +18,9 @@ local en = {
     ["(/co version reset si cette alerte est erronée)"] = "(/co version reset if this alert is wrong)",
     ["Crafting Order — version %s"] = "Crafting Order — version %s",
     ["Aucun enchantement connu pour cet emplacement."] = "No known enchant for that slot.",
+    ["Ses composants désignent : %s"] = "Their reagents point to: %s",
+    ["Ses composants vont à %d enchantements — à toi de choisir."] = "Their reagents fit %d enchants — your call.",
+    ["Clic : ouvrir cette recette dans la fenêtre."] = "Click: open this recipe in the window.",
     ["Choisir par emplacement"] = "Pick by slot", ["Retour"] = "Back",   -- vue silhouette (onglet Commande)
     -- Onglets / fenêtre
     ["Carnet"] = "Ledger", ["Commande"] = "Order", ["Récolte"] = "Gather", ["Artisans"] = "Artisans",
