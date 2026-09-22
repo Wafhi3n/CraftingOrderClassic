@@ -161,7 +161,11 @@ vérifie case par case. Résultats dans `COCProbeDB.enchantTest` après `/reload
 - **M5 — réglé par M1** : la pose a réussi, `PickupInventoryItem` et `ClickTradeButton` ne sont pas
   protégées sur Forever (appelées depuis le clic sur l'alerte).
 - **M2 — le moyen est trouvé, l'atterrissage n'est pas maîtrisable fenêtre fermée.**
-  `C_TradeSkillUI.OpenTradeSkill(333)` ouvre la fenêtre sans blocage, mais pas sur le métier demandé.
+  `C_TradeSkillUI.OpenTradeSkill(333)` ouvre la fenêtre sans blocage **fenêtre FERMÉE**, mais pas sur
+  le métier demandé. ⚠️ **Correction du 2026-09-22** : appelée **fenêtre DÉJÀ OUVERTE** pour rattraper
+  la cascade, elle est **PROTÉGÉE** — `ADDON_ACTION_BLOCKED` imputé nommément à COC (journal du user),
+  et le `pcall` ne l'attrape pas (ce n'est pas une erreur Lua). La cascade ne se rattrape donc PAS par
+  code : seul le second clic du joueur bascule (M2b).
   La cause est chez Blizzard (Forever) : **à l'affichage de la fenêtre, chaque onglet latéral dont le
   métier n'est pas le métier courant relance son propre sort de métier**
   (`ProfessionsLargeRightTabMixin`, rappel « ProfessionsFrame.Show » → `CastProfessionSpell`). Les
@@ -377,5 +381,16 @@ se mélangent dans les mêmes fichiers.
 6. **T6 — Bouton « Enchantement » sur l'échange** : bouton sécurisé de type « sort », configuré hors
    combat, visible tant que l'Enchantement n'est pas affiché (second clic = bascule, M2b).
    Indépendante des autres : peut passer tôt. Critère 8.
+   **Codée le 2026-09-22**, `_Enchant_Trade_Open.lua`. Trois choses apprises en jeu :
+   · l'attribut `spell` d'un bouton sécurisé doit porter le **NOM** du sort, pas son identifiant :
+     `SECURE_ACTIONS.spell` fait `CastSpellByID` sur un nombre, et l'identifiant du grimoire d'un
+     métier n'est pas castable — le bouton s'affichait et ne faisait RIEN au clic ;
+   · l'onglet reprend l'art NATIF des onglets latéraux (`LargeSideTabButtonTemplate`, atlas
+     `common-sidetab`), au bord droit de la fenêtre d'échange, comme les onglets de métier (demande
+     du user). Primitive `Skin.MakeSideTab` dans le kit ; `fillToInterior` est obligatoire, sans lui
+     l'icône n'a aucune taille ;
+   · **la cascade ne se rattrape pas par code** (voir M2, correction du 2026-09-22). L'onglet PULSE
+     donc tant que la fenêtre est ouverte sur un autre métier, pour appeler le second clic — lueur
+     native `TabGlowAnimation` du même template.
 7. **T7 — Clôture** : portes, `api-gotcha-reviewer`, parcours complet à deux comptes avec
    `taint.log` actif (critères 6 et 9), agent `spec-updater` sur le diff, release.

@@ -161,6 +161,7 @@ CraftingOrderClassic_Companion_Mail.lua
 CraftingOrderClassic_Companion_Trade.lua
 CraftingOrderClassic_Enchant_Trade.lua
 CraftingOrderClassic_Enchant_Trade_Ask.lua
+CraftingOrderClassic_Enchant_Trade_Open.lua
 # Suivi à l'écran (façon suivi de quête) : modèle Journal + coque + lignes
 CraftingOrderClassic_Journal.lua
 CraftingOrderClassic_Tracker.lua

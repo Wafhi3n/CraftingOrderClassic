@@ -363,8 +363,33 @@ end
 -- =========================================================================
 -- Icône native encadrée d'un liseré 1 px — même famille visuelle que Skin.MakeBadge. Contrat :
 -- .icon (texture, désaturable par l'appelant), :SetSelected(on) = liseré doré vif.
-function Skin.MakeIconButton(parent, size, tex)
-    local b = CreateFrame("Button", nil, parent, "BackdropTemplate")
+-- =========================================================================
+-- Onglet LATÉRAL natif (l'art des onglets de métier, à droite de la fenêtre)
+-- =========================================================================
+-- On HÉRITE `LargeSideTabButtonTemplate` (SharedUIPanelTemplates.xml) : l'atlas `common-sidetab`,
+-- l'icône masquée par `common-sidetab-mask`, le survol, la sélection, l'enfoncement et le son du
+-- clic viennent de Blizzard — zéro asset, zéro imitation. `fillToInterior` est ce que posent les
+-- onglets de métier eux-mêmes : sans lui, l'icône n'a AUCUNE taille et le bouton paraît vide.
+-- Ancrage d'usage, copié des onglets natifs : TOPLEFT sur le TOPRIGHT du cadre, y = -60.
+-- ⚠️ On REMPLACE OnEnter/OnLeave (au lieu de les chaîner comme ailleurs) : le template les délègue à
+-- une méthode que seul un mixin d'appelant définit — laissée telle quelle, elle lève au survol.
+-- `template` (facultatif) : « SecureActionButtonTemplate » pour un clic qui lance un sort.
+-- Repli sur MakeIconButton si le template n'existe pas (autre saveur de client).
+function Skin.MakeSideTab(parent, tex, template)
+    local names = template and ("LargeSideTabButtonTemplate, " .. template) or "LargeSideTabButtonTemplate"
+    local ok, b = pcall(CreateFrame, "Button", nil, parent, names)
+    if not (ok and b and b.SetFillToInterior) then return Skin.MakeIconButton(parent, 34, tex, template) end
+    b:SetFillToInterior(true)
+    if tex and b.Icon then b.Icon:SetTexture(tex) end
+    b.icon = b.Icon          -- même nom de poignée que MakeIconButton, pour les appelants
+    return b
+end
+
+-- `template` (facultatif) : même contrat que MakeGoldButton — « SecureActionButtonTemplate » pour un
+-- clic qui doit lancer un sort ou viser une cible protégée. NE JAMAIS LE RETIRER d'un appelant.
+function Skin.MakeIconButton(parent, size, tex, template)
+    local b = CreateFrame("Button", nil, parent,
+        template and ("BackdropTemplate, " .. template) or "BackdropTemplate")
     b:SetSize(size, size)
     b:SetBackdrop({ bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
         edgeFile = "Interface\\Buttons\\WHITE8X8", edgeSize = 1,
