@@ -34,7 +34,7 @@ function UI:BuildMyArtisansTab(f)
     local allBtn = Skin.MakeGoldButton(az, azw - 36, 20, L["Tous les plans du royaume"])
     allBtn:SetPoint("LEFT", 12, 0); self.myArtAllBtn = allBtn
     allBtn:SetScript("OnClick", function()
-        if not (COC.LazyGold and COC.LazyGold:IsAvailable()) then COC:NeedLazyGold(); return end
+        if not (COC.LazyGold and COC.LazyGold:IsAvailable()) then COC:NeedPriceAddon(); return end
         UI.myArtAllProfs = not UI.myArtAllProfs
         UI:RefreshMyArtisans()
     end)

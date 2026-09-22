@@ -132,7 +132,7 @@ end
 -- Bascule le tri par rentabilité (sans effet si Lazy Gold absent). Met à jour l'en-tête + rafraîchit.
 -- Exclusif avec le tri progression : un seul à-plat à la fois.
 function PW:_ToggleRecipeSort()
-    if not (COC.LazyGold and COC.LazyGold:IsAvailable()) then COC:NeedLazyGold(); return end
+    if not (COC.LazyGold and COC.LazyGold:IsAvailable()) then COC:NeedPriceAddon(); return end
     self.recipeSortProfit = not self.recipeSortProfit
     if self.recipeSortProfit then self.recipeSortLevel = nil end
     self:_SyncSortHeader()
@@ -151,7 +151,7 @@ end
 -- c'est un confort de lecture, il doit survivre au /reload.
 function PW:_ToggleProfitExact()
     local LG = COC.LazyGold
-    if not (LG and LG:IsAvailable()) then COC:NeedLazyGold(); return end
+    if not (LG and LG:IsAvailable()) then COC:NeedPriceAddon(); return end
     LG:SetExactMode(not LG:ExactMode())
     self:_SyncSortHeader()
     self:RefreshRecipes()

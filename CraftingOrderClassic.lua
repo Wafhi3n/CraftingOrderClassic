@@ -222,12 +222,11 @@ function COC:MissingAddon(displayName)
     }
     StaticPopup_Show("COC_MISSING_ADDON")
 end
--- L'oracle de prix n'est pas le même selon la saveur : Lazy Gold Classic n'existe QUE sur Classic
--- Era, et sur WoW: Forever c'est Auctionator qui tient ce rôle (cf. _LazyGold.lua). Conseiller un
--- addon introuvable sur le client du joueur, c'est envoyer dans le mur.
-function COC:NeedLazyGold()
-    local mainline = COC.Api and COC.Api.IS_MAINLINE
-    self:MissingAddon(mainline and "Auctionator" or "Lazy Gold Classic")
+-- L'oracle de prix est Auctionator, et lui seul depuis le 2026-09-22 (spec docs/specs/prix-maison).
+-- Le pont vers Lazy Gold a été retiré : il ne faisait que relire Auctionator, et il n'existait que
+-- sur l'Era, purgée. Conseiller un addon introuvable sur le client du joueur, c'est envoyer dans le mur.
+function COC:NeedPriceAddon()
+    self:MissingAddon("Auctionator")
 end
 
 -- Balise TEXTE de découverte. À n'appeler QUE depuis une action joueur (hardware event) — sinon

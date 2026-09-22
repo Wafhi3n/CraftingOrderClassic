@@ -59,7 +59,7 @@ function UI:_BuildMyArtLGBar(panel, anchor)
         return UI.myArtSortProfit and L["Tri par rentabilité — clic pour A-Z."]
             or L["Trier par rentabilité (Lazy Gold)."]
     end, function()
-        if not LG() then COC:NeedLazyGold(); return end
+        if not LG() then COC:NeedPriceAddon(); return end
         UI.myArtSortProfit = not UI.myArtSortProfit
         UI:RefreshMyArtisans()
     end)
@@ -74,7 +74,7 @@ function UI:_BuildMyArtLGBar(panel, anchor)
         return (g and g:ExactMode()) and L["Valeurs exactes — clic pour l'affichage compact."]
             or L["Afficher les valeurs exactes (po/pa/pc)."]
     end, function()
-        local g = LG(); if not g then COC:NeedLazyGold(); return end
+        local g = LG(); if not g then COC:NeedPriceAddon(); return end
         g:SetExactMode(not g:ExactMode())
         UI:RefreshMyArtisans()
     end)

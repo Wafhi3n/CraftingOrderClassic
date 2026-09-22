@@ -241,13 +241,20 @@ function PW:_FillReagPanel(card, o)
     return h
 end
 
--- « Dois-je accepter ? » — les deux repères Lazy Gold : Valeur HV de la marchandise (× qté) et
+-- « Dois-je accepter ? » — les deux repères de prix : Valeur HV de la marchandise (× qté) et
 -- Réactifs À MA CHARGE (coût HV des composants NON fournis). PAS de « profit net » : o.price est du
 -- TEXTE LIBRE (« 15po », « 2 stacks de fer »…), le parser serait un devin — l'artisan compare lui-même
 -- le prix proposé à ces repères. Renvoie la hauteur consommée (0 = rien).
 function PW:_FillOrderProfit(card, o, hasPanel)
     local LG = COC.LazyGold
-    if not (LG and LG:IsAvailable() and hasPanel) then card.lgLine:Hide(); return 0 end
+    if not hasPanel then card.lgLine:Hide(); return 0 end
+    -- Aucun oracle : on le DIT au lieu de laisser un trou. Une ligne absente se lit comme « cette
+    -- commande ne vaut rien », alors qu'on n'en sait simplement rien (décision du user 2026-09-22).
+    if not (LG and LG:IsAvailable()) then
+        card.lgLine:SetText("|cFF888888" .. L["Installe Auctionator pour voir les prix."] .. "|r")
+        card.lgLine:Show()
+        return 16
+    end
     local list = self:_OrderReagents(o)
     local mine = 0
     for _, rg in ipairs(list or {}) do

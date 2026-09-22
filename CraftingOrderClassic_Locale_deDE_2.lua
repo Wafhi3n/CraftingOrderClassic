@@ -457,6 +457,7 @@ local de2 = {
     ["À apprendre maintenant (%d)"] = "Jetzt erlernbar (%d)",
     ["… et %d autres"] = "… und %d weitere",
     ["Niveau requis : inconnu (la donnée manque pour cette recette)"] = "Benötigter Skill: unbekannt (die Daten fehlen für dieses Rezept)",
+    ["Installe Auctionator pour voir les prix."] = "Installiere Auctionator, um Preise zu sehen.",
     ["Niveau requis : %d"] = "Benötigter Skill: %d",
     ["Rien ne manque dans ce métier."] = "In diesem Beruf fehlt nichts.",
     ["Formateur : %d recette(s) notée(s), mais ton filtre en cache (%s)."] = "Lehrer: %d Rezept(e) notiert, aber dein Filter verbirgt welche (%s).",

@@ -458,6 +458,7 @@ local es2 = {
     ["À apprendre maintenant (%d)"] = "Aprender ahora (%d)",
     ["… et %d autres"] = "… y %d más",
     ["Niveau requis : inconnu (la donnée manque pour cette recette)"] = "Nivel requerido: desconocido (faltan los datos de esta receta)",
+    ["Installe Auctionator pour voir les prix."] = "Instala Auctionator para ver los precios.",
     ["Niveau requis : %d"] = "Nivel requerido: %d",
     ["Rien ne manque dans ce métier."] = "No falta nada en esta profesión.",
     ["Formateur : %d recette(s) notée(s), mais ton filtre en cache (%s)."] = "Maestro: %d receta(s) anotada(s), pero tu filtro oculta algunas (%s).",

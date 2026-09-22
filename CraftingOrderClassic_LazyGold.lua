@@ -1,21 +1,20 @@
--- CraftingOrderClassic_LazyGold.lua — pont LECTURE SEULE vers l'addon « Lazy Gold Classic » (LG).
+-- CraftingOrderClassic_LazyGold.lua — pont LECTURE SEULE vers l'oracle de prix, AUCTIONATOR.
+-- Spec : docs/specs/prix-maison.md.
 --
 -- BUT : afficher la RENTABILITÉ d'une recette dans la vue métier — prix de vente à l'HV, coût des
--- réactifs, profit net — en réutilisant les prix que Lazy Gold calcule (via Auctionator + prix
--- vendeur). On ne réimplémente PAS la collecte de prix : on lit sa primitive publique.
+-- réactifs, profit net. On ne collecte PAS de prix nous-mêmes : le scan de l'hôtel des ventes est le
+-- métier d'Auctionator, on lit son API publique.
 --
--- DÉPENDANCE MOLLE : COC reste autonome. Si aucun oracle de prix n'est là, IsAvailable() est faux et
--- la section « Rentabilité » ne s'affiche pas — aucun plantage. On lit UNE fonction publique, jamais
--- l'UI ni les tables internes des addons lus.
+-- DÉPENDANCE MOLLE : COC reste autonome. Sans oracle, `IsAvailable()` est faux, les sections d'argent
+-- ne s'affichent pas et un clic sur un bouton de prix dit QUOI installer — aucun plantage, et jamais
+-- un « 0 » qui se lirait comme « ça ne rapporte rien ».
 --
--- DEUX ORACLES, une seule façade. Lazy Gold Classic n'existe que sur Classic Era ; sur WoW: Forever
--- (Camelot, API mainline) il n'y a qu'AUCTIONATOR, que Lazy Gold interroge d'ailleurs lui-même. On
--- lit donc directement l'API publique versionnée d'Auctionator quand Lazy Gold manque — ce qui rend
--- au portage Forever la rentabilité, le coût/point et le PLAN DE ROUTE, qui tous en dépendent.
--- Lazy Gold garde la priorité là où il est : il connaît en plus une table de prix VENDEUR curée.
+-- UN SEUL ORACLE depuis le 2026-09-22 (décision du user). Le pont vers **Lazy Gold Classic** a été
+-- retiré : il ne calculait rien, il relisait Auctionator. Deux ponts pour la même donnée, c'était un
+-- de trop — et le pied de fenêtre pouvait nommer « Lazy Gold » un chiffre venu d'ailleurs. Lazy Gold
+-- n'existait de toute façon que sur Classic Era, purgée de `main` depuis le 2026-09-21.
 --
 -- PRIMITIVES LUES :
---   LazyGold:GetItemCost(itemID)                          -> cuivre (vendeur, sinon HV), nil si inconnu.
 --   Auctionator.API.v1.GetVendorPriceByItemID(id, itemID) -> prix d'ACHAT chez le PNJ, par unité,
 --       relevé à la visite d'un marchand à stock illimité (Source/CraftingInfo/Main.lua) — donc bien
 --       un coût d'approvisionnement, pas le prix de rachat. nil tant qu'aucun marchand n'a été vu.
@@ -29,15 +28,10 @@ local COC = CraftingOrderClassic
 local LG  = {}
 COC.LazyGold = LG
 
-local AH_CUT = 0.05   -- coupe de l'hôtel des ventes, comme Lazy Gold (5 %)
+local AH_CUT = 0.05   -- coupe de l'hôtel des ventes (5 %)
 
 -- Nom d'appelant exigé par l'API d'Auctionator (elle lève sur une chaîne vide).
 local CALLER = "CraftingOrderClassic"
-
-local function lazyGold()
-    local lg = _G.LazyGold
-    return (type(lg) == "table" and type(lg.GetItemCost) == "function") and lg or nil
-end
 
 local function auctionator()
     local a = _G.Auctionator
@@ -45,19 +39,15 @@ local function auctionator()
     return (type(v1) == "table" and type(v1.GetAuctionPriceByItemID) == "function") and v1 or nil
 end
 
--- Un oracle de prix, quel qu'il soit, répond-il ?
+-- L'oracle de prix répond-il ?
 function LG:IsAvailable()
-    return (lazyGold() or auctionator()) and true or false
+    return auctionator() ~= nil
 end
 
--- Quel oracle sert ? Rend le NOM D'AFFICHAGE de l'addon, parce que c'est à ça que ça sert : les
--- libellés qui citaient « Lazy Gold » en dur mentaient sur Forever, où les prix viennent
--- d'Auctionator. Un pied de fenêtre qui nomme la mauvaise source envoie chercher le problème au
--- mauvais endroit le jour où un prix semble faux.
+-- Le NOM D'AFFICHAGE de l'oracle, ou nil s'il n'est pas là. Un pied de fenêtre qui nomme la source
+-- envoie chercher au bon endroit le jour où un prix semble faux.
 function LG:PriceSource()
-    if lazyGold() then return "Lazy Gold" end
-    if auctionator() then return "Auctionator" end
-    return nil
+    return auctionator() and "Auctionator" or nil
 end
 
 -- Prix d'un objet en cuivre (vendeur ou HV), ou nil si aucun oracle ne le connaît.
@@ -65,12 +55,6 @@ end
 -- jamais être valorisé au cours de l'HV, sinon toute la route se trompe de recette.
 function LG:ItemValue(itemID)
     if not itemID then return nil end
-    local lg = lazyGold()
-    if lg then
-        local ok, price = pcall(lg.GetItemCost, lg, itemID)
-        if ok and type(price) == "number" and price > 0 then return price end
-        return nil
-    end
     local v1 = auctionator()
     if not v1 then return nil end
     local ok, price = pcall(v1.GetVendorPriceByItemID, CALLER, itemID)
@@ -80,20 +64,14 @@ function LG:ItemValue(itemID)
     return nil
 end
 
--- Objet vendu par un PNJ (prix fixe) ? Lit la table publique de Lazy Gold (VENDOR_ITEMS, prix
--- vendeur par unité — celle que GetItemCost consulte en premier). Sert à la bourse d'artisan : un
--- composant vendeur ne vaut pas d'être fourni, l'artisan l'achètera en ville (retour user
--- 2026-07-19 : Coarse Thread / Red Dye encombraient la grille).
--- Auctionator répond à la même question, mais seulement pour les marchands DÉJÀ VISITÉS : sa réponse
--- est donc sûre quand elle est positive, muette sinon. On ne comble pas ce trou par une devinette —
--- au pire un composant vendeur reste dans la grille, ce qui est l'état d'avant la feature.
+-- Objet vendu par un PNJ (prix fixe) ? Sert à la bourse d'artisan : un composant vendeur ne vaut pas
+-- d'être fourni, l'artisan l'achètera en ville (retour user 2026-07-19 : Coarse Thread / Red Dye
+-- encombraient la grille).
+-- Auctionator ne répond que pour les marchands DÉJÀ VISITÉS : sa réponse est sûre quand elle est
+-- positive, muette sinon. On ne comble pas ce trou par une devinette — au pire un composant vendeur
+-- reste dans la grille, ce qui est l'état d'avant la feature.
 function LG:IsVendorItem(itemID)
     if not itemID then return false end
-    local lg = lazyGold()
-    if lg then
-        local t = lg.VENDOR_ITEMS
-        return (type(t) == "table" and t[itemID]) and true or false
-    end
     local v1 = auctionator()
     if not v1 then return false end
     local ok, price = pcall(v1.GetVendorPriceByItemID, CALLER, itemID)
@@ -217,7 +195,7 @@ end
 -- Rentabilité d'une recette : { sell, cost, profit, missing } en cuivre, ou nil si le prix de VENTE
 -- du produit est inconnu (sans lui, aucun calcul n'a de sens). `missing` = au moins un réactif sans
 -- prix (coût sous-estimé). numMade = nb d'objets produits par craft (défaut 1). Formule identique à
--- Lazy Gold : vente × quantité × (1 − coupe HV) − coût des réactifs.
+-- Vente × quantité × (1 − coupe HV) − coût des réactifs.
 function LG:CraftProfit(profKey, spellID, numMade)
     if not (self:IsAvailable() and profKey and spellID) then return nil end
     local lib = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
@@ -436,7 +414,7 @@ LG.TIER_COLOR   = {                                            -- teinte du cont
 }
 
 -- Section « Rentabilité » du panneau d'info (cf. _ProfWindow_Info.lua). S'affiche pour toute recette
--- — apprise ou manquante — dont on connaît le prix de vente. Nil sinon (Lazy Gold absent, prix inconnu…).
+-- — apprise ou manquante — dont on connaît le prix de vente. Nil sinon (oracle absent, prix inconnu…).
 if COC.ProfWindow and COC.ProfWindow.RegisterInfoSection then
     COC.ProfWindow:RegisterInfoSection(function(ctx)
         if not LG:IsAvailable() then return nil end

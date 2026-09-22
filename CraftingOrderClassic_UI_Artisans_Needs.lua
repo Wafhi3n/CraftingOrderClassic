@@ -8,7 +8,7 @@
 -- plans de FORMATEUR restent une note (pas d'objet à donner, il devra l'apprendre au PNJ).
 -- Bouton d'entrée : sac posé après les icônes de métier d'une ligne (hook sous garde nil dans
 -- _UI_Artisans_Icons — l'absence de ce fichier avant restart ne casse rien). Sans Lazy Gold, le
--- bouton reste visible et le clic ouvre la popup NeedLazyGold (pattern découvrabilité).
+-- bouton reste visible et le clic ouvre la popup NeedPriceAddon (pattern découvrabilité).
 
 local COC  = CraftingOrderClassic
 local UI   = COC.UI
@@ -117,7 +117,7 @@ end
 function UI:OpenNeeds(name)
     local LG = COC.LazyGold
     if not (LG and LG:IsAvailable()) then
-        if COC.NeedLazyGold then COC:NeedLazyGold() end
+        if COC.NeedPriceAddon then COC:NeedPriceAddon() end
         return
     end
     if not (COC.Route and name) then return end

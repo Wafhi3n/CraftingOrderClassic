@@ -4,7 +4,7 @@
 -- exclusions cooldown/coût partiel) vit dans CraftingOrderClassic_Route.lua (COC.Route), partagé
 -- avec la bourse d'artisan — ici : le câblage MON perso (recettes de la fenêtre native + couleur
 -- LIVE du client au rang courant, cohérence avec le badge de la liste) et toute l'UI.
--- Tout est soft-dep : sans Lazy Gold, le bouton ouvre la popup NeedLazyGold ; sans ce fichier,
+-- Tout est soft-dep : sans Lazy Gold, le bouton ouvre la popup NeedPriceAddon ; sans ce fichier,
 -- rien ne change (hooks sous garde nil dans _ProfWindow_Toolbar).
 
 local COC  = CraftingOrderClassic
@@ -442,7 +442,7 @@ end
 -- d'incitation (même pattern que les toggles de tri).
 function PW:ToggleRoute()
     local LG = COC.LazyGold
-    if not (LG and LG:IsAvailable()) then COC:NeedLazyGold(); return end
+    if not (LG and LG:IsAvailable()) then COC:NeedPriceAddon(); return end
     local f = self.routeWin or self:_BuildRouteWin()
     if f:IsShown() then f:Hide() else self:_FillRoute(); f:Show() end
     self:_SyncRouteBtn()
