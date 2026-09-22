@@ -1,5 +1,33 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.35.0 - Enchanting someone else's gear over the trade window
+
+The floating enchant panel is gone. On Forever it sat exactly where the game puts the profession
+window, so it spent its life hidden behind it. What it was for now lives in the profession column.
+
+Open a trade with Enchanting up and the column drops its tabs and shows the trade instead: your
+partner, the piece they put in the slot that isn't traded, and what their reagents point to. Click a
+slot on the silhouette and two things happen. They get asked for that piece, by whisper, and by a
+prompt they can click if they run the addon. And Blizzard's own recipe list narrows to that slot,
+the same as ticking the box yourself under Filter, Slots. The main hand ticks Weapon and 2H Weapon
+both, since nothing tells the addon yet what they're carrying.
+
+Once something is on the table, the list follows the item itself rather than what you asked for.
+Bracers give you bracer enchants, a chest piece gives you chest enchants, a ring turns the filter
+off because nothing you know applies to it. End the trade and the list goes back to the filters you
+had before, including one you'd set yourself, and the column returns to the tab you were on. If you
+untick something while the trade is running, that stays your choice.
+
+When they put reagents down as well, the column names what those reagents point to, "Their reagents
+point to: Minor Stamina". It reads what they place, never what's in your bags, and it keeps quiet
+when their pile fits several enchants or carries something the recipe doesn't use. It won't pick the
+recipe for you, and that's deliberate: the list is already down to a handful, so the right line is
+right there.
+
+If a trade opens while Enchanting is closed, the trade window grows a tab on its right edge with the
+profession's icon on it. The game decides which profession the window lands on, so it can come up on
+Cooking. The tab keeps pulsing until Enchanting is actually up, and a second click gets you there.
+
 ## v1.34.1 - No more error when you walk into town
 
 If you turned on crafter spotting (`/co crafters on`), walking into a city threw an "action

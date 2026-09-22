@@ -1,10 +1,10 @@
 # CraftingOrderClassic — carte du code
 
-> **GÉNÉRÉ** le 2026-09-22 (v1.34.1) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
+> **GÉNÉRÉ** le 2026-09-22 (v1.35.0) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
-129 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
+131 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
 
 ## Modules (ordre de chargement)
 
@@ -15,18 +15,18 @@
 | `CraftingOrderClassic_Trace.lua` | trace réseau PERSISTÉE, lisible hors-jeu. | 79 |
 | `CraftingOrderClassic_Migrations.lua` | versionnage du schéma SavedVariables. | 40 |
 | `CraftingOrderClassic_Locale.lua` | socle de localisation du CHROME de l'UI. | 12 |
-| `CraftingOrderClassic_Locale_enUS.lua` | overlay ANGLAIS (enUS/enGB). | 267 |
+| `CraftingOrderClassic_Locale_enUS.lua` | overlay ANGLAIS (enUS/enGB). | 274 |
 | `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 489 |
-| `CraftingOrderClassic_Locale_deDE.lua` | overlay ALLEMAND (deDE). | 269 |
+| `CraftingOrderClassic_Locale_deDE.lua` | overlay ALLEMAND (deDE). | 276 |
 | `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 469 |
-| `CraftingOrderClassic_Locale_esES.lua` | overlay ESPAGNOL (esES/esMX). | 270 |
+| `CraftingOrderClassic_Locale_esES.lua` | overlay ESPAGNOL (esES/esMX). | 277 |
 | `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 470 |
-| `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 338 |
-| `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 335 |
-| `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 335 |
+| `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 349 |
+| `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 346 |
+| `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 346 |
 | `CraftingOrderClassic_Elemental.lua` | pseudo-« métier » de récolte « Élémentaire ». | 61 |
 | `CraftingOrderClassic_UI_Skin.lua` | tokens + helpers SÉMANTIQUES du skin (métiers, statuts, rareté, quantités, icônes natives) et petits widgets d'affichage. | 431 |
-| `CraftingOrderClassic_UI_Skin_Native.lua` | kit de chrome Blizzard NATIF (le « framework » UI de COC). | 455 |
+| `CraftingOrderClassic_UI_Skin_Native.lua` | kit de chrome Blizzard NATIF (le « framework » UI de COC). | 480 |
 | `CraftingOrderClassic_UI_Skin_Dropdown.lua` | menu deroulant (selecteur) du kit natif. | 93 |
 | `CraftingOrderClassic_UI_Skin_Sections.lua` | kit de chrome natif, volet SECTIONS : comment on découpe l'intérieur d'une fenêtre en blocs et en zones. | 254 |
 | `CraftingOrderClassic_UI_Skin_HelpPlate.lua` | kit d'AIDE CONTEXTUELLE (le « bouton i » de retail). | 262 |
@@ -55,7 +55,7 @@
 | `CraftingOrderClassic_UI_MyArtisans_LazyGold.lua` | onglet « Mes artisans » : couche Lazy Gold. | 135 |
 | `CraftingOrderClassic_UI_MyArtisans_Reroll.lua` | accès à la vue REROLL (métiers d'un AUTRE perso du compte) depuis l'onglet « Mes artisans ». | 86 |
 | `CraftingOrderClassic_UI_Help.lua` | onglet Aide : page unique défilante qui explique les autres onglets (Carnet/Commande/Récolte/Artisans), la Vue Métier et le réseau. | 196 |
-| `CraftingOrderClassic_UI_News.lua` | onglet « Nouveautés » : notes de version (changelog) affichées EN JEU, version par version, la plus récente en tête. | 406 |
+| `CraftingOrderClassic_UI_News.lua` | onglet « Nouveautés » : notes de version (changelog) affichées EN JEU, version par version, la plus récente en tête. | 415 |
 | `CraftingOrderClassic_Social.lua` | couche sociale passive (socle). | 402 |
 | `CraftingOrderClassic_Social_Menu.lua` | entrées « Crafting Order » du menu contextuel joueur. | 104 |
 | `CraftingOrderClassic_Social_Roster.lua` | affichage des métiers sur les fenêtres NATIVES. | 130 |
@@ -72,13 +72,13 @@
 | `CraftingOrderClassic_Craft_Mainline.lua` | backend de lecture de la fenêtre métier, pour les clients MAINLINE/Retail (WoW: Forever / Camelot, interface 16001). | 264 |
 | `CraftingOrderClassic_Enchant.lua` | spécifique à l'Enchantement (API Craft). | 409 |
 | `CraftingOrderClassic_Enchant_Filter.lua` | le filtre natif « Filter → Slots » de l'Enchantement (Forever). | 130 |
-| `CraftingOrderClassic_Enchant_Filter_Pilot.lua` | pose et rend le filtre natif « Slots » (T2). | 159 |
+| `CraftingOrderClassic_Enchant_Filter_Pilot.lua` | pose et rend le filtre natif « Slots » (T2). | 195 |
 | `CraftingOrderClassic_Stats.lua` | STATS d'un objet : identité canonique + libellé localisé. | 370 |
 | `CraftingOrderClassic_Stats_Filter.lua` | sélecteur « ne montrer que ce qui donne <stat> ». | 103 |
 | `CraftingOrderClassic_Gem.lua` | spécifique à la JOAILLERIE : sous-catégorise les GEMMES TAILLÉES par TAILLE (le mot qui porte la stat). | 226 |
 | `CraftingOrderClassic_Gem_Stats.lua` | correspondance TAILLE DE GEMME → STAT (données, éditées à la main). | 41 |
 | `CraftingOrderClassic_Sources.lua` | « où j'obtiens ce plan, et lesquels me manquent ». | 344 |
-| `CraftingOrderClassic_Trainers.lua` | « le formateur, vu de nos propres yeux ». | 273 |
+| `CraftingOrderClassic_Trainers.lua` | « le formateur, vu de nos propres yeux ». | 280 |
 | `CraftingOrderClassic_ProfWindow.lua` | fenêtre métier custom 3 colonnes (migration depuis Guild Economy) : Recettes \| Détail+Craft \| Commandes du métier. | 479 |
 | `CraftingOrderClassic_ProfWindow_Layout.lua` | GÉOMÉTRIE de la vue métier (fenêtre 3 colonnes). | 165 |
 | `CraftingOrderClassic_ProfWindow_HelpPlate.lua` | AIDE CONTEXTUELLE de la Vue Métier (« bouton i »). | 103 |
@@ -92,7 +92,8 @@
 | `CraftingOrderClassic_Route.lua` | cœur de CALCUL du plan de route de montée de métier, PARAMÉTRABLE : marche gloutonne rang par rang (recette au meilleur coût/point ESPÉRÉ), seuils réels CraftLink `skillColors` aux rangs futurs, amortissement du prix des plans à acheter, exclusion des recettes à cooldown et des coûts partiels. | 329 |
 | `CraftingOrderClassic_ProfWindow_Route.lua` | fenêtre « PLAN DE ROUTE » de montée de métier (étage ③ de l'aide à la progression) : « du rang actuel au plafond, quoi crafter, combien de fois, pour combien ». | 487 |
 | `CraftingOrderClassic_ProfWindow_Learn.lua` | section « À apprendre maintenant » du Plan de route : les recettes NON APPRISES que ton rang permet déjà d'apprendre ET qui rapportent encore un point, classées par coût espéré par point, avec l'icône de leur source. | 113 |
-| `CraftingOrderClassic_ProfWindow_DockViews.lua` | la colonne Commandes CHANGE DE CONTENU au lieu d'ouvrir des fenêtres par-dessus. | 391 |
+| `CraftingOrderClassic_ProfWindow_DockViews.lua` | la colonne Commandes CHANGE DE CONTENU au lieu d'ouvrir des fenêtres par-dessus. | 410 |
+| `CraftingOrderClassic_ProfWindow_Trade.lua` | le mode ÉCHANGE de la colonne de métier (T3). | 277 |
 | `CraftingOrderClassic_ProfWindow_Geo.lua` | `/co geo` : le RELEVÉ de la colonne, en pixels écran, écrit dans la SavedVariable pour être relu HORS DU JEU. | 261 |
 | `CraftingOrderClassic_ProfWindow_Detail.lua` | colonne CENTRE : détail de la recette sélectionnée (icône, réactifs have/need) + boutons Créer / Créer tout. | 279 |
 | `CraftingOrderClassic_ProfWindow_Info.lua` | PANNEAU D'INFO en SECTIONS pour la colonne centrale de la vue métier. | 217 |
@@ -131,8 +132,9 @@
 | `CraftingOrderClassic_Companion.lua` | socle des GREFFONS : panneaux compagnons accrochés aux fenêtres natives (échange, courrier) pour livrer une commande sans quitter le geste en cours. | 211 |
 | `CraftingOrderClassic_Companion_Mail.lua` | greffon COURRIER (scène B de la maquette) : panneau accroché à droite du compositeur d'envoi. | 177 |
 | `CraftingOrderClassic_Companion_Trade.lua` | greffon ÉCHANGE (scène A de la maquette) : panneau accroché SOUS la fenêtre d'échange native quand une commande nous lie au partenaire (dans les DEUX sens : je crafte pour lui = « vendeur », ou il crafte pour moi = « acheteur »). | 114 |
-| `CraftingOrderClassic_Enchant_Trade.lua` | greffon ENCHANTEMENT sur la fenêtre d'ÉCHANGE. | 285 |
-| `CraftingOrderClassic_Enchant_Trade_Ask.lua` | greffon ÉCHANGE : « demande-lui la pièce ». | 297 |
+| `CraftingOrderClassic_Enchant_Trade.lua` | « ses composants désignent quel enchant ? »  Ce fichier portait un PANNEAU flottant accroché à droite de la fenêtre d'échange : la liste de mes enchants applicables à la pièce posée, classée par pertinence. | 139 |
+| `CraftingOrderClassic_Enchant_Trade_Ask.lua` | « demande-lui la pièce » : la SILHOUETTE et le verbe ASKE. | 280 |
+| `CraftingOrderClassic_Enchant_Trade_Open.lua` | le bouton « Enchantement » sur la fenêtre d'échange (T6). | 156 |
 | `CraftingOrderClassic_Journal.lua` | MODÈLE « journal » : la liste unique, triée par PRIORITÉ, de ce sur quoi le joueur peut agir maintenant. | 269 |
 | `CraftingOrderClassic_Tracker.lua` | SUIVI À L'ÉCRAN des commandes, façon suivi de quête : un cadre léger, déplaçable, hors de toute fenêtre, qui liste ce sur quoi le joueur peut agir MAINTENANT. | 217 |
 | `CraftingOrderClassic_Tracker_Rows.lua` | LIGNES du suivi à l'écran : pool réutilisable + peinture d'un groupe de sections rendu par COC.Journal:Grouped. | 238 |
@@ -414,11 +416,26 @@
 > Un menu à géométrie libre (titres de section, hauteur custom) peut ré-ancrer les lignes du pool et
 > écraser la hauteur APRÈS SetCount — cf. le menu minimap.
 
-**`Skin.MakeIconButton(parent, size, tex)`**
+**`Skin.MakeSideTab(parent, tex, template)`**
 
 > Bouton-icône carré (filtres par métier, pills).
 > Icône native encadrée d'un liseré 1 px — même famille visuelle que Skin.MakeBadge. Contrat :
 > .icon (texture, désaturable par l'appelant), :SetSelected(on) = liseré doré vif.
+> Onglet LATÉRAL natif (l'art des onglets de métier, à droite de la fenêtre)
+> On HÉRITE `LargeSideTabButtonTemplate` (SharedUIPanelTemplates.xml) : l'atlas `common-sidetab`,
+> l'icône masquée par `common-sidetab-mask`, le survol, la sélection, l'enfoncement et le son du
+> clic viennent de Blizzard — zéro asset, zéro imitation. `fillToInterior` est ce que posent les
+> onglets de métier eux-mêmes : sans lui, l'icône n'a AUCUNE taille et le bouton paraît vide.
+> Ancrage d'usage, copié des onglets natifs : TOPLEFT sur le TOPRIGHT du cadre, y = -60.
+> ⚠️ On REMPLACE OnEnter/OnLeave (au lieu de les chaîner comme ailleurs) : le template les délègue à
+> une méthode que seul un mixin d'appelant définit — laissée telle quelle, elle lève au survol.
+> `template` (facultatif) : « SecureActionButtonTemplate » pour un clic qui lance un sort.
+> Repli sur MakeIconButton si le template n'existe pas (autre saveur de client).
+
+**`Skin.MakeIconButton(parent, size, tex, template)`**
+
+> `template` (facultatif) : même contrat que MakeGoldButton — « SecureActionButtonTemplate » pour un
+> clic qui doit lancer un sort ou viser une cible protégée. NE JAMAIS LE RETIRER d'un appelant.
 
 **`Skin.MakeCheckButton(parent, text, size)`**
 
@@ -690,7 +707,7 @@
 > MakeDropdown dès qu'il s'agit de choisir UNE valeur dans une liste courte.
 > INTOUCHABLE ici aussi : le langage couleur (statuts d'ordre, rareté) n'est jamais recoloré.
 
-**API** : `Skin.MakeGoldButton(parent, w, h, text, template)` · `Skin.MakeWindow(name, w, h, opts)` · `Skin.SetWindowPortrait(f, tex)` · `Skin.SetPortraitClickable(f, onClick, tooltipText)` · `Skin.MakeTabs(f, defs, onSelect, opts)` · `Skin.MakeFlatRow(parent, w, h)` · `Skin.PersonHighlight(row)` · `Skin.MakeArtisanRow(parent, w, h)` · `Skin.MakeFlyout(name, w, opts)` · `Skin.MakeIconButton(parent, size, tex)` · `Skin.MakeCheckButton(parent, text, size)` · `Skin.FieldLabel(parent, text, x, y)` · `Skin.MakeFilterButton(parent, w, h, text)`
+**API** : `Skin.MakeGoldButton(parent, w, h, text, template)` · `Skin.MakeWindow(name, w, h, opts)` · `Skin.SetWindowPortrait(f, tex)` · `Skin.SetPortraitClickable(f, onClick, tooltipText)` · `Skin.MakeTabs(f, defs, onSelect, opts)` · `Skin.MakeFlatRow(parent, w, h)` · `Skin.PersonHighlight(row)` · `Skin.MakeArtisanRow(parent, w, h)` · `Skin.MakeFlyout(name, w, opts)` · `Skin.MakeSideTab(parent, tex, template)` · `Skin.MakeIconButton(parent, size, tex, template)` · `Skin.MakeCheckButton(parent, text, size)` · `Skin.FieldLabel(parent, text, x, y)` · `Skin.MakeFilterButton(parent, w, h, text)`
 
 ### `CraftingOrderClassic_UI_Skin_Dropdown.lua`
 > CraftingOrderClassic_UI_Skin_Dropdown.lua — menu deroulant (selecteur) du kit natif.
@@ -1292,7 +1309,7 @@
 > Le filtre est propre au métier affiché : on n'écrit QUE si l'Enchantement est affiché. Ailleurs
 > (fenêtre fermée, autre métier), on attend qu'il revienne.
 
-**API** : `Filter.NewPilot(ts)` · `Pilot:Holding()` · `Pilot:Apply(cases)` · `Pilot:Release()` · `Filter.NewFollower(deps)` · `Follower:Refresh()` · `Filter:Start()`
+**API** : `Filter.NewPilot(ts)` · `Pilot:Holding()` · `Pilot:Apply(cases)` · `Pilot:Release()` · `Filter.NewFollower(deps)` · `Follower:SetRequest(slot)` · `Follower:Refresh()` · `Filter:Start()` · `Filter.Request(slot)`
 
 ### `CraftingOrderClassic_Stats.lua`
 > CraftingOrderClassic_Stats.lua — STATS d'un objet : identité canonique + libellé localisé.
@@ -1625,6 +1642,25 @@
 > `Show`/`Hide` sur ses enfants sont donc refusés en combat (piège wow-protected-frame-hide-combat,
 > reconfirmé sur Forever). Changer de vue est un geste de confort, jamais urgent : on le refuse
 > franchement, avec un mot, plutôt que de laisser le jeu bloquer l'action sans explication.
+
+### `CraftingOrderClassic_ProfWindow_Trade.lua`
+> CraftingOrderClassic_ProfWindow_Trade.lua — le mode ÉCHANGE de la colonne de métier (T3).
+> Spec : docs/specs/enchant-echange-forever.md. Un échange est ouvert ET la fenêtre affiche
+> l'Enchantement : la colonne cache ses onglets (Commandes, Plan de route, Manquantes) et ne montre
+> plus que l'échange — la silhouette du partenaire, la pièce qu'il a posée, et la place de l'indice
+> « ses composants correspondent à » (T5). À la fin de l'échange, elle revient sur l'onglet d'avant.
+> 
+> C'est une VUE de plus de la colonne (dockView = "trade", cf. _ProfWindow_DockViews) : la bascule
+> existante masque déjà les pièces des autres vues, et tait les onglets tant qu'elle est active.
+> Ce fichier décide seulement QUAND y entrer et en sortir, et remplit la vue.
+> 
+> La silhouette vient de _Enchant_Trade_Ask (BuildSilhouette). Son clic fait DEUX choses : demander
+> la pièce au partenaire (chuchotement + ASKE) et filtrer la liste native sur cet emplacement (T4).
+> Le panneau flottant qui la portait a été supprimé au passage.
+> 
+> ⚠️ LE COMBAT. Greffée, la colonne est protégée comme la fenêtre native : changer de vue y est
+> refusé. On n'entre ni ne sort en combat ; tout se rejoue à PLAYER_REGEN_ENABLED, selon l'état
+> RÉEL de l'échange à ce moment-là.
 
 ### `CraftingOrderClassic_ProfWindow_Geo.lua`
 > CraftingOrderClassic_ProfWindow_Geo.lua — `/co geo` : le RELEVÉ de la colonne, en pixels écran,
@@ -2211,32 +2247,32 @@
 **API** : `Trade.Update()`
 
 ### `CraftingOrderClassic_Enchant_Trade.lua`
-> CraftingOrderClassic_Enchant_Trade.lua — greffon ENCHANTEMENT sur la fenêtre d'ÉCHANGE.
-> Quand le partenaire pose un objet dans l'emplacement « ne sera pas échangé » (TRADE_ENCHANT_SLOT),
-> on liste MES enchants applicables à CET emplacement — plus besoin de chercher dans toute la liste.
-> La liste est CLASSÉE par pertinence (cf. offerRank) : ce que ses RÉACTIFS posés dans l'échange
-> désignent d'abord, puis ce que mes sacs permettent, et seulement ensuite l'ordre catalogue (rang de
-> métier décroissant). Le surplus se parcourt à la MOLETTE — le classement rapproche la bonne recette,
-> il ne la garantit pas : rien ne doit rester hors d'atteinte.
-> Chaque ligne était un bouton SÉCURISÉ dont le clic était redirigé vers `CraftCreateButton` : le
-> seul moyen de lancer un `DoCraft` PROTÉGÉ sur l'Era. Ce montage a disparu avec l'Era — les lignes
-> sont des boutons ORDINAIRES qui sélectionnent et montrent l'infobulle.
-> ⚠️ Le CRAFT lui-même n'est pas (re)branché ici : sur la cible il passerait par
-> `C_TradeSkillUI.CraftEnchant(recipeID, 1, nil, itemLocation)`, qui n'est pas protégée. À porter
-> si on veut le clic-pour-crafter ; en l'état le panneau CLASSE et RENSEIGNE, il ne crafte pas.
-> CONTRAINTE : la lecture des recettes ne répond que fenêtre d'Enchantement OUVERTE → sinon on l'indique.
-> On AJOUTE un panneau à côté du natif (jamais de Hide/neutralisation), à DROITE pour ne pas heurter le
-> greffon Commandes (_Companion_Trade) qui vit SOUS la fenêtre d'échange.
+> CraftingOrderClassic_Enchant_Trade.lua — « ses composants désignent quel enchant ? »
+> 
+> Ce fichier portait un PANNEAU flottant accroché à droite de la fenêtre d'échange : la liste de mes
+> enchants applicables à la pièce posée, classée par pertinence. Le panneau est SUPPRIMÉ (T4, spec
+> docs/specs/enchant-echange-forever.md) — sur Forever, la fenêtre de métier se dessine exactement
+> par-dessus, et la liste native filtrée (T2) le remplace avantageusement : c'est celle de Blizzard,
+> avec sa recherche, ses catégories et son bouton de craft.
+> 
+> Ce qui RESTE ici est ce que la liste native ne sait pas faire : lire ce que le partenaire a posé
+> sur la table d'échange et dire quel enchant ses composants désignent. La colonne en mode Échange
+> s'en servira pour son indice (T5).
+> 
+> ⚠️ Les mats posés dans l'échange ne sont PAS encore dans mes sacs → `numAvailable` vaut 0 tant que
+> l'échange n'est pas validé : trier sur lui SEUL ne peut donc pas remonter la bonne recette (retour
+> terrain : mats de Fiery Weapon échangés, l'enchant n'était même pas suggéré).
 
-**API** : `ET.Update()` · `ET:Start()`
+**API** : `ET.PartnerOffer()` · `ET.OfferRank(e, offer)` · `ET.Rank(crafts)` · `ET.OfferMatches(e, offer)` · `ET.GuessFromOffer(crafts, offer)` · `ET.OfferKey(offer)`
 
 ### `CraftingOrderClassic_Enchant_Trade_Ask.lua`
-> CraftingOrderClassic_Enchant_Trade_Ask.lua — greffon ÉCHANGE : « demande-lui la pièce ».
-> L'ÉTAT VIDE de _Enchant_Trade : tant que le partenaire n'a rien posé dans l'emplacement « ne sera pas
-> échangé », l'enchanteur ne voyait RIEN (panel:Hide()) — or c'est précisément le moment où le client
-> débutant ignore que cet emplacement existe. On y met la silhouette : clic sur un emplacement → on lui
-> chuchote de poser CETTE pièce-là. C'est un bouton « explique l'emplacement d'enchant au débutant »,
-> pas de l'automatisation.
+> CraftingOrderClassic_Enchant_Trade_Ask.lua — « demande-lui la pièce » : la SILHOUETTE et le verbe ASKE.
+> Clic sur un emplacement → on chuchote au partenaire de poser CETTE pièce-là. C'est un bouton
+> « explique l'emplacement d'enchant au débutant », pas de l'automatisation.
+> 
+> Ce fichier n'a plus de fenêtre à lui. La silhouette est construite ICI (Ask:BuildSilhouette) mais
+> vit dans la COLONNE de métier, en mode Échange (_ProfWindow_Trade, T3/T4) : le panneau flottant
+> qui la portait a été supprimé — la fenêtre de métier de Forever se dessinait par-dessus.
 > 
 > CHUCHOTEMENT, jamais /s : le destinataire est en face et il est le SEUL concerné — écrire en public
 > spammerait tout le district des enchanteurs à chaque clic, à rebours de la discipline anti-spam de COC
@@ -2266,7 +2302,27 @@
 > (il est sans arme le temps de l'enchant). Normal — c'est déjà le flux manuel — mais ça reste une
 > raison de plus d'EXIGER son clic : l'addon ne déséquipe personne tout seul.
 
-**API** : `Ask:Request(label, token)` · `Ask:Refresh()` · `Ask:OnAsk(sender, message)` · `Ask:Hide()` · `Ask:Update()`
+**API** : `Ask:Request(label, token)` · `Ask:RefreshSlots(btns)` · `Ask:BuildSilhouette(well, onPick)` · `Ask:ShowPartnerModel(model)` · `Ask:OnAsk(sender, message)`
+
+### `CraftingOrderClassic_Enchant_Trade_Open.lua`
+> CraftingOrderClassic_Enchant_Trade_Open.lua — le bouton « Enchantement » sur la fenêtre d'échange (T6).
+> Spec : docs/specs/enchant-echange-forever.md. Un échange s'ouvre alors que la fenêtre de métier est
+> FERMÉE : l'enchanteur ne voit plus rien depuis que le panneau flottant a disparu (T4). Ce bouton
+> comble ce trou — il ouvre la fenêtre, et le mode Échange de la colonne prend le relais.
+> 
+> BOUTON SÉCURISÉ de type « sort », c'est-à-dire ce que fait une macro `/cast Enchantement`. Mesure
+> M2 (2026-09-21) : fenêtre FERMÉE, aucun appelant ne choisit le métier d'arrivée — ni
+> `C_TradeSkillUI.OpenTradeSkill`, ni `OpenProfessionUIToSkillLine`, parce qu'à l'affichage CHAQUE
+> onglet latéral relance son propre sort de métier et que la fenêtre atterrit sur le dernier traité.
+> Seul le sort lancé par un vrai clic passe. M2b : fenêtre DÉJÀ ouverte sur un autre métier, le même
+> sort bascule directement sur l'Enchantement, sans cascade — d'où un bouton qui RESTE affiché tant
+> que l'Enchantement n'est pas à l'écran : le second clic finit le travail.
+> 
+> ⚠️ COMBAT. Un bouton sécurisé ne se configure ni ne s'affiche/masque en combat. On le prépare donc
+> à froid, et s'il n'a jamais pu l'être (métier appris en plein combat), un rappel écrit le remplace.
+> Rien de tout ça ne s'improvise en combat : tout se rejoue à PLAYER_REGEN_ENABLED.
+
+**API** : `Open:Hide()` · `Open:Update()` · `Open:Start()`
 
 ### `CraftingOrderClassic_Journal.lua`
 > CraftingOrderClassic_Journal.lua — MODÈLE « journal » : la liste unique, triée par PRIORITÉ, de ce

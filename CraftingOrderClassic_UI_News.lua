@@ -31,6 +31,15 @@ local BODY_W = 780
 local function versionsNewest()
     return {
         {
+            v = "v1.35.0", title = L["Enchanter la pièce d'un autre, depuis l'échange"],
+            lines = {
+                L["Le panneau flottant d'enchantement a disparu : sur Forever, la fenêtre de métier se dessinait exactement par-dessus. Son rôle revient à la colonne de métier, qui passe en mode Échange dès qu'un échange s'ouvre avec ton Enchantement affiché — la silhouette du partenaire, la pièce qu'il a posée dans l'emplacement « ne sera pas échangé », et ce que ses composants désignent."],
+                L["Clique un emplacement de la silhouette : il reçoit la demande de poser cette pièce (chuchotement, plus une invite d'un clic s'il a l'addon), et la liste de recettes de Blizzard se filtre sur cet emplacement. La main droite coche « Arme » et « Arme à deux mains » à la fois, faute de savoir ce qu'il tient."],
+                L["Dès qu'une pièce est posée, la liste suit la pièce elle-même plutôt que ta demande. À la fin de l'échange elle retrouve tes filtres d'avant, y compris celui que tu avais posé toi-même, et la colonne revient sur l'onglet que tu regardais."],
+                L["S'il pose aussi des composants, la colonne nomme l'enchantement qu'ils désignent — elle lit ce qu'il pose, jamais tes sacs, et se tait quand plusieurs enchantements collent. Et si un échange s'ouvre alors que ton Enchantement est fermé, un onglet apparaît au bord droit de la fenêtre d'échange pour l'ouvrir."],
+            },
+        },
+        {
             v = "v1.34.1", title = L["Plus d'erreur en entrant en ville"],
             lines = {
                 L["Avec la détection des artisans sans l'addon activée (/co crafters on), chaque entrée en ville déclenchait une erreur « action interdite » au nom de l'addon. Sur Forever, le jeu n'autorise plus les addons à écouter le journal de combat, et l'addon s'y abonnait quand même. C'est fini : la détection passe désormais par les messages de fabrication du chat (« Untel crée … »), qui restent ouverts aux addons."],
