@@ -164,24 +164,31 @@ end
 -- Appelé sur TRAINER_SHOW. Ne fait rien chez un formateur de classe, rien si aucun service ne
 -- correspond au catalogue, rien si la base n'est pas encore montée (login en cours).
 function T:Harvest()
+    self._lastVisit = nil   -- une sortie anticipée ne doit pas laisser la visite PRÉCÉDENTE en vue
     if not COC.db then return nil end
     if _G.IsTradeskillTrainer and not _G.IsTradeskillTrainer() then return nil end
     local list, seen, sample = readServices()
     self._lastSeen, self._lastSample, self._lastIndex = seen, sample, select(2, nameIndex())
     local prof, n = winningProf(list)
     if not prof then return nil, 0, seen end
-    local st = store(prof, true)
+    local st, spells = store(prof, true), {}
     for _, p in ipairs(list) do
-        if p[1] == prof then st.teaches[p[2]] = true end
+        if p[1] == prof then st.teaches[p[2]] = true; spells[#spells + 1] = p[2] end
     end
     local id, name = npcIdentity()
+    local map, x, y
     if name then
         -- Une position a MOITIE resolue (carte sans coordonnees) ne vaut pas mieux que pas de
         -- position : elle passe les gardes en aval et casse l'arithmetique du poseur de repere.
-        local map, x, y = herePosition()
+        map, x, y = herePosition()
         if not (x and y) then map = nil end
         st.npc = { id = id, name = name, mapID = map, x = x, y = y, at = time() }
     end
+    -- CETTE visite, telle quelle -- en memoire seulement, pour les outils de dev (COCScout). La base
+    -- ne garde qu'UN PNJ par metier alors que `teaches` s'accumule : apres deux formateurs de Forge,
+    -- elle attribuerait au second ce que le premier enseigne. Juste pour « ou j'apprends ça », faux
+    -- pour une donnee livree -- qui a besoin de savoir QUEL PNJ enseigne QUOI.
+    self._lastVisit = { prof = prof, npcID = id, name = name, mapID = map, x = x, y = y, spells = spells }
     if COC.Trace then COC.Trace:Log("trainer", (name or "?") .. " / " .. prof .. " : " .. n .. " services") end
     -- Une fois par fenêtre (le drapeau tombe au TRAINER_SHOW) : TRAINER_UPDATE se déclenche à chaque
     -- clic et à chaque changement de filtre, on ne va pas le répéter à chacun.
