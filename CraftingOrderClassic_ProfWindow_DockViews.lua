@@ -181,8 +181,15 @@ end
 -- COURANT, y compris sur une recette pas apprise. Nos seuils générés ne sont plus consultés ici :
 -- deux réponses qui peuvent diverger valent moins qu'une.
 local function missWorth(row, facts)
-    local lvl  = row.rlevel or 0
+    local lvl  = row.rlevel
     local rank = (COC.Craft and COC.Craft.OpenRank) and COC.Craft:OpenRank() or nil
+    if not lvl then
+        -- On ne le sait pas, on le dit. Le client, lui, répond quand même sur la difficulté.
+        GameTooltip:AddLine(L["Niveau requis : inconnu (la donnée manque pour cette recette)"],
+            0.6, 0.75, 0.91, true)
+        if not (facts and facts.difficulty) then return end
+        return
+    end
     local miss = (rank and lvl > rank) and (lvl - rank) or nil
     GameTooltip:AddLine(string.format(L["Niveau requis : %d"], lvl)
         .. (miss and (" |cFFFF6666" .. string.format(L["il t'en manque %d"], miss) .. "|r") or ""),
@@ -283,7 +290,10 @@ function PW:_FillDockMissing()
     local mp = self.missPanel; if not mp then return end
     local S = COC.Sources
     local list = (S and S:MissingRecipes(self.profKey)) or {}
+    -- Niveau inconnu = EN FIN de liste, jamais en tête : trié comme un 0, il passait devant tout ce
+    -- que le joueur peut réellement apprendre (vécu en Couture, 8 recettes sans niveau).
     table.sort(list, function(a, b)
+        if (a.level == nil) ~= (b.level == nil) then return b.level == nil end
         if (a.level or 0) ~= (b.level or 0) then return (a.level or 0) < (b.level or 0) end
         return (a.name or "") < (b.name or "")
     end)
@@ -299,10 +309,12 @@ function PW:_FillDockMissing()
         row.rlink, row.pin = nil, nil   -- ligne poolée : rien de la précédente ne survit
         row.prof = self.profKey   -- la ligne emporte le métier qui l'a produite (cf. missTooltip)
         row.ic:SetTexture(ICON[S:SourceKind(self.profKey, e.spellID)] or ICON.unknown)
-        local reachable = (e.level or 0) <= rank
-        row.ic:SetDesaturated(not reachable)
-        row.nm:SetText((reachable and "" or "|cFF777777") .. (e.name or "?") .. (reachable and "" or "|r"))
-        row.lv:SetText(tostring(e.level or 0))
+        -- Trois états, pas deux : à portée, hors de portée (grisée), et NIVEAU INCONNU — celle-là
+        -- n'est pas grisée (on ne sait pas), mais son « ? » dit qu'on ne promet rien.
+        local outOfReach = e.level ~= nil and e.level > rank
+        row.ic:SetDesaturated(outOfReach)
+        row.nm:SetText((outOfReach and "|cFF777777" or "") .. (e.name or "?") .. (outOfReach and "|r" or ""))
+        row.lv:SetText(e.level and tostring(e.level) or "|cFF777777?|r")
         row:Show()
     end
     for i = #list + 1, #mp.rows do mp.rows[i]:Hide(); mp.rows[i].sid = nil end

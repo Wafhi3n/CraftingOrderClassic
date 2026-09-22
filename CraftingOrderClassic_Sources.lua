@@ -251,6 +251,13 @@ end
 --
 -- Format IDENTIQUE à COC.Craft:ReadRecipes() + isMissing/level, pour que la vue métier et le
 -- regroupement par catégories les traitent sans cas particulier.
+-- Niveau d'apprentissage, ou nil quand on ne le sait pas. 0 n'est pas un niveau : les données ne
+-- s'en servent jamais (le plus bas est 1), il ne peut donc venir que d'une absence.
+local function levelOf(lib, profKey, spellID)
+    local at = lib.RecipeLearnedAt and lib:RecipeLearnedAt(profKey, spellID)
+    return (at and at > 0) and at or nil
+end
+
 function S:MissingRecipes(profKey)
     local lib = CL()
     if not (lib and profKey and lib.GetRecipes) then return {} end
@@ -263,7 +270,11 @@ function S:MissingRecipes(profKey)
                 isMissing = true, spellID = spellID, itemID = itemID,
                 name = (lib.RecipeName and lib:RecipeName(spellID)) or COC.Api.GetSpellName(spellID)
                        or ("spell:" .. spellID),
-                level = (lib.RecipeLearnedAt and lib:RecipeLearnedAt(profKey, spellID)) or 0,
+                -- ⚠️ PAS de `or 0` : 29 recettes du set Camelot n'ont AUCUN niveau (trou de
+                -- génération, 8 rien qu'en Couture). Rendu 0, l'inconnu devenait un niveau REQUIS
+                -- de 0 : la vue les classait en tête et les déclarait à portée (0 <= ton rang),
+                -- c'est-à-dire qu'elle affirmait ce qu'elle ignore. Un repli doit se taire.
+                level = levelOf(lib, profKey, spellID),
                 icon = (itemID and COC.Api.GetItemIcon and COC.Api.GetItemIcon(itemID))
                        or "Interface\\Icons\\INV_Scroll_03",
                 difficulty = "trivial",   -- neutre : une recette non apprise n'a pas de couleur

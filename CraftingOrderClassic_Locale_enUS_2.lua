@@ -476,6 +476,7 @@ local en2 = {
     ["Aucun autre perso avec ce métier : %s"] = "No other character has this profession: %s",
     ["À apprendre maintenant (%d)"] = "Learn now (%d)",
     ["… et %d autres"] = "… and %d more",
+    ["Niveau requis : inconnu (la donnée manque pour cette recette)"] = "Required skill: unknown (the data is missing for this recipe)",
     ["Niveau requis : %d"] = "Required skill: %d",
     ["Rien ne manque dans ce métier."] = "Nothing missing in this profession.",
     ["Formateur : %d recette(s) notée(s), mais ton filtre en cache (%s)."] = "Trainer: %d recipe(s) noted, but your filter is hiding some (%s).",

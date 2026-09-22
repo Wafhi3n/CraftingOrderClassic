@@ -457,6 +457,7 @@ local es2 = {
     ["Aucun autre perso avec ce métier : %s"] = "Ningún otro personaje tiene esta profesión: %s",
     ["À apprendre maintenant (%d)"] = "Aprender ahora (%d)",
     ["… et %d autres"] = "… y %d más",
+    ["Niveau requis : inconnu (la donnée manque pour cette recette)"] = "Nivel requerido: desconocido (faltan los datos de esta receta)",
     ["Niveau requis : %d"] = "Nivel requerido: %d",
     ["Rien ne manque dans ce métier."] = "No falta nada en esta profesión.",
     ["Formateur : %d recette(s) notée(s), mais ton filtre en cache (%s)."] = "Maestro: %d receta(s) anotada(s), pero tu filtro oculta algunas (%s).",
