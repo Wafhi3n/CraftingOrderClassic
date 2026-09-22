@@ -6,7 +6,7 @@
 ## X-Category: Auction & Economy
 ## X-Website: https://github.com/Wafhi3n/CraftingOrderClassic
 ## SavedVariables: CraftingOrderClassicDB
-## OptionalDeps: MissingTradeSkillsList, LazyGoldClassic
+## OptionalDeps: LazyGoldClassic
 
 # Infra partagée CraftLink (embarquée via LibStub) : catalogue de recettes + registre + transports.
 # MÊME instance que Guild Economy au runtime (LibStub dédoublonne). Source : repo CraftLink,

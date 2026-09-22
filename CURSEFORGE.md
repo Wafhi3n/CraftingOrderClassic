@@ -32,11 +32,11 @@ answer, even people you've never met, as long as they've got the addon too.
 - See recipe cooldowns on other artisans, so you know whether their Transmute is ready or still ticking.
 - Group your alts under one identity, so an order for your offline alchemist reaches whatever character you're playing.
 - Check every profession on your whole account at once in the My Artisans tab.
-- Season of Discovery recipes are built in, on SoD realms only, so seasonal crafts show up on the board like any other.
+- Enchant someone else's gear over the trade window. Click a slot to ask them for the piece, and Blizzard's recipe list narrows to what fits it (new in 1.35).
 - Keep the board clean: mute a spammer (with a reason, or just for an hour), or trust a busy friend so they're never auto-muted.
 - Recipes sorted into real categories instead of one flat "Consumable" pile, everywhere they show up.
-- If you run Lazy Gold, every recipe shows what it'd earn you, and you can sort the list by profit.
-- If you run MissingTradeSkillsList, flip the recipe list to show what you haven't learned yet, in red, and click one to see where it drops.
+- Orders carry what the goods sell for against what the reagents cost, so you can judge a commission before taking it.
+- The Missing view lists the plans you haven't learned and says where each one comes from, the trainer or the vendor on your faction, with coordinates you can click.
 - The window uses the game's own frame style, not a custom skin, so it reads as part of the interface.
 - Click the bag icon on any artisan in the directory to see exactly what materials they need to keep leveling, worked out locally from what the addon already knows about them.
 - Get a heads-up when you're running an old version, read off the versions other players around you are on, with a dot on the minimap that clears once you update (new in 1.27).
@@ -45,7 +45,7 @@ answer, even people you've never met, as long as they've got the addon too.
 - Read your orders and your real quests in one parchment journal with `/co journal` (new in 1.29).
 - Cooking, First Aid and Fishing count as professions in the directory, so you can look them up and order from them like anything else (new in 1.30).
 - Turn a WoW community into a crafting circle with `/co circle`, and its members show up in the Artisans directory with their presence, including the ones who are offline (new in 1.31).
-- Ready for patch 1.15.9 and the modern interface it brings to Era, Season of Discovery and Hardcore.
+- Built for WoW: Forever, the 1.60.1 client. Era, Season of Discovery and Hardcore stay on 1.30.0, the last build that shipped for them.
 
 ## Order straight from a name, friend or stranger
 
@@ -154,12 +154,12 @@ call), and it can ignore very-low-level posters that look like bots. Someone leg
 lot? `/co trust <name>` and they're never auto-muted. It's all yours alone; muting never touches anyone
 else's game.
 
-## The profession window (optional)
+## The profession window
 
-There's an optional three-column profession window: a searchable, difficulty-colored recipe list,
-reagents with have/need counts and Create / Create All, and the live orders for that profession right
-alongside. One click swaps to the Blizzard window and back. Enchanting works too, which takes a little
-doing in Classic since its craft function is protected.
+Forever's own profession window is the modern one, with search, categories and a real detail panel,
+so the addon doesn't replace it. It adds a column inside it. That column holds the live orders for
+the profession you're looking at, a route for levelling it at the lowest cost per point, and the
+plans you're still missing with a line on where each comes from.
 
 The recipe list is sorted the way you'd actually look for things. Vanilla dumps every potion you know
 under one "Consumable" heading in no particular order; here they're split into healing potions, mana
@@ -168,14 +168,10 @@ potion that restores both health and mana sits under both headings. The same gro
 the Order tab, the My Artisans tab, and the gathering professions, where ores, herbs, leathers and fish
 get the same treatment.
 
-If you've got Lazy Gold installed, the addon reads its prices. Each recipe picks up a small coin next to
-it showing what crafting it would earn, a silver coin for small change up through gold coins and then
-stars once you're past a thousand gold a craft. A recipe that loses money shows nothing, since the point
-is to spot what pays. Click the gold coin above the list and it re-sorts by profit, highest first, with
-the categories dropped so you get one straight ranking. The "123" button next to it swaps the coin
-picture for the exact figure in gold, silver and copper. The Order tab carries both buttons, and every
-incoming order there tells you what the goods sell for at auction against what the reagents you'd supply
-would cost, so you can see whether the commission is worth taking.
+Prices are read from Lazy Gold when you run it, so an incoming order tells you what the goods sell for
+against what the reagents you'd supply would cost, and you can see whether the commission is worth
+taking. Reading them from an addon you have to install is on the way out, and prices will come from the
+addon itself.
 
 In the Artisans directory each profession shows as its icon rather than its name. A crafter sitting on a
 genuinely profitable plan gets a gold border on that profession, and hovering it names the plan and the
@@ -185,18 +181,37 @@ characters and adds an "All realm crafts" view that merges every profession on t
 profit-ranked list, so a glance tells you which alt is sitting on money. Cooking and Fishing are in
 there too, along with the essences, dusts and shards an enchanter pulls from disenchanting.
 
-If you run MissingTradeSkillsList, a button above the list folds in the recipes you haven't learned,
-drawn in red beside the ones you have. Click one and the middle panel tells you where it comes from,
-the vendor, drop or quest, with the NPC and its coordinates. It only ever points you at NPCs your own
-faction can talk to; loot drops and neutral vendors show for everyone.
+The Missing view lists the plans you haven't learned yet, with a line on where each one comes from:
+the trainer who teaches it, the vendor who sells it and what they charge, or the creature it drops
+from. It only ever points you at NPCs your own faction can talk to, and when the only one we know
+about is on the other side, it says so rather than walking you into their capital. Click a line and
+it drops a waypoint.
 
-## Season of Discovery
+## Enchanting over the trade window
 
-On a Season of Discovery realm, the 304 seasonal recipes are in the catalogue too — Leatherworking,
-Blacksmithing, Tailoring, Enchanting, Engineering, Alchemy and the rest — so a seasonal craft posts,
-shows its reagents, and gets matched to crafters like any classic recipe. On a regular Era realm none of
-this loads and nothing changes; the recipes your friends have already shared with you stay exactly as
-they were.
+Someone hands you a piece to enchant. They have to drop it in the slot at the bottom of the trade
+window, the one that isn't traded, which plenty of people have never noticed, and then you go hunting
+through your enchants for the right one.
+
+Open a trade with Enchanting up and the addon's column switches to the trade. You get your partner,
+the piece they put down, and what their reagents point to. Click a slot on the silhouette and they're
+asked for that piece, by whisper and, if they run the addon, by a prompt they can click to place it.
+Blizzard's recipe list narrows to that slot at the same time, exactly as if you'd ticked the box
+yourself, and once something is on the table the list follows the item rather than what you asked
+for. End the trade and your own filters come back, including one you'd set before.
+
+If they put reagents down too, the column names the enchant those reagents point to. It reads what
+they place, never what's in your bags, and it stays quiet when their pile fits more than one. You
+craft with Blizzard's own button, and you pick their piece as the target.
+
+If the trade opens while Enchanting is closed, the trade window grows a tab on its right edge that
+opens it.
+
+## Which client this is for
+
+This build is for WoW: Forever, the 1.60.1 client, and it's the only one it loads on. Era, Season of
+Discovery and Hardcore stopped at 1.30.0, which stays available and still carries the 304 seasonal
+recipes for SoD realms.
 
 ## Crafting circles (WoW communities)
 
@@ -226,10 +241,10 @@ Guild Economy.
 
 ## Commands
 
-`/co help` lists them all. The ones you'll reach for: `/co` opens the board, `/co profwindow` toggles the
-custom profession window, `/co notify` sets notifications, `/co scan` toggles the chat scanner, `/co gift`
+`/co help` lists them all. The ones you'll reach for: `/co` opens the board, `/co prof <profession>`
+opens that profession's window, `/co notify` sets notifications, `/co scan` toggles the chat scanner, `/co gift`
 offers a looted plan to a partner, `/co refresh` re-polls the directory, `/co alts` groups your
 characters (off by default), `/co mute` and `/co trust` handle noisy or trusted players.
 
-Made with Season of Discovery and Fresh realms in mind, guild-economy challenges, and servers where the
-auction house isn't the answer.
+Made for fresh realms and guild-economy challenges, and for servers where the auction house isn't the
+answer.
