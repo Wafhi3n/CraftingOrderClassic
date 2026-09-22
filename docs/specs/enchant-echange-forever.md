@@ -61,8 +61,9 @@ clic et la pièce se pose dans l'emplacement 7. Sans COC, il ne reçoit que le c
   pose sur Forever (M5).
 - **Pas de bouton de craft COC** : le bouton natif fait le travail (décision). On ne touche pas à
   `C_TradeSkillUI.CraftEnchant`.
-- **Pas d'inspection** du partenaire (son vrai équipement, ses enchants déjà posés) : la silhouette
-  reste celle d'aujourd'hui (décision). Piste pour une version suivante.
+- **Pas d'inspection** du partenaire (son vrai équipement, ses enchants déjà posés) **en v1** : la
+  silhouette reste celle d'aujourd'hui (décision). Le user l'a redemandée le 2026-09-22 — voir
+  « Après la v1 : la silhouette vivante », qui dit ce que ça vaut et ce qu'il faut mesurer d'abord.
 - **Jamais « Have Materials »** : les composants du partenaire n'arrivent dans les sacs qu'à la
   validation de l'échange ; ce filtre cacherait précisément le bon enchant.
 - **Plus de panneau flottant** sur l'échange (décision) : il disparaît, remplacé par le mode Échange
@@ -237,6 +238,34 @@ vérifie case par case. Résultats dans `COCProbeDB.enchantTest` après `/reload
 Fil `ASKE` **inchangé** : `ASKE|<slotToken>` en whisper addon, `slotToken` pris dans les jetons de
 `COC.UI.DOLL` (liste blanche côté receveur). Aucun nouveau verbe en v1, donc aucun changement de
 protocole ni de révision de transport.
+
+## Après la v1 : la silhouette vivante (équipement réel du partenaire)
+
+Demandé par le user le 2026-09-22 : montrer dans la silhouette ce que le partenaire **porte**, au lieu
+de l'art d'emplacement vide. Hors v1, mais ce n'est pas qu'un confort :
+
+- l'enchanteur **choisit mieux** : il voit la pièce avant de la demander, et son niveau ;
+- il voit ce qui est **déjà enchanté** : le lien rendu par le client porte l'enchant posé. « Ses
+  poignets ont déjà Endurance mineure » est précisément ce qu'un enchanteur veut savoir ;
+- ça lève l'**ambiguïté des armes**. Au clic sur la main droite, T4 coche « Weapon » ET « 2H Weapon »
+  faute de savoir ce qu'il tient. En le sachant, on coche la bonne case.
+
+Ce que le client permet (lu dans `Blizzard_InspectUI/Camelot/Blizzard_InspectUI.lua`) :
+`CanInspect(unit, true)` → `NotifyInspect(unit)` → événement `INSPECT_READY(guid)` → puis
+`GetInventoryItemLink(unit, slotID)` rend le lien COMPLET de chaque pièce portée. Rien de protégé,
+rien de secret par nature — mais tout passe par un aller-retour serveur.
+
+- **M6 `[sonde]` à faire AVANT de coder** : quel JETON d'unité désigne le partenaire d'échange ?
+  `CanInspect("NPC")` répond-il vrai, `NotifyInspect("NPC")` déclenche-t-il `INSPECT_READY` avec son
+  GUID, et `GetInventoryItemLink("NPC", i)` rend-il les liens ? Repli à mesurer aussi : le jeton
+  `"target"` quand le partenaire est ciblé. Sans cette mesure, tout le reste est une supposition.
+- Pièges connus d'avance : **rien n'est synchrone** (la vue doit rester utilisable si l'inspection ne
+  répond jamais) ; Blizzard **étrangle** les demandes d'inspection ; la portée d'inspection (~28 m)
+  est acquise en échange mais pas après ; comparer le GUID de `INSPECT_READY` à celui de l'unité
+  visée, jamais le nom (valeurs SECRÈTES, cf. `COC.Api.UnitNameSafe`) ; `ClearInspectPlayer()` en
+  sortant, pour ne pas garder la session d'inspection ouverte.
+- Rendu visé : l'icône d'emplacement montre l'objet porté (sinon l'art vide, comme aujourd'hui), une
+  marque distingue « déjà enchanté », et le filtre d'arme devient exact au clic.
 
 ## Renvois
 
