@@ -36,6 +36,15 @@ client.
 
 ## Relevés
 
+- 2026-09-23 (4) — jusqu'a b50f724 — Forever, un client — **GO** — la capture du RANG chez le
+  formateur, vue fonctionner : visite d'un formateur d'Enchantement, `/reload`, et la SavedVariable
+  porte `ranks = { [7420]=15, [7426]=40, [7454]=45, [7457]=50, [7748]=60, [7771]=70, [14293]=10,
+  [14807]=70, [1230643]=20 }` — neuf rangs, de 10 a 70. Preuve au passage que
+  `GetTrainerServiceSkillReq` existe bien sur Forever.
+  ⚠️ **NON observé** : le rattrapage par infobulle (aucun service de ce formateur n'avait un nom
+  inconnu de notre catalogue, donc ce chemin n'a pas été emprunté) et le comportement chez un
+  formateur de CLASSE (où le rang doit rester absent, pas valoir zéro).
+
 - 2026-09-23 (3) — jusqu'a c59ec45 — Forever, un client — **GO, la spec `prix-maison` est close** —
   la priorité du prix VENDEUR est enfin **observée**, et sur le cas qui discrimine : `/co pricedump`
   sur **Coal (id 3857)** rend `vendeur=4s75c  HV=3s97c  -> 4s75c`. Les deux prix existent, ils
