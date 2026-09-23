@@ -1,6 +1,7 @@
 # Les prix : une seule source, Auctionator
 
-> État : **implémentée** (retrait du pont + renommage, 2026-09-22 ; reste à voir en jeu) · Rédigée le 2026-09-22 · Arbitrages du user le 2026-09-22
+> État : **close — implémentée ET éprouvée en jeu le 2026-09-23** (relevés dans
+> `docs/verif-registre.md`) · Rédigée le 2026-09-22 · Arbitrages du user le 2026-09-22
 > Cible : WoW: Forever / Camelot · Addon : Crafting Order - Classic
 
 ## Le problème
@@ -25,6 +26,22 @@ pas une, et un pied de fenêtre peut nommer « Lazy Gold » là où le chiffre v
    d'artisan, ligne de prix d'une commande. On retire une source, on ne change aucun calcul.
 5. **Le prix VENDEUR garde sa priorité** sur le prix de marché pour un réactif achetable en ville.
    Règle existante : sans elle, la route de progression choisit la mauvaise recette.
+
+## Ce que la vérification en jeu a ajouté (2026-09-23)
+
+Les cinq points ont été observés dans le client. Deux faits méritent de survivre à la séance :
+
+- **La règle du prix vendeur ne s'observe pas sans préparation.** Auctionator ne connaît le prix
+  d'un vendeur qu'après qu'on a OUVERT la fenêtre de ce marchand. Avant toute visite, `vendeur=nil`
+  partout et la règle est intestable — on croirait à tort qu'elle ne tire pas. La preuve s'obtient
+  avec `/co pricedump <objet>` sur un produit vendu en ville ET échangé à l'hôtel des ventes.
+  Témoin retenu : **Coal (3857)**, `vendeur=4s75c` / `HV=3s97c` → **4s75c**.
+- **La règle coûte quand le HV est moins cher.** Sur ce même témoin, le vendeur est PLUS cher que
+  le marché : la route surévalue donc Coal de 78 c. C'est le prix assumé d'une protection contre un
+  hôtel des ventes gonflé sur un produit de vendeur — un prix vendeur est fixe et toujours
+  disponible, un prix HV ne l'est pas. Si un jour ce biais gêne, la correction naturelle est
+  `min(vendeur, HV)` : elle garde le plancher fixe ET profite d'un marché moins cher. Ce n'est PAS
+  décidé — la règle actuelle reste vendeur d'abord.
 
 ## Ce qu'on NE fait PAS
 
