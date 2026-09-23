@@ -1,11 +1,18 @@
 # Rentabilité des recettes sur Forever
 
 > État : **implémentée, non validée en jeu** · Rédigée le 2026-09-21 · Codée le 2026-09-21
+> Remise à niveau sur `main` le **2026-09-23** · Arbitrages 9 à 12 ajoutés le 2026-09-23 (user)
 > Cible : WoW: Forever / Camelot (16001) uniquement · Addon : Crafting Order - Classic
 >
 > Les portes déterministes (critères 7 à 10) sont **passées** ; les critères `[humain]` et `[outil]`
 > (1 à 6) attendent une session en jeu. Rien de ce qui suit n'a été vu à l'écran.
 > Vue livrée : `CraftingOrderClassic_ProfWindow_DockProfit.lua`, languette **« Profit »**.
+>
+> ⚠️ **Les arbitrages 9 à 12 ne sont PAS encore codés.** La remise à niveau du 2026-09-23 a rebasé la
+> branche sur `main` (28 commits de retard) et porté le renommage `COC.LazyGold` → `COC.Profit` ;
+> elle n'a rien ajouté au comportement. Les quatre décisions nouvelles restent à implémenter, et la
+> bascule « tout le métier » (9) comme le mode COÛT de l'Enchantement (12) demandent chacune leur
+> critère d'acceptation.
 
 ## Le problème
 
@@ -45,11 +52,13 @@ Rien ne change dans la fenêtre de Blizzard : on l'accompagne, on ne la touche p
   sur l'hôte) : c'est le seul montage mesuré sans teinte.
 - **On ne réimplémente aucune collecte de prix.** Auctionator est le seul oracle sur Forever, on lit
   son API publique versionnée. Scanner l'HV nous-mêmes est un autre chantier, hors sujet ici.
-- **On ne liste pas les recettes NON apprises** dans cette v1. « Est-ce que ça vaudrait le coup
-  d'aller l'apprendre » est une question voisine mais différente (elle vit déjà dans le mode
-  « Manquantes »).
-- **On ne traite pas les enchantements** : pas d'objet produit, donc pas de prix de vente, donc pas
-  de profit. Leur coût existe déjà par ailleurs (`LG:CraftCost`, utilisé par la montée de métier).
+- ~~**On ne liste pas les recettes NON apprises** dans cette v1.~~ **AMENDÉ le 2026-09-23 (décision
+  9)** : le défaut reste les recettes apprises, mais une **bascule « tout le métier »** est ajoutée.
+  « Manquantes » continue de dire *où* apprendre ; cette bascule dit *ce que ça rapporterait*.
+- ~~**On ne traite pas les enchantements** : pas d'objet produit, donc pas de prix de vente, donc
+  pas de profit.~~ **RENVERSÉ le 2026-09-23 (décision 12)** : ils sont traités, par le **coût**
+  (`PR:CraftCost`, qui n'a pas besoin d'un prix de vente) et non par la marge. Sans ça, la page est
+  vide pour un enchanteur — indiscernable d'une page cassée.
 - **On ne décompose pas** les intermédiaires, la prospection ni la mouture. Le profit d'une recette
   se calcule sur SES réactifs, au prix du marché, point.
 
@@ -57,7 +66,7 @@ Rien ne change dans la fenêtre de Blizzard : on l'accompagne, on ne la touche p
 
 | Situation | Comportement attendu |
 |---|---|
-| Aucun oracle de prix (Auctionator absent/désactivé) | La languette **n'existe pas du tout**. Pas d'onglet vide, pas d'erreur. Règle existante : `LG:IsAvailable()`. |
+| Aucun oracle de prix (Auctionator absent/désactivé) | La languette **n'existe pas du tout**. Pas d'onglet vide, pas d'erreur. Règle existante : `PR:IsAvailable()`. |
 | Prix de vente du produit inconnu | La recette **n'apparaît pas** dans la liste. Sans prix de vente, le calcul n'a aucun sens. |
 | Un réactif sans prix | La recette apparaît, le coût est **sous-estimé** → marquer la ligne (le drapeau `missing` existe déjà dans `CraftProfit`). |
 | Profit négatif | **Tranché le 2026-09-21 (user) : la recette ne figure pas dans la liste.** Comme dans l'ancienne liste, cette vue ne sert qu'à repérer ce qui rapporte — et une ligne avec un nom et une colonne vide ne dit pas « à perte », elle dit « prix inconnu ». Le calcul, lui, rend bien la valeur négative (verrouillé par le test 906). |
@@ -97,9 +106,33 @@ Rien ne change dans la fenêtre de Blizzard : on l'accompagne, on ne la touche p
    chez lui depuis le nôtre. Sur la ligne de métier ouverte son traitement se borne à
    `CraftingPage:Init` (lu dans `Blizzard_ProfessionsFrame.lua`), donc la fenêtre n'est ni rouverte
    ni déplacée — ce que le critère 2 doit constater à l'écran.
-8. **`LG:CraftCost` n'a PAS été touchée.** Elle sert la montée de métier et la bourse d'artisan, deux
+8. **`PR:CraftCost` n'a PAS été touchée.** Elle sert la montée de métier et la bourse d'artisan, deux
    chantiers clos et validés en jeu ; leur faire changer de source de données n'est pas dans cette
    spec. Elle lit donc toujours le catalogue seul. À rouvrir sciemment, pas par effet de bord.
+
+### Arbitrages du 2026-09-23 (user) — postérieurs, ils l'emportent
+
+9. **La liste s'ouvre sur ce que je peux crafter MAINTENANT**, et gagne une **bascule « tout le
+   métier »** qui montre aussi ce que rapporterait une recette non apprise, visiblement distinguée.
+   *Ça amende la décision « on ne liste pas les recettes NON apprises dans cette v1 »* : le défaut ne
+   change pas, la bascule est un ajout. Le lien avec « Manquantes », qui dit où apprendre, reste
+   entier.
+10. **Le prix de VENTE garde « vendeur d'abord »**, tel que `ItemValue` le fait déjà des deux côtés
+    du calcul. Raison : si un marchand vend l'objet, personne ne paiera plus cher à l'hôtel des
+    ventes — le prix vendeur est un **plafond honnête**, et l'inverse gonflerait des marges qu'on ne
+    réalisera jamais. **Conséquence obligatoire** : la ligne **nomme sa source** au survol (marchand
+    ou HV), sinon le chiffre passe pour faux auprès de qui voit l'HV afficher autre chose.
+11. **La coupe de 5 % reste en dur**, et s'affiche dans le détail du calcul plutôt que d'être
+    réglable. Un réglage de plus pour une constante du jeu ne paie pas sa place ; l'afficher suffit
+    à ce que personne ne cherche d'où vient l'écart.
+12. ⚠️ **L'Enchantement EST traité — par le COÛT, pas par la marge.** *Ça RENVERSE la décision
+    « on ne traite pas les enchantements » prise le 2026-09-21.* Motif : `CraftProfit` exige un prix
+    de vente et rend `nil` sans objet produit, donc pour un enchanteur la page serait **vide** — et
+    une page vide ne se distingue pas de « cette page ne sait pas parler de mon métier ».
+    `CraftCost` fonctionne sans prix de vente : la vue bascule alors en « ce que coûte chaque
+    enchantement à lancer », ce qu'un enchanteur a précisément besoin de savoir pour fixer sa
+    commission — et qui rejoint l'offre LFW (cf. `docs/specs/lfw-forever.md`). La page **dit** qu'elle
+    affiche un coût et pas un gain : un montant dont on ignore le signe est pire que pas de montant.
 
 ## Critères d'acceptation
 
@@ -158,7 +191,7 @@ Rien ne change dans la fenêtre de Blizzard : on l'accompagne, on ne la touche p
 
 ## Renvois
 
-- Code existant à réutiliser **tel quel** : `CraftingOrderClassic_LazyGold.lua`
+- Code existant à réutiliser **tel quel** : `CraftingOrderClassic_Profit.lua` (ex-`_LazyGold.lua`)
   (`CraftProfit`, `EntryProfit`, `ProfitTier`, `ProfitText`, `IsAvailable`, `PriceSource`).
 - Surface : `CraftingOrderClassic_ProfWindow_DockViews.lua` — la table `VIEWS`, `_BuildDockViewBtns`,
   `_SetDockView`, `_PlaceOrdTabs`, `_TabTop` (c'est là que la 4ᵉ languette s'ajoute) ;
