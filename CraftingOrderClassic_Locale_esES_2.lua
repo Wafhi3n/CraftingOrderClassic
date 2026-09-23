@@ -347,6 +347,7 @@ local es2 = {
     ["aucune recette calculable"] = "ninguna receta calculable",
     ["Estimation : chance de point par couleur, prix du dernier scan HV (%s)."] = "Estimación: probabilidad de punto por color, precios del último escaneo de la subasta (%s).",
     ["Rien à calculer — scanne l'HV (Auctionator) puis rouvre ce panneau."] = "Nada que calcular — escanea la casa de subastas (Auctionator) y vuelve a abrir este panel.",
+    ["Auctionator n'est pas là — sans lui, COC n'estime aucun prix."] = "Falta Auctionator — sin él, COC no puede estimar ningún precio.",
     ["Crafts attendus : ~%d"] = "Fabricaciones esperadas: ~%d",
     ["Réactifs (espéré)"] = "Componentes (esperado)",
     ["Plan à acheter"] = "Receta a comprar",

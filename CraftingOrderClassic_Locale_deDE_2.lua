@@ -346,6 +346,7 @@ local de2 = {
     ["aucune recette calculable"] = "kein berechenbares Rezept",
     ["Estimation : chance de point par couleur, prix du dernier scan HV (%s)."] = "Schätzung: Skill-Chance je Farbe, Preise vom letzten AH-Scan (%s).",
     ["Rien à calculer — scanne l'HV (Auctionator) puis rouvre ce panneau."] = "Nichts zu berechnen — scanne das AH (Auctionator) und öffne dieses Fenster erneut.",
+    ["Auctionator n'est pas là — sans lui, COC n'estime aucun prix."] = "Auctionator fehlt — ohne ihn kann COC keine Preise schätzen.",
     ["Crafts attendus : ~%d"] = "Erwartete Crafts: ~%d",
     ["Réactifs (espéré)"] = "Materialien (erwartet)",
     ["Plan à acheter"] = "Zu kaufendes Rezept",

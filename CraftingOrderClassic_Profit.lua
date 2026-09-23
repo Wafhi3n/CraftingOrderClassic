@@ -50,6 +50,16 @@ function PR:PriceSource()
     return auctionator() and "Auctionator" or nil
 end
 
+-- Ce qu'on DIT au joueur quand une vue d'argent reste vide. Deux causes, deux phrases : un panneau
+-- vide a longtemps conseille « scanne l'HV » a quelqu'un qui n'avait meme pas Auctionator installe,
+-- donc on l'envoyait faire une chose impossible (vu au banc le 2026-09-23). La vue n'a pas a
+-- refaire ce diagnostic : elle demande la phrase, c'est tout.
+function PR:NoPriceMessage()
+    local L = COC.L
+    if not self:IsAvailable() then return L["Auctionator n'est pas là — sans lui, COC n'estime aucun prix."] end
+    return L["Rien à calculer — scanne l'HV (Auctionator) puis rouvre ce panneau."]
+end
+
 -- Prix d'un objet en cuivre (vendeur ou HV), ou nil si aucun oracle ne le connaît.
 -- Ordre VENDEUR puis HV dans les deux chemins : un réactif vendu à prix fixe en ville ne doit
 -- jamais être valorisé au cours de l'HV, sinon toute la route se trompe de recette.

@@ -1,26 +1,26 @@
 # CraftingOrderClassic — carte du code
 
-> **GÉNÉRÉ** le 2026-09-22 (v1.35.1) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
+> **GÉNÉRÉ** le 2026-09-23 (v1.35.1) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
-131 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
+132 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
 
 ## Modules (ordre de chargement)
 
 | Fichier | Rôle | Lignes |
 |---|---|---|
-| `CraftingOrderClassic.lua` | Crafting Order - Classic — réseau GLOBAL et SOCIAL de commandes de craft. | 473 |
+| `CraftingOrderClassic.lua` | Crafting Order - Classic — réseau GLOBAL et SOCIAL de commandes de craft. | 483 |
 | `CraftingOrderClassic_Compat.lua` | couche d'adaptation d'API entre les SAVEURS de client. | 295 |
 | `CraftingOrderClassic_Trace.lua` | trace réseau PERSISTÉE, lisible hors-jeu. | 79 |
 | `CraftingOrderClassic_Migrations.lua` | versionnage du schéma SavedVariables. | 40 |
 | `CraftingOrderClassic_Locale.lua` | socle de localisation du CHROME de l'UI. | 12 |
 | `CraftingOrderClassic_Locale_enUS.lua` | overlay ANGLAIS (enUS/enGB). | 274 |
-| `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 491 |
+| `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 492 |
 | `CraftingOrderClassic_Locale_deDE.lua` | overlay ALLEMAND (deDE). | 276 |
-| `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 471 |
+| `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 472 |
 | `CraftingOrderClassic_Locale_esES.lua` | overlay ESPAGNOL (esES/esMX). | 277 |
-| `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 472 |
+| `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 473 |
 | `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 356 |
 | `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 353 |
 | `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 353 |
@@ -90,14 +90,15 @@
 | `CraftingOrderClassic_ProfWindow_Recipes.lua` | colonne GAUCHE : liste de recettes virtualisée (scroll), recherche, couleur par difficulté, sélection, badge « demandé » (nb de commandes ouvertes pour l'objet). | 485 |
 | `CraftingOrderClassic_ProfWindow_Leveling.lua` | aide à la MONTÉE DE MÉTIER dans la liste de recettes : coût de progression (réactifs au prix Lazy Gold ÷ chance de point selon la couleur), badge « meilleur coût/point » sur la recette recommandée, icônes de SOURCE sur les manquantes (formateur / vendeur PNJ / coté à l'HV / à farmer) et tri « progression » affiné par coût. | 219 |
 | `CraftingOrderClassic_Route.lua` | cœur de CALCUL du plan de route de montée de métier, PARAMÉTRABLE : marche gloutonne rang par rang (recette au meilleur coût/point ESPÉRÉ), seuils réels CraftLink `skillColors` aux rangs futurs, amortissement du prix des plans à acheter, exclusion des recettes à cooldown et des coûts partiels. | 329 |
-| `CraftingOrderClassic_ProfWindow_Route.lua` | fenêtre « PLAN DE ROUTE » de montée de métier (étage ③ de l'aide à la progression) : « du rang actuel au plafond, quoi crafter, combien de fois, pour combien ». | 487 |
+| `CraftingOrderClassic_ProfWindow_Route.lua` | fenêtre « PLAN DE ROUTE » de montée de métier (étage ③ de l'aide à la progression) : « du rang actuel au plafond, quoi crafter, combien de fois, pour combien ». | 413 |
+| `CraftingOrderClassic_ProfWindow_Route_Supply.lua` | ce qui se peint SOUS les segments du plan de route : le bloc « FOURNITURES » (composants agrégés de toute la route, plans à acheter) et, quand le rang est AU PLAFOND, le bloc « débloquer le palier suivant » (livre de rang curaté, ou renvoi vers le formateur de métier). | 111 |
 | `CraftingOrderClassic_ProfWindow_Learn.lua` | section « À apprendre maintenant » du Plan de route : les recettes NON APPRISES que ton rang permet déjà d'apprendre ET qui rapportent encore un point, classées par coût espéré par point, avec l'icône de leur source. | 113 |
 | `CraftingOrderClassic_ProfWindow_DockViews.lua` | la colonne Commandes CHANGE DE CONTENU au lieu d'ouvrir des fenêtres par-dessus. | 422 |
 | `CraftingOrderClassic_ProfWindow_Trade.lua` | le mode ÉCHANGE de la colonne de métier (T3). | 277 |
 | `CraftingOrderClassic_ProfWindow_Geo.lua` | `/co geo` : le RELEVÉ de la colonne, en pixels écran, écrit dans la SavedVariable pour être relu HORS DU JEU. | 261 |
 | `CraftingOrderClassic_ProfWindow_Detail.lua` | colonne CENTRE : détail de la recette sélectionnée (icône, réactifs have/need) + boutons Créer / Créer tout. | 279 |
 | `CraftingOrderClassic_ProfWindow_Info.lua` | PANNEAU D'INFO en SECTIONS pour la colonne centrale de la vue métier. | 217 |
-| `CraftingOrderClassic_Profit.lua` | pont LECTURE SEULE vers l'oracle de prix, AUCTIONATOR. | 441 |
+| `CraftingOrderClassic_Profit.lua` | pont LECTURE SEULE vers l'oracle de prix, AUCTIONATOR. | 451 |
 | `CraftingOrderClassic_ProfWindow_Orders.lua` | colonne « Commandes » de la vue métier (cabine de l'artisan) : construction (onglets de relation, en-tête, scroll), vue LISTE (une ligne par commande : demandeur + prix + âge ; une ligne sourdine cliquée se réaffiche), collecte/tri et rafraîchissement. | 499 |
 | `CraftingOrderClassic_ProfWindow_Orders_Card.lua` | vue SÉLECTIONNÉE de la colonne « Commandes » : la carte complète d'une commande (composants fournis, repères Lazy Gold, ACCEPTER / REFUSER / CHUCHOTER ; croix en haut à droite = retour liste). | 315 |
 | `CraftingOrderClassic_ProfWindow_LFW.lua` | config de l'OFFRE « recherche de travail » par métier. | 327 |
@@ -553,7 +554,7 @@
 > État actuel : capture AUTONOME des recettes (scan des fenêtres métier via CraftLink) +
 > persistance propre (CraftingOrderClassicDB). Le carnet d'ordres et le social arrivent (C/D).
 
-**API** : `COC:Scan()` · `COC:ScanSoon()` · `COC:Status()` · `COC:ChannelCmd(arg)` · `COC:NotifyCmd(arg)` · `COC:ScanCmd(arg)` · `COC:CrafterScanCmd(arg)` · `COC:ChannelNotice()` · `COC:MissingAddon(displayName)` · `COC:NeedPriceAddon()` · `COC:Beacon()` · `COC:BeaconDiag()` · `COC:WipeRoster()` · `COC:GreenWallDiag()` · `COC:Help()` · `COC:Slash(msg)`
+**API** : `COC:Scan()` · `COC:ScanSoon()` · `COC:OnSkillLines()` · `COC:Status()` · `COC:ChannelCmd(arg)` · `COC:NotifyCmd(arg)` · `COC:ScanCmd(arg)` · `COC:CrafterScanCmd(arg)` · `COC:ChannelNotice()` · `COC:MissingAddon(displayName)` · `COC:NeedPriceAddon()` · `COC:Beacon()` · `COC:BeaconDiag()` · `COC:WipeRoster()` · `COC:GreenWallDiag()` · `COC:Help()` · `COC:Slash(msg)`
 
 ### `CraftingOrderClassic_Compat.lua`
 > CraftingOrderClassic_Compat.lua — couche d'adaptation d'API entre les SAVEURS de client.
@@ -1600,7 +1601,25 @@
 > Tout est soft-dep : sans Lazy Gold, le bouton ouvre la popup NeedPriceAddon ; sans ce fichier,
 > rien ne change (hooks sous garde nil dans _ProfWindow_Toolbar).
 
-**API** : `PW:ToggleRoute()`
+**API** : `PW:InvalidateDockRecipes()` · `PW:ToggleRoute()`
+
+### `CraftingOrderClassic_ProfWindow_Route_Supply.lua`
+> CraftingOrderClassic_ProfWindow_Route_Supply.lua — ce qui se peint SOUS les segments du plan de
+> route : le bloc « FOURNITURES » (composants agrégés de toute la route, plans à acheter) et, quand
+> le rang est AU PLAFOND, le bloc « débloquer le palier suivant » (livre de rang curaté, ou renvoi
+> vers le formateur de métier).
+> 
+> Séparé de _ProfWindow_Route.lua le 2026-09-23 : le fichier atteignait 500 lignes pile, le plafond
+> anti-monolithe de la maison, et la porte de deploy.ps1 refusait la ligne suivante. La couture
+> n'est pas arbitraire — au-dessus on décrit UN CHEMIN (quoi crafter, combien de fois, pour
+> combien), ici on décrit CE QU'IL FAUT RÉUNIR pour l'emprunter, et ça s'appuie sur les helpers
+> PARTAGÉS de la bourse d'artisan (_UI_Artisans_Needs), pas sur la mécanique de route.
+> 
+> Ce qui est soft-dep et ce qui ne l'est PAS : _UI_Artisans_Needs l'est (sans lui la fenêtre garde
+> ses segments seuls, garde nil en place), et _ProfWindow_Learn aussi. CE fichier ne l'est pas :
+> _FillRoute l'appelle SANS garde (_ProfWindow_Route.lua:337), donc le retirer du .toc casse le
+> panneau au lieu de le dégrader. C'est assumé — le .toc est le contrat, et une erreur franche
+> vaut mieux qu'un bloc FOURNITURES qui disparaît sans rien dire.
 
 ### `CraftingOrderClassic_ProfWindow_Learn.lua`
 > CraftingOrderClassic_ProfWindow_Learn.lua — section « À apprendre maintenant » du Plan de route :
@@ -1737,7 +1756,7 @@
 > Le COÛT des réactifs et l'objet produit viennent de NOS données CraftLink (RecipeReagents/RecipeProduct),
 > pas des tables de PR : on reste maître de la recette, PR ne sert QUE d'oracle de prix.
 
-**API** : `PR:IsAvailable()` · `PR:PriceSource()` · `PR:ItemValue(itemID)` · `PR:IsVendorItem(itemID)` · `PR:PriceDump(arg)` · `PR:CoinTier(copper)` · `PR:ProfitTier(copper)` · `PR:ExactMode()` · `PR:SetExactMode(on)` · `PR:ProfitText(copper)` · `PR:Money(copper, colored)` · `PR:CraftProfit(profKey, spellID, numMade)` · `PR:EntryProfit(profKey, entry)` · `PR:CraftCost(profKey, spellID)` · `PR:EntryCost(profKey, entry)` · `PR:BestPlanFor(profKey, rank)` · `PR:BestProfitFor(profKey, rank)` · `PR:PlanName(profKey, plan)` · `PR:BestPlanName(profKey, rank)` · `PR:BestKnownPlanFor(profKey, r)` · `PR:MinProfit()` · `PR:HighlightTier(profit)`
+**API** : `PR:IsAvailable()` · `PR:PriceSource()` · `PR:NoPriceMessage()` · `PR:ItemValue(itemID)` · `PR:IsVendorItem(itemID)` · `PR:PriceDump(arg)` · `PR:CoinTier(copper)` · `PR:ProfitTier(copper)` · `PR:ExactMode()` · `PR:SetExactMode(on)` · `PR:ProfitText(copper)` · `PR:Money(copper, colored)` · `PR:CraftProfit(profKey, spellID, numMade)` · `PR:EntryProfit(profKey, entry)` · `PR:CraftCost(profKey, spellID)` · `PR:EntryCost(profKey, entry)` · `PR:BestPlanFor(profKey, rank)` · `PR:BestProfitFor(profKey, rank)` · `PR:PlanName(profKey, plan)` · `PR:BestPlanName(profKey, rank)` · `PR:BestKnownPlanFor(profKey, r)` · `PR:MinProfit()` · `PR:HighlightTier(profit)`
 
 ### `CraftingOrderClassic_ProfWindow_Orders.lua`
 > CraftingOrderClassic_ProfWindow_Orders.lua — colonne « Commandes » de la vue métier (cabine de
