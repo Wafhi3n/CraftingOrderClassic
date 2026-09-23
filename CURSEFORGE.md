@@ -168,10 +168,10 @@ potion that restores both health and mana sits under both headings. The same gro
 the Order tab, the My Artisans tab, and the gathering professions, where ores, herbs, leathers and fish
 get the same treatment.
 
-Prices are read from Lazy Gold when you run it, so an incoming order tells you what the goods sell for
-against what the reagents you'd supply would cost, and you can see whether the commission is worth
-taking. Reading them from an addon you have to install is on the way out, and prices will come from the
-addon itself.
+Prices come from Auctionator's last auction house scan, so an incoming order tells you what the goods
+sell for against what the reagents you'd supply would cost, and you can see whether the commission is
+worth taking. Without Auctionator the addon says it doesn't know, instead of showing you a zero that
+would read as "this earns nothing".
 
 In the Artisans directory each profession shows as its icon rather than its name. A crafter sitting on a
 genuinely profitable plan gets a gold border on that profession, and hovering it names the plan and the
@@ -248,3 +248,18 @@ characters (off by default), `/co mute` and `/co trust` handle noisy or trusted 
 
 Made for fresh realms and guild-economy challenges, and for servers where the auction house isn't the
 answer.
+
+## Beta note: Forever forgets what addons remember
+
+The beta writes addon data to disk but doesn't read it back when you log in. Everything this addon
+keeps — your artisan directory, your ledger, your settings, your muted list — starts over every
+session. It's a client bug, not this addon, and no addon can work around it: there is nowhere left
+to store anything, I checked.
+
+What still works is everything the addon reads from the game itself each session: your professions
+and recipes, the profession window column, the levelling route, prices from Auctionator's scan.
+Your directory also refills on its own as people around you come online.
+
+The addon says all this once when it loads, and stays quiet if you already have a fix in place. If
+you want your data to stick, ForeverSVFix (github.com/nobewayo/ForeverSVFix) restores saved
+variables until Blizzard fixes the client.
