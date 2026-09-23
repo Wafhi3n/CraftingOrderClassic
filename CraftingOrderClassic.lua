@@ -94,6 +94,30 @@ function COC:ScanSoon()
     C_Timer.After(0.3, function() COC._scanTimer = nil; pcall(COC.Scan, COC) end)
 end
 
+-- SKILL_LINES_CHANGED : gain de point, ou plan appris. Fenêtre métier OUVERTE = capture locale et
+-- rafraîchissement UI IMMÉDIATS, pour que la route et le badge « coût/point » suivent l'événement
+-- AUTORITAIRE du point — les événements de liste, eux, ne tombent pas à chaque gain. Gaté sur la
+-- fenêtre ouverte : les compétences d'ARME montent en plein combat, sur ce même événement.
+function COC:OnSkillLines()
+    local PW = COC.ProfWindow
+    -- Le cache de recettes de la colonne greffée (TTL 5 s) ne voit pas cet événement : sans ça la
+    -- route se recalcule sur la liste — et la couleur — d'AVANT le point gagné. Marquage seul.
+    if PW and PW.InvalidateDockRecipes then PW:InvalidateDockRecipes() end
+    if COC.Directory and PW and PW.frame and PW.frame:IsShown() then
+        COC.Directory:CaptureSkills()
+        if PW.Refresh then PW:Refresh() end
+    end
+    -- Diffusion réseau (+ capture de repli fenêtre fermée) : throttlée 2 s (une série de crafts
+    -- spamme cet événement — on ne réannonce pas mon profil à chaque point).
+    if COC.Directory and not COC._skillTimer and C_Timer then
+        COC._skillTimer = true
+        C_Timer.After(2, function()
+            COC._skillTimer = nil
+            COC.Directory:CaptureSkills(); COC.Directory:AnnounceSkills()
+        end)
+    end
+end
+
 -- /co : statut. Infra CraftLink (catalogue + versions) + MES recettes captées (autonome).
 function COC:Status()
     local L = COC.L
@@ -447,27 +471,13 @@ f:SetScript("OnEvent", function(_, event, arg1)
         SlashCmdList["CRAFTINGORDER"] = function(msg) COC:Slash(msg) end
         p(COC.L["chargé — |cFFFFFFFF/co help|r pour les commandes. (Réseau global de craft — autonome.)"])
     elseif event == "SKILL_LINES_CHANGED" then
-        -- Gain de point / apprentissage. Si la fenêtre métier est OUVERTE : CAPTURE locale +
-        -- rafraîchissement UI IMMÉDIATS, pour que la route/le badge « coût/point » suivent l'événement
-        -- AUTORITAIRE du point. Sans ça, ils ne suivaient que les événements de liste, qui ne tombent
-        -- pas à chaque gain. Gaté sur la fenêtre ouverte : les compétences d'ARME montent en plein
-        -- combat (même événement) — inutile de recapturer à chaque coup fenêtre fermée.
-        local PW = COC.ProfWindow
-        if COC.Directory and PW and PW.frame and PW.frame:IsShown() then
-            COC.Directory:CaptureSkills()
-            if PW.Refresh then PW:Refresh() end
-        end
-        -- Diffusion réseau (+ capture de repli fenêtre fermée) : throttlée 2 s (une série de crafts
-        -- spamme cet événement — on ne réannonce pas mon profil à chaque point).
-        if COC.Directory and not COC._skillTimer and C_Timer then
-            COC._skillTimer = true
-            C_Timer.After(2, function()
-                COC._skillTimer = nil
-                COC.Directory:CaptureSkills(); COC.Directory:AnnounceSkills()
-            end)
-        end
+        COC:OnSkillLines()
     else
         -- TRADE_SKILL_* : la fenêtre est lisible → on capte (débouncé, cf. COC:ScanSoon).
+        -- La liste vient de changer (plan appris, recette mise à jour) : le cache de recettes de la
+        -- colonne greffée a menti jusqu'ici, on le périme AVANT le repaint qu'il sert.
+        local PW = COC.ProfWindow
+        if PW and PW.InvalidateDockRecipes then PW:InvalidateDockRecipes() end
         COC:ScanSoon()
     end
 end)
