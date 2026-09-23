@@ -28,7 +28,13 @@ local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
 -- Persistance
 -- ------------------------------------------------------------------
 
--- db.trainers[profKey] = { npc = { id, name, mapID, x, y, at }, teaches = { [spellID] = true } }
+-- db.trainers[profKey] = { npc = { id, name, mapID, x, y, at }, teaches = { [spellID] = true },
+--                          ranks = { [spellID] = rang de metier exige } }
+--
+-- `ranks` est une table PARALLELE, pas un changement de forme de `teaches`. Recense le 2026-09-23 :
+-- un seul lecteur compare `teaches[sid] == true` (Trainers:Teaches), tous les autres n'en lisent
+-- que les CLES. Y ranger un nombre aurait casse ce lecteur-la, en silence. Une table de plus ne
+-- casse personne et les anciennes bases restent lisibles telles quelles.
 --
 -- UN SEUL PNJ retenu par métier, le DERNIER VU. La question à laquelle on répond est « où
 -- j'apprends ça », pas « donne-moi l'annuaire complet des formateurs » ; et le dernier vu est le
@@ -62,10 +68,14 @@ end
 -- n'a pas encore résolu : construire l'index à ce moment-là le figerait VIDE pour toute la session,
 -- et plus aucune visite de formateur ne reconnaîtrait quoi que ce soit. On garde le compte et on
 -- reconstruit tant qu'il est à zéro.
-local byName, byNameN = nil, 0
+-- `bySid` est l'ENVERS du meme index : il sert quand le NOM ne dit rien (service dont le libelle
+-- ne correspond a aucune recette de notre catalogue) mais dont l'infobulle rend un spellID connu.
+-- Il se construit dans la meme passe : deux index qui se rempliraient separement divergeraient.
+local byName, byNameN, bySid = nil, 0, nil
 local function nameIndex()
     if byName and byNameN > 0 then return byName, byNameN end
     local idx, n = {}, 0
+    bySid = {}
     local lib = CL()
     for _, prof in ipairs((lib and lib.Professions and lib:Professions()) or {}) do
         for _, sid in ipairs((lib.GetRecipes and lib:GetRecipes(prof)) or {}) do
@@ -73,6 +83,7 @@ local function nameIndex()
             -- Premier arrivé, premier servi : deux métiers peuvent produire le même nom (Fonte,
             -- Prospection), et le vote par métier ci-dessous rattrape le mauvais aiguillage.
             if nm and nm ~= "" and not idx[nm] then idx[nm] = { prof, sid }; n = n + 1 end
+            if not bySid[sid] then bySid[sid] = prof end
         end
     end
     byName, byNameN = idx, n
@@ -89,19 +100,60 @@ end
 -- Rend AUSSI le nombre de services vus et un exemple de nom non reconnu. Sans ça un échec est
 -- muet : « rien de moissonné » ne dit pas si le client n'a rien donné, ou si c'est nous qui n'avons
 -- rien su lire -- et ces deux pannes ne se réparent pas au même endroit.
+-- Infobulle CACHEE, a nous : `SetTrainerService(i)` puis `GetSpell()` rend le spellID REEL du
+-- service. C'est plus sur qu'un appariement par nom -- un nom peut manquer a notre catalogue, etre
+-- traduit autrement, ou etre porte par deux metiers. On ne s'en sert que pour RATTRAPER ce que le
+-- nom n'a pas reconnu : jamais pour contredire une correspondance qui a marche.
+local tip
+local function serviceSpellID(i)
+    if not (GameTooltip and CreateFrame) then return nil end
+    tip = tip or CreateFrame("GameTooltip", "COCTrainerScanTip", nil, "GameTooltipTemplate")
+    if not (tip.SetTrainerService and tip.GetSpell) then return nil end
+    tip:SetOwner(UIParent or WorldFrame, "ANCHOR_NONE")
+    tip:ClearLines()
+    local ok = pcall(tip.SetTrainerService, tip, i)
+    if not ok then return nil end
+    local ok2, _, sid = pcall(tip.GetSpell, tip)
+    return (ok2 and type(sid) == "number" and sid > 0) and sid or nil
+end
+
+-- Rang de METIER exige par le service. `GetTrainerServiceSkillReq(i)` rend (nom du metier, rang,
+-- le joueur l'a-t-il). C'est CE rang qui comble les niveaux d'apprentissage absents des donnees.
+-- Ne vaut que chez un formateur de METIER : chez un formateur de classe il n'y a pas de rang, et
+-- la fonction rend alors un couple vide qu'il ne faut pas prendre pour un zero.
+local function serviceRank(i, isTradeskill)
+    if not (isTradeskill and _G.GetTrainerServiceSkillReq) then return nil end
+    local ok, _, rank = pcall(_G.GetTrainerServiceSkillReq, i)
+    if ok and type(rank) == "number" and rank > 0 then return rank end
+    return nil
+end
+
 local function readServices()
     local out, seen, sample = {}, 0, nil
     local num  = _G.GetNumTrainerServices and _G.GetNumTrainerServices() or 0
     local info = _G.GetTrainerServiceInfo
     if not info or num == 0 then return out, 0, nil end
     local idx = nameIndex()
+    local isTradeskill = (_G.IsTradeskillTrainer == nil) or (_G.IsTradeskillTrainer() == true)
     for i = 1, num do
         local ok, name, sType = pcall(info, i)
         if ok and name and sType ~= "header" then
             seen = seen + 1
             local hit = idx[name]
-            if hit then out[#out + 1] = hit
-            elseif not sample then sample = name end
+            local prof, sid
+            if hit then
+                prof, sid = hit[1], hit[2]
+            else
+                -- Le nom n'a rien dit : on demande son id a l'infobulle, et on ne le garde que
+                -- s'il designe une recette de NOTRE catalogue. Sinon c'est un service qui ne nous
+                -- regarde pas, et on en garde un exemple pour le diagnostic.
+                local tid = serviceSpellID(i)
+                prof = tid and bySid and bySid[tid] or nil
+                if prof then sid = tid elseif not sample then sample = name end
+            end
+            -- COPIE : `idx[name]` est la table de l'INDEX, partagee par toutes les visites. Y
+            -- ecrire le rang du service courant le collerait a toutes les occurrences suivantes.
+            if prof and sid then out[#out + 1] = { prof, sid, serviceRank(i, isTradeskill) } end
         end
     end
     return out, seen, sample
@@ -171,9 +223,20 @@ function T:Harvest()
     self._lastSeen, self._lastSample, self._lastIndex = seen, sample, select(2, nameIndex())
     local prof, n = winningProf(list)
     if not prof then return nil, 0, seen end
-    local st, spells = store(prof, true), {}
+    local st, spells, ranks = store(prof, true), {}, {}
     for _, p in ipairs(list) do
-        if p[1] == prof then st.teaches[p[2]] = true; spells[#spells + 1] = p[2] end
+        if p[1] == prof then
+            st.teaches[p[2]] = true
+            spells[#spells + 1] = p[2]
+            -- Le rang ne s'ecrit que s'il EXISTE. Ecrire 0 pour « pas vu » rejouerait la faute
+            -- que la v1.35.1 vient de corriger cote donnees : une absence lue comme un zero, qui
+            -- se classe en tete des Manquantes et promet une recette hors de portee.
+            if p[3] then
+                st.ranks = st.ranks or {}
+                st.ranks[p[2]] = p[3]
+                ranks[p[2]] = p[3]
+            end
+        end
     end
     local id, name = npcIdentity()
     local map, x, y
@@ -188,7 +251,8 @@ function T:Harvest()
     -- ne garde qu'UN PNJ par metier alors que `teaches` s'accumule : apres deux formateurs de Forge,
     -- elle attribuerait au second ce que le premier enseigne. Juste pour « ou j'apprends ça », faux
     -- pour une donnee livree -- qui a besoin de savoir QUEL PNJ enseigne QUOI.
-    self._lastVisit = { prof = prof, npcID = id, name = name, mapID = map, x = x, y = y, spells = spells }
+    self._lastVisit = { prof = prof, npcID = id, name = name, mapID = map, x = x, y = y,
+                        spells = spells, ranks = ranks }
     if COC.Trace then COC.Trace:Log("trainer", (name or "?") .. " / " .. prof .. " : " .. n .. " services") end
     -- Une fois par fenêtre (le drapeau tombe au TRAINER_SHOW) : TRAINER_UPDATE se déclenche à chaque
     -- clic et à chaque changement de filtre, on ne va pas le répéter à chacun.
