@@ -36,6 +36,19 @@ client.
 
 ## Relevés
 
+- 2026-09-23 (3) — jusqu'a c59ec45 — Forever, un client — **GO, la spec `prix-maison` est close** —
+  la priorité du prix VENDEUR est enfin **observée**, et sur le cas qui discrimine : `/co pricedump`
+  sur **Coal (id 3857)** rend `vendeur=4s75c  HV=3s97c  -> 4s75c`. Les deux prix existent, ils
+  diffèrent, et c'est le vendeur qui l'emporte — la règle tire, elle n'est pas juste écrite.
+  Chemin pour l'obtenir, à garder : Auctionator ne connaît le prix d'un vendeur qu'après avoir
+  OUVERT sa fenêtre. Tant qu'on n'a visité personne, `vendeur=nil` partout et la règle est
+  intestable. Il faut donc visiter un marchand, puis dumper un objet qu'il vend ET qui se trade.
+  Constaté aussi : sur les réactifs non vendus (Rough Stone, Linen Cloth, Copper Bar…) le repli HV
+  fonctionne, ce qui écarte la crainte qu'Auctionator rende un prix de REVENTE pour tout objet.
+  ⚠️ Question de CONCEPTION ouverte (ce n'est pas un défaut) : ici le vendeur est PLUS CHER que le
+  HV, donc la route surévalue Coal de 78c. La règle protège d'un HV gonflé sur un produit de
+  vendeur ; elle coûte quand le HV est réellement moins cher. Voir la spec.
+
 - 2026-09-23 (2) — jusqu'a 9d0be6e — Forever, un client, HV rescanné — **GO** — deux observations
   faites dans la foulée de la séance prix :
   **Gain de point de compétence** (`COC:OnSkillLines`, commit 20d93b8) : un point gagné fenêtre
