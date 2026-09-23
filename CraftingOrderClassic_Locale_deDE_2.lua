@@ -150,8 +150,8 @@ local de2 = {
     -- Aide contextuelle « bouton i » (Vue Métier) — cf. _ProfWindow_HelpPlate.lua (bulles courtes)
     ["Aide : survole les zones surlignées pour comprendre chaque fonction."] =
         "Hilfe: Bewege den Mauszeiger über die hervorgehobenen Bereiche, um jede Funktion zu verstehen.",
-    ["Barre de filtres. À gauche (avec Lazy Gold) : pièce = trier par rentabilité, « 123 » = prix exacts au lieu de l'indicateur compact, flèche verte = trier par montée de compétence, carte = plan de route (quoi crafter jusqu'au plafond, au moins cher). Au centre : la recherche. À droite : sac = seulement les recettes dont tu as les matériaux, flèche orange = masquer les recettes grises (aucun gain de compétence)."] =
-        "Filterleiste. Links (mit Lazy Gold): Münze = nach Gewinn sortieren, „123“ = exakte Preise statt der kompakten Anzeige, grüner Pfeil = nach Fertigkeitsanstieg sortieren, Karte = Levelroute (was du bis zum Maximum am günstigsten craften solltest). Mitte: die Suche. Rechts: Beutel = nur Rezepte, für die du das Material hast, oranger Pfeil = graue Rezepte ausblenden (kein Fertigkeitsgewinn).",
+    ["Barre de filtres. À gauche (avec Auctionator) : pièce = trier par rentabilité, « 123 » = prix exacts au lieu de l'indicateur compact, flèche verte = trier par montée de compétence, carte = plan de route (quoi crafter jusqu'au plafond, au moins cher). Au centre : la recherche. À droite : sac = seulement les recettes dont tu as les matériaux, flèche orange = masquer les recettes grises (aucun gain de compétence)."] =
+        "Filterleiste. Links (mit Auctionator): Münze = nach Gewinn sortieren, „123“ = exakte Preise statt der kompakten Anzeige, grüner Pfeil = nach Fertigkeitsanstieg sortieren, Karte = Levelroute (was du bis zum Maximum am günstigsten craften solltest). Mitte: die Suche. Rechts: Beutel = nur Rezepte, für die du das Material hast, oranger Pfeil = graue Rezepte ausblenden (kein Fertigkeitsgewinn).",
     ["Tes recettes, groupées par famille (clique un en-tête pour replier). À droite de chaque ligne : %s = rentabilité à l'HV (survole pour le profit net exact), %s = plan conseillé pour monter le métier (meilleur coût par point), « ×N » doré = commandes en attente pour cet objet. En mode Manquantes, une icône dit où obtenir le plan : formateur, vendeur, HV ou à farmer."] =
         "Deine Rezepte, nach Familie gruppiert (Kopfzeile anklicken zum Einklappen). Rechts an jeder Zeile: %s = Gewinn im AH (für den genauen Nettogewinn mit der Maus darüberfahren), %s = empfohlenes Rezept zum Hochleveln (bestes Preis-Leistungs-Verhältnis pro Punkt), goldenes „×N“ = ausstehende Aufträge für diesen Gegenstand. Im Modus Fehlende zeigt ein Symbol, wo du das Rezept bekommst: Lehrer, Händler, AH oder zu farmen.",
     ["Le plan sélectionné : ses réactifs et le bouton pour le fabriquer."] =
@@ -166,8 +166,8 @@ local de2 = {
         "Aufträge nach Quelle filtern: alle, deine Gilde, deine Freunde oder dein Handwerker-Verzeichnis.",
 
     -- Aide contextuelle « bouton i » — onglet Commande (cf. _UI_HelpPlate.lua)
-    ["Filtre les plans : recherche par nom, filtre par qualité, filtre par réactif, et l'outil %s « 123 » de Lazy Gold (prix/rentabilité)."] =
-        "Filtert die Rezepte: Suche nach Name, Filter nach Qualität, Filter nach Reagenz und Lazy Golds Werkzeug %s „123“ (Preis/Gewinn).",
+    ["Filtre les plans : recherche par nom, filtre par qualité, filtre par réactif, et l'outil %s « 123 » de prix et de rentabilité (Auctionator)."] =
+        "Filtert die Rezepte: Suche nach Name, Filter nach Qualität, Filter nach Reagenz und Auctionators Werkzeug %s „123“ (Preis/Gewinn).",
     ["La liste des plans. Choisis celui que tu veux faire réaliser par un artisan."] =
         "Die Rezeptliste. Wähle das, das ein Handwerker herstellen soll.",
     ["L'objet choisi. La pastille « Je fournis » indique que tu apportes tous les composants toi-même."] =
@@ -205,12 +205,12 @@ local de2 = {
     -- Aide contextuelle « bouton i » — onglet Mes artisans (cf. _UI_HelpPlate.lua)
     ["Partage tes rerolls sur le réseau (les autres voient tes métiers), et choisis le perso mis en « vitrine »."] =
         "Teile deine Twinks im Netzwerk (andere sehen deine Berufe) und wähle den Charakter für die „Auslage“.",
-    ["Tous les plans du royaume : la liste agrégée de toutes tes recettes, au lieu du découpage par métier (Lazy Gold requis)."] =
-        "Alle Rezepte des Realms: die zusammengeführte Liste all deiner Rezepte statt der Aufteilung nach Beruf (Lazy Gold erforderlich).",
+    ["Tous les plans du royaume : la liste agrégée de toutes tes recettes, au lieu du découpage par métier (Auctionator requis)."] =
+        "Alle Rezepte des Realms: die zusammengeführte Liste all deiner Rezepte statt der Aufteilung nach Beruf (Auctionator erforderlich).",
     ["Tes métiers (tous les persos du compte). Choisis-en un pour voir ses recettes à droite."] =
         "Deine Berufe (alle Charaktere des Kontos). Wähle einen, um rechts seine Rezepte zu sehen.",
-    ["En-tête des recettes du métier choisi : bouton « Manquantes » et outils de prix (Lazy Gold)."] =
-        "Kopfzeile der Rezepte des gewählten Berufs: Schaltfläche „Fehlende“ und Preiswerkzeuge (Lazy Gold).",
+    ["En-tête des recettes du métier choisi : bouton « Manquantes » et outils de prix (Auctionator)."] =
+        "Kopfzeile der Rezepte des gewählten Berufs: Schaltfläche „Fehlende“ und Preiswerkzeuge (Auctionator).",
     ["Les recettes du métier sélectionné (ou tous les plans du royaume)."] =
         "Die Rezepte des ausgewählten Berufs (oder alle Rezepte des Realms).",
 
@@ -220,7 +220,7 @@ local de2 = {
     ["Le Carnet = TES commandes postées. Accepter/livrer se fait dans la Vue Métier, pas ici ; quand une commande t'est remise, le bouton « J'ai reçu » confirme la réception."] =
         "Das Auftragsbuch = DEINE aufgegebenen Aufträge. Annehmen/Liefern passiert in der Berufsansicht, nicht hier; wenn dir ein Auftrag übergeben wird, bestätigt die Schaltfläche „Erhalten“ den Empfang.",
 
-    -- Popup dépendance optionnelle manquante (boutons Lazy Gold / MTSL toujours visibles)
+    -- Popup dépendance optionnelle manquante (boutons Auctionator / MTSL toujours visibles)
     ["Cette fonction nécessite l'addon |cFFFFD100%s|r (non installé ou désactivé). Installe-le pour en profiter."] =
         "Diese Funktion benötigt das Addon |cFFFFD100%s|r (nicht installiert oder deaktiviert). Installiere es, um sie zu nutzen.",
 
@@ -289,7 +289,7 @@ local de2 = {
     ["Butin"] = "Beute",
     ["Source inconnue"] = "Unbekannte Quelle",
 
-    -- Pont Lazy Gold (rentabilité)
+    -- Pont Auctionator (rentabilité)
     ["Rentabilité"] = "Rentabilität",
     ["Vente HV"] = "AH-Verkauf",
     ["Profit net"] = "Nettogewinn",
@@ -302,7 +302,7 @@ local de2 = {
     ["Valeurs exactes — clic pour l'affichage compact."] = "Exakte Werte — Klick für kompakte Anzeige.",
     ["Afficher les valeurs exactes (po/pa/pc)."] = "Exakte Werte anzeigen (G/S/K).",
     ["Clic : commander ce métier"] = "Klick: diesen Beruf beauftragen",
-    ["Trier par rentabilité (Lazy Gold)."] = "Nach Rentabilität sortieren (Lazy Gold).",
+    ["Trier par rentabilité (Auctionator)."] = "Nach Rentabilität sortieren (Auctionator).",
     ["Tri par rentabilité — clic pour A-Z."] = "Nach Gewinn sortiert — Klick für A-Z.",
     ["N'afficher que les recettes dont j'ai les matériaux."] = "Nur Rezepte anzeigen, für die du das Material hast.",
     ["Filtre matériaux actif — clic pour tout afficher."] = "Materialfilter aktiv — Klick zeigt alle.",
@@ -355,18 +355,18 @@ local de2 = {
     ["Replier / déplier les étapes."] = "Schritte ein-/ausklappen.",
     ["Aucune recette calculable sur ce segment (prix HV manquants, ou plans introuvables)."] = "Kein berechenbares Rezept in diesem Abschnitt (fehlende AH-Preise oder nicht beschaffbare Rezepte).",
     ["Monter son métier au meilleur prix"] = "Skille deinen Beruf zum günstigsten Preis",
-    ["Dans la Vue Métier, la flèche verte trie par montée de compétence : les plans qui rapportent un point d'abord, les moins chers en tête (prix Lazy Gold)."] =
+    ["Dans la Vue Métier, la flèche verte trie par montée de compétence : les plans qui rapportent un point d'abord, les moins chers en tête (prix Auctionator)."] =
         "In der Berufsansicht sortiert der grüne Pfeil nach Fertigkeitsanstieg: Rezepte, die einen Punkt bringen, zuerst — die günstigsten oben (Lazy-Gold-Preise).",
     ["Le badge doré marque le meilleur coût par point ; les plans utiles non appris s'affichent aussi, avec où les obtenir (formateur, vendeur, HV, à farmer)."] =
         "Das goldene Abzeichen markiert die besten Kosten pro Punkt; nützliche ungelernte Rezepte erscheinen ebenfalls, samt Bezugsquelle (Lehrer, Händler, AH, farmen).",
     ["Le bouton carte ouvre le |cFFE8B84BPlan de route|r : du rang actuel au plafond, quoi crafter, combien de fois, pour quel coût total estimé — recalculé à chaque point gagné."] =
         "Der Karten-Button öffnet die |cFFE8B84BLevelroute|r: vom aktuellen Rang bis zum Maximum — was du wie oft craften solltest und zu welchen geschätzten Gesamtkosten, neu berechnet bei jedem Punkt.",
-    ["Tout repose sur les prix du dernier scan Auctionator (addons Lazy Gold + Auctionator conseillés) : sans eux, ces aides s'effacent."] =
-        "Alles beruht auf den Preisen des letzten Auctionator-Scans (Addons Lazy Gold + Auctionator empfohlen): ohne sie blenden sich diese Hilfen aus.",
+    ["Tout repose sur les prix du dernier scan Auctionator : sans cet addon, ces aides s'effacent."] =
+        "Alles beruht auf den Preisen des letzten Auctionator-Scans: ohne dieses Addon blenden sich diese Hilfen aus.",
 
     -- Bourse d'artisan (onglet Artisans)
     ["Bourse d'artisan"] = "Handwerker-Beutel",
-    ["Clic : les fournitures qu'il lui faut pour monter ses métiers (prix Lazy Gold)."] =
+    ["Clic : les fournitures qu'il lui faut pour monter ses métiers (prix Auctionator)."] =
         "Klick: die Materialien, die er zum Skillen seiner Berufe braucht (Lazy-Gold-Preise).",
     ["Bourse — %s"] = "Beutel — %s",
     ["Rien à fournir — métiers au plafond, ou données trop anciennes."] = "Nichts zu liefern — Berufe am Maximum oder Daten zu alt.",

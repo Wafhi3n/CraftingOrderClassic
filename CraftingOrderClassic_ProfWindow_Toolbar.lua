@@ -1,5 +1,5 @@
 -- CraftingOrderClassic_ProfWindow_Toolbar.lua — barre d'outils de la colonne Recettes (vue métier) :
--- les toggles de TRI (slot recTools, à gauche : rentabilité / valeurs exactes / progression — Lazy Gold)
+-- les toggles de TRI (slot recTools, à gauche : rentabilité / valeurs exactes / progression — Auctionator)
 -- et de FILTRE (slot recFilterToggles, à droite : « j'ai les matériaux » / « montée de compétence »).
 -- Extrait de _ProfWindow_Recipes.lua (plafond anti-monolithe) : même table PW, les build sont appelés
 -- par _BuildRecipes, les _Sync* par RefreshRecipes. Tri = RÉORDONNE la liste ; filtre = la RÉDUIT.
@@ -28,7 +28,7 @@ function PW:_MakeToolBtn(col, tipFn, onClick)
     return b
 end
 
--- Barre d'outils du slot recTools : pièce d'or + « 123 » (Lazy Gold, masqués sans addon de prix,
+-- Barre d'outils du slot recTools : pièce d'or + « 123 » (Auctionator, masqués sans addon de prix,
 -- cf. _SyncSortHeader) et ▲ verte (tri progression, toujours visible).
 --   pièce d'or  → tri par rentabilité : liste à PLAT du plus rentable au moins (plus de catégories)
 --   « 123 »     → valeurs EXACTES (po/pa/pc) au lieu de l'indicateur compact en paliers de pièces
@@ -36,7 +36,7 @@ end
 function PW:_BuildRecipeTools(tz)
     local sortBtn = self:_MakeToolBtn(tz, function()
         return PW.recipeSortProfit and L["Tri par rentabilité — clic pour A-Z."]
-            or L["Trier par rentabilité (Lazy Gold)."]
+            or L["Trier par rentabilité (Auctionator)."]
     end, function() PW:_ToggleRecipeSort() end)
     sortBtn:SetPoint("LEFT", 24, 0)
     local coin = sortBtn:CreateTexture(nil, "ARTWORK")
@@ -129,7 +129,7 @@ function PW:_BuildAcquireFilter(hz)
     self.recAcquireBtn = acqBtn
 end
 
--- Bascule le tri par rentabilité (sans effet si Lazy Gold absent). Met à jour l'en-tête + rafraîchit.
+-- Bascule le tri par rentabilité (sans effet si Auctionator absent). Met à jour l'en-tête + rafraîchit.
 -- Exclusif avec le tri progression : un seul à-plat à la fois.
 function PW:_ToggleRecipeSort()
     if not (COC.Profit and COC.Profit:IsAvailable()) then COC:NeedPriceAddon(); return end
@@ -174,7 +174,7 @@ function PW:_ToggleAcquirable()
     self:RefreshRecipes()
 end
 
--- Reflète l'état des boutons de tri (fond doré = actif) + le libellé de l'en-tête. Boutons Lazy Gold
+-- Reflète l'état des boutons de tri (fond doré = actif) + le libellé de l'en-tête. Boutons Auctionator
 -- masqués si l'addon est absent — inutile de proposer un tri ou des prix sans données ; la ▲
 -- progression reste, elle ne dépend que des couleurs de difficulté du client.
 function PW:_SyncSortHeader()
@@ -182,9 +182,9 @@ function PW:_SyncSortHeader()
     local ok = PR and PR:IsAvailable()
     local on = self.recipeSortProfit and ok
     if self.recSortBtn then
-        self.recSortBtn:SetShown(true)   -- toujours visible (enticing) ; clic sans Lazy Gold → popup
+        self.recSortBtn:SetShown(true)   -- toujours visible (enticing) ; clic sans Auctionator → popup
         if self.recSortBtn.onBG then self.recSortBtn.onBG:SetShown(on and true or false) end
-        -- coloré si Lazy Gold absent (incite au clic) ; sinon gris quand le tri est inactif (toggle normal)
+        -- coloré si Auctionator absent (incite au clic) ; sinon gris quand le tri est inactif (toggle normal)
         if self.recSortBtn.coin then self.recSortBtn.coin:SetDesaturated(ok and not on or false) end
     end
     if self.recExactBtn then

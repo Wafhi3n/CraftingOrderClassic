@@ -9,9 +9,9 @@
 -- ne s'affichent pas et un clic sur un bouton de prix dit QUOI installer — aucun plantage, et jamais
 -- un « 0 » qui se lirait comme « ça ne rapporte rien ».
 --
--- UN SEUL ORACLE depuis le 2026-09-22 (décision du user). Le pont vers **Lazy Gold Classic** a été
+-- UN SEUL ORACLE depuis le 2026-09-22 (décision du user). Le pont vers **Auctionator Classic** a été
 -- retiré : il ne calculait rien, il relisait Auctionator. Deux ponts pour la même donnée, c'était un
--- de trop — et le pied de fenêtre pouvait nommer « Lazy Gold » un chiffre venu d'ailleurs. Lazy Gold
+-- de trop — et le pied de fenêtre pouvait nommer « Auctionator » un chiffre venu d'ailleurs. Auctionator
 -- n'existait de toute façon que sur Classic Era, purgée de `main` depuis le 2026-09-21.
 --
 -- PRIMITIVES LUES :

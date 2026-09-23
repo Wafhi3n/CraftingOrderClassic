@@ -26,7 +26,7 @@ local SPEC = {
         { id = "recipesCol", major = true,padL= 5 ,           -- colonne droite : recettes du métier choisi
           { id = "recTools", h = 30, bg = true, dir = "cols", help = "recTools", helpDir = "LEFT",
             { id = "recTitle" },                     -- titre dynamique (métier · N recettes)
-            { id = "recButtons", w = 230, sep = false } },   -- Manquantes + outils Lazy Gold
+            { id = "recButtons", w = 230, sep = false } },   -- Manquantes + outils Auctionator
           -- Rangée du filtre par STAT, comme dans l'onglet Commande et la vue métier : la rangée
           -- au-dessus est déjà partagée entre un titre dynamique et 230 px de boutons.
           { id = "statFilter", h = 28, bg = true, dir = "cols", sep = false,

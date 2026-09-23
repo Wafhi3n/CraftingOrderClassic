@@ -107,7 +107,7 @@ function UI:_BuildPostLeft()
     -- Pool FIXE de lignes réutilisées au scroll (virtualisation ; cf. VISIBLE + _RenderPostPlanWindow).
     self.postPlanRows = {}
     for i = 1, VISIBLE do self.postPlanRows[i] = self:_PostPlanRow(i) end
-    -- Outils Lazy Gold (tri rentabilité + « 123 » valeurs exactes) : dans LEUR slot de la bande de
+    -- Outils Auctionator (tri rentabilité + « 123 » valeurs exactes) : dans LEUR slot de la bande de
     -- filtres (id "AH_Filter" dans la SPEC) — ce sont des réglages d'affichage, avec les filtres.
     self:_BuildPostLGBar(self:PostSec("AH_Filter"))
     -- Vue silhouette (Enchantement) : elle occupe LA MÊME zone que le scroll, montrée en alternance
@@ -347,8 +347,8 @@ function UI:_PostPlanRow(i)
     r.hdrLine:SetPoint("BOTTOMLEFT", 2, 3); r.hdrLine:SetPoint("BOTTOMRIGHT", -2, 3); r.hdrLine:Hide()
     -- Chevron +/- des en-têtes : TEXTURE native (la police rend « ▾ » en tofu).
     r.expand = r:CreateTexture(nil, "ARTWORK"); r.expand:SetSize(14, 14); r.expand:Hide()
-    -- Indicateur de rentabilité Lazy Gold (cf. _UI_Post_Profit.lua) : le plus à droite, masqué
-    -- si Lazy Gold est absent ou si le plan n'est pas rentable.
+    -- Indicateur de rentabilité Auctionator (cf. _UI_Post_Profit.lua) : le plus à droite, masqué
+    -- si Auctionator est absent ou si le plan n'est pas rentable.
     r.profit = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     r.profit:SetPoint("RIGHT", -4, 0); r.profit:SetJustifyH("RIGHT"); Skin.ApplyShadow(r.profit); r.profit:Hide()
     r:SetScript("OnClick", function(self2)

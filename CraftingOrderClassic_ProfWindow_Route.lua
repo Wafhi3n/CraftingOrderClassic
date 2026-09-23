@@ -4,7 +4,7 @@
 -- exclusions cooldown/coût partiel) vit dans CraftingOrderClassic_Route.lua (COC.Route), partagé
 -- avec la bourse d'artisan — ici : le câblage MON perso (recettes de la fenêtre native + couleur
 -- LIVE du client au rang courant, cohérence avec le badge de la liste) et toute l'UI.
--- Tout est soft-dep : sans Lazy Gold, le bouton ouvre la popup NeedPriceAddon ; sans ce fichier,
+-- Tout est soft-dep : sans Auctionator, le bouton ouvre la popup NeedPriceAddon ; sans ce fichier,
 -- rien ne change (hooks sous garde nil dans _ProfWindow_Toolbar).
 
 local COC  = CraftingOrderClassic
@@ -364,7 +364,7 @@ function PW:_FillRoute()
     if #segs == 0 then f.msg:SetText(COC.Profit and COC.Profit:NoPriceMessage() or "") end
 end
 
--- Ouvre/ferme le panneau (bouton carte de la barre d'outils Recettes). Sans Lazy Gold : popup
+-- Ouvre/ferme le panneau (bouton carte de la barre d'outils Recettes). Sans Auctionator : popup
 -- d'incitation (même pattern que les toggles de tri).
 function PW:ToggleRoute()
     local PR = COC.Profit
@@ -389,7 +389,7 @@ end
 -- État du bouton (appelé par _SyncSortHeader à chaque refresh) : masqué en reroll ; coloré si Lazy
 -- Gold absent (incite au clic → popup) ou panneau ouvert, grisé sinon. Fenêtre ouverte : re-remplit
 -- à chaque refresh de la liste (throttle 1 s) — même cadence que le badge « meilleur coût/point »,
--- pour que la route suive AUSSI les prix Lazy Gold (vécu 2026-07-18 : route figée sur d'anciens prix
+-- pour que la route suive AUSSI les prix Auctionator (vécu 2026-07-18 : route figée sur d'anciens prix
 -- ≠ badge recalculé → les deux guides se contredisaient) ; immédiat si métier ou rang a changé.
 function PW:_SyncRouteBtn()
     local b = self.recRouteBtn

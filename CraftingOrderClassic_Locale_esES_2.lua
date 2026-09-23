@@ -151,8 +151,8 @@ local es2 = {
     -- Aide contextuelle « bouton i » (Vue Métier) — cf. _ProfWindow_HelpPlate.lua (bulles courtes)
     ["Aide : survole les zones surlignées pour comprendre chaque fonction."] =
         "Ayuda: pasa el ratón por las zonas resaltadas para entender cada función.",
-    ["Barre de filtres. À gauche (avec Lazy Gold) : pièce = trier par rentabilité, « 123 » = prix exacts au lieu de l'indicateur compact, flèche verte = trier par montée de compétence, carte = plan de route (quoi crafter jusqu'au plafond, au moins cher). Au centre : la recherche. À droite : sac = seulement les recettes dont tu as les matériaux, flèche orange = masquer les recettes grises (aucun gain de compétence)."] =
-        "Barra de filtros. A la izquierda (con Lazy Gold): moneda = ordenar por rentabilidad, «123» = precios exactos en vez del indicador compacto, flecha verde = ordenar por subida de habilidad, mapa = ruta de subida (qué fabricar hasta el tope, al menor coste). En el centro: la búsqueda. A la derecha: bolsa = solo las recetas de las que tienes los materiales, flecha naranja = ocultar las recetas grises (sin ganancia de habilidad).",
+    ["Barre de filtres. À gauche (avec Auctionator) : pièce = trier par rentabilité, « 123 » = prix exacts au lieu de l'indicateur compact, flèche verte = trier par montée de compétence, carte = plan de route (quoi crafter jusqu'au plafond, au moins cher). Au centre : la recherche. À droite : sac = seulement les recettes dont tu as les matériaux, flèche orange = masquer les recettes grises (aucun gain de compétence)."] =
+        "Barra de filtros. A la izquierda (con Auctionator): moneda = ordenar por rentabilidad, «123» = precios exactos en vez del indicador compacto, flecha verde = ordenar por subida de habilidad, mapa = ruta de subida (qué fabricar hasta el tope, al menor coste). En el centro: la búsqueda. A la derecha: bolsa = solo las recetas de las que tienes los materiales, flecha naranja = ocultar las recetas grises (sin ganancia de habilidad).",
     ["Tes recettes, groupées par famille (clique un en-tête pour replier). À droite de chaque ligne : %s = rentabilité à l'HV (survole pour le profit net exact), %s = plan conseillé pour monter le métier (meilleur coût par point), « ×N » doré = commandes en attente pour cet objet. En mode Manquantes, une icône dit où obtenir le plan : formateur, vendeur, HV ou à farmer."] =
         "Tus recetas, agrupadas por familia (haz clic en una cabecera para plegar). A la derecha de cada línea: %s = rentabilidad en la CdS (pasa el ratón para el beneficio neto exacto), %s = receta recomendada para subir de nivel (mejor coste por punto), «×N» dorado = pedidos pendientes de ese objeto. En modo Faltantes, un icono indica dónde conseguir el plano: entrenador, vendedor, CdS o farmear.",
     ["Le plan sélectionné : ses réactifs et le bouton pour le fabriquer."] =
@@ -167,8 +167,8 @@ local es2 = {
         "Filtra los pedidos por fuente: todos, tu hermandad, tus amigos o tu directorio de artesanos.",
 
     -- Aide contextuelle « bouton i » — onglet Commande (cf. _UI_HelpPlate.lua)
-    ["Filtre les plans : recherche par nom, filtre par qualité, filtre par réactif, et l'outil %s « 123 » de Lazy Gold (prix/rentabilité)."] =
-        "Filtra las recetas: búsqueda por nombre, filtro por calidad, filtro por componente y la herramienta %s «123» de Lazy Gold (precio/rentabilidad).",
+    ["Filtre les plans : recherche par nom, filtre par qualité, filtre par réactif, et l'outil %s « 123 » de prix et de rentabilité (Auctionator)."] =
+        "Filtra las recetas: búsqueda por nombre, filtro por calidad, filtro por componente y la herramienta %s «123» de Auctionator (precio/rentabilidad).",
     ["La liste des plans. Choisis celui que tu veux faire réaliser par un artisan."] =
         "La lista de recetas. Elige la que quieres que fabrique un artesano.",
     ["L'objet choisi. La pastille « Je fournis » indique que tu apportes tous les composants toi-même."] =
@@ -206,12 +206,12 @@ local es2 = {
     -- Aide contextuelle « bouton i » — onglet Mes artisans (cf. _UI_HelpPlate.lua)
     ["Partage tes rerolls sur le réseau (les autres voient tes métiers), et choisis le perso mis en « vitrine »."] =
         "Comparte tus alters en la red (los demás ven tus profesiones) y elige el personaje en «escaparate».",
-    ["Tous les plans du royaume : la liste agrégée de toutes tes recettes, au lieu du découpage par métier (Lazy Gold requis)."] =
-        "Todos los planos del reino: la lista agregada de todas tus recetas, en vez de la división por profesión (requiere Lazy Gold).",
+    ["Tous les plans du royaume : la liste agrégée de toutes tes recettes, au lieu du découpage par métier (Auctionator requis)."] =
+        "Todos los planos del reino: la lista agregada de todas tus recetas, en vez de la división por profesión (requiere Auctionator).",
     ["Tes métiers (tous les persos du compte). Choisis-en un pour voir ses recettes à droite."] =
         "Tus profesiones (todos los personajes de la cuenta). Elige una para ver sus recetas a la derecha.",
-    ["En-tête des recettes du métier choisi : bouton « Manquantes » et outils de prix (Lazy Gold)."] =
-        "Cabecera de las recetas de la profesión elegida: botón «Faltantes» y herramientas de precio (Lazy Gold).",
+    ["En-tête des recettes du métier choisi : bouton « Manquantes » et outils de prix (Auctionator)."] =
+        "Cabecera de las recetas de la profesión elegida: botón «Faltantes» y herramientas de precio (Auctionator).",
     ["Les recettes du métier sélectionné (ou tous les plans du royaume)."] =
         "Las recetas de la profesión seleccionada (o todos los planos del reino).",
 
@@ -221,7 +221,7 @@ local es2 = {
     ["Le Carnet = TES commandes postées. Accepter/livrer se fait dans la Vue Métier, pas ici ; quand une commande t'est remise, le bouton « J'ai reçu » confirme la réception."] =
         "El Libro = TUS pedidos publicados. Aceptar/entregar se hace en la Vista de Profesión, no aquí; cuando te entregan un pedido, el botón «Recibido» confirma la recepción.",
 
-    -- Popup dépendance optionnelle manquante (boutons Lazy Gold / MTSL toujours visibles)
+    -- Popup dépendance optionnelle manquante (boutons Auctionator / MTSL toujours visibles)
     ["Cette fonction nécessite l'addon |cFFFFD100%s|r (non installé ou désactivé). Installe-le pour en profiter."] =
         "Esta función necesita el addon |cFFFFD100%s|r (no instalado o desactivado). Instálalo para usarla.",
 
@@ -290,7 +290,7 @@ local es2 = {
     ["Butin"] = "Botín",
     ["Source inconnue"] = "Fuente desconocida",
 
-    -- Pont Lazy Gold (rentabilité)
+    -- Pont Auctionator (rentabilité)
     ["Rentabilité"] = "Rentabilidad",
     ["Vente HV"] = "Venta CS",
     ["Profit net"] = "Beneficio neto",
@@ -303,7 +303,7 @@ local es2 = {
     ["Valeurs exactes — clic pour l'affichage compact."] = "Valores exactos — clic para vista compacta.",
     ["Afficher les valeurs exactes (po/pa/pc)."] = "Mostrar valores exactos (o/p/c).",
     ["Clic : commander ce métier"] = "Clic: encargar esta profesión",
-    ["Trier par rentabilité (Lazy Gold)."] = "Ordenar por rentabilidad (Lazy Gold).",
+    ["Trier par rentabilité (Auctionator)."] = "Ordenar por rentabilidad (Auctionator).",
     ["Tri par rentabilité — clic pour A-Z."] = "Ordenado por beneficio — clic para A-Z.",
     ["N'afficher que les recettes dont j'ai les matériaux."] = "Mostrar solo las recetas para las que tienes materiales.",
     ["Filtre matériaux actif — clic pour tout afficher."] = "Filtro de materiales activo — clic para mostrar todo.",
@@ -356,19 +356,19 @@ local es2 = {
     ["Replier / déplier les étapes."] = "Plegar / desplegar los pasos.",
     ["Aucune recette calculable sur ce segment (prix HV manquants, ou plans introuvables)."] = "Ninguna receta calculable en este tramo (faltan precios de la subasta o recetas inaccesibles).",
     ["Monter son métier au meilleur prix"] = "Sube tu oficio al menor coste",
-    ["Dans la Vue Métier, la flèche verte trie par montée de compétence : les plans qui rapportent un point d'abord, les moins chers en tête (prix Lazy Gold)."] =
-        "En la Vista de oficio, la flecha verde ordena por subida de habilidad: primero las recetas que dan un punto, las más baratas arriba (precios de Lazy Gold).",
+    ["Dans la Vue Métier, la flèche verte trie par montée de compétence : les plans qui rapportent un point d'abord, les moins chers en tête (prix Auctionator)."] =
+        "En la Vista de oficio, la flecha verde ordena por subida de habilidad: primero las recetas que dan un punto, las más baratas arriba (precios de Auctionator).",
     ["Le badge doré marque le meilleur coût par point ; les plans utiles non appris s'affichent aussi, avec où les obtenir (formateur, vendeur, HV, à farmer)."] =
         "La insignia dorada marca el mejor coste por punto; las recetas útiles no aprendidas también aparecen, con dónde conseguirlas (instructor, vendedor, subasta, farmeo).",
     ["Le bouton carte ouvre le |cFFE8B84BPlan de route|r : du rang actuel au plafond, quoi crafter, combien de fois, pour quel coût total estimé — recalculé à chaque point gagné."] =
         "El botón mapa abre la |cFFE8B84BRuta de subida|r: de tu rango actual al tope, qué fabricar, cuántas veces y por qué coste total estimado — recalculado con cada punto ganado.",
-    ["Tout repose sur les prix du dernier scan Auctionator (addons Lazy Gold + Auctionator conseillés) : sans eux, ces aides s'effacent."] =
-        "Todo se basa en los precios del último escaneo de Auctionator (addons Lazy Gold + Auctionator recomendados): sin ellos, estas ayudas se ocultan.",
+    ["Tout repose sur les prix du dernier scan Auctionator : sans cet addon, ces aides s'effacent."] =
+        "Todo se basa en los precios del último escaneo de Auctionator: sin ese addon, estas ayudas se ocultan.",
 
     -- Bourse d'artisan (onglet Artisans)
     ["Bourse d'artisan"] = "Bolsa del artesano",
-    ["Clic : les fournitures qu'il lui faut pour monter ses métiers (prix Lazy Gold)."] =
-        "Clic: los suministros que necesita para subir sus oficios (precios de Lazy Gold).",
+    ["Clic : les fournitures qu'il lui faut pour monter ses métiers (prix Auctionator)."] =
+        "Clic: los suministros que necesita para subir sus oficios (precios de Auctionator).",
     ["Bourse — %s"] = "Bolsa — %s",
     ["Rien à fournir — métiers au plafond, ou données trop anciennes."] = "Nada que suministrar — oficios al tope, o datos demasiado antiguos.",
     ["Inclure les plans à acheter"] = "Incluir las recetas por comprar",

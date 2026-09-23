@@ -39,7 +39,7 @@
 | `CraftingOrderClassic_UI_Post_Artisans.lua` | onglet « Commande », section droite basse : boutons source, liste des artisans, ciblage (@Nom), libellé destinataire, bouton Poster. | 234 |
 | `CraftingOrderClassic_UI_Post_Categories.lua` | onglet « Commande », panneau gauche : regroupe la LISTE DES PLANS en sections type fenêtre native (emplacement puis type pour les équipements, type pour les armes, catégorie pour le reste). | 184 |
 | `CraftingOrderClassic_UI_Post_Paperdoll.lua` | onglet « Commande », vue SILHOUETTE de l'Enchantement. | 332 |
-| `CraftingOrderClassic_UI_Post_Profit.lua` | onglet « Commande » : couche Lazy Gold (lecture seule). | 151 |
+| `CraftingOrderClassic_UI_Post_Profit.lua` | onglet « Commande » : couche Auctionator (lecture seule). | 151 |
 | `CraftingOrderClassic_UI_Gather_Layout.lua` | GÉOMÉTRIE de l'onglet « Récolte » : la SPEC (structure éditable, cf. | 66 |
 | `CraftingOrderClassic_UI_Gather_Build.lua` | onglet « Récolte », moitié CONSTRUCTION. | 231 |
 | `CraftingOrderClassic_UI_Gather.lua` | onglet « Récolte » : ressources de récolte (minéraux, herbes, cuirs, poissons) + demande de quantité + prix par pile + ciblage récolteur. | 286 |
@@ -52,7 +52,7 @@
 | `CraftingOrderClassic_UI_Artisans_Muted.lua` | panel « En sourdine » de l'onglet Artisans. | 86 |
 | `CraftingOrderClassic_UI_MyArtisans_Layout.lua` | GÉOMÉTRIE de l'onglet « Mes artisans ». | 57 |
 | `CraftingOrderClassic_UI_MyArtisans.lua` | onglet « Mes artisans » : vue agrégée des métiers du COMPTE (tous mes rerolls du royaume), en mode « connu ». | 484 |
-| `CraftingOrderClassic_UI_MyArtisans_Profit.lua` | onglet « Mes artisans » : couche Lazy Gold. | 135 |
+| `CraftingOrderClassic_UI_MyArtisans_Profit.lua` | onglet « Mes artisans » : couche Auctionator. | 135 |
 | `CraftingOrderClassic_UI_MyArtisans_Reroll.lua` | accès à la vue REROLL (métiers d'un AUTRE perso du compte) depuis l'onglet « Mes artisans ». | 86 |
 | `CraftingOrderClassic_UI_Help.lua` | onglet Aide : page unique défilante qui explique les autres onglets (Carnet/Commande/Récolte/Artisans), la Vue Métier et le réseau. | 196 |
 | `CraftingOrderClassic_UI_News.lua` | onglet « Nouveautés » : notes de version (changelog) affichées EN JEU, version par version, la plus récente en tête. | 422 |
@@ -86,9 +86,9 @@
 | `CraftingOrderClassic_ProfWindow_Camelot.lua` | POC : notre colonne Commandes À L'INTÉRIEUR de la fenêtre de métier NATIVE de WoW: Forever (Camelot). | 446 |
 | `CraftingOrderClassic_ProfWindow_Camelot_Open.lua` | OUVRIR un metier dans la fenetre NATIVE de WoW: Forever, et rediriger vers elle toutes nos entrees (bouton minimap, /co prof, clic du suivi). | 115 |
 | `CraftingOrderClassic_ProfWindow_Camelot_PageArt.lua` | prolonger le FOND de la page native dans la bande que notre greffe ajoute à droite de la fenêtre de métier de WoW: Forever. | 80 |
-| `CraftingOrderClassic_ProfWindow_Toolbar.lua` | barre d'outils de la colonne Recettes (vue métier) : les toggles de TRI (slot recTools, à gauche : rentabilité / valeurs exactes / progression — Lazy Gold) et de FILTRE (slot recFilterToggles, à droite : « j'ai les matériaux » / « montée de compétence »). | 245 |
+| `CraftingOrderClassic_ProfWindow_Toolbar.lua` | barre d'outils de la colonne Recettes (vue métier) : les toggles de TRI (slot recTools, à gauche : rentabilité / valeurs exactes / progression — Auctionator) et de FILTRE (slot recFilterToggles, à droite : « j'ai les matériaux » / « montée de compétence »). | 245 |
 | `CraftingOrderClassic_ProfWindow_Recipes.lua` | colonne GAUCHE : liste de recettes virtualisée (scroll), recherche, couleur par difficulté, sélection, badge « demandé » (nb de commandes ouvertes pour l'objet). | 485 |
-| `CraftingOrderClassic_ProfWindow_Leveling.lua` | aide à la MONTÉE DE MÉTIER dans la liste de recettes : coût de progression (réactifs au prix Lazy Gold ÷ chance de point selon la couleur), badge « meilleur coût/point » sur la recette recommandée, icônes de SOURCE sur les manquantes (formateur / vendeur PNJ / coté à l'HV / à farmer) et tri « progression » affiné par coût. | 219 |
+| `CraftingOrderClassic_ProfWindow_Leveling.lua` | aide à la MONTÉE DE MÉTIER dans la liste de recettes : coût de progression (réactifs au prix Auctionator ÷ chance de point selon la couleur), badge « meilleur coût/point » sur la recette recommandée, icônes de SOURCE sur les manquantes (formateur / vendeur PNJ / coté à l'HV / à farmer) et tri « progression » affiné par coût. | 219 |
 | `CraftingOrderClassic_Route.lua` | cœur de CALCUL du plan de route de montée de métier, PARAMÉTRABLE : marche gloutonne rang par rang (recette au meilleur coût/point ESPÉRÉ), seuils réels CraftLink `skillColors` aux rangs futurs, amortissement du prix des plans à acheter, exclusion des recettes à cooldown et des coûts partiels. | 329 |
 | `CraftingOrderClassic_ProfWindow_Route.lua` | fenêtre « PLAN DE ROUTE » de montée de métier (étage ③ de l'aide à la progression) : « du rang actuel au plafond, quoi crafter, combien de fois, pour combien ». | 413 |
 | `CraftingOrderClassic_ProfWindow_Route_Supply.lua` | ce qui se peint SOUS les segments du plan de route : le bloc « FOURNITURES » (composants agrégés de toute la route, plans à acheter) et, quand le rang est AU PLAFOND, le bloc « débloquer le palier suivant » (livre de rang curaté, ou renvoi vers le formateur de métier). | 111 |
@@ -100,7 +100,7 @@
 | `CraftingOrderClassic_ProfWindow_Info.lua` | PANNEAU D'INFO en SECTIONS pour la colonne centrale de la vue métier. | 217 |
 | `CraftingOrderClassic_Profit.lua` | pont LECTURE SEULE vers l'oracle de prix, AUCTIONATOR. | 451 |
 | `CraftingOrderClassic_ProfWindow_Orders.lua` | colonne « Commandes » de la vue métier (cabine de l'artisan) : construction (onglets de relation, en-tête, scroll), vue LISTE (une ligne par commande : demandeur + prix + âge ; une ligne sourdine cliquée se réaffiche), collecte/tri et rafraîchissement. | 499 |
-| `CraftingOrderClassic_ProfWindow_Orders_Card.lua` | vue SÉLECTIONNÉE de la colonne « Commandes » : la carte complète d'une commande (composants fournis, repères Lazy Gold, ACCEPTER / REFUSER / CHUCHOTER ; croix en haut à droite = retour liste). | 315 |
+| `CraftingOrderClassic_ProfWindow_Orders_Card.lua` | vue SÉLECTIONNÉE de la colonne « Commandes » : la carte complète d'une commande (composants fournis, repères Auctionator, ACCEPTER / REFUSER / CHUCHOTER ; croix en haut à droite = retour liste). | 315 |
 | `CraftingOrderClassic_ProfWindow_LFW.lua` | config de l'OFFRE « recherche de travail » par métier. | 327 |
 | `CraftingOrderClassic_ProfWindow_Reroll.lua` | vue métier LECTURE SEULE d'un REROLL. | 118 |
 | `Directory.lua` | Crafting Order - Classic — Directory : l'annuaire des GENS (présence + qui peut crafter quoi). | 485 |
@@ -872,12 +872,12 @@
 > reste lisible, et un emplacement mort se voit au lieu de manquer.
 
 ### `CraftingOrderClassic_UI_Post_Profit.lua`
-> CraftingOrderClassic_UI_Post_Profit.lua — onglet « Commande » : couche Lazy Gold (lecture seule).
+> CraftingOrderClassic_UI_Post_Profit.lua — onglet « Commande » : couche Auctionator (lecture seule).
 >   * barre d'outils (pièce = tri par rentabilité, « 123 » = valeurs exactes) — mêmes codes que la
 >     vue métier, et le mode exact est le MÊME réglage partagé (db.lgExactProfit) ;
 >   * indicateur de profit sur chaque ligne de la LISTE DES PLANS ;
 >   * tri par rentabilité : liste à PLAT (les sections disparaissent), du plus rentable au moins.
-> Tout est masqué/inerte si Lazy Gold n'est pas installé — COC reste autonome.
+> Tout est masqué/inerte si Auctionator n'est pas installé — COC reste autonome.
 
 ### `CraftingOrderClassic_UI_Gather_Layout.lua`
 > CraftingOrderClassic_UI_Gather_Layout.lua — GÉOMÉTRIE de l'onglet « Récolte » : la SPEC (structure
@@ -958,7 +958,7 @@
 ### `CraftingOrderClassic_UI_Artisans_Icons.lua`
 > CraftingOrderClassic_UI_Artisans_Icons.lua — onglet « Artisans » : tout ce qui est ICÔNE de métier.
 >   1. les pills de filtre métier (icône seule, plus de texte : tous les métiers tiennent sur une rangée) ;
->   2. les icônes de métier d'une ligne artisan : contour de rentabilité (Lazy Gold), tooltip, et
+>   2. les icônes de métier d'une ligne artisan : contour de rentabilité (Auctionator), tooltip, et
 >      CLIC → onglet Commande pré-ciblé sur CET artisan et CE métier (UI:OpenPostForArtisan).
 > Extrait de _UI_Artisans.lua (plafond anti-monolithe).
 
@@ -972,7 +972,7 @@
 > qu'il n'a pas — les plans-OBJETS rejoignent la grille comme fournitures à lui apporter, les
 > plans de FORMATEUR restent une note (pas d'objet à donner, il devra l'apprendre au PNJ).
 > Bouton d'entrée : sac posé après les icônes de métier d'une ligne (hook sous garde nil dans
-> _UI_Artisans_Icons — l'absence de ce fichier avant restart ne casse rien). Sans Lazy Gold, le
+> _UI_Artisans_Icons — l'absence de ce fichier avant restart ne casse rien). Sans Auctionator, le
 > bouton reste visible et le clic ouvre la popup NeedPriceAddon (pattern découvrabilité).
 
 **API** : `UI:OpenNeeds(name)` · `UI:RefreshSoon()`
@@ -1008,12 +1008,12 @@
 **API** : `UI:BuildMyArtisansTab(f)` · `UI:RefreshMyArtisans()`
 
 ### `CraftingOrderClassic_UI_MyArtisans_Profit.lua`
-> CraftingOrderClassic_UI_MyArtisans_Profit.lua — onglet « Mes artisans » : couche Lazy Gold.
+> CraftingOrderClassic_UI_MyArtisans_Profit.lua — onglet « Mes artisans » : couche Auctionator.
 >   * barre d'outils : pièce (tri rentabilité), « 123 » (valeurs exactes, réglage PARTAGÉ avec la
 >     vue métier), et « Tout le royaume » ;
 >   * « Tout le royaume » = TOUS les métiers du compte fusionnés en une seule liste à plat triée par
 >     profit : la réponse d'un coup d'œil à « lequel de mes rerolls a des sous à se faire ? ».
-> Lecture seule, inerte si Lazy Gold est absent.
+> Lecture seule, inerte si Auctionator est absent.
 
 ### `CraftingOrderClassic_UI_MyArtisans_Reroll.lua`
 > CraftingOrderClassic_UI_MyArtisans_Reroll.lua — accès à la vue REROLL (métiers d'un AUTRE perso
@@ -1554,7 +1554,7 @@
 
 ### `CraftingOrderClassic_ProfWindow_Toolbar.lua`
 > CraftingOrderClassic_ProfWindow_Toolbar.lua — barre d'outils de la colonne Recettes (vue métier) :
-> les toggles de TRI (slot recTools, à gauche : rentabilité / valeurs exactes / progression — Lazy Gold)
+> les toggles de TRI (slot recTools, à gauche : rentabilité / valeurs exactes / progression — Auctionator)
 > et de FILTRE (slot recFilterToggles, à droite : « j'ai les matériaux » / « montée de compétence »).
 > Extrait de _ProfWindow_Recipes.lua (plafond anti-monolithe) : même table PW, les build sont appelés
 > par _BuildRecipes, les _Sync* par RefreshRecipes. Tri = RÉORDONNE la liste ; filtre = la RÉDUIT.
@@ -1568,11 +1568,11 @@
 
 ### `CraftingOrderClassic_ProfWindow_Leveling.lua`
 > CraftingOrderClassic_ProfWindow_Leveling.lua — aide à la MONTÉE DE MÉTIER dans la liste de
-> recettes : coût de progression (réactifs au prix Lazy Gold ÷ chance de point selon la couleur),
+> recettes : coût de progression (réactifs au prix Auctionator ÷ chance de point selon la couleur),
 > badge « meilleur coût/point » sur la recette recommandée, icônes de SOURCE sur les manquantes
 > (formateur / vendeur PNJ / coté à l'HV / à farmer) et tri « progression » affiné par coût.
 > Les guides statiques se trompent quand l'économie du serveur diverge (vécu : shards à 10 pc alors
-> que le guide dit d'acheter de la dust) — ici tout est au prix RÉEL (Auctionator via Lazy Gold).
+> que le guide dit d'acheter de la dust) — ici tout est au prix RÉEL (Auctionator via Auctionator).
 > Sans oracle de prix le coût disparaît, les icônes de source restent : elles viennent de notre
 > catalogue (COC.Sources), sans aucun addon tiers. Appelé par _ProfWindow_Recipes sous garde
 > nil (`self._FillLevelingRight and …`) : l'absence de ce fichier ne casse rien.
@@ -1598,7 +1598,7 @@
 > exclusions cooldown/coût partiel) vit dans CraftingOrderClassic_Route.lua (COC.Route), partagé
 > avec la bourse d'artisan — ici : le câblage MON perso (recettes de la fenêtre native + couleur
 > LIVE du client au rang courant, cohérence avec le badge de la liste) et toute l'UI.
-> Tout est soft-dep : sans Lazy Gold, le bouton ouvre la popup NeedPriceAddon ; sans ce fichier,
+> Tout est soft-dep : sans Auctionator, le bouton ouvre la popup NeedPriceAddon ; sans ce fichier,
 > rien ne change (hooks sous garde nil dans _ProfWindow_Toolbar).
 
 **API** : `PW:InvalidateDockRecipes()` · `PW:ToggleRoute()`
@@ -1741,9 +1741,9 @@
 > ne s'affichent pas et un clic sur un bouton de prix dit QUOI installer — aucun plantage, et jamais
 > un « 0 » qui se lirait comme « ça ne rapporte rien ».
 > 
-> UN SEUL ORACLE depuis le 2026-09-22 (décision du user). Le pont vers **Lazy Gold Classic** a été
+> UN SEUL ORACLE depuis le 2026-09-22 (décision du user). Le pont vers **Auctionator Classic** a été
 > retiré : il ne calculait rien, il relisait Auctionator. Deux ponts pour la même donnée, c'était un
-> de trop — et le pied de fenêtre pouvait nommer « Lazy Gold » un chiffre venu d'ailleurs. Lazy Gold
+> de trop — et le pied de fenêtre pouvait nommer « Auctionator » un chiffre venu d'ailleurs. Auctionator
 > n'existait de toute façon que sur Classic Era, purgée de `main` depuis le 2026-09-21.
 > 
 > PRIMITIVES LUES :
@@ -1762,7 +1762,7 @@
 > CraftingOrderClassic_ProfWindow_Orders.lua — colonne « Commandes » de la vue métier (cabine de
 > l'artisan) : construction (onglets de relation, en-tête, scroll), vue LISTE (une ligne par
 > commande : demandeur + prix + âge ; une ligne sourdine cliquée se réaffiche), collecte/tri et
-> rafraîchissement. La vue SÉLECTIONNÉE (carte complète : composants, Lazy Gold, ACCEPTER/REFUSER/
+> rafraîchissement. La vue SÉLECTIONNÉE (carte complète : composants, Auctionator, ACCEPTER/REFUSER/
 > CHUCHOTER) vit dans _ProfWindow_Orders_Card.lua (anti-monolithe). Onglets de relation (Tous /
 > Guilde / Amis / Annuaire) + onglet de SOURCE « Entrantes » (chat capté /commerce·/guilde et
 > ordres `captured`, avec badge de comptage) au header.
@@ -1771,7 +1771,7 @@
 
 ### `CraftingOrderClassic_ProfWindow_Orders_Card.lua`
 > CraftingOrderClassic_ProfWindow_Orders_Card.lua — vue SÉLECTIONNÉE de la colonne « Commandes » :
-> la carte complète d'une commande (composants fournis, repères Lazy Gold, ACCEPTER / REFUSER /
+> la carte complète d'une commande (composants fournis, repères Auctionator, ACCEPTER / REFUSER /
 > CHUCHOTER ; croix en haut à droite = retour liste). Sorti de _ProfWindow_Orders.lua
 > (anti-monolithe) — la LISTE, la collecte et les helpers partagés (_OrderReagents, _OrderItemName,
 > _OrdRelation, PW.ORD_REL_COL, PW.ORD_CARD_W) restent là-bas.

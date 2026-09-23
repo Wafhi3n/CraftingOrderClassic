@@ -180,8 +180,8 @@ local en2 = {
     -- Aide contextuelle « bouton i » (Vue Métier) — cf. _ProfWindow_HelpPlate.lua (bulles courtes)
     ["Aide : survole les zones surlignées pour comprendre chaque fonction."] =
         "Help: hover the highlighted areas to understand each feature.",
-    ["Barre de filtres. À gauche (avec Lazy Gold) : pièce = trier par rentabilité, « 123 » = prix exacts au lieu de l'indicateur compact, flèche verte = trier par montée de compétence, carte = plan de route (quoi crafter jusqu'au plafond, au moins cher). Au centre : la recherche. À droite : sac = seulement les recettes dont tu as les matériaux, flèche orange = masquer les recettes grises (aucun gain de compétence)."] =
-        "Filter bar. On the left (with Lazy Gold): coin = sort by profit, \"123\" = exact prices instead of the compact indicator, green arrow = sort by skill-up, map = leveling route (what to craft up to the cap, at the lowest cost). In the middle: the search. On the right: bag = only recipes you have the materials for, orange arrow = hide gray recipes (no skill gain).",
+    ["Barre de filtres. À gauche (avec Auctionator) : pièce = trier par rentabilité, « 123 » = prix exacts au lieu de l'indicateur compact, flèche verte = trier par montée de compétence, carte = plan de route (quoi crafter jusqu'au plafond, au moins cher). Au centre : la recherche. À droite : sac = seulement les recettes dont tu as les matériaux, flèche orange = masquer les recettes grises (aucun gain de compétence)."] =
+        "Filter bar. On the left (with Auctionator): coin = sort by profit, \"123\" = exact prices instead of the compact indicator, green arrow = sort by skill-up, map = leveling route (what to craft up to the cap, at the lowest cost). In the middle: the search. On the right: bag = only recipes you have the materials for, orange arrow = hide gray recipes (no skill gain).",
     ["Tes recettes, groupées par famille (clique un en-tête pour replier). À droite de chaque ligne : %s = rentabilité à l'HV (survole pour le profit net exact), %s = plan conseillé pour monter le métier (meilleur coût par point), « ×N » doré = commandes en attente pour cet objet. En mode Manquantes, une icône dit où obtenir le plan : formateur, vendeur, HV ou à farmer."] =
         "Your recipes, grouped by family (click a header to collapse). On the right of each line: %s = profit at the AH (hover for the exact net profit), %s = recommended recipe to level up (best cost per point), gold \"×N\" = pending orders for that item. In Missing mode, an icon shows where to get the recipe: trainer, vendor, AH, or to farm.",
     ["Le plan sélectionné : ses réactifs et le bouton pour le fabriquer."] =
@@ -196,8 +196,8 @@ local en2 = {
         "Filter orders by source: all, your guild, your friends, or your artisan directory.",
 
     -- Aide contextuelle « bouton i » — onglet Commande (cf. _UI_HelpPlate.lua)
-    ["Filtre les plans : recherche par nom, filtre par qualité, filtre par réactif, et l'outil %s « 123 » de Lazy Gold (prix/rentabilité)."] =
-        "Filter the recipes: search by name, filter by quality, filter by reagent, and Lazy Gold's %s \"123\" tool (price/profit).",
+    ["Filtre les plans : recherche par nom, filtre par qualité, filtre par réactif, et l'outil %s « 123 » de prix et de rentabilité (Auctionator)."] =
+        "Filter the recipes: search by name, filter by quality, filter by reagent, and Auctionator's %s \"123\" tool (price/profit).",
     ["La liste des plans. Choisis celui que tu veux faire réaliser par un artisan."] =
         "The recipe list. Pick the one you want a crafter to make.",
     ["L'objet choisi. La pastille « Je fournis » indique que tu apportes tous les composants toi-même."] =
@@ -235,12 +235,12 @@ local en2 = {
     -- Aide contextuelle « bouton i » — onglet Mes artisans (cf. _UI_HelpPlate.lua)
     ["Partage tes rerolls sur le réseau (les autres voient tes métiers), et choisis le perso mis en « vitrine »."] =
         "Share your rerolls on the network (others see your professions), and pick the character on \"display\".",
-    ["Tous les plans du royaume : la liste agrégée de toutes tes recettes, au lieu du découpage par métier (Lazy Gold requis)."] =
-        "All realm recipes: the aggregated list of all your recipes, instead of the per-profession split (Lazy Gold required).",
+    ["Tous les plans du royaume : la liste agrégée de toutes tes recettes, au lieu du découpage par métier (Auctionator requis)."] =
+        "All realm recipes: the aggregated list of all your recipes, instead of the per-profession split (Auctionator required).",
     ["Tes métiers (tous les persos du compte). Choisis-en un pour voir ses recettes à droite."] =
         "Your professions (all account characters). Pick one to see its recipes on the right.",
-    ["En-tête des recettes du métier choisi : bouton « Manquantes » et outils de prix (Lazy Gold)."] =
-        "Header of the chosen profession's recipes: \"Missing\" button and price tools (Lazy Gold).",
+    ["En-tête des recettes du métier choisi : bouton « Manquantes » et outils de prix (Auctionator)."] =
+        "Header of the chosen profession's recipes: \"Missing\" button and price tools (Auctionator).",
     ["Les recettes du métier sélectionné (ou tous les plans du royaume)."] =
         "The recipes of the selected profession (or all realm recipes).",
 
@@ -250,7 +250,7 @@ local en2 = {
     ["Le Carnet = TES commandes postées. Accepter/livrer se fait dans la Vue Métier, pas ici ; quand une commande t'est remise, le bouton « J'ai reçu » confirme la réception."] =
         "The Ledger = YOUR posted orders. Accepting/delivering happens in the Profession View, not here; when an order is handed to you, the \"Received\" button confirms receipt.",
 
-    -- Popup dépendance optionnelle manquante (boutons Lazy Gold / MTSL toujours visibles)
+    -- Popup dépendance optionnelle manquante (boutons Auctionator / MTSL toujours visibles)
     ["Cette fonction nécessite l'addon |cFFFFD100%s|r (non installé ou désactivé). Installe-le pour en profiter."] =
         "This feature needs the |cFFFFD100%s|r addon (not installed or disabled). Install it to use it.",
 
@@ -319,7 +319,7 @@ local en2 = {
     ["N'afficher que les recettes acquérables (formateur, vendeur ou HV)."] = "Show only obtainable recipes (trainer, vendor or AH).",
     ["Filtre acquérables actif — clic pour tout afficher."] = "Obtainable filter active — click to show all.",
 
-    -- Pont Lazy Gold (rentabilité)
+    -- Pont Auctionator (rentabilité)
     ["Rentabilité"] = "Profitability",
     ["Vente HV"] = "AH sale",
     ["Profit net"] = "Net profit",
@@ -332,7 +332,7 @@ local en2 = {
     ["Valeurs exactes — clic pour l'affichage compact."] = "Exact values — click for compact display.",
     ["Afficher les valeurs exactes (po/pa/pc)."] = "Show exact values (g/s/c).",
     ["Clic : commander ce métier"] = "Click: order this profession",
-    ["Trier par rentabilité (Lazy Gold)."] = "Sort by profitability (Lazy Gold).",
+    ["Trier par rentabilité (Auctionator)."] = "Sort by profitability (Auctionator).",
     ["Tri par rentabilité — clic pour A-Z."] = "Sorted by profit — click for A-Z.",
     ["N'afficher que les recettes dont j'ai les matériaux."] = "Show only recipes you have the materials for.", ["Filtre matériaux actif — clic pour tout afficher."] = "Materials filter on — click to show all.",
     ["N'afficher que les recettes qui font monter la compétence (masque le gris)."] = "Show only recipes that raise your skill (hides grey).", ["Filtre progression actif — clic pour tout afficher."] = "Skill-up filter on — click to show all.",
@@ -375,19 +375,19 @@ local en2 = {
     ["Replier / déplier les étapes."] = "Collapse / expand the steps.",
     ["Aucune recette calculable sur ce segment (prix HV manquants, ou plans introuvables)."] = "No computable recipe over this segment (missing AH prices, or unobtainable recipes).",
     ["Monter son métier au meilleur prix"] = "Level your profession at the lowest cost",
-    ["Dans la Vue Métier, la flèche verte trie par montée de compétence : les plans qui rapportent un point d'abord, les moins chers en tête (prix Lazy Gold)."] =
-        "In the Profession View, the green arrow sorts by skill-up: recipes that grant a point first, cheapest on top (Lazy Gold prices).",
+    ["Dans la Vue Métier, la flèche verte trie par montée de compétence : les plans qui rapportent un point d'abord, les moins chers en tête (prix Auctionator)."] =
+        "In the Profession View, the green arrow sorts by skill-up: recipes that grant a point first, cheapest on top (Auctionator prices).",
     ["Le badge doré marque le meilleur coût par point ; les plans utiles non appris s'affichent aussi, avec où les obtenir (formateur, vendeur, HV, à farmer)."] =
         "The gold badge marks the best cost per point; useful unlearned recipes show up too, with where to get them (trainer, vendor, AH, farm).",
     ["Le bouton carte ouvre le |cFFE8B84BPlan de route|r : du rang actuel au plafond, quoi crafter, combien de fois, pour quel coût total estimé — recalculé à chaque point gagné."] =
         "The map button opens the |cFFE8B84BLeveling route|r: from your current rank to the cap, what to craft, how many times, for what estimated total cost — recomputed with every point you gain.",
-    ["Tout repose sur les prix du dernier scan Auctionator (addons Lazy Gold + Auctionator conseillés) : sans eux, ces aides s'effacent."] =
-        "Everything relies on prices from the last Auctionator scan (Lazy Gold + Auctionator addons recommended): without them, these helpers step aside.",
+    ["Tout repose sur les prix du dernier scan Auctionator : sans cet addon, ces aides s'effacent."] =
+        "Everything relies on prices from the last Auctionator scan: without that addon, these helpers step aside.",
 
     -- Bourse d'artisan (onglet Artisans)
     ["Bourse d'artisan"] = "Artisan pouch",
-    ["Clic : les fournitures qu'il lui faut pour monter ses métiers (prix Lazy Gold)."] =
-        "Click: the supplies they need to level their professions (Lazy Gold prices).",
+    ["Clic : les fournitures qu'il lui faut pour monter ses métiers (prix Auctionator)."] =
+        "Click: the supplies they need to level their professions (Auctionator prices).",
     ["Bourse — %s"] = "Pouch — %s",
     ["Rien à fournir — métiers au plafond, ou données trop anciennes."] = "Nothing to supply — professions at cap, or data too old.",
     ["Inclure les plans à acheter"] = "Include recipes to buy",

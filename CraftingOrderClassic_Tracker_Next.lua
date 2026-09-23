@@ -120,7 +120,7 @@ local function subtitle(p, step)
     return sub
 end
 
--- Le fournisseur. Silencieux si les briques manquent (Lazy Gold absent, seuils non générés, métier
+-- Le fournisseur. Silencieux si les briques manquent (Auctionator absent, seuils non générés, métier
 -- jamais ouvert) : une section vide vaut mieux qu'un conseil inventé.
 local function progressProvider(entries, ctx)
     local Route = COC.Route

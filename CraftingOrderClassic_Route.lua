@@ -44,7 +44,7 @@ end
 -- difficulté client (nil pour un tiers), plans = inclure les manquantes ACHETABLES (prix
 -- formateur/vendeur MTSL, sinon objet-plan coté à l'HV) }. Sans opts.plans : recettes CONNUES
 -- seulement (pour un tiers, on ne présume pas de ce qu'il accepterait d'acheter — sauf demande).
--- nil si les briques manquent (lib sans seuils, Lazy Gold absent).
+-- nil si les briques manquent (lib sans seuils, Auctionator absent).
 function Route:Candidates(profKey, opts)
     local lib = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
     local PR, M = COC.Profit, COC.Sources
@@ -173,7 +173,7 @@ end
 -- ------------------------------------------------------------------
 -- Prochain point seulement (consommateur CHAUD : le suivi à l'écran)
 -- ------------------------------------------------------------------
--- Candidates() balaie TOUTES les recettes du métier et interroge Lazy Gold pour chacune. Compute()
+-- Candidates() balaie TOUTES les recettes du métier et interroge Auctionator pour chacune. Compute()
 -- paie ça une fois puis marche rang par rang jusqu'au plafond : c'est un chemin FROID (on ouvre une
 -- fenêtre). Le suivi à l'écran, lui, se recalcule à chaque BAG_UPDATE — d'où ce cache, même patron
 -- que PR:BestPlanFor (clé + TTL). Clé : métier + inclusion des plans + version de données + nombre
@@ -258,7 +258,7 @@ end
 -- quantité, crédit/décomposition cf. addReagent, arrondis au plafond par objet) + plans achetés
 -- par la route (objet-plan à fournir, ou plan de FORMATEUR — pas d'objet, il devra l'apprendre au
 -- PNJ). Sert à la bourse d'artisan. mats triés par coût total décroissant ; cost = prix unitaire
--- Lazy Gold (nil si inconnu) ; vendor = vendu par un PNJ (inutile de fournir, l'UI le sort de la
+-- Auctionator (nil si inconnu) ; vendor = vendu par un PNJ (inutile de fournir, l'UI le sort de la
 -- grille). gaps = des rangs sans candidate (liste incomplète).
 function Route:Materials(profKey, route)
     local lib = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)

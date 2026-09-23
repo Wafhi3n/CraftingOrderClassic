@@ -1,6 +1,6 @@
 -- CraftingOrderClassic_UI_Artisans_Icons.lua — onglet « Artisans » : tout ce qui est ICÔNE de métier.
 --   1. les pills de filtre métier (icône seule, plus de texte : tous les métiers tiennent sur une rangée) ;
---   2. les icônes de métier d'une ligne artisan : contour de rentabilité (Lazy Gold), tooltip, et
+--   2. les icônes de métier d'une ligne artisan : contour de rentabilité (Auctionator), tooltip, et
 --      CLIC → onglet Commande pré-ciblé sur CET artisan et CE métier (UI:OpenPostForArtisan).
 -- Extrait de _UI_Artisans.lua (plafond anti-monolithe).
 
@@ -88,7 +88,7 @@ end
 -- relayée, jamais croisé en direct), on retombe sur l'approximation par NIVEAU (BestPlanFor) — moins
 -- fiable : elle peut désigner une recette que l'artisan n'a pas apprise (PNJ/butin/quête à part),
 -- même si son niveau de métier suffirait. Seuils : doré ≥ 10 po, doré + halo ≥ 1000 po (seuil de
--- base configurable, db.lgMinProfit). Lazy Gold absent → aucune désaturation.
+-- base configurable, db.lgMinProfit). Auctionator absent → aucune désaturation.
 -- `r` = fiche roster de l'artisan (nil si indisponible → on saute direct à l'approximation).
 function UI:_SetArtProfitBorder(ic, item, r)
     local PR = COC.Profit

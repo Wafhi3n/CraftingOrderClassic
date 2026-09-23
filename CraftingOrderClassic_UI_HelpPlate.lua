@@ -12,14 +12,14 @@ local UI   = COC.UI
 local Skin = COC.UI.Skin
 local L    = COC.L
 
--- Pièce d'or INLINE : la MÊME texture que l'outil de prix Lazy Gold, injectée via %s (clé sans texture).
+-- Pièce d'or INLINE : la MÊME texture que l'outil de prix Auctionator, injectée via %s (clé sans texture).
 local COIN = "|TInterface\\MoneyFrame\\UI-GoldIcon:13:13:0:0|t"
 
 -- Textes des bulles de l'onglet Commande (id de section SPEC → texte court localisé). reagentsList et
 -- le portrait réutilisent des clés existantes déjà traduites (pas de doublon).
 local function postTexts()
     return {
-        filters      = string.format(L["Filtre les plans : recherche par nom, filtre par qualité, filtre par réactif, et l'outil %s « 123 » de Lazy Gold (prix/rentabilité)."], COIN),
+        filters      = string.format(L["Filtre les plans : recherche par nom, filtre par qualité, filtre par réactif, et l'outil %s « 123 » de prix et de rentabilité (Auctionator)."], COIN),
         plans        = L["La liste des plans. Choisis celui que tu veux faire réaliser par un artisan."],
         ItemSelected = L["L'objet choisi. La pastille « Je fournis » indique que tu apportes tous les composants toi-même."],
         reagentsList = L["Coche les réactifs que TU fournis toi-même (le reste reste à la charge de l'artisan)."],
@@ -57,9 +57,9 @@ end
 local function myArtisansTexts()
     return {
         shareBar  = L["Partage tes rerolls sur le réseau (les autres voient tes métiers), et choisis le perso mis en « vitrine »."],
-        allRealm  = L["Tous les plans du royaume : la liste agrégée de toutes tes recettes, au lieu du découpage par métier (Lazy Gold requis)."],
+        allRealm  = L["Tous les plans du royaume : la liste agrégée de toutes tes recettes, au lieu du découpage par métier (Auctionator requis)."],
         profsList = L["Tes métiers (tous les persos du compte). Choisis-en un pour voir ses recettes à droite."],
-        recTools  = L["En-tête des recettes du métier choisi : bouton « Manquantes » et outils de prix (Lazy Gold)."],
+        recTools  = L["En-tête des recettes du métier choisi : bouton « Manquantes » et outils de prix (Auctionator)."],
         recList   = L["Les recettes du métier sélectionné (ou tous les plans du royaume)."],
     }
 end

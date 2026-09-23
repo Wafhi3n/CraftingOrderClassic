@@ -53,7 +53,7 @@ function UI:BuildMyArtisansTab(f)
     self:_BuildMyArtRight()   -- colonne recettes : bande d'outils + liste (ses zones)
 end
 
--- Colonne recettes : bande d'outils (titre · Manquantes · Lazy Gold) + liste, dans leurs zones.
+-- Colonne recettes : bande d'outils (titre · Manquantes · Auctionator) + liste, dans leurs zones.
 function UI:_BuildMyArtRight()
     local tz = self:MyArtSec("recTitle")
     local rhdr = tz:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
@@ -71,7 +71,7 @@ function UI:_BuildMyArtRight()
         UI:RefreshMyArtisans()
     end)
 
-    -- Barre Lazy Gold (pièce / « 123 »), à gauche du bouton Manquantes (même slot).
+    -- Barre Auctionator (pièce / « 123 »), à gauche du bouton Manquantes (même slot).
     self:_BuildMyArtLGBar(bz, mBtn)
     self:_BuildMyArtStatFilter(self:MyArtSec("recStatDD"))
 
@@ -218,7 +218,7 @@ function UI:_MyArtRecRow(i)
     r.icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
     r.name = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     r.name:SetJustifyH("LEFT"); Skin.ApplyShadow(r.name)
-    -- Rentabilité Lazy Gold, tout à droite ; « porté par » se cale à sa gauche.
+    -- Rentabilité Auctionator, tout à droite ; « porté par » se cale à sa gauche.
     r.profit = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     r.profit:SetPoint("RIGHT", -6, 0); r.profit:SetJustifyH("RIGHT"); Skin.ApplyShadow(r.profit)
     r.who = r:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
@@ -236,7 +236,7 @@ local function anchorName(row, x, reserve)
     row.name:SetWidth(math.max(20, (UI.myArtRecW or M.WIDE_W) - x - 126 - (reserve or 0)))
 end
 
--- Profit Lazy Gold d'une ligne (mémorisé le temps du refresh). Renvoie la largeur consommée, pour
+-- Profit Auctionator d'une ligne (mémorisé le temps du refresh). Renvoie la largeur consommée, pour
 -- que le nom se rétrécisse d'autant.
 function UI:_FillMyArtProfit(row, rc)
     local PR = COC.Profit

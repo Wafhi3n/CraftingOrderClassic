@@ -95,7 +95,7 @@ function Dir:AggregateMyProfs()
     local myFaction = UnitFactionGroup and UnitFactionGroup("player")
     if myFaction ~= "Horde" and myFaction ~= "Alliance" then myFaction = nil end
     -- Aucun filtre ici (secondary = {}) : cette vue est là pour dire quel perso du compte peut se
-    -- faire des sous, or la Cuisine et la Pêche rapportent de l'or (Lazy Gold les valorise). Même les
+    -- faire des sous, or la Cuisine et la Pêche rapportent de l'or (Auctionator les valorise). Même les
     -- Poisons y ont leur place — c'est MON reroll, pas un inconnu à qui passer commande.
     return aggregate(db.myChars, db.knownRecipes, db.mySkillsByChar, myRealm(), main,
         {}, db.myCharFaction, myFaction)

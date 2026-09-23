@@ -56,8 +56,8 @@ function UI:_FillGatherRow(row, item)
     local disp = item.name:match("^item:") and ("|cFF777777" .. L["Chargement…"] .. "|r") or item.name
     row.name:SetText(disp); row.name:SetTextColor(r, g, b)
     if e == self.gatherEntry then row.name:SetTextColor(1, 0.85, 0.27) end
-    -- Valeur HV Lazy Gold (à droite) : prix vendeur ou hôtel des ventes. Vide si Lazy Gold absent ou
-    -- prix inconnu. C'est l'usage phare de Lazy Gold pour la récolte (cf. sa vue Minage).
+    -- Valeur HV Auctionator (à droite) : prix vendeur ou hôtel des ventes. Vide si Auctionator absent ou
+    -- prix inconnu. C'est l'usage phare de Auctionator pour la récolte (cf. sa vue Minage).
     local val = COC.Profit and COC.Profit:ItemValue(e.itemID)
     row.stack:SetText(val and COC.Api.Coin(val) or "")
     row.entry = e; row.tipItemID = e.itemID

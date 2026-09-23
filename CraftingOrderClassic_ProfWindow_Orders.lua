@@ -1,7 +1,7 @@
 -- CraftingOrderClassic_ProfWindow_Orders.lua — colonne « Commandes » de la vue métier (cabine de
 -- l'artisan) : construction (onglets de relation, en-tête, scroll), vue LISTE (une ligne par
 -- commande : demandeur + prix + âge ; une ligne sourdine cliquée se réaffiche), collecte/tri et
--- rafraîchissement. La vue SÉLECTIONNÉE (carte complète : composants, Lazy Gold, ACCEPTER/REFUSER/
+-- rafraîchissement. La vue SÉLECTIONNÉE (carte complète : composants, Auctionator, ACCEPTER/REFUSER/
 -- CHUCHOTER) vit dans _ProfWindow_Orders_Card.lua (anti-monolithe). Onglets de relation (Tous /
 -- Guilde / Amis / Annuaire) + onglet de SOURCE « Entrantes » (chat capté /commerce·/guilde et
 -- ordres `captured`, avec badge de comptage) au header.

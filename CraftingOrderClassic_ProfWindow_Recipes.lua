@@ -43,7 +43,7 @@ function PW:_BuildRecipeRow(parent, i)
     local nameFS = row:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     nameFS:SetPoint("LEFT", icon, "RIGHT", 4, 0); nameFS:SetPoint("RIGHT", -2, 0)
     nameFS:SetJustifyH("LEFT"); nameFS:SetWordWrap(false); row.nameFS = nameFS
-    -- Profit Lazy Gold (le plus à droite), puis badge « demandé » à sa gauche. Les deux masqués par défaut.
+    -- Profit Auctionator (le plus à droite), puis badge « demandé » à sa gauche. Les deux masqués par défaut.
     local profit = row:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     profit:SetPoint("RIGHT", -2, 0); profit:Hide(); row.profit = profit
     local badge = row:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
@@ -273,7 +273,7 @@ function PW:_RecipeDisplayList()
     if COC.StatFilter then
         items = COC.StatFilter:Apply("prof", items, function(r) return r.itemID end)
     end
-    -- Tri « rentabilité » (Lazy Gold) : on ABANDONNE le regroupement — liste À PLAT, sans en-tête ni
+    -- Tri « rentabilité » (Auctionator) : on ABANDONNE le regroupement — liste À PLAT, sans en-tête ni
     -- sous-catégorie, du plus rentable au moins rentable. C'est le but du mode : voir d'un coup quoi
     -- fabriquer en premier, peu importe la famille. Profit inconnu / à perte → en fin de liste.
     if sortProfit then
@@ -330,7 +330,7 @@ function PW:RefreshRecipes()
             for _, sid in ipairs(o.recipes) do self._lfwOfferSet[sid] = true end
         end
     end
-    self:_SyncSortHeader()   -- affiche/masque le bouton de tri selon la présence de Lazy Gold
+    self:_SyncSortHeader()   -- affiche/masque le bouton de tri selon la présence de Auctionator
     self:_SyncFilterButtons()
     self.wantedMap = self:_ComputeWantedMap()
     self.recDisplay = self:_RecipeDisplayList()
@@ -417,9 +417,9 @@ function PW:_FillRecipeRow(row, e)
     self:_FillRecipeRight(row, e)
 end
 
--- Profit Lazy Gold d'une ligne, MÉMORISÉ le temps du refresh (le rendu se refait à chaque scroll → on
+-- Profit Auctionator d'une ligne, MÉMORISÉ le temps du refresh (le rendu se refait à chaque scroll → on
 -- éviterait sinon de rappeler Auctionator en boucle). `false` = calculé, sans valeur. Rien pour les
--- recettes manquantes (on ne peut pas les fabriquer) ni si Lazy Gold est absent.
+-- recettes manquantes (on ne peut pas les fabriquer) ni si Auctionator est absent.
 function PW:_RowProfit(e)
     if not (COC.Profit and COC.Profit:IsAvailable()) then return nil end
     -- Les recettes MANQUANTES ont aussi un profit : c'est même l'info qui décide si ça vaut le coup

@@ -1,7 +1,7 @@
 # Les prix : une seule source, Auctionator
 
-> État : **close — implémentée ET éprouvée en jeu le 2026-09-23** (relevés dans
-> `docs/verif-registre.md`) · Rédigée le 2026-09-22 · Arbitrages du user le 2026-09-22
+> État : **close — implémentée, éprouvée en jeu le 2026-09-23, libellés purgés le même jour**
+> (relevés dans `docs/verif-registre.md`) · Rédigée le 2026-09-22 · Arbitrages du user le 2026-09-22
 > Cible : WoW: Forever / Camelot · Addon : Crafting Order - Classic
 
 ## Le problème
@@ -26,6 +26,20 @@ pas une, et un pied de fenêtre peut nommer « Lazy Gold » là où le chiffre v
    d'artisan, ligne de prix d'une commande. On retire une source, on ne change aucun calcul.
 5. **Le prix VENDEUR garde sa priorité** sur le prix de marché pour un réactif achetable en ville.
    Règle existante : sans elle, la route de progression choisit la mauvaise recette.
+
+## Une clôture prématurée, et ce qu'elle apprend (2026-09-23)
+
+Cette spec a été déclarée close une première fois sur la foi du **banc** : les cinq points observés
+en jeu, prix affichés, aucun zéro, popup nommant Auctionator. Un audit du même jour a montré que le
+point 2 — « le pont Lazy Gold disparaît, avec ses gardes, sa table de vendeurs **et ses libellés** »
+— ne l'était pas : **huit chaînes affichées en jeu** (bulles d'aide, tooltips de tri, onglet Aide)
+nommaient encore Lazy Gold, dans les quatre langues. Sur Forever, elles envoyaient le joueur
+installer un addon qui n'existe que sur l'Era.
+
+Ce que ça apprend, et qui vaut au-delà de cette spec : **un banc vérifie un comportement, il ne lit
+pas les textes.** On avait regardé ce que l'addon *fait*, personne n'avait regardé ce qu'il *dit*.
+Un critère d'acceptation qui porte sur des libellés demande un observateur qui LIT — un grep suffit,
+mais il faut le faire, et il n'était dans aucune porte.
 
 ## Ce que la vérification en jeu a ajouté (2026-09-23)
 

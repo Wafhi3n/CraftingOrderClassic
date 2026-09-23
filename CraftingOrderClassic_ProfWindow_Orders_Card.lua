@@ -1,5 +1,5 @@
 -- CraftingOrderClassic_ProfWindow_Orders_Card.lua — vue SÉLECTIONNÉE de la colonne « Commandes » :
--- la carte complète d'une commande (composants fournis, repères Lazy Gold, ACCEPTER / REFUSER /
+-- la carte complète d'une commande (composants fournis, repères Auctionator, ACCEPTER / REFUSER /
 -- CHUCHOTER ; croix en haut à droite = retour liste). Sorti de _ProfWindow_Orders.lua
 -- (anti-monolithe) — la LISTE, la collecte et les helpers partagés (_OrderReagents, _OrderItemName,
 -- _OrdRelation, PW.ORD_REL_COL, PW.ORD_CARD_W) restent là-bas.
@@ -23,7 +23,7 @@ local CARD_HDR, CARD_FOOT = 20, 24
 local CARD_COMPACT = CARD_HDR + 26 + CARD_FOOT   -- carte sans plan connu (objet seul / récolte)
 
 -- Les TROIS BANDES de la carte : en-tête (demandeur + âge + inviter), corps FLEX (objet, prix,
--- composants, Lazy Gold), pied (Accepter / Refuser / Chuchoter). Ancrées GAUCHE **et** DROITE sur
+-- composants, Auctionator), pied (Accepter / Refuser / Chuchoter). Ancrées GAUCHE **et** DROITE sur
 -- l'hôte, donc élastiques.
 --
 -- POURQUOI PLUS DE MINI-SPEC ICI. `Skin.MakeSections` est un découpage à coordonnées ABSOLUES : il
@@ -125,7 +125,7 @@ local function buildCardHeader(c, hz)
     c.age:SetPoint("RIGHT", c.invite, "LEFT", -4, 0); Skin.ApplyShadow(c.age)
 end
 
--- CORPS de la carte : rangée objet (badge + nom + prix) puis panneau composants + ligne Lazy Gold.
+-- CORPS de la carte : rangée objet (badge + nom + prix) puis panneau composants + ligne Auctionator.
 local function buildCardBody(c, bz)
     c.badge = Skin.MakeBadge(bz, 16); c.badge:SetPoint("TOPLEFT", 8, -4)
     -- Le PRIX d'abord, le nom s'ancre sur lui : le nom se rétrécit AVANT le prix, comme la ligne de
@@ -138,7 +138,7 @@ local function buildCardBody(c, bz)
     c.item:SetPoint("RIGHT", c.price, "LEFT", -6, 0)
     c.item:SetJustifyH("LEFT"); c.item:SetWordWrap(false); Skin.ApplyShadow(c.item)
     buildReagPanel(c, bz)
-    -- Ligne « dois-je accepter ? » (Lazy Gold) : sous le panneau composants, au-dessus du pied.
+    -- Ligne « dois-je accepter ? » (Auctionator) : sous le panneau composants, au-dessus du pied.
     c.lgLine = bz:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
     c.lgLine:SetPoint("TOPLEFT", c.reagPanel, "BOTTOMLEFT", 0, -3)
     c.lgLine:SetPoint("RIGHT", bz, "RIGHT", -8, 0)

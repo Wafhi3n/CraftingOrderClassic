@@ -85,7 +85,7 @@ end
 function UI:_BuildPostPrice(sec)
     -- Rangée CENTRÉE VERTICALEMENT : libellés en LEFT (centrés par construction), champs de saisie
     -- (16 px, ancrés TOPLEFT via MakeMoneyRow) au y qui les centre : -(H−16)/2. Le repère de prix
-    -- Lazy Gold (2ᵉ ligne, souvent vide) se pose juste sous les champs. (g/s/c : Skin.MakeMoneyRow,
+    -- Auctionator (2ᵉ ligne, souvent vide) se pose juste sous les champs. (g/s/c : Skin.MakeMoneyRow,
     -- partagé avec l'onglet Récolte.)
     local ROW_Y = -((P.PRICE_H or 54) - 16) / 2
     local comLbl = sec:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")

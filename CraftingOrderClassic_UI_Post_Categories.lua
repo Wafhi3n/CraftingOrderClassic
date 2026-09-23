@@ -92,7 +92,7 @@ end
 -- Pendant une RECHERCHE le repliage est ignoré, sinon un résultat pourrait rester invisible.
 function UI:_RenderPostPlanRows(list)
     local searching = (self.postSearch or "") ~= ""
-    -- Tri par rentabilité (Lazy Gold) : liste À PLAT, sans sections — on veut le classement global du
+    -- Tri par rentabilité (Auctionator) : liste À PLAT, sans sections — on veut le classement global du
     -- plus rentable au moins. Sinon, regroupement normal.
     -- Classement dérivé du sort (enchantements : emplacement › stat ; gemmes : couleur › taille) —
     -- MÊME dispatch que la vue métier, écrit une seule fois : cf. RecipeCats.SectionForSpell.
@@ -179,6 +179,6 @@ function UI:_FillPostPlanRow(row, item)
     if item.ready then disp = "|cFF33DD33" .. L["[Prêt]"] .. "|r " .. disp end
     row.name:SetText(disp); row.name:Show()
     row.name:SetTextColor(e == self.postEntry and 1 or r, e == self.postEntry and 0.85 or g, e == self.postEntry and 0.27 or b)
-    self:_FillPostPlanProfit(row, item)   -- rentabilité Lazy Gold (rétrécit le nom si présente)
+    self:_FillPostPlanProfit(row, item)   -- rentabilité Auctionator (rétrécit le nom si présente)
     row.tipItemID, row.tipSpellID = e.itemID, e.spellID
 end

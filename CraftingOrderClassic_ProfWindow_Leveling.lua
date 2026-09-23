@@ -1,9 +1,9 @@
 -- CraftingOrderClassic_ProfWindow_Leveling.lua — aide à la MONTÉE DE MÉTIER dans la liste de
--- recettes : coût de progression (réactifs au prix Lazy Gold ÷ chance de point selon la couleur),
+-- recettes : coût de progression (réactifs au prix Auctionator ÷ chance de point selon la couleur),
 -- badge « meilleur coût/point » sur la recette recommandée, icônes de SOURCE sur les manquantes
 -- (formateur / vendeur PNJ / coté à l'HV / à farmer) et tri « progression » affiné par coût.
 -- Les guides statiques se trompent quand l'économie du serveur diverge (vécu : shards à 10 pc alors
--- que le guide dit d'acheter de la dust) — ici tout est au prix RÉEL (Auctionator via Lazy Gold).
+-- que le guide dit d'acheter de la dust) — ici tout est au prix RÉEL (Auctionator via Auctionator).
 -- Sans oracle de prix le coût disparaît, les icônes de source restent : elles viennent de notre
 -- catalogue (COC.Sources), sans aucun addon tiers. Appelé par _ProfWindow_Recipes sous garde
 -- nil (`self._FillLevelingRight and …`) : l'absence de ce fichier ne casse rien.
@@ -60,7 +60,7 @@ function PW:_MissingProgresses(e)
 end
 
 -- Coût de progression d'une entrée : { perPoint, cost, chance, missing } en cuivre, ou nil (gris —
--- réel ou estimé —, prix inconnus, Lazy Gold absent, manquante pas encore apprenable…). missing = un
+-- réel ou estimé —, prix inconnus, Auctionator absent, manquante pas encore apprenable…). missing = un
 -- réactif sans prix (coût sous-estimé). Cache par refresh (posé dans RefreshRecipes, le rendu se
 -- rejoue à chaque scroll).
 function PW:_LevelCost(e)
@@ -151,7 +151,7 @@ function PW:_LevelingTooltip(e)
 end
 
 -- Destination du plan d'une manquante (tooltip) : formateur / vendeur PNJ (prix fixe MTSL), coté à
--- l'HV (cote Lazy Gold), ou à farmer. Même logique que l'icône de source — les deux doivent raconter
+-- l'HV (cote Auctionator), ou à farmer. Même logique que l'icône de source — les deux doivent raconter
 -- la même histoire.
 function PW:_PlanTooltip(e)
     local M = COC.Sources

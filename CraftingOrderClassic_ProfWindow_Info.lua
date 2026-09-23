@@ -204,7 +204,7 @@ PW:RegisterInfoSection(function(ctx)
     if not (M and M:IsAvailable() and ctx.entry and ctx.entry.isMissing and ctx.entry.spellID) then return nil end
     local d = M:SkillDetail(ctx.profKey, ctx.entry.spellID)
     if not (d and d.lines and #d.lines > 0) then return nil end
-    -- Prix HV de l'OBJET-RECETTE (parchemin/patron), quand Auctionator/Lazy Gold l'a déjà vu passer :
+    -- Prix HV de l'OBJET-RECETTE (parchemin/patron), quand Auctionator/Auctionator l'a déjà vu passer :
     -- répond à « combien coûte cette recette à l'hôtel des ventes ». On lit le DERNIER prix connu (le pont
     -- est en lecture seule — jamais de scan à la demande) ; rien pour une recette de formateur (pas d'objet)
     -- ou qu'Auctionator n'a jamais croisée.

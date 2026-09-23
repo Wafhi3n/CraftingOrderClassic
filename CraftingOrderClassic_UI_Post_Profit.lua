@@ -1,9 +1,9 @@
--- CraftingOrderClassic_UI_Post_Profit.lua — onglet « Commande » : couche Lazy Gold (lecture seule).
+-- CraftingOrderClassic_UI_Post_Profit.lua — onglet « Commande » : couche Auctionator (lecture seule).
 --   * barre d'outils (pièce = tri par rentabilité, « 123 » = valeurs exactes) — mêmes codes que la
 --     vue métier, et le mode exact est le MÊME réglage partagé (db.lgExactProfit) ;
 --   * indicateur de profit sur chaque ligne de la LISTE DES PLANS ;
 --   * tri par rentabilité : liste à PLAT (les sections disparaissent), du plus rentable au moins.
--- Tout est masqué/inerte si Lazy Gold n'est pas installé — COC reste autonome.
+-- Tout est masqué/inerte si Auctionator n'est pas installé — COC reste autonome.
 
 local COC  = CraftingOrderClassic
 local UI   = COC.UI
@@ -30,13 +30,13 @@ local function makeToolBtn(panel, tipFn, onClick)
     return b
 end
 
--- `sec` = le SLOT « AH_Filter » de la bande de filtres (SPEC) : les deux outils Lazy Gold (tri
+-- `sec` = le SLOT « AH_Filter » de la bande de filtres (SPEC) : les deux outils Auctionator (tri
 -- rentabilité + « 123 » valeurs exactes) y sont ancrés en RIGHT → centrés verticalement par
--- construction. Cachés si Lazy Gold est absent (cf. _Sync).
+-- construction. Cachés si Auctionator est absent (cf. _Sync).
 function UI:_BuildPostLGBar(sec)
     local sortBtn = makeToolBtn(sec, function()
         return UI.postSortProfit and L["Tri par rentabilité — clic pour A-Z."]
-            or L["Trier par rentabilité (Lazy Gold)."]
+            or L["Trier par rentabilité (Auctionator)."]
     end, function()
         if not PR() then COC:NeedPriceAddon(); return end
         UI.postSortProfit = not UI.postSortProfit
@@ -68,7 +68,7 @@ end
 function UI:_SyncPostLGBar()
     local g = PR()
     if self.postSortBtn then
-        self.postSortBtn:SetShown(true)   -- toujours visible (enticing) ; clic sans Lazy Gold → popup
+        self.postSortBtn:SetShown(true)   -- toujours visible (enticing) ; clic sans Auctionator → popup
         self.postSortBtn.onBG:SetShown((g and self.postSortProfit) and true or false)
         self.postSortBtn.coin:SetDesaturated((g and not self.postSortProfit) and true or false)
     end
@@ -85,8 +85,8 @@ end
 -- Repère de prix (zone commission)
 -- =========================================================================
 -- « Valeur HV: Xg · Réactifs: Yg » sous la commission : aide à fixer un prix cohérent avec le
--- marché. Vide si Lazy Gold absent ou prix produit inconnu. (Déplacé de _UI_Post.lua — c'est du
--- pur Lazy Gold, et le fichier hôte frôlait le plafond anti-monolithe.)
+-- marché. Vide si Auctionator absent ou prix produit inconnu. (Déplacé de _UI_Post.lua — c'est du
+-- pur Auctionator, et le fichier hôte frôlait le plafond anti-monolithe.)
 function UI:_RefreshPostPriceHint(e)
     local hint = self.postPriceHint; if not hint then return end
     if not e then hint:SetText(""); return end   -- bascule « 123 » sans plan sélectionné

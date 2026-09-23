@@ -1,9 +1,9 @@
--- CraftingOrderClassic_UI_MyArtisans_Profit.lua — onglet « Mes artisans » : couche Lazy Gold.
+-- CraftingOrderClassic_UI_MyArtisans_Profit.lua — onglet « Mes artisans » : couche Auctionator.
 --   * barre d'outils : pièce (tri rentabilité), « 123 » (valeurs exactes, réglage PARTAGÉ avec la
 --     vue métier), et « Tout le royaume » ;
 --   * « Tout le royaume » = TOUS les métiers du compte fusionnés en une seule liste à plat triée par
 --     profit : la réponse d'un coup d'œil à « lequel de mes rerolls a des sous à se faire ? ».
--- Lecture seule, inerte si Lazy Gold est absent.
+-- Lecture seule, inerte si Auctionator est absent.
 
 local COC  = CraftingOrderClassic
 local UI   = COC.UI
@@ -57,7 +57,7 @@ end
 function UI:_BuildMyArtLGBar(panel, anchor)
     local sortBtn = makeToolBtn(panel, function()
         return UI.myArtSortProfit and L["Tri par rentabilité — clic pour A-Z."]
-            or L["Trier par rentabilité (Lazy Gold)."]
+            or L["Trier par rentabilité (Auctionator)."]
     end, function()
         if not PR() then COC:NeedPriceAddon(); return end
         UI.myArtSortProfit = not UI.myArtSortProfit
@@ -87,7 +87,7 @@ end
 function UI:_SyncMyArtLGBar()
     local g = PR()
     if self.myArtAllBtn then
-        self.myArtAllBtn:SetShown(true)   -- toujours visible (enticing) ; clic sans Lazy Gold → popup
+        self.myArtAllBtn:SetShown(true)   -- toujours visible (enticing) ; clic sans Auctionator → popup
         self.myArtAllBtn:SetSelected(self.myArtAllProfs and true or false)
     end
     if self.myArtSortBtn then
@@ -96,7 +96,7 @@ function UI:_SyncMyArtLGBar()
         local on = g and (self.myArtSortProfit or self.myArtAllProfs)
         self.myArtSortBtn:SetShown(true)
         self.myArtSortBtn.onBG:SetShown(on and true or false)
-        self.myArtSortBtn.coin:SetDesaturated(g and not on or false)   -- coloré si Lazy Gold absent
+        self.myArtSortBtn.coin:SetDesaturated(g and not on or false)   -- coloré si Auctionator absent
     end
     if self.myArtExactBtn then
         local ex = g and g:ExactMode()

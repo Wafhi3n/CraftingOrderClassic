@@ -7,7 +7,7 @@
 -- qu'il n'a pas — les plans-OBJETS rejoignent la grille comme fournitures à lui apporter, les
 -- plans de FORMATEUR restent une note (pas d'objet à donner, il devra l'apprendre au PNJ).
 -- Bouton d'entrée : sac posé après les icônes de métier d'une ligne (hook sous garde nil dans
--- _UI_Artisans_Icons — l'absence de ce fichier avant restart ne casse rien). Sans Lazy Gold, le
+-- _UI_Artisans_Icons — l'absence de ce fichier avant restart ne casse rien). Sans Auctionator, le
 -- bouton reste visible et le clic ouvre la popup NeedPriceAddon (pattern découvrabilité).
 
 local COC  = CraftingOrderClassic
@@ -100,7 +100,7 @@ function UI:_SetArtNeedsBtn(row, x, r, name)
         b:SetScript("OnEnter", function(btn)
             GameTooltip:SetOwner(btn, "ANCHOR_RIGHT")
             GameTooltip:SetText(L["Bourse d'artisan"], 1, 1, 1)
-            GameTooltip:AddLine(L["Clic : les fournitures qu'il lui faut pour monter ses métiers (prix Lazy Gold)."], 0.60, 0.75, 0.91, true)
+            GameTooltip:AddLine(L["Clic : les fournitures qu'il lui faut pour monter ses métiers (prix Auctionator)."], 0.60, 0.75, 0.91, true)
             GameTooltip:Show()
         end)
         b:SetScript("OnLeave", GameTooltip_Hide)
@@ -112,7 +112,7 @@ function UI:_SetArtNeedsBtn(row, x, r, name)
     b:Show()
 end
 
--- Ouvre la bourse d'un artisan. Sans Lazy Gold : popup d'incitation (le bouton reste visible pour
+-- Ouvre la bourse d'un artisan. Sans Auctionator : popup d'incitation (le bouton reste visible pour
 -- inciter au clic — même pattern que les toggles de tri, cf. coc-optional-dep-discoverability).
 function UI:OpenNeeds(name)
     local PR = COC.Profit

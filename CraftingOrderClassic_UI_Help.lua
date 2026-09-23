@@ -117,10 +117,10 @@ local function contentLeveling()
         {
             icon = Skin.tex.gold, title = L["Monter son métier au meilleur prix"],
             lines = {
-                L["Dans la Vue Métier, la flèche verte trie par montée de compétence : les plans qui rapportent un point d'abord, les moins chers en tête (prix Lazy Gold)."],
+                L["Dans la Vue Métier, la flèche verte trie par montée de compétence : les plans qui rapportent un point d'abord, les moins chers en tête (prix Auctionator)."],
                 L["Le badge doré marque le meilleur coût par point ; les plans utiles non appris s'affichent aussi, avec où les obtenir (formateur, vendeur, HV, à farmer)."],
                 L["Le bouton carte ouvre le |cFFE8B84BPlan de route|r : du rang actuel au plafond, quoi crafter, combien de fois, pour quel coût total estimé — recalculé à chaque point gagné."],
-                L["Tout repose sur les prix du dernier scan Auctionator (addons Lazy Gold + Auctionator conseillés) : sans eux, ces aides s'effacent."],
+                L["Tout repose sur les prix du dernier scan Auctionator : sans cet addon, ces aides s'effacent."],
             },
         },
     }

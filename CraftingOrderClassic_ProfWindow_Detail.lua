@@ -208,7 +208,7 @@ function PW:_FillReagentRows(e)
         end
     end
     if self.detShareBtn then self.detShareBtn:SetShown(nReag > 0) end
-    -- Sections d'info SOUS les réactifs (ex. « Rentabilité » Lazy Gold). REAG_H = hauteur d'une ligne
+    -- Sections d'info SOUS les réactifs (ex. « Rentabilité » Auctionator). REAG_H = hauteur d'une ligne
     -- réactif ; on démarre juste sous la dernière + une petite marge. Vide (0 ligne) = rien ne s'affiche.
     if self._RenderInfoPanel then self:_RenderInfoPanel(e, -70 - nReag * REAG_H - 12) end
 end
