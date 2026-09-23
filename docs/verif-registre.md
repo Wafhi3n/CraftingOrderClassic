@@ -36,6 +36,21 @@ client.
 
 ## Relevés
 
+- 2026-09-23 (2) — jusqu'a 9d0be6e — Forever, un client, HV rescanné — **GO** — deux observations
+  faites dans la foulée de la séance prix :
+  **Gain de point de compétence** (`COC:OnSkillLines`, commit 20d93b8) : un point gagné fenêtre
+  Ingénierie OUVERTE met le panneau de droite à jour tout seul, sans rien fermer ni rouvrir.
+  C'était le but du correctif — la route suivait auparavant la liste d'AVANT le point.
+  **Découpage de `_ProfWindow_Route_Supply`** (commit c206978) : le bloc « Supplies (aggregated) »
+  et les « Recipe to buy » se peignent toujours, donc l'extraction n'a rien perdu en chemin.
+  ⚠️ **NON observé, toujours** : la priorité du prix VENDEUR sur le prix HV pour un réactif
+  achetable en ville. Ce qui a été vu n'est PAS ça — seulement qu'Auctionator n'ajoute une ligne
+  « Vendor » à son infobulle que lorsqu'un prix vendeur existe (un objet sans valeur de revente
+  n'affiche que « Auction »). C'est rassurant sur l'oracle, ce n'est pas la règle. Un seul
+  `/co pricedump` la trancherait : il imprime `vendeur=` et `HV=` côte à côte avec ce que
+  `ItemValue` a retenu.
+  ⚠️ Séance toujours sous la **panne de SavedVariables** de Forever : rien de persistant éprouvé.
+
 - 2026-09-23 — jusqu'a 32d994d — Forever, un client, HV rescanné en ouverture — **GO partiel** —
   **avec Auctionator** : le Plan de route se peint en entier (total estimé, 4 paliers chiffrés,
   « Supplies (aggregated) », plans à acheter), et la carte de recette affiche `To Craft` et
