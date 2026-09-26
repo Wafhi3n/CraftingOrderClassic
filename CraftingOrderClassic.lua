@@ -438,14 +438,6 @@ for _, ev in ipairs({ "TRADE_SKILL_SHOW", "TRADE_SKILL_LIST_UPDATE", "SKILL_LINE
 end
 f:SetScript("OnEvent", function(_, event, arg1)
     if event == "ADDON_LOADED" and arg1 == ADDON then
-        -- La base etait-elle ABSENTE au chargement ? Sur WoW: Forever (beta) le client ECRIT les
-        -- SavedVariables mais ne les RESTAURE pas : elle l'est donc a chaque session, et tout ce
-        -- que l'addon avait retenu -- annuaire, carnet, reglages -- repart de zero. Le joueur va
-        -- le CONSTATER et soupconner l'addon : on le lui dit, une fois, au chargement.
-        -- Silencieux pour qui a un contournement en place (ForeverSVFix restaure la base, donc
-        -- elle n'est pas nulle). Et sur une premiere installation le message reste VRAI : ses
-        -- reglages ne tiendront pas davantage. Ce n'est donc pas un faux positif.
-        COC._freshDB = (CraftingOrderClassicDB == nil)
         CraftingOrderClassicDB = CraftingOrderClassicDB or {}
         COC.db = CraftingOrderClassicDB
         -- Schéma SV versionné (échelle de migrations ordonnée) — voir CraftingOrderClassic_Migrations.lua.
@@ -478,7 +470,6 @@ f:SetScript("OnEvent", function(_, event, arg1)
         SLASH_CRAFTINGORDER2 = "/craftorder"
         SlashCmdList["CRAFTINGORDER"] = function(msg) COC:Slash(msg) end
         p(COC.L["chargé — |cFFFFFFFF/co help|r pour les commandes. (Réseau global de craft — autonome.)"])
-        if COC._freshDB then p(COC.L["Bug de WoW: Forever : le client ne rend pas leurs données aux addons. Annuaire, carnet et réglages repartent de zéro à chaque session — ce n'est pas COC. Correctif tiers : |cFFFFD100ForeverSVFix|r."]) end
     elseif event == "SKILL_LINES_CHANGED" then
         COC:OnSkillLines()
     else

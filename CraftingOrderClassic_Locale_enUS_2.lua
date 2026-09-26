@@ -367,7 +367,6 @@ local en2 = {
     ["Estimation : chance de point par couleur, prix du dernier scan HV (%s)."] = "Estimate: skill-up chance per color, prices from the last AH scan (%s).",
     ["Rien à calculer — scanne l'HV (Auctionator) puis rouvre ce panneau."] = "Nothing to compute — scan the AH (Auctionator) then reopen this panel.",
     ["Auctionator n'est pas là — sans lui, COC n'estime aucun prix."] = "Auctionator isn't installed — without it, COC can't estimate any price.",
-    ["Bug de WoW: Forever : le client ne rend pas leurs données aux addons. Annuaire, carnet et réglages repartent de zéro à chaque session — ce n'est pas COC. Correctif tiers : |cFFFFD100ForeverSVFix|r."] = "WoW: Forever bug: the client doesn't give addons their data back. Your directory, ledger and settings start over every session - this isn't COC. Third-party fix: |cFFFFD100ForeverSVFix|r.",
     ["Crafts attendus : ~%d"] = "Expected crafts: ~%d",
     ["Réactifs (espéré)"] = "Reagents (expected)",
     ["Plan à acheter"] = "Recipe to buy",

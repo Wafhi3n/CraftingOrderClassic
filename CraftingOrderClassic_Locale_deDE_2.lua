@@ -347,7 +347,6 @@ local de2 = {
     ["Estimation : chance de point par couleur, prix du dernier scan HV (%s)."] = "Schätzung: Skill-Chance je Farbe, Preise vom letzten AH-Scan (%s).",
     ["Rien à calculer — scanne l'HV (Auctionator) puis rouvre ce panneau."] = "Nichts zu berechnen — scanne das AH (Auctionator) und öffne dieses Fenster erneut.",
     ["Auctionator n'est pas là — sans lui, COC n'estime aucun prix."] = "Auctionator fehlt — ohne ihn kann COC keine Preise schätzen.",
-    ["Bug de WoW: Forever : le client ne rend pas leurs données aux addons. Annuaire, carnet et réglages repartent de zéro à chaque session — ce n'est pas COC. Correctif tiers : |cFFFFD100ForeverSVFix|r."] = "WoW:-Forever-Fehler: Der Client gibt Addons ihre Daten nicht zurueck. Verzeichnis, Auftragsbuch und Einstellungen beginnen jede Sitzung von vorn - das liegt nicht an COC. Fremdloesung: |cFFFFD100ForeverSVFix|r.",
     ["Crafts attendus : ~%d"] = "Erwartete Crafts: ~%d",
     ["Réactifs (espéré)"] = "Materialien (erwartet)",
     ["Plan à acheter"] = "Zu kaufendes Rezept",

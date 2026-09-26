@@ -348,7 +348,6 @@ local es2 = {
     ["Estimation : chance de point par couleur, prix du dernier scan HV (%s)."] = "Estimación: probabilidad de punto por color, precios del último escaneo de la subasta (%s).",
     ["Rien à calculer — scanne l'HV (Auctionator) puis rouvre ce panneau."] = "Nada que calcular — escanea la casa de subastas (Auctionator) y vuelve a abrir este panel.",
     ["Auctionator n'est pas là — sans lui, COC n'estime aucun prix."] = "Falta Auctionator — sin él, COC no puede estimar ningún precio.",
-    ["Bug de WoW: Forever : le client ne rend pas leurs données aux addons. Annuaire, carnet et réglages repartent de zéro à chaque session — ce n'est pas COC. Correctif tiers : |cFFFFD100ForeverSVFix|r."] = "Fallo de WoW: Forever: el cliente no devuelve sus datos a los addons. Directorio, libro y ajustes empiezan de cero cada sesion; no es cosa de COC. Arreglo externo: |cFFFFD100ForeverSVFix|r.",
     ["Crafts attendus : ~%d"] = "Fabricaciones esperadas: ~%d",
     ["Réactifs (espéré)"] = "Componentes (esperado)",
     ["Plan à acheter"] = "Receta a comprar",

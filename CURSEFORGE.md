@@ -248,18 +248,3 @@ characters (off by default), `/co mute` and `/co trust` handle noisy or trusted 
 
 Made for fresh realms and guild-economy challenges, and for servers where the auction house isn't the
 answer.
-
-## Beta note: Forever forgets what addons remember
-
-The beta writes addon data to disk but doesn't read it back when you log in. Everything this addon
-keeps — your artisan directory, your ledger, your settings, your muted list — starts over every
-session. It's a client bug, not this addon, and no addon can work around it: there is nowhere left
-to store anything, I checked.
-
-What still works is everything the addon reads from the game itself each session: your professions
-and recipes, the profession window column, the levelling route, prices from Auctionator's scan.
-Your directory also refills on its own as people around you come online.
-
-The addon says all this once when it loads, and stays quiet if you already have a fix in place. If
-you want your data to stick, ForeverSVFix (github.com/nobewayo/ForeverSVFix) restores saved
-variables until Blizzard fixes the client.
