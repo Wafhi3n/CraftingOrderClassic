@@ -346,9 +346,16 @@ end
 -- PR:IsAvailable() — ici on ne fait que la consulter. Libellé court à dessein : la rangée est la
 -- SEULE chose qui contraint encore la largeur de la colonne (sizeColumn prend le max), donc chaque
 -- caractère de plus élargit la fenêtre native de Forever d'autant (arbitrage du user, 2026-09-21).
+--
+-- ⚠️ La languette « route » dit **Route**, pas « Plan de route » — et ce n'est pas une étourderie
+-- à « corriger ». Un libellé de languette coûte de la LARGEUR À LA FENÊTRE, pas seulement de la
+-- place dans la rangée : `sizeColumn` prend le max, et la fenêtre native s'élargit d'autant. Sur
+-- le relevé du 2026-09-26 la rangée fait 213 px pour 8 px de marge, et un 5ᵉ onglet est spécifié
+-- (Travail, cf. docs/specs/lfw-forever.md) — ce sont ces caractères-là qui lui font la place.
+-- La VUE, elle, garde le mot entier dans son titre (`_ProfWindow_Route.lua`) : là il ne coûte rien.
 local VIEWS = {
     { id = "orders", label = function() return L["Commandes"] end },
-    { id = "route",  label = function() return L["Plan de route"] end },
+    { id = "route",  label = function() return L["Route"] end },
     { id = "learn",  label = function() return L["Manquantes"] end },
     { id = "profit", label = function() return L["Profit"] end,
       shown = function() return (COC.Profit and COC.Profit:IsAvailable()) and true or false end },

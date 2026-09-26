@@ -330,6 +330,7 @@ local es2 = {
     ["Plan : à farmer (butin/quête — absent de l'HV)"] = "Receta: a farmear (botín/misión — no está en la subasta)",
     -- Plan de route (montée de métier)
     ["Plan de route"] = "Ruta de subida",
+    ["Route"] = "Ruta",               -- languette courte (la vue garde « Ruta de subida »)
     ["Plan de route : quoi crafter pour monter au moins cher."] = "Ruta de subida: qué fabricar para subir al menor coste.",
     ["En tête : rang actuel, plafond entraînable, et coût total estimé (« > » = des rangs sans recette calculable, total incomplet)."] =
         "Arriba: rango actual, tope entrenable y el coste total estimado («>» = algunos rangos no tienen receta calculable, el total está incompleto).",
