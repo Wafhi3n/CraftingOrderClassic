@@ -24,15 +24,20 @@ local PW   = COC.ProfWindow
 -- faire, et le client seul le sait. `ReadRecipes` écarte déjà les non-apprises, y compris sur
 -- MAINLINE où la fenêtre native les liste aussi.
 --
--- ⚠️ PAS DE CACHE PAR MÉTIER, contrairement à l'univers des réactifs. Celui-là vient d'un
--- catalogue statique, ses IDs ne bougent pas de la session. Celui-ci, si : on apprend une recette
--- en cours de route, et un joueur qui vient d'acheter son plan doit pouvoir le proposer tout de
--- suite. La lecture est bornée (les recettes d'UN métier) et n'arrive qu'à l'ouverture du panneau.
+-- MIS EN CACHE, et VIDÉ SUR ÉVÉNEMENT. `ReadRecipes` parcourt toute la liste du client en
+-- appelant plusieurs API par ligne : le rappeler à chaque touche frappée dans la recherche du
+-- picker serait cher pour rien. Mais on apprend des recettes en jouant, donc un cache « pour la
+-- session » mentirait — celui qui vient d'acheter son plan doit pouvoir le proposer tout de suite.
+-- `TRADE_SKILL_LIST_UPDATE` est exactement l'événement qui dit que cette liste a changé : il vide
+-- les DEUX univers, celui des recettes et celui des réactifs, qui en dérive.
 --
 -- Une recette sans `spellID` est écartée : c'est l'identifiant que le fil transporte (LFR), donc
 -- sans lui il n'y a rien à annoncer. Le backend le dit lui-même : il « peut rester nil si l'API
 -- sous-jacente ne l'expose pas ».
 function PW:_LFWRecipeUniverse()
+    local key = self.profKey or "?"
+    self._lfwRecUniv = self._lfwRecUniv or {}
+    if self._lfwRecUniv[key] then return self._lfwRecUniv[key] end
     local craft = COC.Craft
     local list  = craft and craft.ReadRecipes and craft:ReadRecipes()
     local out, seen = {}, {}
@@ -42,8 +47,20 @@ function PW:_LFWRecipeUniverse()
             out[#out + 1] = { id = r.spellID, name = r.name or ("spell:" .. r.spellID), icon = r.icon }
         end
     end
+    -- Une lecture VIDE ne se met pas en cache : `ReadRecipes` rend nil quand aucune fenêtre de
+    -- métier n'est ouverte, et figer ce vide condamnerait le picker pour toute la session.
+    if #out > 0 then self._lfwRecUniv[key] = out end
     return out
 end
+
+-- Le client dit lui-même quand sa liste de recettes change — apprentissage, changement de métier,
+-- premier remplissage après l'ouverture. On ne devine pas, on écoute.
+local inval = CreateFrame("Frame")
+inval:RegisterEvent("TRADE_SKILL_LIST_UPDATE")
+inval:SetScript("OnEvent", function()
+    PW._lfwRecUniv, PW._lfwUniv = nil, nil
+    if PW.lfwPanel and PW.lfwPanel:IsShown() and PW._RefreshLFWList then PW:_RefreshLFWList() end
+end)
 
 -- ------------------------------------------------------------------
 -- La rangée de modes du picker

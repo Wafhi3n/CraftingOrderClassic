@@ -290,20 +290,42 @@ end
 -- ------------------------------------------------------------------
 -- Données du picker
 -- ------------------------------------------------------------------
--- Univers d'un métier : UNION des réactifs de toutes ses recettes (catalogue CraftLink), filtrée par
+-- Univers d'un métier : les réactifs des recettes que CE personnage SAIT FAIRE, filtrés par
 -- existence côté client (données multi-flavor : un réactif TBC n'apparaît pas sur un client Era).
--- Mémorisé par métier (session) — les IDs ne bougent pas, seuls les NOMS se résolvent async.
+--
+-- ⚠️ C'ÉTAIT l'union des réactifs de TOUTES les recettes du catalogue, et c'était trop large. Vu
+-- sur capture le 2026-09-26 : un artisan du cuir à 82/150 se voyait proposer « Bloodvine » et
+-- « Azerothian Diamond » — du contenu qu'il ne touchera pas avant longtemps, ou jamais. On fournit
+-- des composants pour ce qu'on va CRAFTER : la liste se restreint donc à ce qu'on sait faire, et
+-- elle rétrécit d'autant. Décision du user, 2026-09-26.
+--
+-- REPLI ASSUMÉ : si le client ne sait pas dire ce qu'on connaît — `ReadRecipes` rend nil quand
+-- aucune fenêtre de métier n'est ouverte, ce qui est le cas de la vue compacte d'un métier de
+-- RÉCOLTE — on retombe sur le catalogue entier. Une liste trop large reste utilisable ; une liste
+-- vide, non, et elle se lirait comme une panne.
+--
+-- Le cache ne peut plus être « par métier pour la session » : on apprend des recettes en jouant.
+-- Il est vidé sur `TRADE_SKILL_LIST_UPDATE` (cf. _ProfWindow_LFW_Recipes), l'événement que le
+-- client envoie justement quand cette liste change. Première idée écartée : une empreinte tirée du
+-- NOMBRE de recettes connues — la calculer obligeait à relire toute la liste, donc à chaque touche
+-- frappée dans la recherche. Un cache dont la clé coûte le prix du calcul n'est pas un cache.
 function PW:_LFWUniverse(profKey)
     self._lfwUniv = self._lfwUniv or {}
     if self._lfwUniv[profKey] then return self._lfwUniv[profKey] end
+    local known = self._LFWRecipeUniverse and self:_LFWRecipeUniverse() or nil
     local c = CL()
-    local def = c and c.GetProfession and c:GetProfession(profKey)
     local seen, out = {}, {}
-    for _, list in pairs((def and def.reagents) or {}) do
-        for _, rg in ipairs(list) do
+    local function take(list)
+        for _, rg in ipairs(list or {}) do
             local id = rg[1]
             if id and not seen[id] and Skin.ItemExists(id) then seen[id] = true; out[#out + 1] = id end
         end
+    end
+    if known and #known > 0 and c and c.RecipeReagents then
+        for _, e in ipairs(known) do take(c:RecipeReagents(profKey, e.id)) end
+    else
+        local def = c and c.GetProfession and c:GetProfession(profKey)
+        for _, list in pairs((def and def.reagents) or {}) do take(list) end
     end
     self._lfwUniv[profKey] = out
     return out
