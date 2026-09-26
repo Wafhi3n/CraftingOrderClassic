@@ -36,6 +36,19 @@ client.
 
 ## Relevés
 
+- 2026-09-26 (6) — jusqu'a 70a15c8 — Forever, un client, client en ANGLAIS — **GO sur la bascule
+  LFW, croisée avec la commande** — rapporté par le user : *« co lfw fait la même chose que quand
+  je clique dessus »*. **C'est LE critère de la bande** : elle affiche un état, donc il faut
+  prouver qu'elle ne ment pas. Deux chemins indépendants (la commande et le clic) donnent le même
+  résultat, sur Leatherworking comme sur Engineering.
+  Le bouton **« Offre »** est lisible là où l'engrenage ne l'était pas — mais le user l'a vu
+  « en arrière ». Cause : il était créé sur le cadre de la colonne et seulement ANCRÉ sur la bande,
+  donc **frère** et non enfant, deux frames au même niveau et un ordre de dessin indécis. Corrigé
+  (enfant + niveau explicite) — **à revoir à l'écran**.
+  PÉRIMÈTRE, toujours pas observé : le **panneau d'offre** lui-même (l'« Offre » n'a pas encore été
+  cliqué, et son ancrage a été corrigé par le calcul, jamais vu) ; la vue compacte d'un métier de
+  **récolte** ; le **combat** ; et tout l'étage réception, qui demande le banc 2 comptes.
+
 - 2026-09-26 (5) — jusqu'a dc086d5 — Forever, un client, client en ANGLAIS — **GO partiel sur la
   bande LFW** — capture d'écran, métier Engineering 130/150, après `/reload` (aucun redémarrage).
   La bande est **présente en pied de colonne**, sous le récapitulatif `0 pending · 0 accepted ·

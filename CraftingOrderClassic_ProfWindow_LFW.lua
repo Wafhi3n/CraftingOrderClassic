@@ -58,7 +58,7 @@ function PW:_BuildLFWStrip(f)
     s:SetScript("OnLeave", GameTooltip_Hide)
     s:Hide()
     self.lfwStrip = s
-    if self._BuildLFWOfferBtn then self:_BuildLFWOfferBtn(f, s) end
+    if self._BuildLFWOfferBtn then self:_BuildLFWOfferBtn(s) end
 end
 
 -- Etat de la bande : visible sur un metier A MOI en colonne, et elle DIT lequel quand elle est
@@ -98,11 +98,21 @@ end
 -- `Documentation/wow-ui-textures-classic/`, PAS l'export Lua/XML. L'export ne contient aucun asset
 -- et donne des faux négatifs — `MoneyFrame\UI-GoldIcon` n'y figure pas davantage, et elle s'affiche
 -- très bien dans la vue Profit.
-function PW:_BuildLFWOfferBtn(f, strip)
+function PW:_BuildLFWOfferBtn(strip)
     if self.lfwCfgBtn then return end
-    local b = Skin.MakeGoldButton(f, 56, 16, L["Offre"])
-    -- DANS la bande, calé à droite : l'état à gauche, le réglage ferme la ligne.
+    -- ENFANT de la bande, pas frère. Il était créé sur le cadre de la colonne et seulement ANCRÉ
+    -- sur la bande : deux frères au même niveau, donc un ordre de dessin qui ne se décide pas — le
+    -- user l'a vu « en arrière » le 2026-09-26. Enfant, il passe devant par construction, il se
+    -- montre et se cache avec elle, et le niveau explicite ne laisse plus la question ouverte.
+    local b = Skin.MakeGoldButton(strip, 56, 16, L["Offre"])
     b:SetPoint("RIGHT", strip, "RIGHT", -2, 0)
+    b:SetFrameLevel((strip:GetFrameLevel() or 0) + 2)
+    -- Et le texte d'état s'arrête AVANT le bouton : « Dispo — Leatherworking » est déjà long, et
+    -- un libellé sans bord droit passerait dessous au lieu d'être tronqué.
+    if strip.text then
+        strip.text:SetPoint("RIGHT", b, "LEFT", -4, 0)
+        strip.text:SetWordWrap(false)
+    end
     b:SetScript("OnClick", function() PW:ToggleLFWConfig() end)
     b:SetScript("OnEnter", function(s)
         GameTooltip:SetOwner(s, "ANCHOR_TOPLEFT")
