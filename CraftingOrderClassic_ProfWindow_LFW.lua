@@ -399,6 +399,9 @@ function PW:_RefreshLFWPanel()
     local D = COC.Directory
     local o = (D and D:MyLFWOffer(self.profKey)) or {}
     p._filling = true
+    -- Le mode courant se remarque a CHAQUE ouverture : le panneau est reutilise d'un metier a
+    -- l'autre, et un bouton laisse dans l'etat d'une session precedente mentirait.
+    if self._SyncLFWModeTabs then self:_SyncLFWModeTabs(p) end
     p.title:SetText(string.format(L["Recherche de travail — %s"], Skin.ProfLabel(self.profKey) or self.profKey))
     p.basics:SetChecked(o.basics and true or false)
     p.skillUp:SetChecked(o.skillUpOnly and true or false)

@@ -4,7 +4,7 @@
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
-133 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
+134 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
 
 ## Modules (ordre de chargement)
 
@@ -16,11 +16,11 @@
 | `CraftingOrderClassic_Migrations.lua` | versionnage du schéma SavedVariables. | 40 |
 | `CraftingOrderClassic_Locale.lua` | socle de localisation du CHROME de l'UI. | 12 |
 | `CraftingOrderClassic_Locale_enUS.lua` | overlay ANGLAIS (enUS/enGB). | 280 |
-| `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 495 |
+| `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 498 |
 | `CraftingOrderClassic_Locale_deDE.lua` | overlay ALLEMAND (deDE). | 282 |
-| `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 475 |
+| `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 478 |
 | `CraftingOrderClassic_Locale_esES.lua` | overlay ESPAGNOL (esES/esMX). | 283 |
-| `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 476 |
+| `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 479 |
 | `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 356 |
 | `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 353 |
 | `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 353 |
@@ -102,7 +102,8 @@
 | `CraftingOrderClassic_Profit.lua` | pont LECTURE SEULE vers l'oracle de prix, AUCTIONATOR. | 477 |
 | `CraftingOrderClassic_ProfWindow_Orders.lua` | colonne « Commandes » de la vue métier (cabine de l'artisan) : construction (onglets de relation, en-tête, scroll), vue LISTE (une ligne par commande : demandeur + prix + âge ; une ligne sourdine cliquée se réaffiche), collecte/tri et rafraîchissement. | 499 |
 | `CraftingOrderClassic_ProfWindow_Orders_Card.lua` | vue SÉLECTIONNÉE de la colonne « Commandes » : la carte complète d'une commande (composants fournis, repères Auctionator, ACCEPTER / REFUSER / CHUCHOTER ; croix en haut à droite = retour liste). | 315 |
-| `CraftingOrderClassic_ProfWindow_LFW.lua` | config de l'OFFRE « recherche de travail » par métier. | 425 |
+| `CraftingOrderClassic_ProfWindow_LFW.lua` | config de l'OFFRE « recherche de travail » par métier. | 458 |
+| `CraftingOrderClassic_ProfWindow_LFW_Recipes.lua` | le SÉLECTEUR DE RECETTES de l'offre LFW. | 91 |
 | `CraftingOrderClassic_ProfWindow_Reroll.lua` | vue métier LECTURE SEULE d'un REROLL. | 118 |
 | `Directory.lua` | Crafting Order - Classic — Directory : l'annuaire des GENS (présence + qui peut crafter quoi). | 485 |
 | `Directory_Presence.lua` | présence : la vérité JEU (amis/guilde) et sa fusion avec la vérité ADDON. | 90 |
@@ -1810,6 +1811,20 @@
 > re-diffusion LFO débouncée). Éditable même LFW éteint : la config part au prochain SetLFW.
 
 **API** : `PW:ToggleLFWConfig()`
+
+### `CraftingOrderClassic_ProfWindow_LFW_Recipes.lua`
+> CraftingOrderClassic_ProfWindow_LFW_Recipes.lua — le SÉLECTEUR DE RECETTES de l'offre LFW.
+> 
+> Le panneau d'offre savait déjà choisir des RÉACTIFS (« je fournis ceci »). Il sait maintenant
+> choisir des RECETTES (« je propose ceci »), diffusées par le verbe LFR. Plutôt qu'un second
+> sélecteur — sa liste, sa recherche, son pool de lignes, son rendu — le picker existant gagne
+> DEUX MODES et une rangée pour en changer. Un seul chemin de code à corriger le jour où il aura
+> un défaut, et 100 lignes de duplication en moins.
+> 
+> Ce fichier ne porte que ce qui est PROPRE aux recettes : l'univers, la rangée de modes, la
+> bascule. Les branches dans `_LFWDisplayList` / `_RefreshLFWList` / `_RenderLFWList` restent chez
+> leur propriétaire (_ProfWindow_LFW.lua), minces et lisibles. Il vit à part parce que son hôte
+> frôlait les 500 lignes, pas parce qu'il est d'une autre nature.
 
 ### `CraftingOrderClassic_ProfWindow_Reroll.lua`
 > CraftingOrderClassic_ProfWindow_Reroll.lua — vue métier LECTURE SEULE d'un REROLL.

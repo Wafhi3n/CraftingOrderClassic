@@ -66,11 +66,16 @@ function PW:_BuildLFWModeTabs(p)
         p.modeBtns[d.id] = b
         prev = b
     end
-    self:_SyncLFWModeTabs()
+    self:_SyncLFWModeTabs(p)
 end
 
-function PW:_SyncLFWModeTabs()
-    local p = self.lfwPanel
+-- ⚠️ Le panneau se passe en ARGUMENT, et ce n'est pas un raffinement. `_BuildLFWPanel` n'assigne
+-- `self.lfwPanel` qu'APRES avoir construit le picker : appelee sans argument depuis la
+-- construction, cette fonction lisait nil et sortait en silence. Resultat vu en jeu le 2026-09-26 :
+-- les deux boutons de mode rendus a l'identique, aucun marque, impossible de savoir lequel est
+-- actif. Un etat qui ne se voit pas vaut un etat faux.
+function PW:_SyncLFWModeTabs(panel)
+    local p = panel or self.lfwPanel
     if not (p and p.modeBtns) then return end
     for id, b in pairs(p.modeBtns) do b:SetSelected(p.pickMode == id) end
 end
