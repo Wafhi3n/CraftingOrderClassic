@@ -406,6 +406,11 @@ local en2 = {
     ["Coche « Inclure les plans à acheter » pour en combler une partie."] =
         "Check \"Include recipes to buy\" to fill some of them.",
     ["Coût partiel : au moins un réactif sans prix HV."] = "Partial cost: at least one reagent has no AH price.",
+    -- Plan de route : le stock (sacs + ce que la route fabrique en chemin)
+    ["Déjà dans tes sacs : %s"] = "Already in your bags: %s",
+    ["Fabriqué aux étapes d'avant : %s"] = "Made in earlier steps: %s",
+    ["Ce que tu as déjà en sac est déduit."] = "What's already in your bags is subtracted.",
+    ["Tout ce qu'il faut est déjà dans tes sacs."] = "Everything you need is already in your bags.",
     ["Désenchanter : objets %s, niv. d'objet %d-%d (estimation)"] = "Disenchant: %s items, item level %d-%d (estimate)",
     -- Échange enchanteur, étage 2 : invite un-clic côté client
     ["%s propose d'enchanter : %s. Poser la pièce dans l'emplacement « ne sera pas échangé » ? Rien n'est donné — tu la récupères enchantée."] =

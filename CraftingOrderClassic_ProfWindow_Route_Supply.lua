@@ -36,9 +36,18 @@ function PW:_FillRouteSupply(f, route, startY)
         y = self:_FillRouteGateway(f, used, y, route)   -- au plafond : comment débloquer la suite
     elseif route and not route.done and U and U._FillSupplyBlock and COC.Route then
         local m = COC.Route:Materials(self.profKey, route)
-        if m and (#m.mats > 0 or #m.plans > 0) then
+        local any = m and (#m.mats > 0 or #m.plans > 0)
+        if any or (m and m.fromBags) then
             y = U:_NeedsTextLine(f, used, y + 8, "|cFFE8B84B" .. L["Fournitures (agrégées)"] .. "|r")
-            y = U:_FillSupplyBlock(f, used, y, self.profKey, m)
+        end
+        if any then y = U:_FillSupplyBlock(f, used, y, self.profKey, m) end
+        -- Les sacs ont été déduits (COC.Route:Materials) : la liste est un RESTE. Le dire, sinon un
+        -- joueur qui compte ses retailles croit la route fausse. Liste vide ET route sans trou = tout
+        -- est déjà là (avec des trous, on ne sait pas ce qui manque : on ne promet rien).
+        if m and m.fromBags then
+            local all = not any and not m.gaps
+            y = U:_NeedsTextLine(f, used, y, "|cFF888888" .. (all and L["Tout ce qu'il faut est déjà dans tes sacs."]
+                or L["Ce que tu as déjà en sac est déduit."]) .. "|r")
         end
     end
     -- « À apprendre maintenant » (soft-dep _ProfWindow_Learn) : ce que la route ne montre pas, parce

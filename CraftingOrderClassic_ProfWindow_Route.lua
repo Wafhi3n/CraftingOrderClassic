@@ -19,6 +19,8 @@ PW.ROUTE_ROW_H = ROW_H
 -- Flèche « vers » en TEXTURE native : la police rend « → » en tofu (piège wow-ui-tofu-textures,
 -- vu en jeu sur la capture user 2026-07-17 — « Rank 250 □ 300 »).
 local ARROW = "|TInterface\\ChatFrame\\ChatFrameExpandArrow:12:12|t"
+-- Sac : un segment qui puise dans le stock (sacs, ou ce que la route a fabriqué avant lui).
+local BAG = "|TInterface\\Icons\\INV_Misc_Bag_08:12:12|t"
 
 -- La route de MON perso : rang/plafond de la session ouverte + couleur LIVE du client au rang
 -- courant (les seuils Wowhead basculent à ±1 rang des couleurs réelles — dump user 2026-07-18,
@@ -68,8 +70,17 @@ function PW:_ComputeRoute()
     -- Plans achetables INCLUS par défaut (case « inclure les plans » — db.routePlans, nil = coché) :
     -- indépendante de celle de la bourse (db.needsPlans) — deux fenêtres, deux préférences.
     local withPlans = not (COC.db and COC.db.routePlans == false)
+    -- Mes SACS : ce qui y dort est déjà payé, la route le consomme avant de passer à l'HV (cf.
+    -- COC.Route, bloc « stock »). Compteur mémoïsé le temps de CE calcul : la route et le bloc
+    -- fournitures (Materials, même `bag` porté par la route) interrogent les mêmes objets.
+    local counts = {}
+    local function bag(id)
+        local v = counts[id]
+        if v == nil then v = (COC.Api.GetItemCount and COC.Api.GetItemCount(id, false)) or 0; counts[id] = v end
+        return v
+    end
     return COC.Route:Compute(self.profKey, rank, maxRank,
-        { known = self:_KnownRecipeSet(), live = live, plans = withPlans })
+        { known = self:_KnownRecipeSet(), live = live, plans = withPlans, bag = bag })
 end
 
 -- Nom affichable d'un segment : objet produit (localisé si en cache client), repli nom canonique
@@ -92,6 +103,23 @@ local function headText(profKey, from, to)
         .. "|cFF9AC0E8" .. from .. "|r" .. ARROW .. "|cFF9AC0E8" .. to .. "|r"
 end
 
+-- « Ruined Leather Scraps ×43, Light Leather ×19 » — ce qu'un segment prend au stock (seg.bag /
+-- seg.made, posés par COC.Route). nil si rien : pas de ligne vide dans l'infobulle.
+local function stockText(map)
+    local lib = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
+    local parts = {}
+    for id, q in pairs(map or {}) do
+        local n = math.floor(q + 0.5)
+        if n > 0 then
+            local nm = COC.Api.GetItemInfo and COC.Api.GetItemInfo(id)
+            if not nm and lib and lib.ItemName then nm = lib:ItemName(id) end
+            parts[#parts + 1] = (nm or ("item:" .. id)) .. " ×" .. n
+        end
+    end
+    table.sort(parts)
+    return parts[1] and table.concat(parts, ", ") or nil
+end
+
 local function segTooltip(row)
     local s = row.seg; if not s then return end
     GameTooltip:SetOwner(row, "ANCHOR_RIGHT"); GameTooltip:ClearLines()
@@ -104,6 +132,9 @@ local function segTooltip(row)
     else
         GameTooltip:AddLine(string.format(L["Crafts attendus : ~%d"], math.ceil(s.crafts - 0.001)), 0.60, 0.75, 0.91)
         GameTooltip:AddLine(L["Réactifs (espéré)"] .. " : " .. COC.Api.Coin(math.floor(s.cost + 0.5)), 0.60, 0.75, 0.91)
+        local bag, made = stockText(s.bag), stockText(s.made)
+        if bag then GameTooltip:AddLine(string.format(L["Déjà dans tes sacs : %s"], bag), 0.55, 0.85, 0.55, true) end
+        if made then GameTooltip:AddLine(string.format(L["Fabriqué aux étapes d'avant : %s"], made), 0.55, 0.85, 0.55, true) end
         if (s.plan or 0) > 0 then
             GameTooltip:AddLine(L["Plan à acheter"] .. " : " .. COC.Api.Coin(s.plan), 0.91, 0.72, 0.29)
         end
@@ -246,7 +277,12 @@ local function fillSegRow(row, s)
         local plan = (s.plan or 0) > 0 and "|TInterface\\Icons\\INV_Scroll_03:12:12|t " or ""
         row.name:SetText(plan .. segName(s.sid, s.prod)
             .. string.format(" |cFFAAAAAA×~%d|r", math.ceil(s.crafts - 0.001)))
-        row.cost:SetText(COC.Api.Coin(math.floor(s.cost + (s.plan or 0) + 0.5))
+        -- Sac = le segment puise dans le stock (le détail est dans l'infobulle). Tout en sac → le
+        -- sac SEUL : « 0c » se lirait comme un prix manquant, pas comme « tu as déjà tout ».
+        local total = math.floor(s.cost + (s.plan or 0) + 0.5)
+        local stocked = (next(s.bag or {}) or next(s.made or {})) and true or false
+        local coin = (total > 0 or not stocked) and COC.Api.Coin(total) or ""
+        row.cost:SetText((stocked and (BAG .. (coin ~= "" and " " or "")) or "") .. coin
             .. (s.partial and " |cFF888888(?)|r" or ""))   -- coût partiel : réactif sans prix HV
     end
     row:Show()
