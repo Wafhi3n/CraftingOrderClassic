@@ -36,6 +36,26 @@ client.
 
 ## Relevés
 
+- 2026-09-26 — jusqu'a 45e6f02 — Forever, un client, **client en ANGLAIS** — **GO sur la page
+  Profit (affichage)** — capture d'écran à l'appui, métier Engineering 130/150, Auctionator présent
+  et scanné. La languette **Profit** existe dans la rangée et s'ouvre ; la liste affiche
+  « Profitable (14) » et elle est **triée par marge décroissante** — vérifié en relisant les
+  montants : `1po 62pa 49pc`, puis `12pa 40pc`, `10pa 88pc`, `8pa 67pc` … jusqu'à `4pc`. Les
+  montants sont formatés en or/argent/cuivre. La fenêtre native n'est **ni fermée ni déplacée**, une
+  recette y est sélectionnée et son panneau de détail porte « To Craft » et « Profit ».
+  ⚠️ **DÉFAUT VU** : le bouton d'aide « i » **recouvre le coin haut-droit de la languette Profit**.
+  Mesuré par `/co geo` (`!! aide x vues : 11 x 17 px`) ET visible sur la capture. Cliquer ce coin
+  ouvre l'aide au lieu de changer de vue. Cause : le « i » est ancré à 16 px du bord DROIT de la
+  colonne, sur la ligne de la rangée — une place qui était vide à trois languettes.
+  PÉRIMÈTRE, ce qui n'a PAS été observé : que **le clic sur une ligne de Profit** soit bien ce qui
+  a sélectionné la recette dans la fenêtre native (plausible sur la capture, pas rapporté) ; le cas
+  **Auctionator absent**, où la languette ne doit pas apparaître du tout ; la disparition des textes
+  « Lazy Gold » ; le comportement en combat. Les deux commits `f353468` et `925f981` restent donc
+  non éprouvés malgré ce relevé.
+  Relevé de géométrie du même jour : colonne 227 px, rangée de vues 212 px à **4 languettes**, marge
+  droite **9 px**. Les libellés mesurés sont les ANGLAIS (`Orders`, `Leveling route`, `Missing`,
+  `Profit`).
+
 - 2026-09-23 (4) — jusqu'a b50f724 — Forever, un client — **GO** — la capture du RANG chez le
   formateur, vue fonctionner : visite d'un formateur d'Enchantement, `/reload`, et la SavedVariable
   porte `ranks = { [7420]=15, [7426]=40, [7454]=45, [7457]=50, [7748]=60, [7771]=70, [14293]=10,
