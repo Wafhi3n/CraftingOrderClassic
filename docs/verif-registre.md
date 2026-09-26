@@ -36,6 +36,30 @@ client.
 
 ## Relevés
 
+- 2026-09-26 (3) — jusqu'a fe922f2 — Forever, un client, client en ANGLAIS — **GO mesuré sur la
+  géométrie** — `/co geo`, **3 vues relevées sur 3** (orders, route, learn), métier Engineering.
+  Le correctif du bouton d'aide est confirmé par l'outil, pas seulement à l'œil :
+
+  ```
+  aide           x 521..538   (avant : 726..743)
+  rangee vues    x 539..752   213 px, 4 onglets, marge droite 8 px
+  colonne        x 519..760   241 px   (avant : 227 px)
+  ok  aucune des 6 paires surveillees ne se chevauche
+  ```
+
+  Le `!! aide x vues : 11 x 17 px` du matin a **disparu** dans les trois vues. La colonne a grandi
+  de **14 px** (et la fenêtre hôte d'autant, 714 → 728) — c'est le prix voulu de la gouttière ;
+  j'avais estimé +20, la mesure dit +14.
+  **Ce que ce relevé apprend pour la rangée à cinq** : la rangée fait 213 px pour quatre libellés
+  anglais (33 caractères) et il reste 8 px de marge. Le 5ᵉ onglet ne tient donc pas dans cette
+  marge — mais `Leveling route` → `Route` (décidé dans `docs/specs/lfw-forever.md`) libère
+  ~9 caractères, de quoi l'absorber. À confirmer par un relevé après coup, pas par ce calcul.
+  ⚠️ **Défaut de conception trouvé par ces chiffres, et corrigé dans la spec avant d'être codé** :
+  la languette Travail devait changer de texte selon l'état (`Travail` / `● Dispo`). Or
+  `bar:SetText` rappelle `PanelTemplates_TabResize` — la languette aurait changé de LARGEUR au clic,
+  pour 8 px de marge disponible. L'état se portera par la couleur.
+  PÉRIMÈTRE : rien de neuf sur le fond de la page Profit ici, c'est un relevé de géométrie.
+
 - 2026-09-26 (2) — jusqu'a f2af930 — Forever, un client, client en ANGLAIS — **GO sur le
   déplacement du bouton d'aide** — capture d'écran après `/reload`. Le « i » est passé au bout
   GAUCHE de la rangée, juste avant `Orders`, et le coin haut-droit de la languette `Profit` est

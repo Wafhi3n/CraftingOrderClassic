@@ -215,7 +215,7 @@ chercher.
 ### Retenu : cinq languettes, dont une qui porte son état
 
 ```
-[ Commandes ][ Profit ][ Route ][ Manquantes ][ ● Dispo ]
+[ Commandes ][ Profit ][ Route ][ Manquantes ][ Travail ]
 ```
 
 - **Ordre par nature** : le carnet, l'argent, les deux pages de progression, puis moi. Travail en
@@ -226,9 +226,20 @@ chercher.
   (`prix-maison.md` dit « Rentabilité » côté joueur ; sur la **languette**, la décision plus récente
   et plus précise l'emporte.)
 - **La languette Travail porte l'état.** Une languette non sélectionnée reste affichée : elle est
-  donc le bon support pour un état persistant. Éteint elle dit `Travail` ; allumé elle dit
-  `● Dispo` en vert, quelle que soit la vue affichée. On résout la visibilité **sans** dépenser une
+  donc le bon support pour un état persistant. On résout la visibilité **sans** dépenser une
   surface de plus, et sans icône nue.
+
+  ⚠️ **CORRIGÉ le 2026-09-26 — l'état se porte par la COULEUR, pas par un texte différent.** La
+  première version disait « `Travail` éteint, `● Dispo` en vert allumé ». Deux textes de longueurs
+  différentes sur la même languette, c'est une languette qui **change de largeur au clic** :
+  `bar:SetText` rappelle `PanelTemplates_TabResize` (`_UI_Skin_Native.lua`), la rangée s'allonge, et
+  la colonne ne suit pas — elle n'est dimensionnée qu'à la greffe (`sizeColumn`). Le relevé du
+  2026-09-26 donne **8 px** de marge à droite : `● Dispo` contre `Travail`, c'est déjà plus. On
+  aurait donc obtenu une languette qui déborde de sa colonne un clic sur deux, et le
+  `!! aide x vues` qu'on vient de corriger serait revenu par une autre porte.
+  Règle : **le libellé de cette languette ne change jamais.** L'état se lit à sa couleur (vert
+  quand je suis dispo), qui ne coûte pas un pixel. Si une pastille est jugée nécessaire, elle doit
+  être présente dans les DEUX états — allumée ou éteinte — pour que la largeur reste constante.
 - **`Plan de route` devient `Route`** dans la languette. C'est le libellé qui coûte le plus cher
   pour ce qu'il ajoute, et le titre de la vue continue de dire le mot entier.
 - **Le contenu de la vue Travail** : l'interrupteur en tête, puis le réglage d'offre existant
@@ -254,10 +265,14 @@ Le design ci-dessus ne change pas selon le résultat ; seul le repli de libellé
    Observateur : le user, en jeu.
 2. `[humain]` Le réglage de l'offre est atteignable et modifiable **LFW éteint**, et il rouvre sur
    les valeurs réellement enregistrées (témoin : régler une commission, `/reload`, rouvrir).
-2 bis. `[humain]` LFW allumé, je bascule sur Commandes : **la languette Travail continue d'afficher
-   `● Dispo`**. Je l'éteins, elle redit `Travail`. *Témoin connu-bon : `/co lfw` sans argument
-   annonce le même état.* C'est le critère qui justifie le design de la rangée — sans lui, on a
-   dépensé une languette pour rien.
+2 bis. `[humain]` LFW allumé, je bascule sur Commandes : **la languette Travail reste verte**, et
+   elle redevient neutre quand je l'éteins. *Témoin connu-bon : `/co lfw` sans argument annonce le
+   même état.* C'est le critère qui justifie le design de la rangée — sans lui, on a dépensé une
+   languette pour rien.
+2 ter. `[outil]` **La rangée fait la MÊME largeur dans les deux états**, LFW allumé et éteint, et la
+   marge droite ne devient jamais négative. → `/co geo`, relevé dans les deux états. C'est le
+   critère qui interdit la régression décrite plus haut : une languette qui change de texte change
+   de largeur, et la colonne ne suit pas.
 3. `[humain]` En Secourisme (aucune fenêtre native), la vue compacte autonome offre le même
    contrôle. Observateur : le user, en jeu.
 4. `[humain]` Ouvrir la fenêtre de métier **en plein combat** ne produit aucune erreur rouge et
