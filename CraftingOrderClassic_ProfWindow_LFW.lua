@@ -126,7 +126,13 @@ function PW:_BuildLFWPanel()
     if self.lfwPanel then return self.lfwPanel end
     local p = CreateFrame("Frame", "CraftingOrderLFWConfig", self.frame, "BackdropTemplate")
     p:SetSize(PANEL_W, PANEL_H)
-    p:SetPoint("TOPLEFT", self.frame, "TOPRIGHT", -4, -28)
+    -- Il s'ouvre à GAUCHE de la colonne, centré sur sa hauteur. Il s'ouvrait à DROITE
+    -- (`frame TOPRIGHT`), ce qui valait quand la fenêtre custom flottait au milieu de l'écran :
+    -- greffée, la colonne est collée au bord droit du cadre natif, et 330 px partant de là sortent
+    -- de l'écran. À gauche il se pose sur le contenu natif, ce qui est la bonne place pour un
+    -- panneau de réglage modal — et vertical centré, il tient presque exactement dans la hauteur
+    -- du cadre hôte (relevé du 2026-09-26 : colonne 287..667, panneau 430 de haut).
+    p:SetPoint("RIGHT", self.frame, "LEFT", -4, 0)
     p:SetFrameStrata("HIGH"); p:SetToplevel(true)
     Skin.SkinWell(p)
     p.title = p:CreateFontString(nil, "OVERLAY", "GameFontNormal")
