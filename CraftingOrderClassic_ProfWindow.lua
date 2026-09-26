@@ -110,8 +110,9 @@ function PW:_BuildHeader(f)
     lfw:Hide()   -- caché jusqu'au 1er _SyncLFWBtn (évite un flash en vue reroll/compact)
     self.lfwBtn = lfw
 
-    -- Engrenage de config de l'OFFRE LFW (composants fournis, commission) — cf. _ProfWindow_LFW.lua.
-    if self._BuildLFWGear then self:_BuildLFWGear(f, lfw) end
+    -- L'entrée LFW vivante est la BANDE de pied de colonne (la greffe ne montre pas cet en-tête) :
+    -- interrupteur, état écrit, engrenage d'offre. Le pourquoi est dans _ProfWindow_LFW.lua.
+    if self._BuildLFWStrip then self:_BuildLFWStrip(f) end
 
     -- (Bouton fermer : le natif de MakeWindow porte la logique dock/fermeture via opts.onClose.)
     -- Filet sous la barre de titre. Il fait partie du CHROME de la fenêtre autonome — mais c'est une
@@ -192,8 +193,10 @@ function PW:_SyncLFWBtn()
     local show = self.profKey and not self.rerollKey and not self._compact and D and D.SetLFW
     b:SetShown(show and true or false)
     if show then b:SetSelected(D.MyLFW and D:MyLFW() == self.profKey and true or false) end
-    -- L'engrenage + le panneau de config suivent la même portée (et se repeignent au changement de métier).
-    if self._SyncLFWConfig then self:_SyncLFWConfig(show and true or false) end
+    -- La BANDE de pied a sa propre portée (elle, vit en mode colonne) et c'est elle qui commande
+    -- désormais l'engrenage et le panneau d'offre — un seul propriétaire, sinon les deux se
+    -- contredisent : ce bouton-ci est masqué en colonne, et il masquait l'engrenage avec lui.
+    if self._SyncLFWStrip then self:_SyncLFWStrip() end
 end
 
 function PW:Build()
@@ -340,7 +343,10 @@ function PW:_ApplyMode(compact)
         -- Sous la rangée d'onglets, dont la hauteur dépend de la bande d'en-tête : pleine sur une
         -- fenêtre titrée, presque nulle une fois la colonne encastrée (cf. PW:_TabBand).
         self.ordCol:SetPoint("TOPLEFT", self.frame, "TOPLEFT", self.PAD, self:_BodyTop())
-        self.ordCol:SetPoint("BOTTOM", self.frame, "BOTTOM", 0, self.PAD)
+        -- La place de la bande LFW est reservee INCONDITIONNELLEMENT (cf. TUNE.lfwStrip) : elle
+        -- n'apparait que sur un metier a moi, mais une liste qui se raccourcit de 20 px quand la
+        -- bande s'allume sauterait a chaque ouverture. 20 px constants coutent moins qu'un saut.
+        self.ordCol:SetPoint("BOTTOM", self.frame, "BOTTOM", 0, PW.TUNE.lfwStrip + 8)
         self.ordCol:SetWidth(300 - 2 * self.PAD)
     else
         self.frame:SetWidth(self.FRAME_W)

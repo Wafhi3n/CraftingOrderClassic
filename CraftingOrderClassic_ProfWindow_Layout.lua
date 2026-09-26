@@ -109,6 +109,12 @@ PW.TUNE = {
     -- posé sur le coin de la languette Profit à l'écran). Une rangée qui grandit vers la droite
     -- reprendra toujours ce qu'on lui laisse de ce côté ; à gauche, c'est nous qui décidons.
     helpGutter    = 20,
+    -- Bande « Chercher du travail » en PIED de colonne (cf. _ProfWindow_LFW). Hauteur, pas largeur :
+    -- c'est tout l'argument. Une 5e languette aurait coûté ~44 px sur la rangée (mesuré le
+    -- 2026-09-26 : ~41 px de cadre par languette, le texte ne pèse que 1,9 px/caractère), et la
+    -- rangée pilote la colonne, qui pilote la fenêtre NATIVE. Ici on paie 20 px sur une liste qui
+    -- en fait 301 — une ligne et demie — et la fenêtre ne bouge pas d'un pixel.
+    lfwStrip      = 20,
     -- Prolonger le fond de page natif dans la bande ajoutée (false = bande laissée nue).
     pageFill      = true,
 }

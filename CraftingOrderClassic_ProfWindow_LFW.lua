@@ -20,13 +20,75 @@ local LIST_TOP         = 184     -- y du haut de la liste (sous en-tête picker 
 
 local function maxItems() return (COC.Directory and COC.Directory.OFFER_MAX_ITEMS) or 15 end
 
+local function profLabel(key) return (Skin.ProfLabel and Skin.ProfLabel(key)) or key end
+
+-- ------------------------------------------------------------------
+-- Bande « Chercher du travail » en PIED de colonne
+-- ------------------------------------------------------------------
+-- POURQUOI UNE BANDE ET PAS UNE 5e LANGUETTE. Le portage Forever a tue l'entree LFW : le bouton
+-- d'en-tete et son engrenage vivaient dans la vue custom, que la colonne greffee n'affiche plus.
+-- La reponse evidente etait une languette de plus. Elle a ete mesuree le 2026-09-26 et elle coute
+-- cher : ~41 px de CADRE par languette (le texte, lui, ne pese que 1,9 px/caractere), et la rangee
+-- pilote la largeur de la colonne, qui elargit la FENETRE NATIVE d'autant. ~35 px de fenetre pour
+-- un interrupteur. Ici on paie 20 px de HAUTEUR sur une liste qui en fait 301, et rien ne bouge.
+--
+-- Deux avantages tombent avec ce choix, et ils ne sont pas cosmetiques :
+--   * la bande est visible dans TOUTES les vues -- or c'est un ETAT qu'on oublie d'eteindre, et
+--     tout le mecanisme de TTL anti-leurre existe precisement pour ca ;
+--   * elle peut ECRIRE son etat. Une languette ne le pouvait pas : changer son libelle change sa
+--     largeur (bar:SetText rappelle PanelTemplates_TabResize), donc la rangee, donc la colonne --
+--     pour 9 px de marge. La bande ne pilote aucune mise en page : elle dit le metier en toutes
+--     lettres.
+-- Sa hauteur est reservee INCONDITIONNELLEMENT par _ApplyMode : voir PW.TUNE.lfwStrip.
+function PW:_BuildLFWStrip(f)
+    if self.lfwStrip then return end
+    local s = Skin.MakeFlatRow(f, 100, PW.TUNE.lfwStrip)
+    s:SetPoint("BOTTOMLEFT",  f, "BOTTOMLEFT",   PW.PAD, 4)
+    s:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -PW.PAD, 4)
+    s:SetHeight(PW.TUNE.lfwStrip)
+    s:SetScript("OnClick", function() PW:_ToggleLFW() end)
+    s:SetScript("OnEnter", function(b)
+        local D = COC.Directory
+        local on = D and D.MyLFW and D:MyLFW() == PW.profKey
+        GameTooltip:SetOwner(b, "ANCHOR_TOPLEFT")
+        GameTooltip:SetText(on and L["Tu cherches du travail — clic pour arrêter."]
+            or L["Signale au royaume que tu cherches du travail dans ce métier."], 1, 1, 1, 1, true)
+        GameTooltip:Show()
+    end)
+    s:SetScript("OnLeave", GameTooltip_Hide)
+    s:Hide()
+    self.lfwStrip = s
+    if self._BuildLFWGear then self:_BuildLFWGear(f, s) end
+end
+
+-- Etat de la bande : visible sur un metier A MOI en colonne, et elle DIT lequel quand elle est
+-- allumee. L'engrenage suit la meme portee -- regler une offre pour un metier qu'on n'a pas ouvert
+-- n'aurait pas de sens.
+function PW:_SyncLFWStrip()
+    local s = self.lfwStrip; if not s then return end
+    local D = COC.Directory
+    local show = self.profKey and not self.rerollKey and (self._compact or self.docked)
+                 and D and D.SetLFW and true or false
+    s:SetShown(show)
+    if show then
+        local on = D.MyLFW and D:MyLFW() == self.profKey
+        s:SetSelected(on and true or false)
+        s:SetText(on and ("|cFF4CDB6E" .. string.format(L["Dispo — %s"], profLabel(self.profKey)) .. "|r")
+            or L["Chercher du travail"])
+    end
+    if self._SyncLFWConfig then self:_SyncLFWConfig(show) end
+end
+
 -- ------------------------------------------------------------------
 -- Engrenage d'en-tête (appelé par PW:_BuildHeader ; visibilité gérée par PW:_SyncLFWBtn)
 -- ------------------------------------------------------------------
 -- Gear_64 : texture VÉRIFIÉE en Era (le bouton d'options de prix de l'HdV Classic l'utilise).
-function PW:_BuildLFWGear(f, lfwBtn)
+function PW:_BuildLFWGear(f, strip)
+    if self.lfwCfgBtn then return end
     local b = Skin.MakeIconButton(f, 18, "Interface\\WorldMap\\Gear_64")
-    b:SetPoint("LEFT", lfwBtn, "RIGHT", 4, 0)
+    -- DANS la bande, calé à droite : la bande porte le texte d'état à gauche, l'engrenage ferme la
+    -- ligne. Il était auparavant collé à la DROITE du bouton d'en-tête, qui ne s'affiche plus.
+    b:SetPoint("RIGHT", strip, "RIGHT", -2, 0)
     b:SetScript("OnClick", function() PW:ToggleLFWConfig() end)
     b:SetScript("OnEnter", function(s)
         GameTooltip:SetOwner(s, "ANCHOR_BOTTOMLEFT")
