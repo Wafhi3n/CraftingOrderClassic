@@ -366,7 +366,7 @@ function PW:_BuildDockViewBtns()
     end
     self.viewTabs = Skin.MakeTabs(self.frame, defs, function(id)
         PW:_SetDockView(id ~= "orders" and id or nil)
-    end, { tabX = 8, tabY = self:_TabTop(),
+    end, { tabX = self:_TabX(), tabY = self:_TabTop(),
            namePrefix = (self.frame:GetName() or "COCWin") .. "View" })
     self.viewTabs:Select("orders")
     self:_HideViewTabs()
@@ -380,7 +380,7 @@ function PW:_PlaceViewTabs()
     local first = bar and bar.buttons[VIEWS[1].id]
     if not first then return end
     first:ClearAllPoints()
-    first:SetPoint("TOPLEFT", self.frame, "TOPLEFT", 8, self:_TabTop())
+    first:SetPoint("TOPLEFT", self.frame, "TOPLEFT", self:_TabX(), self:_TabTop())
 end
 
 function PW:_HideViewTabs()
@@ -390,13 +390,18 @@ end
 -- Largeur RÉELLE de la rangée de vues, pour que la greffe dimensionne la colonne sur la PLUS LARGE
 -- des deux rangées (cf. _ProfWindow_Camelot) : sinon la dernière languette se fait rogner par la
 -- bordure, comme « Incoming » au premier essai du POC.
+-- ⚠️ La marge GAUCHE n'est pas une constante : c'est `_TabX()`, donc elle grandit de la gouttière
+-- du « i » une fois la colonne encastrée. Elle était forfaitisée dans un « + 20 » qui ne bougeait
+-- pas — la colonne se dimensionnait alors sans savoir où la rangée commençait vraiment, et le
+-- surplus qui restait à droite n'était pas une marge voulue mais un reste. On somme donc ce qu'on
+-- pose réellement : gouttière + rangée + une marge droite explicite.
 function PW:_ViewTabsWidth()
     local bar = self.viewTabs
     if not (bar and bar.buttons) then return 0 end
     local total, n = 0, 0
     for _, b in pairs(bar.buttons) do total = total + ((b.GetWidth and b:GetWidth()) or 0); n = n + 1 end
     if n == 0 then return 0 end
-    return total - 4 * (n - 1) + 20
+    return self:_TabX() + (total - 4 * (n - 1)) + 12
 end
 
 -- La rangée de vues n'existe que là où la colonne est SEULE et qu'un métier est ouvert : sans rang

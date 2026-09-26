@@ -103,6 +103,12 @@ PW.TUNE = {
     selReserveR   = 34,   -- place gardée à droite pour le bouton de tri
     listBand      = 26,   -- bande réservée au-dessus de la liste
     viewTop       = 8,    -- marge en haut des vues Plan de route / Manquantes
+    -- Gouttière réservée au bouton d'aide « i » à GAUCHE de la rangée de vues, colonne encastrée.
+    -- Il vivait au bout DROIT de cette rangée — place vide à trois languettes, recouverte par la
+    -- QUATRIÈME (relevé `/co geo` du 2026-09-26 : « aide x vues : 11 x 17 px », et le « i » se voit
+    -- posé sur le coin de la languette Profit à l'écran). Une rangée qui grandit vers la droite
+    -- reprendra toujours ce qu'on lui laisse de ce côté ; à gauche, c'est nous qui décidons.
+    helpGutter    = 20,
     -- Prolonger le fond de page natif dans la bande ajoutée (false = bande laissée nue).
     pageFill      = true,
 }
@@ -118,6 +124,13 @@ end
 
 function PW:_TabBand()
     return self:_ChromeStripped() and 4 or PW.TAB_BAND
+end
+
+-- X de la rangée d'onglets. Colonne encastrée, elle démarre après la gouttière du « i » ; fenêtre
+-- titrée, le « i » se pose sur la barre de titre et la rangée reprend le bord. Un seul endroit
+-- décide, et `_ViewTabsWidth` le relit pour dimensionner la colonne (cf. TUNE.helpGutter).
+function PW:_TabX()
+    return self:_ChromeStripped() and (8 + PW.TUNE.helpGutter) or 8
 end
 
 -- Y de la rangée d'onglets, et Y du contenu qui commence sous elle. Dérivés tous les deux : régler

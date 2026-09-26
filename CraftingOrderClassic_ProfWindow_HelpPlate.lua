@@ -84,15 +84,25 @@ end
 
 -- Le « i » est posé un peu HORS CADRE en haut à gauche : sur une fenêtre titrée il se pose sur la
 -- barre de titre, où il ne gêne rien. Une fois la colonne ENCASTRÉE, cette barre n'existe plus et la
--- rangée d'onglets remonte à sa place : le bouton tombait alors sur la languette « Commandes ». Il
--- passe au bout DROIT de la rangée, centré sur elle — la seule portion vraiment vide de la bande, et
--- dégagée de la croix native, qui vit plus haut, dans le cadre hôte.
+-- rangée d'onglets remonte à sa place.
+--
+-- Il a d'abord été mis au bout DROIT de cette rangée, « la seule portion vraiment vide de la bande ».
+-- Elle l'était à TROIS languettes. La quatrième l'a reprise : relevé `/co geo` du 2026-09-26,
+-- « !! aide x vues : 11 x 17 px », et à l'écran le « i » est posé sur le coin de la languette
+-- Profit — cliquer ce coin ouvre l'aide au lieu de changer de vue.
+--
+-- La leçon n'est pas « décaler encore » : une rangée qui grandit vers la droite finira toujours par
+-- reprendre ce qu'on lui laisse de ce côté, et le 5ᵉ onglet est déjà spécifié. Le bouton passe donc
+-- à GAUCHE, dans une gouttière que la rangée ne peut pas atteindre parce que c'est nous qui posons
+-- son origine (`PW:_TabX`, cf. TUNE.helpGutter). Collision impossible, quel que soit le nombre
+-- d'onglets — et ça rejoint la place qu'il occupe déjà sur une fenêtre titrée.
 function PW:_PlaceHelpBtn()
     local b = self.helpBtn
     if not b then return end
     b:ClearAllPoints()
     if self:_ChromeStripped() then
-        b:SetPoint("CENTER", self.frame, "TOPRIGHT", -16, self:_TabTop() - PW.TAB_ROW_H / 2)
+        b:SetPoint("CENTER", self.frame, "TOPLEFT",
+            PW.TUNE.helpGutter / 2 + 4, self:_TabTop() - PW.TAB_ROW_H / 2)
     else
         b:SetPoint("CENTER", self.frame, "TOPLEFT", 8, 6)
     end
