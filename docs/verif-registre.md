@@ -36,6 +36,39 @@ client.
 
 ## Relevés
 
+- 2026-09-26 (4) — jusqu'a a5a678e — Forever, un client, client en ANGLAIS — **GO mesuré sur la
+  languette « Route »** — `/co geo` avant/après, vue `route` (les deux autres vues n'ont pas été
+  rouvertes et gardent le relevé de 11:28 ; la rangée est identique dans les trois).
+
+  | | avant | après | delta |
+  |---|---|---|---|
+  | rangée vues | 213 px | **196 px** | −17 |
+  | colonne | 241 px | **225 px** | −16 |
+  | fenêtre hôte | 728 px | **712 px** | −16 |
+  | marge droite | 8 px | 9 px | +1 |
+
+  Le mécanisme est confirmé en conditions réelles : **la rangée pilote la colonne, et la fenêtre
+  native suit**. Aucun chevauchement.
+
+  **⚠️ CE RELEVÉ CALIBRE LA RANGÉE, ET IL DÉMENT L'ESTIMATION QUI L'A PRÉCÉDÉ.** J'avais annoncé
+  ~31 px de gain ; la mesure en donne 17. Avec deux points (33 caractères → 213 px, 24 → 196) le
+  modèle se pose :
+
+  ```
+  largeur d'une languette ≈ 40,6 px + 1,9 px × (nb de caractères)   [− 4 px de chevauchement]
+  ```
+
+  Recoupé sur l'état d'avant : 4 × 40,6 + 33 × 1,9 = 225 px contre 225 mesurés.
+
+  **Ce que ça change pour le 5ᵉ onglet : c'est le CADRE qui coûte, pas le texte.** Une languette
+  pèse ~41 px rien que pour exister, ses caractères 1,9 px pièce. Un 5ᵉ onglet `Work` (4 car.)
+  ≈ 48 px, soit **+44 px** sur la rangée dont 9 de marge → **la colonne grandirait de ~35 px**
+  (225 → ~260, fenêtre 712 → ~747). Raccourcir encore des libellés ne rendrait presque rien.
+  Le renommage était donc le bon geste, mais il **ne rend pas le 5ᵉ onglet gratuit** : il en paie
+  17 px sur 44. À décider en connaissance de cause avant d'écrire la vue Travail.
+  PÉRIMÈTRE : chiffres relevés sur un client ANGLAIS. Le français rallonge les libellés, mais le
+  cadre dominant, l'écart attendu reste faible.
+
 - 2026-09-26 (3) — jusqu'a fe922f2 — Forever, un client, client en ANGLAIS — **GO mesuré sur la
   géométrie** — `/co geo`, **3 vues relevées sur 3** (orders, route, learn), métier Engineering.
   Le correctif du bouton d'aide est confirmé par l'outil, pas seulement à l'œil :
