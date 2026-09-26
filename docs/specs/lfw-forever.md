@@ -180,7 +180,7 @@ données (ce qui referme une partie des 357 recettes sans objet produit), et sa 
 attente). La branche a **28 commits de retard** et précède le renommage `COC.LazyGold` →
 `COC.Profit` : elle demande une remise à niveau avant de revenir, pas une fusion telle quelle.
 
-## La rangée à cinq — design
+## La rangée d'onglets — design (et le renversement que la mesure a imposé)
 
 **D'abord une idée fausse à écarter : une rangée trop large ne se fait PAS rogner.** `sizeColumn`
 calcule `colW = max(largeur du cadre, _ViewTabsWidth())` puis élargit le cadre natif d'autant. Une
@@ -212,48 +212,53 @@ hauteur d'UNE rangée ; une seconde ligne oblige à retoucher cette dérivation 
 de liste dans une colonne qui n'en a pas de trop, pour un gain de largeur qu'on n'a pas besoin de
 chercher.
 
-### Retenu : cinq languettes, dont une qui porte son état
+### ⚠️ RENVERSÉ le 2026-09-26 par la mesure — retenu : une BANDE, et la rangée reste à quatre
+
+La version précédente de cette section retenait **cinq languettes, dont une portant son état**.
+Le relevé `/co geo` du 2026-09-26 l'a chiffrée, et le chiffre l'a récusée.
 
 ```
-[ Commandes ][ Profit ][ Route ][ Manquantes ][ Travail ]
+[ Commandes ][ Profit ][ Route ][ Manquantes ]     ← inchangée, 196 px
+┌──────────────────────────────────────┐
+│  (la vue courante)                   │
+├──────────────────────────────────────┤
+│ Dispo — Leatherworking    [ Offre ]  │  ← bande, visible dans TOUTES les vues
+└──────────────────────────────────────┘
 ```
 
-- **Ordre par nature** : le carnet, l'argent, les deux pages de progression, puis moi. Travail en
-  bout de rangée, là où l'œil le retrouve sans le chercher.
-- **Le libellé est « Profit », pas « Rentabilité »** — arbitrage du user du **2026-09-21**, pris pour
-  exactement la raison de largeur redécrite ici : le mot long coûtait ~90 px de fenêtre native pour
-  la même information. « Rentabilité » reste le titre de la section du panneau d'info.
-  (`prix-maison.md` dit « Rentabilité » côté joueur ; sur la **languette**, la décision plus récente
-  et plus précise l'emporte.)
-- **La languette Travail porte l'état.** Une languette non sélectionnée reste affichée : elle est
-  donc le bon support pour un état persistant. On résout la visibilité **sans** dépenser une
-  surface de plus, et sans icône nue.
+**Ce que la mesure a démenti.** On croyait le 5ᵉ onglet presque gratuit une fois `Leveling route`
+raccourci. Le renommage n'a rendu que **17 px** (annoncé ~31), et deux points de mesure ont posé le
+modèle : `largeur ≈ 40,6 px + 1,9 px × caractères`, recoupé au pixel près sur l'état d'avant.
+**C'est le cadre qui coûte, pas le texte** : une languette pèse ~41 px rien que pour exister. Le 5ᵉ
+onglet aurait donc coûté ~44 px sur la rangée, dont 9 de marge, soit **~35 px de fenêtre NATIVE** —
+sur une fenêtre qui occupe déjà 92 % de la largeur du client. Aucun raccourcissement de libellé ne
+rattrape ça.
 
-  ⚠️ **CORRIGÉ le 2026-09-26 — l'état se porte par la COULEUR, pas par un texte différent.** La
-  première version disait « `Travail` éteint, `● Dispo` en vert allumé ». Deux textes de longueurs
-  différentes sur la même languette, c'est une languette qui **change de largeur au clic** :
-  `bar:SetText` rappelle `PanelTemplates_TabResize` (`_UI_Skin_Native.lua`), la rangée s'allonge, et
-  la colonne ne suit pas — elle n'est dimensionnée qu'à la greffe (`sizeColumn`). Le relevé du
-  2026-09-26 donne **8 px** de marge à droite : `● Dispo` contre `Travail`, c'est déjà plus. On
-  aurait donc obtenu une languette qui déborde de sa colonne un clic sur deux, et le
-  `!! aide x vues` qu'on vient de corriger serait revenu par une autre porte.
-  Règle : **le libellé de cette languette ne change jamais.** L'état se lit à sa couleur (vert
-  quand je suis dispo), qui ne coûte pas un pixel. Si une pastille est jugée nécessaire, elle doit
-  être présente dans les DEUX états — allumée ou éteinte — pour que la largeur reste constante.
-- **`Plan de route` devient `Route`** dans la languette. C'est le libellé qui coûte le plus cher
-  pour ce qu'il ajoute, et le titre de la vue continue de dire le mot entier.
-- **Le contenu de la vue Travail** : l'interrupteur en tête, puis le réglage d'offre existant
-  (`_ProfWindow_LFW.lua` quasi tel quel — il a perdu son hôte, pas sa logique), puis les deux
-  sélecteurs cherchables, réactifs et recettes.
+**Pourquoi la bande est meilleure, et pas seulement moins chère :**
 
-**Seul point laissé à la mesure (ce n'est pas un arbitrage ouvert) :** la largeur réelle de la rangée
-à cinq. `/co geo` la relève, et la rangée `vues` sort déjà sa `marge` droite (négative = ça déborde).
-Le relever **avant/après**. Le design ne change pas selon le résultat ; seul un éventuel
-raccourcissement de libellé en dépendrait.
+- **On paie l'axe bon marché.** L'horizontal pousse toute la fenêtre du jeu ; la bande prend 20 px
+  de hauteur sur une liste qui en fait 301 — une ligne et demie. La fenêtre ne bouge pas.
+- **Elle peut ÉCRIRE son état.** C'est ce qu'on avait dû abandonner sur la languette : un libellé
+  qui change change la largeur (`bar:SetText` rappelle `PanelTemplates_TabResize`), donc la rangée,
+  donc la colonne, pour 8 px de marge. Une bande ne pilote aucune mise en page — elle dit le métier
+  en toutes lettres.
+- **Elle est visible dans toutes les vues**, ce qui était l'exigence de départ : un état qu'on
+  oublie d'éteindre doit rester sous les yeux. Vérifié dès la première capture — elle a révélé un
+  personnage annoncé disponible sans que ça se voie ailleurs.
 
-**Une seule chose se mesure à T0**, et elle est cheap : `_ViewTabsWidth()` à cinq languettes, contre
-la largeur actuelle de la colonne. Elle dit combien de pixels la fenêtre de métier gagne réellement.
-Le design ci-dessus ne change pas selon le résultat ; seul le repli de libellé en dépend.
+**Le prix assumé** : deux idiomes de navigation dans la même colonne, des languettes en haut et une
+bande en bas. On l'accepte parce que les deux choses ne sont pas de même nature — quatre **pages
+qu'on lit**, et un **état qu'on tient**.
+
+**Ce qui survit de l'ancienne section** : `Plan de route` → `Route` sur la languette (fait,
+−17 px mesurés, le titre de la vue garde le mot entier), et le libellé « Profit » plutôt que
+« Rentabilité » (arbitrage du user du 2026-09-21, même raison de largeur).
+
+**Contenu de la bande** : l'état à gauche, le bouton « Offre » à droite. « Offre » est un MOT et
+non un engrenage — l'icône testée s'est révélée illisible en 18 px, et un libellé ne peut pas
+manquer. Le bouton ouvre le panneau d'offre existant (`_ProfWindow_LFW.lua`, qui avait perdu son
+hôte, pas sa logique) : checks, commission, sélecteur de réactifs, et le sélecteur de recettes
+proposées (arbitrage B) qui reste à écrire.
 
 ## Critères d'acceptation
 
@@ -265,14 +270,13 @@ Le design ci-dessus ne change pas selon le résultat ; seul le repli de libellé
    Observateur : le user, en jeu.
 2. `[humain]` Le réglage de l'offre est atteignable et modifiable **LFW éteint**, et il rouvre sur
    les valeurs réellement enregistrées (témoin : régler une commission, `/reload`, rouvrir).
-2 bis. `[humain]` LFW allumé, je bascule sur Commandes : **la languette Travail reste verte**, et
-   elle redevient neutre quand je l'éteins. *Témoin connu-bon : `/co lfw` sans argument annonce le
-   même état.* C'est le critère qui justifie le design de la rangée — sans lui, on a dépensé une
-   languette pour rien.
-2 ter. `[outil]` **La rangée fait la MÊME largeur dans les deux états**, LFW allumé et éteint, et la
-   marge droite ne devient jamais négative. → `/co geo`, relevé dans les deux états. C'est le
-   critère qui interdit la régression décrite plus haut : une languette qui change de texte change
-   de largeur, et la colonne ne suit pas.
+2 bis. ✅ `[humain]` **ÉPROUVÉ le 2026-09-26.** LFW allumé, je change de vue : la bande reste
+   visible et dit « Dispo — <métier> ». *Témoin connu-bon : `/co lfw` sans argument annonce le même
+   état* — le user l'a croisé, les deux chemins concordent. C'est LE critère d'une bande d'état :
+   elle affiche, donc il faut prouver qu'elle ne ment pas.
+2 ter. `[outil]` **La rangée d'onglets ne bouge pas quand LFW s'allume** — la bande vit en dehors
+   d'elle, et c'est tout l'intérêt du renversement. → `/co geo` dans les deux états ; la marge
+   droite doit rester identique et jamais négative.
 3. `[humain]` En Secourisme (aucune fenêtre native), la vue compacte autonome offre le même
    contrôle. Observateur : le user, en jeu.
 4. `[humain]` Ouvrir la fenêtre de métier **en plein combat** ne produit aucune erreur rouge et
@@ -340,25 +344,25 @@ avant le portage doit se relire après.
 
 ## Plan (daté du 2026-09-23 — meurt quand c'est fait)
 
-**T0 — mesurer avant d'écrire.** Un client, Forever. `/co lfw <métier>` pour s'allumer, puis
-injecter un LFW d'un tiers (`COCMonitor`, `/cocm lfw <nom> <métier> [fee] [ids]` — chemin réel
-`Directory:OnLFW` / `OnLFO`) et regarder une plaque. On cherche trois faits, pas une impression :
-la plaque porte-t-elle l'icône ; `plate:IsProtected()` rend quoi ; `GetNamePlates()` rend-il bien
-les plaques amies. Issue : soit le moteur d'affichage est intact et T2 se réduit à un relevé, soit
-il est cassé et on sait **où**. Aucune ligne de code avant ça.
+**T0 — mesurer avant d'écrire.** ✅ FAIT le 2026-09-26. `/co geo` avant/après, trois vues sur
+trois. C'est cette mesure qui a renversé la rangée à cinq (voir la section design).
 
-Même séance, une mesure de plus, qui ne coûte rien : `_ViewTabsWidth()` à cinq languettes contre la
-largeur actuelle de la colonne (`/co geo` la rapporte). Elle ne change pas le design retenu, elle
-décide seulement du repli de libellé « Rentabilité » → « Gains ».
+**T1 — rendre l'entrée.** ✅ FAIT le 2026-09-26, sous la forme d'une **bande** et non d'une vue :
+bascule, état écrit, bouton « Offre » qui rouvre le panneau existant. Éprouvé à l'écran, y compris
+le croisement avec `/co lfw`. Trois défauts trouvés en jeu et corrigés dans la foulée — engrenage
+illisible, bouton dessiné en arrière (frère et non enfant), panneau qui demandait deux clics.
 
-**T1 — rendre l'entrée.** Une vue LFW dans la rangée d'onglets, contenant la bascule, le réglage de
-l'offre et le sélecteur de recettes (arbitrages B et C tranchés ; A conditionne seulement la forme de
-la rangée). Réutiliser `_ProfWindow_LFW.lua` (checks, commission, sélecteur cherchable) plutôt que de
-le réécrire : ce fichier n'a pas de dette, il a perdu son hôte. Critères 1, 2, 3, 6.
+**T1 bis — le sélecteur de recettes proposées.** Reste à écrire (arbitrage B) : jumeau du sélecteur
+de réactifs déjà présent dans le panneau d'offre, alimenté par les recettes APPRISES du métier
+ouvert. Jamais de case greffée sur les lignes de Blizzard.
 
-**T2 — la discipline de combat.** Critère 4, avec le `taintLog` à l'appui.
+**T2 — la récolte et le combat.** Un métier sans fenêtre native (Secourisme) : la bande doit y être
+identique — c'est l'arbitrage C, sinon LFW redevient conditionnel au type de métier. Puis le combat
+(critère 4), `taintLog` à l'appui.
 
-**T3 — le banc 2 comptes.** Critères 7 à 12, d'une traite, avec le CVar noté. Relevé dans
+**T3 — le banc 2 comptes.** Critères 7 à 12, d'une traite. **Rien ne remplace deux comptes** : deux
+persos du même compte partagent la SavedVariable et donnent un faux positif. Noter l'état du CVar
+`nameplateShowFriends`, sans quoi « pas de badge » ne veut rien dire. Relevé dans
 `docs/verif-registre.md`, et **seulement ce qui a été observé** : si le TTL AFK n'a pas été attendu
 20 minutes, le relevé le dit.
 
