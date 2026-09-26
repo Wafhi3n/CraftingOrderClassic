@@ -36,6 +36,22 @@ client.
 
 ## Relevés
 
+- 2026-09-26 (2) — jusqu'a f2af930 — Forever, un client, client en ANGLAIS — **GO sur le
+  déplacement du bouton d'aide** — capture d'écran après `/reload`. Le « i » est passé au bout
+  GAUCHE de la rangée, juste avant `Orders`, et le coin haut-droit de la languette `Profit` est
+  **dégagé** : le chevauchement de 11 × 17 px relevé le matin même a disparu à l'œil. La fenêtre
+  native s'est élargie d'une vingtaine de pixels, ce qui est le comportement VOULU — depuis ce
+  correctif `_ViewTabsWidth` compte la gouttière au lieu de la forfaitiser, donc la colonne se
+  dimensionne enfin sur ce qu'on pose réellement.
+  **Deux faits de plateforme observés au passage, qui contredisent une règle du projet :**
+  le déploiement a été fait **pendant que le client tournait** (copie sans verrou), et un simple
+  **`/reload` a suffi** à charger les fichiers MODIFIÉS — la ligne « Crafting Order loaded » est
+  visible dans le chat de la capture. Aucun redémarrage complet.
+  PÉRIMÈTRE : ceci ne dit RIEN du cas qui fonde la règle `wow-toc-newfile-restart-and-parity`, à
+  savoir un fichier **NEUF ajouté au `.toc`**. Ce correctif ne touche que des fichiers existants.
+  Non mesuré non plus : le relevé `/co geo` d'après correctif (l'absence de `!! aide x vues` et les
+  nouvelles marges) — il reste à prendre, et c'est lui qui chiffrera la rangée à cinq.
+
 - 2026-09-26 — jusqu'a 45e6f02 — Forever, un client, **client en ANGLAIS** — **GO sur la page
   Profit (affichage)** — capture d'écran à l'appui, métier Engineering 130/150, Auctionator présent
   et scanné. La languette **Profit** existe dans la rangée et s'ouvre ; la liste affiche
