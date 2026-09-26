@@ -36,6 +36,21 @@ client.
 
 ## Relevés
 
+- 2026-09-26 (5) — jusqu'a dc086d5 — Forever, un client, client en ANGLAIS — **GO partiel sur la
+  bande LFW** — capture d'écran, métier Engineering 130/150, après `/reload` (aucun redémarrage).
+  La bande est **présente en pied de colonne**, sous le récapitulatif `0 pending · 0 accepted ·
+  0 muted`, sans chevauchement. Elle affiche **« Available — Engineering » en vert**, avec
+  l'engrenage calé à droite. La liste au-dessus n'est pas rognée : les 20 px réservés
+  inconditionnellement se tiennent.
+  **Effet immédiat, et c'est la raison d'être de la bande** : elle a révélé que le personnage était
+  **annoncé comme disponible** en Ingénierie sans que ce soit visible nulle part ailleurs. L'état
+  qu'on oublie d'éteindre se voit maintenant depuis toutes les vues.
+  PÉRIMÈTRE, non observé à ce stade : le **clic sur la bande** (allumer/éteindre) ; le **clic sur
+  l'engrenage** et l'endroit où le panneau d'offre s'ouvre — il s'ancre encore sur
+  `frame TOPRIGHT`, hérité de la fenêtre custom, et la colonne étant collée au bord droit du cadre
+  natif il peut sortir de l'écran ; le recoupement avec `/co lfw` sans argument ; la vue compacte
+  d'un métier de récolte ; le comportement en combat.
+
 - 2026-09-26 (4) — jusqu'a a5a678e — Forever, un client, client en ANGLAIS — **GO mesuré sur la
   languette « Route »** — `/co geo` avant/après, vue `route` (les deux autres vues n'ont pas été
   rouvertes et gardent le relevé de 11:28 ; la rangée est identique dans les trois).
