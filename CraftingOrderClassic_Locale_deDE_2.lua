@@ -331,6 +331,7 @@ local de2 = {
     ["Plan de route"] = "Levelroute",
     ["Route"] = "Route",              -- languette courte (la vue garde « Levelroute »)
     ["Dispo — %s"] = "Verfuegbar — %s",
+    ["Offre"] = "Angebot",
     ["Plan de route : quoi crafter pour monter au moins cher."] = "Levelroute: was du craften solltest, um am günstigsten zu skillen.",
     ["En tête : rang actuel, plafond entraînable, et coût total estimé (« > » = des rangs sans recette calculable, total incomplet)."] =
         "Oben: aktueller Rang, trainierbares Maximum und die geschätzten Gesamtkosten („>“ = einige Ränge haben kein berechenbares Rezept, die Summe ist unvollständig).",

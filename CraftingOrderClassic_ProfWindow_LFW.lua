@@ -58,7 +58,7 @@ function PW:_BuildLFWStrip(f)
     s:SetScript("OnLeave", GameTooltip_Hide)
     s:Hide()
     self.lfwStrip = s
-    if self._BuildLFWGear then self:_BuildLFWGear(f, s) end
+    if self._BuildLFWOfferBtn then self:_BuildLFWOfferBtn(f, s) end
 end
 
 -- Etat de la bande : visible sur un metier A MOI en colonne, et elle DIT lequel quand elle est
@@ -80,18 +80,32 @@ function PW:_SyncLFWStrip()
 end
 
 -- ------------------------------------------------------------------
--- Engrenage d'en-tête (appelé par PW:_BuildHeader ; visibilité gérée par PW:_SyncLFWBtn)
+-- Bouton « Offre » à droite de la bande (visibilité gérée par PW:_SyncLFWStrip)
 -- ------------------------------------------------------------------
--- Gear_64 : texture VÉRIFIÉE en Era (le bouton d'options de prix de l'HdV Classic l'utilise).
-function PW:_BuildLFWGear(f, strip)
+-- C'ÉTAIT UN ENGRENAGE (`Interface\WorldMap\Gear_64`, 18 px) ET LE USER NE L'A PAS RECONNU : à
+-- l'écran, le 2026-09-26, deux petits carrés sans forme lisible.
+--
+-- Pourquoi on ne cherche pas plus loin la cause. L'asset EXISTE — `WorldMap/Gear_64.PNG` est dans
+-- `Documentation/wow-ui-textures-classic/`. Reste qu'il n'est référencé nulle part dans l'export
+-- Forever 1.60.1 (il a pu disparaître sur MAINLINE), ou qu'un dessin conçu en 64 px ne survit pas
+-- à une réduction en 16. Départager coûterait un aller-retour en jeu pour un bouton, alors qu'un
+-- MOT est lisible à toute taille et ne peut pas manquer. Et ça rejoint la leçon du 2026-09-19,
+-- payée sur capture dans cette colonne même : une icône de 16 px posée dans une bande se lit comme
+-- un bouton secondaire oublié là, quand un libellé dit ce qu'il fait.
+-- Pas de glyphe ⚙ non plus : la police du jeu les rend en tofu.
+--
+-- ⚠️ MÉTHODE, apprise en se trompant ce jour-là : pour savoir si une texture existe, l'oracle est
+-- `Documentation/wow-ui-textures-classic/`, PAS l'export Lua/XML. L'export ne contient aucun asset
+-- et donne des faux négatifs — `MoneyFrame\UI-GoldIcon` n'y figure pas davantage, et elle s'affiche
+-- très bien dans la vue Profit.
+function PW:_BuildLFWOfferBtn(f, strip)
     if self.lfwCfgBtn then return end
-    local b = Skin.MakeIconButton(f, 18, "Interface\\WorldMap\\Gear_64")
-    -- DANS la bande, calé à droite : la bande porte le texte d'état à gauche, l'engrenage ferme la
-    -- ligne. Il était auparavant collé à la DROITE du bouton d'en-tête, qui ne s'affiche plus.
+    local b = Skin.MakeGoldButton(f, 56, 16, L["Offre"])
+    -- DANS la bande, calé à droite : l'état à gauche, le réglage ferme la ligne.
     b:SetPoint("RIGHT", strip, "RIGHT", -2, 0)
     b:SetScript("OnClick", function() PW:ToggleLFWConfig() end)
     b:SetScript("OnEnter", function(s)
-        GameTooltip:SetOwner(s, "ANCHOR_BOTTOMLEFT")
+        GameTooltip:SetOwner(s, "ANCHOR_TOPLEFT")
         GameTooltip:SetText(L["Configurer l'offre : composants fournis, commission…"], 1, 1, 1, 1, true)
         GameTooltip:Show()
     end)
