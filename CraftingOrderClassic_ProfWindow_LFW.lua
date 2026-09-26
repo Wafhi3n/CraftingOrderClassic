@@ -15,8 +15,11 @@ local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
 
 local PANEL_W, PANEL_H = 330, 430
 -- Pool ≥ viewport (invariant liste virtualisée) : zone liste ≈ 236 px / 20 ≈ 12 lignes → 16 = marge.
-local ROW_H, VISIBLE   = 20, 16
-local LIST_TOP         = 184     -- y du haut de la liste (sous en-tête picker + recherche)
+-- 15 et non 16 : la rangee de modes (Reactifs / Recettes) a pris 20 px sur la zone de liste.
+-- L'invariant tient largement -- viewport ~196 px / 20 = ~10 lignes, le pool en couvre 15.
+local ROW_H, VISIBLE   = 20, 15
+local LIST_TOP         = 204     -- y du haut de la liste (sous modes + en-tête picker + recherche)
+PW.LFW_LIST_TOP        = LIST_TOP   -- lu par _ProfWindow_LFW_Recipes pour poser la rangee de modes
 
 local function maxItems() return (COC.Directory and COC.Directory.OFFER_MAX_ITEMS) or 15 end
 
@@ -222,7 +225,7 @@ end
 
 -- Moitié basse : le picker des composants fournis (en-tête compteur, recherche, liste virtualisée).
 function PW:_BuildLFWPicker(p)
-    Skin.MakeSeparator(p, -(LIST_TOP - 30))
+    Skin.MakeSeparator(p, -(LIST_TOP - 50))   -- inchange en absolu : LIST_TOP a descendu de 20
     p.pickHdr = p:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     p.pickHdr:SetPoint("TOPLEFT", 12, -(LIST_TOP - 24))
     local search = CreateFrame("EditBox", nil, p, "InputBoxTemplate")
@@ -241,6 +244,7 @@ function PW:_BuildLFWPicker(p)
     p.scroll, p.content = scroll, content
     p.rows = {}
     for i = 1, VISIBLE do p.rows[i] = self:_BuildLFWRow(content, i) end
+    if self._BuildLFWModeTabs then self:_BuildLFWModeTabs(p) end
 end
 
 function PW:_BuildLFWRow(parent, i)
@@ -255,12 +259,23 @@ function PW:_BuildLFWRow(parent, i)
     name:SetPoint("LEFT", icon, "RIGHT", 4, 0); name:SetPoint("RIGHT", -2, 0)
     name:SetJustifyH("LEFT"); name:SetWordWrap(false); row.name = name
     row:SetScript("OnClick", function(r)
+        -- Une recette se coche par son spellID : _ToggleLFWRecipe gere deja le cap, le retrait et
+        -- la rediffusion. Il attend une ENTREE de liste de recettes, d'ou la table minimale.
+        if r.spellID then PW:_ToggleLFWRecipe({ spellID = r.spellID }); return end
         if not r.itemID then return end
         -- Shift-clic → lien chat, SANS cocher (cet OnClick MUTE l'offre : ne pas déclencher les deux).
         if IsModifiedClick("CHATLINK") then HandleModifiedItemClick(Skin.ChatLinkFor(nil, r.itemID, nil)); return end
         PW:_ToggleLFWItem(r.itemID)
     end)
     row:SetScript("OnEnter", function(r)
+        if r.spellID then
+            GameTooltip:SetOwner(r, "ANCHOR_RIGHT")
+            if not pcall(GameTooltip.SetSpellByID, GameTooltip, r.spellID) then
+                GameTooltip:SetText(r.name:GetText() or "?", 1, 1, 1)
+            end
+            GameTooltip:Show()
+            return
+        end
         if not r.itemID then return end
         GameTooltip:SetOwner(r, "ANCHOR_RIGHT")
         if not pcall(GameTooltip.SetHyperlink, GameTooltip, "item:" .. r.itemID) then
@@ -300,10 +315,17 @@ function PW:_LFWDisplayList()
     local p, c = self.lfwPanel, CL()
     local search = (p.search:GetText() or ""):lower()
     local out = {}
-    for _, id in ipairs(self:_LFWUniverse(self.profKey)) do
-        local name = (c and c:ItemName(id)) or ("item:" .. id)
-        if search == "" or name:lower():find(search, 1, true) then
-            out[#out + 1] = { id = id, name = name }
+    if p.pickMode == "recipes" then
+        -- L'univers des recettes porte deja son nom (lu sur le client) : rien a resoudre.
+        for _, e in ipairs(self:_LFWRecipeUniverse()) do
+            if search == "" or e.name:lower():find(search, 1, true) then out[#out + 1] = e end
+        end
+    else
+        for _, id in ipairs(self:_LFWUniverse(self.profKey)) do
+            local name = (c and c:ItemName(id)) or ("item:" .. id)
+            if search == "" or name:lower():find(search, 1, true) then
+                out[#out + 1] = { id = id, name = name }
+            end
         end
     end
     table.sort(out, function(a, b) return a.name < b.name end)
@@ -392,9 +414,16 @@ function PW:_RefreshLFWList()
     local p = self.lfwPanel; if not (p and p.scroll and self.profKey) then return end
     local D = COC.Directory
     local o = (D and D:MyLFWOffer(self.profKey)) or {}
+    -- Un seul ensemble « coche » a la fois : celui du mode courant. Les deux listes de l'offre
+    -- (items et recipes) sont DISJOINTES sur le fil comme en base -- on ne les melange pas ici.
+    local recipes = (p.pickMode == "recipes")
+    local sel = (recipes and o.recipes) or (not recipes and o.items) or {}
+    local cap = recipes and ((D and D.OFFER_MAX_RECIPES) or 12) or maxItems()
     self._lfwProvided = {}
-    for _, id in ipairs(o.items or {}) do self._lfwProvided[id] = true end
-    p.pickHdr:SetText("|cFFE8B84B" .. string.format(L["Composants fournis (%d/%d)"], #(o.items or {}), maxItems()) .. "|r")
+    for _, id in ipairs(sel) do self._lfwProvided[id] = true end
+    p.pickHdr:SetText("|cFFE8B84B" .. string.format(
+        recipes and L["Recettes proposées (%d/%d)"] or L["Composants fournis (%d/%d)"],
+        #sel, cap) .. "|r")
     self._lfwDisplay = self:_LFWDisplayList()
     local n = #self._lfwDisplay
     p.content:SetHeight(math.max(n * ROW_H, VISIBLE * ROW_H))
@@ -410,16 +439,20 @@ function PW:_RenderLFWList()
     for i = 1, #p.rows do
         local row, e = p.rows[i], list[off + i]
         if e then
-            row.itemID = e.id
+            local recipes = (p.pickMode == "recipes")
+            row.itemID  = (not recipes) and e.id or nil
+            row.spellID = recipes and e.id or nil
             row:ClearAllPoints()
             row:SetPoint("TOPLEFT", 0, -(off + i - 1) * ROW_H)
             row.check:SetChecked(self._lfwProvided and self._lfwProvided[e.id] or false)
-            local tex = C_Item and C_Item.GetItemIconByID and C_Item.GetItemIconByID(e.id)
+            -- L'icone d'une recette est lue avec elle par le backend ; celle d'un objet se demande.
+            local tex = (recipes and e.icon)
+                or (C_Item and C_Item.GetItemIconByID and C_Item.GetItemIconByID(e.id))
             row.icon:SetTexture(tex or "Interface\\Icons\\INV_Misc_QuestionMark")
             row.name:SetText(e.name)
             row:Show()
         else
-            row.itemID = nil; row:Hide()
+            row.itemID, row.spellID = nil, nil; row:Hide()
         end
     end
 end

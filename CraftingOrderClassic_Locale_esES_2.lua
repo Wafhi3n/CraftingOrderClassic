@@ -333,6 +333,9 @@ local es2 = {
     ["Route"] = "Ruta",               -- languette courte (la vue garde « Ruta de subida »)
     ["Dispo — %s"] = "Disponible — %s",
     ["Offre"] = "Oferta",
+    ["Réactifs"] = "Reactivos",
+    ["Recettes"] = "Recetas",
+    ["Recettes proposées (%d/%d)"] = "Recetas ofrecidas (%d/%d)",
     ["Plan de route : quoi crafter pour monter au moins cher."] = "Ruta de subida: qué fabricar para subir al menor coste.",
     ["En tête : rang actuel, plafond entraînable, et coût total estimé (« > » = des rangs sans recette calculable, total incomplet)."] =
         "Arriba: rango actual, tope entrenable y el coste total estimado («>» = algunos rangos no tienen receta calculable, el total está incompleto).",
