@@ -175,6 +175,12 @@ function PW:_BuildLFWPanel()
             C_Timer.After(0.3, function() p._nameTick = nil; if p:IsShown() then PW:_RefreshLFWList() end end)
         end
     end)
+    -- NAÎTRE CACHÉ, et ce n'est pas une precaution : un CreateFrame est AFFICHE par defaut. Le
+    -- panneau etant construit PARESSEUSEMENT au premier clic, la bascule le trouvait deja visible
+    -- et le refermait dans la foulee -- il fallait cliquer DEUX fois pour l'ouvrir (vu en jeu le
+    -- 2026-09-26). Un constructeur paresseux doit rendre l'objet dans l'etat que l'appelant
+    -- suppose, sinon le premier appel ne se comporte pas comme les suivants.
+    p:Hide()
     self.lfwPanel = p
     return p
 end
