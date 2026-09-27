@@ -366,6 +366,11 @@ local news = {
     ["Plus petit. Le bouton d'aide « i » se posait sur la dernière languette et lui volait ses clics. L'onglet « Plan de route » s'appelle « Route », ce qui a fait la place au reste. Et l'addon relève le niveau qu'un formateur exige, donc les recettes affichées « ? » se remplissent à mesure que tu passes les voir."] =
         "Smaller things. The 'i' help button sat on top of the last tab and swallowed clicks meant for it. The 'Leveling route' tab is called 'Route', which is what made room for the rest. And the addon picks up the skill level a trainer asks for, so recipes that showed a '?' fill in as you visit them.",
 
+    -- v1.36.1
+    ["Une icône dans la liste des addons"] =
+        "An icon in the addon list",
+    ["L'addon a enfin sa propre icône dans la liste des addons, à la place du point d'interrogation. Rien d'autre ne change."] =
+        "The addon finally has its own icon in the addon list instead of the question mark. Nothing else changes.",
 }
 
 for k, v in pairs(news) do L[k] = v end

@@ -1,5 +1,9 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.36.1 - An icon of its own
+
+The addon has its own icon in the addon list now, instead of a question mark. Nothing else changes.
+
 ## v1.36.0 - What's worth crafting, and telling the realm you're free
 
 The profession column has a new tab, Profit. It lists what you can make that's worth making, biggest

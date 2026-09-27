@@ -28,6 +28,20 @@ local BODY_W = 780
 -- ⚠️ L'ORDRE D'AFFICHAGE est celui des blocs puis des entrées : la version la plus récente va EN TÊTE
 -- de CE bloc. La v1.34.0 avait été rangée en tête de versionsCurrentA et s'affichait donc SOUS la
 -- v1.33.0 (corrigé avec la v1.34.1). Le lint de bump_version.ps1 ne voit pas l'ordre, seulement la présence.
+-- Bloc de tête ACTUEL, créé pour v1.36.1 : versionsNewest faisait 56 lignes, l'entrée l'aurait porté
+-- à 62. Même manœuvre : un bloc DEVANT, concaténé en premier par versions(). À la prochaine release,
+-- ajouter ici, en tête.
+local function versionsHead()
+    return {
+        {
+            v = "v1.36.1", title = L["Une icône dans la liste des addons"],
+            lines = {
+                L["L'addon a enfin sa propre icône dans la liste des addons, à la place du point d'interrogation. Rien d'autre ne change."],
+            },
+        },
+    }
+end
+
 local function versionsNewest()
     return {
         {
@@ -387,7 +401,8 @@ local function versionsOldest()
 end
 
 local function versions()
-    local out = versionsNewest()
+    local out = versionsHead()
+    for _, e in ipairs(versionsNewest()) do out[#out + 1] = e end
     for _, e in ipairs(versionsCurrent()) do out[#out + 1] = e end
     for _, e in ipairs(versionsLatest()) do out[#out + 1] = e end
     for _, e in ipairs(versionsRecent()) do out[#out + 1] = e end
