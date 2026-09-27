@@ -206,6 +206,10 @@ function Dir:OnHello(sender, message, distribution)
     elseif C_Timer then
         C_Timer.After(math.random() * 3, function() Dir:Announce() end)
     end
+    -- Il vient d'arriver : il ne sait rien de mon LFW, et `Dir.lfw` est RUNTIME chez lui comme
+    -- chez moi. Je me ré-annonce (throttlé, jitté, et JAMAIS en AFK — cf. Directory_LFW).
+    -- Dépendance molle : LFW peut ne pas être chargé.
+    if self.LFWRiposte then self:LFWRiposte() end
 end
 
 -- PING reçu → PONG sur la MÊME portée (whisper si dirigé, sinon yell). Dirigé → profil (throttlé par

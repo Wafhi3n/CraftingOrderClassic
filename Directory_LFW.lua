@@ -278,6 +278,44 @@ function Dir:_StartLFWTicker()
     end)
 end
 
+-- ------------------------------------------------------------------
+-- Riposte : quelqu'un vient d'arriver, il ne sait rien de mon LFW
+-- ------------------------------------------------------------------
+-- LE TROU, établi le 2026-09-27. `Dir.lfw` est RUNTIME par conception : un joueur qui recharge
+-- perd tout ce qu'il savait des LFW des autres. Or personne ne se ré-annonçait à son arrivée —
+-- `_BroadcastLFW` ne partait qu'au changement d'offre, à `SetLFW`, sur le ticker de 8 minutes, et
+-- sur MON propre OnNetworkReady. D'où une asymétrie vicieuse : celui qui recharge se ré-annonce
+-- aux autres tout de suite, mais reste aveugle aux leurs jusqu'à 8 min — il croit voir le radar
+-- alors qu'il est vide. C'est la même forme que la découverte à sens unique, corrigée en son temps
+-- par une riposte throttlée dans OnHello/OnPing.
+--
+-- ⚠️ LA GARDE AFK N'EST PAS UNE PRÉCAUTION, C'EST LA FEATURE. Tout l'anti-leurre tient à « un AFK
+-- cesse d'émettre, donc il sort du radar au bout du TTL ». Une riposte qui l'ignorerait rendrait
+-- un absent visible INDÉFINIMENT — il suffit que quelqu'un se connecte toutes les 20 minutes. On
+-- la vérifie donc deux fois : à la décision, et à l'envoi (3 s plus tard, l'état a pu changer).
+--
+-- THROTTLE GLOBAL, pas par personne : mon annonce part sur le CANAL, donc une seule émission sert
+-- tout le monde. Cinq arrivées d'affilée ne doivent pas coûter cinq lignes. Et le tirage aléatoire
+-- évite que tous les artisans LFW du royaume parlent dans la même seconde — même raison que le
+-- jitter d'`Announce`.
+local RIPOSTE_THROTTLE = 45    -- s entre deux ripostes, quel que soit le nombre d'arrivants
+local RIPOSTE_JITTER   = 3     -- s : étalement aléatoire, pour ne pas parler tous en choeur
+
+local function stillBroadcastable()
+    return (COC.db and COC.db.lfw and COC.db.lfw.prof) and not (UnitIsAFK and UnitIsAFK("player"))
+end
+
+function Dir:LFWRiposte()
+    if not stillBroadcastable() then return end
+    local now = (GetTime and GetTime()) or 0
+    if self._lfwRiposteAt and (now - self._lfwRiposteAt) < RIPOSTE_THROTTLE then return end
+    self._lfwRiposteAt = now
+    if not (C_Timer and C_Timer.After) then Dir:_BroadcastLFW(); return end
+    C_Timer.After(math.random() * RIPOSTE_JITTER, function()
+        if stillBroadcastable() then Dir:_BroadcastLFW() end
+    end)
+end
+
 -- /co lfw [métier|off] : me déclarer dispo pour du travail dans un métier (ou couper). Sans argument :
 -- affiche l'état. Le métier doit être un des MIENS (sinon annoncer un métier qu'on ne fait pas n'a pas de sens).
 function Dir:LFWCmd(arg)
