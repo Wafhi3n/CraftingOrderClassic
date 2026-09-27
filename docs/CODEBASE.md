@@ -1,10 +1,10 @@
 # CraftingOrderClassic — carte du code
 
-> **GÉNÉRÉ** le 2026-09-26 (v1.35.1) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
+> **GÉNÉRÉ** le 2026-09-27 (v1.35.1) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
-134 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
+137 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
 
 ## Modules (ordre de chargement)
 
@@ -16,11 +16,14 @@
 | `CraftingOrderClassic_Migrations.lua` | versionnage du schéma SavedVariables. | 40 |
 | `CraftingOrderClassic_Locale.lua` | socle de localisation du CHROME de l'UI. | 12 |
 | `CraftingOrderClassic_Locale_enUS.lua` | overlay ANGLAIS (enUS/enGB). | 280 |
-| `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 498 |
+| `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 492 |
+| `CraftingOrderClassic_Locale_enUS_3.lua` | overlay enUS, 3/3. | 23 |
 | `CraftingOrderClassic_Locale_deDE.lua` | overlay ALLEMAND (deDE). | 282 |
-| `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 478 |
+| `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 472 |
+| `CraftingOrderClassic_Locale_deDE_3.lua` | overlay deDE, 3/3. | 22 |
 | `CraftingOrderClassic_Locale_esES.lua` | overlay ESPAGNOL (esES/esMX). | 283 |
-| `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 479 |
+| `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 473 |
+| `CraftingOrderClassic_Locale_esES_3.lua` | overlay esES, 3/3. | 23 |
 | `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 356 |
 | `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 353 |
 | `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 353 |
@@ -102,8 +105,8 @@
 | `CraftingOrderClassic_Profit.lua` | pont LECTURE SEULE vers l'oracle de prix, AUCTIONATOR. | 477 |
 | `CraftingOrderClassic_ProfWindow_Orders.lua` | colonne « Commandes » de la vue métier (cabine de l'artisan) : construction (onglets de relation, en-tête, scroll), vue LISTE (une ligne par commande : demandeur + prix + âge ; une ligne sourdine cliquée se réaffiche), collecte/tri et rafraîchissement. | 499 |
 | `CraftingOrderClassic_ProfWindow_Orders_Card.lua` | vue SÉLECTIONNÉE de la colonne « Commandes » : la carte complète d'une commande (composants fournis, repères Auctionator, ACCEPTER / REFUSER / CHUCHOTER ; croix en haut à droite = retour liste). | 315 |
-| `CraftingOrderClassic_ProfWindow_LFW.lua` | config de l'OFFRE « recherche de travail » par métier. | 483 |
-| `CraftingOrderClassic_ProfWindow_LFW_Recipes.lua` | le SÉLECTEUR DE RECETTES de l'offre LFW. | 113 |
+| `CraftingOrderClassic_ProfWindow_LFW.lua` | config de l'OFFRE « recherche de travail » par métier. | 492 |
+| `CraftingOrderClassic_ProfWindow_LFW_Recipes.lua` | le SÉLECTEUR DE RECETTES de l'offre LFW. | 140 |
 | `CraftingOrderClassic_ProfWindow_Reroll.lua` | vue métier LECTURE SEULE d'un REROLL. | 118 |
 | `Directory.lua` | Crafting Order - Classic — Directory : l'annuaire des GENS (présence + qui peut crafter quoi). | 485 |
 | `Directory_Presence.lua` | présence : la vérité JEU (amis/guilde) et sa fusion avec la vérité ADDON. | 90 |
@@ -629,6 +632,12 @@
 > Même contrat : chargé APRÈS _Locale.lua, table à plat fusionnée dans COC.L — les deux moitiés
 > sont indépendantes (aucun ordre requis entre elles). Client d'une autre langue : early-return.
 
+### `CraftingOrderClassic_Locale_enUS_3.lua`
+> CraftingOrderClassic_Locale_enUS_3.lua — overlay enUS, 3/3. Clé FR → texte traduit.
+> Troisième part, ouverte le 2026-09-26 : _2 avait atteint le plafond anti-monolithe
+> (500 l/fichier) en accueillant les clés de la bande LFW. Même contrat que les deux
+> autres — table à plat fusionnée dans COC.L, aucun ordre requis entre les parts.
+
 ### `CraftingOrderClassic_Locale_deDE.lua`
 > CraftingOrderClassic_Locale_deDE.lua — overlay ALLEMAND (deDE). Clé FR → texte DE.
 > Chargé APRÈS CraftingOrderClassic_Locale.lua (qui crée COC.L via setmetatable). Repli sur la clé FR
@@ -641,6 +650,12 @@
 > Même contrat : chargé APRÈS _Locale.lua, table à plat fusionnée dans COC.L — les deux moitiés
 > sont indépendantes (aucun ordre requis entre elles). Client d'une autre langue : early-return.
 
+### `CraftingOrderClassic_Locale_deDE_3.lua`
+> CraftingOrderClassic_Locale_deDE_3.lua — overlay deDE, 3/3. Clé FR → texte traduit.
+> Troisième part, ouverte le 2026-09-26 : _2 avait atteint le plafond anti-monolithe
+> (500 l/fichier) en accueillant les clés de la bande LFW. Même contrat que les deux
+> autres — table à plat fusionnée dans COC.L, aucun ordre requis entre les parts.
+
 ### `CraftingOrderClassic_Locale_esES.lua`
 > CraftingOrderClassic_Locale_esES.lua — overlay ESPAGNOL (esES/esMX). Clé FR → texte ES.
 > Chargé APRÈS CraftingOrderClassic_Locale.lua (qui crée COC.L via setmetatable). Repli sur la clé FR
@@ -652,6 +667,12 @@
 > Suite de _Locale_esES.lua, scindé pour rester sous le plafond anti-monolithe (500 l/fichier).
 > Même contrat : chargé APRÈS _Locale.lua, table à plat fusionnée dans COC.L — les deux moitiés
 > sont indépendantes (aucun ordre requis entre elles). Client d'une autre langue : early-return.
+
+### `CraftingOrderClassic_Locale_esES_3.lua`
+> CraftingOrderClassic_Locale_esES_3.lua — overlay esES, 3/3. Clé FR → texte traduit.
+> Troisième part, ouverte le 2026-09-26 : _2 avait atteint le plafond anti-monolithe
+> (500 l/fichier) en accueillant les clés de la bande LFW. Même contrat que les deux
+> autres — table à plat fusionnée dans COC.L, aucun ordre requis entre les parts.
 
 ### `CraftingOrderClassic_Locale_News_enUS.lua`
 > CraftingOrderClassic_Locale_News_enUS.lua — traductions de l'onglet « Nouveautés » (enUS/enGB).
