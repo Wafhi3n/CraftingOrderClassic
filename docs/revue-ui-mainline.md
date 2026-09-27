@@ -1,7 +1,7 @@
 # Revue : passer l'interface de COC sur les briques Mainline de Forever
 
 > Rédigée le 2026-09-27 · Cible : WoW: Forever / Camelot (16001) · Statut : **D1-D3 tranchées le
-> 2026-09-27, P0 au labo en cours** · Portée : la fenêtre principale d'abord (Carnet, Commande, Récolte, Artisans, Mes
+> 2026-09-27 ; P0 : menus EXCLUS (le client plante), sonde et minicarte à jouer** · Portée : la fenêtre principale d'abord (Carnet, Commande, Récolte, Artisans, Mes
 > artisans, Aide, Nouveautés), puis les fenêtres annexes. La colonne greffée dans la fenêtre des
 > métiers est déjà faite.
 >
@@ -49,7 +49,7 @@ Relevé sur `main` le 2026-09-27 : 30 fichiers `_UI_*`, 24 fichiers `_ProfWindow
 | `ButtonFrameTemplate` (via `Skin.MakeWindow`) | 3 fenêtres | le même : sur Forever c'est déjà le cadre retail | **garder** |
 | `UIPanelScrollFrameTemplate` + pools de lignes manuels + `Skin.AutoHideScroll` | 19 listes, 18 appels | `WowScrollBoxList` + `MinimalScrollBar` + `CreateDataProvider` / `CreateTreeDataProvider` | **migrer**, le plus gros gain |
 | `TabButtonTemplate` en haut (`Skin.MakeTabs`) | 3 rangées | onglets latéraux à droite, `Skin.MakeSideTab` (`LargeSideTabButtonTemplate`, déjà dans le kit) | **migrer**, décision D1 |
-| `Skin.MakeDropdown` / `Skin.MakeFlyout` (maison, anti-taint `UIDropDownMenu`) | 8 + 6 | `WowStyle1DropdownTemplate`, `WowStyle1FilterDropdownTemplate` (système Menu) | **bloqué** par le risque 1 |
+| `Skin.MakeDropdown` / `Skin.MakeFlyout` (maison, anti-taint `UIDropDownMenu`) | 8 + 6 | `WowStyle1DropdownTemplate`, `WowStyle1FilterDropdownTemplate` (système Menu) | **exclu** : ouvert par un addon, il fait planter le client (risque 1) ; le flyout maison reste |
 | `Skin.MakeMoneyRow` (3 `InputBoxTemplate` or/argent/cuivre) | 3 | `LargeMoneyInputFrameTemplate` (le champ pourboire de retail) | **migrer** |
 | Qté (`InputBoxTemplate` nu) | — | `NumericInputSpinnerTemplate` (le compteur de « Créer tout ») | **migrer** |
 | Recherche : `InputBoxTemplate` + loupe et texte d'invite posés à la main (`Skin.SearchHint`) | 2 | `SearchBoxTemplate` (loupe, invite et croix d'effacement fournies) | **migrer** |
@@ -80,6 +80,25 @@ est la machinerie partagée du nouveau système Menu. Rien n'est prouvé, mais l
 mesuré sur Forever. Passer nos 8 menus déroulants sur `WowStyle1DropdownTemplate` sans mesure, c'est
 parier là-dessus. **Parade** : un palier 0 au labo (`TaintLab`, Forever, `/console taintLog 1`) avant
 de toucher un seul menu. D'ici là, le flyout maison reste.
+
+**Mesuré le 2026-09-27 : c'est pire que du taint.** Au premier clic sur un `WowStyle1DropdownTemplate`
+créé par le labo (en ville, hors combat), le client s'arrête net : « Fatal Error », assertion Lua
+`ldebug.c(747)`. La pile est entièrement chez Blizzard : `DropdownButton.lua:105` → `Menu.lua:2649`
+`OpenMenu` → `Menu.lua:2212` `AcquireMenu`, sur la ligne `proxy.ownerRegion = ownerRegion`, qui écrit
+dans un cadre protégé par `SetPrivateReference`. Lecture la plus probable : l'écriture est refusée
+parce que l'ouverture part d'un bouton d'addon, et le client plante en fabriquant le message
+d'erreur. Build 70009, rapport `Errors\2026-09-27_19.06.34_Error_19208.txt`. Les trois autres
+plantages de la semaine ont d'autres signatures : ce n'est pas du bruit.
+
+Conséquences :
+
+- **aucun menu du système Menu ouvert depuis notre code** : ni `WowStyle1DropdownTemplate`, ni
+  `MenuUtil.CreateContextMenu`, qui passe par le même `AcquireMenu` ;
+- `Menu.ModifyMenu`, lui, reste sûr. COC s'en sert pour ajouter ses lignes aux menus clic droit de
+  Blizzard : c'est le code de Blizzard qui ouvre le menu. Vérifié : c'est notre seul usage du système
+  Menu, dans COC comme dans LeyLines ;
+- le flyout maison (`Skin.MakeFlyout`, `Skin.MakeDropdown`) reste la brique des menus. Il faudra en
+  moderniser l'aspect à la main, avec les atlas du menu de Blizzard.
 
 **2. Les gabarits chargés à la demande.** `Blizzard_ProfessionsTemplates` et
 `Blizzard_ProfessionsCustomerOrders` sont `LoadOnDemand`. Les charger nous-mêmes exécuterait du code
@@ -145,8 +164,9 @@ aujourd'hui), le nom passe dans l'infobulle.
 ~~Options écartées~~ : en bas (`PanelTabButtonTemplate`), en haut (`TabSystemTemplate`), garder les
 languettes actuelles.
 
-**D2 — Menus déroulants : on passe par le labo.** `TaintLab` 0.2.0 (dépôt d'outillage, `c839900`),
-`/tlab menu`. Tant que le labo n'a pas rendu son verdict, le flyout maison reste.
+**D2 — Menus déroulants : passés au labo, EXCLUS.** `TaintLab` 0.2.0 (dépôt d'outillage, `c839900`),
+`/tlab menu` : le client plante à l'ouverture (cf. risque 1). Le flyout maison reste. `/tlab menu`
+demande désormais confirmation (`dfd3b75`) et ne sert plus qu'à re-tester après un patch du client.
 
 **D3 — Portée : la fenêtre principale d'abord.**
 
