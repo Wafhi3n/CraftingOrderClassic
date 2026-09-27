@@ -368,6 +368,13 @@ local news = {
         "Un icono en la lista de addons",
     ["L'addon a enfin sa propre icône dans la liste des addons, à la place du point d'interrogation. Rien d'autre ne change."] =
         "El addon por fin tiene su propio icono en la lista de addons, en lugar del signo de interrogación. Nada más cambia.",
+    -- v1.36.2
+    ["Les commandes trouvent leur destinataire"] =
+        "Los pedidos llegan a quien deben",
+    ["Sur WoW Forever, chaque personnage a un nom de famille, et le jeu te désigne partout par « Prénom Nom ». L'addon t'appelait par ton prénom seul et ne se reconnaissait plus : une commande à ton nom arrivait puis était ignorée, une commande postée sur le canal était rejetée comme si quelqu'un postait à la place d'un autre, et tu pouvais te retrouver dans ta propre liste d'artisans. C'est réparé, y compris pour les commandes des joueurs restés en 1.36.1."] =
+        "En WoW Forever cada personaje tiene apellido, y el juego te llama 'Nombre Apellido' en todas partes. El addon seguía usando solo tu nombre y dejó de reconocerse: un pedido a tu nombre llegaba y se ignoraba, un pedido publicado en el canal se descartaba como si alguien publicara en nombre de otro, y podías aparecer en tu propia lista de artesanos. Corregido, también para los pedidos de jugadores que siguen en la 1.36.1.",
+    ["Une ligne du canal Commerce comme « dont need fire wand: [Lesser Magic Wand] » n'est plus prise pour une demande."] =
+        "Una línea del canal de Comercio como 'dont need fire wand: [Lesser Magic Wand]' ya no se toma por una petición.",
 }
 
 for k, v in pairs(news) do L[k] = v end

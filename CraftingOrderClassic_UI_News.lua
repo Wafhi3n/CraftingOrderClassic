@@ -34,6 +34,13 @@ local BODY_W = 780
 local function versionsHead()
     return {
         {
+            v = "v1.36.2", title = L["Les commandes trouvent leur destinataire"],
+            lines = {
+                L["Sur WoW Forever, chaque personnage a un nom de famille, et le jeu te désigne partout par « Prénom Nom ». L'addon t'appelait par ton prénom seul et ne se reconnaissait plus : une commande à ton nom arrivait puis était ignorée, une commande postée sur le canal était rejetée comme si quelqu'un postait à la place d'un autre, et tu pouvais te retrouver dans ta propre liste d'artisans. C'est réparé, y compris pour les commandes des joueurs restés en 1.36.1."],
+                L["Une ligne du canal Commerce comme « dont need fire wand: [Lesser Magic Wand] » n'est plus prise pour une demande."],
+            },
+        },
+        {
             v = "v1.36.1", title = L["Une icône dans la liste des addons"],
             lines = {
                 L["L'addon a enfin sa propre icône dans la liste des addons, à la place du point d'interrogation. Rien d'autre ne change."],

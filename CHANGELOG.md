@@ -1,5 +1,17 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.36.2 - Orders that reach the right person
+
+Characters on WoW Forever have a surname, and the game knows you as "Firstname Surname" everywhere: whispers,
+channels, addon messages. The addon still called you by your first name alone, so it didn't recognize itself. An
+order addressed to you by name arrived and was ignored, orders posted on the channel got thrown out as if someone
+were posting in another player's name, and you could find yourself in your own Artisans list. It uses your full
+name now. Players still on 1.36.1 sign their orders with their first name only, and the addon fills in the rest
+from the sender, so their orders get through too.
+
+A trade chat line like "dont need fire wand: [Lesser Magic Wand]" no longer counts as a request. "Don't need",
+"no need" and "pas besoin" are skipped, and a real request next to them ("WTB [X], no need for mats") still counts.
+
 ## v1.36.1 - An icon of its own
 
 The addon has its own icon in the addon list now, instead of a question mark. Nothing else changes.
