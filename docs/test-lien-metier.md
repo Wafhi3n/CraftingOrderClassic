@@ -2,6 +2,7 @@
 
 **Durée estimée : 25 minutes**, plus 5 pour la partie guilde (facultative).
 **Banc :** les 2 comptes Forever, jamais deux clients du même compte.
+**État :** jouée le 2026-09-27, étapes 1 à 6 et 8. Résultats dans le Relevé, en fin de fiche.
 
 - **A** = `101576982#1`, celui qui **regarde** (« Gnomi Short », sans métier au 2026-09-19).
 - **B** = `101576982#4`, celui qu'on **regarde** (« Rédemption Wafhien » : Enchantement, Cuisine…).
@@ -43,8 +44,12 @@ elle est sauvegardée, et elle ressortira le jour où A apprendra l'Enchantement
 
 - A et B **du même camp** (on chuchote), **dans la même zone, hors combat, hors instance**. En
   instance, le nom et le GUID d'un autre joueur peuvent devenir des valeurs secrètes.
-- **Copier-coller** les lignes depuis ce fichier : Ctrl+V marche dans la boîte de chat. Chaque `/run`
-  fait moins de 255 caractères et passe la syntaxe Lua 5.1 (vérifié avec Elune).
+- **Copier-coller** les lignes depuis ce fichier, **une ligne par collage** : Ctrl+V marche dans la
+  boîte de chat. Chaque `/run` fait moins de 255 caractères et passe la syntaxe Lua 5.1 (vérifié
+  avec Elune).
+- ⚠️ **La boîte de chat double les `|`** tapés ou collés dans un `/run` : un motif `"|H"` y devient
+  `"||H"` et ne trouve plus rien, un `print("|cff…")` n'affiche plus de lien (vécu le 2026-09-27).
+  Les lignes de cette fiche écrivent donc `\124` (le code du caractère `|`) : ne pas le « corriger ».
 - Chaque relevé s'affiche dans le chat (`LP clé = valeur`) **et** est rangé dans la sauvegarde de
   COC (`CraftingOrderClassicDB._lp`). Rien à recopier : je lirai les deux fichiers après le
   `/reload` final.
@@ -54,7 +59,7 @@ elle est sauvegardée, et elle ressortira le jour où A apprendra l'Enchantement
 **Sur B**, coller ces deux lignes :
 
 ```
-/run LPD=CraftingOrderClassicDB LPD._lp=LPD._lp or {} function LP(k,v) LPD._lp[k]=v print("LP "..k.." = "..(tostring(v):gsub("|","||"))) end
+/run LPD=CraftingOrderClassicDB LPD._lp=LPD._lp or {} function LP(k,v) LPD._lp[k]=v print("LP "..k.." = "..(tostring(v):gsub("\124","\124\124"))) end
 /run function LC(k) local t={} for _,id in ipairs(C_TradeSkillUI.GetAllRecipeIDs()) do local r=C_TradeSkillUI.GetRecipeInfo(id) if r and r.learned then t[#t+1]=id end end LP(k,#t..":"..table.concat(t,",")) end
 ```
 
@@ -63,8 +68,8 @@ elle est sauvegardée, et elle ressortira le jour où A apprendra l'Enchantement
 ```
 /run function LV(k) local T=C_TradeSkillUI local a,b=T.IsTradeSkillLinked() local p=T.GetBaseProfessionInfo() LP(k,tostring(a).."/"..tostring(b).."/"..tostring(T.IsTradeSkillGuildMember()).."/"..tostring(p and p.professionName)) LC(k.."_n") end
 /run function LK(k) local s=LibStub("CraftLink-1.0"):MyKnownSet("Enchanting") local n=0 for _ in pairs(s or {}) do n=n+1 end LP(k,n) end
-/run function LF(g,s,l) print("|cffffd000|Htrade:"..g..":"..s..":"..l.."|h[forge "..l.."]|h|r") end
-/run local f=CreateFrame("Frame") f:RegisterEvent("CHAT_MSG_WHISPER") f:SetScript("OnEvent",function(_,_,m) local l=m:match("|H(trade:.-)|h") if l then LP("recu",l) end end)
+/run function LF(g,s,l) print("\124cffffd000\124Htrade:"..g..":"..s..":"..l.."\124h[forge "..l.."]\124h\124r") end
+/run local f=CreateFrame("Frame") f:RegisterEvent("CHAT_MSG_WHISPER") f:SetScript("OnEvent",function(_,_,m) local l=m:match("\124H(trade:.-)\124h") if l then LP("recu",l) end end)
 ```
 
 Ce que chacune fait : `LP` note une valeur ; `LC` compte les recettes **apprises** dans la fenêtre
@@ -144,8 +149,17 @@ A, **avant de cliquer quoi que ce soit** :
 /run LK("connusA_avant")
 ```
 
-A chuchote « test » à B. B répond : taper `/r ` **puis** clic gauche sur le bouton chaîne (le lien
-s'insère dans la ligne), Entrée.
+A chuchote « test » à B. Le bouton chaîne de B est un **menu de canaux** (Guilde, Groupe, canaux) :
+il n'offre pas le chuchotement. B, avec **son** Enchantement affiché (ouvrir les Communautés referme
+la fenêtre de métier, et le lien devient `nil`), colle :
+
+```
+/run local l=C_TradeSkillUI.GetTradeSkillListLink() if l then ChatFrameUtil.OpenChat("/r "..l,DEFAULT_CHAT_FRAME) else print("PAS DE LIEN : ouvre ton Enchantement") end
+```
+
+La ligne de chat s'ouvre avec le lien : vérifier qu'elle chuchote à A, puis **Entrée** (la commande
+ne fait que préparer la ligne, c'est le joueur qui envoie). Poster dans une communauté fait passer le
+lien, mais un addon n'y lit qu'une référence opaque : le capteur de A resterait vide.
 
 Chez A, la ligne `LP recu = trade:…` doit s'afficher d'elle-même. A clique le lien dans le chat,
 attend que la liste soit remplie, puis :
@@ -222,7 +236,7 @@ garde le sort de l'Enchantement (remplacer seulement `LIGNE`) :
 B revient à l'**écran de sélection des personnages** (pas seulement AFK). A :
 
 ```
-/run print("|cffffd000|H"..LPD._lp.recu.."|h[rejouer]|h|r")
+/run print("\124cffffd000\124H"..LPD._lp.recu.."\124h[rejouer]\124h\124r")
 ```
 
 Cliquer `[rejouer]`, puis `/run LV("vueA_horsligne")`. Si l'étape 5 a ouvert la Cuisine, recliquer
@@ -295,8 +309,27 @@ Je lis moi-même la clé `_lp` dans
 et dans son jumeau `#4`, et je compare les listes de recettes. Ensuite, sur chaque compte :
 `/run CraftingOrderClassicDB._lp=nil` puis `/reload`.
 
-## Relevé
+## Relevé — joué le 2026-09-27
+
+**Réponse à la question : non.** Un addon ne voit que le métier qu'on lui a lié (la guilde n'a pas
+été essayée). Un lien fabriqué avec le bon GUID ne livre rien pour un métier jamais partagé. Comme
+les deux comptes sont sous le même Battle.net, ce « non » vaut *a fortiori* pour un inconnu. Mais
+un lien partagé se rejoue plus tard, et quiconque l'a reçu peut le partager à son tour.
 
 | Étape | Date | Résultat |
 |---|---|---|
-| 1 à 8 | — | non testé |
+| 1 | 2026-09-27 | ✅ `CanTradeSkillListLink()` = `true`. Le bouton chaîne est un menu de canaux, sans chuchotement |
+| 2 | 2026-09-27 | ✅ Lien `\|cffffd000\|Htrade:Player-4620-0099DCCF:7412:333\|h[Enchanting]\|h\|r` : forme Retail (GUID : sort de **rang** : ligne), rien d'encodé. Grimoire : Enchantement `sort=7412`, égal au lien ; Cuisine `sort=2550`, ligne 185. `enchB` = 21 recettes, `cuisB` = 6 |
+| 3 | 2026-09-27 | ✅ Chez A, fenêtre « Enchanting [Rédemption Wafhien] », liste identique à `enchB` (21/21). **Bug confirmé** : `knownRecipes["Gnomi-…"].Enchanting` contenait ces 21 recettes, pour un perso **sans aucun métier** (`connusA_avant` = 0). La colonne COC se greffe sur la vue liée, avec « Look for work » et **Offer** |
+| 4 | 2026-09-27 | ✅ Témoin : le lien reconstruit rend `true/Rédemption Wafhien/false/Enchanting` et 21 recettes |
+| 5 | 2026-09-27 | ❌ Lien fabriqué pour la Cuisine (bon GUID, sort 2550, ligne 185) : mode lié au nom de B, **nom de métier vide**, et la liste reste les 21 de l'Enchantement, jamais les 6 de la Cuisine. Le serveur ne livre pas un métier jamais partagé |
+| 6 | 2026-09-27 | ⚠️ B déconnecté : le vrai lien rejoué rouvre l'Enchantement (21) ; le lien fabriqué ne livre toujours rien. Portée : A avait déjà ouvert ce métier dans la même session, donc un cache du client n'est pas exclu |
+| 7 | — | Non joué : A et B ne sont pas dans la même guilde |
+| 8 | 2026-09-27 | ✅ Recettes de B retirées de la sauvegarde de A (vérifié dans le fichier) |
+
+Vu en dehors des étapes :
+
+- **Celui qui regarde peut re-lier** : sur A, avec la vue liée ouverte, `GetTradeSkillListLink()` rend
+  un lien, et A l'a renvoyé à B.
+- `GetTradeSkillListLink()` rend `nil` dès que la fenêtre de métier s'est refermée.
+- Le premier capteur n'a rien capté à cause des `|` doublés par le chat (voir Préparation).
