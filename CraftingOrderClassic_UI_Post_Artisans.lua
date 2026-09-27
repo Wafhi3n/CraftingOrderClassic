@@ -165,15 +165,29 @@ function UI:RefreshPostArtisans()
         return a.leader < b.leader
     end)
     local n = 0
+    self._postSelIdx = nil   -- rang de la ligne ciblée, pour que OpenPostForArtisan la fasse défiler à l'écran
     for _, g in ipairs(list) do
         n = n + 1
-        self:_FillPostArtGroupRow(self:_PostArtRow(n), g, prof)
+        local row = self:_PostArtRow(n)
+        self:_FillPostArtGroupRow(row, g, prof)
+        if row.selTex:IsShown() then self._postSelIdx = n end
     end
     for i = n+1, #self.postArtRows do self.postArtRows[i]:Hide() end
     self.postArtContent:SetHeight(math.max(n * ARH, 10))
     Skin.AutoHideScroll("COCPostArtScroll", self.postArtContent)
     self:_RefreshAllRow("post"); self:_UpdateArtisanLabel()
     if self.postDiffBtn then self.postDiffBtn:SetSelected((self.postTarget or "all") == "all") end
+end
+
+-- Amène la ligne ciblée dans la fenêtre de la liste (4 lignes visibles) : triée en ligne d'abord puis
+-- par nom, elle peut tomber bien plus bas, et une sélection hors champ ne se voit pas. Les deux
+-- hauteurs sont posées à la main (SetHeight / SetSize), donc lisibles tout de suite, sans attendre
+-- une passe de mise en page ; même bornage que les autres listes (cf. _UI_Post_Categories).
+function UI:_ScrollPostArtToTarget()
+    local scroll, content, idx = _G.COCPostArtScroll, self.postArtContent, self._postSelIdx
+    if not (scroll and content) then return end
+    local maxScroll = math.max(0, (content:GetHeight() or 0) - (scroll:GetHeight() or 0))
+    scroll:SetVerticalScroll(idx and math.min(maxScroll, (idx - 1) * ARH) or 0)
 end
 
 function UI:_PostArtRow(i)
@@ -226,9 +240,14 @@ function UI:OpenPostForArtisan(name, prof)
         if pick then self.postProf = pick end
     end
     self.postTarget = "@" .. name
+    -- La portée suit l'artisan : restée sur « Guilde », la liste excluait quelqu'un de l'annuaire, et
+    -- la cible était posée sans que sa ligne existe (cf. Skin.PostSourceFor).
+    self.postSource = Skin.PostSourceFor(r, self.postSource or "guild")
+    self:_RefreshPostSrcTabs()
     if not self.frame:IsShown() then self.frame:Show() end
     self:ShowTab("post")
     self:RefreshPost()
+    self:_ScrollPostArtToTarget()
     -- Sollicite le registre FRAIS (RK+SK à jour) si l'artisan est en ligne — throttlé 60 s/nom.
     if r and D.online and D.online[name] and D.DiscoverPlayer then D:DiscoverPlayer(name) end
 end
