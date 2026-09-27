@@ -349,12 +349,6 @@ local en2 = {
 
     -- Plan de route (montée de métier)
     ["Plan de route"] = "Leveling route",
-    ["Route"] = "Route",              -- languette courte (la vue garde « Leveling route »)
-    ["Dispo — %s"] = "Available — %s",
-    ["Offre"] = "Offer",
-    ["Réactifs"] = "Reagents",
-    ["Recettes"] = "Recipes",
-    ["Recettes proposées (%d/%d)"] = "Offered recipes (%d/%d)",
     ["Plan de route : quoi crafter pour monter au moins cher."] = "Leveling route: what to craft to level up at the lowest cost.",
     ["En tête : rang actuel, plafond entraînable, et coût total estimé (« > » = des rangs sans recette calculable, total incomplet)."] =
         "At the top: current rank, trainable cap, and the estimated total cost (\">\" = some ranks have no computable recipe, the total is incomplete).",

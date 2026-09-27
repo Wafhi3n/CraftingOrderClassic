@@ -36,6 +36,40 @@ client.
 
 ## Relevés
 
+- 2026-09-27 — jusqu'a 760119c — Forever, **DEUX COMPTES**, client en ANGLAIS — **GO sur l'étage
+  RÉCEPTION de LFW et sur le métier de RÉCOLTE** — quatre captures du user. Premier relevé à deux
+  comptes de LFW sur Forever : cette moitié n'avait **jamais** été vue fonctionner.
+
+  ✅ **La plaque de nom.** Compte A (« Rédemption Wafhien », LFW actif) vu depuis le compte B
+  (« Gnomi Short ») à Forgefer : une icône est posée au-dessus de sa plaque.
+  ✅ **Le badge `[LFW]`** apparaît en vert devant son nom dans l'onglet Artisans du compte B,
+  avec ses icônes de métier. Pied de fenêtre : « network channel joined · 3 online · 5 crafter(s) ».
+  ✅ **Métier de RÉCOLTE** (Herbalism 70/75, arbitrage C) : la bande « Look for work » est bien là,
+  avec son bouton « Offer », et le panneau d'offre s'ouvre. La bande n'est donc pas conditionnelle
+  au type de métier.
+  ✅ Le panneau s'ouvre **à gauche**, entièrement visible, au PREMIER clic, et la rangée de modes
+  « Reagents / Recipes » y est — les trois correctifs faits au calcul sont confirmés d'un coup.
+
+  ⚠️ **DÉFAUT VU, corrigé depuis** : sur Herbalism la liste des réactifs était **vide**, sans un
+  mot. Le filtre « recettes connues » posé le 2026-09-26 ne repliait que si l'on n'avait RIEN pour
+  filtrer ; là le client connaissait bien une recette (« Incense Candle ») mais notre catalogue
+  n'a pas ses réactifs, donc le résultat sortait vide sans jamais replier. Le repli se déclenche
+  désormais sur un RÉSULTAT vide, et le picker DIT quand il n'a rien à montrer.
+
+  ❓ **OUVERT — l'infobulle monde ne porte pas le bloc LFW.** Sur la capture, le survol de
+  « Rédemption Wafhien » affiche bien « CO-Classic » et ses cinq métiers, mais **pas** la ligne
+  « Cherche du travail ». Or le code est inconditionnel (`if lfwE then` dans `_Social.lua`) : c'est
+  donc que `Dir:LFWOf(nom)` a rendu nil pour CE nom, alors que la plaque et l'annuaire l'ont
+  trouvé. Piste à vérifier, pas conclusion : une **clé de nom** qui diffère (accent, suffixe de
+  royaume, casse) entre ce que stocke `Dir.lfw` et ce que l'infobulle interroge.
+  Diagnostic, une ligne en jeu :
+  `/run for k,v in pairs(CraftingOrderClassic.Directory.lfw or {}) do print("["..k.."]", v.prof) end`
+  — comparer la clé imprimée au nom exact affiché par l'infobulle.
+
+  PÉRIMÈTRE, toujours pas observé : le détail d'OFFRE dans la plaque (pièce / sac / nom de recette)
+  et dans l'annuaire — aucune offre n'était réglée ; l'**anti-leurre AFK** (TTL 20 min, il faut
+  l'attendre vraiment) ; le **combat** ; et le sélecteur de recettes, déployé après ces captures.
+
 - 2026-09-26 (6) — jusqu'a 70a15c8 — Forever, un client, client en ANGLAIS — **GO sur la bascule
   LFW, croisée avec la commande** — rapporté par le user : *« co lfw fait la même chose que quand
   je clique dessus »*. **C'est LE critère de la bande** : elle affiche un état, donc il faut

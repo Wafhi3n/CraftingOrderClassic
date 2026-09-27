@@ -244,6 +244,7 @@ function PW:_BuildLFWPicker(p)
     p.scroll, p.content = scroll, content
     p.rows = {}
     for i = 1, VISIBLE do p.rows[i] = self:_BuildLFWRow(content, i) end
+    if self._BuildLFWEmptyMsg then self:_BuildLFWEmptyMsg(p) end
     if self._BuildLFWModeTabs then self:_BuildLFWModeTabs(p) end
 end
 
@@ -323,11 +324,18 @@ function PW:_LFWUniverse(profKey)
     end
     if known and #known > 0 and c and c.RecipeReagents then
         for _, e in ipairs(known) do take(c:RecipeReagents(profKey, e.id)) end
-    else
+    end
+    -- Le repli se declenche sur un RESULTAT vide, pas sur une entree vide. Vu sur Herbalism le
+    -- 2026-09-26 : le client connaissait bien une recette (« Incense Candle »), donc `known`
+    -- n'etait pas vide et l'ancienne garde ne repliait pas -- mais notre catalogue n'a pas ses
+    -- reactifs, et la liste sortait vide. Ce qui compte n'est pas d'avoir eu de quoi filtrer,
+    -- c'est d'avoir obtenu quelque chose.
+    if #out == 0 then
         local def = c and c.GetProfession and c:GetProfession(profKey)
         for _, list in pairs((def and def.reagents) or {}) do take(list) end
     end
-    self._lfwUniv[profKey] = out
+    -- Un univers vide ne se met pas en cache : il vient peut-etre d'une fenetre pas encore prete.
+    if #out > 0 then self._lfwUniv[profKey] = out end
     return out
 end
 
@@ -451,6 +459,7 @@ function PW:_RefreshLFWList()
         #sel, cap) .. "|r")
     self._lfwDisplay = self:_LFWDisplayList()
     local n = #self._lfwDisplay
+    if self._SyncLFWEmptyMsg then self:_SyncLFWEmptyMsg(n) end
     p.content:SetHeight(math.max(n * ROW_H, VISIBLE * ROW_H))
     local maxScroll = math.max(0, n * ROW_H - (p.scroll:GetHeight() or 0))
     if (p.scroll:GetVerticalScroll() or 0) > maxScroll then p.scroll:SetVerticalScroll(maxScroll) end

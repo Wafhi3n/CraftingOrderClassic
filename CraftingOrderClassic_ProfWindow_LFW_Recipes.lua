@@ -111,3 +111,30 @@ function PW:_SetLFWPickMode(mode)
     self:_SyncLFWModeTabs()
     self:_RefreshLFWList()
 end
+
+-- ------------------------------------------------------------------
+-- L'état VIDE du picker
+-- ------------------------------------------------------------------
+-- Une liste vide sans un mot se lit comme une panne — c'est exactement ce qu'a donné Herbalism sur
+-- la capture du 2026-09-26 : le panneau ouvert, « Provided reagents (0/15) », et rien en dessous.
+-- Le joueur ne peut pas savoir si l'addon n'a rien trouvé, si sa recherche ne matche pas, ou si
+-- c'est cassé. On le dit, et on distingue les deux cas : une recherche qui ne rend rien n'est pas
+-- un métier qui n'a rien.
+function PW:_BuildLFWEmptyMsg(p)
+    if p.emptyMsg then return end
+    local fs = p:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+    fs:SetPoint("TOPLEFT", p.scroll, "TOPLEFT", 10, -14)
+    fs:SetPoint("RIGHT", p.scroll, "RIGHT", -10, 0)
+    fs:SetJustifyH("LEFT"); fs:SetWordWrap(true); fs:Hide()
+    p.emptyMsg = fs
+end
+
+function PW:_SyncLFWEmptyMsg(n)
+    local p = self.lfwPanel
+    if not (p and p.emptyMsg) then return end
+    if n > 0 then p.emptyMsg:Hide(); return end
+    local searching = (p.search and (p.search:GetText() or "") ~= "")
+    p.emptyMsg:SetText(searching and L["Aucun résultat pour cette recherche."]
+        or L["Rien à afficher pour ce métier."])
+    p.emptyMsg:Show()
+end
