@@ -36,6 +36,17 @@ client.
 
 ## Relevés
 
+- 2026-09-27 (4) — jusqu'a 1cb8e6a (marqueur INCHANGÉ) — Forever — **GO partiel sur le COMBAT** —
+  rapporté par le user : testé en combat la veille (2026-09-26), aucun souci. La colonne greffée
+  est PROTÉGÉE comme son hôte, et c'est le scénario qui inquiétait : `Show`, `Hide`, `SetPoint`,
+  `SetWidth` y sont refusés en combat, et la bande LFW comme la page Profit s'affichent et se
+  masquent selon le métier ouvert.
+  ⚠️ **PÉRIMÈTRE, et il n'est pas cosmétique : « aucune erreur visible » n'est pas « aucune action
+  refusée ».** Un `ADDON_ACTION_BLOCKED` peut passer SANS rien afficher ; seul `/console taintLog 1`
+  puis la lecture de `Logs/taint.log` le prouve, et ce log n'a pas été relu. Le critère 4 de la spec
+  reste donc à moitié ouvert : on sait que rien ne CASSE à l'écran en combat, on ne sait pas que
+  rien n'est refusé en silence. À faire un jour de calme, pas avant une release.
+
 - 2026-09-27 (3) — jusqu'a 1cb8e6a (marqueur INCHANGÉ) — Forever, un client — **GO sur le mode
   « Recettes » du sélecteur** — capture, métier Cooking 31/75. Ce relevé n'avance pas le marqueur :
   il **ferme un trou de périmètre nommé dans le relevé précédent**, il n'ajoute pas de couverture.
