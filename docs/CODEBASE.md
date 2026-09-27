@@ -28,25 +28,25 @@
 | `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 380 |
 | `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 380 |
 | `CraftingOrderClassic_Elemental.lua` | pseudo-« métier » de récolte « Élémentaire ». | 61 |
-| `CraftingOrderClassic_UI_Skin.lua` | tokens + helpers SÉMANTIQUES du skin (métiers, statuts, rareté, quantités, icônes natives) et petits widgets d'affichage. | 431 |
-| `CraftingOrderClassic_UI_Skin_Native.lua` | kit de chrome Blizzard NATIF (le « framework » UI de COC). | 480 |
-| `CraftingOrderClassic_UI_Skin_ScrollList.lua` | la LISTE DÉFILANTE moderne du kit, palier 1 de la revue d'interface (docs/revue-ui-mainline.md). | 123 |
+| `CraftingOrderClassic_UI_Skin.lua` | tokens + helpers SÉMANTIQUES du skin (métiers, statuts, rareté, quantités, icônes natives) et petits widgets d'affichage. | 450 |
+| `CraftingOrderClassic_UI_Skin_Native.lua` | kit de chrome Blizzard NATIF (le « framework » UI de COC). | 471 |
+| `CraftingOrderClassic_UI_Skin_ScrollList.lua` | la LISTE DÉFILANTE moderne du kit, palier 1 de la revue d'interface (docs/revue-ui-mainline.md). | 137 |
 | `CraftingOrderClassic_UI_Skin_Dropdown.lua` | menu deroulant (selecteur) du kit natif. | 93 |
 | `CraftingOrderClassic_UI_Skin_Sections.lua` | kit de chrome natif, volet SECTIONS : comment on découpe l'intérieur d'une fenêtre en blocs et en zones. | 254 |
 | `CraftingOrderClassic_UI_Skin_HelpPlate.lua` | kit d'AIDE CONTEXTUELLE (le « bouton i » de retail). | 262 |
 | `CraftingOrderClassic_ShareReagents.lua` | « liste de courses » : diffuser en un clic les réactifs d'une recette (vue métier) ou d'une commande (carte) dans un canal de discussion, avec le LIEN objet de chaque réactif. | 157 |
-| `CraftingOrderClassic_UI.lua` | fenêtre principale (chrome Blizzard natif, kit UI_Skin_Native). | 485 |
+| `CraftingOrderClassic_UI.lua` | fenêtre principale (chrome Blizzard natif, kit UI_Skin_Native). | 498 |
 | `CraftingOrderClassic_UI_HelpPlate.lua` | AIDE CONTEXTUELLE de la FENÊTRE PRINCIPALE (« bouton i »). | 166 |
 | `CraftingOrderClassic_UI_Post_Layout.lua` | GÉOMÉTRIE de l'onglet « Commande » : colonnes, zones, séparateurs. | 132 |
 | `CraftingOrderClassic_UI_Post.lua` | onglet « Commande » : sélection de plan (gauche) + réactifs « je fournis » / commission g-s-c / ciblage artisan (droite). | 428 |
-| `CraftingOrderClassic_UI_Post_Detail.lua` | onglet « Commande », PANNEAU DROIT : en-tête du plan sélectionné (icône + cadre doré + nom + niveau), liste des réactifs « je fournis », et la rangée commission. | 194 |
-| `CraftingOrderClassic_UI_Post_Artisans.lua` | onglet « Commande », section droite basse : boutons source, liste des artisans, ciblage (@Nom), libellé destinataire, bouton Poster. | 234 |
+| `CraftingOrderClassic_UI_Post_Detail.lua` | onglet « Commande », PANNEAU DROIT : en-tête du plan sélectionné (icône + cadre doré + nom + niveau), liste des réactifs « je fournis », et la rangée commission. | 201 |
+| `CraftingOrderClassic_UI_Post_Artisans.lua` | onglet « Commande », section droite basse : boutons source, liste des artisans, ciblage (@Nom), libellé destinataire, bouton Poster. | 250 |
 | `CraftingOrderClassic_UI_Post_Categories.lua` | onglet « Commande », panneau gauche : regroupe la LISTE DES PLANS en sections type fenêtre native (emplacement puis type pour les équipements, type pour les armes, catégorie pour le reste). | 169 |
 | `CraftingOrderClassic_UI_Post_Paperdoll.lua` | onglet « Commande », vue SILHOUETTE de l'Enchantement. | 332 |
 | `CraftingOrderClassic_UI_Post_Profit.lua` | onglet « Commande » : couche Auctionator (lecture seule). | 154 |
 | `CraftingOrderClassic_UI_Gather_Layout.lua` | GÉOMÉTRIE de l'onglet « Récolte » : la SPEC (structure éditable, cf. | 66 |
-| `CraftingOrderClassic_UI_Gather_Build.lua` | onglet « Récolte », moitié CONSTRUCTION. | 231 |
-| `CraftingOrderClassic_UI_Gather.lua` | onglet « Récolte » : ressources de récolte (minéraux, herbes, cuirs, poissons) + demande de quantité + prix par pile + ciblage récolteur. | 286 |
+| `CraftingOrderClassic_UI_Gather_Build.lua` | onglet « Récolte », moitié CONSTRUCTION. | 233 |
+| `CraftingOrderClassic_UI_Gather.lua` | onglet « Récolte » : ressources de récolte (minéraux, herbes, cuirs, poissons) + demande de quantité + prix par pile + ciblage récolteur. | 278 |
 | `CraftingOrderClassic_UI_Gather_Categories.lua` | onglet « Récolte », panneau gauche : repliage des en-têtes et remplissage des lignes (en-tête de section/sous-catégorie, ou ressource). | 65 |
 | `CraftingOrderClassic_UI_Artisans_Layout.lua` | GÉOMÉTRIE de l'onglet « Artisans » (annuaire social). | 44 |
 | `CraftingOrderClassic_UI_Artisans.lua` | onglet « Artisans » : annuaire social. | 443 |
@@ -147,7 +147,7 @@
 | `CraftingOrderClassic_Tracker_Rows.lua` | LIGNES du suivi à l'écran : pool réutilisable + peinture d'un groupe de sections rendu par COC.Journal:Grouped. | 238 |
 | `CraftingOrderClassic_Tracker_Next.lua` | section « Progression » du suivi à l'écran : pour chaque métier encore en montée, LA recette à crafter maintenant pour gagner le prochain point, ses réactifs en objectifs, et le plan à acheter quand la route en achète un. | 152 |
 | `Debug.lua` | Crafting Order - Classic — Debug : mode solo pour "jouer" un réseau fictif. | 136 |
-| `CraftingOrderClassic_SelfTest.lua` | suite de tests IN-GAME (/cotest). | 180 |
+| `CraftingOrderClassic_SelfTest.lua` | suite de tests IN-GAME (/cotest). | 181 |
 
 ## Kit UI — référence `Skin.*` (extraite des fichiers *Skin*)
 
@@ -204,9 +204,14 @@
 
 **`Skin.InSource(r, src)`**
 
-> Un artisan entre-t-il dans la SOURCE (Guilde/Amis via drapeaux de relation, sinon catégorie
-> d'affichage) ? « confed » (display-only) traité comme « recent » : un confédéré reste sélectionnable
-> sous « Croisés ». Partagé par les listes d'artisans de Commande et Récolte.
+
+**`Skin.PostSourceFor(r, current)`**
+
+> La portée à montrer quand on arrive sur la liste de ciblage AVEC un artisan déjà choisi (clic sur
+> un métier dans l'onglet Artisans, menu clic-droit…). La portée COURANTE si elle le contient déjà —
+> on ne déplace pas le joueur sans raison —, sinon la première qui le contient. Sans ce choix, la
+> liste restait sur « Guilde » : la cible était posée (le destinataire l'affichait) mais l'artisan
+> n'apparaissait nulle part, donc rien n'était surligné (relevé en jeu le 2026-09-27).
 
 **`Skin.MakeMoneyRow(parent, x, y)`**
 
@@ -406,9 +411,6 @@
 > couche HIGHLIGHT (auto au survol) + rend une texture de SÉLECTION (bleu léger, masquée) pour
 > :SetSelected. À utiliser partout où on liste des PERSONNES (artisans, récolteurs) pour l'homogénéité.
 
-**`Skin.MakeArtisanRow(parent, w, h)`**
-
-
 **`Skin.MakeFlyout(name, w, opts)`**
 
 > Flyout : dropdown/menu léger maison (puits + closer + pool de lignes).
@@ -493,6 +495,13 @@
 
 > kind : "header" (section : barre + libellé doré), "subheader" (sous-catégorie : libellé seul, sans
 > barre, sinon la liste est zébrée) ou "item". `collapsed` choisit le + ou le -.
+
+**`Skin.ArtisanRowArt(r)`**
+
+> Ligne « personne » (artisan, récolteur) : pastille de présence, nom, source à droite, surbrillance
+> bleue de la liste d'Amis (Skin.PersonHighlight). Posée sur une ligne de liste défilante par `build`.
+> Le nom est ANCRÉ contre la source au lieu d'être dimensionné : la liste fixe la largeur de ses
+> lignes elle-même (même raison que le nom d'un plan, cf. _UI_Post_Profit).
 
 ### `CraftingOrderClassic_UI_Skin_Dropdown.lua`
 
@@ -731,7 +740,7 @@
 > (or des libellés, hover, sélection) ; le chrome (cadre, onglets, boutons) est natif.
 > INTOUCHABLE : le langage couleur des statuts d'ordre et la rareté d'objet ne sont jamais recolorés.
 
-**API** : `Skin.ProfLabel(p)` · `Skin.ProfIcon(key)` · `Skin.StatusInfo(s)` · `Skin.RarityColor(itemID)` · `Skin.QtyText(o)` · `Skin.QtySuffix(o)` · `Skin.FormatDuration(sec)` · `Skin.KnowsProf(r, p)` · `Skin.KnowsProfOrSeen(r, p)` · `Skin.InSource(r, src)` · `Skin.MakeMoneyRow(parent, x, y)` · `Skin.FirstChar(s)` · `Skin.ItemExists(itemID)` · `Skin.Icon(itemID, spellID)` · `Skin.MakeBadge(parent, size)` · `Skin.SearchHint(parent, editbox, text)` · `Skin.MakeCheck(parent, size)` · `Skin.TipItem(tip, itemID, name)` · `Skin.WireItemTooltip(row)` · `Skin.ChatLinkFor(link, itemID, spellID)` · `Skin.WireItemLink(row)` · `Skin.MakeStatusIcon(parent, size)` · `Skin.MoneyIcon(parent, kind, anchorTo)` · `Skin.AutoHideScroll(scrollName, content)` · `Skin.ApplyShadow(fs)` · `Skin.SkinFrameBackdrop(f)` · `Skin.SkinWell(f)` · `Skin.MakeSeparator(parent, offsetY)`
+**API** : `Skin.ProfLabel(p)` · `Skin.ProfIcon(key)` · `Skin.StatusInfo(s)` · `Skin.RarityColor(itemID)` · `Skin.QtyText(o)` · `Skin.QtySuffix(o)` · `Skin.FormatDuration(sec)` · `Skin.KnowsProf(r, p)` · `Skin.KnowsProfOrSeen(r, p)` · `Skin.InSource(r, src)` · `Skin.PostSourceFor(r, current)` · `Skin.MakeMoneyRow(parent, x, y)` · `Skin.FirstChar(s)` · `Skin.ItemExists(itemID)` · `Skin.Icon(itemID, spellID)` · `Skin.MakeBadge(parent, size)` · `Skin.SearchHint(parent, editbox, text)` · `Skin.MakeCheck(parent, size)` · `Skin.TipItem(tip, itemID, name)` · `Skin.WireItemTooltip(row)` · `Skin.ChatLinkFor(link, itemID, spellID)` · `Skin.WireItemLink(row)` · `Skin.MakeStatusIcon(parent, size)` · `Skin.MoneyIcon(parent, kind, anchorTo)` · `Skin.AutoHideScroll(scrollName, content)` · `Skin.ApplyShadow(fs)` · `Skin.SkinFrameBackdrop(f)` · `Skin.SkinWell(f)` · `Skin.MakeSeparator(parent, offsetY)`
 
 ### `CraftingOrderClassic_UI_Skin_Native.lua`
 > CraftingOrderClassic_UI_Skin_Native.lua — kit de chrome Blizzard NATIF (le « framework » UI de COC).
@@ -754,7 +763,7 @@
 > MakeDropdown dès qu'il s'agit de choisir UNE valeur dans une liste courte.
 > INTOUCHABLE ici aussi : le langage couleur (statuts d'ordre, rareté) n'est jamais recoloré.
 
-**API** : `Skin.MakeGoldButton(parent, w, h, text, template)` · `Skin.MakeWindow(name, w, h, opts)` · `Skin.SetWindowPortrait(f, tex)` · `Skin.SetPortraitClickable(f, onClick, tooltipText)` · `Skin.MakeTabs(f, defs, onSelect, opts)` · `Skin.MakeFlatRow(parent, w, h)` · `Skin.PersonHighlight(row)` · `Skin.MakeArtisanRow(parent, w, h)` · `Skin.MakeFlyout(name, w, opts)` · `Skin.MakeSideTab(parent, tex, template)` · `Skin.MakeIconButton(parent, size, tex, template)` · `Skin.MakeCheckButton(parent, text, size)` · `Skin.FieldLabel(parent, text, x, y)` · `Skin.MakeFilterButton(parent, w, h, text)`
+**API** : `Skin.MakeGoldButton(parent, w, h, text, template)` · `Skin.MakeWindow(name, w, h, opts)` · `Skin.SetWindowPortrait(f, tex)` · `Skin.SetPortraitClickable(f, onClick, tooltipText)` · `Skin.MakeTabs(f, defs, onSelect, opts)` · `Skin.MakeFlatRow(parent, w, h)` · `Skin.PersonHighlight(row)` · `Skin.MakeFlyout(name, w, opts)` · `Skin.MakeSideTab(parent, tex, template)` · `Skin.MakeIconButton(parent, size, tex, template)` · `Skin.MakeCheckButton(parent, text, size)` · `Skin.FieldLabel(parent, text, x, y)` · `Skin.MakeFilterButton(parent, w, h, text)`
 
 ### `CraftingOrderClassic_UI_Skin_ScrollList.lua`
 > CraftingOrderClassic_UI_Skin_ScrollList.lua — la LISTE DÉFILANTE moderne du kit, palier 1 de la
@@ -775,7 +784,7 @@
 > l'héberge, et une ScrollBox repositionne ses lignes à chaque défilement : refusé en combat
 > (risque 4 de la revue). Fenêtre principale seulement, jusqu'à un relevé en combat.
 
-**API** : `Skin.MakeScrollList(host, opts)` · `Skin.ListRowArt(row)` · `Skin.ListRowKind(row, kind, collapsed)`
+**API** : `Skin.MakeScrollList(host, opts)` · `Skin.ListRowArt(row)` · `Skin.ListRowKind(row, kind, collapsed)` · `Skin.ArtisanRowArt(r)`
 
 ### `CraftingOrderClassic_UI_Skin_Dropdown.lua`
 > CraftingOrderClassic_UI_Skin_Dropdown.lua — menu deroulant (selecteur) du kit natif.
