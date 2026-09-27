@@ -35,11 +35,13 @@ function Skin.CollectHelp(spec)
     return out
 end
 
--- Bouton rond « i », posé un peu HORS CADRE (retail). Template natif RinglessHelpPlateButtonTemplate
--- (help-i + surbrillance) ; repli défensif si absent. `onToggle` au clic. opts : size · point (ancre
--- {p, rel, relP, x, y}) · tooltip.
-function Skin.MakeHelpButton(parent, onToggle, opts)
-    opts = opts or {}
+-- La petite pastille sans anneau (RinglessHelpPlateButtonTemplate) : celle de la fenêtre de métier
+-- greffée, qui se loge dans une gouttière à côté des languettes. Repli défensif si le gabarit manque.
+-- 24, pas 28 : c'est la taille de la CROIX de fermeture native, à côté de laquelle ce bouton se
+-- pose. À 28 il était plus gros que le bouton de Blizzard juste au-dessus (mesuré 2026-09-20 :
+-- 20 px écran contre 17) — exactement le genre d'écart qui trahit l'addon quand le cahier des
+-- charges est « qu'on ne nous distingue pas du jeu ».
+local function ringlessButton(parent, size)
     local b
     local ok = pcall(function()
         b = CreateFrame("Button", nil, parent, "RinglessHelpPlateButtonTemplate")
@@ -49,11 +51,43 @@ function Skin.MakeHelpButton(parent, onToggle, opts)
         b:SetNormalTexture("Interface\\common\\help-i")
         b:SetHighlightTexture("Interface\\common\\help-i", "ADD")
     end
-    -- 24, pas 28 : c'est la taille de la CROIX de fermeture native, à côté de laquelle ce bouton se
-    -- pose. À 28 il était plus gros que le bouton de Blizzard juste au-dessus (mesuré 2026-09-20 :
-    -- 20 px écran contre 17) — exactement le genre d'écart qui trahit l'addon quand le cahier des
-    -- charges est « qu'on ne nous distingue pas du jeu ».
-    b:SetSize(opts.size or 24, opts.size or 24)
+    b:SetSize(size or 24, size or 24)
+    return b
+end
+
+-- Le « i » des fenêtres À PORTRAIT de Blizzard (MainHelpPlateButton, Blizzard_HelpPlate.xml) : 46 px
+-- dans un anneau de minicarte, à cheval sur le haut du cadre à droite du médaillon. La pastille sans
+-- anneau, posée sur le bord du portrait, était plus petite que la croix de fermeture et se lisait
+-- mal (relevé en jeu le 2026-09-27 : « faudrait agrandir le i »).
+-- RECOPIÉ texture par texture, PAS hérité : le mixin du gabarit écrit dans `HelpPlateTooltip` au
+-- survol, un singleton de Blizzard — même règle que le voile plus bas.
+local function portraitButton(parent)
+    local b = CreateFrame("Button", nil, parent)
+    b:SetSize(64, 64)
+    b:SetHitRectInsets(20, 20, 20, 20)   -- la zone cliquable est le disque, pas l'anneau
+    local i = b:CreateTexture(nil, "BACKGROUND")
+    i:SetTexture("Interface\\common\\help-i"); i:SetSize(46, 46); i:SetPoint("CENTER")
+    local ring = b:CreateTexture(nil, "BORDER")
+    ring:SetTexture("Interface\\Minimap\\MiniMap-TrackingBorder"); ring:SetSize(64, 64)
+    ring:SetPoint("CENTER", 12, -13)     -- l'anneau n'occupe que le coin haut-gauche de sa texture
+    local hl = b:CreateTexture(nil, "HIGHLIGHT")
+    hl:SetTexture("Interface\\Minimap\\UI-Minimap-ZoomButton-Highlight"); hl:SetBlendMode("ADD")
+    hl:SetSize(46, 46); hl:SetPoint("CENTER", -1, 1)
+    -- L'enfoncement et le son du gabarit : ce qui distingue un bouton du jeu d'une image cliquable.
+    b:SetScript("OnMouseDown", function() i:SetPoint("CENTER", 1, -1) end)
+    b:SetScript("OnMouseUp", function()
+        i:SetPoint("CENTER", 0, 0)
+        if PlaySound and SOUNDKIT then PlaySound(SOUNDKIT.IG_MAINMENU_OPTION_CHECKBOX_ON) end
+    end)
+    return b
+end
+
+-- Bouton rond « i », posé un peu HORS CADRE (retail). `onToggle` au clic. opts : style ("portrait" =
+-- le grand « i » à anneau des fenêtres à médaillon, sinon la petite pastille) · size (pastille
+-- seulement) · point (ancre {p, rel, relP, x, y}) · tooltip.
+function Skin.MakeHelpButton(parent, onToggle, opts)
+    opts = opts or {}
+    local b = (opts.style == "portrait") and portraitButton(parent) or ringlessButton(parent, opts.size)
     local a = opts.point or { "CENTER", parent, "TOPLEFT", 8, 6 }
     b:ClearAllPoints(); b:SetPoint(a[1], a[2], a[3], a[4], a[5])
     -- ⚠️ AU-DESSUS DU MÉDAILLON, et « parent + 20 » n'y suffit pas. Sur Forever, `ButtonFrameTemplate`

@@ -184,7 +184,8 @@ function PW:_BuildRouteWin()
     -- Aide contextuelle « bouton i » (même mécanisme que la fenêtre principale ; soft-dep HelpPlate).
     if HelpPlate then
         f.helpBtn = Skin.MakeHelpButton(f, function() PW:_ToggleRouteHelp() end, {
-            point   = { "CENTER", f, "TOPLEFT", 8, 6 },
+            style   = "portrait",                                  -- cf. UI:_BuildHelp
+            point   = { "TOPLEFT", f, "TOPLEFT", 39, 20 },
             tooltip = L["Aide : survole les zones surlignées pour comprendre chaque fonction."],
         })
     end
