@@ -1,7 +1,7 @@
 # Revue : passer l'interface de COC sur les briques Mainline de Forever
 
 > Rédigée le 2026-09-27 · Cible : WoW: Forever / Camelot (16001) · Statut : **D1-D3 tranchées le
-> 2026-09-27 ; P0 : menus EXCLUS (le client plante), sonde et minicarte à jouer** · Portée : la fenêtre principale d'abord (Carnet, Commande, Récolte, Artisans, Mes
+> 2026-09-27 ; P0 : menus EXCLUS (le client plante), sonde 26/26, minicarte à jouer** · Portée : la fenêtre principale d'abord (Carnet, Commande, Récolte, Artisans, Mes
 > artisans, Aide, Nouveautés), puis les fenêtres annexes. La colonne greffée dans la fenêtre des
 > métiers est déjà faite.
 >
@@ -121,6 +121,13 @@ sont exclus des types de jeu « vanilla tbc ». Les `.toc` de Forever écrivent
 `[AllowLoadGameType vanilla, camelot]` quand un fichier vaut pour les deux : Camelot est donc un type
 distinct, et ces exclusions ne le touchent pas. **Parade** : confirmer par la sonde (`TableBuilderMixin`
 et `TabSystemMixin` dans les `globals` de COCProbeDB) avant d'en dépendre.
+
+**Levé le 2026-09-27** : `/tlab sonde` (TaintLab 0.2.0) rend **26/26** sur le client du user. Les 14
+gabarits de l'inventaire, les 7 fonctions et mixins (dont `TableBuilderMixin` et `TabSystemMixin`)
+et les 5 atlas (dont `UI-HUD-Minimap-CraftingOrder-Up` et `Professions_Recipe_Hover`) existent.
+⚠️ **Présent ne veut pas dire utilisable** : `WowStyle1DropdownTemplate` était présent lui aussi, et
+c'est à l'ouverture qu'il a fait planter le client (risque 1). Chaque brique se valide à son premier
+usage réel, en jeu, dans son palier.
 
 **6. Les onglets en bas peuvent être recouverts.** Déjà payé en juillet avec
 `CharacterFrameTabButtonTemplate` : un onglet qui pend sous la fenêtre passe sous toute fenêtre
