@@ -36,6 +36,11 @@ client.
 
 ## Relevés
 
+- 2026-09-27 (5) — jusqu'a a04c3a2 — Forever, client redémarré — **GO sur l'icône de la liste des
+  addons** — confirmé par le user (« c'est bon pour les logos ») : le logo « CO » remplace le point
+  d'interrogation devant « Crafting & Gathering Order - Classic ». Ce commit ne touche AUCUN code
+  Lua : seulement `## IconTexture` dans le `.toc` et `Textures/icon.tga`.
+
 - 2026-09-27 (4) — jusqu'a 1cb8e6a (marqueur INCHANGÉ) — Forever — **GO partiel sur le COMBAT** —
   rapporté par le user : testé en combat la veille (2026-09-26), aucun souci. La colonne greffée
   est PROTÉGÉE comme son hôte, et c'est le scénario qui inquiétait : `Show`, `Hide`, `SetPoint`,
