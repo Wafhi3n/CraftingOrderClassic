@@ -1,7 +1,7 @@
 # Revue : passer l'interface de COC sur les briques Mainline de Forever
 
 > Rédigée le 2026-09-27 · Cible : WoW: Forever / Camelot (16001) · Statut : **D1-D3 tranchées le
-> 2026-09-27 ; P0 : menus EXCLUS (le client plante), sonde 26/26, minicarte à jouer** · Portée : la fenêtre principale d'abord (Carnet, Commande, Récolte, Artisans, Mes
+> 2026-09-27 ; P0 : menus EXCLUS (le client plante), sonde 26/26, minicarte 0 action refusée (taint.log et aspect à voir)** · Portée : la fenêtre principale d'abord (Carnet, Commande, Récolte, Artisans, Mes
 > artisans, Aide, Nouveautés), puis les fenêtres annexes. La colonne greffée dans la fenêtre des
 > métiers est déjà faite.
 >
@@ -184,6 +184,26 @@ native, ce qui plaide pour le garder.
 minicarte, à côté de la lettre (mémoire `coc-minimap-indicator-idea`). `/tlab indica` (insérée dans
 la barre de Blizzard) contre `/tlab indicb` (cadre à nous collé contre elle), `/tlab icone` pour
 l'allumer et l'éteindre.
+
+**Joué le 2026-09-27** (SavedVariable `TaintLabDB`, écrite à 19:35) :
+
+| Session | Armé | Bascules de l'icône | Actions refusées |
+|---|---|---|---|
+| 19:29 | `indica` | 1 hors combat, 6 en combat | **0** |
+| 19:33 | `indica` + `indicb` (les deux dans la même session) | 6 hors combat, 12 en combat | **0** |
+
+Aucune action refusée par le jeu, y compris 18 bascules en combat, et la variante INSÉRÉE (celle qui
+fait relancer la disposition de la barre de Blizzard par notre code) n'a rien déclenché.
+
+Ce que ça ne dit PAS encore :
+
+- **Le journal de taint n'a pas tourné** : `Logs\taint.log` date du 2026-09-22. `/console taintLog 1`
+  n'était pas actif, donc on n'a pas l'analyse fine, seulement le verdict du jeu.
+- **Le labo ne sait pas** si le mode Édition a été ouvert, ni le livre des métiers en combat : il ne
+  compte que les bascules.
+- **La 2ᵉ session mélange les deux variantes** : l'icône insérée restait dans la barre pendant que
+  `/tlab icone` basculait la dernière posée.
+- **L'aspect** des deux variantes n'est pas encore comparé.
 
 ## Sources vérifiées
 
