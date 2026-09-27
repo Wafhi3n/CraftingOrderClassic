@@ -10,14 +10,10 @@ local Skin = UI.Skin
 local L    = COC.L   -- localisation du chrome (clé = FR ; overlay enUS). NB : les VALEURS canoniques
                      -- de destinataire restent en FR (clé) pour rester identiques sur le réseau.
 
-local PLH = 20    -- hauteur ligne plan (en-tête de section INCLUS : pool virtualisé homogène)
 -- (hauteur de ligne réactif RRH : déplacée dans _UI_Post_Detail.lua avec la liste des réactifs.)
--- Liste des plans VIRTUALISÉE : pool FIXE de lignes physiques réutilisées au scroll (ne dépend plus
--- du nb de plans → ~28 frames au lieu de ~300 en Couture). INVARIANT (cf. ProfWindow_Recipes) : VISIBLE
--- doit être ≥ au nb de lignes que le viewport peut afficher, sinon la queue de liste est inatteignable.
--- Viewport re-mesuré après le passage des filtres sur UNE ligne (2026-07-12, la liste a regagné cette
--- hauteur) : ≈ 452 px / 20 ≈ 23 lignes → 28 avec marge.
-local VISIBLE = 28
+-- Liste des plans : une liste défilante moderne du kit (Skin.MakeScrollList, palier 1 de la revue
+-- d'UI). Elle gère seule son pool de lignes : l'ancien pool fixe de 28 lignes et son invariant
+-- « pool ≥ viewport » ont disparu avec elle. Hauteurs : cf. _UI_Post_Categories.lua (postPlanExtent).
 
 -- Filtre qualité MINIMALE (cycle) : false = Toutes, sinon seuil WoW (2=Inhabituel, 3=Rare, 4=Épique).
 -- Les NOMS de qualité sont localisés par le client via _G["ITEM_QUALITY<n>_DESC"] (zéro clé à baker).
@@ -92,21 +88,18 @@ function UI:_BuildPostLeft()
     -- vit dans la JAUGE du header avec le nom de l'artisan — l'ancien FontString flottait SUR la
     -- première ligne de la liste depuis le passage des filtres sur une ligne, vu sur capture user.)
 
-    -- Le scroll remplit le bloc : ancré HAUT ET BAS (marge PAD) → il suit la hauteur sans recalcul.
-    -- Largeur LUE sur la zone (SPEC pilote pad/gouttière ; −6 = la scrollbar déborde dans la gouttière).
-    -- INVARIANT (cf. en-tête) : VISIBLE ≥ lignes du viewport.
-    local plansW = sec:GetWidth(); if plansW <= 1 then plansW = P.LIST_W + 6 end
-    self.postPlanW = plansW - 6
-    local pscroll = CreateFrame("ScrollFrame", "COCPostPlanScroll", sec, "UIPanelScrollFrameTemplate")
-    pscroll:SetPoint("TOPLEFT", P.PAD, 0); pscroll:SetPoint("BOTTOMLEFT", P.PAD, P.PAD)
-    pscroll:SetWidth(self.postPlanW)
-    local pc = CreateFrame("Frame", nil, pscroll); pc:SetSize(self.postPlanW, 10); pscroll:SetScrollChild(pc)
-    pscroll:HookScript("OnVerticalScroll", function() UI:_RenderPostPlanWindow() end)
-    self.postPlanScroll = pscroll; self.postPlanContent = pc
-    Skin.ScrollTrack("COCPostPlanScroll")   -- rail sombre derrière la scrollbar (fond qui manquait)
-    -- Pool FIXE de lignes réutilisées au scroll (virtualisation ; cf. VISIBLE + _RenderPostPlanWindow).
-    self.postPlanRows = {}
-    for i = 1, VISIBLE do self.postPlanRows[i] = self:_PostPlanRow(i) end
+    -- La liste remplit le bloc : ancrée aux QUATRE coins (marge PAD), elle suit la zone sans recalcul,
+    -- et sa barre (8 px) se loge dans son bord droit au lieu de déborder dans la gouttière.
+    -- `postPlanScroll` garde son nom : la silhouette d'enchantement (_UI_Post_Paperdoll) le masque
+    -- quand elle prend la place de la liste.
+    local host = CreateFrame("Frame", nil, sec)
+    host:SetPoint("TOPLEFT", P.PAD, 0); host:SetPoint("BOTTOMRIGHT", 0, P.PAD)
+    self.postPlanScroll = host
+    self.postPlanList = Skin.MakeScrollList(host, {
+        extent = function(item) return UI:_PostPlanExtent(item) end,
+        build  = function(row) UI:_BuildPostPlanRow(row) end,
+        fill   = function(row, item) row.item = item; UI:_FillPostPlanRow(row, item) end,
+    })
     -- Outils Auctionator (tri rentabilité + « 123 » valeurs exactes) : dans LEUR slot de la bande de
     -- filtres (id "AH_Filter" dans la SPEC) — ce sont des réglages d'affichage, avec les filtres.
     self:_BuildPostLGBar(self:PostSec("AH_Filter"))
@@ -270,7 +263,7 @@ function UI:_RefreshProfDropdown()
 end
 
 function UI:RefreshPostPlans()
-    local c = CL(); if not (c and self.postPlanContent) then return end
+    local c = CL(); if not (c and self.postPlanList) then return end
     self._postProfitCache = {}   -- invalidé à chaque refresh (les prix Auctionator ont pu changer)
     self:_SyncPostLGBar()
     local list = self.postProf and c:ProfessionCatalogue(self.postProf) or {}
@@ -327,26 +320,19 @@ function UI:RefreshPostPlans()
     self:_SyncPostDollView()
 end
 
--- Ligne UNIFIÉE du pool virtualisé : rend soit un PLAN (badge + nom, cliquable) soit un EN-TÊTE de
--- section (libellé doré + filet, non interactif). Le remplissage/bascule se fait dans _FillPostPlanRow
--- (_UI_Post_Categories) ; le clic lit self.item (pas de closure recréée au scroll).
-function UI:_PostPlanRow(i)
-    local r = self.postPlanRows[i]; if r then return r end
-    local lw = self.postPlanW or P.LIST_W   -- largeur de la zone plans (lue au build, cf. _BuildPostLeft)
-    r = CreateFrame("Button", nil, self.postPlanContent); r:SetSize(lw, PLH); r:SetPoint("TOPLEFT", 0, -(i-1)*PLH)
-    local hi = r:CreateTexture(nil, "HIGHLIGHT"); hi:SetAllPoints(); hi:SetColorTexture(Skin.unpack(Skin.color.rowHover))
+-- Construit UNE ligne de la liste des plans, la première fois que la liste défilante crée ce cadre.
+-- Ligne UNIFIÉE : elle rend tour à tour un PLAN (badge + nom, cliquable) ou un EN-TÊTE de section,
+-- selon la donnée que la liste lui confie (cf. _FillPostPlanRow, _UI_Post_Categories). Le clic lit
+-- `row.item`, posé à chaque remplissage : aucune closure recréée au défilement.
+function UI:_BuildPostPlanRow(r)
+    Skin.ListRowArt(r)   -- barre d'en-tête, +/-, survol et sélection des métiers de Forever
     r.badge = Skin.MakeBadge(r, 14); r.badge:SetPoint("LEFT", 2, 0)
-    r.name  = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    r.name:SetPoint("LEFT", 20, 0); r.name:SetJustifyH("LEFT"); r.name:SetWidth(lw - 24); Skin.ApplyShadow(r.name)
-    -- Variante EN-TÊTE (même ligne physique) : libellé + filet, masqués quand la ligne rend un plan.
-    r.hdr = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    r.hdr:SetPoint("BOTTOMLEFT", 4, 5); r.hdr:SetJustifyH("LEFT")
-    r.hdr:SetTextColor(Skin.unpack(Skin.color.gold)); Skin.ApplyShadow(r.hdr); r.hdr:Hide()
-    r.hdrLine = r:CreateTexture(nil, "ARTWORK"); r.hdrLine:SetHeight(1)
-    r.hdrLine:SetColorTexture(Skin.color.gold[1], Skin.color.gold[2], Skin.color.gold[3], 0.25)
-    r.hdrLine:SetPoint("BOTTOMLEFT", 2, 3); r.hdrLine:SetPoint("BOTTOMRIGHT", -2, 3); r.hdrLine:Hide()
-    -- Chevron +/- des en-têtes : TEXTURE native (la police rend « ▾ » en tofu).
-    r.expand = r:CreateTexture(nil, "ARTWORK"); r.expand:SetSize(14, 14); r.expand:Hide()
+    -- Nom ancré à GAUCHE ET À DROITE (cf. _FillPostPlanProfit) plutôt que dimensionné : la liste fixe
+    -- la largeur de ses lignes elle-même, et elle n'est pas forcément connue au remplissage.
+    r.name = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    r.name:SetJustifyH("LEFT"); r.name:SetWordWrap(false); Skin.ApplyShadow(r.name)
+    r.hdr = r:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    r.hdr:SetJustifyH("LEFT"); r.hdr:SetWordWrap(false); Skin.ApplyShadow(r.hdr); r.hdr:Hide()
     -- Indicateur de rentabilité Auctionator (cf. _UI_Post_Profit.lua) : le plus à droite, masqué
     -- si Auctionator est absent ou si le plan n'est pas rentable.
     r.profit = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
@@ -356,7 +342,7 @@ function UI:_PostPlanRow(i)
         if it.isHeader then UI:TogglePostSection(it.ckey)
         elseif it.e then UI:SelectPostPlan(it.e) end
     end)
-    self.postPlanRows[i] = r; Skin.WireItemTooltip(r); Skin.WireItemLink(r); return r
+    Skin.WireItemTooltip(r); Skin.WireItemLink(r)
 end
 
 -- (RefreshPostPlanDetail / RefreshPostReagents / _PostReagRow / _UpdateProvidedCount :
