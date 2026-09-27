@@ -69,6 +69,7 @@ function T:_TestHelpers()
     check(Skin.InSource(rGuild, "guild") == true, "InSource : guilde")
     check(not Skin.InSource(rGuild, "friend"), "InSource : guilde n'est pas ami")
     check(Skin.InSource(rConfed, "recent") == true, "InSource : confed traité comme recent")
+    check(Skin.InSource({ source = "circle" }, "recent") == true, "InSource : cercle traité comme recent")
 end
 
 -- === Groupe 4 : durcissement ORD (validation de l'émetteur) ===
