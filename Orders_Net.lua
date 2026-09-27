@@ -12,7 +12,7 @@ local L      = COC.L
 local CraftLink = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
 local Codec     = COC.OrdersCodec   -- sérialisation ⇄ parsing ORD| (Orders_Codec.lua, chargé avant)
 
-local function me()  return (UnitName and UnitName("player")) or "?" end
+local function me() return COC.Api.PlayerName() end   -- nom RÉSEAU (« Prénom Nom » sur Forever)
 local function pmsg(m) print("|cFF33DD88Crafting Order|r " .. m) end
 
 local KEYWORD_RCPT = { Tous = true, Guilde = true, Amis = true }
@@ -35,6 +35,16 @@ local function samePlayer(a, b)
     if a == b then return true end
     local D = COC.Directory
     return (D and D.SamePlayer and D:SamePlayer(a, b)) == true
+end
+
+-- Client pas encore à jour (≤ v1.36.1) : il signe au PRÉNOM (« Gnomi ») ce que le serveur livre sous
+-- le nom complet (« Gnomi Short », cf. Api.PlayerName). L'émetteur, lui, est authentifié par le
+-- serveur : s'il signe de SON prénom, on complète, et aucune identité n'est empruntée. Tout autre
+-- prénom reste tel quel et retombe sur l'anti-usurpation. Relevé 2026-09-27 : sans ça, la commande
+-- de Gnomi arrivait bien chez Rédemption et tombait en « NEW ignoré : Gnomi Short ≠ acheteur Gnomi ».
+local function ownFullName(name, sender)
+    if name and sender and name ~= sender and sender:match("^(%S+) ") == name then return sender end
+    return name
 end
 
 -- Ordre NOMMÉ (destinataire = un joueur précis, pas une portée Tous/Guilde/Amis).
@@ -159,6 +169,7 @@ end
 function Orders:_OnNew(message, distribution, sender)
     local f = Codec.Decode(message)
     if not f or not f.id or f.id == "" then return end
+    f.buyer = ownFullName(f.buyer, sender)
     if distribution == "CHANNEL" and sender and not samePlayer(sender, f.buyer) then
         if COC.Trace then COC.Trace:Log("recv", string.format(
             "canal : NEW usurpé (%s prétend poster pour %s) — rejeté", tostring(sender), tostring(f.buyer))) end

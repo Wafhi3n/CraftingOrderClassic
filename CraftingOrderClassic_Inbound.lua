@@ -33,7 +33,7 @@ local KW_OFFER     = { "WTS", "VDS", "S>", "VEND", "SELL", "LFW", "YOUR MATS", "
 -- cas réel manqué : « Crafting [Mageweave Bag] 12 slot for 22 [Mageweave Cloth] at org bank ».
 local KW_OFFER_LEAD = { "CRAFTING", "MAKING", "CAN CRAFT", "CAN MAKE", "I CRAFT", "I MAKE", "I CAN CRAFT", "I CAN MAKE" }
 
-local function me() return (UnitName and UnitName("player")) or "?" end
+local function me() return COC.Api.PlayerName() end   -- nom RÉSEAU (« Prénom Nom » sur Forever)
 local function pmsg(m) print("|cFF33DD88Crafting Order|r " .. m) end
 
 local function StripMarkup(msg)

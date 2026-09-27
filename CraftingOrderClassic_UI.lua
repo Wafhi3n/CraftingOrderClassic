@@ -7,7 +7,7 @@ local UI   = COC.UI
 local Skin = UI.Skin
 local L    = COC.L
 
-local function me() return (UnitName and UnitName("player")) or "?" end
+local function me() return COC.Api.PlayerName() end   -- nom RÉSEAU (« Prénom Nom » sur Forever)
 
 -- Le Carnet = MES commandes (postées par moi). L'acceptation/livraison se fait dans la VUE MÉTIER,
 -- pas ici → ce fichier ne filtre plus par relation : il liste mes ordres (actifs vs archivés).

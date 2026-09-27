@@ -20,7 +20,7 @@ local Dir = COC.Directory
 local L   = COC.L
 
 local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true) end
-local function me() return (UnitName and UnitName("player")) or "?" end
+local function me() return COC.Api.PlayerName() end   -- nom RÉSEAU (« Prénom Nom » sur Forever)
 local function pmsg(m) print("|cFF33DD88Crafting Order|r " .. m) end
 local function profLabel(key)
     local Skin = COC.UI and COC.UI.Skin

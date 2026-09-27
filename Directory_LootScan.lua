@@ -67,7 +67,7 @@ function Dir:_NoteSeen(who, prof, spellID)
     -- au feu de camp est trop banal pour peupler l'annuaire depuis un CLEU — on noierait les vrais
     -- artisans sous le bruit de la capitale. Un cuisinier qui a l'addon remonte de toute façon par SK.
     if COC.SECONDARY_PROF and COC.SECONDARY_PROF[prof] then return end
-    if who == (UnitName and UnitName("player")) then return end
+    if who == COC.Api.PlayerName() or who == (UnitName and UnitName("player")) then return end
     self.roster = self.roster or {}
     local r = self.roster[who]; if not r then r = {}; self.roster[who] = r end
     if (r.skill and r.skill[prof]) or (r.recipes and r.recipes[prof]) then return end   -- vraies données prioritaires

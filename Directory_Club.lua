@@ -22,7 +22,7 @@ local Dir = COC.Directory
 
 -- shortName : dupliqué de Directory.lua (fonction file-locale ; on ne partage pas les locales).
 local function shortName(n) return n and (n:match("^([^%-]+)") or n) or n end
-local function me() return shortName(UnitName and UnitName("player") or "") end
+local function me() return shortName(COC.Api.PlayerName()) end   -- nom RÉSEAU, repli si pas de GUID
 
 local REFRESH_DEBOUNCE = 2   -- s : les événements club arrivent en rafale (un par membre)
 

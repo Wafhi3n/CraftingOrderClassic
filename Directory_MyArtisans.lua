@@ -11,7 +11,7 @@
 local COC = CraftingOrderClassic
 local Dir = COC.Directory
 
-local function me() return (UnitName and UnitName("player")) or "?" end
+local function me() return (UnitName and UnitName("player")) or "?" end   -- PRÉNOM : clé LOCALE de perso (cf. Api.PlayerName)
 local function myRealm() return (GetRealmName and GetRealmName()) or "" end
 
 -- Nom court d'une clé « Nom-Royaume » SI elle est du royaume `realm`, sinon nil. Le nom de perso
@@ -91,7 +91,8 @@ Dir._Aggregate = aggregate   -- exposé pour tests/test_myartisans.lua
 function Dir:AggregateMyProfs()
     local db = COC.db
     if not db then return {} end
-    local main = db.altMain or me()
+    -- Clés locales au prénom : un altMain noté « Prénom Nom » se ramène à son premier mot.
+    local main = (db.altMain and db.altMain:match("^(%S+)")) or me()
     local myFaction = UnitFactionGroup and UnitFactionGroup("player")
     if myFaction ~= "Horde" and myFaction ~= "Alliance" then myFaction = nil end
     -- Aucun filtre ici (secondary = {}) : cette vue est là pour dire quel perso du compte peut se

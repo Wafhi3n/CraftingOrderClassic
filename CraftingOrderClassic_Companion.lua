@@ -11,7 +11,7 @@ COC.Companion = Comp
 local L    = COC.L
 local Skin = COC.UI.Skin
 
-local function me() return (UnitName and UnitName("player")) or "?" end
+local function me() return COC.Api.PlayerName() end   -- nom RÉSEAU (« Prénom Nom » sur Forever)
 local function shortName(n) return n and (n:match("^([^%-]+)") or n) or n end
 Comp.shortName = shortName
 

@@ -99,7 +99,7 @@ end
 -- === Groupe 5 : rétention du cache d'ordres (PruneExpired) ===
 function T:_TestPrune()
     local O = COC.Orders; if not (O and COC.db) then return check(false, "Orders/db absent") end
-    local me = (UnitName and UnitName("player")) or "Me"
+    local me = COC.Api.PlayerName()
     local now = time()
     local savedO, savedM = COC.db.orders, COC.db.muted
     COC.db.orders = {

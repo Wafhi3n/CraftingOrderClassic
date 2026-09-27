@@ -49,7 +49,7 @@ end
 -- Aides communes
 -- ------------------------------------------------------------------
 local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true) end
-local function me() return (UnitName and UnitName("player")) or "?" end
+local function me() return COC.Api.PlayerName() end   -- nom RÉSEAU (« Prénom Nom » sur Forever)
 
 -- Même sémantique que le `actsFor` d'Orders (rerolls seulement si l'opt-in ALT est actif) : le suivi
 -- ne doit pas afficher comme « à moi » une commande que le protocole me refuserait de livrer.

@@ -22,7 +22,7 @@ end
 
 function Dir:_NoteConfederate(name, guild_id)   -- guild_id = guilde d'origine (info, '-' = inconnu)
     local sn = shortName(name)
-    if not sn or sn == "" or sn == shortName(UnitName and UnitName("player") or "") then return end
+    if not sn or sn == "" or sn == shortName(COC.Api.PlayerName()) then return end
     self._confedSet = self._confedSet or {}
     local gid = (guild_id and guild_id ~= "-" and guild_id ~= "") and guild_id or nil
     local prev = self._confedSet[sn]

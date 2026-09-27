@@ -121,6 +121,9 @@ function Dir:PruneRoster(maxAgeDays, maxRecent)
     if not self.roster then return end
     local cutoff = time() - (maxAgeDays or RECENT_TTL_DAYS) * 86400
     local recents = {}
+    -- L'écho de nos propres messages (nom complet non reconnu avant Api.PlayerName) nous a inscrit
+    -- dans notre propre annuaire : on s'en retire. Un reroll s'en retire à sa propre connexion.
+    self.roster[COC.Api.PlayerName()] = nil
     for name, r in pairs(self.roster) do
         -- « circle » est une RELATION (le joueur a marqué ce cercle), au même titre que guilde/amis :
         -- on la garde. De toute façon la liste est re-dérivée du club à chaque session.
@@ -268,7 +271,7 @@ end
 function Dir:DiscoverPlayer(name)
     name = shortName(name)
     if not (CraftLink and name and name ~= "") then return end
-    if name == shortName(UnitName and UnitName("player") or "") then return end
+    if name == shortName(COC.Api.PlayerName()) then return end
     self._lastPing = self._lastPing or {}
     local t = now()
     if (self._lastPing[name] or 0) + 60 > t then return end   -- 1 hello / 60 s / joueur

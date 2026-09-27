@@ -13,7 +13,7 @@ COC.Debug = Debug
 
 local L = COC.L
 local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true) end
-local function me() return (UnitName and UnitName("player")) or "?" end
+local function me() return COC.Api.PlayerName() end   -- nom RÉSEAU (« Prénom Nom » sur Forever)
 
 -- Faux artisans (mock proche du template Claude Design). Clés métier = clés internes EN du catalogue.
 -- source = guild|friend|added|recent|confed (confed = co-guildes GreenWall, visibles en debug/SoD live).

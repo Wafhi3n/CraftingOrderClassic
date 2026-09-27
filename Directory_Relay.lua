@@ -94,7 +94,7 @@ function Dir:OnRelay(sender, message, distribution)
     local f = Codec and Codec.Parse(message)
     if not f or f.age > RELAY_MAX_AGE then return end
     if f.verb ~= "SK" and f.verb ~= "RK" and f.verb ~= "RI" and f.verb ~= "CD" then return end
-    local me = (UnitName and UnitName("player")) or ""
+    local me = COC.Api.PlayerName()
     if f.origin == me or f.origin == sender then return end
     if COC.IsMyChar and COC:IsMyChar(f.origin) then return end
     local ts = time() - f.age

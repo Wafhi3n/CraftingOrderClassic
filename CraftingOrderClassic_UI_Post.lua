@@ -426,7 +426,7 @@ function UI:DoPostAsQuest()
         editable   = true,
         objective  = nm .. ((qty > 1) and (" ×" .. qty) or ""),
         reward     = reward,
-        giver      = (UnitName and UnitName("player")) or "",
+        giver      = COC.Api.PlayerName(),
         acceptText = L["Poster"],
         onAccept   = function(title, text) UI:DoPostOrder({ title = title, text = text }) end,
     })

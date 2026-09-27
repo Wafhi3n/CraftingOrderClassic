@@ -30,7 +30,7 @@ local ANSWER_THROTTLE = 10    -- s entre deux réponses TXQ au MÊME demandeur
 local PENDING_MAX        = 20 -- titres en attente de leur NEW (borne anti-gonflement)
 local PENDING_PER_SENDER = 4  -- … dont au plus 4 par émetteur (anti-éviction, cf. stashTitle)
 
-local function me()  return (UnitName and UnitName("player")) or "?" end
+local function me() return COC.Api.PlayerName() end   -- nom RÉSEAU (« Prénom Nom » sur Forever)
 local function pmsg(m) print("|cFF33DD88Crafting Order|r " .. m) end
 local function myChar(n) return n == me() or (COC.IsMyChar and COC:IsMyChar(n)) or false end
 

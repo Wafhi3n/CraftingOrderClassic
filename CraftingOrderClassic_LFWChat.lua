@@ -12,7 +12,7 @@ local LC  = {}
 COC.LFWChat = LC
 local L = COC.L
 
-local function me() return (UnitName and UnitName("player")) or "?" end
+local function me() return COC.Api.PlayerName() end   -- nom RÉSEAU (« Prénom Nom » sur Forever)
 local function short(n) return n and (n:match("^([^%-]+)") or n) or n end
 local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true) end
 
