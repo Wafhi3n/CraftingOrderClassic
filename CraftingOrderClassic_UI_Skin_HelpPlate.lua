@@ -82,6 +82,18 @@ local function portraitButton(parent)
     return b
 end
 
+-- Strate du bouton : une strate FIXÉE ne s'hérite plus, et un enfant plus bas que son parent est
+-- dessiné DERRIÈRE lui, quel que soit son niveau. HIGH en dur cachait le « i » de la fenêtre Route
+-- (FULLSCREEN_DIALOG) sous sa propre fenêtre (revue du 2026-09-27). On ne fait que MONTER : sous
+-- HIGH (colonne greffée sur la fenêtre de métier), le bouton garde HIGH, comme avant.
+local STRATA_RANK = { BACKGROUND = 1, LOW = 2, MEDIUM = 3, HIGH = 4, DIALOG = 5, FULLSCREEN = 6,
+                      FULLSCREEN_DIALOG = 7, TOOLTIP = 8 }
+local function helpStrata(parent)
+    local ps = parent.GetFrameStrata and parent:GetFrameStrata()
+    if ps and (STRATA_RANK[ps] or 0) > STRATA_RANK.HIGH then return ps end
+    return "HIGH"
+end
+
 -- Bouton rond « i », posé un peu HORS CADRE (retail). `onToggle` au clic. opts : style ("portrait" =
 -- le grand « i » à anneau des fenêtres à médaillon, sinon la petite pastille) · size (pastille
 -- seulement) · point (ancre {p, rel, relP, x, y}) · tooltip.
@@ -98,7 +110,7 @@ function Skin.MakeHelpButton(parent, onToggle, opts)
     local level = parent:GetFrameLevel() + 20
     local pc = parent.PortraitContainer
     if pc and pc.GetFrameLevel then level = math.max(level, pc:GetFrameLevel() + 1) end
-    b:SetFrameStrata("HIGH"); b:SetFrameLevel(level)
+    b:SetFrameStrata(helpStrata(parent)); b:SetFrameLevel(level)
     b:SetScript("OnClick", function() if onToggle then onToggle() end end)
     if opts.tooltip then
         b:SetScript("OnEnter", function(self)
