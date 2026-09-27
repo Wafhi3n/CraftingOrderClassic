@@ -36,6 +36,16 @@ client.
 
 ## Relevés
 
+- 2026-09-27 (7) — jusqu'a ee4a2e2 — Forever, un client (Rédemption, enchanteur) — **GO sur les
+  demandes niées du canal Commerce** — le parseur RÉEL (`Inbound:OnChat`) appelé par `/run` avec un
+  lien de l'objet 11287, sans rien poster sur Commerce : « need [Lesser Magic Wand] pls » (Testeur)
+  → popup d'alerte ; « dont need fire wand: [Lesser Magic Wand] » (Testeur Deux) → le user ne
+  rapporte de popup que pour le 1er. Le client tournait la branche d'essai `b5ac0a0`, qui porte les
+  deux correctifs avec le même code que `main` ; le marqueur pointe la fusion `ee4a2e2`, qui les
+  réunit sur `main`. PÉRIMÈTRE : la ligne entre par l'injection, pas par un vrai `CHAT_MSG_CHANNEL`
+  (le filtre de nom de canal trade/commerce n'est pas exercé) ; les autres négations (don't, no
+  need, pas besoin) ne sont couvertes que par le banc headless.
+
 - 2026-09-27 (6) — jusqu'a 361c409 — Forever, **DEUX COMPTES** (Gnomi Short ↔ Rédemption Wafhien),
   canal coupé des deux côtés (`/co channel off`), communauté « Crafting Order PVE » marquée par
   `/co circle` — **GO sur une commande nommée passée par la communauté** — rapporté par le user
