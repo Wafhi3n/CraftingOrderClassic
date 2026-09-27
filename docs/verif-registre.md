@@ -36,6 +36,22 @@ client.
 
 ## Relevés
 
+- 2026-09-27 (3) — jusqu'a 1cb8e6a (marqueur INCHANGÉ) — Forever, un client — **GO sur le mode
+  « Recettes » du sélecteur** — capture, métier Cooking 31/75. Ce relevé n'avance pas le marqueur :
+  il **ferme un trou de périmètre nommé dans le relevé précédent**, il n'ajoute pas de couverture.
+
+  Le bouton « Recettes » affiche la liste, et elle est juste sur les trois points qui comptent :
+  l'en-tête dit « Offered recipes (0/12) » — donc le libellé **et** le plafond ont basculé, 12 étant
+  celui des recettes et non les 15 des réactifs ; les six lignes (Basic Campfire, Brilliant
+  Smallfish, Charred Wolf Meat, Herb Baked Egg, Roasted Boar Meat, Spiced Wolf Meat) sont
+  **exactement** les six recettes de la liste native à gauche, ce qui confirme que l'univers est lu
+  sur le CLIENT (`Craft:ReadRecipes`) et non dans notre catalogue ; chaque ligne porte son icône et
+  sa case.
+
+  PÉRIMÈTRE : c'est l'AFFICHAGE qui est vu. Cocher une recette, la voir persister après un
+  `/reload` et arriver chez un autre joueur par le verbe `LFR` n'a pas été observé — la partie
+  transport est couverte par le banc headless, pas par l'œil.
+
 - 2026-09-27 (2) — jusqu'a 1cb8e6a — Forever, **DEUX COMPTES** — **GO sur la riposte LFW** —
   rapporté par le user : « ça fonctionne, je vois le LFW après le reload ». Le récepteur recharge
   pendant que l'autre compte est LFW, et le badge `[LFW]` revient **en quelques secondes** au lieu
