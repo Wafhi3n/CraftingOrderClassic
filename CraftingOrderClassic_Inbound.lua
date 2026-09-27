@@ -52,8 +52,26 @@ local function findToken(up, kw)
     return false
 end
 
+-- Tournures NIÉES d'une demande : « dont need [X] » (un conseil, une réponse), « no need for [X] »,
+-- « pas besoin de [X] ». Le stem NEED/BESOIN y matchait → fausse entrante (retour testeur
+-- 2026-09-27 : « dont need fire wand: [Lesser Magic Wand] » alertait l'enchanteur). On EFFACE la
+-- tournure niée au lieu de rejeter le message : « WTB [X], no need for mats » reste une demande
+-- grâce à WTB. « do NOT need » est couvert par NOT.
+local NEG_WORDS = { "DON'?T", "DOESN'?T", "DIDN'?T", "NO", "NOT", "NEVER" }
+local NEG_VERBS = { "NEED", "BUY" }
+local NEG_FR    = { "PAS BESOIN", "PLUS BESOIN", "AUCUN BESOIN" }
+
+local function StripNegated(up)
+    up = up:gsub("\226\128\153", "'")   -- apostrophe typographique ’ → '
+    for _, neg in ipairs(NEG_WORDS) do
+        for _, verb in ipairs(NEG_VERBS) do up = up:gsub("%f[%w]" .. neg .. "%s+" .. verb, " ") end
+    end
+    for _, kw in ipairs(NEG_FR) do up = up:gsub(kw, " ") end
+    return up
+end
+
 local function HasRequestKW(msg)
-    local up = " " .. msg:upper() .. " "
+    local up = " " .. StripNegated(msg:upper()) .. " "
     for _, kw in ipairs(KW_REQ_STEM)  do if up:find(kw, 1, true) then return true end end
     for _, kw in ipairs(KW_REQ_TOKEN) do if findToken(up, kw)    then return true end end
     return false
