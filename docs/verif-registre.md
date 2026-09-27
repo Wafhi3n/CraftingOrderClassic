@@ -56,15 +56,26 @@ client.
   n'a pas ses réactifs, donc le résultat sortait vide sans jamais replier. Le repli se déclenche
   désormais sur un RÉSULTAT vide, et le picker DIT quand il n'a rien à montrer.
 
-  ❓ **OUVERT — l'infobulle monde ne porte pas le bloc LFW.** Sur la capture, le survol de
-  « Rédemption Wafhien » affiche bien « CO-Classic » et ses cinq métiers, mais **pas** la ligne
-  « Cherche du travail ». Or le code est inconditionnel (`if lfwE then` dans `_Social.lua`) : c'est
-  donc que `Dir:LFWOf(nom)` a rendu nil pour CE nom, alors que la plaque et l'annuaire l'ont
-  trouvé. Piste à vérifier, pas conclusion : une **clé de nom** qui diffère (accent, suffixe de
-  royaume, casse) entre ce que stocke `Dir.lfw` et ce que l'infobulle interroge.
-  Diagnostic, une ligne en jeu :
-  `/run for k,v in pairs(CraftingOrderClassic.Directory.lfw or {}) do print("["..k.."]", v.prof) end`
-  — comparer la clé imprimée au nom exact affiché par l'infobulle.
+  ❓ **L'infobulle monde sans bloc LFW — EXPLIQUÉ le 2026-09-27, ce n'est pas un défaut de code.**
+  Sur la capture, le survol de « Rédemption Wafhien » affiche « CO-Classic » et ses cinq métiers,
+  mais pas la ligne « Cherche du travail ». J'avais d'abord soupçonné une **clé de nom** qui
+  diffère : **c'est faux**, l'infobulle et la plaque appellent le MÊME `Api.UnitNameSafe(unit)`.
+  La vraie raison est que les deux données n'ont pas la même durée de vie :
+
+  | | source | survit à un `/reload` ? |
+  |---|---|---|
+  | les métiers (`summary`) | `roster`, dans `COC.db` | **oui**, persisté |
+  | le bloc LFW (`lfwE`) | `Dir.lfw` | **non**, RUNTIME par conception |
+
+  Après un rechargement, le spectateur garde donc les métiers et perd les LFW — jusqu'à ce que
+  l'émetteur ré-émette. Et **il n'existe aucune riposte** : `_BroadcastLFW` ne part qu'au
+  changement d'offre, à `SetLFW`, sur le ticker de **8 minutes**, et sur le `OnNetworkReady` de
+  l'ÉMETTEUR. D'où une asymétrie — celui qui recharge se ré-annonce tout de suite aux autres, mais
+  reste aveugle aux leurs jusqu'à 8 min.
+
+  C'est la même forme que le bug de découverte à sens unique déjà corrigé par une riposte throttlée
+  dans `OnHello`/`OnPing`. À décider : appliquer le même remède à LFW (coût = du trafic canal, sur
+  lequel ce projet a déjà payé une revue anti-spam), ou l'assumer et le documenter.
 
   PÉRIMÈTRE, toujours pas observé : le détail d'OFFRE dans la plaque (pièce / sac / nom de recette)
   et dans l'annuaire — aucune offre n'était réglée ; l'**anti-leurre AFK** (TTL 20 min, il faut
