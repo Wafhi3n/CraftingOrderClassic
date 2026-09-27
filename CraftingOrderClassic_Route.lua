@@ -1,13 +1,17 @@
 -- CraftingOrderClassic_Route.lua — cœur de CALCUL du plan de route de montée de métier,
 -- PARAMÉTRABLE : marche gloutonne rang par rang (recette au meilleur coût/point ESPÉRÉ), seuils
 -- réels CraftLink `skillColors` aux rangs futurs, amortissement du prix des plans à acheter,
--- exclusion des recettes à cooldown et des coûts partiels. Deux consommateurs :
+-- exclusion des recettes à cooldown et des coûts partiels, STOCK (sacs + produits de la route)
+-- déduit avant de payer quoi que ce soit au prix HV. Consommateurs :
 --   · la fenêtre « Plan de route » de la Vue Métier (_ProfWindow_Route.lua — MON perso : recettes
---     de la fenêtre native + couleur LIVE du client au rang courant) ;
+--     de la fenêtre native + couleur LIVE du client au rang courant + mes sacs) ;
+--   · le suivi à l'écran (_Tracker_Next.lua — MON perso, prochain point seulement + mes sacs) ;
 --   · la « bourse d'artisan » de l'onglet Artisans (_UI_Artisans_Needs.lua — un TIERS du roster :
---     rang SK diffusé + recettes décodées de son bitfield RK ; pas de couleur live).
+--     rang SK diffusé + recettes décodées de son bitfield RK ; ni couleur live, ni sacs).
 -- Les hypothèses (chance de point par couleur) sont ALIGNÉES sur _ProfWindow_Leveling : le badge
 -- coût/point, la route et la bourse doivent raconter la même histoire. Aucune UI ici.
+-- ⚠️ Le badge, lui, ignore les sacs : il chiffre UNE recette au prix HV, pas un chemin. Il ne vit
+-- que dans notre liste pleine vue — la colonne greffée de Forever montre la liste de Blizzard.
 
 local COC   = CraftingOrderClassic
 local Route = {}
@@ -40,29 +44,54 @@ local function colorAt(c, r)
     return "optimal"
 end
 
+-- Objets qui servent de RÉACTIF à au moins une recette du métier. Une recette dont le produit est
+-- dans ce set est une CONVERSION (retailles → cuir léger, étoffe → rouleau, essences) : cf. le
+-- bloc « stock » plus bas, qui lui interdit de puiser dans ce que la route a fabriqué.
+local function reagentSet(lib, profKey)
+    local set = {}
+    for _, sid in ipairs((lib.GetRecipes and lib:GetRecipes(profKey)) or {}) do
+        for _, rg in ipairs((lib.RecipeReagents and lib:RecipeReagents(profKey, sid)) or {}) do
+            set[rg[1]] = true
+        end
+    end
+    return set
+end
+
+-- Réactifs d'une recette avec leur prix UNITAIRE — { id, qté, prix|nil } — et le coût d'un craft
+-- au prix HV. Le prix unitaire est gardé parce que le stock se déduit réactif par réactif.
+-- Réactif SANS prix HV → `missing` : la candidate devient un REPLI (`partial`) plutôt qu'exclue,
+-- l'exclusion trouait la route dès qu'un composant courant manquait au scan (vécu 2026-07-19 :
+-- Poussière étrange absente → Enchantement 12→75 réduit à 7 essences). pickBest ne la retient que
+-- si le rang n'a AUCUNE candidate au coût complet ; le total passe en « > ».
+local function pricedReagents(PR, reags)
+    local out, cost, missing = {}, 0, false
+    for _, rg in ipairs(reags) do
+        local n, p = rg[2] or 1, PR:ItemValue(rg[1])
+        out[#out + 1] = { rg[1], n, p }
+        if p then cost = cost + p * n else missing = true end
+    end
+    return out, cost, missing
+end
+
 -- Candidates de la route. opts = { known = set clé "s<spellID>"/"i<itemID>", live = map même clé →
 -- difficulté client (nil pour un tiers), plans = inclure les manquantes ACHETABLES (prix
 -- formateur/vendeur MTSL, sinon objet-plan coté à l'HV) }. Sans opts.plans : recettes CONNUES
 -- seulement (pour un tiers, on ne présume pas de ce qu'il accepterait d'acheter — sauf demande).
--- nil si les briques manquent (lib sans seuils, Auctionator absent).
+-- nil si les briques manquent (lib sans seuils, Auctionator absent). Indépendantes du stock (il
+-- se déduit au moment du choix, cf. pickBest) : c'est ce qui les rend cachables (CachedCandidates).
 function Route:Candidates(profKey, opts)
     local lib = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
     local PR, M = COC.Profit, COC.Sources
     if not (lib and lib.RecipeColors and PR and PR:IsAvailable() and profKey) then return nil end
     local known, live = opts.known or {}, opts.live or {}
+    local isReagent = reagentSet(lib, profKey)
     local out = {}
     for _, sid in ipairs((lib.GetRecipes and lib:GetRecipes(profKey)) or {}) do
         local colors = lib:RecipeColors(profKey, sid)
         local cd = lib.RecipeCooldown and lib:RecipeCooldown(profKey, sid)
-        -- Coût des réactifs. Réactif(s) SANS prix HV → candidate de REPLI (`partial`) plutôt
-        -- qu'exclue : l'exclusion trouait la route dès qu'un composant courant manquait au scan
-        -- (vécu 2026-07-19 : Poussière étrange absente → Enchantement 12→75 réduit à 7 essences).
-        -- pickBest ne la retient que si le rang n'a AUCUNE candidate au coût complet (un coût
-        -- sous-estimé ne doit jamais rivaliser avec un coût sûr) ; le total passe en « > ».
         local reags = (colors and not cd) and lib.RecipeReagents and lib:RecipeReagents(profKey, sid) or nil
-        local cost = (reags and #reags > 0)
-            and (PR:CraftCost(profKey, sid) or { cost = 0, missing = true }) or nil
-        if cost then
+        if reags and #reags > 0 then
+            local priced, cost, missing = pricedReagents(PR, reags)
             local prod = lib.RecipeProduct and lib:RecipeProduct(profKey, sid)
             local isKnown = (known["s" .. sid] or (prod and known["i" .. prod])) and true or false
             local planPrice, planUnknown
@@ -85,9 +114,11 @@ function Route:Candidates(profKey, opts)
             end
             if isKnown or planPrice then
                 out[#out + 1] = {
-                    sid = sid, colors = colors, cost = cost.cost, prod = prod,
+                    sid = sid, colors = colors, cost = cost, reags = priced, prod = prod,
+                    conv = (prod and isReagent[prod]) or nil,
                     known = isKnown, planPrice = planPrice,
-                    partial = cost.missing or planUnknown or nil,
+                    -- missing n'est PAS figé ici : un réactif sans prix mais en sac ne manque pas.
+                    planUnknown = planUnknown or nil,
                     live = live["s" .. sid] or (prod and live["i" .. prod]) or nil,
                     learnAt = (lib.RecipeLearnedAt and lib:RecipeLearnedAt(profKey, sid)) or colors[1],
                 }
@@ -97,17 +128,87 @@ function Route:Candidates(profKey, opts)
     return out
 end
 
--- Meilleure candidate à un rang donné : coût/point espéré minimal ; le prix d'un plan pas encore
--- « acheté » est amorti sur les points qu'il peut encore servir d'ici sa couleur grise (ou la
--- cible). Au rang COURANT (`cur`), la couleur live du client — quand elle existe — remplace les
--- seuils data : le 1er segment raconte la même histoire que le badge de la liste.
+-- ------------------------------------------------------------------
+-- Stock : ce que le joueur a DÉJÀ, et ce que la route fabrique en chemin
+-- ------------------------------------------------------------------
+-- Sans stock, la route payait au prix HV des réactifs qui dormaient dans les sacs. Retour user
+-- 2026-09-26 : un tanneur rang 7, une pile de Ruined Leather Scraps, et la route prenait le Light
+-- Armor Kit (1 cuir léger à 1s18 le point) contre la conversion (3 retailles à 40c = 1s20) — deux
+-- cuivres d'écart, et les retailles n'apparaissaient jamais. Deux réserves :
+--   · bag  = les sacs, lus À LA DEMANDE par opts.bag(itemID) (absent pour un tiers : tout vaut 0) ;
+--   · made = ce que les segments précédents ont fabriqué — le cuir tiré des retailles nourrit les
+--            kits d'après. numMade inconnu de la lib → 1 craft = 1 objet, comme Materials.
+-- ⚠️ Une CONVERSION (cf. reagentSet) ne puise JAMAIS dans `made` : deux conversions réciproques
+-- (essences d'enchanteur, transmutations élémentaires A→B puis B→A) s'y nourriraient l'une l'autre
+-- et la route afficherait des points GRATUITS à l'infini. Les sacs sont finis : aucun cycle.
+local EPS = 1e-6
+
+local function newStock(bag)
+    local lazy = setmetatable({}, { __index = function(t, id)
+        local n = (bag and tonumber(bag(id))) or 0
+        rawset(t, id, n)
+        return n
+    end })
+    return { bag = lazy, made = {} }
+end
+
+-- Quantité de `id` à la disposition de la candidate `c`.
+local function avail(st, c, id)
+    return st.bag[id] + ((not c.conv) and (st.made[id] or 0) or 0)
+end
+
+-- Coût ESPÉRÉ du prochain point avec `c` (crafts = 1/chance), stock déduit : chaque réactif est
+-- d'abord pris au stock, le reste payé au prix HV. missing = un reste qu'aucun prix ne couvre.
+-- Stock vide → c.cost / chance, exactement le calcul d'avant.
+local function pointCost(c, crafts, st)
+    local cost, missing = 0, false
+    for _, rg in ipairs(c.reags) do
+        local left = rg[2] * crafts - avail(st, c, rg[1])
+        if left > EPS then
+            if rg[3] then cost = cost + left * rg[3] else missing = true end
+        end
+    end
+    return cost, missing
+end
+
+-- Engage le point : puise au stock (sacs d'abord), range le produit dans `made`, et note dans le
+-- segment ce qui a été pris (seg.bag / seg.made : { [itemID] = qté }) — l'infobulle le dit.
+local function consume(c, crafts, st, seg)
+    for _, rg in ipairs(c.reags) do
+        local id, need = rg[1], rg[2] * crafts
+        local b = math.min(need, st.bag[id])
+        local m = c.conv and 0 or math.min(need - b, st.made[id] or 0)
+        if b > EPS then st.bag[id] = st.bag[id] - b; seg.bag[id] = (seg.bag[id] or 0) + b end
+        if m > EPS then st.made[id] = st.made[id] - m; seg.made[id] = (seg.made[id] or 0) + m end
+    end
+    if c.prod then st.made[c.prod] = (st.made[c.prod] or 0) + crafts end
+end
+
+-- Départage de pickBest. Deux étages : une candidate au coût PARTIEL (réactif sans prix,
+-- sous-estimé) ne détrône JAMAIS une candidate au coût complet — repli quand le rang n'a qu'elle.
+-- À coût ÉGAL — typiquement deux recettes gratuites parce que tout est en sac —, celle qui grisera
+-- la PREMIÈRE passe devant : bientôt elle ne rapportera plus rien, l'autre peut attendre. C'est ce
+-- qui met les retailles → cuir léger (gris à 40) AVANT le kit d'armure (gris à 60), qui mange
+-- ensuite ce cuir. Sans ce départage, l'ordre du catalogue décidait.
+local function better(p, per, c, bestP, bestPer, best)
+    if bestP ~= p then return bestP end
+    if per < bestPer - EPS then return true end
+    if per > bestPer + EPS then return false end
+    return c.colors[4] < best.colors[4]
+end
+
+-- Meilleure candidate à un rang donné : coût/point espéré minimal, stock `st` déduit ; le prix
+-- d'un plan pas encore « acheté » est amorti sur les points qu'il peut encore servir d'ici sa
+-- couleur grise (ou la cible). Au rang COURANT (`cur`), la couleur live du client — quand elle
+-- existe — remplace les seuils data : le 1er segment raconte la même histoire que le badge.
 -- ⚠️ GRIS MONOTONE : une recette TRIVIALE (grise) au rang courant l'est à TOUS les rangs supérieurs
 -- (une recette ne « dé-grisonne » jamais en montant) → exclue de TOUTE la route (r n'itère que
 -- >= cur). Sans ça, la couleur live l'écartait au rang courant mais les seuils Wowhead la
 -- RESSUSCITAIENT en « vert » aux rangs suivants (données ≠ jeu à la frontière vert→gris) → la route
 -- comptait, et recommandait, une recette DÉJÀ grise dans la liste du joueur.
-local function pickBest(cands, r, cur, target, bought)
-    local best, bestPer, bestChance, bestPartial
+-- Rend best, chance, partiel, et le coût des réactifs de CE point (stock déduit, plan exclu).
+local function pickBest(cands, r, cur, target, bought, st)
+    local best, bestPer, bestChance, bestPartial, bestCost
     for _, c in ipairs(cands) do
         if c.learnAt <= r and c.live ~= "trivial" then
             local col
@@ -115,37 +216,58 @@ local function pickBest(cands, r, cur, target, bought)
             else col = colorAt(c.colors, r) end
             local chance = col and CHANCE[col]
             if chance then
-                local per = c.cost / chance
+                local cost, missing = pointCost(c, 1 / chance, st)
+                local per = cost
                 if not c.known and not bought[c.sid] then
                     per = per + (c.planPrice or 0) / math.max(1, math.min(c.colors[4], target) - r)
                 end
-                -- Deux étages : une candidate au coût PARTIEL (réactif sans prix, sous-estimé) ne
-                -- détrône JAMAIS une candidate au coût complet — repli quand le rang n'a qu'elle.
-                local p = c.partial and true or false
-                if not best or (bestPartial and not p) or (bestPartial == p and per < bestPer) then
-                    best, bestPer, bestChance, bestPartial = c, per, chance, p
+                local p = (missing or c.planUnknown) and true or false
+                if not best or better(p, per, c, bestPartial, bestPer, best) then
+                    best, bestPer, bestChance, bestPartial, bestCost = c, per, chance, p, cost
                 end
             end
         end
     end
-    return best, bestChance, bestPartial
+    return best, bestChance, bestPartial, bestCost
 end
 
--- La route : segments consécutifs { sid, from, to, crafts, cost, plan, prod, bought } (ou
--- { gap = true }), + totaux mats/plans. `done` = déjà au plafond. maxRank nil → prochain palier
--- CAPS. nil si briques absentes (cf. Candidates). opts : voir Candidates.
+-- Plafond visé : maxRank s'il est connu, sinon le prochain palier CAPS au-dessus de `rank`.
+local function targetFor(rank, maxRank)
+    if maxRank and maxRank > 0 then return maxRank end
+    for _, cap in ipairs(CAPS) do if rank < cap then return cap end end
+    return nil
+end
+
+-- Le point `r` est gagné avec `best` : étend le segment courant ou en ouvre un.
+local function addPoint(segs, r, best, chance, cost, planCost, boughtNow, isPartial)
+    local seg = segs[#segs]
+    if not (seg and seg.sid == best.sid) then
+        seg = { sid = best.sid, from = r, to = r, crafts = 0, cost = 0, plan = 0, prod = best.prod,
+            bought = boughtNow, bag = {}, made = {} }
+        segs[#segs + 1] = seg
+    end
+    seg.to = r + 1; seg.crafts = seg.crafts + 1 / chance
+    seg.cost = seg.cost + cost; seg.plan = seg.plan + planCost
+    if isPartial then seg.partial = true end
+    return seg
+end
+
+-- La route : segments consécutifs { sid, from, to, crafts, cost, plan, prod, bought, partial,
+-- bag, made } (ou { gap = true }), + totaux mats/plans. `done` = déjà au plafond. maxRank nil →
+-- prochain palier CAPS. nil si briques absentes (cf. Candidates). opts : voir Candidates, plus
+-- opts.bag(itemID) → quantité en sac (MON perso seulement). `bag` est gardé sur la route : Materials
+-- en a besoin pour dire ce qu'il reste à réunir.
 function Route:Compute(profKey, rank, maxRank, opts)
     if not rank then return nil end
-    local target = (maxRank and maxRank > 0) and maxRank or nil
-    if not target then
-        for _, cap in ipairs(CAPS) do if rank < cap then target = cap; break end end
-    end
+    opts = opts or {}
+    local target = targetFor(rank, maxRank)
     if not target or rank >= target then return { rank = rank, target = target or rank, segments = {}, mats = 0, plans = 0, done = true } end
-    local cands = self:Candidates(profKey, opts or {})
+    local cands = self:Candidates(profKey, opts)
     if not cands then return nil end
+    local st = newStock(opts.bag)
     local segs, mats, plans, bought, anyPartial = {}, 0, 0, {}, false
     for r = rank, target - 1 do
-        local best, chance, isPartial = pickBest(cands, r, rank, target, bought)
+        local best, chance, isPartial, cost = pickBest(cands, r, rank, target, bought, st)
         local seg = segs[#segs]
         if not best then
             if seg and seg.gap then seg.to = r + 1
@@ -157,20 +279,12 @@ function Route:Compute(profKey, rank, maxRank, opts)
                 planCost = best.planPrice or 0; plans = plans + planCost
             end
             if isPartial then anyPartial = true end
-            local matCost = best.cost / chance   -- coût espéré des réactifs pour CE point
-            mats = mats + matCost
-            if seg and seg.sid == best.sid then
-                seg.to = r + 1; seg.crafts = seg.crafts + 1 / chance
-                seg.cost = seg.cost + matCost; seg.plan = seg.plan + planCost
-            else
-                segs[#segs + 1] = { sid = best.sid, from = r, to = r + 1, crafts = 1 / chance,
-                    cost = matCost, plan = planCost, prod = best.prod, bought = boughtNow,
-                    partial = isPartial or nil }
-            end
+            mats = mats + cost   -- coût espéré des réactifs pour CE point, stock déduit
+            consume(best, 1 / chance, st, addPoint(segs, r, best, chance, cost, planCost, boughtNow, isPartial))
         end
     end
     return { rank = rank, target = target, segments = segs, mats = mats, plans = plans,
-        partial = anyPartial }
+        partial = anyPartial, bag = opts.bag }
 end
 
 -- ------------------------------------------------------------------
@@ -210,31 +324,34 @@ end
 -- rang courant. `target` reste celui de la route complète — l'amortissement du prix d'un plan doit
 -- raconter la même histoire ici et dans la fenêtre Plan de route (un plan cher se justifie sur tous
 -- les points qu'il servira ENCORE, pas sur un seul). Rend nil si rien n'est calculable ou si le
--- métier est déjà au plafond. opts : voir Candidates.
+-- métier est déjà au plafond. opts : voir Compute (opts.bag compris — le suivi et la fenêtre
+-- doivent choisir la même recette). Le cache ne voit pas les sacs, et n'a pas à les voir : les
+-- candidates n'en dépendent pas, le stock se déduit au choix.
+-- perPoint = ce que le prochain point coûtera VRAIMENT, sacs déduits (0 si tout y est).
 function Route:NextStep(profKey, rank, maxRank, opts)
     if not (profKey and rank) then return nil end
-    local target = (maxRank and maxRank > 0) and maxRank or nil
-    if not target then
-        for _, cap in ipairs(CAPS) do if rank < cap then target = cap; break end end
-    end
+    opts = opts or {}
+    local target = targetFor(rank, maxRank)
     if not target or rank >= target then return nil end
-    local cands = self:CachedCandidates(profKey, opts or {})
+    local cands = self:CachedCandidates(profKey, opts)
     if not cands then return nil end
-    local best, chance, partial = pickBest(cands, rank, rank, target, {})
+    local best, chance, partial, cost = pickBest(cands, rank, rank, target, {}, newStock(opts.bag))
     if not (best and chance) then return nil end
     return {
         sid = best.sid, prod = best.prod, rank = rank, target = target,
-        cost = best.cost, chance = chance, perPoint = best.cost / chance,
+        cost = best.cost, chance = chance, perPoint = cost,
         -- `plan` non nil = la route ACHÈTE ce plan pour ce point (le joueur ne le connaît pas encore).
         plan = (not best.known) and { price = best.planPrice or 0 } or nil,
         partial = partial or nil,
     }
 end
 
--- Ajoute `n` unités du réactif `id` au sac `acc`, avec deux raffinements terrain (retour user
--- 2026-07-19, capture Couture) :
+-- Ajoute `n` unités du réactif `id` au sac `acc`, avec trois raffinements terrain (retours user
+-- 2026-07-19, capture Couture, et 2026-09-26, capture Travail du cuir) :
 --  · CRÉDIT de production : ce que la route CRAFTE déjà (acc.produced, ex. rouleaux montés pour
 --    les points) sert d'abord aux recettes suivantes — pas de double compte ;
+--  · SACS : ce que le joueur a déjà (acc.bag, vide pour un tiers) passe ensuite — la liste dit ce
+--    qu'il RESTE à réunir, pas ce que la route consomme ;
 --  · DÉCOMPOSITION : un intermédiaire que le MÊME métier fabrique (acc.i2s : objet → recette,
 --    ex. rouleau ← étoffe) est remplacé par ses composants de base, récursivement. Garde de
 --    profondeur : les transmutations d'essences bouclent (A→B et B→A). numMade inconnu de la lib
@@ -246,6 +363,14 @@ local function addReagent(lib, profKey, acc, id, n, depth)
         acc.produced[id] = credit - used
         n = n - used
         if n <= 0 then return end
+    end
+    local inBag = acc.bag[id]
+    if inBag > EPS then
+        local used = (inBag < n) and inBag or n
+        acc.bag[id] = inBag - used
+        acc.fromBags = true
+        n = n - used
+        if n <= EPS then return end
     end
     local sid = (depth < 4) and acc.i2s[id]
     local sub = sid and lib.RecipeReagents and lib:RecipeReagents(profKey, sid)
@@ -262,12 +387,13 @@ end
 -- par la route (objet-plan à fournir, ou plan de FORMATEUR — pas d'objet, il devra l'apprendre au
 -- PNJ). Sert à la bourse d'artisan. mats triés par coût total décroissant ; cost = prix unitaire
 -- Auctionator (nil si inconnu) ; vendor = vendu par un PNJ (inutile de fournir, l'UI le sort de la
--- grille). gaps = des rangs sans candidate (liste incomplète).
+-- grille). gaps = des rangs sans candidate (liste incomplète). fromBags = les sacs (route.bag, MON
+-- perso seulement) ont couvert une partie des besoins : la liste est un RESTE, l'UI le dit.
 function Route:Materials(profKey, route)
     local lib = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
     if not (lib and route) then return nil end
     local PR, M = COC.Profit, COC.Sources
-    local acc = { qty = {}, order = {}, produced = {},
+    local acc = { qty = {}, order = {}, produced = {}, bag = newStock(route.bag).bag,
         i2s = (lib.ItemToSpell and lib:ItemToSpell(profKey)) or {} }
     for _, s in ipairs(route.segments or {}) do
         if not s.gap and s.prod then acc.produced[s.prod] = (acc.produced[s.prod] or 0) + s.crafts end
@@ -295,7 +421,8 @@ function Route:Materials(profKey, route)
             vendor = (PR and PR.IsVendorItem) and PR:IsVendorItem(id) or false } end
     end
     table.sort(mats, function(a, b) return ((a.cost or 0) * a.qty) > ((b.cost or 0) * b.qty) end)
-    return { mats = mats, plans = plans, gaps = gapPts > 0, gapPts = gapPts, partial = partial }
+    return { mats = mats, plans = plans, gaps = gapPts > 0, gapPts = gapPts, partial = partial,
+        fromBags = acc.fromBags or nil }
 end
 
 -- Vrai s'il existe, dans les données CHARGÉES (couche du client), au moins une recette apprise à un

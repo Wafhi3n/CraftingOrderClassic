@@ -18,6 +18,8 @@ local L    = COC.L
 
 -- Flèche « vers » en TEXTURE : la police rend « → » en tofu.
 local ARROW = "|TInterface\\ChatFrame\\ChatFrameExpandArrow:12:12|t"
+-- Sac : le prochain point ne coûte rien, tout est déjà en sac (même marque que le Plan de route).
+local BAG = "|TInterface\\Icons\\INV_Misc_Bag_08:12:12|t"
 
 local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true) end
 
@@ -111,9 +113,12 @@ end
 
 -- Sous-titre : « 317 → 380 · ~41po/point ». Un coût PARTIEL (réactif sans prix coté) se dit « > »,
 -- jamais « ~ » : la route le sous-estime et ne doit pas le faire passer pour une estimation sûre.
+-- Un point GRATUIT (réactifs en sac, perPoint sacs déduits) se dit par le sac, pas par « ~0/point ».
 local function subtitle(p, step)
     local sub = p.rank .. " " .. ARROW .. " " .. step.target
-    if step.perPoint then
+    if step.perPoint and step.perPoint < 0.5 and not step.partial then
+        sub = sub .. "  " .. BAG
+    elseif step.perPoint then
         sub = sub .. "  " .. string.format(step.partial and L[">%s/point"] or L["~%s/point"],
                                            costText(step.perPoint))
     end
@@ -128,7 +133,10 @@ local function progressProvider(entries, ctx)
     local withPlans = not (COC.db and COC.db.routePlans == false)
     for _, p in ipairs(levelingProfs()) do
         local known = knownSet(p.key)
-        local step = known and Route:NextStep(p.key, p.rank, p.max, { known = known, plans = withPlans })
+        -- Mes sacs, comme la fenêtre Plan de route : sans eux, le suivi et la route conseilleraient
+        -- deux recettes différentes dès qu'une pile de réactifs dort dans les sacs.
+        local step = known and Route:NextStep(p.key, p.rank, p.max,
+            { known = known, plans = withPlans, bag = ctx.bagCount })
         if step then
             local objs, done = stepObjectives(p.key, step.sid, ctx)
             local icon = Skin and Skin.ProfIcon and Skin.ProfIcon(p.key)

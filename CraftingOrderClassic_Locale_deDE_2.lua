@@ -385,6 +385,11 @@ local de2 = {
     ["Coche « Inclure les plans à acheter » pour en combler une partie."] =
         "Aktiviere „Kaufbare Rezepte einbeziehen“, um einen Teil zu füllen.",
     ["Coût partiel : au moins un réactif sans prix HV."] = "Teilkosten: mindestens ein Material ohne AH-Preis.",
+    -- Plan de route : le stock (sacs + ce que la route fabrique en chemin)
+    ["Déjà dans tes sacs : %s"] = "Schon in deinen Taschen: %s",
+    ["Fabriqué aux étapes d'avant : %s"] = "In früheren Schritten hergestellt: %s",
+    ["Ce que tu as déjà en sac est déduit."] = "Was du schon in den Taschen hast, ist abgezogen.",
+    ["Tout ce qu'il faut est déjà dans tes sacs."] = "Alles Nötige ist schon in deinen Taschen.",
     ["Désenchanter : objets %s, niv. d'objet %d-%d (estimation)"] = "Entzaubern: %s Gegenstände, Gegenstandsstufe %d-%d (Schätzung)",
     -- Échange enchanteur, étage 2 : invite un-clic côté client
     ["%s propose d'enchanter : %s. Poser la pièce dans l'emplacement « ne sera pas échangé » ? Rien n'est donné — tu la récupères enchantée."] =

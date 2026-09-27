@@ -16,13 +16,13 @@
 | `CraftingOrderClassic_Migrations.lua` | versionnage du schéma SavedVariables. | 40 |
 | `CraftingOrderClassic_Locale.lua` | socle de localisation du CHROME de l'UI. | 12 |
 | `CraftingOrderClassic_Locale_enUS.lua` | overlay ANGLAIS (enUS/enGB). | 280 |
-| `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 492 |
+| `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 497 |
 | `CraftingOrderClassic_Locale_enUS_3.lua` | overlay enUS, 3/3. | 23 |
 | `CraftingOrderClassic_Locale_deDE.lua` | overlay ALLEMAND (deDE). | 282 |
-| `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 472 |
+| `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 477 |
 | `CraftingOrderClassic_Locale_deDE_3.lua` | overlay deDE, 3/3. | 22 |
 | `CraftingOrderClassic_Locale_esES.lua` | overlay ESPAGNOL (esES/esMX). | 283 |
-| `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 473 |
+| `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 478 |
 | `CraftingOrderClassic_Locale_esES_3.lua` | overlay esES, 3/3. | 23 |
 | `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 383 |
 | `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 380 |
@@ -87,15 +87,15 @@
 | `CraftingOrderClassic_ProfWindow_Layout.lua` | GÉOMÉTRIE de la vue métier (fenêtre 3 colonnes). | 184 |
 | `CraftingOrderClassic_ProfWindow_HelpPlate.lua` | AIDE CONTEXTUELLE de la Vue Métier (« bouton i »). | 113 |
 | `CraftingOrderClassic_ProfWindow_Dock.lua` | mode DOCK de la vue métier (« Vue Blizzard ») : la fenêtre native reste VISIBLE (non neutralisée) et NOTRE colonne Commandes s'épingle à sa droite. | 70 |
-| `CraftingOrderClassic_ProfWindow_Camelot.lua` | POC : notre colonne Commandes À L'INTÉRIEUR de la fenêtre de métier NATIVE de WoW: Forever (Camelot). | 446 |
+| `CraftingOrderClassic_ProfWindow_Camelot.lua` | POC : notre colonne Commandes À L'INTÉRIEUR de la fenêtre de métier NATIVE de WoW: Forever (Camelot). | 469 |
 | `CraftingOrderClassic_ProfWindow_Camelot_Open.lua` | OUVRIR un metier dans la fenetre NATIVE de WoW: Forever, et rediriger vers elle toutes nos entrees (bouton minimap, /co prof, clic du suivi). | 115 |
 | `CraftingOrderClassic_ProfWindow_Camelot_PageArt.lua` | prolonger le FOND de la page native dans la bande que notre greffe ajoute à droite de la fenêtre de métier de WoW: Forever. | 80 |
 | `CraftingOrderClassic_ProfWindow_Toolbar.lua` | barre d'outils de la colonne Recettes (vue métier) : les toggles de TRI (slot recTools, à gauche : rentabilité / valeurs exactes / progression — Auctionator) et de FILTRE (slot recFilterToggles, à droite : « j'ai les matériaux » / « montée de compétence »). | 245 |
 | `CraftingOrderClassic_ProfWindow_Recipes.lua` | colonne GAUCHE : liste de recettes virtualisée (scroll), recherche, couleur par difficulté, sélection, badge « demandé » (nb de commandes ouvertes pour l'objet). | 485 |
 | `CraftingOrderClassic_ProfWindow_Leveling.lua` | aide à la MONTÉE DE MÉTIER dans la liste de recettes : coût de progression (réactifs au prix Auctionator ÷ chance de point selon la couleur), badge « meilleur coût/point » sur la recette recommandée, icônes de SOURCE sur les manquantes (formateur / vendeur PNJ / coté à l'HV / à farmer) et tri « progression » affiné par coût. | 219 |
-| `CraftingOrderClassic_Route.lua` | cœur de CALCUL du plan de route de montée de métier, PARAMÉTRABLE : marche gloutonne rang par rang (recette au meilleur coût/point ESPÉRÉ), seuils réels CraftLink `skillColors` aux rangs futurs, amortissement du prix des plans à acheter, exclusion des recettes à cooldown et des coûts partiels. | 332 |
-| `CraftingOrderClassic_ProfWindow_Route.lua` | fenêtre « PLAN DE ROUTE » de montée de métier (étage ③ de l'aide à la progression) : « du rang actuel au plafond, quoi crafter, combien de fois, pour combien ». | 414 |
-| `CraftingOrderClassic_ProfWindow_Route_Supply.lua` | ce qui se peint SOUS les segments du plan de route : le bloc « FOURNITURES » (composants agrégés de toute la route, plans à acheter) et, quand le rang est AU PLAFOND, le bloc « débloquer le palier suivant » (livre de rang curaté, ou renvoi vers le formateur de métier). | 111 |
+| `CraftingOrderClassic_Route.lua` | cœur de CALCUL du plan de route de montée de métier, PARAMÉTRABLE : marche gloutonne rang par rang (recette au meilleur coût/point ESPÉRÉ), seuils réels CraftLink `skillColors` aux rangs futurs, amortissement du prix des plans à acheter, exclusion des recettes à cooldown et des coûts partiels, STOCK (sacs + produits de la route) déduit avant de payer quoi que ce soit au prix HV. | 459 |
+| `CraftingOrderClassic_ProfWindow_Route.lua` | fenêtre « PLAN DE ROUTE » de montée de métier (étage ③ de l'aide à la progression) : « du rang actuel au plafond, quoi crafter, combien de fois, pour combien ». | 450 |
+| `CraftingOrderClassic_ProfWindow_Route_Supply.lua` | ce qui se peint SOUS les segments du plan de route : le bloc « FOURNITURES » (composants agrégés de toute la route, plans à acheter) et, quand le rang est AU PLAFOND, le bloc « débloquer le palier suivant » (livre de rang curaté, ou renvoi vers le formateur de métier). | 120 |
 | `CraftingOrderClassic_ProfWindow_Learn.lua` | section « À apprendre maintenant » du Plan de route : les recettes NON APPRISES que ton rang permet déjà d'apprendre ET qui rapportent encore un point, classées par coût espéré par point, avec l'icône de leur source. | 113 |
 | `CraftingOrderClassic_ProfWindow_DockViews.lua` | la colonne Commandes CHANGE DE CONTENU au lieu d'ouvrir des fenêtres par-dessus. | 459 |
 | `CraftingOrderClassic_ProfWindow_DockProfit.lua` | la 4ᵉ vue de la colonne : « Profit ». | 214 |
@@ -145,7 +145,7 @@
 | `CraftingOrderClassic_Journal.lua` | MODÈLE « journal » : la liste unique, triée par PRIORITÉ, de ce sur quoi le joueur peut agir maintenant. | 269 |
 | `CraftingOrderClassic_Tracker.lua` | SUIVI À L'ÉCRAN des commandes, façon suivi de quête : un cadre léger, déplaçable, hors de toute fenêtre, qui liste ce sur quoi le joueur peut agir MAINTENANT. | 217 |
 | `CraftingOrderClassic_Tracker_Rows.lua` | LIGNES du suivi à l'écran : pool réutilisable + peinture d'un groupe de sections rendu par COC.Journal:Grouped. | 238 |
-| `CraftingOrderClassic_Tracker_Next.lua` | section « Progression » du suivi à l'écran : pour chaque métier encore en montée, LA recette à crafter maintenant pour gagner le prochain point, ses réactifs en objectifs, et le plan à acheter quand la route en achète un. | 152 |
+| `CraftingOrderClassic_Tracker_Next.lua` | section « Progression » du suivi à l'écran : pour chaque métier encore en montée, LA recette à crafter maintenant pour gagner le prochain point, ses réactifs en objectifs, et le plan à acheter quand la route en achète un. | 160 |
 | `Debug.lua` | Crafting Order - Classic — Debug : mode solo pour "jouer" un réseau fictif. | 136 |
 | `CraftingOrderClassic_SelfTest.lua` | suite de tests IN-GAME (/cotest). | 181 |
 
@@ -1653,13 +1653,17 @@
 > CraftingOrderClassic_Route.lua — cœur de CALCUL du plan de route de montée de métier,
 > PARAMÉTRABLE : marche gloutonne rang par rang (recette au meilleur coût/point ESPÉRÉ), seuils
 > réels CraftLink `skillColors` aux rangs futurs, amortissement du prix des plans à acheter,
-> exclusion des recettes à cooldown et des coûts partiels. Deux consommateurs :
+> exclusion des recettes à cooldown et des coûts partiels, STOCK (sacs + produits de la route)
+> déduit avant de payer quoi que ce soit au prix HV. Consommateurs :
 >   · la fenêtre « Plan de route » de la Vue Métier (_ProfWindow_Route.lua — MON perso : recettes
->     de la fenêtre native + couleur LIVE du client au rang courant) ;
+>     de la fenêtre native + couleur LIVE du client au rang courant + mes sacs) ;
+>   · le suivi à l'écran (_Tracker_Next.lua — MON perso, prochain point seulement + mes sacs) ;
 >   · la « bourse d'artisan » de l'onglet Artisans (_UI_Artisans_Needs.lua — un TIERS du roster :
->     rang SK diffusé + recettes décodées de son bitfield RK ; pas de couleur live).
+>     rang SK diffusé + recettes décodées de son bitfield RK ; ni couleur live, ni sacs).
 > Les hypothèses (chance de point par couleur) sont ALIGNÉES sur _ProfWindow_Leveling : le badge
 > coût/point, la route et la bourse doivent raconter la même histoire. Aucune UI ici.
+> ⚠️ Le badge, lui, ignore les sacs : il chiffre UNE recette au prix HV, pas un chemin. Il ne vit
+> que dans notre liste pleine vue — la colonne greffée de Forever montre la liste de Blizzard.
 
 **API** : `Route:Candidates(profKey, opts)` · `Route:Compute(profKey, rank, maxRank, opts)` · `Route:InvalidateCandidates(profKey)` · `Route:CachedCandidates(profKey, opts)` · `Route:NextStep(profKey, rank, maxRank, opts)` · `Route:Materials(profKey, route)` · `Route:HasHigherTier(profKey, rank)` · `Route:Gateway(profKey, rank)` · `Route:NextTierCap(rank)`
 
