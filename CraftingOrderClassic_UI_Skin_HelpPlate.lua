@@ -56,7 +56,15 @@ function Skin.MakeHelpButton(parent, onToggle, opts)
     b:SetSize(opts.size or 24, opts.size or 24)
     local a = opts.point or { "CENTER", parent, "TOPLEFT", 8, 6 }
     b:ClearAllPoints(); b:SetPoint(a[1], a[2], a[3], a[4], a[5])
-    b:SetFrameStrata("HIGH"); b:SetFrameLevel(parent:GetFrameLevel() + 20)
+    -- ⚠️ AU-DESSUS DU MÉDAILLON, et « parent + 20 » n'y suffit pas. Sur Forever, `ButtonFrameTemplate`
+    -- hérite de `PortraitFrameTemplate`, dont le `PortraitContainer` est posé à un niveau ABSOLU de
+    -- 400 (SharedUIPanelTemplates.xml, Mainline) : notre pastille, à quelques dizaines, passait
+    -- DESSOUS le portrait qu'elle chevauche, et on n'en voyait qu'un croissant (relevé en jeu par un
+    -- testeur le 2026-09-27). On se cale donc sur le conteneur quand le parent en a un.
+    local level = parent:GetFrameLevel() + 20
+    local pc = parent.PortraitContainer
+    if pc and pc.GetFrameLevel then level = math.max(level, pc:GetFrameLevel() + 1) end
+    b:SetFrameStrata("HIGH"); b:SetFrameLevel(level)
     b:SetScript("OnClick", function() if onToggle then onToggle() end end)
     if opts.tooltip then
         b:SetScript("OnEnter", function(self)
