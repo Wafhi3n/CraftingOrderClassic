@@ -141,8 +141,8 @@ local ALL_SRC_LABEL = {
 -- juste en dessous, et renseigne self.<kind>AllRow / <kind>ArtList.
 -- `panel` peut être un PANNEAU (Récolte : coordonnées absolues, x/w = ALL_RX/ALL_RW par défaut) ou une
 -- SECTION (Commande, blocs natifs : on passe alors x = marge du bloc et w = largeur utile du bloc).
--- opts.fill(ligne, donnée) remplit une ligne d'artisan ; opts.bottom (facultatif) = marge au bas du
--- panneau : la liste descend alors jusque-là au lieu de s'arrêter à 4 lignes.
+-- opts.fill(ligne, donnée) remplit une ligne d'artisan ; opts.bottom = marge au bas du panneau, où la
+-- liste s'arrête (au-dessus du statut de l'onglet).
 function UI:_BuildAllRowAndScroll(panel, kind, top, x, w, opts)
     x, w = x or ALL_RX, w or ALL_RW
     local row = Skin.MakeFlatRow(panel, w - 22, ALL_ARH)
@@ -158,15 +158,11 @@ function UI:_BuildAllRowAndScroll(panel, kind, top, x, w, opts)
     self[kind .. "AllRow"] = row
 
     -- Liste défilante du kit (palier 2). w − 10 = largeur de la ligne épinglée + la barre de 8 px.
-    -- 4 lignes, ou jusqu'à `opts.bottom` : dans Commande, 4 lignes laissaient un grand vide dessous.
+    -- Elle descend jusqu'à `opts.bottom` : figée à 4 lignes, elle défilait au-dessus d'un grand vide.
     local host = CreateFrame("Frame", nil, panel)
     host:SetPoint("TOPLEFT", x, top - ALL_ARH - 2)
-    if opts.bottom then
-        host:SetPoint("BOTTOMLEFT", panel, "BOTTOMLEFT", x, opts.bottom)
-        host:SetWidth(w - 10)
-    else
-        host:SetSize(w - 10, 4 * ALL_ARH)
-    end
+    host:SetPoint("BOTTOMLEFT", panel, "BOTTOMLEFT", x, opts.bottom or 22)
+    host:SetWidth(w - 10)
     self[kind .. "ArtList"] = Skin.MakeScrollList(host, {
         extent = ALL_ARH,
         build  = Skin.ArtisanRowArt,
