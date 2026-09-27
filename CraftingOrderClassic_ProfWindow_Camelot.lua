@@ -114,18 +114,6 @@ local function lockedDown()
     return InCombatLockdown and InCombatLockdown()
 end
 
--- La greffe pilote, donc la greffe RAFRAICHIT. A la premiere ouverture d'un metier, le client n'a
--- pas encore la liste : notre colonne se dessine VIDE, et depouillee de son fond elle est alors
--- indiscernable d'une colonne absente (symptome vecu le 2026-09-19 : il fallait ouvrir-fermer une
--- fois pour la voir). Les donnees arrivent avec TRADE_SKILL_LIST_UPDATE, juste apres. ProfOrders
--- s'en chargeait ; depuis qu'il laisse la main a la greffe (pilote unique), plus personne ne le
--- faisait. On le reprend ici, la ou vit desormais la responsabilite.
-local upd = CreateFrame("Frame")
-Api.RegisterEventsSafe(upd, { "TRADE_SKILL_LIST_UPDATE" })
-upd:SetScript("OnEvent", function()
-    if PW.docked and PW.frame and PW.frame:IsShown() then PW:Refresh() end
-end)
-
 local regen = CreateFrame("Frame")
 regen:RegisterEvent("PLAYER_REGEN_ENABLED")
 regen:SetScript("OnEvent", function()
@@ -143,6 +131,35 @@ end)
 local function onRecipesPage(native)
     return not native.CraftingPage or native.CraftingPage:IsShown()
 end
+
+-- La colonne ne se greffe que sur MON metier. Le lien de metier d'un autre joueur, la guilde et un
+-- PNJ artisan ouvrent la MEME fenetre : la colonne s'y greffait et proposait « Offer » avec les
+-- recettes de l'AUTRE (vu en jeu le 2026-09-27, docs/test-lien-metier.md). Le critere vit dans
+-- CraftLink, qui en garde aussi la capture : une seule definition de « mon metier ».
+local function ownProfession()
+    local CL = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
+    return not (CL and CL.IsOwnProfessionOpen) or CL:IsOwnProfessionOpen()
+end
+
+-- La greffe pilote, donc la greffe RAFRAICHIT. A la premiere ouverture d'un metier, le client n'a
+-- pas encore la liste : notre colonne se dessine VIDE, et depouillee de son fond elle est alors
+-- indiscernable d'une colonne absente (symptome vecu le 2026-09-19 : il fallait ouvrir-fermer une
+-- fois pour la voir). Les donnees arrivent avec TRADE_SKILL_LIST_UPDATE, juste apres. ProfOrders
+-- s'en chargeait ; depuis qu'il laisse la main a la greffe (pilote unique), plus personne ne le
+-- faisait. On le reprend ici, la ou vit desormais la responsabilite.
+-- Elle SUIT aussi le proprietaire : cliquer un lien de metier fenetre ouverte change de metier sans
+-- rouvrir le cadre, donc sans OnShow. On se degreffe en passant chez l'autre, et on revient en
+-- rentrant chez soi (`_foreign`, pose par l'attache refusee).
+local upd = CreateFrame("Frame")
+Api.RegisterEventsSafe(upd, { "TRADE_SKILL_SHOW", "TRADE_SKILL_LIST_UPDATE", "TRADE_SKILL_DATA_SOURCE_CHANGED" })
+upd:SetScript("OnEvent", function()
+    local native = _G.ProfessionsFrame
+    if native and native:IsShown() and onRecipesPage(native) then
+        local own = ownProfession()
+        if (PW.docked and not own) or (PW._foreign and own) then return PW:CamelotAttach(native) end
+    end
+    if PW.docked and PW.frame and PW.frame:IsShown() then PW:Refresh() end
+end)
 
 -- Largeur de la colonne : au moins celle de sa barre d'onglets, sinon « Incoming » sort du cadre.
 local function sizeColumn(self)
@@ -314,6 +331,12 @@ function PW:CamelotAttach(native)
         tr("attach refuse : page d'ensemble affichee, pas de metier courant")
         return self:CamelotDetach(native)
     end
+    if not ownProfession() then
+        tr("attach refuse : metier d'un autre joueur (lien, guilde ou PNJ)")
+        self._foreign = true
+        return self:CamelotDetach(native)
+    end
+    self._foreign = nil
     self:Build()
     -- Le depouillement n'a de sens qu'ENCASTREE : il sert a fondre la colonne dans le fond natif.
     -- ACCOLEE, elle est un panneau a part entiere et doit porter sa bordure, son titre et sa croix,
