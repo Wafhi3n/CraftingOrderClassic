@@ -36,6 +36,17 @@ client.
 
 ## Relevés
 
+- 2026-09-27 (9) — jusqu'a 2712afd — Forever, **DEUX COMPTES**, build = `main` candidat v1.36.2 —
+  **GO sur la reprise des commandes d'avant le nom complet** (`AdoptFullNames`) — rapporté par le
+  user (« c'est bon pour Gnomi, j'avais ses commandes d'avant ») et corroboré par la SavedVariable
+  de Gnomi écrite à 20:23 : `Gnomi-1`, postée avant le correctif avec l'acheteur « Gnomi », porte
+  désormais « Gnomi Short », et son statut est `cancelled` (le bouton Annuler a fonctionné dessus).
+  Au `/reload`, une erreur Blizzard `SelectRecipe:466` (`SchematicForm:Init` nil) : c'est
+  **Auctionator** (3e fois, cf. mémoire), disparue quand le user l'a coupé ; COC ne touche jamais
+  `SchematicForm`. PÉRIMÈTRE : l'annonce ALT des rerolls (codec corrigé) n'est pas observée — la
+  feature est opt-in et n'a jamais été éprouvée à 2 comptes ; chez Rédemption, `Gnomi-1` reste
+  ouverte (limite de transition assumée : un pair garde l'acheteur au prénom jusqu'au TTL).
+
 - 2026-09-27 (7) — jusqu'a ee4a2e2 — Forever, un client (Rédemption, enchanteur) — **GO sur les
   demandes niées du canal Commerce** — le parseur RÉEL (`Inbound:OnChat`) appelé par `/run` avec un
   lien de l'objet 11287, sans rien poster sur Commerce : « need [Lesser Magic Wand] pls » (Testeur)
