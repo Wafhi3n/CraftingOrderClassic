@@ -204,7 +204,12 @@ function UI:_BuildGatherArtisanSection(panel)
     local az = self:GatherSec("gatherers")
     local aw = az:GetWidth(); if aw <= 1 then aw = G.WIDE_W end
     self.gatherArtW = aw
-    self:_BuildAllRowAndScroll(az, "COCGatherArtScroll", "gather", -G.PAD, G.PAD, aw)
+    -- Jusqu'au-dessus du statut (posé à 6 du bas, cf. _BuildGatherActionBar), comme dans Commande :
+    -- 4 lignes laissaient un grand vide sous une liste qui défilait (relevé en jeu le 2026-09-27).
+    self:_BuildAllRowAndScroll(az, "gather", -G.PAD, G.PAD, aw, {
+        fill   = function(row, a) UI:_FillGatherArtRow(row, a) end,
+        bottom = 22,
+    })
 
     self:_BuildGatherActionBar(panel)
 end

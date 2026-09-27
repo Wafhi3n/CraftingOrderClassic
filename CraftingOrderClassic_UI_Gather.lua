@@ -10,7 +10,6 @@ local Skin = UI.Skin
 local L    = COC.L   -- localisation du chrome (valeurs recipient canoniques en FR — cf. _GatherTargetLabel)
 
 local GLH = 20    -- hauteur ligne ressource
-local ARH = 26    -- hauteur ligne artisan
 
 local G = UI.GATHER   -- métriques dérivées de la SPEC (PAD, replis de largeur) — cf. _UI_Gather_Layout.lua
 
@@ -189,7 +188,7 @@ function UI:_RefreshGatherDetail()
 end
 
 function UI:_RefreshGatherArtisans()
-    local D = COC.Directory; if not (D and self.gatherArtContent) then return end
+    local D = COC.Directory; if not (D and self.gatherArtList) then return end
     local src = self.gatherSrc or "guild"
     -- Élémentaire = farmé par n'importe qui → pas de filtre par métier.
     local prof = (self.gatherProf == "Elemental") and nil or self.gatherProf
@@ -203,39 +202,32 @@ function UI:_RefreshGatherArtisans()
         if (a.online and true) ~= (b.online and true) then return a.online end
         return a.name < b.name
     end)
-    local n = 0
-    for _, a in ipairs(list) do
-        n = n + 1; local row = self:_GatherArtRow(n)
-        row.dot:SetOnline(a.online and true or false)
-        -- Métiers affichés = skill ∪ recipes (les récoltes ne vivent que dans skill).
-        local profset = {}
-        for p2 in pairs(a.r.recipes or {}) do profset[p2] = true end
-        for p2 in pairs(a.r.skill   or {}) do profset[p2] = true end
-        local profs2 = {}
-        for p2 in pairs(profset) do profs2[#profs2+1] = Skin.ProfLabel(p2) end
-        table.sort(profs2)
-        -- Niveau du métier de récolte ciblé (ex. « Skinning 320/375 »), lisible sans ouvrir la fenêtre.
-        local sk = a.r.skill and prof and a.r.skill[prof]
-        local skTxt = sk and ("|cFF888888"..sk[1].."/"..sk[2].."|r  ") or ""
-        row.name:SetText("|cFFFFFFFF"..a.name.."|r  "..skTxt.."|cFF888888"..table.concat(profs2, " · ").."|r")
-        row.src:SetText("|cFF888888"..(a.r.source or ""):upper().."|r")
-        row.artEntry = a; row.selTex:SetShown(UI.gatherTarget == "@" .. a.name)
-        row:SetScript("OnClick", function()
-            UI.gatherTarget = "@" .. a.name; UI:_RefreshGatherArtisans()
-        end)
-        row:Show()
-    end
-    for i = n+1, #self.gatherArtRows do self.gatherArtRows[i]:Hide() end
-    self.gatherArtContent:SetHeight(math.max(n * ARH, 10))
-    Skin.AutoHideScroll("COCGatherArtScroll", self.gatherArtContent)
+    -- La liste défilante place et remplit elle-même les lignes visibles (cf. _FillGatherArtRow).
+    self.gatherArtList:SetData(list, true)
     self:_RefreshAllRow("gather"); self:_UpdateGatherArtisanLabel()
 end
 
-function UI:_GatherArtRow(i)
-    local r = self.gatherArtRows[i]; if r then return r end
-    r = Skin.MakeArtisanRow(self.gatherArtContent, (self.gatherArtW or G.WIDE_W) - 22, ARH)   -- pastille + nom + source (kit)
-    r:SetPoint("TOPLEFT", 0, -(i-1)*ARH)
-    self.gatherArtRows[i] = r; return r
+-- Une ligne de récolteur, remplie par la liste défilante (Skin.MakeScrollList) pour la donnée `a`
+-- = { name, r (fiche d'annuaire), online }. Elle repose TOUT : la ligne a pu montrer quelqu'un d'autre.
+function UI:_FillGatherArtRow(row, a)
+    local prof = (self.gatherProf == "Elemental") and nil or self.gatherProf
+    row.dot:SetOnline(a.online and true or false)
+    -- Métiers affichés = skill ∪ recipes (les récoltes ne vivent que dans skill).
+    local profset = {}
+    for p2 in pairs(a.r.recipes or {}) do profset[p2] = true end
+    for p2 in pairs(a.r.skill   or {}) do profset[p2] = true end
+    local profs2 = {}
+    for p2 in pairs(profset) do profs2[#profs2+1] = Skin.ProfLabel(p2) end
+    table.sort(profs2)
+    -- Niveau du métier de récolte ciblé (ex. « Skinning 320/375 »), lisible sans ouvrir la fenêtre.
+    local sk = a.r.skill and prof and a.r.skill[prof]
+    local skTxt = sk and ("|cFF888888"..sk[1].."/"..sk[2].."|r  ") or ""
+    row.name:SetText("|cFFFFFFFF"..a.name.."|r  "..skTxt.."|cFF888888"..table.concat(profs2, " · ").."|r")
+    row.src:SetText("|cFF888888"..(a.r.source or ""):upper().."|r")
+    row.artEntry = a; row.selTex:SetShown(UI.gatherTarget == "@" .. a.name)
+    row:SetScript("OnClick", function()
+        UI.gatherTarget = "@" .. a.name; UI:_RefreshGatherArtisans()
+    end)
 end
 
 -- Valeur CANONIQUE du destinataire (cf. _PostTargetLabel / Orders:VisibleTo).

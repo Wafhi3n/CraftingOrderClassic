@@ -23,13 +23,21 @@ function UI:_BuildMutedList()
     hdr:SetText("|cFF888888" .. L["Joueurs en sourdine — aucune notification de leur part."] .. "|r")
     hdr:Hide(); self.mutedHdr = hdr
 
+    -- La liste défilante du kit (palier 2b), SUPERPOSÉE à celle des artisans dans la même zone et
+    -- cachée par défaut (bascule : _ShowMutedMode). Elle dit « personne en sourdine » d'elle-même.
     local lz = self:ArtSec("artisansList")
-    self.mutedW = self.artListW or (lz:GetWidth() - 6)   -- même largeur que la liste d'artisans
-    local scroll = CreateFrame("ScrollFrame", "COCMutedScroll", lz, "UIPanelScrollFrameTemplate")
-    scroll:SetPoint("TOPLEFT", 0, 0); scroll:SetPoint("BOTTOMLEFT", 0, 0); scroll:SetWidth(self.mutedW)
-    local c = CreateFrame("Frame", nil, scroll); c:SetSize(self.mutedW, 10); scroll:SetScrollChild(c)
-    scroll:Hide()
-    self.mutedScroll = scroll; self.mutedContent = c; self.mutedRows = {}
+    local host = CreateFrame("Frame", nil, lz)
+    host:SetPoint("TOPLEFT", 0, 0); host:SetPoint("BOTTOMRIGHT", 0, 0); host:Hide()
+    self.mutedScroll = host
+    self.mutedList = Skin.MakeScrollList(host, {
+        extent = MRH,
+        build  = function(row) UI:_BuildMutedRow(row) end,
+        fill   = function(row, it) UI:_FillMutedRow(row, it) end,
+        -- Saut de ligne par string.char(10) : un antislash écrit dans le source peut arriver
+        -- transformé en VRAI retour à la ligne, qui coupe la chaîne (vécu en écrivant ces lignes).
+        empty  = "|cFF888888" .. L["Personne en sourdine."] .. "|r" .. string.char(10) .. "|cFF666666"
+                 .. L["Mets un joueur en sourdine par clic-droit sur sa carte ou /co mute <nom>."] .. "|r",
+    })
 end
 
 -- Bascule l'affichage : vue « En sourdine » (on=true) ↔ liste d'artisans normale. Cache/montre les
@@ -42,45 +50,35 @@ function UI:_ShowMutedMode(on)
     if self.mutedScroll then self.mutedScroll:SetShown(on) end
 end
 
-function UI:_MutedRow(i)
-    local r = self.mutedRows[i]; if r then return r end
-    local rw = self.mutedW or 560   -- largeur de la zone artisansList (lue au build)
-    r = CreateFrame("Frame", nil, self.mutedContent)
-    r:SetSize(rw, MRH); r:SetPoint("TOPLEFT", 0, -(i - 1) * MRH)
-    local hi = r:CreateTexture(nil, "HIGHLIGHT"); hi:SetAllPoints(); hi:SetColorTexture(Skin.unpack(Skin.color.rowHover))
+-- Construit une ligne de sourdine, la première fois que la liste défilante crée ce cadre. La
+-- sous-ligne (durée + raison) s'ancre contre « Rétablir » au lieu d'une largeur tirée de la zone.
+function UI:_BuildMutedRow(r)
+    Skin.ListRowArt(r); Skin.ListRowKind(r, "item")   -- survol des listes des métiers
+    r.unmute = Skin.MakeGoldButton(r, 96, 22, L["Rétablir"]); r.unmute:SetPoint("RIGHT", -8, 0)
     r.name = r:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     r.name:SetPoint("TOPLEFT", 8, -5); r.name:SetWidth(260); r.name:SetJustifyH("LEFT"); Skin.ApplyShadow(r.name)
     r.sub = r:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    r.sub:SetPoint("TOPLEFT", 8, -22); r.sub:SetWidth(rw - 130); r.sub:SetJustifyH("LEFT"); Skin.ApplyShadow(r.sub)
-    r.unmute = Skin.MakeGoldButton(r, 96, 22, L["Rétablir"]); r.unmute:SetPoint("RIGHT", -8, 0)
-    self.mutedRows[i] = r; return r
+    r.sub:SetPoint("TOPLEFT", 8, -22); r.sub:SetPoint("RIGHT", r.unmute, "LEFT", -8, 0)
+    r.sub:SetJustifyH("LEFT"); r.sub:SetWordWrap(false); Skin.ApplyShadow(r.sub)
+    -- « Rétablir » démute le joueur que la ligne porte À CE MOMENT (la même ligne en sert d'autres).
+    r.unmute:SetScript("OnClick", function(b)
+        local Mod, name = COC.Moderation, b:GetParent().mutedName
+        if name and Mod and Mod.Unmute then Mod:Unmute(name) end   -- Unmute rappelle UI:Refresh → RefreshMuted
+    end)
 end
 
--- Remplit la liste depuis Mod:MutedList (déjà triée). « Rétablir » → démute + rafraîchit.
+-- Une ligne pour `it` = { name, reason, durLabel, expired } (format Mod:MutedList).
+function UI:_FillMutedRow(row, it)
+    row.mutedName = it.name
+    row.name:SetText("|cFFFFFFFF" .. it.name .. "|r")
+    local reason = it.reason and ("  |cFF888888· " .. it.reason .. "|r") or ""
+    local dur = (it.expired and "|cFFAA5555" or "|cFFE8B84B") .. it.durLabel .. "|r"
+    row.sub:SetText(dur .. reason)
+end
+
+-- Remplit la liste depuis Mod:MutedList (déjà triée).
 function UI:RefreshMuted()
     local Mod = COC.Moderation
     local list = (Mod and Mod.MutedList and Mod:MutedList()) or {}
-    local n = 0
-    for _, it in ipairs(list) do
-        n = n + 1
-        local row = self:_MutedRow(n)
-        row.name:SetText("|cFFFFFFFF" .. it.name .. "|r")
-        local reason = it.reason and ("  |cFF888888· " .. it.reason .. "|r") or ""
-        local dur = (it.expired and "|cFFAA5555" or "|cFFE8B84B") .. it.durLabel .. "|r"
-        row.sub:SetText(dur .. reason)
-        row.unmute:SetScript("OnClick", function()
-            if Mod and Mod.Unmute then Mod:Unmute(it.name) end   -- Unmute rappelle UI:Refresh → RefreshMuted
-        end)
-        row.unmute:Show()
-        row:Show()
-    end
-    for i = n + 1, #self.mutedRows do self.mutedRows[i]:Hide() end
-    self.mutedContent:SetHeight(math.max(n * MRH, 10))
-    Skin.AutoHideScroll("COCMutedScroll", self.mutedContent)
-    if n == 0 and self.mutedRows[1] then
-        local row = self:_MutedRow(1)
-        row.name:SetText("|cFF888888" .. L["Personne en sourdine."] .. "|r")
-        row.sub:SetText("|cFF666666" .. L["Mets un joueur en sourdine par clic-droit sur sa carte ou /co mute <nom>."] .. "|r")
-        row.unmute:Hide(); row:Show()
-    end
+    if self.mutedList then self.mutedList:SetData(list, true) end
 end

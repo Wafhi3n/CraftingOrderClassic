@@ -39,16 +39,15 @@ function UI:BuildMyArtisansTab(f)
         UI:RefreshMyArtisans()
     end)
 
-    -- Liste des métiers du compte : largeur LUE sur la zone (−6 = scrollbar dans la gouttière).
+    -- Liste des métiers du compte : la liste défilante du kit (palier 2b), aux quatre coins de la zone.
     local pz = self:MyArtSec("profsList")
-    local pw = pz:GetWidth(); if pw <= 1 then pw = M.LEFT_W end
-    self.myArtProfW = pw - 6
-    local lscroll = CreateFrame("ScrollFrame", "COCMyArtProfScroll", pz, "UIPanelScrollFrameTemplate")
-    lscroll:SetPoint("TOPLEFT", M.PAD, 0); lscroll:SetPoint("BOTTOMLEFT", M.PAD, M.PAD)
-    lscroll:SetWidth(self.myArtProfW)
-    local lc = CreateFrame("Frame", nil, lscroll); lc:SetSize(self.myArtProfW, 10); lscroll:SetScrollChild(lc)
-    self.myArtProfContent = lc; self.myArtProfRows = {}
-    Skin.ScrollTrack("COCMyArtProfScroll")
+    local lhost = CreateFrame("Frame", nil, pz)
+    lhost:SetPoint("TOPLEFT", M.PAD, 0); lhost:SetPoint("BOTTOMRIGHT", 0, M.PAD)
+    self.myArtProfList = Skin.MakeScrollList(lhost, {
+        extent = PLH,
+        build  = function(row) UI:_BuildMyArtProfRow(row) end,
+        fill   = function(row, it) UI:_FillMyArtProfRow(row, it.e, it.selected) end,
+    })
 
     self:_BuildMyArtRight()   -- colonne recettes : bande d'outils + liste (ses zones)
 end
@@ -75,16 +74,16 @@ function UI:_BuildMyArtRight()
     self:_BuildMyArtLGBar(bz, mBtn)
     self:_BuildMyArtStatFilter(self:MyArtSec("recStatDD"))
 
-    -- Liste des recettes : largeur LUE sur la zone.
+    -- Liste des recettes : la liste défilante du kit (palier 2b), aux quatre coins de la zone.
     local rz = self:MyArtSec("recList")
-    local rw = rz:GetWidth(); if rw <= 1 then rw = M.WIDE_W end
-    self.myArtRecW = rw - 6
-    local rscroll = CreateFrame("ScrollFrame", "COCMyArtRecScroll", rz, "UIPanelScrollFrameTemplate")
-    rscroll:SetPoint("TOPLEFT", M.PAD, 0); rscroll:SetPoint("BOTTOMLEFT", M.PAD, M.PAD)
-    rscroll:SetWidth(self.myArtRecW)
-    local rc = CreateFrame("Frame", nil, rscroll); rc:SetSize(self.myArtRecW, 10); rscroll:SetScrollChild(rc)
-    self.myArtRecContent = rc; self.myArtRecRows = {}
-    Skin.ScrollTrack("COCMyArtRecScroll")
+    local rhost = CreateFrame("Frame", nil, rz)
+    rhost:SetPoint("TOPLEFT", M.PAD, 0); rhost:SetPoint("BOTTOMRIGHT", 0, M.PAD)
+    self.myArtRecList = Skin.MakeScrollList(rhost, {
+        extent = RLH,
+        build  = function(row) UI:_BuildMyArtRecRow(row) end,
+        fill   = function(row, it) UI:_FillMyArtRecRow(row, it) end,
+        empty  = "|cFF888888" .. L["Pas de recettes connues (métier de récolte ?)."] .. "|r",
+    })
 end
 
 -- Bandeau haut (zone « shareBar » de la SPEC, bande grise) : case à cocher opt-in « partager mes
@@ -167,11 +166,9 @@ end
 -- =========================================================================
 -- Zone gauche : lignes de métier
 -- =========================================================================
-function UI:_MyArtProfRow(i)
-    local r = self.myArtProfRows[i]; if r then return r end
-    local lc = self.myArtProfContent
-    local rw = self.myArtProfW or M.LEFT_W   -- largeur de la zone profsList (lue au build)
-    r = CreateFrame("Button", nil, lc); r:SetSize(rw, PLH); r:SetPoint("TOPLEFT", 0, -(i - 1) * PLH)
+-- Construite une fois par cadre de la liste défilante ; nom et sous-ligne ANCRÉS à droite au lieu
+-- d'une largeur tirée de la zone (la liste fixe la largeur de ses lignes elle-même).
+function UI:_BuildMyArtProfRow(r)
     r:RegisterForClicks("LeftButtonUp", "RightButtonUp")   -- droit = porteurs du métier (_MyArtisans_Reroll)
     local hi = r:CreateTexture(nil, "HIGHLIGHT"); hi:SetAllPoints(); hi:SetColorTexture(Skin.unpack(Skin.color.rowHover))
     local st = r:CreateTexture(nil, "BACKGROUND"); st:SetAllPoints()
@@ -179,10 +176,11 @@ function UI:_MyArtProfRow(i)
     st:Hide(); r.selTex = st
     r.badge = Skin.MakeBadge(r, 22); r.badge:SetPoint("LEFT", 6, 0)
     r.name = r:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    r.name:SetPoint("TOPLEFT", 34, -5); r.name:SetWidth(rw - 46); r.name:SetJustifyH("LEFT"); Skin.ApplyShadow(r.name)
+    r.name:SetPoint("TOPLEFT", 34, -5); r.name:SetPoint("RIGHT", -12, 0)
+    r.name:SetJustifyH("LEFT"); r.name:SetWordWrap(false); Skin.ApplyShadow(r.name)
     r.sub = r:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    r.sub:SetPoint("TOPLEFT", 34, -19); r.sub:SetWidth(rw - 46); r.sub:SetJustifyH("LEFT"); Skin.ApplyShadow(r.sub)
-    self.myArtProfRows[i] = r; return r
+    r.sub:SetPoint("TOPLEFT", 34, -19); r.sub:SetPoint("RIGHT", -12, 0)
+    r.sub:SetJustifyH("LEFT"); r.sub:SetWordWrap(false); Skin.ApplyShadow(r.sub)
 end
 
 -- Nb de persos porteurs + libellé « porté par : A, B » (pour la sous-ligne / détail).
@@ -210,10 +208,7 @@ end
 -- =========================================================================
 -- Rangée polyvalente (patron ProfWindow_Recipes) : header de section (doré, sans icône), ligne de
 -- recette (icône + nom + niveau requis + porteurs), ou ligne de cooldown (icône horloge + label).
-function UI:_MyArtRecRow(i)
-    local r = self.myArtRecRows[i]; if r then return r end
-    local rw = self.myArtRecW or M.WIDE_W   -- largeur de la zone recList (lue au build)
-    r = CreateFrame("Frame", nil, self.myArtRecContent); r:SetSize(rw, RLH); r:SetPoint("TOPLEFT", 0, -(i - 1) * RLH)
+function UI:_BuildMyArtRecRow(r)
     r.icon = r:CreateTexture(nil, "ARTWORK"); r.icon:SetSize(14, 14); r.icon:SetPoint("LEFT", 2, 0)
     r.icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
     r.name = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
@@ -224,16 +219,16 @@ function UI:_MyArtRecRow(i)
     r.who = r:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
     r.who:SetPoint("RIGHT", r.profit, "LEFT", -6, 0); r.who:SetJustifyH("RIGHT"); r.who:SetWidth(120); Skin.ApplyShadow(r.who)
     r:EnableMouse(true); Skin.WireItemTooltip(r); Skin.WireItemLink(r)   -- tooltip + shift-clic lien (tipItemID/tipSpellID)
-    self.myArtRecRows[i] = r; return r
 end
 
--- Ancre le libellé (nom) : après l'icône (x=20) ou collé au bord (header, x=4), largeur bornée pour
--- ne pas chevaucher « porté par » ni la colonne de profit. SetPoint répété empile les ancres
--- → ClearAllPoints. `reserve` = place prise à droite par le profit (0 si la ligne n'en a pas).
-local function anchorName(row, x, reserve)
+-- Ancre le libellé (nom) : après l'icône (x=20) ou collé au bord (header, x=4), et à DROITE contre
+-- « porté par », lui-même collé au profit : plus de largeur calculée sur la zone, la liste défilante
+-- fixe elle-même la largeur de ses lignes. SetPoint répété empile les ancres, d'où ClearAllPoints.
+local function anchorName(row, x)
     row.name:ClearAllPoints()
     row.name:SetPoint("LEFT", x, 0)
-    row.name:SetWidth(math.max(20, (UI.myArtRecW or M.WIDE_W) - x - 126 - (reserve or 0)))
+    row.name:SetPoint("RIGHT", row.who, "LEFT", -6, 0)
+    row.name:SetWordWrap(false)
 end
 
 -- Profit Auctionator d'une ligne (mémorisé le temps du refresh). Renvoie la largeur consommée, pour
@@ -386,45 +381,45 @@ end
 
 function UI:_FillMyArtRecipes(e, profs)
     local list = self:_MyArtDisplayList(e, profs)
-    local n = 0
-    for _, it in ipairs(list) do
-        n = n + 1
-        local row = self:_MyArtRecRow(n)
-        row.tipItemID, row.tipSpellID = nil, nil   -- lignes poolées : purge le tooltip précédent
-        if it.isHeader then
-            -- Section (doré, collé au bord) ou sous-catégorie (bronze, indentée) + compte.
-            local sub = (it.depth == 2)
-            row.icon:Hide(); row.profit:Hide(); anchorName(row, sub and 14 or 4, 0)
-            local cnt = (it.count and it.count > 0) and string.format(" |cFF888888(%d)|r", it.count) or ""
-            row.name:SetText((sub and "|cFFC9A227" or "|cFFE8B84B") .. (it.label or "") .. "|r" .. cnt)
-            row.who:SetText("")
-        elseif it.cd then
-            row.icon:Show(); row.profit:Hide(); anchorName(row, 20, 0)
-            row.icon:SetTexture("Interface\\Icons\\Spell_Holy_BorrowedTime")
-            row.name:SetText((it.ready and "|cFF4CDB6E" or "|cFFFFA633") .. it.text .. "|r")
-            row.who:SetText("|cFF888888" .. (it.who or "") .. "|r")
-        else
-            -- Icône de l'OBJET PRODUIT d'abord (GetItemIcon, fiable), repli sort — GetSpellTexture sur
-            -- un spellID de recette rend souvent le placeholder « tête » en Classic Era.
-            row.icon:Show(); row.icon:SetTexture(Skin.Icon(it.itemID, it.sid) or Skin.tex.unknown)
-            row.icon:ClearAllPoints(); row.icon:SetPoint("LEFT", it._sub and 16 or 2, 0)
-            row.icon:SetDesaturated(it.missing and true or false)   -- non apprise = grisée, comme la vue métier
-            local w = self:_FillMyArtProfit(row, it)
-            anchorName(row, it._sub and 34 or 20, w)
-            row.tipItemID, row.tipSpellID = it.itemID, it.sid   -- tooltip d'objet au survol
-            local col = it.missing and "|cFFDD4444" or "|cFFFFFFFF"   -- non apprise = ROUGE
-            -- Inter-métiers : la ligne n'a plus d'en-tête de métier au-dessus → on préfixe son icône.
-            local pfx = self.myArtAllProfs and it.profKey
-                and ("|T" .. (Skin.ProfIcon(it.profKey) or Skin.tex.unknown) .. ":12|t ") or ""
-            row.name:SetText(pfx .. col .. it.name .. "|r" .. (it.at and (" |cFF888888(" .. it.at .. ")|r") or ""))
-            row.who:SetText("|cFF888888" .. (it.who or "") .. "|r")
-        end
-        row:Show()
+    -- Même métier (ou même vue inter-métiers) : on garde la position ; sinon, retour en haut.
+    local key = self.myArtAllProfs and "*" or (e and e.profKey)
+    local same = (self._myArtRecFor == key)
+    self._myArtRecFor = key
+    self.myArtRecList:SetData(list, same)
+    return #list
+end
+
+-- Une ligne de la colonne recettes, remplie par la liste défilante : en-tête, cooldown ou recette.
+function UI:_FillMyArtRecRow(row, it)
+    row.tipItemID, row.tipSpellID = nil, nil   -- lignes poolées : purge le tooltip précédent
+    if it.isHeader then
+        -- Section (doré, collé au bord) ou sous-catégorie (bronze, indentée) + compte.
+        local sub = (it.depth == 2)
+        row.icon:Hide(); row.profit:Hide(); anchorName(row, sub and 14 or 4)
+        local cnt = (it.count and it.count > 0) and string.format(" |cFF888888(%d)|r", it.count) or ""
+        row.name:SetText((sub and "|cFFC9A227" or "|cFFE8B84B") .. (it.label or "") .. "|r" .. cnt)
+        row.who:SetText("")
+    elseif it.cd then
+        row.icon:Show(); row.profit:Hide(); anchorName(row, 20)
+        row.icon:SetTexture("Interface\\Icons\\Spell_Holy_BorrowedTime")
+        row.name:SetText((it.ready and "|cFF4CDB6E" or "|cFFFFA633") .. it.text .. "|r")
+        row.who:SetText("|cFF888888" .. (it.who or "") .. "|r")
+    else
+        -- Icône de l'OBJET PRODUIT d'abord (GetItemIcon, fiable), repli sort — GetSpellTexture sur
+        -- un spellID de recette rend souvent le placeholder « tête » en Classic Era.
+        row.icon:Show(); row.icon:SetTexture(Skin.Icon(it.itemID, it.sid) or Skin.tex.unknown)
+        row.icon:ClearAllPoints(); row.icon:SetPoint("LEFT", it._sub and 16 or 2, 0)
+        row.icon:SetDesaturated(it.missing and true or false)   -- non apprise = grisée, comme la vue métier
+        self:_FillMyArtProfit(row, it)
+        anchorName(row, it._sub and 34 or 20)
+        row.tipItemID, row.tipSpellID = it.itemID, it.sid   -- tooltip d'objet au survol
+        local col = it.missing and "|cFFDD4444" or "|cFFFFFFFF"   -- non apprise = ROUGE
+        -- Inter-métiers : la ligne n'a plus d'en-tête de métier au-dessus → on préfixe son icône.
+        local pfx = self.myArtAllProfs and it.profKey
+            and ("|T" .. (Skin.ProfIcon(it.profKey) or Skin.tex.unknown) .. ":12|t ") or ""
+        row.name:SetText(pfx .. col .. it.name .. "|r" .. (it.at and (" |cFF888888(" .. it.at .. ")|r") or ""))
+        row.who:SetText("|cFF888888" .. (it.who or "") .. "|r")
     end
-    for i = n + 1, #self.myArtRecRows do self.myArtRecRows[i]:Hide() end
-    self.myArtRecContent:SetHeight(math.max(n * RLH, 10))
-    Skin.AutoHideScroll("COCMyArtRecScroll", self.myArtRecContent)
-    return n
 end
 
 -- =========================================================================
@@ -445,17 +440,14 @@ function UI:RefreshMyArtisans()
 
     local selE = self:_MyArtSyncSelection(list)
 
-    local n = 0
-    for _, e in ipairs(list) do
-        n = n + 1; self:_FillMyArtProfRow(self:_MyArtProfRow(n), e, e == selE)
-    end
-    for i = n + 1, #self.myArtProfRows do self.myArtProfRows[i]:Hide() end
-    self.myArtProfContent:SetHeight(math.max(n * PLH, 10))
-    Skin.AutoHideScroll("COCMyArtProfScroll", self.myArtProfContent)
+    local items = {}
+    for i, e in ipairs(list) do items[i] = { e = e, selected = (e == selE) } end
+    self.myArtProfList:SetData(items, true)
+    local n = #items
 
     if n == 0 then
         self.myArtDetailHdr:SetText("|cFF888888" .. L["Aucun métier. Ouvre ta fenêtre métier sur chaque perso une fois."] .. "|r")
-        for i = 1, #self.myArtRecRows do self.myArtRecRows[i]:Hide() end
+        self.myArtRecList:SetData({}, false, true)   -- muette : l'en-tête dit déjà pourquoi
         return
     end
 
@@ -474,11 +466,5 @@ function UI:RefreshMyArtisans()
         self.myArtMissBtn:SetText(self.myArtMissing
             and string.format(L["Manquantes (%d)"], self:_MyArtMissing(selE)) or L["Manquantes"])
     end
-    local shown = self:_FillMyArtRecipes(selE, list)
-    if shown == 0 then
-        local row = self:_MyArtRecRow(1)
-        row.icon:SetTexture(Skin.tex.unknown); row.profit:Hide()
-        row.name:SetText("|cFF888888" .. L["Pas de recettes connues (métier de récolte ?)."] .. "|r")
-        row.who:SetText(""); row:Show()
-    end
+    self:_FillMyArtRecipes(selE, list)   -- liste vide : la liste défilante le dit elle-même
 end

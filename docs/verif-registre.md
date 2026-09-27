@@ -36,6 +36,17 @@ client.
 
 ## Relevés
 
+- 2026-09-27 (10) — jusqu'a c50f401 — Forever, un client (branche d'essai `test/ui-p2-essai` :
+  `feat/ui-p2-listes` + `fix/manquantes-faction-et-bouton-aide`) — **GO sur le lot 2a du palier 2
+  et sur la présélection d'artisan** — tests menés par le user, deux captures :
+  réactifs du plan choisi (cocher, décocher, compteur « N / M fournis », remise à zéro au changement
+  de plan) ; artisans de Commande sur la liste moderne, descendue jusqu'au statut (3 lignes vues en
+  portée Annuaire, clic = surbrillance + destinataire) ; depuis l'onglet Artisans, un clic sur le
+  métier de quelqu'un ouvre Commande sur sa ligne, surlignée (`a5c7467`) ; récolteurs de Récolte :
+  d'abord figés à 4 lignes au-dessus d'un vide (défaut vu), puis, après `c50f401`, 6 lignes jusqu'au
+  statut, sans barre puisque tout tient.
+  Non vu : le repli des membres de CERCLE sous Annuaire (`a5c7467`, cas pas testé), le clic sur un
+  récolteur, le défilement d'une liste d'artisans qui déborde.
 - 2026-09-27 (9) — jusqu'a 2712afd — Forever, **DEUX COMPTES**, build = `main` candidat v1.36.2 —
   **GO sur la reprise des commandes d'avant le nom complet** (`AdoptFullNames`) — rapporté par le
   user (« c'est bon pour Gnomi, j'avais ses commandes d'avant ») et corroboré par la SavedVariable

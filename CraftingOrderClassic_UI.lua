@@ -130,18 +130,20 @@ end
 -- déjà côté réseau (recipient "Guilde"/"Amis" ; cf. Orders:_ScopeMatch/VisibleTo) : ici on rend ce
 -- choix VISIBLE et re-sélectionnable (sinon il n'existait qu'en effet de bord du clic sur l'onglet
 -- source). Sélection seule → on poste ensuite via « Poster ». Partagé par _UI_Post + _UI_Gather.
--- ALL_RX/RW/ARH = mêmes valeurs que les locaux RX/RW/ARH de ces deux fichiers (layout identique).
+-- ALL_RX/RW = place par défaut (Récolte) ; ALL_ARH = hauteur d'une ligne d'artisan, SEULE source.
 local ALL_RX, ALL_RW, ALL_ARH = 316, 502, 26
 local ALL_SRC_LABEL = {
     guild  = "Toute la guilde",  friend = "Tous les amis",
     added  = "Tous les ajoutés", recent = "Tous les croisés",
 }
 
--- kind = "post" | "gather" ; top = Y de la ligne épinglée. Construit la ligne + le ScrollFrame (4
--- lignes visibles) juste en dessous, et renseigne self.<kind>AllRow / <kind>ArtContent / <kind>ArtRows.
+-- kind = "post" | "gather" ; top = Y de la ligne épinglée. Construit la ligne + la liste des artisans
+-- juste en dessous, et renseigne self.<kind>AllRow / <kind>ArtList.
 -- `panel` peut être un PANNEAU (Récolte : coordonnées absolues, x/w = ALL_RX/ALL_RW par défaut) ou une
 -- SECTION (Commande, blocs natifs : on passe alors x = marge du bloc et w = largeur utile du bloc).
-function UI:_BuildAllRowAndScroll(panel, scrollName, kind, top, x, w)
+-- opts.fill(ligne, donnée) remplit une ligne d'artisan ; opts.bottom = marge au bas du panneau, où la
+-- liste s'arrête (au-dessus du statut de l'onglet).
+function UI:_BuildAllRowAndScroll(panel, kind, top, x, w, opts)
     x, w = x or ALL_RX, w or ALL_RW
     local row = Skin.MakeFlatRow(panel, w - 22, ALL_ARH)
     row:SetPoint("TOPLEFT", x, top)
@@ -155,10 +157,17 @@ function UI:_BuildAllRowAndScroll(panel, scrollName, kind, top, x, w)
     end)
     self[kind .. "AllRow"] = row
 
-    local scroll = CreateFrame("ScrollFrame", scrollName, panel, "UIPanelScrollFrameTemplate")
-    scroll:SetPoint("TOPLEFT", x, top - ALL_ARH - 2); scroll:SetSize(w, 4 * ALL_ARH)
-    local content = CreateFrame("Frame", nil, scroll); content:SetSize(w - 22, 10); scroll:SetScrollChild(content)
-    self[kind .. "ArtContent"] = content; self[kind .. "ArtRows"] = {}
+    -- Liste défilante du kit (palier 2). w − 10 = largeur de la ligne épinglée + la barre de 8 px.
+    -- Elle descend jusqu'à `opts.bottom` : figée à 4 lignes, elle défilait au-dessus d'un grand vide.
+    local host = CreateFrame("Frame", nil, panel)
+    host:SetPoint("TOPLEFT", x, top - ALL_ARH - 2)
+    host:SetPoint("BOTTOMLEFT", panel, "BOTTOMLEFT", x, opts.bottom or 22)
+    host:SetWidth(w - 10)
+    self[kind .. "ArtList"] = Skin.MakeScrollList(host, {
+        extent = ALL_ARH,
+        build  = Skin.ArtisanRowArt,
+        fill   = opts.fill,
+    })
 end
 
 -- Rafraîchit le libellé + l'état sélectionné de la ligne « toute la liste » selon la source courante.

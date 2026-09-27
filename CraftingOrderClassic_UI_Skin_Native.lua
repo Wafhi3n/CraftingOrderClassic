@@ -291,17 +291,8 @@ function Skin.PersonHighlight(row)
     return sel
 end
 
-function Skin.MakeArtisanRow(parent, w, h)
-    local r = CreateFrame("Button", nil, parent)
-    r:SetSize(w, h)
-    r.selTex = Skin.PersonHighlight(r)   -- surbrillance bleue native (liste d'Amis)
-    r.dot  = Skin.MakeStatusIcon(r, 14); r.dot:SetPoint("LEFT", 4, 0)
-    r.name = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    r.name:SetPoint("LEFT", 18, 0); r.name:SetWidth(w - 78); r.name:SetJustifyH("LEFT"); Skin.ApplyShadow(r.name)
-    r.src  = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    r.src:SetPoint("RIGHT", -4, 0); Skin.ApplyShadow(r.src)
-    return r
-end
+-- (La ligne « personne » vit dans _UI_Skin_ScrollList.lua : Skin.ArtisanRowArt, posée sur une
+-- ligne de liste défilante. L'ancienne fabrique MakeArtisanRow figeait la largeur à la création.)
 
 -- =========================================================================
 -- Flyout : dropdown/menu léger maison (puits + closer + pool de lignes).

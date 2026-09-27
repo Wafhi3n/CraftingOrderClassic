@@ -69,14 +69,16 @@ function UI:_BuildPostDetail()
     self.postBQCount:SetPoint("RIGHT", self.postShareBtn, "LEFT", -8, 0)
     self.postBQCount:SetTextColor(Skin.unpack(Skin.color.textMuted)); Skin.ApplyShadow(self.postBQCount)
 
-    -- LISTE des réactifs (slot corps flex) : largeur LUE sur la zone (tu pilotes pad/gouttière depuis
-    -- la SPEC) ; −6 = le scroll s'arrête avant la gouttière, la scrollbar y atterrit (iso liste de plans).
+    -- LISTE des réactifs (slot corps flex) : la liste défilante du kit (palier 2 de la revue d'UI),
+    -- ancrée aux quatre coins de la zone (la SPEC pilote le pad), sa barre logée dans son bord droit.
     local body = self:PostSec("reagBody")
-    local reagW = body:GetWidth(); if reagW <= 1 then reagW = P.WIDE_W end; self.postReagW = reagW - 6
-    local rscroll = CreateFrame("ScrollFrame", "COCPostReagScroll", body, "UIPanelScrollFrameTemplate")
-    rscroll:SetPoint("TOPLEFT", P.PAD, -P.PAD); rscroll:SetPoint("BOTTOMLEFT", P.PAD, P.PAD); rscroll:SetWidth(self.postReagW)
-    local rc = CreateFrame("Frame", nil, rscroll); rc:SetSize(self.postReagW, 10); rscroll:SetScrollChild(rc)
-    self.postReagContent = rc; self.postReagRows = {}
+    local host = CreateFrame("Frame", nil, body)
+    host:SetPoint("TOPLEFT", P.PAD, -P.PAD); host:SetPoint("BOTTOMRIGHT", 0, P.PAD)
+    self.postReagList = Skin.MakeScrollList(host, {
+        extent = RRH,
+        build  = function(row) UI:_BuildPostReagRow(row) end,
+        fill   = function(row, rg) UI:_FillPostReagRow(row, rg) end,
+    })
 end
 
 -- =========================================================================
@@ -115,9 +117,8 @@ function UI:RefreshPostPlanDetail()
         if self.postPlanSub then self.postPlanSub:SetText("") end
         self.postReagHdr:SetShown(false); self.postBQCount:SetText("")
         if self.postShareBtn then self.postShareBtn:Hide() end
-        for i = 1, #self.postReagRows do self.postReagRows[i]:Hide() end
-        self.postReagContent:SetHeight(10)
-        Skin.AutoHideScroll("COCPostReagScroll", self.postReagContent)   -- sinon scrollbar fantôme
+        self.postCurrentReag = {}
+        self.postReagList:SetData({})
         if self.postPriceHint then self.postPriceHint:SetText("") end
         if self.postSelLbl then self.postSelLbl:SetText("|cFF888888" .. L["Choisis un métier puis un plan."] .. "|r") end
         return
@@ -139,25 +140,10 @@ function UI:RefreshPostReagents()
     local reag = (c and self.postEntry and self.postEntry.spellID)
         and c:RecipeReagents(self.postProf, self.postEntry.spellID) or {}
     self.postCurrentReag = reag
-    for i = 1, #self.postReagRows do self.postReagRows[i]:Hide() end
-    for i, rg in ipairs(reag) do
-        local row = self:_PostReagRow(i); local iid, qty = rg[1], rg[2]; row.tipItemID = iid
-        local cr, cg, cb = Skin.RarityColor(iid)
-        local nm2 = c and c:ItemName(iid) or ("item:"..iid)
-        local disp = nm2:match("^item:") and "|cFF777777" .. L["Chargement…"] .. "|r" or nm2
-        row.badge:Paint(cr, cg, cb, Skin.FirstChar(nm2), Skin.Icon(iid))
-        row.name:SetText(disp); row.name:SetTextColor(cr, cg, cb)
-        row.qty:SetText("|cFFFFCC00×"..qty.."|r")
-        row.check:SetChecked(UI.postProvide[iid])
-        row:SetScript("OnClick", function()
-            UI.postProvide[iid] = not UI.postProvide[iid]
-            row.check:SetChecked(UI.postProvide[iid])
-            UI:_UpdateProvidedCount()
-        end)
-        row:Show()
-    end
-    self.postReagContent:SetHeight(math.max(#reag * RRH, 10))
-    Skin.AutoHideScroll("COCPostReagScroll", self.postReagContent)
+    -- Même plan qu'au dernier rafraîchissement : on garde la position ; nouveau plan : on repart du haut.
+    local samePlan = (self._postReagFor == self.postEntry)
+    self._postReagFor = self.postEntry
+    self.postReagList:SetData(reag, samePlan)
     self.postReagHdr:SetShown(self.postEntry ~= nil)
     if self.postShareBtn then
         self.postShareBtn:SetShown(#reag > 0)
@@ -170,21 +156,42 @@ function UI:RefreshPostReagents()
     self:_UpdateProvidedCount()
 end
 
-function UI:_PostReagRow(i)
-    local r = self.postReagRows[i]; if r then return r end
-    local w = self.postReagW or P.WIDE_W   -- largeur de la zone reagBody (lue au build, cf. _BuildPostDetail)
-    r = CreateFrame("Button", nil, self.postReagContent); r:SetSize(w, RRH); r:SetPoint("TOPLEFT", 0, -(i-1)*RRH)
+-- Construit une ligne de réactif, la première fois que la liste défilante crée ce cadre. Le clic
+-- coche « je fournis » pour le réactif que la ligne porte À CE MOMENT (`row.iid`, posé au
+-- remplissage) : la même ligne sert à d'autres réactifs quand on change de plan.
+function UI:_BuildPostReagRow(r)
     -- FOND de « boîte » par réactif (demande user : encadrer les objets comme la vue métier) : bande
-    -- discrète derrière la ligne + le survol par-dessus.
+    -- discrète derrière la ligne ; le survol est celui des recettes des métiers (Skin.ListRowArt).
     local bg = r:CreateTexture(nil, "BACKGROUND"); bg:SetPoint("TOPLEFT", 0, -1); bg:SetPoint("BOTTOMRIGHT", 0, 1)
     bg:SetColorTexture(1, 1, 1, 0.05)
-    local hi = r:CreateTexture(nil, "HIGHLIGHT"); hi:SetAllPoints(); hi:SetColorTexture(Skin.unpack(Skin.color.rowHover))
+    Skin.ListRowArt(r); Skin.ListRowKind(r, "item")
     r.badge = Skin.MakeBadge(r, 16); r.badge:SetPoint("LEFT", 2, 0)   -- icône réactif iso vue métier
-    r.name  = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    r.name:SetPoint("LEFT", 24, 0); r.name:SetWidth(w - 114); r.name:SetJustifyH("LEFT"); Skin.ApplyShadow(r.name)
-    r.qty   = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall"); r.qty:SetPoint("RIGHT", -22, 0); Skin.ApplyShadow(r.qty)
     r.check = Skin.MakeCheck(r, 18); r.check:SetPoint("RIGHT", -4, 0)
-    self.postReagRows[i] = r; Skin.WireItemTooltip(r); Skin.WireItemLink(r); return r
+    r.qty   = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall"); r.qty:SetPoint("RIGHT", -22, 0); Skin.ApplyShadow(r.qty)
+    r.name  = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    r.name:SetPoint("LEFT", 24, 0); r.name:SetPoint("RIGHT", r.qty, "LEFT", -8, 0)
+    r.name:SetJustifyH("LEFT"); r.name:SetWordWrap(false); Skin.ApplyShadow(r.name)
+    r:SetScript("OnClick", function(self2)
+        local iid = self2.iid; if not iid then return end
+        UI.postProvide[iid] = not UI.postProvide[iid]
+        self2.check:SetChecked(UI.postProvide[iid])
+        UI:_UpdateProvidedCount()
+    end)
+    Skin.WireItemTooltip(r); Skin.WireItemLink(r)
+end
+
+-- Remplit une ligne pour le réactif `rg` = { itemID, quantité } (format CraftLink:RecipeReagents).
+function UI:_FillPostReagRow(row, rg)
+    local c = CL()
+    local iid, qty = rg[1], rg[2]
+    row.iid, row.tipItemID = iid, iid
+    local cr, cg, cb = Skin.RarityColor(iid)
+    local nm2 = c and c:ItemName(iid) or ("item:"..iid)
+    local disp = nm2:match("^item:") and "|cFF777777" .. L["Chargement…"] .. "|r" or nm2
+    row.badge:Paint(cr, cg, cb, Skin.FirstChar(nm2), Skin.Icon(iid))
+    row.name:SetText(disp); row.name:SetTextColor(cr, cg, cb)
+    row.qty:SetText("|cFFFFCC00×"..qty.."|r")
+    row.check:SetChecked(UI.postProvide[iid])
 end
 
 function UI:_UpdateProvidedCount()

@@ -7,7 +7,6 @@ local UI   = COC.UI
 local Skin = UI.Skin
 local L    = COC.L
 
-local ARH = 26    -- hauteur ligne artisan (= ALL_ARH de _UI.lua : même pool de lignes)
 local P   = UI.POST   -- métriques/blocs de l'onglet — cf. _UI_Post_Layout.lua
 
 local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true) end
@@ -101,14 +100,15 @@ function UI:_BuildPostArtisanSection(panel)
     end)
     diffBtn:SetScript("OnLeave", GameTooltip_Hide)
 
-    -- Ligne « Toute la guilde / Tous les amis » épinglée en tête + liste, DANS la zone artisans (parent =
-    -- la zone, offsets relatifs à son bord — cf. _BuildAllRowAndScroll, dont le x est paramétrable).
-    -- Largeur LUE sur la zone (SPEC pilote le pad) : la ligne épinglée, le scroll et les rangées
-    -- suivent tes réglages de « artisans » dans la SPEC — plus de constante WIDE_W recopiée.
+    -- Ligne « Toute la guilde » épinglée + liste, DANS la zone artisans, à la largeur LUE sur la zone
+    -- (la SPEC pilote le pad). La liste descend jusqu'au-dessus du statut, posé à 6 du bas.
     local az = self:PostSec("artisans")
     local aw = az:GetWidth(); if aw <= 1 then aw = P.WIDE_W end
     self.postArtW = aw
-    self:_BuildAllRowAndScroll(az, "COCPostArtScroll", "post", -P.PAD, P.PAD, aw)
+    self:_BuildAllRowAndScroll(az, "post", -P.PAD, P.PAD, aw, {
+        fill   = function(row, it) UI:_FillPostArtGroupRow(row, it.g, it.prof) end,
+        bottom = 22,
+    })
 
     self:_BuildPostActionBar(panel, self:PostSec("artisans"))
 end
@@ -152,7 +152,7 @@ function UI:_RefreshPostSrcTabs()
 end
 
 function UI:RefreshPostArtisans()
-    local D = COC.Directory; if not (D and self.postArtContent) then return end
+    local D = COC.Directory; if not (D and self.postArtList) then return end
     local src, prof = self.postSource or "guild", self.postProf
     -- Fusion par joueur vérifié (rerolls → une ligne) ; le CLIC re-résout la cible vers le PERSO
     -- du set qui connaît le métier (cf. UI:_FillPostArtGroupRow / _ResolvePostChar). Le groupe passe
@@ -164,37 +164,34 @@ function UI:RefreshPostArtisans()
         if (a.onlineChar ~= nil) ~= (b.onlineChar ~= nil) then return a.onlineChar ~= nil end
         return a.leader < b.leader
     end)
-    local n = 0
-    self._postSelIdx = nil   -- rang de la ligne ciblée, pour que OpenPostForArtisan la fasse défiler à l'écran
-    for _, g in ipairs(list) do
-        n = n + 1
-        local row = self:_PostArtRow(n)
-        self:_FillPostArtGroupRow(row, g, prof)
-        if row.selTex:IsShown() then self._postSelIdx = n end
+    -- Rang du groupe ciblé, pour que OpenPostForArtisan le fasse défiler à l'écran. Calculé ICI, sur
+    -- les données : la liste défilante ne remplit que les lignes visibles, une ligne hors champ n'a
+    -- jamais été remplie et ne peut donc pas dire si elle est sélectionnée. Même règle que
+    -- _FillPostArtGroupRow : le groupe est ciblé si UN de ses persos l'est.
+    local items = {}
+    self._postSelIdx = nil
+    for i, g in ipairs(list) do
+        items[i] = { g = g, prof = prof }
+        for _, m in ipairs(g.members) do
+            if self.postTarget == "@" .. m.name then self._postSelIdx = i end
+        end
     end
-    for i = n+1, #self.postArtRows do self.postArtRows[i]:Hide() end
-    self.postArtContent:SetHeight(math.max(n * ARH, 10))
-    Skin.AutoHideScroll("COCPostArtScroll", self.postArtContent)
+    self.postArtList:SetData(items, true)
     self:_RefreshAllRow("post"); self:_UpdateArtisanLabel()
     if self.postDiffBtn then self.postDiffBtn:SetSelected((self.postTarget or "all") == "all") end
 end
 
--- Amène la ligne ciblée dans la fenêtre de la liste (4 lignes visibles) : triée en ligne d'abord puis
--- par nom, elle peut tomber bien plus bas, et une sélection hors champ ne se voit pas. Les deux
--- hauteurs sont posées à la main (SetHeight / SetSize), donc lisibles tout de suite, sans attendre
--- une passe de mise en page ; même bornage que les autres listes (cf. _UI_Post_Categories).
+-- Amène la ligne ciblée dans la fenêtre de la liste : triée en ligne d'abord puis par nom, elle peut
+-- tomber bien plus bas, et une sélection hors champ ne se voit pas. La liste défilante sait viser
+-- une donnée par son rang et borner elle-même ; « au plus près » ne bouge rien si elle est déjà visible.
 function UI:_ScrollPostArtToTarget()
-    local scroll, content, idx = _G.COCPostArtScroll, self.postArtContent, self._postSelIdx
-    if not (scroll and content) then return end
-    local maxScroll = math.max(0, (content:GetHeight() or 0) - (scroll:GetHeight() or 0))
-    scroll:SetVerticalScroll(idx and math.min(maxScroll, (idx - 1) * ARH) or 0)
-end
-
-function UI:_PostArtRow(i)
-    local r = self.postArtRows[i]; if r then return r end
-    r = Skin.MakeArtisanRow(self.postArtContent, (self.postArtW or P.WIDE_W) - 22, ARH)   -- pastille + nom + source (kit)
-    r:SetPoint("TOPLEFT", 0, -(i-1)*ARH)
-    self.postArtRows[i] = r; return r
+    local list, idx = self.postArtList, self._postSelIdx
+    if not list then return end
+    if idx then
+        list.box:ScrollToElementDataIndex(idx, ScrollBoxConstants.AlignNearest)
+    else
+        list.box:ScrollToBegin()
+    end
 end
 
 -- Valeur CANONIQUE du destinataire (FR, identique sur le réseau ; cf. Orders:VisibleTo). Seuls

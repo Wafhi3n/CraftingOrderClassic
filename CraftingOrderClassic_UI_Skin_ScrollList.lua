@@ -25,8 +25,11 @@ local BAR_GAP = 4   -- entre la liste et sa barre (MinimalScrollBar fait 8 px de
 -- opts :
 --   extent = hauteur d'une ligne : nombre, ou fonction(donnée) -> nombre (en-têtes plus hauts) ;
 --   build  = fonction(ligne), appelée UNE fois par cadre du pool : y créer textes et textures ;
---   fill   = fonction(ligne, donnée), appelée à chaque affichage d'une donnée.
--- Rend { box, bar, SetData(liste, garderLaPosition) }.
+--   fill   = fonction(ligne, donnée), appelée à chaque affichage d'une donnée ;
+--   empty  = texte (facultatif) affiché en haut de la liste quand elle n'a AUCUNE donnée. Une liste
+--            défilante ne crée pas de ligne sans donnée : l'ancien geste « écrire le message dans la
+--            ligne 1 du pool » n'y a plus de ligne où écrire.
+-- Rend { box, bar, SetData(liste, garderLaPosition, quiet) }.
 -- ⚠️ Une ligne du pool sert tour à tour à n'importe quelle donnée : `fill` doit TOUT reposer, jamais
 -- supposer ce qu'affichait la ligne avant.
 function Skin.MakeScrollList(host, opts)
@@ -57,10 +60,20 @@ function Skin.MakeScrollList(host, opts)
                       CreateAnchor("BOTTOMRIGHT", host, "BOTTOMRIGHT", 0, 0) }
     ScrollUtil.AddManagedScrollBarVisibilityBehavior(box, bar, withBar, without)
 
+    local emptyText
+    if opts.empty then
+        emptyText = host:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+        emptyText:SetPoint("TOPLEFT", 8, -8); emptyText:SetPoint("RIGHT", -8, 0)
+        emptyText:SetJustifyH("LEFT"); emptyText:SetText(opts.empty); emptyText:Hide()
+    end
+
+    -- `quiet` : vider la liste SANS son message d'absence, quand c'est un autre texte qui explique
+    -- déjà pourquoi il n'y a rien (ex. Mes artisans sans aucun métier : l'en-tête le dit).
     local list = { box = box, bar = bar }
-    function list:SetData(items, keepScroll)
+    function list:SetData(items, keepScroll, quiet)
         box:SetDataProvider(CreateDataProvider(items),
             keepScroll and ScrollBoxConstants.RetainScrollPosition or nil)
+        if emptyText then emptyText:SetShown(#items == 0 and not quiet) end
     end
     return list
 end
@@ -120,4 +133,18 @@ function Skin.ListRowKind(row, kind, collapsed)
         row.selected:Hide()
     end
     row.hover:SetShown(not isHeader)
+end
+
+-- Ligne « personne » (artisan, récolteur) : pastille de présence, nom, source à droite, surbrillance
+-- bleue de la liste d'Amis (Skin.PersonHighlight). Posée sur une ligne de liste défilante par `build`.
+-- Le nom est ANCRÉ contre la source au lieu d'être dimensionné : la liste fixe la largeur de ses
+-- lignes elle-même (même raison que le nom d'un plan, cf. _UI_Post_Profit).
+function Skin.ArtisanRowArt(r)
+    r.selTex = Skin.PersonHighlight(r)
+    r.dot = Skin.MakeStatusIcon(r, 14); r.dot:SetPoint("LEFT", 4, 0)
+    r.src = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    r.src:SetPoint("RIGHT", -4, 0); Skin.ApplyShadow(r.src)
+    r.name = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    r.name:SetPoint("LEFT", 18, 0); r.name:SetPoint("RIGHT", r.src, "LEFT", -6, 0)
+    r.name:SetJustifyH("LEFT"); r.name:SetWordWrap(false); Skin.ApplyShadow(r.name)
 end

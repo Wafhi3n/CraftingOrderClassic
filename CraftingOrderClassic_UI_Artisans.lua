@@ -117,19 +117,26 @@ function UI:BuildArtisansTab(f)
     self.artPillHdr:SetPoint("LEFT", A.PAD + 4, 0); self.artPillHdr:SetText("|cFF888888" .. L["Métier :"] .. "|r"); Skin.ApplyShadow(self.artPillHdr)
     self.artPills = {}
 
-    -- Liste des artisans : largeur LUE sur la zone (SPEC pilote pad/gouttière ; −6 = la scrollbar
-    -- déborde dans la gouttière). Les lignes suivent (cf. _ArtRow).
-    local lz = self:ArtSec("artisansList")
-    local w = lz:GetWidth(); if w <= 1 then w = A.WIDE_W end
-    self.artListW = w - 6
-    local ascroll = CreateFrame("ScrollFrame", "COCArtScroll", lz, "UIPanelScrollFrameTemplate")
-    ascroll:SetPoint("TOPLEFT", A.PAD, 0); ascroll:SetPoint("BOTTOMLEFT", A.PAD, A.PAD)
-    ascroll:SetWidth(self.artListW)
-    local ac = CreateFrame("Frame", nil, ascroll); ac:SetSize(self.artListW, 10); ascroll:SetScrollChild(ac)
-    self.artScroll = ascroll; self.artListContent = ac; self.artListRows = {}
-    Skin.ScrollTrack("COCArtScroll")   -- rail sombre derrière la scrollbar (iso Commande/Récolte)
-
+    self:_BuildArtList()
     if self._BuildMutedList then self:_BuildMutedList() end   -- panneau « En sourdine » (superposé aux zones, caché)
+end
+
+-- Liste des artisans : la liste défilante du kit (palier 2b de la revue d'UI), ancrée aux quatre
+-- coins de la zone (la SPEC pilote le pad). `artScroll` garde son nom : le mode « En sourdine »
+-- (_UI_Artisans_Muted) le masque quand il prend la place de la liste.
+function UI:_BuildArtList()
+    local host = CreateFrame("Frame", nil, self:ArtSec("artisansList"))
+    host:SetPoint("TOPLEFT", A.PAD, 0); host:SetPoint("BOTTOMRIGHT", 0, A.PAD)
+    self.artScroll = host
+    self.artList = Skin.MakeScrollList(host, {
+        extent = ARH,
+        build  = function(row) UI:_BuildArtRow(row) end,
+        fill   = function(row, g)
+            if #g.members > 1 then UI:_FillArtGroupRow(row, g)
+            else UI:_FillArtRow(row, { name = g.leader, r = g.lead.r, online = g.lead.online }) end
+        end,
+        empty  = "|cFF888888" .. L["Aucun artisan dans cette source."] .. "|r",
+    })
 end
 
 -- Cluster « remplir l'annuaire » (zone « addPlayer » de la SPEC, en bas de sidebar) : champ d'ajout
@@ -299,23 +306,8 @@ function UI:RefreshArtisans()
         return a.leader < b.leader
     end)
 
-    local n = 0
-    for _, g in ipairs(list) do
-        n = n + 1
-        local row = self:_ArtRow(n)
-        if #g.members > 1 then self:_FillArtGroupRow(row, g)
-        else self:_FillArtRow(row, { name = g.leader, r = g.lead.r, online = g.lead.online }) end
-    end
-    for i = n + 1, #self.artListRows do self.artListRows[i]:Hide() end
-    self.artListContent:SetHeight(math.max(n * ARH, 10))
-    Skin.AutoHideScroll("COCArtScroll", self.artListContent)
-    if n == 0 and self.artListRows[1] then
-        local row = self:_ArtRow(1)
-        row:SetScript("OnEnter", nil); row:SetScript("OnLeave", nil)
-        row.dot:SetOnline(nil); row.name:SetText("|cFF888888" .. L["Aucun artisan dans cette source."] .. "|r")
-        row.sub:SetText(""); UI:_SetArtProfIcons(row, {}); row.src:SetText(""); row.whisper:Hide(); row.addFriend:Hide(); row.partner:Hide()
-        row:Show()
-    end
+    -- La liste défilante place et remplit les lignes visibles, et dit « aucun artisan » d'elle-même.
+    self.artList:SetData(list, true)
 end
 
 -- Remplit une ligne artisan. Distingue les NON-porteurs (r.nonAddon, vus crafter via CHAT_MSG_LOOT) :
@@ -412,10 +404,9 @@ function UI:_AddFriend(name)
     if C_Timer then C_Timer.After(1, function() if UI.RefreshArtisans then UI:RefreshArtisans() end end) end
 end
 
-function UI:_ArtRow(i)
-    local r = self.artListRows[i]; if r then return r end
-    local rw = self.artListW or A.WIDE_W   -- largeur de la zone artisansList (lue au build)
-    r = CreateFrame("Button", nil, self.artListContent); r:SetSize(rw, ARH); r:SetPoint("TOPLEFT", 0, -(i - 1) * ARH)
+-- Construit une ligne de l'annuaire, la première fois que la liste défilante crée ce cadre. Le
+-- remplissage (_FillArtRow / _FillArtGroupRow) repose tout : il était déjà écrit pour un pool.
+function UI:_BuildArtRow(r)
     Skin.PersonHighlight(r)   -- surbrillance bleue native (liste d'Amis) — homogène avec Commande/Récolte
     r.dot   = Skin.MakeStatusIcon(r, 14); r.dot:SetPoint("LEFT", 6, 0)
     r.name  = r:CreateFontString(nil, "OVERLAY", "GameFontNormal")
@@ -423,7 +414,8 @@ function UI:_ArtRow(i)
     r.sub   = r:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
     r.sub:SetPoint("TOPLEFT", 22, -22); r.sub:SetWidth(150); r.sub:SetJustifyH("LEFT"); Skin.ApplyShadow(r.sub)
     r.profsFrame = CreateFrame("Frame", nil, r)
-    r.profsFrame:SetPoint("LEFT", 180, 0); r.profsFrame:SetSize(rw - 306, ARH)   -- resserré : place à l'étoile partenaire
+    -- Ancrée et pas dimensionnée : de x = 180 jusqu'à 126 du bord droit (source, étoile, boutons).
+    r.profsFrame:SetPoint("TOPLEFT", 180, 0); r.profsFrame:SetPoint("BOTTOMRIGHT", -126, 0)
     r.profIconPool = {}
     r.src   = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall"); r.src:SetPoint("RIGHT", -116, 0); Skin.ApplyShadow(r.src)
     -- Toggle « Partenaire » (drapeau explicite priorisé dans l'alerte de don) : icône pleine = partenaire,
@@ -439,5 +431,4 @@ function UI:_ArtRow(i)
     r.partner:SetScript("OnLeave", GameTooltip_Hide)
     r.whisper = Skin.MakeGoldButton(r, 78, 22, L["Chuchoter"]); r.whisper:SetPoint("RIGHT", -6, 0)
     r.addFriend = Skin.MakeGoldButton(r, 78, 18, L["Ajouter ami"]); r.addFriend:SetPoint("RIGHT", -6, -9); r.addFriend:Hide()
-    self.artListRows[i] = r; return r
 end
