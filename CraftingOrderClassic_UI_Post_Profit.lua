@@ -118,18 +118,21 @@ function UI:_PostRowProfit(e)
     return v or nil
 end
 
--- Colonne de droite d'une ligne de plan. Rétrécit le nom pour ne pas chevaucher.
+-- Colonne de droite d'une ligne de plan, et bord DROIT du nom : contre le montant s'il y en a un,
+-- contre le bord de la ligne sinon. Une ANCRE et pas une largeur : la liste défilante fixe la
+-- largeur de ses lignes elle-même, et `row:GetWidth()` peut encore valoir 0 au remplissage. Calculé
+-- dessus, le nom tombait à sa largeur plancher de 20 px.
 function UI:_FillPostPlanProfit(row, item)
     if not row.profit then return end
     local g = PR()
     local txt = g and item.e and g:ProfitText(self:_PostRowProfit(item.e)) or ""
     if txt == "" then
         row.profit:Hide()
-        row.name:SetWidth(math.max(20, row:GetWidth() - 26 - (item._sub and 14 or 0)))
+        row.name:SetPoint("RIGHT", row, "RIGHT", -4, 0)
         return
     end
     row.profit:SetText(txt); row.profit:Show()
-    row.name:SetWidth(math.max(20, row:GetWidth() - 26 - (item._sub and 14 or 0) - row.profit:GetStringWidth() - 6))
+    row.name:SetPoint("RIGHT", row.profit, "LEFT", -6, 0)
 end
 
 -- =========================================================================

@@ -47,6 +47,17 @@ client.
   feature est opt-in et n'a jamais été éprouvée à 2 comptes ; chez Rédemption, `Gnomi-1` reste
   ouverte (limite de transition assumée : un pair garde l'acheteur au prénom jusqu'au TTL).
 
+- 2026-09-27 (8) — jusqu'a 1a1347b — Forever, un client (build déployé : branche d'essai
+  `test/ui-p1-essai`, soit `main` + palier 1 + les deux branches `fix/` du jour) — **GO sur le
+  palier 1 de la revue d'UI** : la liste des plans de l'onglet Commande sur la liste défilante
+  moderne (`Skin.MakeScrollList`). Vu sur capture du user : en-têtes de section sur la barre sombre
+  des métiers, sous-catégories en bronze sans barre, « – » en atlas à droite (les deux atlas que la
+  sonde n'avait pas vérifiés existent, le repli n'a pas servi), `MinimalScrollBar`, recherche
+  « minor » qui filtre, comptes justes. Confirmé ensuite par le user (« tout fonctionne bien ») :
+  repli et dépli sans remonter en haut, surbrillance de sélection, survol avec infobulle, dernière
+  ligne atteignable à la molette.
+  Non vu : la colonne de rentabilité (Auctionator), la silhouette d'enchantement qui masque la liste.
+
 - 2026-09-27 (7) — jusqu'a ee4a2e2 — Forever, un client (Rédemption, enchanteur) — **GO sur les
   demandes niées du canal Commerce** — le parseur RÉEL (`Inbound:OnChat`) appelé par `/run` avec un
   lien de l'objet 11287, sans rien poster sur Commerce : « need [Lesser Magic Wand] pls » (Testeur)
