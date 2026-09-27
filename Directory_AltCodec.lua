@@ -16,12 +16,16 @@ COC.AltCodec = AltCodec
 AltCodec.MAX_NAMES = 12    -- persos max par déclaration (borne aussi le BFS de Component)
 AltCodec.MAX_BYTES = 240   -- marge sous la limite AddonMessage (255)
 
--- Nom court plausible : 2..24 octets (12 caractères Blizzard, UTF-8 accentué ≤ 2 o/car),
--- sans séparateurs du fil (| ,) ni espace ni tiret (réservé au suffixe royaume).
+-- Nom plausible : 2..48 octets. Sur Forever un nom est « Prénom Nom » (cf. Api.PlayerName) : 12
+-- caractères de chaque côté, UTF-8 accentué ≤ 2 o/car. Refusés : séparateurs du fil (| ,), tiret
+-- (réservé au suffixe royaume), caractère de contrôle, et tout espace qui n'est pas UN séparateur
+-- entre deux mots. Jusqu'à 1.36.1 tout espace était refusé : l'annonce d'un joueur à nom de famille
+-- rendait nil et ne partait jamais, sans un mot.
 local function validName(n)
     if type(n) ~= "string" then return false end
-    if #n < 2 or #n > 24 then return false end
-    return not n:find("[|,%s%-]")
+    if #n < 2 or #n > 48 then return false end
+    if n:find("[|,%-%c]") then return false end
+    return not (n:find("^ ") or n:find(" $") or n:find("  ", 1, true))
 end
 
 -- Sérialise une déclaration. `names` est en ORDRE DE PRIORITÉ (l'appelant met main + émetteur en
