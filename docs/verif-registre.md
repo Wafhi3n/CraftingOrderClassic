@@ -36,6 +36,24 @@ client.
 
 ## Relevés
 
+- 2026-09-27 (2) — jusqu'a 1cb8e6a — Forever, **DEUX COMPTES** — **GO sur la riposte LFW** —
+  rapporté par le user : « ça fonctionne, je vois le LFW après le reload ». Le récepteur recharge
+  pendant que l'autre compte est LFW, et le badge `[LFW]` revient **en quelques secondes** au lieu
+  des 8 minutes du ticker. L'asymétrie est fermée : `Dir.lfw` est toujours RUNTIME et toujours vidé
+  par un `/reload`, mais quelqu'un se ré-annonce désormais quand on arrive.
+  **Conséquence pour le banc, à retenir** : un « pas de badge » juste après un `/reload` était
+  jusqu'ici un faux négatif garanti. Il redevient une observation exploitable.
+
+  ⚠️ **PÉRIMÈTRE — ce relevé porte le marqueur à `1cb8e6a`, donc il couvre aussi `57e7553` (le
+  picker qui ne reste plus vide, cas Herbalism) qui N'A PAS été ré-observé.** Il était déployé
+  pendant la séance, il n'a rien cassé de visible, mais personne n'a rouvert le sélecteur de
+  réactifs d'un métier de récolte pour vérifier que le repli marche et que le message d'état
+  s'affiche. À faire au prochain passage : ouvrir Herbalism → « Offre » → onglet Réactifs.
+
+  Toujours jamais observé, indépendamment de ce relevé : le **détail d'OFFRE sur la plaque**
+  (pièce / sac / nom de la 1re recette — il faut d'abord régler une offre), l'**anti-leurre AFK**
+  (20 min d'attente réelle, sinon on ne l'écrit pas), et le **combat**.
+
 - 2026-09-27 — jusqu'a 760119c — Forever, **DEUX COMPTES**, client en ANGLAIS — **GO sur l'étage
   RÉCEPTION de LFW et sur le métier de RÉCOLTE** — quatre captures du user. Premier relevé à deux
   comptes de LFW sur Forever : cette moitié n'avait **jamais** été vue fonctionner.
