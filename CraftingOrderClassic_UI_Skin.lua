@@ -153,9 +153,28 @@ end
 -- Un artisan entre-t-il dans la SOURCE (Guilde/Amis via drapeaux de relation, sinon catégorie
 -- d'affichage) ? « confed » (display-only) traité comme « recent » : un confédéré reste sélectionnable
 -- sous « Croisés ». Partagé par les listes d'artisans de Commande et Récolte.
+-- « circle » (membre d'une communauté, cf. Directory_Club) suit la même règle, et pour la même
+-- raison : les listes de Commande et Récolte n'ont PAS de portée Cercle. Sans ce repli, un membre de
+-- cercle n'entrait dans AUCUNE portée — l'onglet Artisans le montrait, la liste de ciblage jamais.
+local FOLD_TO_RECENT = { confed = true, circle = true }
 function Skin.InSource(r, src)
-    return (src == "friend" and r.isFriend) or (src == "guild" and r.isGuild)
-        or (r.source == "confed" and "recent" or r.source or "recent") == src
+    local s = r.source or "recent"
+    if FOLD_TO_RECENT[s] then s = "recent" end
+    return (src == "friend" and r.isFriend) or (src == "guild" and r.isGuild) or s == src
+end
+
+-- La portée à montrer quand on arrive sur la liste de ciblage AVEC un artisan déjà choisi (clic sur
+-- un métier dans l'onglet Artisans, menu clic-droit…). La portée COURANTE si elle le contient déjà —
+-- on ne déplace pas le joueur sans raison —, sinon la première qui le contient. Sans ce choix, la
+-- liste restait sur « Guilde » : la cible était posée (le destinataire l'affichait) mais l'artisan
+-- n'apparaissait nulle part, donc rien n'était surligné (relevé en jeu le 2026-09-27).
+function Skin.PostSourceFor(r, current)
+    if not r then return current end
+    if current and Skin.InSource(r, current) then return current end
+    for _, src in ipairs({ "guild", "friend", "added", "recent" }) do
+        if Skin.InSource(r, src) then return src end
+    end
+    return current
 end
 
 -- Trois champs de saisie or/argent/cuivre alignés (icônes de monnaie) → (goldEB, silverEB, copperEB).
