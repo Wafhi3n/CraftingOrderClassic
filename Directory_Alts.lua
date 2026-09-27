@@ -57,6 +57,27 @@ function COC:StampMyChar()
     if f == "Horde" or f == "Alliance" then self.db.myCharFaction[key] = f end
 end
 
+-- Mes commandes d'AVANT le nom complet portent mon prénom seul (acheteur, accepteur) : sans cette
+-- reprise, « Annuler », « Livrer » et « J'ai reçu » répondaient « ce n'est pas ta commande » jusqu'à
+-- leur expiration. On ne touche QU'aux miennes : un acheteur au prénom n'est à moi que si la commande
+-- n'est PAS venue du réseau (viaAddon nil ; _OnNew pose true, la capture pose false), sinon c'est
+-- peut-être un inconnu qui porte le prénom d'un de mes persos. L'accepteur, lui, n'a pu être posé au
+-- prénom que par une acceptation LOCALE (un ACK reçu prend l'émetteur, déjà complet). Idempotent, à
+-- chaque connexion : un reroll pas encore reconnecté est rattrapé à la sienne.
+function COC:AdoptFullNames()
+    local db = self.db
+    if not (db and db.orders and db.myCharNames) then return end
+    local rl, full = myRealm(), {}
+    for key, name in pairs(db.myCharNames) do
+        local short, realm = key:match("^([^%-]+)%-(.*)$")
+        if short and realm == rl and name ~= short then full[short] = name end
+    end
+    for _, o in pairs(db.orders) do
+        if o.viaAddon == nil and o.buyer and full[o.buyer] then o.buyer = full[o.buyer] end
+        if o.acceptedBy and full[o.acceptedBy] then o.acceptedBy = full[o.acceptedBy] end
+    end
+end
+
 -- Ce nom court est-il un perso de MON compte (même royaume) ? Lit myChars + les partitions
 -- existantes (persos passés avant cette version) — décision locale, jamais pilotable du réseau.
 -- Un nom venu du réseau est COMPLET sur Forever (« Prénom Nom ») : on le cherche parmi les noms
@@ -289,6 +310,7 @@ end
 -- Câblage réseau — appelé par Dir:Start (Directory.lua) après StartRelay.
 function Dir:StartAlts()
     COC:StampMyChar()
+    COC:AdoptFullNames()   -- après StampMyChar : il vient de noter le nom complet du perso connecté
     if not (CraftLink and Codec) then return end
     CraftLink:RegisterHandler("ALT", function(s, m) Dir:OnAlt(s, m) end)
 end
