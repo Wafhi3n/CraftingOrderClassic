@@ -31,6 +31,16 @@ local BODY_W = 780
 local function versionsNewest()
     return {
         {
+            v = "v1.36.0", title = L["Ce qui rapporte, et dire au royaume que tu es dispo"],
+            lines = {
+                L["La colonne de métier gagne un onglet, Profit : ce que tu sais faire qui vaut la peine d'être fait, la plus grosse marge en haut, avec le prix de vente face au coût des composants. Un clic sur une ligne amène la recette dans la liste de Blizzard. L'onglet n'apparaît que si Auctionator tourne, puisque les prix viennent de lui, et il le dit au lieu de t'afficher un zéro."],
+                L["« Chercher du travail » est revenu. Sur Forever le bouton avait disparu avec l'ancienne fenêtre à trois colonnes : il ne restait que /co lfw, et plus aucun moyen de régler ton offre. C'est maintenant une bande en bas de la colonne, qui affiche « Dispo — Forge » dans toutes les vues. Oublier qu'on est annoncé est exactement ce que le minuteur d'expiration existe pour rattraper."],
+                L["À côté, le bouton Offre ouvre ce que tu proposes : les composants de base, une commission par craft, ne prendre que ce qui te fait progresser, les réactifs que tu fournis. Nouveau, tu coches aussi les recettes précises que tu proposes, et qui te consulte les voit par leur nom. La liste des réactifs se limite désormais à ce que tu sais crafter — un travailleur du cuir à 82 ne se voit plus proposer de la Vigne de sang."],
+                L["Recharge ton interface et tu revois les annonces des autres en quelques secondes. Avant, personne ne se ré-annonçait à ton arrivée : tu pouvais rester devant un radar vide pendant huit minutes sans le savoir."],
+                L["Plus petit. Le bouton d'aide « i » se posait sur la dernière languette et lui volait ses clics. L'onglet « Plan de route » s'appelle « Route », ce qui a fait la place au reste. Et l'addon relève le niveau qu'un formateur exige, donc les recettes affichées « ? » se remplissent à mesure que tu passes les voir."],
+            },
+        },
+        {
             v = "v1.35.1", title = L["Un niveau qu'on ne connaît pas n'est pas un niveau 0"],
             lines = {
                 L["La vue Manquantes plaçait huit recettes de Couture en tête de liste en te disant qu'elles étaient à ta portée, affichées « niveau requis 0 ». 29 recettes réparties sur six métiers n'ont aucun niveau dans les données, et l'addon lisait cette absence comme un zéro — qui se classe en tête et passe tous les tests de « peux-tu l'apprendre »."],

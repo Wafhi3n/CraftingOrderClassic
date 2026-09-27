@@ -1,5 +1,36 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.36.0 - What's worth crafting, and telling the realm you're free
+
+The profession column has a new tab, Profit. It lists what you can make that's worth making, biggest
+margin first, with what the item sells for set against what its reagents cost. Click a line and
+Blizzard's own list jumps to that recipe. The tab only appears if Auctionator is running, since
+that's where the prices come from, and it says so instead of showing you a zero.
+
+Prices now come from Auctionator and nothing else. The Lazy Gold bridge is gone. It never calculated
+anything, it read Auctionator too, so there were two doors into one room.
+
+"Look for work" is back. It had quietly stopped existing on Forever, because the button lived in the
+old three-column window that the addon no longer opens there. All that was left was typing
+`/co lfw`, and there was no way at all to change what you were offering. It's a strip along the
+bottom of the column now, and it reads "Available, Blacksmithing" in every view when you're on.
+Forgetting you're advertised is the whole reason the listing expires by itself.
+
+Next to it, an Offer button opens what you're willing to do. Supply the vendor reagents, a flat fee
+per craft, only take work that skills you up, and which reagents you'll bring. New in this one, you
+can tick the specific recipes you're offering, and anyone who looks you up sees them by name.
+
+That reagent list only shows what you can actually craft now. It used to list every reagent in the
+profession, so a Leatherworker at 82 was offered Bloodvine.
+
+Reload your interface and other people's listings come back within seconds. Before, nobody
+re-announced when you arrived, so you could sit in front of an empty radar for eight minutes without
+knowing it.
+
+Smaller things. The "i" help button sat on top of the last tab and swallowed clicks meant for it.
+The "Leveling route" tab is called "Route", which is what made room for the rest. And the addon now
+picks up the skill level a trainer asks for, so recipes that showed a "?" fill in as you visit them.
+
 ## v1.35.1 - A skill level we don't know isn't zero
 
 The Missing view put eight Tailoring recipes at the top of the list and told you they were within
