@@ -1,7 +1,7 @@
 # Revue : passer l'interface de COC sur les briques Mainline de Forever
 
-> Rédigée le 2026-09-27 · Cible : WoW: Forever / Camelot (16001) · Statut : **proposition, rien de
-> décidé** · Portée : la fenêtre principale d'abord (Carnet, Commande, Récolte, Artisans, Mes
+> Rédigée le 2026-09-27 · Cible : WoW: Forever / Camelot (16001) · Statut : **D1-D3 tranchées le
+> 2026-09-27, P0 au labo en cours** · Portée : la fenêtre principale d'abord (Carnet, Commande, Récolte, Artisans, Mes
 > artisans, Aide, Nouveautés), puis les fenêtres annexes. La colonne greffée dans la fenêtre des
 > métiers est déjà faite.
 >
@@ -48,7 +48,7 @@ Relevé sur `main` le 2026-09-27 : 30 fichiers `_UI_*`, 24 fichiers `_ProfWindow
 |---|---|---|---|
 | `ButtonFrameTemplate` (via `Skin.MakeWindow`) | 3 fenêtres | le même : sur Forever c'est déjà le cadre retail | **garder** |
 | `UIPanelScrollFrameTemplate` + pools de lignes manuels + `Skin.AutoHideScroll` | 19 listes, 18 appels | `WowScrollBoxList` + `MinimalScrollBar` + `CreateDataProvider` / `CreateTreeDataProvider` | **migrer**, le plus gros gain |
-| `TabButtonTemplate` en haut (`Skin.MakeTabs`) | 3 rangées | `PanelTabButtonTemplate` en bas (Commandes d'artisanat) ou `TabSystemTemplate` | **décision D1** |
+| `TabButtonTemplate` en haut (`Skin.MakeTabs`) | 3 rangées | onglets latéraux à droite, `Skin.MakeSideTab` (`LargeSideTabButtonTemplate`, déjà dans le kit) | **migrer**, décision D1 |
 | `Skin.MakeDropdown` / `Skin.MakeFlyout` (maison, anti-taint `UIDropDownMenu`) | 8 + 6 | `WowStyle1DropdownTemplate`, `WowStyle1FilterDropdownTemplate` (système Menu) | **bloqué** par le risque 1 |
 | `Skin.MakeMoneyRow` (3 `InputBoxTemplate` or/argent/cuivre) | 3 | `LargeMoneyInputFrameTemplate` (le champ pourboire de retail) | **migrer** |
 | Qté (`InputBoxTemplate` nu) | — | `NumericInputSpinnerTemplate` (le compteur de « Créer tout ») | **migrer** |
@@ -105,7 +105,8 @@ et `TabSystemMixin` dans les `globals` de COCProbeDB) avant d'en dépendre.
 
 **6. Les onglets en bas peuvent être recouverts.** Déjà payé en juillet avec
 `CharacterFrameTabButtonTemplate` : un onglet qui pend sous la fenêtre passe sous toute fenêtre
-Blizzard ouverte en dessous. `PanelTabButtonTemplate` a la même géométrie. **Parade** : voir D1.
+Blizzard ouverte en dessous. `PanelTabButtonTemplate` a la même géométrie. **Levé par D1** : les
+onglets latéraux collent au flanc droit de notre cadre, ils ne pendent sous rien.
 
 ## Plan par paliers
 
@@ -123,26 +124,39 @@ avant la suivante. Chaque palier démarre par une primitive du kit (`Skin.Make*`
 | **P6** | Fonds : rocher, marbre et puits vers NineSlice et atlas | le plus visible mais le moins risqué ; en dernier pour ne pas repeindre deux fois |
 | **P7** | Fenêtres annexes (Route, Journal, panneaux Échange/Courrier), puis listes de la colonne greffée | après le relevé en combat (risque 4) |
 
-## Décisions à prendre
+## Décisions
 
-**D1 — Où vont les onglets ?**
-- **En bas**, `PanelTabButtonTemplate`, comme les Commandes d'artisanat. C'est la convention de la
-  fenêtre qui fait la même chose que nous, et elle libère le haut pour le titre et le « i ». Contre :
-  le recouvrement (risque 6).
-- **En haut**, `TabSystemTemplate`, dans le style des onglets de retail.
-- **Garder** les languettes actuelles et ne moderniser que l'intérieur.
+**D1 — Les onglets vont À DROITE, en onglets latéraux, comme la vue métier.** Tranché par le user
+le 2026-09-27 (capture annotée : « ça met les onglets sur la droite comme pour la vue métier »).
+C'est une quatrième option, que la première version de cette revue n'avait pas listée. Elle vaut
+mieux que les trois autres :
 
-Recommandation : **en bas**, en mesurant le recouvrement dès P3. L'incident de juillet venait d'un
-art dessiné pour pendre sous le cadre de la fiche de personnage. Il faut vérifier s'il se reproduit
-avec la brique retail avant de l'exclure.
+- la brique existe déjà dans le kit : `Skin.MakeSideTab` hérite `LargeSideTabButtonTemplate`, celle
+  de la fenêtre des métiers de Forever (piège 25 de la skill `coc-native-ui`), ancrée TOPLEFT sur le
+  TOPRIGHT du cadre ;
+- le haut de la fenêtre se libère pour le titre, et le « i » retrouve sa place native (TOPLEFT
+  +39,+20) sans rien chevaucher ;
+- un onglet latéral colle au flanc de NOTRE cadre au lieu de pendre dessous : le recouvrement du
+  risque 6 ne se pose plus.
 
-**D2 — Menus déroulants.** Attendre le labo P0 (recommandé), ou migrer directement et surveiller.
+Ce qu'elle coûte : un onglet latéral est une **icône**, pas un mot. Il en faut une par onglet (sept
+aujourd'hui), le nom passe dans l'infobulle.
 
-**D3 — Portée.** Fenêtre principale seulement pour commencer (recommandé), ou tout d'un coup.
+~~Options écartées~~ : en bas (`PanelTabButtonTemplate`), en haut (`TabSystemTemplate`), garder les
+languettes actuelles.
 
-**D4 — Le grand « i » à anneau** (`55320c2`, jamais vu en jeu) : le garder en attendant P3, où il
-trouvera sa place, ou le retirer de la branche de correctifs pour ne livrer que le correctif de
-niveau déjà vérifié (`5480223`).
+**D2 — Menus déroulants : on passe par le labo.** `TaintLab` 0.2.0 (dépôt d'outillage, `c839900`),
+`/tlab menu`. Tant que le labo n'a pas rendu son verdict, le flyout maison reste.
+
+**D3 — Portée : la fenêtre principale d'abord.**
+
+**D4 — Le grand « i » à anneau** (`55320c2`, jamais vu en jeu) : pas tranché. D1 lui rend sa place
+native, ce qui plaide pour le garder.
+
+**Ajouté au labo à la demande du user** : l'icône « commande reçue » dans la barre d'icônes de la
+minicarte, à côté de la lettre (mémoire `coc-minimap-indicator-idea`). `/tlab indica` (insérée dans
+la barre de Blizzard) contre `/tlab indicb` (cadre à nous collé contre elle), `/tlab icone` pour
+l'allumer et l'éteindre.
 
 ## Sources vérifiées
 
