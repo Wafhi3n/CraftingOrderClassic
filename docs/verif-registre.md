@@ -36,6 +36,19 @@ client.
 
 ## Relevés
 
+- 2026-09-27 (6) — jusqu'a 361c409 — Forever, **DEUX COMPTES** (Gnomi Short ↔ Rédemption Wafhien),
+  canal coupé des deux côtés (`/co channel off`), communauté « Crafting Order PVE » marquée par
+  `/co circle` — **GO sur une commande nommée passée par la communauté** — rapporté par le user
+  (« j'ai bien reçu ») : la commande nommée de Gnomi Short pour Rédemption Wafhien arrive chez
+  Rédemption. Même séance, AVANT ce commit : la commande arrivait 2× par whisper puis tombait en
+  « NEW ignoré : Gnomi Short ≠ acheteur en cache Gnomi » (noms de famille), et Gnomi voyait déjà
+  Rédemption Wafhien sous *Circle*, en ligne, avec ses métiers (capture).
+  PÉRIMÈTRE : seule la RÉCEPTION d'un NEW nommé est rapportée. Pas observé : ACK/DLV/DONE sur
+  cette commande, un client resté en v1.36.1 (complétion de l'acheteur au prénom), le retrait de
+  soi de l'annuaire, les rerolls (IsMyChar, ALT), le filtre d'écho du canal (canal coupé pendant
+  la séance). Le client tournait la branche d'essai `b5ac0a0`, qui porte aussi
+  `fix/commerce-negation` : non observé, et hors de l'ascendance de ce marqueur.
+
 - 2026-09-27 (5) — jusqu'a a04c3a2 — Forever, client redémarré — **GO sur l'icône de la liste des
   addons** — confirmé par le user (« c'est bon pour les logos ») : le logo « CO » remplace le point
   d'interrogation devant « Crafting & Gathering Order - Classic ». Ce commit ne touche AUCUN code
