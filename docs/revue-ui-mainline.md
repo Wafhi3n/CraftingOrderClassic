@@ -1,7 +1,7 @@
 # Revue : passer l'interface de COC sur les briques Mainline de Forever
 
 > Rédigée le 2026-09-27 · Cible : WoW: Forever / Camelot (16001) · Statut : **D1-D3 tranchées le
-> 2026-09-27 ; P0 : menus EXCLUS (le client plante), sonde 26/26, minicarte 0 action refusée (taint.log et aspect à voir)** · Portée : la fenêtre principale d'abord (Carnet, Commande, Récolte, Artisans, Mes
+> 2026-09-27 ; P0 : menus EXCLUS (le client plante), sonde 26/26, minicarte : variante A choisie, 0 refus ; P0 bouclé** · Portée : la fenêtre principale d'abord (Carnet, Commande, Récolte, Artisans, Mes
 > artisans, Aide, Nouveautés), puis les fenêtres annexes. La colonne greffée dans la fenêtre des
 > métiers est déjà faite.
 >
@@ -203,7 +203,20 @@ Ce que ça ne dit PAS encore :
   compte que les bascules.
 - **La 2ᵉ session mélange les deux variantes** : l'icône insérée restait dans la barre pendant que
   `/tlab icone` basculait la dernière posée.
-- **L'aspect** des deux variantes n'est pas encore comparé.
+- ~~L'aspect des deux variantes n'est pas encore comparé.~~ **Comparé le 2026-09-27, le user choisit
+  A** (insérée dans la barre) sur capture : « A est beaucoup mieux, B ça fait bizarre, décalé ». A
+  s'aligne avec la lettre comme une icône de Blizzard ; B flotte à gauche de la barre. Et A est
+  aussi la variante qui n'a rien déclenché en combat.
+
+Relevé du soir : `Logs\taint.log` toujours daté du 2026-09-22. Au niveau 1, le journal n'écrit qu'au
+moment d'une action bloquée : un fichier inchangé concorde avec les 0 refus, sans les prouver
+davantage. Pour aller plus loin il faudrait le niveau 2 (`/console taintLog 2`), qui trace aussi les
+écritures de globales.
+
+**Suite** : l'icône « commande reçue » de COC prendra la variante A : un cadre enfant de
+`MinimapCluster.IndicatorFrame`, `layoutIndex` 3, atlas `UI-HUD-Minimap-CraftingOrder-Up`, et un
+`Layout()` à chaque apparition ou disparition. C'est une fonctionnalité à spécifier (qu'est-ce qui
+l'allume, qu'est-ce qui l'éteint, que dit l'infobulle, où mène le clic), hors paliers de la revue.
 
 ## Sources vérifiées
 
