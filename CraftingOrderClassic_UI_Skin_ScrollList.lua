@@ -121,3 +121,17 @@ function Skin.ListRowKind(row, kind, collapsed)
     end
     row.hover:SetShown(not isHeader)
 end
+
+-- Ligne « personne » (artisan, récolteur) : pastille de présence, nom, source à droite, surbrillance
+-- bleue de la liste d'Amis (Skin.PersonHighlight). Posée sur une ligne de liste défilante par `build`.
+-- Le nom est ANCRÉ contre la source au lieu d'être dimensionné : la liste fixe la largeur de ses
+-- lignes elle-même (même raison que le nom d'un plan, cf. _UI_Post_Profit).
+function Skin.ArtisanRowArt(r)
+    r.selTex = Skin.PersonHighlight(r)
+    r.dot = Skin.MakeStatusIcon(r, 14); r.dot:SetPoint("LEFT", 4, 0)
+    r.src = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    r.src:SetPoint("RIGHT", -4, 0); Skin.ApplyShadow(r.src)
+    r.name = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    r.name:SetPoint("LEFT", 18, 0); r.name:SetPoint("RIGHT", r.src, "LEFT", -6, 0)
+    r.name:SetJustifyH("LEFT"); r.name:SetWordWrap(false); Skin.ApplyShadow(r.name)
+end

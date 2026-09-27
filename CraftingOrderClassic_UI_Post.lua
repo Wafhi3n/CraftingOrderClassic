@@ -345,7 +345,7 @@ function UI:_BuildPostPlanRow(r)
     Skin.WireItemTooltip(r); Skin.WireItemLink(r)
 end
 
--- (RefreshPostPlanDetail / RefreshPostReagents / _PostReagRow / _UpdateProvidedCount :
+-- (RefreshPostPlanDetail / RefreshPostReagents / _BuildPostReagRow · _FillPostReagRow / _UpdateProvidedCount :
 --  CraftingOrderClassic_UI_Post_Detail.lua — le sous-système « détail du plan sélectionné ».)
 
 function UI:SelectPostPlan(entry)

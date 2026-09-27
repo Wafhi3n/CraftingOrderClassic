@@ -204,7 +204,9 @@ function UI:_BuildGatherArtisanSection(panel)
     local az = self:GatherSec("gatherers")
     local aw = az:GetWidth(); if aw <= 1 then aw = G.WIDE_W end
     self.gatherArtW = aw
-    self:_BuildAllRowAndScroll(az, "COCGatherArtScroll", "gather", -G.PAD, G.PAD, aw)
+    self:_BuildAllRowAndScroll(az, "gather", -G.PAD, G.PAD, aw, {
+        fill = function(row, a) UI:_FillGatherArtRow(row, a) end,
+    })
 
     self:_BuildGatherActionBar(panel)
 end
