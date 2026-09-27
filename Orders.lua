@@ -22,7 +22,7 @@ Orders.ORDER_TTL = ORDER_TTL    -- exposé : la vue métier (ProfWindow_Orders) 
 local REBROADCAST = 2 * 3600    -- 2 h : ré-émission périodique de MES commandes ouvertes (anti-oubli réseau)
 local DONE_RETENTION = 7 * 86400 -- 7 j (depuis la création) : au-delà, une commande TERMINÉE est purgée du cache
 
-local function me()  return (UnitName and UnitName("player")) or "?" end
+local function me() return COC.Api.PlayerName() end   -- nom RÉSEAU (« Prénom Nom » sur Forever)
 local function pmsg(m) print("|cFF33DD88Crafting Order|r " .. m) end
 local function itemName(id) return (id and COC.Api.GetItemInfo and (COC.Api.GetItemInfo(id))) or (id and ("item:" .. id)) or "?" end
 

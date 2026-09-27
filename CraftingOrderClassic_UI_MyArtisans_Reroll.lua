@@ -16,7 +16,7 @@ local UI   = COC.UI
 local Skin = UI.Skin
 local L    = COC.L
 
-local function me() return (UnitName and UnitName("player")) or "?" end
+local function me() return (UnitName and UnitName("player")) or "?" end   -- PRÉNOM : clé LOCALE de perso (cf. Api.PlayerName)
 
 -- Porteurs du métier HORS perso connecté : lui, sa vue « reroll » n'a aucun sens (ses recettes se
 -- lisent en direct dans la fenêtre de métier).

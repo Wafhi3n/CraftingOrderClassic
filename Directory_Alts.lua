@@ -18,8 +18,17 @@ local CraftLink = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
 
 local function p(msg) print("|cFF33DD88Crafting Order|r " .. msg) end
 local function now() return (GetTime and GetTime()) or 0 end     -- uptime : rate-cap
-local function me() return (UnitName and UnitName("player")) or "?" end
+local function me() return COC.Api.PlayerName() end   -- nom RÉSEAU (« Prénom Nom » sur Forever)
 local function myRealm() return (GetRealmName and GetRealmName()) or "" end
+
+-- Nom RÉSEAU d'un de mes persos. `altMain` peut valoir un prénom (choisi par /co alts main dans les
+-- clés locales) : on le complète par myCharNames avant de l'annoncer, sinon les pairs le compareraient
+-- à « Prénom Nom » sans jamais le reconnaître.
+local function netName(n)
+    if type(n) ~= "string" or n:find(" ", 1, true) then return n end
+    local full = COC.db and COC.db.myCharNames and COC.db.myCharNames[n .. "-" .. myRealm()]
+    return full or n
+end
 
 local ALT_KEEP              = 30 * 86400   -- claim jamais rafraîchie depuis 30 j → périmée
 local RATE_WINDOW, RATE_MAX = 300, 10      -- réception : 10 msgs ALT max / 5 min / émetteur
@@ -34,11 +43,15 @@ local RATE_WINDOW, RATE_MAX = 300, 10      -- réception : 10 msgs ALT max / 5 m
 -- autres dans « Mes artisans » donnerait une liste de plans qu'on ne peut pas se faire livrer.
 -- Les persos vus AVANT cette version n'ont pas de faction : ils restent visibles jusqu'à leur
 -- prochain login, où ils se rangent tout seuls (pas de purge, pas de perte de données).
+-- La clé reste au PRÉNOM (format des partitions locales, cf. Api.PlayerName) ; le nom RÉSEAU de chaque
+-- perso est noté à côté, dans myCharNames : c'est lui que les autres joueurs nous renvoient.
 function COC:StampMyChar()
     if not self.db then return end
-    local key = me() .. "-" .. myRealm()
+    local key = ((UnitName and UnitName("player")) or "?") .. "-" .. myRealm()
     self.db.myChars = self.db.myChars or {}
     self.db.myChars[key] = time()
+    self.db.myCharNames = self.db.myCharNames or {}
+    self.db.myCharNames[key] = me()
     self.db.myCharFaction = self.db.myCharFaction or {}
     local f = UnitFactionGroup and UnitFactionGroup("player")
     if f == "Horde" or f == "Alliance" then self.db.myCharFaction[key] = f end
@@ -46,10 +59,18 @@ end
 
 -- Ce nom court est-il un perso de MON compte (même royaume) ? Lit myChars + les partitions
 -- existantes (persos passés avant cette version) — décision locale, jamais pilotable du réseau.
+-- Un nom venu du réseau est COMPLET sur Forever (« Prénom Nom ») : on le cherche parmi les noms
+-- réseau notés par StampMyChar, jamais en le réduisant au prénom — un inconnu qui porte le prénom
+-- d'un de mes rerolls n'est PAS mon perso. Un perso pas reconnecté depuis n'est reconnu qu'après
+-- sa prochaine connexion.
 function COC:IsMyChar(short)
     if type(short) ~= "string" or short == "" or not self.db then return false end
     if short == me() then return true end
-    local key = short .. "-" .. myRealm()
+    local rl = myRealm()
+    for key, full in pairs(self.db.myCharNames or {}) do
+        if full == short and key:match("^[^%-]+%-(.*)$") == rl then return true end
+    end
+    local key = short .. "-" .. rl
     local hit = (self.db.myChars and self.db.myChars[key])
         or (self.db.knownRecipes and self.db.knownRecipes[key])
         or (self.db.myCooldowns and self.db.myCooldowns[key])
@@ -65,12 +86,15 @@ function Dir:_MyAltNames()
     local rl, cands = myRealm(), {}
     for key, ts in pairs(db.myChars or {}) do
         local short, realm = key:match("^([^%-]+)%-(.*)$")
-        if short and realm == rl then cands[#cands + 1] = { n = short, t = tonumber(ts) or 0 } end
+        -- Annoncé sous son nom RÉSEAU (comparé par les pairs à l'émetteur) ; le prénom seul ne reste
+        -- que pour un perso pas reconnecté depuis que COC note ce nom.
+        local net = db.myCharNames and db.myCharNames[key] or short
+        if short and realm == rl then cands[#cands + 1] = { n = net, t = tonumber(ts) or 0 } end
     end
     table.sort(cands, function(a, b) return a.t > b.t end)
     local names, seen = {}, {}
     local function add(n) if n and not seen[n] then seen[n] = true; names[#names + 1] = n end end
-    add(db.altMain); add(me())
+    add(netName(db.altMain)); add(me())
     for i = 1, #cands do add(cands[i].n) end
     return names
 end
@@ -83,7 +107,7 @@ function Dir:AnnounceAlts(scope, target)
     if not (CraftLink and Codec and COC.db and COC.db.altsEnabled) then return end
     local names = self:_MyAltNames()
     if #names < 2 then return end
-    local msg = Codec.Encode(COC.db.altMain or me(), names)
+    local msg = Codec.Encode(netName(COC.db.altMain) or me(), names)
     if msg then CraftLink:Send(msg, scope or "global", target) end
 end
 

@@ -281,6 +281,27 @@ function A.UnitNameSafe(unit, getter)
     return n
 end
 
+-- ---------------------------------------------------------------- identité du joueur
+
+-- Nom RÉSEAU du joueur : celui sous lequel le serveur le présente aux AUTRES (émetteur d'un
+-- AddonMessage, cible d'un whisper, liste d'un canal). Sur Forever un personnage a un NOM DE
+-- FAMILLE, et ce nom-là est « Prénom Nom » : UnitName("player") n'en rend que le prénom (sa 2e
+-- valeur est le nom de famille, pas le royaume — Blizzard_FrameXMLUtil/Camelot/NameUtil.lua), et
+-- GetUnitName les recolle. Relevé le 2026-09-27 : UnitName = « Rédemption », GetUnitName("player",
+-- true) = UnitFullName = « Rédemption Wafhien ».
+-- Se désigner au prénom cassait tout ce qui compare un nom venu du réseau au sien : une commande
+-- nommée « Rédemption Wafhien » ne se reconnaissait pas, l'anti-usurpation rejetait l'acheteur
+-- « Gnomi » livré par « Gnomi Short », et l'écho de nos messages entrait dans l'annuaire.
+-- ⚠️ Les CLÉS LOCALES des persos (« Prénom-Royaume » : recettes, CD, métiers par perso) restent au
+-- prénom : elles ne quittent jamais la SavedVariable, et les renommer dédoublerait chaque perso.
+function A.PlayerName()
+    if _G.GetUnitName then
+        local ok, n = pcall(_G.GetUnitName, "player", true)
+        if ok and type(n) == "string" and n ~= "" then return n end
+    end
+    return (_G.UnitName and _G.UnitName("player")) or "?"
+end
+
 -- ---------------------------------------------------------------- métiers
 
 -- Fermer la session de métier ouverte. Il y avait trois API selon la saveur — `CloseCraft` (Craft,

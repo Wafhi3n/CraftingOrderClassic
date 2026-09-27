@@ -10,7 +10,7 @@ local Dir = COC.Directory
 
 local CraftLink = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
 
-local function me() return (UnitName and UnitName("player")) or "?" end
+local function me() return (UnitName and UnitName("player")) or "?" end   -- PRÉNOM : clé LOCALE de perso (cf. Api.PlayerName)
 local function myRealm() return (GetRealmName and GetRealmName()) or "" end
 
 -- Miroir de mySkills (perso COURANT) vers une partition PAR PERSO (clé « Nom-Royaume », comme

@@ -17,7 +17,7 @@ local panel
 local pending          -- { id, buyer } posé par « Remplir » — consommé à MAIL_SEND_SUCCESS
 local lastSendTarget   -- destinataire RÉEL du dernier SendMail (hook passif, anti-mismatch)
 
-local function me() return (UnitName and UnitName("player")) or "?" end
+local function me() return COC.Api.PlayerName() end   -- nom RÉSEAU (« Prénom Nom » sur Forever)
 
 local function currentRecipient()
     local eb = _G.SendMailNameEditBox
