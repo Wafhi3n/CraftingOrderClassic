@@ -66,7 +66,10 @@ function Route:Candidates(profKey, opts)
             local prod = lib.RecipeProduct and lib:RecipeProduct(profKey, sid)
             local isKnown = (known["s" .. sid] or (prod and known["i" .. prod])) and true or false
             local planPrice, planUnknown
-            if not isKnown and opts.plans then
+            -- L'exemplaire de l'AUTRE camp d'une recette jumelle (cf. Sources:IsOtherSideTwin) n'est
+            -- pas un plan à acheter : aucun formateur ne l'enseignera à ce joueur.
+            local otherSide = M and M.IsOtherSideTwin and M:IsOtherSideTwin(profKey, sid)
+            if not isKnown and opts.plans and not otherSide then
                 local kind = (M and M:IsAvailable()) and M:SourceKind(profKey, sid) or "unknown"
                 if kind == "trainer" or kind == "vendor" then
                     planPrice = M and M:SourcePrice(profKey, sid)

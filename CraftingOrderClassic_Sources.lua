@@ -258,13 +258,87 @@ local function levelOf(lib, profKey, spellID)
     return (at and at > 0) and at or nil
 end
 
+-- ------------------------------------------------------------------
+-- Les jumeaux de camp
+-- ------------------------------------------------------------------
+
+-- UNE MÊME RECETTE PEUT EXISTER EN DEUX EXEMPLAIRES, UN PAR CAMP. Sur Forever, « Faction Banner »
+-- (Couture) est 1229504 côté Horde et 1263425 côté Alliance : même nom, mêmes réactifs, deux
+-- objets distincts. Le catalogue porte les deux, le joueur n'apprendra jamais que le sien — et la
+-- vue Manquantes lui affichait l'autre à vie, comme un plan à aller chercher (relevé en jeu par un
+-- testeur le 2026-09-27, bannière connue ET listée manquante).
+--
+-- ⚠️ LE CRITÈRE EST LE JUMEAU, PAS LE CAMP SEUL. « Tous les PNJ de l'origine sont de l'autre camp »
+-- ne suffit pas : 46 recettes du set Camelot n'y nomment que des PNJ d'un seul camp (mesuré le
+-- 2026-09-27 ; ex. les spécialisations du Travail du cuir, chez Hahrana Ironhide ou Thorkaf
+-- Dragoneye, tous deux Horde) parce que la liste d'origines est INCOMPLÈTE, pas parce que l'autre
+-- camp ne peut pas les apprendre. Les masquer sur ce seul indice cacherait un vrai plan à la moitié
+-- des joueurs. On n'écarte donc une recette que si son JUMEAU —
+-- même nom, même métier — est exclusivement de NOTRE camp. Là, la donnée ne peut pas mentir par
+-- omission : les deux exemplaires sont sous nos yeux, chacun marqué de son camp.
+-- Et les PNJ SANS camp ne comptent pas : Othesia Evengale (Zephras Isle) est listée pour les DEUX
+-- bannières, parce qu'elle enseigne à chacun celle de son camp.
+
+-- "A" | "H" quand tous les PNJ marqués d'un camp sont de ce camp ; nil sinon (aucun marqué, ou les deux).
+local function soleSide(lib, profKey, spellID)
+    local seen
+    for _, e in ipairs(lib:RecipeOrigins(profKey, spellID) or {}) do
+        local f = e[4]
+        if f then
+            if seen and seen ~= f then return nil end
+            seen = f
+        end
+    end
+    return seen
+end
+
+-- [profKey] = { [spellID] = "A"|"H" } : les recettes qui ont un jumeau de l'AUTRE camp. Le catalogue
+-- est figé pour la session, la table aussi. Un nom non résolu (repli « spell:<id> ») ne trouve aucun
+-- jumeau : on retombe alors sur le comportement d'avant, qui montre tout — jamais sur un masquage.
+local twinSides = {}
+local function factionTwins(profKey)
+    if twinSides[profKey] then return twinSides[profKey] end
+    local lib, out = CL(), {}
+    if lib and lib.GetRecipes and lib.RecipeOrigins and lib.RecipeName then
+        local byName = {}   -- [nom] = { A = { spellID… }, H = { spellID… } }
+        for _, sid in ipairs(lib:GetRecipes(profKey) or {}) do
+            local side = soleSide(lib, profKey, sid)
+            if side then
+                local n = lib:RecipeName(sid)
+                byName[n] = byName[n] or {}
+                byName[n][side] = byName[n][side] or {}
+                table.insert(byName[n][side], sid)
+            end
+        end
+        for _, sides in pairs(byName) do
+            if sides.A and sides.H then
+                for side, ids in pairs(sides) do
+                    for _, sid in ipairs(ids) do out[sid] = side end
+                end
+            end
+        end
+    end
+    twinSides[profKey] = out
+    return out
+end
+
+-- Vrai si cette recette est l'exemplaire de l'AUTRE camp d'une recette qui existe aussi pour nous.
+-- Camp inconnu (avant l'entrée en jeu) : faux — on ne tranche pas sans savoir qui regarde.
+function S:IsOtherSideTwin(profKey, spellID)
+    local me = myFaction()
+    if not (me and profKey and spellID) then return false end
+    local side = factionTwins(profKey)[spellID]
+    return side ~= nil and side ~= me
+end
+
 function S:MissingRecipes(profKey)
     local lib = CL()
     if not (lib and profKey and lib.GetRecipes) then return {} end
     local known = (lib.MyKnownSet and lib:MyKnownSet(profKey)) or {}
     local out = {}
     for _, spellID in ipairs(lib:GetRecipes(profKey) or {}) do
-        if not known[spellID] and not (IsSpellKnown and IsSpellKnown(spellID)) then
+        if not known[spellID] and not (IsSpellKnown and IsSpellKnown(spellID))
+           and not self:IsOtherSideTwin(profKey, spellID) then
             local itemID = lib.RecipeProduct and lib:RecipeProduct(profKey, spellID) or nil
             out[#out + 1] = {
                 isMissing = true, spellID = spellID, itemID = itemID,
