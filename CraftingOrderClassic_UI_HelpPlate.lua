@@ -135,10 +135,13 @@ function UI:_ToggleHelp()
 end
 
 -- Bouton `i` hors-cadre en haut à gauche (dépendance molle : sans Blizzard_HelpPlate, pas de bouton).
+-- Le grand « i » à anneau, à la place exacte que Blizzard lui donne sur ses fenêtres à médaillon
+-- (TOPLEFT +39,+20 : Archéologie, Mascottes, liaisons de clics).
 function UI:_BuildHelp(f)
     if not HelpPlate then return end
     self.helpBtn = Skin.MakeHelpButton(f, function() UI:_ToggleHelp() end, {
-        point   = { "CENTER", f, "TOPLEFT", 8, 6 },
+        style   = "portrait",
+        point   = { "TOPLEFT", f, "TOPLEFT", 39, 20 },
         tooltip = L["Aide : survole les zones surlignées pour comprendre chaque fonction."],
     })
 end
