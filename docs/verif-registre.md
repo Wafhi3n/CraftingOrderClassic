@@ -53,6 +53,16 @@ client.
   composée (en-têtes de métier, grilles de cases, notes). Le reste rapporté par le user, sans
   capture : l'Aide et les Nouveautés.
   Non vu : une bourse qui tient sans défiler (barre cachée d'elle-même).
+- 2026-09-28 12:40 — jusqu'a a02815e — Forever, un client, client en ANGLAIS ; build
+  `main-dev@bb4efc8 2026-09-28 12:35`, branches en test `feat/icone-commande-recue, feat/ui-p2d-pages,
+  feat/ui-p3-onglets-lateraux` (lu dans la signature du `.toc` déployé) — **GO sur le palier 3 : les
+  onglets latéraux** — capture du user (« tout est ok ») : les sept onglets au flanc droit, sous le
+  coin haut-droit du cadre, toutes les icônes présentes (livre, parchemin, pioche, l'atlas
+  `friends-icon-tab-friends` pour Artisans — l'atlas existe, le repli n'a pas servi —, l'icône
+  `INV_SideTab_Professions_c60` pour Mes artisans, point d'interrogation, lettre) ; Artisans surligné
+  (art de sélection de Blizzard) ; titre « Crafting & Gathering Order — Artisans » ; le grand « i »
+  libre à côté du portrait.
+  Non vu : le chiffre du Carnet sur son icône (aucune commande active), l'infobulle d'un onglet.
 
 - 2026-09-28 12:12 — jusqu'a 6ef2e8b — Forever, un client, client en ANGLAIS ; build
   `main-dev@6ef2e8b 2026-09-28 12:10`, branches en test `feat/ui-p2c-listes` (lu en jeu par

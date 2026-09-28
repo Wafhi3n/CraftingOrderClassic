@@ -9,6 +9,9 @@ local L    = COC.L
 
 local function me() return COC.Api.PlayerName() end   -- nom RÉSEAU (« Prénom Nom » sur Forever)
 
+-- Nom de la fenêtre ; ShowTab y ajoute l'onglet actif, dont l'onglet latéral ne montre que l'icône.
+local TITLE = "Crafting & Gathering Order"
+
 -- Le Carnet = MES commandes (postées par moi). L'acceptation/livraison se fait dans la VUE MÉTIER,
 -- pas ici → ce fichier ne filtre plus par relation : il liste mes ordres (actifs vs archivés).
 
@@ -20,10 +23,10 @@ function UI:Build()
     -- Chrome Blizzard natif via le kit (CraftingOrderClassic_UI_Skin_Native.lua) : barre de titre +
     -- portrait + bouton fermer + panneau encastré marbre (f.Inset). Le langage couleur (statuts
     -- d'ordre / rareté d'objet) reste INTOUCHÉ ; seul le chrome change.
-    -- 606 (pas 600) : les 6 px en plus compensent EXACTEMENT la bande réservée en haut pour les
-    -- languettes d'onglets (cf. PAD_TOP plus bas) — la hauteur UTILE de chaque panneau ne change pas.
+    -- 606 (pas 600) : 6 px ajoutés pour la bande des anciennes languettes d'onglets du haut (cf.
+    -- PAD_TOP plus bas). Les onglets sont au flanc droit depuis le palier 3 ; la hauteur est gardée.
     local f = Skin.MakeWindow("CraftingOrderClassicWindow", 868, 606, {
-        title = "Crafting & Gathering Order", portrait = Skin.tex.scroll,
+        title = TITLE, portrait = Skin.tex.scroll,
         buttonBar = true,   -- barre d'actions native en bas (Destinataire/Poster de l'onglet Commande)
     })
     self.frame = f
@@ -87,18 +90,23 @@ end
 
 function UI:BuildTabs(f)
     self.tabs = {}
+    -- Onglets LATÉRAUX au flanc droit (palier 3, décision D1 : « comme la vue métier ») : une icône
+    -- chacun, le nom dans l'infobulle et dans le titre. Mes artisans prend l'icône d'onglet des métiers
+    -- de Camelot ; Artisans, l'atlas de l'onglet Amis du social (repli : une tête, si l'atlas manque).
+    local I = "Interface\\Icons\\"
     local defs = {
-        { id = "orders",    label = L["Carnet"]      },
-        { id = "post",      label = L["Commande"]    },
-        { id = "gather",    label = L["Récolte"]     },
-        { id = "artisans",  label = L["Artisans"]    },
-        { id = "myartisans",label = L["Mes artisans"] },
-        { id = "help",      label = L["Aide"]        },
-        { id = "news",      label = L["Nouveautés"]  },
+        { id = "orders",     label = L["Carnet"],       icon = I .. "INV_Misc_Book_09" },
+        { id = "post",       label = L["Commande"],     icon = I .. "INV_Scroll_05" },
+        { id = "gather",     label = L["Récolte"],      icon = I .. "INV_Pick_02" },
+        { id = "artisans",   label = L["Artisans"],     icon = I .. "INV_Misc_Head_Human_01",
+          atlas = { "friends-icon-tab-friends", "friends-icon-tab-friends-inactive" } },
+        { id = "myartisans", label = L["Mes artisans"], icon = I .. "INV_SideTab_Professions_c60" },
+        { id = "help",       label = L["Aide"],         icon = I .. "INV_Misc_QuestionMark" },
+        { id = "news",       label = L["Nouveautés"],   icon = I .. "INV_Letter_15" },
     }
-    -- Onglets natifs « bas de cadre » via le kit (pièges du template gérés là-bas). self.tabs reste
-    -- l'index id→bouton (compat) ; la sélection et les SetText passent par self.tabBar.
-    self.tabBar = Skin.MakeTabs(f, defs, function(id) UI:ShowTab(id) end)
+    -- self.tabs reste l'index id→bouton (compat) ; la sélection, l'infobulle et le compteur passent
+    -- par self.tabBar (même contrat que les languettes d'avant, cf. _UI_Skin_SideTabs.lua).
+    self.tabBar = Skin.MakeSideTabs(f, defs, function(id) UI:ShowTab(id) end)
     self.tabs = self.tabBar.buttons
 end
 
@@ -111,6 +119,8 @@ function UI:ShowTab(id)
     end
     self.activeTab = id
     self.tabBar:Select(id)
+    local label = self.tabBar.Label and self.tabBar:Label(id)
+    if self.frame.SetTitle then self.frame:SetTitle(label and (TITLE .. " — " .. label) or TITLE) end
     self.ordersPanel:SetShown(id == "orders")
     if self.postPanel   then self.postPanel:SetShown(id == "post")    end
     if self.gatherPanel then self.gatherPanel:SetShown(id == "gather") end
@@ -200,15 +210,11 @@ local function orderActionFor(o)
 end
 
 -- Marge intérieure commune : décale TOUT le contenu d'un panneau d'un coup, sans retoucher chaque
--- coordonnée. LEVIER CENTRAL du haut de page : la rangée d'onglets (kit MakeTabs, languettes natives
--- SUR la bande grise à droite du portrait depuis le 2026-07-12, cf. demande user « comme pour le
--- Social ») occupe f−34..f−66 ; PAD_TOP réserve la bande EN DESSOUS pour que le contenu ne monte pas
--- sous le bas des languettes. Le contenu le plus HAUT de tous les onglets est à −74 (Aide/Nouveautés) :
--- avec PAD_TOP=0 il atterrit à f−74, soit 8 px sous le bas des languettes (f−66) — jamais de collision.
--- La fenêtre (MakeWindow) est agrandie de +6 px (600→606) pour EXACTEMENT compenser cette bande : la
--- hauteur UTILE de chaque panneau (donc tous les offsets bas-ancrés : Poster, commission…) est
--- inchangée. Ne pas monter PAD_TOP au-dessus de 0 sans re-auditer la collision avec le contenu à −74,
--- ni faire varier l'un sans l'autre (la fenêtre et PAD_TOP bougent ENSEMBLE, même delta).
+-- coordonnée. Jusqu'au palier 3, une rangée de languettes d'onglets occupait f−34..f−66 sur la bande
+-- grise ; les onglets sont désormais au flanc DROIT (Skin.MakeSideTabs), la bande ne porte plus que
+-- la jauge de compétence (Commande/Récolte). Le contenu le plus HAUT est à −74 (Aide/Nouveautés).
+-- La fenêtre fait 606 (600 + 6 pour cette bande) : ne pas faire varier PAD_TOP sans elle, même delta,
+-- sinon la hauteur UTILE des panneaux (offsets bas-ancrés : Poster, commission…) change.
 local PAD_X, PAD_TOP, PAD_BOT = 8, 0, 8
 local function insetPanel(panel, f)
     panel:ClearAllPoints()
@@ -423,7 +429,8 @@ function UI:Refresh()
         for _, o in pairs((COC.db and COC.db.orders) or {}) do
             if o.buyer == m and o.status ~= "done" and o.status ~= "cancelled" then c = c + 1 end
         end
-        self.tabBar:SetText("orders", L["Carnet"] .. " (" .. c .. ")")   -- re-mesure la largeur (kit)
+        self.tabBar:SetText("orders", L["Carnet"] .. " (" .. c .. ")")   -- infobulle de l'onglet
+        self.tabBar:SetCount("orders", c)                                 -- chiffre sur son icône
     end
     self:_RefreshOrderFilterTabs()
     self:_SyncMainPortrait()
