@@ -114,7 +114,7 @@
 | `Directory_Recipes.lua` | COUTURE de lecture du registre « qui sait crafter quoi » d'un artisan. | 129 |
 | `Directory_Confed.lua` | source « confédération » (GreenWall) de l'annuaire, DISPLAY-ONLY. | 51 |
 | `Directory_Club.lua` | source « cercle » (communautés WoW) de l'annuaire, DISPLAY-ONLY. | 341 |
-| `Directory_Community.lua` | le réseau SANS canal : la communauté remplace CraftLinkNet (Forever). | 206 |
+| `Directory_Community.lua` | le réseau SANS canal : la communauté remplace CraftLinkNet (Forever). | 207 |
 | `Directory_Skills.lua` | niveaux de compétence + réputation (couche « profil » de l'annuaire). | 157 |
 | `Directory_Version.lua` | détection « nouvelle version disponible » (100 % P2P, aucun serveur). | 138 |
 | `Directory_Cooldowns.lua` | cooldowns de recettes (couche « profil » de l'annuaire). | 82 |

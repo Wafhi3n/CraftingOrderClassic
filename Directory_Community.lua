@@ -151,13 +151,31 @@ end
 -- Jamais pour un membre de la communauté officielle (même s'il l'a démarquée). Hors `force` (demande
 -- explicite, /co circle) : jamais si le joueur a un cercle, ni s'il a éteint le rappel. Clubs illisibles
 -- (nil) : on s'abstient.
+-- Chaque décision du rappel de connexion laisse sa raison dans /co trace : le 2026-09-28, un lien
+-- attendu n'est jamais venu, et rien ne disait pourquoi.
+local function skip(force, why)
+    if not force and COC.Trace then COC.Trace:Log("net", "lien de la communauté non proposé : " .. why) end
+    return false
+end
+
 function Dir:ShowJoinLink(force)
     local c = officialForMe()
-    if not (c and self:_ClubsAvailable()) or self:IsMemberOf(c.clubId) ~= false then return false end
-    if not force and ((COC.db and COC.db.circleLinkOff) or self:HasCircle() ~= false) then return false end
+    if not c then return skip(force, "aucune communauté officielle pour ce camp") end
+    if not self:_ClubsAvailable() then return skip(force, "communautés indisponibles") end
+    local member = self:IsMemberOf(c.clubId)
+    if member == nil then return skip(force, "clubs illisibles") end
+    if member then return skip(force, "déjà membre") end
+    if not force then
+        if COC.db and COC.db.circleLinkOff then return skip(force, "rappel éteint (/co circle nolink)") end
+        local has = self:HasCircle()
+        if has ~= false then return skip(force, has and "a déjà un cercle" or "clubs illisibles") end
+    end
     p(string.format(L["Rejoins la communauté des artisans : %s — c'est là que Crafting Order trouve les autres joueurs."],
         joinLink(c)))
-    if not force then p("|cFF888888" .. L["(/co circle nolink : ne plus afficher ce rappel)"] .. "|r") end
+    if not force then
+        p("|cFF888888" .. L["(/co circle nolink : ne plus afficher ce rappel)"] .. "|r")
+        if COC.Trace then COC.Trace:Log("net", "lien de la communauté proposé") end
+    end
     return true
 end
 
@@ -168,39 +186,22 @@ function Dir:SetJoinLinkOff(off)
           or L["rappel de la communauté rallumé."])
 end
 
--- À la connexion INITIALE seulement (pas au /reload), et une fois les clubs chargés : avant, la liste des
--- clubs est vide et tout membre recevrait le lien. Aucune API ne dit « clubs prêts » : on attend
--- INITIAL_CLUBS_LOADED, écouté dès le chargement du fichier pour ne pas le rater s'il précède le login.
--- Le délai laisse passer la rafale de messages du login (le lien s'y noierait) et le marquage auto.
-local LINK_DELAY = 8
+-- À la connexion INITIALE seulement (pas au /reload), après un délai FIXE. La 1re version attendait
+-- INITIAL_CLUBS_LOADED : relevé le 2026-09-28, Gnomi a quitté la communauté, s'est déconnecté puis
+-- reconnecté, et aucun lien n'est venu — l'événement ne revient pas quand le client reste ouvert (les
+-- communautés sont déjà chargées). Au banc, le roster du club était lisible 4 s après l'entrée en jeu ;
+-- 15 s laissent aussi passer la rafale de messages du login, où le lien se noierait. Si les clubs d'un
+-- membre traînaient au-delà, il verrait le lien : un clic ouvre alors… sa propre communauté.
+local LINK_DELAY = 15
 
-local NO_CLUBS_TRACE = 30   -- s : sans INITIAL_CLUBS_LOADED, pas de lien — mais on le dit dans la trace
-
-local function onLoginEvent(_, event, isInitialLogin)
-    if event == "PLAYER_ENTERING_WORLD" then
-        if isInitialLogin then
-            Dir._linkPending = true
-            -- Pas de repli qui afficherait le lien quand même : avant cet événement la liste des clubs est
-            -- VIDE, et un membre recevrait le lien. Mieux vaut un rappel manqué, visible dans /co trace.
-            if C_Timer and C_Timer.After then C_Timer.After(NO_CLUBS_TRACE, function()
-                if Dir._linkPending and COC.Trace then
-                    COC.Trace:Log("net", "INITIAL_CLUBS_LOADED jamais reçu : lien de la communauté non proposé")
-                end
-            end) end
-        end
-    else
-        Dir._clubsLoaded = true
-    end
-    if Dir._linkPending and Dir._clubsLoaded then
-        Dir._linkPending = nil
-        if C_Timer and C_Timer.After then C_Timer.After(LINK_DELAY, function() Dir:ShowJoinLink() end)
-        else Dir:ShowJoinLink() end
-    end
+local function onLogin(_, _, isInitialLogin)
+    if not isInitialLogin then return end
+    if C_Timer and C_Timer.After then C_Timer.After(LINK_DELAY, function() Dir:ShowJoinLink() end)
+    else Dir:ShowJoinLink() end
 end
 
 if CreateFrame then
     local f = CreateFrame("Frame")
-    pcall(f.RegisterEvent, f, "INITIAL_CLUBS_LOADED")   -- absent d'un client sans communautés : sans effet
     f:RegisterEvent("PLAYER_ENTERING_WORLD")
-    f:SetScript("OnEvent", onLoginEvent)
+    f:SetScript("OnEvent", onLogin)
 end

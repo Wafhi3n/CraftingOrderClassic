@@ -115,8 +115,11 @@ Ce que le canal portait et qui se tait sans lui :
   - « ton artisan X est en ligne » part aussi à la première réponse, plus seulement à l'entrée dans le canal ;
   - accès aux clubs illisibles (valeur secrète en instance) → on s'abstient, jamais « aucun club » ;
   - envoi refusé pour **verrouillage d'instance** : tracé, pas rejoué (un message rejoué tard ment) ;
-  - pas de repli si `INITIAL_CLUBS_LOADED` n'arrive jamais : une trace, mais pas de lien à l'aveugle
-    (avant cet événement, la liste des clubs est vide et un membre recevrait le lien).
+  - ~~pas de repli si `INITIAL_CLUBS_LOADED` n'arrive jamais~~ — **démenti en jeu le 2026-09-28** :
+    Gnomi quitte la communauté, se déconnecte, se reconnecte, et aucun lien. L'événement ne revient pas
+    quand le client reste ouvert. Le lien part désormais **15 s après l'entrée en jeu**, sans attendre
+    d'événement (roster du club lisible 4 s après l'entrée en jeu au banc). Chaque décision laisse sa
+    raison dans `/co trace` (« lien de la communauté proposé / non proposé : … »).
 
 ## Critères d'acceptation
 
