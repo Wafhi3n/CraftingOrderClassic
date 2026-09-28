@@ -96,33 +96,47 @@ function Comp:MyDeliverables()
 end
 
 -- ------------------------------------------------------------------
--- Panneau compagnon skinné : en-tête (icône work-order + titre + partenaire) + puits de lignes.
+-- Panneau compagnon : barre de titre, sous-titre + partenaire, encart de lignes.
 -- Le pied (boutons, ligne prix) est ajouté par chaque greffon. `maxRows` lignes visibles + « +N ».
 -- ------------------------------------------------------------------
+-- Le panneau sans portrait de retail (DefaultPanelTemplate : NineSlice « ButtonFrameTemplateNoPortrait »,
+-- fond rocher, barre de titre) — le même métal que l'échange et le courrier qu'il accompagne (palier 7).
+-- Ses deux mixins ne touchent que le cadre lui-même (lu dans la source : titre, lueur de focus), rien
+-- de global. pcall : si le gabarit manquait, l'ancien fond plutôt qu'un échange sans panneau.
+local function panelFrame(name, parent)
+    local ok, f = pcall(CreateFrame, "Frame", name, parent, "DefaultPanelTemplate")
+    if ok and f then
+        if f.SetTitle then f:SetTitle("Crafting Order") end
+        return f, 30
+    end
+    f = CreateFrame("Frame", name, parent, "BackdropTemplate")
+    Skin.SkinFrameBackdrop(f)
+    local title = f:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    title:SetPoint("TOP", 0, -12); title:SetText("|c" .. Skin.hex.gold .. "Crafting Order|r")
+    return f, 30
+end
+
 function Comp.MakePanel(name, parent, width, maxRows)
-    local f = CreateFrame("Frame", name, parent, "BackdropTemplate")
+    local f, top = panelFrame(name, parent)
     f.maxRows = maxRows or 4
     f:SetSize(width, 92 + f.maxRows * 30)
-    Skin.SkinFrameBackdrop(f)
     f:SetFrameStrata("MEDIUM")
 
     local ic = f:CreateTexture(nil, "ARTWORK")
-    ic:SetSize(18, 18); ic:SetPoint("TOPLEFT", 14, -14); ic:SetTexture(Skin.tex.workorder)
-    local title = f:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    title:SetPoint("LEFT", ic, "RIGHT", 6, 0); Skin.ApplyShadow(title)
-    title:SetText("|c" .. Skin.hex.gold .. "Crafting Order|r")
-    f.partnerFS = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    f.partnerFS:SetPoint("TOPRIGHT", -16, -17); Skin.ApplyShadow(f.partnerFS)
-
+    ic:SetSize(16, 16); ic:SetPoint("TOPLEFT", 12, -top + 2); ic:SetTexture(Skin.tex.workorder)
     local sub = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    sub:SetPoint("TOPLEFT", 15, -36); Skin.ApplyShadow(sub)
+    sub:SetPoint("LEFT", ic, "RIGHT", 4, 0); Skin.ApplyShadow(sub)
     sub:SetText("|c" .. Skin.hex.gold .. L["Commandes pour ce joueur"] .. "|r")
     f.subFS = sub   -- exposé : un greffon peut changer le sous-titre (ex. courrier « à livrer »)
+    f.partnerFS = f:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    f.partnerFS:SetPoint("RIGHT", f, "RIGHT", -12, 0); f.partnerFS:SetPoint("TOP", ic, "TOP", 0, -2)
+    Skin.ApplyShadow(f.partnerFS)
 
-    local well = CreateFrame("Frame", nil, f, "BackdropTemplate")
-    well:SetPoint("TOPLEFT", 12, -50); well:SetPoint("TOPRIGHT", -12, -50)
+    -- Les lignes dans un encart de liste des métiers (Skin.WrapInset, palier 6) au lieu du puits noir.
+    local well = CreateFrame("Frame", nil, f)
+    well:SetPoint("TOPLEFT", 10, -(top + 18)); well:SetPoint("TOPRIGHT", -8, -(top + 18))
     well:SetHeight(f.maxRows * 30 + 8)
-    Skin.SkinWell(well)
+    Skin.WrapInset(well, "list")
     f.well = well
 
     f.moreFS = f:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
@@ -132,14 +146,27 @@ function Comp.MakePanel(name, parent, width, maxRows)
     return f
 end
 
+-- Survol et sélection des recettes de la fenêtre des métiers, étirés sur les 30 px de la ligne (elle
+-- porte deux lignes de texte). Atlas absent → un voile uni, comme avant.
+local function rowTex(r, layer, atlas, r1, g1, b1, a1)
+    local t = r:CreateTexture(nil, layer)
+    t:SetPoint("TOPLEFT"); t:SetPoint("BOTTOMRIGHT")
+    if C_Texture and C_Texture.GetAtlasInfo and C_Texture.GetAtlasInfo(atlas) then t:SetAtlas(atlas)
+    else t:SetColorTexture(r1, g1, b1, a1) end
+    return t
+end
+
 -- Ligne du pool (2 lignes de texte) : L1 = nom (gauche) + qté ×N (droite) ; L2 = prix en pièces
 -- (gauche) + statut (droite). Séparer qté et prix sur deux lignes évite le télescopage. Clic = sélection.
 local function makeRow(panel, i)
     local well = panel.well
-    local r = CreateFrame("Button", nil, well, "BackdropTemplate")
+    local r = CreateFrame("Button", nil, well)
     r:SetHeight(30)
     r:SetPoint("TOPLEFT", 5, -(4 + (i - 1) * 30)); r:SetPoint("TOPRIGHT", -5, -(4 + (i - 1) * 30))
-    r:SetBackdrop({ bgFile = "Interface\\ChatFrame\\ChatFrameBackground" })
+    r.hover = rowTex(r, "HIGHLIGHT", "Professions_Recipe_Hover", 1, 1, 1, 0.08)
+    r.hover:SetAlpha(0.5)
+    r.sel = rowTex(r, "BACKGROUND", "Professions_Recipe_Active", 0.78, 0.57, 0.18, 0.25)
+    r.sel:Hide()
     r.badge = Skin.MakeBadge(r, 22); r.badge:SetPoint("LEFT", 3, 0)
     -- Ligne 1 : nom + quantité
     r.qtyFS = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
@@ -157,23 +184,12 @@ local function makeRow(panel, i)
         panel.selectedId = self.orderId
         if panel.Update then panel:Update() end
     end)
-    r:SetScript("OnEnter", function(self)
-        if self.orderId ~= panel.selectedId then self:SetBackdropColor(Skin.unpack(Skin.color.rowHover)) end
-    end)
-    r:SetScript("OnLeave", function(self)
-        if panel.PaintRowBg then panel.PaintRowBg(self) end
-    end)
     return r
-end
-
-local function paintRowBg(r)
-    if r.isSelected then r:SetBackdropColor(0.78, 0.57, 0.18, 0.25) else r:SetBackdropColor(0, 0, 0, 0) end
 end
 
 -- Remplit le pool avec `orders` ; entretient la sélection (retombe sur la 1re ligne si l'ordre
 -- sélectionné a disparu du lot). Renvoie l'ordre sélectionné (ou nil si liste vide).
 function Comp.FillRows(panel, orders)
-    panel.PaintRowBg = paintRowBg
     local n = math.min(#orders, panel.maxRows)
     local selOk = false
     for _, o in ipairs(orders) do if o.id == panel.selectedId then selOk = true end end
@@ -191,7 +207,7 @@ function Comp.FillRows(panel, orders)
         r.subFS:SetText(Comp.PriceLabel(o))
         local stTxt, stHex = Skin.StatusInfo(o.status)
         r.stFS:SetText("|c" .. stHex .. stTxt .. "|r")
-        paintRowBg(r)
+        r.sel:SetShown(r.isSelected)
         r:Show()
     end
     for i = n + 1, #panel.rows do panel.rows[i]:Hide() end
