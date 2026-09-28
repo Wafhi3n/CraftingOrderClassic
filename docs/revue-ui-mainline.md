@@ -2,13 +2,12 @@
 
 > Rédigée le 2026-09-27 · Cible : WoW: Forever / Camelot (16001) · Statut : **D1-D3 tranchées le
 > 2026-09-27 ; P0 : menus EXCLUS (le client plante), sonde 26/26, minicarte : variante A choisie, 0 refus ; P0 bouclé ;
-> P1 à P6 faits et vus en jeu (2026-09-27/28 : toutes les listes et pages de la fenêtre principale,
-> onglets latéraux, champs montant et quantité, Carnet triable, encarts des métiers) ; P7 en cours :
-> 7a (Journal et fiche de quête) et 7b (panneaux Échange et Courrier) faits et vus en jeu le
-> 2026-09-28 ; reste 7c, la fenêtre Route et les listes de la colonne greffée, après un relevé en
-> combat (risque 4)** · Portée : la fenêtre principale d'abord (Carnet, Commande, Récolte, Artisans, Mes
-> artisans, Aide, Nouveautés), puis les fenêtres annexes. La colonne greffée dans la fenêtre des
-> métiers est déjà faite.
+> P1 à P7 faits et vus en jeu (2026-09-27/28 : toutes les listes et pages de la fenêtre principale,
+> onglets latéraux, champs montant et quantité, Carnet triable, encarts des métiers, Journal et fiche
+> de quête, panneaux Échange et Courrier, colonne greffée et Route — celle-ci ÉPROUVÉE EN COMBAT,
+> risque 4 levé). REVUE BOUCLÉE le 2026-09-28** · Portée : la fenêtre principale d'abord (Carnet,
+> Commande, Récolte, Artisans, Mes artisans, Aide, Nouveautés), puis les fenêtres annexes, puis la
+> colonne greffée dans la fenêtre des métiers.
 >
 > Origine : une journée passée sur le bouton « i » (caché derrière le portrait, puis trop petit, puis
 > en conflit avec nos onglets). Le user : « au lieu de s'acharner, on va revoir l'UI ».
@@ -169,11 +168,20 @@ avant la suivante. Chaque palier démarre par une primitive du kit (`Skin.Make*`
   sélection aux atlas des recettes ; croix `UIPanelCloseButtonDefaultAnchors` (Camelot l'ancre à
   `TOPRIGHT -2,1`), niveau au-dessus de la barre de titre (510). Au passage : le courrier ne liste
   plus que les commandes qui produisent un objet (un enchant ne part pas par la poste).
-- **7c — reste à faire.** La fenêtre Route partage son CORPS avec la colonne greffée
-  (`PW:_BuildRouteBody`, un seul peintre pour les deux) : changer sa barre de défilement, c'est
-  toucher la colonne. Donc avec les listes de la colonne, après le relevé en combat. L'ouverture
-  automatique de l'Enchantement à l'échange reste impossible (mesure M2 du 2026-09-22 : seul un
-  vrai clic choisit le métier) ; l'onglet collé à la fenêtre d'échange est le chemin.
+- **7c — colonne greffée et Route.** La Route partage son CORPS avec la colonne
+  (`PW:_BuildRouteBody`, un seul peintre pour les deux) : elles changent ensemble. Cinq cadres
+  défilants (Commandes, Manquantes, Route, Profit, réglage du LFW) passent à la barre fine par
+  `Skin.MakeScrollFrameIn` : le ScrollFrame reste celui que le code ancre, masque et interroge, et la
+  barre devient SON enfant, dans la marge de l'ancienne. Avec l'hôte de `MakeScrollFrame`, la barre
+  (sœur du cadre) restait affichée quand la colonne masque sa liste, et le parent lu pour poser les
+  autres vues changeait. `Skin.AutoHideScroll` retirée (plus d'appelant). **Relevé en combat**
+  (2026-09-28, `taintLog 1`) : liste mise à jour, Manquantes qui défile, case de la Route cochée,
+  rien de bloqué. Le changement de VUE reste refusé en combat par la garde de `_SetDockView`,
+  voulue et antérieure (masquer les panneaux de la colonne est refusé par le jeu). La liste de
+  recettes de la fenêtre maison (`_ProfWindow_Recipes`, non montrée sur Camelot) garde l'ancien cadre.
+  L'ouverture automatique de l'Enchantement à l'échange reste impossible (mesure M2 du 2026-09-22 :
+  seul un vrai clic choisit le métier) ; l'onglet collé à l'échange PULSE quand une commande
+  d'enchant acceptée lie les deux joueurs.
 
 ## Décisions
 
