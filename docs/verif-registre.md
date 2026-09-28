@@ -36,6 +36,10 @@ client.
 
 ## Relevés
 
+- 2026-09-28 (15) — jusqu'a 5f7da55 — Forever, un client — **GO sur l'icône à 22 px** — capture du user
+  (« c'est bien mieux ») : le logo « CO » lisible sous le nom de la zone, sans toucher la minicarte.
+  PÉRIMÈTRE : la refonte en outil à plusieurs icônes qui suit (même méthode, même rendu) n'est pas revue.
+
 - 2026-09-28 (14) — jusqu'a 530aa48 — Forever, un client, branche `feat/icone-minicarte-maj` — **GO sur
   l'icône « nouvelle version » de la barre de la minicarte** — capture + « oui c'est bon » du user après
   `NotePeerVersion` × 2 (9.9.9) : le logo « CO » sous le nom de la zone, à la place de la lettre, à

@@ -1,7 +1,9 @@
 # Icône d'état dans la barre de la minicarte
 
-> État : **validée** · Rédigée le 2026-09-28 · Première utilisation décidée par le user le 2026-09-28
-> (« mettre une icône là si une mise à jour est dispo ») · Pas encore implémentée
+> État : **implémentée, vue en jeu** (relevés 14 et 15) · Rédigée le 2026-09-28 · Première utilisation
+> décidée par le user le 2026-09-28 (« mettre une icône là si une mise à jour est dispo »), puis :
+> « c'est bien mieux, crée bien la doc, on va l'utiliser » → l'outil sert désormais à plusieurs icônes.
+> Mode d'emploi pour en ajouter une : skill **coc-native-ui**, section « Icônes d'état de la minicarte ».
 > Cible : WoW: Forever / Camelot (16001) · Addon : Crafting Order - Classic
 
 ## Le problème
@@ -52,6 +54,29 @@ disparaît quand on a mis à jour, ou quand l'alerte est oubliée (`/co version 
    des commandes du labo (`/tlab indica`), vue au même endroit le 2026-09-27.
 4. [humain] `/console taintLog 1`, icône affichée, mode Édition ouvert puis fermé, un combat :
    aucune erreur, rien de COC dans `Logs\taint.log`.
+
+## Décisions
+
+- **2026-09-27, user** : variante A (icône ENFANT de la barre, `layoutIndex`, `Layout()`), mesurée sans
+  taint dans TaintLab ; la variante B (cadre à nous collé contre la barre) « fait bizarre, décalé ».
+- **2026-09-28, défaut de l'agent, accepté** : l'icône « mise à jour » est le LOGO de l'addon ; l'atlas
+  des commandes d'artisanat de Blizzard est gardé pour une future icône « commande ». Un clic écrit le
+  détail dans le chat, il n'éteint pas l'icône (elle reste tant que la mise à jour n'est pas faite).
+- **2026-09-28, user** : 16 px trop petit → **22 px** (la lettre de Blizzard fait 20×15). Revu sur
+  capture : lisible, ne touche pas la minicarte.
+- **2026-09-28, user** (« on va l'utiliser ») : le module devient un OUTIL à plusieurs icônes.
+
+## Contrat
+
+`CraftingOrderClassic_MinimapIndicator.lua`, sur `COC.UI` :
+
+- `UI:DefineIndicator(key, def)`, une fois au chargement. `def.texture` (chemin) ou `def.atlas` (atlas
+  VÉRIFIÉ sur le client), `def.order` (rang dans la barre, **≥ 3** : 1 et 2 sont à Blizzard ; un rang
+  par icône), `def.size` (défaut 22), `def.tooltip(tt)` (lignes après le titre « Crafting Order »,
+  posé par l'outil), `def.onClick(button)` facultatif.
+- `UI:SetIndicator(key, shown)` : allume ou éteint ; rend vrai si la barre existe. Le cadre n'est créé
+  qu'au premier allumage ; sans la barre (hors Forever), rien.
+- Rangs attribués : **3 = mise à jour** (`"update"`). Réserver le suivant ici avant de le coder.
 
 ## Renvois
 

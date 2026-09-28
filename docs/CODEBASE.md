@@ -64,7 +64,7 @@
 | `CraftingOrderClassic_Social_Menu.lua` | entrées « Crafting Order » du menu contextuel joueur. | 104 |
 | `CraftingOrderClassic_Social_Roster.lua` | affichage des métiers sur les fenêtres NATIVES. | 130 |
 | `CraftingOrderClassic_Minimap.lua` | bouton minimap (toggle du carnet). | 185 |
-| `CraftingOrderClassic_MinimapIndicator.lua` | icône d'état dans la barre de la minicarte (Forever). | 72 |
+| `CraftingOrderClassic_MinimapIndicator.lua` | icônes d'état dans la barre de la minicarte (Forever). | 98 |
 | `CraftingOrderClassic_Nameplate.lua` | icône « recherche de travail » (LFW) sur les plaques. | 123 |
 | `CraftingOrderClassic_ProfOrders.lua` | COORDINATEUR d'événements de la fenêtre métier. | 83 |
 | `CraftingOrderClassic_RecipeCats.lua` | SOUS-CATÉGORIES de recettes (moteur + registre). | 122 |
@@ -1165,20 +1165,31 @@
 **API** : `UI:BuildMinimapButton()` · `UI:SetUpdateBadge(shown, ver)` · `UI:ToggleProfMenu()`
 
 ### `CraftingOrderClassic_MinimapIndicator.lua`
-> CraftingOrderClassic_MinimapIndicator.lua — icône d'état dans la barre de la minicarte (Forever).
+> CraftingOrderClassic_MinimapIndicator.lua — icônes d'état dans la barre de la minicarte (Forever).
 > 
 > La barre en haut de la minicarte (`MinimapCluster.IndicatorFrame`, Blizzard_Minimap
 > Mainline/Minimap.xml) aligne des icônes qui n'apparaissent que quand quelque chose attend le
-> joueur : la lettre du courrier (rang 1), les commandes d'artisanat de Blizzard (rang 2). On y pose
-> la nôtre au rang 3. Premier usage : « une nouvelle version est disponible », en plus de la pastille
-> du bouton de minicarte — même état, deux affichages. Spec : docs/specs/icone-minicarte.md.
+> joueur : la lettre du courrier (rang 1), les commandes d'artisanat de Blizzard (rang 2). COC y pose
+> les siennes à partir du rang 3. Spec : docs/specs/icone-minicarte.md ; mode d'emploi : skill
+> coc-native-ui, section « Icônes d'état de la minicarte ».
+> 
+> API (deux appels) :
+>   UI:DefineIndicator(key, def)   -- une fois, au chargement
+>       def.texture | def.atlas    -- l'image (chemin de fichier, ou atlas VÉRIFIÉ sur le client)
+>       def.order                  -- rang dans la barre, ≥ 3 (1 et 2 sont à Blizzard)
+>       def.size                   -- côté en px (défaut 22, cf. ICON_SIZE)
+>       def.tooltip(tt)            -- remplit GameTooltip (lignes après le titre « Crafting Order »)
+>       def.onClick(button)        -- facultatif
+>   UI:SetIndicator(key, shown)    -- l'allume ou l'éteint ; rend vrai si la barre existe
+> Le cadre n'est créé qu'au premier allumage. Sans la barre (hors Forever), SetIndicator ne fait rien.
 > 
 > ⚠️ `MinimapCluster` est un cadre du MODE ÉDITION. Méthode mesurée dans TaintLab le 2026-09-27
-> (`/tlab indica`, variante A choisie par le user) : enfant de la barre, `layoutIndex` 3, `Layout()`
-> à chaque bascule — aucune action refusée, 18 bascules en combat comprises. Ne pas changer de méthode
-> (cadre à nous collé contre la barre, SetPoint dans la barre…) sans remesurer au labo.
+> (`/tlab indica`, variante A choisie par le user) puis revue en jeu dans COC le 2026-09-28 (relevé
+> 14) : enfant de la barre, `layoutIndex`, `Layout()` à chaque bascule — aucune action refusée, 18
+> bascules en combat comprises. Ne pas changer de méthode (cadre à nous collé contre la barre, SetPoint
+> à la main dans la barre…) sans remesurer au labo.
 
-**API** : `UI:SetUpdateIndicator(shown)`
+**API** : `UI:DefineIndicator(key, def)` · `UI:SetIndicator(key, shown)` · `UI:SetUpdateIndicator(shown)`
 
 ### `CraftingOrderClassic_Nameplate.lua`
 > CraftingOrderClassic_Nameplate.lua — icône « recherche de travail » (LFW) sur les plaques.
