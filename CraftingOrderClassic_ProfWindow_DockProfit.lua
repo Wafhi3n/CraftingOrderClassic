@@ -27,7 +27,6 @@ local Skin = COC.UI.Skin
 local L    = COC.L
 
 local ROW_H  = 16
-local SCROLL = "CraftingOrderDockProfitScroll"
 local NO_ICON = "Interface\\Icons\\INV_Misc_QuestionMark"
 
 -- L'oracle de prix, ou nil. Rendu plutôt que testé : les appelants s'en servent ensuite, et deux
@@ -55,9 +54,8 @@ function PW:_BuildDockProfit(host, anchor)
     pp:Hide()
     local hdr = pp:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     hdr:SetPoint("TOPLEFT", 8, -8); pp.hdr = hdr
-    local scroll = CreateFrame("ScrollFrame", SCROLL, pp, "UIPanelScrollFrameTemplate")
+    local scroll = Skin.MakeScrollFrameIn(pp)   -- barre fine, se cache seule (palier 7c)
     scroll:SetPoint("TOPLEFT", 6, -24); scroll:SetPoint("BOTTOMRIGHT", -26, 6)
-    Skin.ScrollTrack(SCROLL)
     local content = CreateFrame("Frame", nil, scroll)
     content:SetSize(10, 1); scroll:SetScrollChild(content)
     pp.scroll, pp.content, pp.rows = scroll, content, {}
@@ -210,5 +208,4 @@ function PW:_FillDockProfit()
         pp.rows[i]:Hide(); pp.rows[i].sid, pp.rows[i].p = nil, nil
     end
     pp.content:SetHeight(math.max(#list * ROW_H, 1))
-    Skin.AutoHideScroll(SCROLL, pp.content)
 end

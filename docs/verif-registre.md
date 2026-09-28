@@ -46,6 +46,22 @@ client.
 
 ## Relevés
 
+- 2026-09-28 16:05 — jusqu'a eaa4ba7 — Forever, deux clients, client en ANGLAIS ; build déployé
+  `main-dev@c43f9f9 2026-09-28 15:43` (`/co version` pas relu) — **GO sur le palier 7c : la colonne
+  greffée à la barre fine, ÉPROUVÉE EN COMBAT** (risque 4 de la revue) — capture du user en combat
+  (épées croisées, mob frappé) : la liste Commandes se met à jour pendant le combat (cinq commandes
+  de Gnomi, la plus récente à 0 s), et le changement de vue refusé par la garde EXISTANTE de
+  `_SetDockView` (« Not possible in combat », ×4 — voulu, antérieur au palier). Rapporté par le
+  user : en combat, la vue Manquantes (choisie avant) défile normalement ; dans la Route, la case
+  « inclure les plans à acheter » se coche et se décoche (la route se recalcule). Second passage
+  en combat refait APRÈS `/console taintLog 1` et un `/reload` (rapporté par le user ; la config du
+  client ne l'écrit qu'à la déconnexion, donc pas vérifiable sur disque) : `Logs\taint.log`, relu par
+  l'agent à 16:05 et 16:15, reste daté du 2026-09-22 — au niveau 1 il n'écrit qu'à une action
+  bloquée : aucune. Aucun « Interface action failed » rapporté. Seule erreur : `SelectRecipe`
+  d'Auctionator à l'ouverture (connue, pas COC).
+  Non vu : la barre fine elle-même sur capture, Profit et le réglage du LFW, la fenêtre Route
+  flottante, fermer/rouvrir la fenêtre de métier en combat.
+
 - 2026-09-28 15:40 — jusqu'a 2335752 — Forever, deux clients, client en ANGLAIS ; build déployé
   `main-dev@99fbb57 2026-09-28 15:33` (`/co version` pas relu ; au build précédent `0f9e9f2`, lu en
   jeu, les branches en test étaient `feat/echange-onglet-pulse, feat/icone-commande-recue`) — **GO

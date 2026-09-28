@@ -247,7 +247,7 @@ function PW:_BuildOrders(col)
     -- (dock Era, greffe Forever), sous garde nil : _ProfWindow_DockViews est une dépendance molle.
     if self._BuildDockViewBtns then self:_BuildDockViewBtns() end
     self.ordLevelBtn = lvl
-    local scroll = CreateFrame("ScrollFrame", "CraftingOrderProfWinOrdScroll", bz, "UIPanelScrollFrameTemplate")
+    local scroll = Skin.MakeScrollFrameIn(bz)   -- barre fine, ENFANT du cadre : cf. Skin.MakeScrollFrameIn
     scroll:SetPoint("TOPLEFT", 6, -26); scroll:SetPoint("BOTTOMRIGHT", -24, 0)
     local content = CreateFrame("Frame", nil, scroll); content:SetSize(PW.ORD_CARD_W, 10); scroll:SetScrollChild(content)
     self.ordScroll, self.ordContent = scroll, content
@@ -472,8 +472,7 @@ function PW:RefreshOrders()
         -- Le sélecteur se re-mesure derrière : sa largeur dépend de la présence du bouton de tri.
         if self._compact and self._PlaceOrdTabs then self:_PlaceOrdTabs(true) end
     end
-    if sel then self:_RenderOrdSelected(sel) else self:_RenderOrdList(list) end
-    Skin.AutoHideScroll("CraftingOrderProfWinOrdScroll", self.ordContent)
+    if sel then self:_RenderOrdSelected(sel) else self:_RenderOrdList(list) end   -- la barre se cache seule
     self.ordHdr:SetText("|cFFE8B84B" .. L["Commandes"] .. "|r |cFF888888(" .. #list .. ")|r")
     if self.ordFoot then
         self.ordFoot:SetText(string.format("|cFFFFCC00%d|r %s · |cFF33CCFF%d|r %s · |cFF888888%d|r %s",

@@ -129,7 +129,7 @@ function PW:_BuildDockViews()
     self.routePanel = rp
     -- Bas à 20 (au lieu de 46) : la colonne n'a pas la note d'estimation en pied de la fenêtre,
     -- seulement la case « inclure les plans ».
-    self:_BuildRouteBody(rp, rp, "CraftingOrderDockRouteScroll", 20)
+    self:_BuildRouteBody(rp, rp, 20)
 
     -- Panneau MANQUANTES : liste simple, tout le détail en infobulle.
     local mp = CreateFrame("Frame", nil, host)
@@ -137,9 +137,8 @@ function PW:_BuildDockViews()
     mp:Hide()
     local hdr = mp:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     hdr:SetPoint("TOPLEFT", 8, -8); mp.hdr = hdr
-    local scroll = CreateFrame("ScrollFrame", "CraftingOrderDockMissScroll", mp, "UIPanelScrollFrameTemplate")
+    local scroll = Skin.MakeScrollFrameIn(mp)   -- barre fine, se cache seule (palier 7c)
     scroll:SetPoint("TOPLEFT", 6, -24); scroll:SetPoint("BOTTOMRIGHT", -26, 6)
-    Skin.ScrollTrack("CraftingOrderDockMissScroll")
     local content = CreateFrame("Frame", nil, scroll)
     content:SetSize(10, 1); scroll:SetScrollChild(content)
     mp.scroll, mp.content, mp.rows = scroll, content, {}
@@ -327,7 +326,6 @@ function PW:_FillDockMissing()
     end
     for i = #list + 1, #mp.rows do mp.rows[i]:Hide(); mp.rows[i].sid = nil end
     mp.content:SetHeight(math.max(#list * ROW_H, 1))
-    Skin.AutoHideScroll("CraftingOrderDockMissScroll", mp.content)
 end
 
 -- ------------------------------------------------------------------

@@ -148,23 +148,22 @@ end
 -- CORPS de la route, indépendant de son contenant. Il vit dans DEUX endroits : la fenêtre
 -- flottante et le panneau de la colonne greffée (_ProfWindow_DockViews). Un seul peintre, une seule
 -- vérité : le dupliquer, c'est se garantir deux routes qui divergent à la première correction faite
--- d'un seul côté. `f` porte les pièces, `inset` est le cadre où les poser, et `scrollName` doit être
--- UNIQUE : les helpers de skin adressent la barre de défilement par son nom GLOBAL.
+-- d'un seul côté. `f` porte les pièces, `inset` est le cadre où les poser. La barre fine est l'enfant
+-- du cadre défilant (Skin.MakeScrollFrameIn, palier 7c) : plus de nom global à tenir unique.
 -- Haut du corps scrollé selon que le titre et le total tiennent sur UNE ligne ou DEUX
 -- (cf. setRouteSub). Déclaré ici parce que le BUILD s'en sert déjà : en Lua un local
 -- n'existe pas avant sa déclaration, et le poser plus bas le rendait nil au build.
 local HEAD_ONE, HEAD_TWO = 30, 44
 
-function PW:_BuildRouteBody(f, inset, scrollName, bottomInset)
+function PW:_BuildRouteBody(f, inset, bottomInset)
     local inset = f.Inset or f
     local head = inset:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     head:SetPoint("TOPLEFT", 10, -9); f.head = head
     local sub = inset:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     sub:SetPoint("TOPRIGHT", -30, -10); sub:SetJustifyH("RIGHT"); f.sub = sub
-    local scroll = CreateFrame("ScrollFrame", scrollName, inset, "UIPanelScrollFrameTemplate")
+    local scroll = Skin.MakeScrollFrameIn(inset)
     -- Bas relevé (46) : place pour la case « inclure les plans » sous la zone scrollée.
     scroll:SetPoint("TOPLEFT", 6, -HEAD_ONE); scroll:SetPoint("BOTTOMRIGHT", -26, bottomInset or 46)
-    Skin.ScrollTrack(scrollName)
     local content = CreateFrame("Frame", nil, scroll)
     content:SetSize(370, 1); scroll:SetScrollChild(content)
     f.scroll, f.content, f.rows = scroll, content, {}
@@ -211,7 +210,7 @@ function PW:_BuildRouteWin()
         pos = COC.db and COC.db.routeWinPos,
         onMoved = function(p, rp, x, y) if COC.db then COC.db.routeWinPos = { p, rp, x, y } end end,
     })
-    self:_BuildRouteBody(f, f.Inset or f, "CraftingOrderRouteScroll", 46)
+    self:_BuildRouteBody(f, f.Inset or f, 46)
     -- Aide contextuelle « bouton i » (même mécanisme que la fenêtre principale ; soft-dep HelpPlate).
     if HelpPlate then
         f.helpBtn = Skin.MakeHelpButton(f, function() PW:_ToggleRouteHelp() end, {

@@ -57,13 +57,11 @@ function PW:_FillRouteSupply(f, route, startY)
     for i = used.line + 1, #(f.lines or {}) do f.lines[i]:Hide() end
     -- Le contenu suit la largeur du VIEWPORT. Il était figé à 370 au build : juste pour la fenêtre
     -- flottante, deux fois trop large pour la colonne greffée — les lignes débordaient et se
-    -- faisaient couper à droite. Et l'ascenseur se masque quand il n'y a rien à faire défiler :
-    -- deux flèches au-dessus d'une route de deux étapes n'indiquent rien (constat 2026-09-20).
+    -- faisaient couper à droite. L'ascenseur se masque quand il n'y a rien à faire défiler (constat
+    -- 2026-09-20) : la barre fine le fait seule depuis le palier 7c.
     local sw = (f.scroll and f.scroll:GetWidth()) or 0
     if sw > 0 then f.content:SetWidth(sw) end
     f.content:SetHeight(math.max(y, 1))
-    local nm = f.scroll and f.scroll.GetName and f.scroll:GetName()
-    if nm then Skin.AutoHideScroll(nm, f.content) end
 end
 
 -- PNJ formateur du PALIER SUIVANT : première recette apprise plus haut que `rank` ET enseignée au
