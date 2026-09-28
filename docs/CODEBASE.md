@@ -4,7 +4,7 @@
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
-139 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
+140 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
 
 ## Modules (ordre de chargement)
 
@@ -17,13 +17,13 @@
 | `CraftingOrderClassic_Locale.lua` | socle de localisation du CHROME de l'UI. | 12 |
 | `CraftingOrderClassic_Locale_enUS.lua` | overlay ANGLAIS (enUS/enGB). | 279 |
 | `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 497 |
-| `CraftingOrderClassic_Locale_enUS_3.lua` | overlay enUS, 3/3. | 37 |
+| `CraftingOrderClassic_Locale_enUS_3.lua` | overlay enUS, 3/3. | 39 |
 | `CraftingOrderClassic_Locale_deDE.lua` | overlay ALLEMAND (deDE). | 281 |
 | `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 477 |
-| `CraftingOrderClassic_Locale_deDE_3.lua` | overlay deDE, 3/3. | 36 |
+| `CraftingOrderClassic_Locale_deDE_3.lua` | overlay deDE, 3/3. | 38 |
 | `CraftingOrderClassic_Locale_esES.lua` | overlay ESPAGNOL (esES/esMX). | 282 |
 | `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 478 |
-| `CraftingOrderClassic_Locale_esES_3.lua` | overlay esES, 3/3. | 37 |
+| `CraftingOrderClassic_Locale_esES_3.lua` | overlay esES, 3/3. | 39 |
 | `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 396 |
 | `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 393 |
 | `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 393 |
@@ -63,7 +63,8 @@
 | `CraftingOrderClassic_Social.lua` | couche sociale passive (socle). | 402 |
 | `CraftingOrderClassic_Social_Menu.lua` | entrées « Crafting Order » du menu contextuel joueur. | 104 |
 | `CraftingOrderClassic_Social_Roster.lua` | affichage des métiers sur les fenêtres NATIVES. | 130 |
-| `CraftingOrderClassic_Minimap.lua` | bouton minimap (toggle du carnet). | 183 |
+| `CraftingOrderClassic_Minimap.lua` | bouton minimap (toggle du carnet). | 185 |
+| `CraftingOrderClassic_MinimapIndicator.lua` | icônes d'état dans la barre de la minicarte (Forever). | 98 |
 | `CraftingOrderClassic_Nameplate.lua` | icône « recherche de travail » (LFW) sur les plaques. | 123 |
 | `CraftingOrderClassic_ProfOrders.lua` | COORDINATEUR d'événements de la fenêtre métier. | 83 |
 | `CraftingOrderClassic_RecipeCats.lua` | SOUS-CATÉGORIES de recettes (moteur + registre). | 122 |
@@ -1162,6 +1163,33 @@
 > Position persistée en angle (COC.db.minimapAngle). Glisser = repositionner autour de la minimap.
 
 **API** : `UI:BuildMinimapButton()` · `UI:SetUpdateBadge(shown, ver)` · `UI:ToggleProfMenu()`
+
+### `CraftingOrderClassic_MinimapIndicator.lua`
+> CraftingOrderClassic_MinimapIndicator.lua — icônes d'état dans la barre de la minicarte (Forever).
+> 
+> La barre en haut de la minicarte (`MinimapCluster.IndicatorFrame`, Blizzard_Minimap
+> Mainline/Minimap.xml) aligne des icônes qui n'apparaissent que quand quelque chose attend le
+> joueur : la lettre du courrier (rang 1), les commandes d'artisanat de Blizzard (rang 2). COC y pose
+> les siennes à partir du rang 3. Spec : docs/specs/icone-minicarte.md ; mode d'emploi : skill
+> coc-native-ui, section « Icônes d'état de la minicarte ».
+> 
+> API (deux appels) :
+>   UI:DefineIndicator(key, def)   -- une fois, au chargement
+>       def.texture | def.atlas    -- l'image (chemin de fichier, ou atlas VÉRIFIÉ sur le client)
+>       def.order                  -- rang dans la barre, ≥ 3 (1 et 2 sont à Blizzard)
+>       def.size                   -- côté en px (défaut 22, cf. ICON_SIZE)
+>       def.tooltip(tt)            -- remplit GameTooltip (lignes après le titre « Crafting Order »)
+>       def.onClick(button)        -- facultatif
+>   UI:SetIndicator(key, shown)    -- l'allume ou l'éteint ; rend vrai si la barre existe
+> Le cadre n'est créé qu'au premier allumage. Sans la barre (hors Forever), SetIndicator ne fait rien.
+> 
+> ⚠️ `MinimapCluster` est un cadre du MODE ÉDITION. Méthode mesurée dans TaintLab le 2026-09-27
+> (`/tlab indica`, variante A choisie par le user) puis revue en jeu dans COC le 2026-09-28 (relevé
+> 14) : enfant de la barre, `layoutIndex`, `Layout()` à chaque bascule — aucune action refusée, 18
+> bascules en combat comprises. Ne pas changer de méthode (cadre à nous collé contre la barre, SetPoint
+> à la main dans la barre…) sans remesurer au labo.
+
+**API** : `UI:DefineIndicator(key, def)` · `UI:SetIndicator(key, shown)` · `UI:SetUpdateIndicator(shown)`
 
 ### `CraftingOrderClassic_Nameplate.lua`
 > CraftingOrderClassic_Nameplate.lua — icône « recherche de travail » (LFW) sur les plaques.

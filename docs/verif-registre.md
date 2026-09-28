@@ -36,6 +36,17 @@ client.
 
 ## Relevés
 
+- 2026-09-28 (15) — jusqu'a 5f7da55 — Forever, un client — **GO sur l'icône à 22 px** — capture du user
+  (« c'est bien mieux ») : le logo « CO » lisible sous le nom de la zone, sans toucher la minicarte.
+  PÉRIMÈTRE : la refonte en outil à plusieurs icônes qui suit (même méthode, même rendu) n'est pas revue.
+
+- 2026-09-28 (14) — jusqu'a 530aa48 — Forever, un client, branche `feat/icone-minicarte-maj` — **GO sur
+  l'icône « nouvelle version » de la barre de la minicarte** — capture + « oui c'est bon » du user après
+  `NotePeerVersion` × 2 (9.9.9) : le logo « CO » sous le nom de la zone, à la place de la lettre, à
+  côté du compartiment d'addons ; infobulle, clic, mode Édition et combat rapportés bons. `taint.log`
+  inchangé depuis le 22/09 (ne prouve rien si `taintLog 1` n'était pas actif). Seul retour : l'icône
+  est trop petite (16 px) → passée à 22 px après la séance, PAS revue.
+
 - 2026-09-28 (13) — jusqu'a 6908c48 — Forever, **DEUX COMPTES** + un perso Horde, branche
   `feat/communaute-sans-canal` — **GO sur les corrections du relevé 12** — rapporté par le user
   (« c'est tout bon, j'ai fait tous les tests ») + capture d'Orcaa + trace de Gnomi (SV 10:54) :

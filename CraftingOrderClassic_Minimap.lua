@@ -108,6 +108,8 @@ end
 function UI:SetUpdateBadge(shown, ver)
     self._updateVer = shown and ver or nil
     if self.updateBadge then self.updateBadge:SetShown(shown and true or false) end
+    -- Même état, deuxième affichage : le logo dans la barre d'état de la minicarte (MinimapIndicator).
+    if self.SetUpdateIndicator then self:SetUpdateIndicator(shown) end
 end
 
 -- ------------------------------------------------------------------
