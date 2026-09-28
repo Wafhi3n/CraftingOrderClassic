@@ -3,7 +3,8 @@
 -- renseigne le destinataire (« À: ») + objet / corps / contre-remboursement, puis marque « remise »
 -- (Orders:Deliver) quand l'envoi ABOUTIT (MAIL_SEND_SUCCESS + destinataire vérifié) — jamais d'auto-envoi.
 -- Si un destinataire est déjà saisi, on filtre sur ses commandes ; sinon on affiche TOUTES mes livraisons.
--- Côté acheteur, la réception (pièce jointe prise) est couverte par le détecteur CHAT_MSG_LOOT existant.
+-- Côté acheteur, prendre la pièce jointe confirme la réception (cf. confirmFromMail, en bas) : le
+-- message de butin du chat, seul détecteur jusque-là, ne vient pas d'une pièce jointe sur Forever.
 
 local COC  = CraftingOrderClassic
 local Comp = COC.Companion
@@ -155,11 +156,48 @@ local function build()
     hooksecurefunc("SendMail", function(target) lastSendTarget = Comp.shortName(target or ""):lower() end)
 end
 
+-- ------------------------------------------------------------------
+-- ACHETEUR : prendre la pièce jointe confirme la commande « remise » qui attend cet objet
+-- ------------------------------------------------------------------
+-- Vu en jeu le 2026-09-28 : l'acheteur prend l'objet, la commande reste « Delivered ». La
+-- confirmation automatique n'écoutait que le message de butin du chat, qu'une pièce jointe ne
+-- produit pas. On s'accroche donc aux DEUX gestes du jeu, `TakeInboxItem` (clic sur l'objet) et
+-- `AutoLootMailItem` (tout prendre), par hooksecurefunc : les remplacer contaminerait le code de
+-- Blizzard qui les appelle. Le crochet passe APRÈS l'appel ; si la pièce jointe n'est déjà plus
+-- lisible, le relevé pris à chaque MAIL_INBOX_UPDATE la donne encore.
+local seen = {}   -- [n° de courrier] = { [n° de pièce jointe] = itemID }
+
+local function snapshot()
+    seen = {}
+    local n = (GetInboxNumItems and GetInboxNumItems()) or 0
+    for m = 1, n do
+        for i = 1, (ATTACHMENTS_MAX_RECEIVE or 16) do
+            local _, id = GetInboxItem(m, i)
+            if id then seen[m] = seen[m] or {}; seen[m][i] = id end
+        end
+    end
+end
+
+local function confirmFromMail(index, attach)
+    if not (index and GetInboxItem and COC.Orders and COC.Orders.TryAutoComplete) then return end
+    local first, last = attach or 1, attach or (ATTACHMENTS_MAX_RECEIVE or 16)
+    for i = first, last do
+        local _, id = GetInboxItem(index, i)
+        id = id or (seen[index] and seen[index][i])
+        if id then COC.Orders:TryAutoComplete(id, "mail") end
+    end
+end
+
+if TakeInboxItem then hooksecurefunc("TakeInboxItem", confirmFromMail) end
+if AutoLootMailItem then hooksecurefunc("AutoLootMailItem", function(index) confirmFromMail(index) end) end
+
 local f = CreateFrame("Frame")
 f:RegisterEvent("MAIL_SHOW")
 f:RegisterEvent("MAIL_CLOSED")
 f:RegisterEvent("MAIL_SEND_SUCCESS")
+f:RegisterEvent("MAIL_INBOX_UPDATE")
 f:SetScript("OnEvent", function(_, event)
+    if event == "MAIL_INBOX_UPDATE" then snapshot(); return end
     if event == "MAIL_SHOW" then
         build()
         if panel then Mail.Update() end
