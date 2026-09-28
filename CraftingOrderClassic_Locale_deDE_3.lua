@@ -36,6 +36,10 @@ local de3 = {
     -- Signature du build de test, /co version (2026-09-28)
     ["Build : %s"] = "Build: %s",
     ["Branches en test : %s"] = "Branches im Test: %s",
+    -- Icône « une commande t'attend » de la barre de la minicarte (2026-09-28)
+    ["Commandes à ton nom : %d"] = "Aufträge auf deinen Namen: %d",
+    ["pour %s"] = "für %s",
+    ["Clic : ouvrir le métier de la plus récente."] = "Klick: Beruf des neuesten öffnen.",
 }
 
 for k, v in pairs(de3) do L[k] = v end

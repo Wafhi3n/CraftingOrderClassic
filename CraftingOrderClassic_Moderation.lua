@@ -89,6 +89,7 @@ function Mod:Mute(name, reason, durationSec)
     local suffix = durationSec and (" (" .. humanRemaining(durationSec) .. ")") or ""
     pmsg(string.format(L["%s est mis en sourdine — plus aucune notification de sa part."], name) .. suffix)
     if COC.UI and COC.UI.Refresh then COC.UI:Refresh() end
+    if COC.UI and COC.UI.RefreshOrderIndicator then COC.UI:RefreshOrderIndicator() end
 end
 
 function Mod:Unmute(name)
@@ -99,6 +100,7 @@ function Mod:Unmute(name)
     tr("démuté : %s", name)
     pmsg(string.format(L["%s n'est plus en sourdine."], name))
     if COC.UI and COC.UI.Refresh then COC.UI:Refresh() end
+    if COC.UI and COC.UI.RefreshOrderIndicator then COC.UI:RefreshOrderIndicator() end
 end
 
 -- Libellé d'un muté pour la liste : « Bob — 42min · spammeur » / « Bob — permanent · <raison> ».

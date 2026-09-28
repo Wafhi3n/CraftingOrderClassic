@@ -37,6 +37,10 @@ local es3 = {
     -- Signature du build de test, /co version (2026-09-28)
     ["Build : %s"] = "Build: %s",
     ["Branches en test : %s"] = "Ramas en prueba: %s",
+    -- Icône « une commande t'attend » de la barre de la minicarte (2026-09-28)
+    ["Commandes à ton nom : %d"] = "Pedidos a tu nombre: %d",
+    ["pour %s"] = "para %s",
+    ["Clic : ouvrir le métier de la plus récente."] = "Clic: abrir la profesión del más reciente.",
 }
 
 for k, v in pairs(es3) do L[k] = v end

@@ -11,6 +11,9 @@
 --       def.texture | def.atlas    -- l'image (chemin de fichier, ou atlas VÉRIFIÉ sur le client)
 --       def.order                  -- rang dans la barre, ≥ 3 (1 et 2 sont à Blizzard)
 --       def.size                   -- côté en px (défaut 22, cf. ICON_SIZE)
+--       def.width / def.height     -- facultatif, pour une icône qui n'est pas carrée (priment sur size)
+--       def.useAtlasSize           -- l'atlas garde sa taille native, calé en haut à gauche (comme le
+--                                  -- useAtlasSize="true" du XML de Blizzard) au lieu d'être étiré
 --       def.tooltip(tt)            -- remplit GameTooltip (lignes après le titre « Crafting Order »)
 --       def.onClick(button)        -- facultatif
 --   UI:SetIndicator(key, shown)    -- l'allume ou l'éteint ; rend vrai si la barre existe
@@ -41,12 +44,17 @@ end
 local function build(parent, def)
     local f = CreateFrame("Frame", nil, parent)
     local size = def.size or ICON_SIZE
-    f:SetSize(size, size)
+    f:SetSize(def.width or size, def.height or size)
     f.layoutIndex = def.order
     f:EnableMouse(true)
     local tex = f:CreateTexture(nil, "ARTWORK")
-    if def.atlas then tex:SetAtlas(def.atlas) else tex:SetTexture(def.texture) end
-    tex:SetAllPoints()
+    if def.atlas and def.useAtlasSize then
+        tex:SetAtlas(def.atlas, true)
+        tex:SetPoint("TOPLEFT")
+    else
+        if def.atlas then tex:SetAtlas(def.atlas) else tex:SetTexture(def.texture) end
+        tex:SetAllPoints()
+    end
     f:SetScript("OnEnter", function(self)
         GameTooltip:SetOwner(self, "ANCHOR_BOTTOMLEFT")
         GameTooltip:AddLine("Crafting Order")

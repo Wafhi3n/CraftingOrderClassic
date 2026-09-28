@@ -201,6 +201,7 @@ function PW:_CardActions(card, it)
         elseif kind == "inbound" then COC.Inbound:Dismiss(o.id)
         else COC.db.muted = COC.db.muted or {}; COC.db.muted[o.id] = true end
         PW:RefreshOrders()
+        if UI.RefreshOrderIndicator then UI:RefreshOrderIndicator() end   -- masquée : elle ne m'attend plus
     end)
 end
 
