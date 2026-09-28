@@ -45,6 +45,7 @@ local de3 = {
         "|cFFE8B84BHilfe|r und |cFFE8B84BNeues|r: diese Seite und was sich in jeder Version geändert hat.",
     ["cercles d'artisans (communautés) et rappel de la communauté"] =
         "Handwerkerkreise (Gemeinschaften) und die Gemeinschafts-Erinnerung",
+    ["ou"] = "oder",   -- statuts d'une commande, Aide : « (ou Annulée / Refusée) »
 }
 
 for k, v in pairs(de3) do L[k] = v end

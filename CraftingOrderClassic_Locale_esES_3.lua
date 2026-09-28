@@ -46,6 +46,7 @@ local es3 = {
         "|cFFE8B84BAyuda|r y |cFFE8B84BNovedades|r: esta página, y lo que cambió en cada versión.",
     ["cercles d'artisans (communautés) et rappel de la communauté"] =
         "círculos de artesanos (comunidades) y el aviso de la comunidad",
+    ["ou"] = "o",   -- statuts d'une commande, Aide : « (ou Annulée / Refusée) »
 }
 
 for k, v in pairs(es3) do L[k] = v end

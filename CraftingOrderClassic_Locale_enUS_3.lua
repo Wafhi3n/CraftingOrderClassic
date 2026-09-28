@@ -46,6 +46,7 @@ local en3 = {
         "|cFFE8B84BHelp|r and |cFFE8B84BWhat's New|r: this page, and what changed in each version.",
     ["cercles d'artisans (communautés) et rappel de la communauté"] =
         "crafters' circles (communities) and the community reminder",
+    ["ou"] = "or",   -- statuts d'une commande, Aide : « (ou Annulée / Refusée) »
 }
 
 for k, v in pairs(en3) do L[k] = v end

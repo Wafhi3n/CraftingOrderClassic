@@ -108,7 +108,8 @@ local function contentSocial()
                 L["Pas de canal de discussion : l'addon échange en chuchotements invisibles avec les joueurs de tes cercles, tes amis et ta guilde — aucun message lisible n'est envoyé."],
                 L["Les artisans se retrouvent dans la communauté |cFFFFD100Crafting Order PVE|r, une par camp. Sans cercle, l'addon t'en envoie le lien à la connexion : rejoins-la, elle devient ton cercle d'artisans."],
                 L["Statuts d'une commande : "] .. "|cFFFFCC00" .. L["En attente"] .. "|r » |cFF33CCFF" .. L["Acceptée"]
-                    .. "|r » |cFF33DD33" .. L["Livrée"] .. "|r (ou |cFF888888" .. L["Annulée"] .. "|r / |cFFFF4444" .. L["Refusée"] .. "|r).",
+                    .. "|r » |cFF33DD33" .. L["Livrée"] .. "|r (" .. L["ou"] .. " |cFF888888" .. L["Annulée"]
+                    .. "|r / |cFFFF4444" .. L["Refusée"] .. "|r).",
             },
         },
     }
