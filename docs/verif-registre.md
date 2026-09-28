@@ -23,6 +23,10 @@ Le `<sha>` est le dernier commit **réellement présent dans le client** pendant
 dans le jeu (`main-dev@<sha>` et les branches en test) : on le recopie, on ne le déduit pas. Le
 reste est en clair, pour qu'un humain relise un verdict sans le décoder.
 
+**Au banc, le repère est le dernier commit de la BRANCHE éprouvée, pas la fusion `main-dev@…`.** La
+fusion embarque les branches des autres sessions, pas forcément vues ; et `main-dev` est refaite
+à chaque release, sa fusion ne reste atteignable que par une sauvegarde.
+
 **Plusieurs sessions écrivent ici en parallèle** (depuis le 2026-09-28), chacune sur sa branche.
 D'où l'heure plutôt qu'un numéro du jour : deux sessions prenaient le même « (14) ». Le fichier
 fusionne en `merge=union` (`.gitattributes`), les deux relevés se retrouvent l'un sous l'autre sans
