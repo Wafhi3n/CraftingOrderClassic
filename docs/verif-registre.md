@@ -46,6 +46,18 @@ client.
 
 ## Relevés
 
+- 2026-09-28 14:45 — jusqu'a 867c3f5 — Forever, un client, client en ANGLAIS ; build déployé
+  `main-dev@acaf664 2026-09-28 14:24` (sortie de `deploy.ps1` ; `/co version` pas relu sur ces
+  captures, mais le nouveau cadre n'existe qu'à partir de ce build), branches en test
+  `fix/aide-a-jour, feat/ui-p7a-journal` et celles de l'autre session — **GO sur le palier 7a : le
+  Journal et la fiche de quête dans le cadre de retail** — verdict du user (« c'est très bien pour le
+  7a ») sur deux captures : le Journal (`/co journal`) en ButtonFrameTemplate, livre en médaillon,
+  parchemin dans l'encart, liste par zone avec « (Complete) » à droite, barre de défilement cachée
+  car tout tient ; la fiche « Poster en quête » avec le donneur en titre (« Anatarion Gifter »),
+  le parchemin, le compteur 5/80 · 0/180, les objectifs, et Cancel / Post sur la barre du bas.
+  Non vu : Échap sur le Journal, le détail d'une entrée sélectionnée, la fiche en lecture
+  (`/co quest`), l'envoi par Post depuis la fiche.
+
 - 2026-09-28 13:51 — jusqu'a bd537da — Forever, un client, client en ANGLAIS ; build
   `main-dev@1371803 2026-09-28 13:45`, branches en test `feat/icone-commande-recue,
   feat/ui-p5-carnet-tri, feat/ui-p6-fonds` (lu dans la signature du `.toc` déployé) — **GO sur le
