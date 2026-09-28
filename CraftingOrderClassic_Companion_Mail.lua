@@ -260,13 +260,21 @@ local function snapshot()
     end
 end
 
+-- Tracé (« mail ») : le crochet est-il appelé, quel objet a-t-il lu (en direct ou dans le relevé), et
+-- une commande « remise » a-t-elle été confirmée. Posé quand, au banc, rien ne s'est confirmé et que
+-- rien ne permettait de dire si la prise avait eu lieu (2026-09-28).
 local function confirmFromMail(index, attach)
+    traceMail(string.format("prise de pièce jointe : courrier %s, pièce %s", tostring(index), tostring(attach or "toutes")))
     if not (index and GetInboxItem and COC.Orders and COC.Orders.TryAutoComplete) then return end
     local first, last = attach or 1, attach or (ATTACHMENTS_MAX_RECEIVE or 16)
     for i = first, last do
-        local _, id = GetInboxItem(index, i)
-        id = id or (seen[index] and seen[index][i])
-        if id then COC.Orders:TryAutoComplete(id, "mail") end
+        local _, live = GetInboxItem(index, i)
+        local id = live or (seen[index] and seen[index][i])
+        if id then
+            local ok = COC.Orders:TryAutoComplete(id, "mail")
+            traceMail(string.format("  pièce %d : objet %s (%s) -> %s", i, tostring(id), live and "lu" or "relevé",
+                ok and "commande confirmée" or "aucune commande remise pour cet objet"))
+        end
     end
 end
 
