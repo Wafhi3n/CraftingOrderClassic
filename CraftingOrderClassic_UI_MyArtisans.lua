@@ -218,6 +218,9 @@ function UI:_BuildMyArtRecRow(r)
     r.profit:SetPoint("RIGHT", -6, 0); r.profit:SetJustifyH("RIGHT"); Skin.ApplyShadow(r.profit)
     r.who = r:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
     r.who:SetPoint("RIGHT", r.profit, "LEFT", -6, 0); r.who:SetJustifyH("RIGHT"); r.who:SetWidth(120); Skin.ApplyShadow(r.who)
+    -- Une seule ligne, tronquée par « … » : trois porteurs passaient sur 2 lignes et mordaient sur la
+    -- recette suivante (ligne de 18 px ; vu en jeu le 2026-09-28, Pêche).
+    r.who:SetWordWrap(false)
     r:EnableMouse(true); Skin.WireItemTooltip(r); Skin.WireItemLink(r)   -- tooltip + shift-clic lien (tipItemID/tipSpellID)
 end
 

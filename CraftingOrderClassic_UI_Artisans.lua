@@ -449,6 +449,9 @@ function UI:_BuildArtRow(r)
     r.name:SetPoint("TOPLEFT", 22, -5); r.name:SetWidth(150); r.name:SetJustifyH("LEFT"); Skin.ApplyShadow(r.name)
     r.sub   = r:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
     r.sub:SetPoint("TOPLEFT", 22, -22); r.sub:SetWidth(150); r.sub:SetJustifyH("LEFT"); Skin.ApplyShadow(r.sub)
+    -- Une ligne chacun, tronquée par « … » : « [Partenaire] » + prénom + nom de famille dépassait 150 px
+    -- et le nom retombait SUR la sous-ligne (vu en jeu le 2026-09-28).
+    r.name:SetWordWrap(false); r.sub:SetWordWrap(false)
     r.profsFrame = CreateFrame("Frame", nil, r)
     -- Ancrée et pas dimensionnée : de x = 180 jusqu'à 126 du bord droit (source, étoile, boutons).
     r.profsFrame:SetPoint("TOPLEFT", 180, 0); r.profsFrame:SetPoint("BOTTOMRIGHT", -126, 0)
