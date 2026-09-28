@@ -53,10 +53,12 @@ client.
   de Gnomi, la plus récente à 0 s), et le changement de vue refusé par la garde EXISTANTE de
   `_SetDockView` (« Not possible in combat », ×4 — voulu, antérieur au palier). Rapporté par le
   user : en combat, la vue Manquantes (choisie avant) défile normalement ; dans la Route, la case
-  « inclure les plans à acheter » se coche et se décoche (la route se recalcule). `Logs\taint.log`
-  relu par l'agent après les deux passages : inchangé depuis le 2026-09-22 — aucun blocage écrit,
-  sous réserve que `/console taintLog 1` ait été actif (pas confirmé). Aucun « Interface action
-  failed » rapporté. Seule erreur : `SelectRecipe` d'Auctionator à l'ouverture (connue, pas COC).
+  « inclure les plans à acheter » se coche et se décoche (la route se recalcule). Second passage
+  en combat refait APRÈS `/console taintLog 1` et un `/reload` (rapporté par le user ; la config du
+  client ne l'écrit qu'à la déconnexion, donc pas vérifiable sur disque) : `Logs\taint.log`, relu par
+  l'agent à 16:05 et 16:15, reste daté du 2026-09-22 — au niveau 1 il n'écrit qu'à une action
+  bloquée : aucune. Aucun « Interface action failed » rapporté. Seule erreur : `SelectRecipe`
+  d'Auctionator à l'ouverture (connue, pas COC).
   Non vu : la barre fine elle-même sur capture, Profit et le réglage du LFW, la fenêtre Route
   flottante, fermer/rouvrir la fenêtre de métier en combat.
 
