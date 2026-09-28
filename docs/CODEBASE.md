@@ -4,7 +4,7 @@
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
-141 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
+142 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
 
 ## Modules (ordre de chargement)
 
@@ -32,22 +32,23 @@
 | `CraftingOrderClassic_UI_Skin_Native.lua` | kit de chrome Blizzard NATIF (le « framework » UI de COC). | 471 |
 | `CraftingOrderClassic_UI_Skin_ScrollList.lua` | la LISTE DÉFILANTE moderne du kit, palier 1 de la revue d'interface (docs/revue-ui-mainline.md). | 189 |
 | `CraftingOrderClassic_UI_Skin_SideTabs.lua` | la rangée d'ONGLETS LATÉRAUX de la fenêtre principale (palier 3 de la revue d'interface, décision D1 : « les onglets sur la droite, comme la vue métier »). | 77 |
+| `CraftingOrderClassic_UI_Skin_Inputs.lua` | les CHAMPS DE SAISIE du formulaire de commande (palier 4 de la revue d'interface) : le montant et la quantité, avec les briques du formulaire des Commandes d'artisanat de Forever (Blizzard_ProfessionsCustomerOrdersForm.xml, notre maquette) au lieu de nos InputBoxTemplate nus. | 75 |
 | `CraftingOrderClassic_UI_Skin_Dropdown.lua` | menu deroulant (selecteur) du kit natif. | 93 |
 | `CraftingOrderClassic_UI_Skin_Sections.lua` | kit de chrome natif, volet SECTIONS : comment on découpe l'intérieur d'une fenêtre en blocs et en zones. | 254 |
 | `CraftingOrderClassic_UI_Skin_HelpPlate.lua` | kit d'AIDE CONTEXTUELLE (le « bouton i » de retail). | 321 |
 | `CraftingOrderClassic_ShareReagents.lua` | « liste de courses » : diffuser en un clic les réactifs d'une recette (vue métier) ou d'une commande (carte) dans un canal de discussion, avec le LIEN objet de chaque réactif. | 157 |
 | `CraftingOrderClassic_UI.lua` | fenêtre principale (chrome Blizzard natif, kit UI_Skin_Native). | 495 |
 | `CraftingOrderClassic_UI_HelpPlate.lua` | AIDE CONTEXTUELLE de la FENÊTRE PRINCIPALE (« bouton i »). | 169 |
-| `CraftingOrderClassic_UI_Post_Layout.lua` | GÉOMÉTRIE de l'onglet « Commande » : colonnes, zones, séparateurs. | 132 |
-| `CraftingOrderClassic_UI_Post.lua` | onglet « Commande » : sélection de plan (gauche) + réactifs « je fournis » / commission g-s-c / ciblage artisan (droite). | 430 |
-| `CraftingOrderClassic_UI_Post_Detail.lua` | onglet « Commande », PANNEAU DROIT : en-tête du plan sélectionné (icône + cadre doré + nom + niveau), liste des réactifs « je fournis », et la rangée commission. | 202 |
+| `CraftingOrderClassic_UI_Post_Layout.lua` | GÉOMÉTRIE de l'onglet « Commande » : colonnes, zones, séparateurs. | 134 |
+| `CraftingOrderClassic_UI_Post.lua` | onglet « Commande » : sélection de plan (gauche) + réactifs « je fournis » / commission g-s-c / ciblage artisan (droite). | 418 |
+| `CraftingOrderClassic_UI_Post_Detail.lua` | onglet « Commande », PANNEAU DROIT : en-tête du plan sélectionné (icône + cadre doré + nom + niveau), liste des réactifs « je fournis », et la rangée commission. | 201 |
 | `CraftingOrderClassic_UI_Post_Artisans.lua` | onglet « Commande », section droite basse : boutons source, liste des artisans, ciblage (@Nom), libellé destinataire, bouton Poster. | 250 |
 | `CraftingOrderClassic_UI_Post_Categories.lua` | onglet « Commande », panneau gauche : regroupe la LISTE DES PLANS en sections type fenêtre native (emplacement puis type pour les équipements, type pour les armes, catégorie pour le reste). | 169 |
 | `CraftingOrderClassic_UI_Post_Paperdoll.lua` | onglet « Commande », vue SILHOUETTE de l'Enchantement. | 332 |
 | `CraftingOrderClassic_UI_Post_Profit.lua` | onglet « Commande » : couche Auctionator (lecture seule). | 154 |
 | `CraftingOrderClassic_UI_Gather_Layout.lua` | GÉOMÉTRIE de l'onglet « Récolte » : la SPEC (structure éditable, cf. | 66 |
-| `CraftingOrderClassic_UI_Gather_Build.lua` | onglet « Récolte », moitié CONSTRUCTION. | 245 |
-| `CraftingOrderClassic_UI_Gather.lua` | onglet « Récolte » : ressources de récolte (minéraux, herbes, cuirs, poissons) + demande de quantité + prix par pile + ciblage récolteur. | 279 |
+| `CraftingOrderClassic_UI_Gather_Build.lua` | onglet « Récolte », moitié CONSTRUCTION. | 246 |
+| `CraftingOrderClassic_UI_Gather.lua` | onglet « Récolte » : ressources de récolte (minéraux, herbes, cuirs, poissons) + demande de quantité + prix par pile + ciblage récolteur. | 269 |
 | `CraftingOrderClassic_UI_Gather_Categories.lua` | onglet « Récolte », panneau gauche : repliage des en-têtes et remplissage des lignes (en-tête de section/sous-catégorie, ou ressource). | 79 |
 | `CraftingOrderClassic_UI_Artisans_Layout.lua` | GÉOMÉTRIE de l'onglet « Artisans » (annuaire social). | 44 |
 | `CraftingOrderClassic_UI_Artisans.lua` | onglet « Artisans » : annuaire social. | 474 |
@@ -527,6 +528,26 @@
 
 > `defs` = { { id, label, icon, atlas? }, ... } dans l'ordre d'affichage ; `onSelect(id)` au clic.
 
+### `CraftingOrderClassic_UI_Skin_Inputs.lua`
+
+**`Skin.PriceText(copper)`**
+
+> Le prix tel que le protocole d'ordres le transporte : « 12po 5pa 3pc », dénominations nulles
+> omises, nil pour zéro. Écrit une fois ici : Commande et Récolte le recopiaient chacune deux fois.
+
+**`Skin.MakeMoneyInput(parent, w)`**
+
+> Le champ MONTANT : `LargeMoneyInputFrameTemplate`, celui du pourboire des Commandes d'artisanat
+> (200 × 33, trois cases or/argent/cuivre avec leur pièce). Rend le cadre, à ancrer par l'appelant :
+> :GetAmount() en cuivre, :SetAmount(cuivre), :Clear().
+
+**`Skin.MakeQtySpinner(parent, max)`**
+
+> Le champ QUANTITÉ : `NumericInputSpinnerTemplate`, le compteur de « Créer tout » de la fenêtre des
+> métiers — [-] case [+], clic maintenu qui accélère, borné de 1 à `max` (999 par défaut : la case
+> tient trois chiffres). ⚠️ L'ancre de l'appelant porte sur la CASE : le [-] déborde de 29 px à sa
+> gauche, le [+] de 23 px à sa droite. :GetValue(), :SetValue(n).
+
 ### `CraftingOrderClassic_UI_Skin_Dropdown.lua`
 
 **`Skin.MakeDropdown(name, parent, w, items, opts)`**
@@ -826,6 +847,16 @@
 > Ici SetText change l'INFOBULLE : le nom d'un onglet ne se lit plus qu'au survol et dans le titre.
 
 **API** : `Skin.MakeSideTabs(f, defs, onSelect)`
+
+### `CraftingOrderClassic_UI_Skin_Inputs.lua`
+> CraftingOrderClassic_UI_Skin_Inputs.lua — les CHAMPS DE SAISIE du formulaire de commande (palier 4
+> de la revue d'interface) : le montant et la quantité, avec les briques du formulaire des Commandes
+> d'artisanat de Forever (Blizzard_ProfessionsCustomerOrdersForm.xml, notre maquette) au lieu de nos
+> InputBoxTemplate nus. Les deux gabarits vivent dans des modules chargés en permanence
+> (Blizzard_MoneyFrame, Blizzard_SharedXML), et la sonde du labo les a vus présents (26/26).
+> Leurs mixins ne touchent aucun objet global (risque 3 de la revue, lu avant d'hériter).
+
+**API** : `Skin.PriceText(copper)` · `Skin.MakeMoneyInput(parent, w)` · `Skin.MakeQtySpinner(parent, max)`
 
 ### `CraftingOrderClassic_UI_Skin_Dropdown.lua`
 > CraftingOrderClassic_UI_Skin_Dropdown.lua — menu deroulant (selecteur) du kit natif.

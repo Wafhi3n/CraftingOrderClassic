@@ -35,7 +35,7 @@ local SPEC = {
           { id = "resText",  sep = false } },
         { id = "qtyRow", h = 26, dir = "cols", help = "qtyRow", helpDir = "LEFT",
           { id = "qtyHdr" },
-          { id = "qtyCtl", w = 150, sep = false } },
+          { id = "qtyCtl", w = 180, sep = false } },   -- 180 (150 avant le palier 4) : le compteur et ses [-] [+]
         { id = "info", sep = false } },
       { id = "price", h = PRICE_H, major = true, padL = 10, help = "price", helpDir = "LEFT" },
       { id = "scope", h = 36, major = true, bg = true, padL = 10, padT = 4, help = "scope", helpDir = "LEFT" },

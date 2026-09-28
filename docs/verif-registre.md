@@ -46,6 +46,19 @@ client.
 
 ## Relevés
 
+- 2026-09-28 13:06 — jusqu'a 64bf8c3 — Forever, un client, client en ANGLAIS ; build
+  `main-dev@12f3479 2026-09-28 12:51`, branches en test `feat/icone-commande-recue,
+  feat/ui-p4-formulaire` (lu dans la signature du `.toc` déployé) — **GO sur le palier 4 : montant et
+  quantité aux champs de Blizzard** — quatre captures du user (« j'ai tout testé ») : Commande, la
+  commission en `LargeMoneyInputFrameTemplate` (trois cases à pièce, « 1 » or, « 50 » argent), la
+  quantité au compteur `[-] 5 [+]`, le repère « AH value… Reagents… » lisible sous le champ ;
+  Récolte, le prix au même champ et le compteur « 6 » à côté de « stacks » ; le Carnet reçoit les
+  deux commandes, « Tasty Raptor Bites ×5 1po 50pa » et « Blindweed ×6 1po 50pa » : le format du
+  prix envoyé (`Skin.PriceText`) est intact. Vu aussi, resté ouvert au relevé du palier 3 : le
+  chiffre du Carnet sur l'icône de son onglet (« 1 »).
+  Non vu : la tabulation or → argent → cuivre (rapportée testée, sans capture), le repli maison des
+  deux champs (les gabarits existent, il n'a pas servi).
+
 - 2026-09-28 12:40 — jusqu'a e7fc574 — Forever, un client, client en ANGLAIS ; même build que le
   relevé du palier 3 (`main-dev@bb4efc8`, `feat/ui-p2d-pages` parmi les branches en test) — **GO sur
   le lot 2d du palier 2** — capture du user (« tout est ok ») : la bourse d'un artisan (« Pouch —

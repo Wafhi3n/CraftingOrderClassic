@@ -256,23 +256,13 @@ end
 function UI:DoGatherOrder()
     local e = self.gatherEntry
     if not e then self.gatherSelLbl:SetText("|cFFFF4444" .. L["Choisis d'abord une ressource."] .. "|r"); return end
-    local qty  = tonumber(self.gatherQty:GetText()) or 1
-    local g    = tonumber(self.gatherGold:GetText()) or 0
-    local s    = tonumber(self.gatherSilver:GetText()) or 0
-    local cu   = tonumber(self.gatherCopper:GetText()) or 0
-    local price = nil
-    if g > 0 or s > 0 or cu > 0 then
-        local parts = {}
-        if g  > 0 then parts[#parts+1] = g.."po"  end
-        if s  > 0 then parts[#parts+1] = s.."pa"  end
-        if cu > 0 then parts[#parts+1] = cu.."pc" end
-        price = table.concat(parts, " ")
-    end
+    local qty   = self.gatherQty:GetValue()
+    local price = Skin.PriceText(self.gatherMoney:GetAmount())   -- « 12po 5pa », nil pour zéro
     COC.Orders:PostEntry(e, qty, price, {
         profession = self.gatherProf, recipient = self:_GatherTargetLabel(), byStack = self.gatherByStack,
     })
-    self.gatherGold:SetText("0"); self.gatherSilver:SetText("0"); self.gatherCopper:SetText("0")
-    self.gatherQty:SetText("1"); self.gatherEntry = nil
+    self.gatherMoney:Clear()
+    self.gatherQty:SetValue(1); self.gatherEntry = nil
     self.gatherByStack = false; if self.gatherStackChk then self.gatherStackChk.Update() end
     self.gatherSelLbl:SetText("|cFF33DD33" .. L["Commande de récolte postée !"] .. "|r")
     self:ShowTab("orders")

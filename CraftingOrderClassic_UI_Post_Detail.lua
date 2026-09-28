@@ -86,24 +86,23 @@ end
 -- Rangée commission (montant g/s/c + quantité) — zone "price"
 -- =========================================================================
 function UI:_BuildPostPrice(sec)
-    -- Rangée CENTRÉE VERTICALEMENT : libellés en LEFT (centrés par construction), champs de saisie
-    -- (16 px, ancrés TOPLEFT via MakeMoneyRow) au y qui les centre : -(H−16)/2. Le repère de prix
-    -- Auctionator (2ᵉ ligne, souvent vide) se pose juste sous les champs. (g/s/c : Skin.MakeMoneyRow,
-    -- partagé avec l'onglet Récolte.)
-    local ROW_Y = -((P.PRICE_H or 54) - 16) / 2
+    -- Les champs du formulaire des Commandes d'artisanat de Forever (palier 4) : le montant en
+    -- LargeMoneyInputFrameTemplate (200 × 33), à 10 px de son libellé comme le pourboire de Blizzard,
+    -- et la quantité au compteur de « Créer tout ». La rangée est centrée sur les 44 px du haut de la
+    -- zone (66 px, cf. _UI_Post_Layout) ; le repère de prix Auctionator, souvent vide, loge dessous.
+    local ROW_CY = -22
     local comLbl = sec:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    comLbl:SetPoint("LEFT", P.PAD, 0); comLbl:SetText("|cFFE8B84B" .. L["Commission"] .. "|r")
+    comLbl:SetPoint("LEFT", sec, "TOPLEFT", P.PAD, ROW_CY); comLbl:SetText("|cFFE8B84B" .. L["Commission"] .. "|r")
     Skin.ApplyShadow(comLbl)
-    self.postGold, self.postSilver, self.postCopper = Skin.MakeMoneyRow(sec, P.PAD + 92, ROW_Y)
+    self.postMoney = Skin.MakeMoneyInput(sec, 200)
+    self.postMoney:SetPoint("LEFT", comLbl, "RIGHT", 10, 0)
     local qLbl = sec:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    qLbl:SetPoint("LEFT", P.PAD + 330, 0); qLbl:SetText(L["Qté"]); Skin.ApplyShadow(qLbl)
-    self.postQty = CreateFrame("EditBox", nil, sec, "InputBoxTemplate")
-    self.postQty:SetSize(40, 16); self.postQty:SetPoint("TOPLEFT", P.PAD + 366, ROW_Y)
-    self.postQty:SetAutoFocus(false); self.postQty:SetNumeric(true); self.postQty:SetText("1")
-    self.postQty:SetScript("OnEscapePressed", function(b) b:ClearFocus() end)
+    qLbl:SetPoint("LEFT", self.postMoney, "RIGHT", 16, 0); qLbl:SetText(L["Qté"]); Skin.ApplyShadow(qLbl)
+    self.postQty = Skin.MakeQtySpinner(sec)
+    self.postQty:SetPoint("LEFT", qLbl, "RIGHT", 36, 0)   -- 36 = le [-] (29 px) qui déborde à gauche, + 7
 
     self.postPriceHint = sec:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    self.postPriceHint:SetPoint("TOPLEFT", self.postGold, "BOTTOMLEFT", -92, -4)
+    self.postPriceHint:SetPoint("TOPLEFT", comLbl, "LEFT", 0, -22)
     self.postPriceHint:SetJustifyH("LEFT")
     self.postPriceHint:SetTextColor(Skin.unpack(Skin.color.textMuted)); Skin.ApplyShadow(self.postPriceHint)
 end

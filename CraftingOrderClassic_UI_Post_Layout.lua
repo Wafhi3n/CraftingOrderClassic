@@ -54,7 +54,9 @@ local Skin = UI.Skin
 -- La SPEC déclare la STRUCTURE (géométrie, zones) ; le CONTENU (textes, widgets, `L[...]`) reste dans
 -- les builders qui se parentent aux slots — `string=`/`type=` de l'essai user n'étaient pas des
 -- propriétés du générateur, et `L` n'existe même pas dans ce fichier (crash au chargement).
-local PRICE_H = 54   -- hauteur de la zone « commission » (réutilisée pour le centrage vertical, cf. UI.POST)
+-- Hauteur de la zone « commission » : 66 depuis le palier 4 (54 avant) — le champ montant de
+-- Blizzard fait 33 px, et le repère de prix Auctionator doit loger dessous (cf. _BuildPostPrice).
+local PRICE_H = 66
 -- help / helpDir : accroches de l'AIDE CONTEXTUELLE (bouton « i », dispatch par onglet dans
 -- _UI_HelpPlate.lua). Tag STRUCTUREL only (le TEXTE est mappé côté glue). Directions : colonne gauche
 -- → RIGHT ; colonne droite (empilée) → LEFT.
@@ -107,8 +109,8 @@ local SPEC = {
 
 -- Métriques DÉRIVÉES de la SPEC (une seule source de vérité : éditer la SPEC suffit, plus de largeurs
 -- recopiées à la main qui divergent). GUTTER = la gouttière scrollbar déclarée ci-dessus.
--- PRICE_H exposé pour que _BuildPostPrice CENTRE sa rangée verticalement sans re-coder « 54 » (demande
--- user : centrer le bloc prix) — le builder calcule -(PRICE_H − hRangée)/2.
+-- PRICE_H exposé (hauteur de la zone commission) ; depuis le palier 4, _BuildPostPrice centre sa
+-- rangée sur les 44 px du haut et loge le repère de prix dessous.
 local PAD, GUTTER = 0, 22
 UI.POST = {
     PAD     = PAD,

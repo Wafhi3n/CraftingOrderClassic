@@ -1,7 +1,9 @@
 # Revue : passer l'interface de COC sur les briques Mainline de Forever
 
 > Rédigée le 2026-09-27 · Cible : WoW: Forever / Camelot (16001) · Statut : **D1-D3 tranchées le
-> 2026-09-27 ; P0 : menus EXCLUS (le client plante), sonde 26/26, minicarte : variante A choisie, 0 refus ; P0 bouclé** · Portée : la fenêtre principale d'abord (Carnet, Commande, Récolte, Artisans, Mes
+> 2026-09-27 ; P0 : menus EXCLUS (le client plante), sonde 26/26, minicarte : variante A choisie, 0 refus ; P0 bouclé ;
+> P1 à P4 faits et vus en jeu (2026-09-27/28 : toutes les listes et pages de la fenêtre principale,
+> onglets latéraux, champs montant et quantité) ; restent P5 à P7** · Portée : la fenêtre principale d'abord (Carnet, Commande, Récolte, Artisans, Mes
 > artisans, Aide, Nouveautés), puis les fenêtres annexes. La colonne greffée dans la fenêtre des
 > métiers est déjà faite.
 >
