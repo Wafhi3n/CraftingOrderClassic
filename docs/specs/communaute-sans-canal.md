@@ -107,9 +107,11 @@ Ce que le canal portait et qui se tait sans lui :
 - **2026-09-28** : `/co circle nolink` éteint le rappel de connexion. Ajout de l'agent, non demandé
   par le user : un rappel à chaque connexion sans moyen de le couper devient une nuisance.
 - **2026-09-28, user** (après le 1er test du lien, qui marche) : une **popup d'explication, une fois par
-  compte**, au même moment que le 1er rappel. Un seul bouton « OK » : l'adhésion reste au lien Blizzard
-  du chat. Un bouton « Rejoindre » d'addon risquerait de « tainter » le « Rejoindre » de Blizzard
-  (non mesuré, écarté par prudence).
+  compte**, au même moment que le 1er rappel. D'abord avec un seul « OK » (crainte de taint), puis, à la
+  demande du user (« les gens risquent de ne pas voir le lien dans le chat »), avec **« Rejoindre » /
+  « Plus tard »**. « Rejoindre » passe par la même porte qu'un clic sur le lien du chat (`SetItemRef`
+  clubTicket). Le risque a été rejugé faible sur la source : aucune fonction des communautés n'est
+  protégée, `RedeemTicket` ne porte que des restrictions de contexte. Il reste à mesurer (critère 13bis).
 - **2026-09-28, revues** (api-gotcha + protocole) :
   - un ACK/DLV reçu sur **ma commande annulée** me fait renvoyer le CANCEL à cet artisan : sans canal,
     un pair qui tient la commande d'un relais de proche en proche ne reçoit pas l'annulation ;
@@ -156,9 +158,12 @@ Ce que le canal portait et qui se tait sans lui :
     clic ouvre Guilde & Communautés sur l'invitation. Après « Rejoindre », le chat dit que la
     communauté est marquée comme cercle, et Rédemption Wafhien apparaît sous « Cercle » avec ses
     métiers en moins d'une minute. Témoin : la liste Cercle vue le 2026-09-27 vers 19 h 28.
-13bis. [humain] Au tout premier rappel sur un compte, une popup explique pourquoi rejoindre, avec un seul
-    « OK » ; le lien est dans le chat au même moment. Au rappel suivant, plus de popup. Témoin : la
-    popup « Crafting Order rejoint un canal dédié » de la v1.36.2, même forme (une fois par compte).
+13bis. [humain] Au tout premier rappel sur un compte, une popup explique pourquoi rejoindre, avec
+    « Rejoindre » et « Plus tard » ; le lien est dans le chat au même moment. « Rejoindre » ouvre Guilde &
+    Communautés sur l'invitation, et le « Rejoindre » de Blizzard aboutit SANS erreur
+    `ADDON_ACTION_BLOCKED` (mesure : `/console taintLog 1` avant le clic, puis `Logs\taint.log` sans
+    ligne `CraftingOrderClassic` sur RedeemTicket). Au rappel suivant, plus de popup. Témoin : le clic
+    sur le lien du chat, qui a fonctionné le 2026-09-28.
     Note : rejoindre la communauté ajoute son chat à la fenêtre (« [6. CLinkN] has been added… », le nom
     court de la communauté) — c'est Blizzard (`ChatFrameUtil.AddCommunitiesChannel`), pas CraftLinkNet.
 14. [humain] Commande de Gnomi vers Rédemption (nommée, puis publique) : reçue, acceptée, livrée,

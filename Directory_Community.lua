@@ -148,23 +148,36 @@ local function joinLink(c)
     return "|cFFFFD100|HclubTicket:" .. c.ticket .. "|h[" .. c.name .. "]|h|r"
 end
 
--- Jamais pour un membre de la communauté officielle (même s'il l'a démarquée). Hors `force` (demande
--- explicite, /co circle) : jamais si le joueur a un cercle, ni s'il a éteint le rappel. Clubs illisibles
--- (nil) : on s'abstient.
+-- Ouvre l'invitation comme un clic sur le lien du chat : même porte d'entrée (SetItemRef → gestionnaire
+-- clubTicket de Blizzard → RequestTicket → Guilde & Communautés sur l'invitation). Aucune fonction des
+-- communautés n'est protégée (ClubDocumentation : pas d'IsProtectedFunction ; RedeemTicket, le
+-- « Rejoindre » de Blizzard, ne porte que des restrictions de CONTEXTE). Le risque de taint reste à
+-- mesurer en jeu (/console taintLog 1), cf. la spec.
+local function openInvite(c)
+    if not _G.SetItemRef then return end
+    local ok = pcall(_G.SetItemRef, "clubTicket:" .. c.ticket, joinLink(c), "LeftButton")
+    if COC.Trace then COC.Trace:Log("net", "invitation ouverte depuis la popup : " .. tostring(ok)) end
+end
+
 -- Une fois par COMPTE (la SavedVariable l'est) : celui qui met l'addon à jour doit comprendre POURQUOI
--- rejoindre, et une ligne de chat au login se noie dans la rafale. Le bouton se contente d'« OK » :
--- l'adhésion passe par le lien Blizzard du chat, le seul chemin propre. Un bouton d'addon qui ouvrirait
--- l'invitation risquerait de « tainter » le « Rejoindre » de Blizzard (décision du user, 2026-09-28).
+-- rejoindre, et une ligne de chat au login se noie dans la rafale — d'où aussi le bouton « Rejoindre »
+-- dans la popup elle-même (demandé par le user le 2026-09-28 : « les gens risquent de ne pas la voir »).
 local function firstTimePopup(c)
     if not (COC.db and not COC.db.communityPopupShown and StaticPopupDialogs and StaticPopup_Show) then return end
     StaticPopupDialogs["COC_COMMUNITY_NOTICE"] = {
-        text = string.format(L["Crafting Order n'utilise plus de canal de discussion : sur WoW Forever, il est découpé en salles et les joueurs ne s'y voient pas tous.\n\nLes artisans se retrouvent maintenant dans la communauté |cFFFFD100%s|r. Clique sur le lien dans ton chat pour y entrer."], c.name),
-        button1 = OKAY or "OK",
+        text = string.format(L["Crafting Order n'utilise plus de canal de discussion : sur WoW Forever, il est découpé en salles et les joueurs ne s'y voient pas tous.\n\nLes artisans se retrouvent maintenant dans la communauté |cFFFFD100%s|r. Rejoins-la ici, ou plus tard par le lien dans ton chat."], c.name),
+        button1 = L["Rejoindre"],
+        button2 = L["Plus tard"],
+        OnAccept = function() openInvite(c) end,
         timeout = 0, whileDead = true, hideOnEscape = true, preferredIndex = 3,
     }
     COC.db.communityPopupShown = true
     StaticPopup_Show("COC_COMMUNITY_NOTICE")
 end
+
+-- Jamais pour un membre de la communauté officielle (même s'il l'a démarquée). Hors `force` (demande
+-- explicite, /co circle) : jamais si le joueur a un cercle, ni s'il a éteint le rappel. Clubs illisibles
+-- (nil) : on s'abstient.
 
 -- Chaque décision du rappel de connexion laisse sa raison dans /co trace : le 2026-09-28, un lien
 -- attendu n'est jamais venu, et rien ne disait pourquoi.
