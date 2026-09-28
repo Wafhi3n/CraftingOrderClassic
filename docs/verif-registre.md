@@ -70,6 +70,29 @@ client.
   le parchemin, le compteur 5/80 · 0/180, les objectifs, et Cancel / Post sur la barre du bas.
   Non vu : Échap sur le Journal, le détail d'une entrée sélectionnée, la fiche en lecture
   (`/co quest`), l'envoi par Post depuis la fiche.
+- 2026-09-28 15:10 — jusqu'a 641c512 — Forever, deux clients, client en ANGLAIS ; build déployé
+  `main-dev@373e8ef 2026-09-28 15:01` (`/co version` pas relu) — **GO sur le filtre du courrier** —
+  capture du user (« tout est bon ») : avec une commande d'enchant ET une de Silverleaf acceptées pour
+  Gnomi Short, le panneau du courrier ne liste plus que Silverleaf ; « Fill from order » a posé
+  « To: Gnomi Short » et « Order: Silverleaf ×1 ».
+  Non vu : la pièce jointe et l'envoi jusqu'à la remise (MAIL_SEND_SUCCESS).
+
+- 2026-09-28 15:05 — jusqu'a c459c05 — Forever, deux clients (Rédemption enchanteur/herboriste,
+  Gnomi acheteur), client en ANGLAIS ; build déployé `main-dev@712b91c 2026-09-28 14:54` ou
+  `main-dev@48e937c 14:35` (`/co version` pas relu ; les deux portent `c459c05`) — **GO sur le
+  palier 7b : les panneaux Échange et Courrier** — deux captures du user :
+  ÉCHANGE, une fois la commande ACCEPTÉE (avant, aucun panneau : voulu, il ne liste que l'accepté
+  ou le remis) : panneau sous la fenêtre d'échange, cadre DefaultPanelTemplate titré « Crafting
+  Order », croix dans la barre de titre, « Orders for this player · Gnomi Short », la ligne Enchant
+  Chest sélectionnée à l'atlas des recettes, « Accepted », « No agreed price. » et « Mark
+  delivered ». Rapporté par le user : « j'ai été jusqu'au bout, ça fonctionne ».
+  COURRIER : panneau à droite de Send Mail, « Orders to deliver · Gnomi Short », Silverleaf et
+  Enchant Chest, « Fill from order » / « Mark delivered ».
+  DÉFAUT vu, ANTÉRIEUR au palier : l'enchant listé au courrier, qui ne peut pas partir par la poste
+  — corrigé après ce relevé, pas vu. Vu aussi : le panneau d'échange reste affiché après l'échange
+  (persistance voulue, il y a encore des commandes à finir) et côtoie celui du courrier.
+  Non vu : « J'ai reçu » côté acheteur sur le panneau d'échange ; « Fill from order » sur un objet
+  jusqu'à l'envoi (pièce jointe, contre-remboursement, remise à MAIL_SEND_SUCCESS).
 
 - 2026-09-28 13:51 — jusqu'a bd537da — Forever, un client, client en ANGLAIS ; build
   `main-dev@1371803 2026-09-28 13:45`, branches en test `feat/icone-commande-recue,

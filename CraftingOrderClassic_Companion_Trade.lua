@@ -75,10 +75,17 @@ local function build()
     panel:SetHeight(panel:GetHeight() + 34)
     panel.Update = Trade.Update
 
-    local close = CreateFrame("Button", nil, panel, "UIPanelCloseButton")
-    close:SetPoint("TOPRIGHT", 2, 2); close:SetScript("OnClick", closePanel)
-    panel.partnerFS:ClearAllPoints()
-    panel.partnerFS:SetPoint("TOPRIGHT", close, "TOPLEFT", -2, -4)
+    -- La croix à la place que Camelot lui donne sur ses panneaux (le gabarit s'ancre tout seul, dans
+    -- la barre de titre) ; le nom du partenaire vit sous cette barre, rien à écarter.
+    local ok, close = pcall(CreateFrame, "Button", nil, panel, "UIPanelCloseButtonDefaultAnchors")
+    if not (ok and close) then
+        close = CreateFrame("Button", nil, panel, "UIPanelCloseButton"); close:SetPoint("TOPRIGHT", 2, 2)
+    end
+    close:SetScript("OnClick", closePanel)
+    -- Au-dessus de la barre de titre (niveau 510 absolu) : sinon la croix passe sous le cadre,
+    -- comme le « i » de la fenêtre principale avant le palier 3.
+    local bar = panel.TitleContainer or panel.NineSlice
+    if bar then close:SetFrameLevel(bar:GetFrameLevel() + 1) end
 
     -- Montant à réclamer / à payer — AFFICHAGE SEUL (champ d'or natif interdit aux addons, cf. en-tête).
     panel.collectFS = panel:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
