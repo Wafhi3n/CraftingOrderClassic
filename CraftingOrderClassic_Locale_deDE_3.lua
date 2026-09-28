@@ -29,6 +29,8 @@ local de3 = {
     ["rappel de la communauté éteint — /co circle link pour le rallumer."] =
         "Gemeinschafts-Erinnerung aus — /co circle link schaltet sie wieder ein.",
     ["rappel de la communauté rallumé."] = "Gemeinschafts-Erinnerung wieder an.",
+    ["Crafting Order n'utilise plus de canal de discussion : sur WoW Forever, il est découpé en salles et les joueurs ne s'y voient pas tous.\n\nLes artisans se retrouvent maintenant dans la communauté |cFFFFD100%s|r. Clique sur le lien dans ton chat pour y entrer."] =
+        "Crafting Order nutzt keinen Chatkanal mehr: Auf WoW Forever wird er in getrennte Räume aufgeteilt, und nicht alle Spieler sehen sich.\n\nHandwerker treffen sich jetzt in der Gemeinschaft |cFFFFD100%s|r. Klicke auf den Link in deinem Chat, um beizutreten.",
 }
 
 for k, v in pairs(de3) do L[k] = v end

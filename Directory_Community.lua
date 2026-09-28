@@ -151,6 +151,21 @@ end
 -- Jamais pour un membre de la communauté officielle (même s'il l'a démarquée). Hors `force` (demande
 -- explicite, /co circle) : jamais si le joueur a un cercle, ni s'il a éteint le rappel. Clubs illisibles
 -- (nil) : on s'abstient.
+-- Une fois par COMPTE (la SavedVariable l'est) : celui qui met l'addon à jour doit comprendre POURQUOI
+-- rejoindre, et une ligne de chat au login se noie dans la rafale. Le bouton se contente d'« OK » :
+-- l'adhésion passe par le lien Blizzard du chat, le seul chemin propre. Un bouton d'addon qui ouvrirait
+-- l'invitation risquerait de « tainter » le « Rejoindre » de Blizzard (décision du user, 2026-09-28).
+local function firstTimePopup(c)
+    if not (COC.db and not COC.db.communityPopupShown and StaticPopupDialogs and StaticPopup_Show) then return end
+    StaticPopupDialogs["COC_COMMUNITY_NOTICE"] = {
+        text = string.format(L["Crafting Order n'utilise plus de canal de discussion : sur WoW Forever, il est découpé en salles et les joueurs ne s'y voient pas tous.\n\nLes artisans se retrouvent maintenant dans la communauté |cFFFFD100%s|r. Clique sur le lien dans ton chat pour y entrer."], c.name),
+        button1 = OKAY or "OK",
+        timeout = 0, whileDead = true, hideOnEscape = true, preferredIndex = 3,
+    }
+    COC.db.communityPopupShown = true
+    StaticPopup_Show("COC_COMMUNITY_NOTICE")
+end
+
 -- Chaque décision du rappel de connexion laisse sa raison dans /co trace : le 2026-09-28, un lien
 -- attendu n'est jamais venu, et rien ne disait pourquoi.
 local function skip(force, why)
@@ -175,6 +190,7 @@ function Dir:ShowJoinLink(force)
     if not force then
         p("|cFF888888" .. L["(/co circle nolink : ne plus afficher ce rappel)"] .. "|r")
         if COC.Trace then COC.Trace:Log("net", "lien de la communauté proposé") end
+        firstTimePopup(c)
     end
     return true
 end
