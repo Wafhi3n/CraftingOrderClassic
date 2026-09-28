@@ -30,6 +30,8 @@ local en3 = {
     ["rappel de la communauté éteint — /co circle link pour le rallumer."] =
         "community reminder off — /co circle link turns it back on.",
     ["rappel de la communauté rallumé."] = "community reminder back on.",
+    -- Icône « nouvelle version » de la barre de la minicarte (2026-09-28)
+    ["Tu as la %s. Mets l'addon à jour depuis CurseForge."] = "You have %s. Update the addon from CurseForge.",
     ["Crafting Order n'utilise plus de canal de discussion : sur WoW Forever, il est découpé en salles et les joueurs ne s'y voient pas tous.\n\nLes artisans se retrouvent maintenant dans la communauté |cFFFFD100%s|r. Clique sur le lien dans ton chat pour y entrer."] =
         "Crafting Order no longer uses a chat channel: on WoW Forever it gets split into separate rooms, so players can't all see each other.\n\nCrafters now meet in the |cFFFFD100%s|r community. Click the link in your chat to join it.",
 }
