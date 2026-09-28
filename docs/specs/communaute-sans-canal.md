@@ -61,8 +61,9 @@ Ce que le canal portait et qui se tait sans lui :
 - **Pas d'encart dans l'interface, pas de `/co circle join`.** Décision du user : le lien dans le
   chat suffit. COC ne peut de toute façon pas adhérer à la place du joueur (`RedeemTicket` est
   sécurisé).
-- **Pas de communauté Horde.** Il n'en existe pas encore. Un Horde sans cercle ne voit aucun lien ;
-  la table des communautés officielles est prête à en recevoir une.
+- ~~Pas de communauté Horde~~ — créée par le user le 2026-09-28, même nom « Crafting Order PVE »,
+  invitation `XGvoAXHvxd`, clubId 22973181 (relevé sur Orcaa). Chaque camp ne voit que la sienne. Un
+  camp sans communauté officielle (aucun aujourd'hui) ne verrait aucun lien.
 - **Pas de nouveau verbe ni de changement de format de fil.** Les messages restent identiques, seule
   la distribution change (WHISPER au lieu de CHANNEL).
 - **Pas de rétro-compatibilité avec le canal.** Un joueur resté en v1.36 n'entend plus que ce qui
@@ -112,6 +113,10 @@ Ce que le canal portait et qui se tait sans lui :
   « Plus tard »**. « Rejoindre » passe par la même porte qu'un clic sur le lien du chat (`SetItemRef`
   clubTicket). Le risque a été rejugé faible sur la source : aucune fonction des communautés n'est
   protégée, `RedeemTicket` ne porte que des restrictions de contexte. Il reste à mesurer (critère 13bis).
+- **2026-09-28, user** : communauté **Horde** au même nom, invitation `XGvoAXHvxd`. Son clubId 22973181
+  vient de `chat-cache.txt` d'Orcaa (« Community:22973181:1 », seule communauté du perso, numéro plus
+  récent que celui de l'Alliance) : c'est une déduction, que confirmera le message de marquage auto
+  (il affiche le nom du club marqué).
 - **2026-09-28, revues** (api-gotcha + protocole) :
   - un ACK/DLV reçu sur **ma commande annulée** me fait renvoyer le CANCEL à cet artisan : sans canal,
     un pair qui tient la commande d'un relais de proche en proche ne reçoit pas l'annulation ;

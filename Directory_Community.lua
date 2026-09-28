@@ -63,11 +63,14 @@ end
 -- ------------------------------------------------------------------
 -- 2. La communauté officielle
 -- ------------------------------------------------------------------
--- Par camp : une communauté de personnage n'accueille qu'un camp. Reconnue par son clubId (le même sur
--- les deux comptes du banc, relevé le 2026-09-27), jamais par son nom, qu'un propriétaire peut changer.
--- `ticket` = code du lien d'invitation ILLIMITÉ créé par le user. Horde : aucune pour l'instant.
+-- Par camp : une communauté de personnage n'accueille qu'un camp, d'où deux communautés au même nom.
+-- Reconnue par son clubId, jamais par son nom, qu'un propriétaire peut changer (et que les deux camps
+-- partagent). `ticket` = code du lien d'invitation ILLIMITÉ créé par le user. clubIds relevés dans
+-- chat-cache.txt (« Community:<clubId>:1 ») : Alliance le 2026-09-27 sur les deux comptes du banc,
+-- Horde le 2026-09-28 sur Orcaa (seule communauté de ce perso, créée après celle de l'Alliance).
 local OFFICIAL = {
-    Alliance = { clubId = 22961321, ticket = "XGvzjrikY", name = "Crafting Order PVE" },
+    Alliance = { clubId = 22961321, ticket = "XGvzjrikY",  name = "Crafting Order PVE" },
+    Horde    = { clubId = 22973181, ticket = "XGvoAXHvxd", name = "Crafting Order PVE" },
 }
 
 local function officialForMe()
