@@ -46,6 +46,13 @@ client.
 
 ## Relevés
 
+- 2026-09-28 15:10 — jusqu'a 641c512 — Forever, deux clients, client en ANGLAIS ; build déployé
+  `main-dev@373e8ef 2026-09-28 15:01` (`/co version` pas relu) — **GO sur le filtre du courrier** —
+  capture du user (« tout est bon ») : avec une commande d'enchant ET une de Silverleaf acceptées pour
+  Gnomi Short, le panneau du courrier ne liste plus que Silverleaf ; « Fill from order » a posé
+  « To: Gnomi Short » et « Order: Silverleaf ×1 ».
+  Non vu : la pièce jointe et l'envoi jusqu'à la remise (MAIL_SEND_SUCCESS).
+
 - 2026-09-28 15:05 — jusqu'a c459c05 — Forever, deux clients (Rédemption enchanteur/herboriste,
   Gnomi acheteur), client en ANGLAIS ; build déployé `main-dev@712b91c 2026-09-28 14:54` ou
   `main-dev@48e937c 14:35` (`/co version` pas relu ; les deux portent `c459c05`) — **GO sur le
