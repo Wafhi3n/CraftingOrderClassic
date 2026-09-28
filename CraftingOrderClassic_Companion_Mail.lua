@@ -89,7 +89,17 @@ local function attachItem(itemID, qty)
                     traceMail(string.format("-> coupe %d (SplitContainerItem), dépôt en pièce jointe %s, ClickSendMailItemButton %s",
                         remaining, tostring(dest), tostring(ClickSendMailItemButton ~= nil)))
                     C.SplitContainerItem(bag, slot, remaining)    -- exactement le reste sur le curseur
-                    if dest and ClickSendMailItemButton then ClickSendMailItemButton(dest) end
+                    -- Relevé au banc le 2026-09-28 (trace « mail ») : coupe PUIS dépôt dans la même
+                    -- image = la pile ENTIÈRE jointe (9 pour 1 voulu). Hypothèse : la coupe n'est
+                    -- pas encore faite quand le dépôt part. On dépose à l'image suivante, et seulement
+                    -- si le curseur porte bien l'objet ; sinon il reste au joueur, rien n'est joint.
+                    if dest and ClickSendMailItemButton and C_Timer and C_Timer.After then
+                        C_Timer.After(0.1, function()
+                            local kind, id = GetCursorInfo()
+                            traceMail(string.format("curseur après coupe : %s %s", tostring(kind), tostring(id)))
+                            if kind == "item" and id == itemID then ClickSendMailItemButton(dest) end
+                        end)
+                    end
                     remaining = 0
                 end
             end
