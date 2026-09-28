@@ -96,7 +96,8 @@ function UI:BuildArtisansTab(f)
     -- est donc recalculée sur les seuls boutons visibles (cf. _RelayoutArtSrcTabs).
     -- « muted » = panneau de gestion des mis en sourdine (données = COC.db.mutedPlayers, pas le
     -- roster ; cf. UI_Artisans_Muted.lua).
-    local srcDefs = { {id="all",label=L["Tous"]}, {id="guild",label=L["Guilde"]}, {id="friend",label=L["Amis"]}, {id="added",label=L["Ajoutés"]}, {id="recent",label=L["Annuaire"]}, {id="muted",label=L["En sourdine"]}, {id="confed",label=L["Confédération"]}, {id="circle",label=L["Cercle"]} }
+    -- Les cercles n'ont pas de bande fixe : une bande PAR cercle, créée à la demande (_SyncCircleTabs).
+    local srcDefs = { {id="all",label=L["Tous"]}, {id="guild",label=L["Guilde"]}, {id="friend",label=L["Amis"]}, {id="added",label=L["Ajoutés"]}, {id="recent",label=L["Annuaire"]}, {id="muted",label=L["En sourdine"]}, {id="confed",label=L["Confédération"]} }
     self.artSrcBtns, self.artSrcOrder = {}, {}
     for _, d in ipairs(srcDefs) do
         local b = Skin.MakeFilterButton(sz, 190, 24, d.label)   -- bande de filtre style HdV (verrou doré, pas de bleu)
@@ -197,29 +198,61 @@ function UI:_RelayoutArtSrcTabs()
     end
 end
 
--- Les deux buckets conditionnels : « Confédération » n'existe que si GreenWall est actif,
--- « Cercle » que si le joueur a marqué au moins une communauté. Si celui qui était sélectionné
--- disparaît, on retombe sur « Tous » plutôt que d'afficher une liste vide sans explication.
+-- Les bandes conditionnelles : « Confédération » n'existe que si GreenWall est chargé, et chaque
+-- cercle MARQUÉ a la sienne (_SyncCircleTabs). Si celle qui était sélectionnée disparaît, on retombe
+-- sur « Tous » plutôt que d'afficher une liste vide sans explication. Un cercle a sa bande dès qu'il
+-- est marqué, même vide (on s'en exclut soi-même) : une bande vide se lit « c'est bien branché ».
 function UI:_SyncOptionalArtTabs()
     local D = COC.Directory
     if not self.artSrcBtns then return end
-    -- Mode solo (/co debug) : on montre tout, pour pouvoir travailler l'UI sans SoD live ni cercle.
+    -- Mode solo (/co debug) : on montre tout, pour pouvoir travailler l'UI sans GreenWall.
     local debug = COC.db and COC.db.debug
-    -- « Cercle » se montre dès qu'un cercle est MARQUÉ, pas dès qu'il a des membres : un cercle
-    -- qu'on vient de créer est vide (on s'en exclut soi-même), et faire disparaître l'onglet juste
-    -- après que le joueur l'a marqué donne l'impression que la commande n'a rien fait. Un onglet
-    -- vide, lui, se lit : « c'est bien branché, il n'y a personne d'autre ».
-    local on = {
-        confed = (D and D._GreenWallActive and D:_GreenWallActive()) or debug,
-        circle = (D and D.CircleIds and next(D:CircleIds()) ~= nil) or debug,
-    }
-    for id, shown in pairs(on) do
-        local b = self.artSrcBtns[id]
-        if b then b:SetShown(shown and true or false) end
-        if not shown and self.artSource == id then self.artSource = "all" end
-    end
+    local shown = (D and D._GreenWallActive and D:_GreenWallActive()) or debug
+    local b = self.artSrcBtns.confed
+    if b then b:SetShown(shown and true or false) end
+    if not shown and self.artSource == "confed" then self.artSource = "all" end
+    if self.artSource == "circle" then self.artSource = "all" end   -- ancienne bande unique, disparue
+    self:_SyncCircleTabs()
     self:_RelayoutArtSrcTabs()
     self:_RefreshArtSrcTabs()
+end
+
+-- Une bande PAR CERCLE, au nom de la communauté (demandé par le user le 2026-09-28) : on voit d'où vient
+-- l'artisan. Boutons créés à la demande puis réutilisés (id « circle:<clubId> »), ajoutés en fin d'ordre ;
+-- celui d'un cercle quitté ou démarqué est masqué. Plafond : la bande n'a de place que pour quelques lignes.
+local MAX_CIRCLE_TABS = 4
+function UI:_SyncCircleTabs()
+    local D, want = COC.Directory, {}
+    for i, c in ipairs((D and D.CircleList and D:CircleList()) or {}) do
+        if i > MAX_CIRCLE_TABS then break end
+        local id = "circle:" .. c.id
+        want[id] = true
+        local b = self.artSrcBtns[id]
+        if not b then
+            b = Skin.MakeFilterButton(self:ArtSec("sources"), 190, 24, c.name)
+            local cnt = b:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+            cnt:SetPoint("RIGHT", -10, 0); Skin.ApplyShadow(cnt); b.count = cnt
+            b.text:SetPoint("RIGHT", cnt, "LEFT", -4, 0); b.text:SetWordWrap(false)   -- nom long : tronqué
+            b:SetScript("OnClick", function() UI.artSource = id; UI:_RefreshArtSrcTabs(); UI:RefreshArtisans() end)
+            self.artSrcBtns[id] = b
+            self.artSrcOrder[#self.artSrcOrder + 1] = id
+        end
+        b:SetText(c.name)   -- une communauté peut être renommée
+    end
+    for id, btn in pairs(self.artSrcBtns) do
+        if id:find("^circle:") then
+            btn:SetShown(want[id] == true)
+            if not want[id] and self.artSource == id then self.artSource = "all" end
+        end
+    end
+end
+
+-- Un artisan est-il dans la source choisie ? Une bande de cercle filtre sur SON cercle (r.circle).
+local function inSource(r, src)
+    if src == "all" then return true end
+    local circle = src:match("^circle:(.+)$")
+    if circle then return r.source == "circle" and r.circle == circle end
+    return (r.source or "recent") == src
 end
 
 -- Pills de filtre métier + icônes de métier des lignes : cf. _UI_Artisans_Icons.lua
@@ -278,6 +311,9 @@ function UI:RefreshArtisans()
     for _, r in pairs(D and D.roster or {}) do
         if not (D and D._SameFaction) or D:_SameFaction(r) then   -- confinement faction (mêmes règles que la liste)
             local s = r.source or "recent"; counts[s] = (counts[s] or 0) + 1; counts.all = counts.all + 1
+            if s == "circle" and r.circle then
+                local k = "circle:" .. r.circle; counts[k] = (counts[k] or 0) + 1
+            end
         end
     end
     counts.muted = (COC.Moderation and COC.Moderation.MutedList) and #COC.Moderation:MutedList() or 0
@@ -297,7 +333,7 @@ function UI:RefreshArtisans()
     -- Le groupe passe le filtre si N'IMPORTE QUEL de ses persos le passe (union).
     local src, pf = self.artSource or "all", self.artProfFilter
     local list = self:_ArtisanGroups(function(r)
-        return (src == "all" or (r.source or "recent") == src) and (not pf or knowsProf(r, pf))
+        return inSource(r, src) and (not pf or knowsProf(r, pf))
     end)
     table.sort(list, function(a, b)
         if (a.anyPartner and true) ~= (b.anyPartner and true) then return a.anyPartner end   -- partenaires en tête

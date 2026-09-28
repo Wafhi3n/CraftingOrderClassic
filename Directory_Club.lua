@@ -72,24 +72,31 @@ function Dir:SetCircle(clubId, on)
     self:RefreshCircles()
 end
 
--- Les clubs auxquels j'appartiens, chacun accompagné de son état « cercle ».
+-- Les clubs auxquels j'appartiens, chacun accompagné de son état « cercle ». Rend (n, lisible) :
+-- en verrouillage de messagerie (instance), GetSubscribedClubs rend une valeur SECRÈTE
+-- (ClubDocumentation : SecretInChatMessagingLockdown) qu'on ne peut ni parcourir ni comparer.
+-- « Illisible » (false) ne doit jamais se lire « aucun club ». Le parcours est sous pcall : un club
+-- secret ailleurs que dans la liste lèverait en plein /co circle, erreur rouge pour le joueur.
 function Dir:EachClub(fn)
-    if not self:_ClubsAvailable() then return 0 end
+    if not self:_ClubsAvailable() then return 0, true end
+    local list = club("GetSubscribedClubs")
+    if COC.Api.IsSecret and COC.Api.IsSecret(list) then return 0, false end
     local n = 0
-    for _, info in ipairs(club("GetSubscribedClubs") or {}) do
-        n = n + 1
-        fn(info, self:IsCircle(info.clubId))
-    end
-    return n
+    local ok = pcall(function()
+        for _, info in ipairs(list or {}) do
+            n = n + 1
+            fn(info, self:IsCircle(info.clubId))
+        end
+    end)
+    return n, ok
 end
 
 -- ------------------------------------------------------------------
 -- Lecture du roster
 -- ------------------------------------------------------------------
--- Le nom ne vient JAMAIS de ClubMemberInfo.name : celui-là porte le nom d'AFFICHAGE BattleNet
--- (« Rédemption Wafhien ») alors que le personnage s'appelle « Rédemption ». Bâtir l'annuaire
--- dessus aurait rempli le roster de noms qui n'existent pas en jeu, et aucun whisper n'aurait
--- jamais abouti. GetPlayerInfoByGUID rend le vrai nom + le royaume en chaîne ordinaire.
+-- Le nom vient de GetPlayerInfoByGUID, qui rend le nom + le royaume en chaînes ordinaires. Sur Forever
+-- c'est le nom COMPLET (« Rédemption Wafhien » : prénom + NOM DE FAMILLE, pas un nom Battle.net comme on
+-- l'a cru d'abord) — celui que le serveur attend pour un whisper (cf. COC.Api.PlayerName).
 local function memberName(guid)
     if not (guid and _G.GetPlayerInfoByGUID) then return nil end
     local res = { pcall(_G.GetPlayerInfoByGUID, guid) }
@@ -128,6 +135,10 @@ function Dir:FocusCircles()
         club("FocusMembers", raw)
         if type(raw) == "number" and (chosen == nil or raw < chosen) then chosen = raw end
     end
+    -- La communauté officielle passe devant : sans canal, c'est la voie de découverte principale, et sans
+    -- souscription sa présence ne bouge plus (revue protocole 2026-09-28). Choix toujours déterministe.
+    local official = self.OfficialCircleId and self:OfficialCircleId()
+    if official then chosen = official end
     if chosen then club("SetClubPresenceSubscription", chosen)
     else club("ClearClubPresenceSubscription") end
     self._presenceClub = chosen
@@ -174,12 +185,28 @@ Dir._circleOnline = Dir._circleOnline or {}   -- [nom court] = true — en ligne
 -- Entrée d'annuaire pour un membre de cercle. Volontairement PAS Dir:_Touch : celui-là est réservé
 -- à un joueur qui a RÉPONDU (donc qui a l'addon) et il le marque en ligne. Un membre de cercle peut
 -- très bien ne pas avoir COC — le marquer en ligne le rendrait faussement ciblable.
-local function noteMember(name)
+-- `r.circle` = le cercle d'où il vient (clubId en chaîne) : une ligne par cercle dans l'onglet Artisans.
+-- Membre de deux cercles : le dernier parcouru l'emporte (une fiche, un seul classement).
+local function noteMember(name, clubId)
     Dir.roster = Dir.roster or {}
     local r = Dir.roster[name]
     if not r then r = {}; Dir.roster[name] = r end
     if not r.manual then r.source = "circle" end
+    r.circle = tostring(clubId)
+    -- Une communauté de personnage n'a qu'un camp, le mien : sans tampon, la fiche passerait le filtre
+    -- de camp des persos d'en face du même compte (SV partagée).
+    if not r.faction and Dir._MyFaction then r.faction = Dir:_MyFaction() end
     return r
+end
+
+-- Les cercles marqués dont je suis membre, dans l'ordre du client : { { id = "<clubId>", name }, … }.
+-- Une ligne par cercle dans l'onglet Artisans (demandé par le user le 2026-09-28).
+function Dir:CircleList()
+    local out = {}
+    self:EachClub(function(info, isCircle)
+        if isCircle then out[#out + 1] = { id = tostring(info.clubId), name = tostring(info.name) } end
+    end)
+    return out
 end
 
 function Dir:RefreshCircles()
@@ -196,7 +223,7 @@ function Dir:RefreshCircles()
             -- cross-royaume n'est de toute façon pas joignable en whisper, donc pas commandable.
             if realm then return end
             set[name] = raw
-            noteMember(name)
+            noteMember(name, raw)
             if isOnline(info.presence) then online[name] = true end
         end)
     end
@@ -208,10 +235,17 @@ function Dir:RefreshCircles()
     -- SavedVariable. Un membre sorti du cercle — ou classé à tort avant un correctif — gardait donc
     -- son étiquette pour toujours, et aucune session suivante ne pouvait la lui retirer.
     for name, r in pairs(self.roster or {}) do
-        if r.source == "circle" and not set[name] and not r.manual then r.source = nil end
+        if not set[name] then
+            if r.source == "circle" and not r.manual then r.source = nil end
+            r.circle = nil
+        end
     end
     self._circleSet, self._circleOnline = set, online
     self:ReclassifyAll()   -- reclasse tout le roster + rafraîchit l'UI
+    -- Sans canal, la présence du CLUB est le seul signal qu'un membre vient d'arriver ou de partir. Le
+    -- balayage ne sonde que les transitions (et éteint les partis) : l'appeler ici ne coûte rien, et sans
+    -- lui un membre connecté après nous n'était découvert qu'au prochain événement amis/guilde.
+    if self.DiscoverFriendsAndGuild then self:DiscoverFriendsAndGuild() end
 end
 
 -- Débounce : les événements club arrivent par rafales (un par membre au chargement du roster).
@@ -258,10 +292,14 @@ function Dir:_WireClubs()
     local f = CreateFrame("Frame")
     for _, ev in ipairs(CLUB_EVENTS) do pcall(f.RegisterEvent, f, ev) end
     f:SetScript("OnEvent", function(_, event)
-        if event == "INITIAL_CLUBS_LOADED" or event == "CLUB_ADDED" then Dir:FocusCircles() end
+        if event == "INITIAL_CLUBS_LOADED" or event == "CLUB_ADDED" then
+            Dir:FocusCircles()
+            if Dir.AutoMarkOfficial then Dir:AutoMarkOfficial() end   -- rejoint par le lien → cercle d'office
+        end
         Dir:RefreshCirclesSoon()
     end)
     self:FocusCircles()
+    if self.AutoMarkOfficial then self:AutoMarkOfficial() end   -- /reload : les clubs sont déjà là
     self:RefreshCirclesSoon()
 end
 
@@ -299,6 +337,11 @@ function Dir:CircleCmd(rest)
     if rest == "" then
         self:_ListCircles()
         p("|cFF888888" .. L["« /co circle <n°> » marque ou démarque un cercle d'artisans."] .. "|r")
+        if self.ShowJoinLink then self:ShowJoinLink(true) end   -- pas membre de l'officielle → son lien
+        return
+    end
+    if rest == "nolink" or rest == "link" then
+        if self.SetJoinLinkOff then self:SetJoinLinkOff(rest == "nolink") end
         return
     end
     local want = tonumber(rest)
@@ -306,6 +349,8 @@ function Dir:CircleCmd(rest)
     self:EachClub(function(info, isCircle)
         i = i + 1
         if i == want then
+            -- Démarquage VOLONTAIRE noté : le marquage d'office ne le défera pas (Directory_Community).
+            if self.CirclesOff then self:CirclesOff()[tostring(info.clubId)] = isCircle or nil end
             self:SetCircle(info.clubId, not isCircle)
             p(string.format(isCircle and L["cercle retiré : %s"] or L["cercle ajouté : %s"], tostring(info.name)))
             done = true

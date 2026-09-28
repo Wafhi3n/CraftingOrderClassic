@@ -142,6 +142,7 @@ Directory_Presence.lua
 Directory_Recipes.lua
 Directory_Confed.lua
 Directory_Club.lua
+Directory_Community.lua
 Directory_Skills.lua
 Directory_Version.lua
 Directory_Cooldowns.lua

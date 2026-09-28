@@ -154,8 +154,7 @@ local en = {
     ["usage : /co post [shift-clic objet] [xN] [prix]"] = "usage: /co post [shift-click item] [xN] [price]",
     ["commande postée |cFFFFFFFF%s|r : %s x%d %s[%s]"] = "order posted |cFFFFFFFF%s|r: %s x%d %s[%s]",
     ["CraftLink absent — l'infra réseau n'est pas chargée."] = "CraftLink missing — the network infrastructure isn't loaded.",
-    ["PING envoyé (canal %s%s). En attente des PONG…"] = "PING sent (channel %s%s). Waiting for PONGs…",
-    ["rejoint"] = "joined", ["PAS rejoint"] = "NOT joined",
+    ["PING envoyé (%s%s). En attente des PONG…"] = "PING sent (%s%s). Waiting for PONGs…",
     [", +|cFFFFFFFF%d|r whisper(s)"] = ", +|cFFFFFFFF%d|r whisper(s)",
     ["entrante acceptée : |cFFFFFFFF%s|r"] = "incoming accepted: |cFFFFFFFF%s|r",
     -- /co debug (mode solo) + /co verbose + /co trace (diag)

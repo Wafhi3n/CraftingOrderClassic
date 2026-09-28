@@ -250,6 +250,16 @@ function A.ChatMessagingBlocked()
     return (f and f()) or false
 end
 
+-- Filtre de messages du chat. Sur Forever la fonction vit dans ChatFrameUtil ; le global
+-- `ChatFrame_AddMessageEventFilter` n'est qu'un alias posé par Blizzard_DeprecatedChatInfo, un
+-- module de compatibilité qu'un réglage peut ne pas charger. Rend vrai si le filtre est posé.
+function A.AddChatFilter(event, fn)
+    local add = (_G.ChatFrameUtil and _G.ChatFrameUtil.AddMessageEventFilter) or _G.ChatFrame_AddMessageEventFilter
+    if not add then return false end
+    add(event, fn)
+    return true
+end
+
 -- ---------------------------------------------------------------- valeurs SECRÈTES
 
 -- Le client moderne rend des valeurs « SECRÈTES » pour certaines données d'unité dans les contextes

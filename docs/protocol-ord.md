@@ -90,7 +90,8 @@ SV, jamais pilotable par le réseau). Sans opt-in `/co alts` et sans claim reçu
 | NACK → réouverture / refus | `SamePlayer(who, o.acceptedBy)` réouvre ; ordre nommé (`who == recipient` ou lié, si `IsMyChar(buyer)`) refusé | refus : **`status ≠ declined`** (rejeu idempotent) |
 | **NEW — CRÉATION d'un id INCONNU** | **n'importe qui** — `sender ≠ buyer` est LÉGITIME (relais mesh) | `not existed` |
 | **NEW — MUTATION d'un id CONNU** | **`SamePlayer(sender, o.buyer` EN CACHE`)` EXIGÉ** — sinon message **ignoré**, champs intacts | `existed` |
-| **NEW reçu en `CHANNEL`** | **`SamePlayer(sender, f.buyer)` EXIGÉ** — le canal n'est alimenté que par `Post`/`PostEntry`/`Cancel` sur ses PROPRES commandes (un reroll VÉRIFIÉ passe) | — |
+| **NEW reçu en `CHANNEL`** | **`SamePlayer(sender, f.buyer)` EXIGÉ** — le canal n'est alimenté que par `Post`/`PostEntry`/`Cancel` sur ses PROPRES commandes (un reroll VÉRIFIÉ passe). ⚠️ Depuis le 2026-09-28 le canal est **coupé par défaut** (Forever) : tout arrive en WHISPER, et cette garde n'agit plus qu'en `/co channel on` (diagnostic). Le vecteur qu'elle fermait (UN message forgé qui touche tout le canal d'un coup) a disparu avec le canal. | — |
+| **ACK/DLV sur MA commande `cancelled`** | l'émetteur ne l'a pas su (relais mesh que mon CANCEL n'atteint pas sans canal) → je lui **renvoie le CANCEL en whisper, à lui seul** ; la transition n'est pas appliquée (2026-09-28) | `IsMyChar(o.buyer)` |
 | **TTL / TXT (texte libre)** | **`SamePlayer(sender, o.buyer)` EXIGÉ, sans exception** — pas de première-écriture par un tiers, contrairement à `NEW`. Conséquence assumée : une commande arrivée par **relais mesh depuis un TIERS** n'a pas de titre tant que son auteur n'est pas là pour le rappeler. ⚠️ **Il n'existe AUCUN verbe de re-demande de titre** — `TXQ`/`TXT` ne portent que la description. Le rattrapage passe uniquement par l'auteur : `RebroadcastMine` joint un `TTL` à chaque `NEW` réémis, et `OnArtisanOnline` fait de même pour SES propres commandes (`Orders:PushTitleTo`). Un `TTL` relayé par un tiers serait rejeté à l'arrivée, donc inutile à envoyer. Une commande sans nom vaut mieux qu'un nom écrit par n'importe qui à la place d'autrui. Rien n'est stocké venant d'un joueur **en sourdine**. | — |
 | **TXQ (répondre à une demande)** | On ne répond que pour **ses propres** commandes (`IsMyChar(o.buyer)`), et **throttlé par demandeur** (10 s) — sans quoi une rafale de `TXQ` fait de notre client un amplificateur de chuchotements | `o.text` non vide |
 
@@ -181,6 +182,23 @@ expiré** (`ORDER_TTL`), et la portée est respectée. `RebroadcastMine` est jit
   simple supposition de l'émetteur.
 
 ## Transports (fournis par CraftLink-1.0)
+
+> ### Réseau SANS canal (TRANSPORT_REV 15, 2026-09-28) — le cas par défaut sur Forever
+>
+> Sur Forever, `CraftLinkNet` est **morcelé** en salles par une clé inconnue (prouvé le 2026-09-27 :
+> deux joueurs côte à côte ne s'entendaient pas ; leurs whispers passaient). COC ne le rejoint plus
+> (`/co channel on` = diagnostic). La portée **« global » part en whisper vers chaque pair en ligne**
+> (`Dir.online`, ceux qui ont répondu dans la session), plafond 40, anti-doublon 2 s
+> (`CraftLink_Fanout.lua`) ; `BroadcastText`/`QueueText` suivent le même chemin, la balise `CLNK1` ne
+> part plus. Format de fil **inchangé**, aucun verbe nouveau. Conséquences à connaître :
+> - le **public** d'un message « à tous » est « qui m'a répondu », plus étroit que « qui connaît la
+>   commande » : un pair atteint par **relais mesh** ne reçoit pas mon CANCEL — d'où le renvoi du CANCEL
+>   sur ACK/DLV d'une commande annulée (table d'autorité ci-dessus) ;
+> - la **présence** vient du code `TargetOffline` de `SendAddonMessage`, du message « aucun joueur
+>   nommé » pour un joueur whispé < 15 s, et d'un **sondage** quand le jeu (amis, guilde, club) le dit
+>   parti — jamais d'un effacement sur la seule foi du jeu ;
+> - la **découverte** d'inconnus passe par la communauté (`Directory_Community.lua`). Spec :
+>   `docs/specs/communaute-sans-canal.md`. Les sections qui suivent décrivent le mode canal.
 
 > ### Confinement ROYAUME de TOUT le trafic addon (TRANSPORT_REV 10, 2026-07-11)
 >

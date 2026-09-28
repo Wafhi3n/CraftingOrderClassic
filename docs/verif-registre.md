@@ -36,6 +36,50 @@ client.
 
 ## Relevés
 
+- 2026-09-28 (13) — jusqu'a 6908c48 — Forever, **DEUX COMPTES** + un perso Horde, branche
+  `feat/communaute-sans-canal` — **GO sur les corrections du relevé 12** — rapporté par le user
+  (« c'est tout bon, j'ai fait tous les tests ») + capture d'Orcaa + trace de Gnomi (SV 10:54) :
+  une bande de cercle au NOM de la communauté à la place de « Cercle », plus de « Confédération »
+  (capture) ; Rédemption quitte le jeu → hors ligne chez Gnomi (rapporté) ; `/join CraftLinkNet` puis
+  /reload → « canal CraftLinkNet encore présent → quitté » à 10:53:46 (12bis) ; Orcaa (Horde) a sa bande
+  de cercle : sa seule communauté, 22973181, a donc bien été marquée d'office (clubId Horde confirmé).
+  Défaut VU sur la capture d'Orcaa, corrigé après : Syrine (Alliance, relayée par Rédemption) visible
+  sur ce perso Horde — la fiche relayée n'avait pas de camp. À noter : la communauté Horde s'appelle
+  « CraftLinkNet » en jeu (bande d'Orcaa), le code annonce « Crafting Order PVE » dans le lien.
+  PÉRIMÈTRE : le tampon de camp d'une fiche relayée n'est PAS vu en jeu (Syrine restera visible sur
+  Orcaa jusqu'au prochain relais reçu par un perso Alliance) ; la copie « To » masquée PAS confirmée.
+
+- 2026-09-28 (12) — jusqu'a 3c4470c — Forever, **DEUX COMPTES**, branche `feat/communaute-sans-canal`,
+  canal coupé — **GO sur les commandes et le LFW sans canal, NO-GO sur la déconnexion** — rapporté par
+  le user (« good pour la prise et annulation de commande + publique », « lfw c'est bon aussi », 3
+  captures) et corroboré par la trace de Gnomi (SV écrite à 10:45) : `Gnomi Short-4` et `-5` postées
+  puis annulées, NEW et CANCEL partis en whisper vers Rédemption ET Sorcerer Supremes (fanout) ; alerte
+  « commande pour TOI » (nommée) et « nouvelle commande » (publique) chez Rédemption ; LFW Enchanting de
+  Rédemption reçu (`LFW|on|Enchanting`) et badge vu au-dessus de lui chez Gnomi. **Déconnexion** :
+  Rédemption quitte le jeu à 10:39:24, Gnomi le sonde à 10:39:27 (la présence du club a bien déclenché
+  le balayage), AUCUN retour → il reste « en ligne » jusqu'à sa reconnexion à 10:42:26 ; corrigé après
+  la séance (la présence du jeu fait foi). Vus aussi : whisper de rappel affiché en double (reçu +
+  « To »), ligne « Confédération » visible sans GreenWall ni /co debug — corrigés après la séance.
+  PÉRIMÈTRE : la correction de la déconnexion n'est PAS encore vue ; départ auto d'un CraftLinkNet resté
+  (12bis) et clubId Horde toujours pas éprouvés.
+
+- 2026-09-28 (11) — jusqu'a 3c4470c — Forever, **DEUX COMPTES**, branche `feat/communaute-sans-canal`
+  (COC + CraftLink + outillage) — **GO sur le réseau sans canal et le rappel de la communauté** — tests
+  menés par le user (captures + « ça passe »), corroborés par la trace de Gnomi (SV écrite à 10:29) :
+  canal coupé, réseau déclaré prêt sans canal (« réseau SANS canal », 10:28:22) ; découverte par
+  whisper des membres de la communauté, **Sorcerer Supremes (joueur extérieur) répond** SK/RI/CD, et
+  Rédemption avec ses métiers + le relais de Syrine ; rappel de connexion (« lien de la communauté
+  proposé », 10:28:34) reçu en **whisper à soi-même**, lien cliquable, invitation ouverte, adhésion
+  faite ; perso Horde sans communauté connue → « non proposé : aucune communauté officielle pour ce
+  camp » (10:15, avant l'ajout de la communauté Horde) ; popup d'info vue une fois par compte. Défauts
+  VUS et corrigés en séance : lien jamais proposé à une reconnexion (attendait `INITIAL_CLUBS_LOADED`,
+  `9d2cc7e`) ; bouton « Rejoindre » dans la popup → `ADDON_ACTION_FORBIDDEN GetLastTicketResponse()`
+  (retiré, `5713feb`). Le chat de la communauté ajouté à la fenêtre (« [6. CLinkN] ») est Blizzard.
+  PÉRIMÈTRE : message « marquée comme cercle » PAS vu (Gnomi gardait sa marque de la session d'avant,
+  quitter par l'interface Blizzard ne la retire pas) ; clubId Horde 22973181 PAS confirmé (déduit du
+  chat-cache d'Orcaa) ; commandes, annulation relayée, LFW, extinction d'un pair déconnecté (critères
+  14 à 16) et départ auto d'un CraftLinkNet resté après /reload (12bis) PAS rejoués.
+
 - 2026-09-27 (10) — jusqu'a c50f401 — Forever, un client (branche d'essai `test/ui-p2-essai` :
   `feat/ui-p2-listes` + `fix/manquantes-faction-et-bouton-aide`) — **GO sur le lot 2a du palier 2
   et sur la présélection d'artisan** — tests menés par le user, deux captures :

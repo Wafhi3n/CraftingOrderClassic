@@ -71,6 +71,18 @@ function Dir:DiscoverFriendsAndGuild()
             if mayDiscover and not prev[name] then self:DiscoverPlayer(name) end
         end)
     end
+    -- Parti selon le JEU (ami, guildmate, membre de cercle) alors qu'il répondait en addon : on l'ÉTEINT,
+    -- et on le sonde quand même. Relevé en jeu le 2026-09-28 : Rédemption quitte le jeu, Gnomi le voit
+    -- toujours connecté — le sondage seul (1re version, sur avis de la revue protocole) ne revenait pas :
+    -- ni « aucun joueur nommé », ni TargetOffline pour un whisper d'addon sur Forever. Un personnage que le
+    -- jeu dit déconnecté ne fait pas tourner d'addon ; si le jeu s'est trompé, le sondage le fait répondre
+    -- et _Touch le rallume aussitôt. (Idée du user : la présence de la communauté fait foi.)
+    for name in pairs(prev) do
+        if not cur[name] and self.online and self.online[name] then
+            self:MarkOffline(name)   -- l'interface est rafraîchie en fin de balayage
+            self:DiscoverPlayer(name)
+        end
+    end
     self._wasOnlineRel = cur
     self.onlineGame    = cur
     if COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end

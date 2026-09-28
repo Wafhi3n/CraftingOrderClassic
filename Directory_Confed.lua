@@ -15,9 +15,21 @@ local function shortName(n) return n and (n:match("^([^%-]+)") or n) or n end
 -- n'expose pas la guilde d'autrui). On CLASSE juste un contact connu de CraftLink en source « confed »,
 -- AUCUN transport. _confedSet en MÉMOIRE. Limite : ne capte que les confédérés actifs en /g.
 local function gwTable() return _G and rawget(_G, "gw") end
+
+-- GreenWall est-il VRAIMENT chargé ? Relevé en jeu le 2026-09-28 : la source « Confédération »
+-- s'affichait sur Forever SANS GreenWall installé et hors /co debug — le seul test de
+-- `gw.ReplicateMessage` avait répondu vrai, sans qu'aucun fichier d'addon installé ne définisse ni
+-- `gw` ni cette fonction (cause non trouvée). On exige donc AUSSI que l'addon soit chargé.
+local function greenWallLoaded()
+    local isLoaded = (C_AddOns and C_AddOns.IsAddOnLoaded) or _G.IsAddOnLoaded
+    if not isLoaded then return true end   -- pas d'API : l'ancien critère seul
+    local ok, loaded = pcall(isLoaded, "GreenWall")
+    return (ok and loaded) and true or false
+end
+
 function Dir:_GreenWallActive()
     local gwt = gwTable()
-    return type(gwt) == "table" and type(gwt.ReplicateMessage) == "function"
+    return greenWallLoaded() and type(gwt) == "table" and type(gwt.ReplicateMessage) == "function"
 end
 
 function Dir:_NoteConfederate(name, guild_id)   -- guild_id = guilde d'origine (info, '-' = inconnu)
@@ -36,7 +48,7 @@ function Dir:_WireGreenWall(attempt)
     if self._gwHooked then return end
     attempt = attempt or 1
     local gwt = gwTable()
-    if type(gwt) == "table" and type(gwt.ReplicateMessage) == "function" then
+    if self:_GreenWallActive() then
         self._gwHooked = true
         self._confedSet = self._confedSet or {}
         hooksecurefunc(gwt, "ReplicateMessage", function(event, _, guild_id, arglist)
