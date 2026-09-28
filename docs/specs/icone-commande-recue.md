@@ -84,11 +84,14 @@ par l'acheteur, masquée, acheteur en sourdine, ou expirée (6 h).
 7. [humain] `/console taintLog 1`, icônes affichées, mode Édition ouvert puis fermé, un combat : aucune
    erreur, rien de COC dans `Logs\taint.log`.
 
-Commandes de test (un client ; Couture requise pour le clic) :
+Commandes de test (un client ; Couture requise pour le clic), une ligne à la fois. ⚠️ La saisie du
+chat s'arrête à **255 caractères** : une ligne plus longue est coupée et lève « unfinished string »
+(vécu le 2026-09-28). D'où la fonction posée d'abord :
 
 ```
-/run local C=CraftingOrderClassic; local m=C.Api.PlayerName(); C.db.orders["T-1"]={id="T-1",buyer="Test Un",recipient=m,status="open",ts=time(),itemID=2996,profession="Tailoring",qty=1}; C.db.orders["T-2"]={id="T-2",buyer="Test Deux",recipient=m,status="open",ts=time(),itemID=2996,profession="Tailoring",qty=2}; C.db.orders["T-3"]={id="T-3",buyer="Test Un",recipient=m,status="open",ts=time(),itemID=118,profession="Alchemy",qty=1}; C.UI:RefreshOrderIndicator()
-/run local C=CraftingOrderClassic; for _,k in ipairs({"T-1","T-2","T-3"}) do C.db.orders[k]=nil end; C.UI:RefreshOrderIndicator()
+/run COCm=CraftingOrderClassic.Api.PlayerName() function COCT(k,p,i,q) CraftingOrderClassic.db.orders[k]={id=k,buyer="Test Un",recipient=COCm,status="open",ts=time(),itemID=i,profession=p,qty=q} end
+/run COCT("T-1","Tailoring",2996,1) COCT("T-2","Tailoring",2996,2) COCT("T-3","Alchemy",118,1) CraftingOrderClassic.UI:RefreshOrderIndicator()
+/run for _,k in ipairs({"T-1","T-2","T-3"}) do CraftingOrderClassic.db.orders[k]=nil end CraftingOrderClassic.UI:RefreshOrderIndicator()
 ```
 
 ## Décisions
