@@ -46,6 +46,18 @@ client.
 
 ## Relevés
 
+- 2026-09-28 13:16 — jusqu'a bd78702 — Forever, **DEUX COMPTES**, client en ANGLAIS ; build
+  `main-dev@1ec0ce0 2026-09-28 13:09`, branches en test `feat/icone-commande-recue` (capture de
+  `/co version`) — **GO sur l'icône « une commande t'attend »** (spec `icone-commande-recue.md`) —
+  deux captures du user après la commande de test `/run` (« Test Un », Bolt of Linen Cloth) : le
+  marteau des commandes dans la barre, sous le nom de la zone ; infobulle « Crafting Order / Orders
+  in your name: 1 / Test Un : Bolt of Linen Cloth / Click: open the profession of the newest one. ».
+  Rapporté par le user, sans capture (« tout s'est bien passé jusqu'au bout ») : le clic, l'extinction
+  par la 2e ligne `/run`, et le test à deux comptes (commande nommée → icône chez B, acceptée → partie ;
+  annulée par A → partie). Bruit : 3× `SelectRecipe:466` à l'acceptation = Auctionator, rallumé par
+  le user pour d'autres tests (4e épisode connu, pas COC). `taint.log` inchangé depuis le 22/09 : le
+  critère 7 (mode Édition, combat, `taintLog 1`) n'est PAS prouvé par ce relevé.
+
 - 2026-09-28 11:46 — jusqu'a d708cb1 — Forever, un client, client en ANGLAIS ; build
   `main-dev@98b333c 2026-09-28 11:36`, branches en test `feat/banc-main-dev, fix/ui-p2b-debordements`
   (lu dans la signature du `.toc` déployé ; `/co version` pas montré) — **GO sur les deux

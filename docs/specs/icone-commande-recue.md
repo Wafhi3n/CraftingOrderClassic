@@ -1,6 +1,7 @@
 # Icône « une commande t'attend » dans la barre de la minicarte
 
-> État : **codée, jamais vue en jeu** · Rédigée le 2026-09-28 · Idée du user le 2026-09-27, périmètre
+> État : **vue en jeu à deux comptes** (registre, relevé 2026-09-28 13:16 ; critère 7, le taint, non
+> prouvé) · Rédigée le 2026-09-28 · Idée du user le 2026-09-27, périmètre
 > tranché par lui le 2026-09-28 (quatre questions, cf. Décisions).
 > Cible : WoW: Forever / Camelot (16001) · Addon : Crafting Order - Classic
 > Deuxième usage de l'outil d'icônes de la minicarte (spec `icone-minicarte.md`, rang 4).
