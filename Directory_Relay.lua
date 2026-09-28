@@ -101,6 +101,10 @@ function Dir:OnRelay(sender, message, distribution)
     self.roster = self.roster or {}
     local r = self.roster[f.origin]
     if not r then r = {}; self.roster[f.origin] = r end   -- SANS lastSeen/online : pas de fausse présence
+    -- Camp : le relayeur m'a chuchoté, il est donc de MON camp, et son partenaire aussi. Sans ce tampon,
+    -- la fiche passait le filtre de camp de TOUS les persos du compte — relevé le 2026-09-28 : Syrine
+    -- (Alliance, relayée par Rédemption) visible sur Orcaa (Horde), la SV étant partagée par compte.
+    if not r.faction and self._MyFaction then r.faction = self:_MyFaction() end
     local rel = r.relayed
     if rel and (rel.ts or 0) > ts then return end          -- on détient déjà plus frais
     if not rel or rel.via ~= sender or ts > (rel.ts or 0) + 60 then

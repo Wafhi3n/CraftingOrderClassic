@@ -36,6 +36,19 @@ client.
 
 ## Relevés
 
+- 2026-09-28 (13) — jusqu'a 6908c48 — Forever, **DEUX COMPTES** + un perso Horde, branche
+  `feat/communaute-sans-canal` — **GO sur les corrections du relevé 12** — rapporté par le user
+  (« c'est tout bon, j'ai fait tous les tests ») + capture d'Orcaa + trace de Gnomi (SV 10:54) :
+  une bande de cercle au NOM de la communauté à la place de « Cercle », plus de « Confédération »
+  (capture) ; Rédemption quitte le jeu → hors ligne chez Gnomi (rapporté) ; `/join CraftLinkNet` puis
+  /reload → « canal CraftLinkNet encore présent → quitté » à 10:53:46 (12bis) ; Orcaa (Horde) a sa bande
+  de cercle : sa seule communauté, 22973181, a donc bien été marquée d'office (clubId Horde confirmé).
+  Défaut VU sur la capture d'Orcaa, corrigé après : Syrine (Alliance, relayée par Rédemption) visible
+  sur ce perso Horde — la fiche relayée n'avait pas de camp. À noter : la communauté Horde s'appelle
+  « CraftLinkNet » en jeu (bande d'Orcaa), le code annonce « Crafting Order PVE » dans le lien.
+  PÉRIMÈTRE : le tampon de camp d'une fiche relayée n'est PAS vu en jeu (Syrine restera visible sur
+  Orcaa jusqu'au prochain relais reçu par un perso Alliance) ; la copie « To » masquée PAS confirmée.
+
 - 2026-09-28 (12) — jusqu'a 3c4470c — Forever, **DEUX COMPTES**, branche `feat/communaute-sans-canal`,
   canal coupé — **GO sur les commandes et le LFW sans canal, NO-GO sur la déconnexion** — rapporté par
   le user (« good pour la prise et annulation de commande + publique », « lfw c'est bon aussi », 3

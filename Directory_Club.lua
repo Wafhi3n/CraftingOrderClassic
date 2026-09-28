@@ -193,6 +193,9 @@ local function noteMember(name, clubId)
     if not r then r = {}; Dir.roster[name] = r end
     if not r.manual then r.source = "circle" end
     r.circle = tostring(clubId)
+    -- Une communauté de personnage n'a qu'un camp, le mien : sans tampon, la fiche passerait le filtre
+    -- de camp des persos d'en face du même compte (SV partagée).
+    if not r.faction and Dir._MyFaction then r.faction = Dir:_MyFaction() end
     return r
 end
 
