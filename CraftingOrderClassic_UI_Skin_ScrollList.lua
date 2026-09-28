@@ -1,7 +1,8 @@
 -- CraftingOrderClassic_UI_Skin_ScrollList.lua — la LISTE DÉFILANTE moderne du kit, palier 1 de la
 -- revue d'interface (docs/revue-ui-mainline.md). Mêmes briques que la liste de recettes des métiers
 -- de Forever : `WowScrollBoxList` + `MinimalScrollBar`, à la place de `UIPanelScrollFrameTemplate`
--- et de son pool de lignes tenu à la main.
+-- et de son pool de lignes tenu à la main. Depuis le palier 2d, aussi le cadre défilant d'une PAGE
+-- (Skin.MakeScrollFrame : l'Aide, les Nouveautés, la bourse d'un artisan).
 --
 -- Ce que la primitive retire à l'appelant, et qui a chacun coûté une session :
 --   · le pool de lignes et son invariant « pool ≥ lignes visibles », sans quoi la fin de la liste est
@@ -89,6 +90,31 @@ function Skin.MakeScrollList(host, opts)
     end
     function list:SetEmpty(text) emptyFS():SetText(text or "") end
     return list
+end
+
+-- ------------------------------------------------------------------ le cadre défilant d'une PAGE
+
+-- Pour une PAGE, pas une liste (palier 2d) : l'Aide, les Nouveautés, la bourse d'un artisan — des
+-- blocs composés, peints une fois dans un enfant qu'on fait défiler. Même montage que le gabarit
+-- `ScrollFrameTemplate` de Forever (ScrollFrame_OnLoad, SecureUIPanelTemplates.lua) : un ScrollFrame
+-- nu, une MinimalScrollBar, ScrollUtil.InitScrollFrameWithScrollBar. Le gabarit lui-même ne convient
+-- pas : ses réglages sont des KeyValues XML lues à la CRÉATION, qu'un addon en Lua ne pose pas avant.
+-- `host` = le cadre à remplir ; la barre se loge dans son bord droit et se cache quand la page tient
+-- (plus de Skin.AutoHideScroll). Rend le ScrollFrame (`sf.ScrollBar` = la barre) : l'appelant pose
+-- son contenu par sf:SetScrollChild(enfant), comme avec l'ancien cadre.
+function Skin.MakeScrollFrame(host)
+    local bar = CreateFrame("EventFrame", nil, host, "MinimalScrollBar")
+    bar:SetPoint("TOPRIGHT", host, "TOPRIGHT", 0, 0)
+    bar:SetPoint("BOTTOMRIGHT", host, "BOTTOMRIGHT", 0, 0)
+    local sf = CreateFrame("ScrollFrame", nil, host)
+    sf:SetPoint("TOPLEFT", host, "TOPLEFT", 0, 0)
+    sf:SetPoint("BOTTOMRIGHT", bar, "BOTTOMLEFT", -BAR_GAP, 0)
+    sf:EnableMouseWheel(true)
+    bar:SetHideIfUnscrollable(true)
+    ScrollUtil.InitScrollFrameWithScrollBar(sf, bar)
+    bar:Update()
+    sf.ScrollBar = bar
+    return sf
 end
 
 -- ------------------------------------------------------------------ l'habillage d'une ligne

@@ -30,12 +30,12 @@
 | `CraftingOrderClassic_Elemental.lua` | pseudo-« métier » de récolte « Élémentaire ». | 61 |
 | `CraftingOrderClassic_UI_Skin.lua` | tokens + helpers SÉMANTIQUES du skin (métiers, statuts, rareté, quantités, icônes natives) et petits widgets d'affichage. | 450 |
 | `CraftingOrderClassic_UI_Skin_Native.lua` | kit de chrome Blizzard NATIF (le « framework » UI de COC). | 471 |
-| `CraftingOrderClassic_UI_Skin_ScrollList.lua` | la LISTE DÉFILANTE moderne du kit, palier 1 de la revue d'interface (docs/revue-ui-mainline.md). | 163 |
+| `CraftingOrderClassic_UI_Skin_ScrollList.lua` | la LISTE DÉFILANTE moderne du kit, palier 1 de la revue d'interface (docs/revue-ui-mainline.md). | 189 |
 | `CraftingOrderClassic_UI_Skin_Dropdown.lua` | menu deroulant (selecteur) du kit natif. | 93 |
 | `CraftingOrderClassic_UI_Skin_Sections.lua` | kit de chrome natif, volet SECTIONS : comment on découpe l'intérieur d'une fenêtre en blocs et en zones. | 254 |
 | `CraftingOrderClassic_UI_Skin_HelpPlate.lua` | kit d'AIDE CONTEXTUELLE (le « bouton i » de retail). | 321 |
 | `CraftingOrderClassic_ShareReagents.lua` | « liste de courses » : diffuser en un clic les réactifs d'une recette (vue métier) ou d'une commande (carte) dans un canal de discussion, avec le LIEN objet de chaque réactif. | 157 |
-| `CraftingOrderClassic_UI.lua` | fenêtre principale (chrome Blizzard natif, kit UI_Skin_Native). | 489 |
+| `CraftingOrderClassic_UI.lua` | fenêtre principale (chrome Blizzard natif, kit UI_Skin_Native). | 488 |
 | `CraftingOrderClassic_UI_HelpPlate.lua` | AIDE CONTEXTUELLE de la FENÊTRE PRINCIPALE (« bouton i »). | 169 |
 | `CraftingOrderClassic_UI_Post_Layout.lua` | GÉOMÉTRIE de l'onglet « Commande » : colonnes, zones, séparateurs. | 132 |
 | `CraftingOrderClassic_UI_Post.lua` | onglet « Commande » : sélection de plan (gauche) + réactifs « je fournis » / commission g-s-c / ciblage artisan (droite). | 430 |
@@ -52,14 +52,14 @@
 | `CraftingOrderClassic_UI_Artisans.lua` | onglet « Artisans » : annuaire social. | 474 |
 | `CraftingOrderClassic_UI_Artisans_Groups.lua` | fusion « une ligne par JOUEUR » (rerolls). | 207 |
 | `CraftingOrderClassic_UI_Artisans_Icons.lua` | onglet « Artisans » : tout ce qui est ICÔNE de métier. | 190 |
-| `CraftingOrderClassic_UI_Artisans_Needs.lua` | la « BOURSE d'artisan » de l'onglet Artisans : pour un artisan du roster (partenaire, guildie, ami…), la LISTE DE COURSES des fournitures qu'il lui faut pour monter ses métiers — mats agrégés de SA route de progression (COC.Route, calculée 100 % en LOCAL depuis son rang SK diffusé + ses recettes décodées du bitfield RK ; prix Lazy Gold locaux, valables serveur entier). | 359 |
+| `CraftingOrderClassic_UI_Artisans_Needs.lua` | la « BOURSE d'artisan » de l'onglet Artisans : pour un artisan du roster (partenaire, guildie, ami…), la LISTE DE COURSES des fournitures qu'il lui faut pour monter ses métiers — mats agrégés de SA route de progression (COC.Route, calculée 100 % en LOCAL depuis son rang SK diffusé + ses recettes décodées du bitfield RK ; prix Lazy Gold locaux, valables serveur entier). | 361 |
 | `CraftingOrderClassic_UI_Artisans_Muted.lua` | panel « En sourdine » de l'onglet Artisans. | 85 |
 | `CraftingOrderClassic_UI_MyArtisans_Layout.lua` | GÉOMÉTRIE de l'onglet « Mes artisans ». | 57 |
 | `CraftingOrderClassic_UI_MyArtisans.lua` | onglet « Mes artisans » : vue agrégée des métiers du COMPTE (tous mes rerolls du royaume), en mode « connu ». | 475 |
 | `CraftingOrderClassic_UI_MyArtisans_Profit.lua` | onglet « Mes artisans » : couche Auctionator. | 135 |
 | `CraftingOrderClassic_UI_MyArtisans_Reroll.lua` | accès à la vue REROLL (métiers d'un AUTRE perso du compte) depuis l'onglet « Mes artisans ». | 86 |
-| `CraftingOrderClassic_UI_Help.lua` | onglet Aide : page unique défilante qui explique les autres onglets (Carnet/Commande/Récolte/Artisans), la Vue Métier et le réseau. | 196 |
-| `CraftingOrderClassic_UI_News.lua` | onglet « Nouveautés » : notes de version (changelog) affichées EN JEU, version par version, la plus récente en tête. | 470 |
+| `CraftingOrderClassic_UI_Help.lua` | onglet Aide : page unique défilante qui explique les autres onglets (Carnet/Commande/Récolte/Artisans), la Vue Métier et le réseau. | 195 |
+| `CraftingOrderClassic_UI_News.lua` | onglet « Nouveautés » : notes de version (changelog) affichées EN JEU, version par version, la plus récente en tête. | 468 |
 | `CraftingOrderClassic_Social.lua` | couche sociale passive (socle). | 402 |
 | `CraftingOrderClassic_Social_Menu.lua` | entrées « Crafting Order » du menu contextuel joueur. | 104 |
 | `CraftingOrderClassic_Social_Roster.lua` | affichage des métiers sur les fenêtres NATIVES. | 130 |
@@ -493,6 +493,17 @@
 > ⚠️ Une ligne du pool sert tour à tour à n'importe quelle donnée : `fill` doit TOUT reposer, jamais
 > supposer ce qu'affichait la ligne avant.
 
+**`Skin.MakeScrollFrame(host)`**
+
+> Pour une PAGE, pas une liste (palier 2d) : l'Aide, les Nouveautés, la bourse d'un artisan — des
+> blocs composés, peints une fois dans un enfant qu'on fait défiler. Même montage que le gabarit
+> `ScrollFrameTemplate` de Forever (ScrollFrame_OnLoad, SecureUIPanelTemplates.lua) : un ScrollFrame
+> nu, une MinimalScrollBar, ScrollUtil.InitScrollFrameWithScrollBar. Le gabarit lui-même ne convient
+> pas : ses réglages sont des KeyValues XML lues à la CRÉATION, qu'un addon en Lua ne pose pas avant.
+> `host` = le cadre à remplir ; la barre se loge dans son bord droit et se cache quand la page tient
+> (plus de Skin.AutoHideScroll). Rend le ScrollFrame (`sf.ScrollBar` = la barre) : l'appelant pose
+> son contenu par sf:SetScrollChild(enfant), comme avec l'ancien cadre.
+
 **`Skin.ListRowArt(row)`**
 
 > Crée, une fois par cadre du pool, les deux habillages. `Skin.ListRowKind` montre le bon.
@@ -775,7 +786,8 @@
 > CraftingOrderClassic_UI_Skin_ScrollList.lua — la LISTE DÉFILANTE moderne du kit, palier 1 de la
 > revue d'interface (docs/revue-ui-mainline.md). Mêmes briques que la liste de recettes des métiers
 > de Forever : `WowScrollBoxList` + `MinimalScrollBar`, à la place de `UIPanelScrollFrameTemplate`
-> et de son pool de lignes tenu à la main.
+> et de son pool de lignes tenu à la main. Depuis le palier 2d, aussi le cadre défilant d'une PAGE
+> (Skin.MakeScrollFrame : l'Aide, les Nouveautés, la bourse d'un artisan).
 > 
 > Ce que la primitive retire à l'appelant, et qui a chacun coûté une session :
 >   · le pool de lignes et son invariant « pool ≥ lignes visibles », sans quoi la fin de la liste est
@@ -790,7 +802,7 @@
 > l'héberge, et une ScrollBox repositionne ses lignes à chaque défilement : refusé en combat
 > (risque 4 de la revue). Fenêtre principale seulement, jusqu'à un relevé en combat.
 
-**API** : `Skin.MakeScrollList(host, opts)` · `Skin.ListRowArt(row)` · `Skin.ListRowKind(row, kind, collapsed)` · `Skin.ArtisanRowArt(r)`
+**API** : `Skin.MakeScrollList(host, opts)` · `Skin.MakeScrollFrame(host)` · `Skin.ListRowArt(row)` · `Skin.ListRowKind(row, kind, collapsed)` · `Skin.ArtisanRowArt(r)`
 
 ### `CraftingOrderClassic_UI_Skin_Dropdown.lua`
 > CraftingOrderClassic_UI_Skin_Dropdown.lua — menu deroulant (selecteur) du kit natif.
@@ -1118,7 +1130,7 @@
 > onglets (Carnet/Commande/Récolte/Artisans), la Vue Métier et le réseau. Contenu data-driven
 > (table HELP) rendu par un renderer générique → ajouter une section = ajouter une entrée localisée.
 
-**API** : `UI:BuildHelpTab(f)` · `UI:RefreshHelp()`
+**API** : `UI:BuildHelpTab(f)`
 
 ### `CraftingOrderClassic_UI_News.lua`
 > CraftingOrderClassic_UI_News.lua — onglet « Nouveautés » : notes de version (changelog) affichées
@@ -1126,7 +1138,7 @@
 > construction (même structure que l'onglet Aide). Source humaine : CHANGELOG.md — garder les deux en
 > phase à chaque release (ici : les points forts localisés, pas la prose complète du .md).
 
-**API** : `UI:BuildNewsTab(f)` · `UI:RefreshNews()`
+**API** : `UI:BuildNewsTab(f)`
 
 ### `CraftingOrderClassic_Social.lua`
 > CraftingOrderClassic_Social.lua — couche sociale passive (socle).

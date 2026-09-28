@@ -181,16 +181,15 @@ end
 function UI:BuildHelpTab(f)
     local panel = CreateFrame("Frame", nil, f); self.insetPanel(panel, f); self.helpPanel = panel
 
-    local scroll = CreateFrame("ScrollFrame", "CraftingOrderHelpScroll", panel, "UIPanelScrollFrameTemplate")
-    scroll:SetPoint("TOPLEFT", 12, -74); scroll:SetPoint("BOTTOMRIGHT", -32, 22)
+    -- Le cadre défilant moderne d'une page (palier 2d) : sa barre se loge à droite, où était celle de
+    -- l'ancien cadre, et se cache d'elle-même quand tout tient.
+    local host = CreateFrame("Frame", nil, panel)
+    host:SetPoint("TOPLEFT", 12, -74); host:SetPoint("BOTTOMRIGHT", -12, 22)
+    local scroll = Skin.MakeScrollFrame(host)
     local body = CreateFrame("Frame", nil, scroll); body:SetSize(BODY_W, 10); scroll:SetScrollChild(body)
     self.helpBody = body
 
     local y = -2
     for _, sec in ipairs(content()) do y = paintSection(body, sec, y) end
     body:SetHeight(math.max(-y, 10))
-end
-
-function UI:RefreshHelp()
-    Skin.AutoHideScroll("CraftingOrderHelpScroll", self.helpBody)
 end
