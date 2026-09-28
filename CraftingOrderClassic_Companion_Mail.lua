@@ -45,34 +45,113 @@ local function alreadyAttached(itemID)
     return false
 end
 
+-- Trace « mail » (/co trace, actif d'office sur Forever). Posée le 2026-09-28 quand « Remplir » a
+-- joint 2 exemplaires pour une commande ×1 : chaque pile lue se nomme ici, et ce qui est réellement
+-- joint se relit une demi-seconde plus tard. C'est elle qui a montré que la coupe joignait tout.
+local function traceMail(msg) if COC.Trace then COC.Trace:Log("mail", msg) end end
+
+local function traceAttached()
+    local parts = {}
+    for i = 1, (ATTACHMENTS_MAX_SEND or 12) do
+        if HasSendMailItem(i) then
+            local _, id, _, count = GetSendMailItem(i)
+            parts[#parts + 1] = string.format("%d:%s×%s", i, tostring(id), tostring(count))
+        end
+    end
+    traceMail("pièces jointes : " .. (#parts > 0 and table.concat(parts, " ") or "aucune"))
+end
+
+-- Une case VIDE d'un sac ORDINAIRE (famille 0) : un sac à herbes ou à minerai refuserait l'objet.
+local function freeBagSlot(C)
+    for bag = 0, (NUM_BAG_SLOTS or 4) do
+        local free, family = C.GetContainerNumFreeSlots(bag)
+        if (free or 0) > 0 and (family or 0) == 0 then
+            for slot = 1, (C.GetContainerNumSlots(bag) or 0) do
+                if not C.GetContainerItemID(bag, slot) then return bag, slot end
+            end
+        end
+    end
+    return nil
+end
+
+-- La coupe à la façon d'Auctionator sur Era (idée du user, 2026-09-28) : couper DANS LE SAC, vers une
+-- case vide, puis joindre cette petite pile ENTIÈRE. Couper puis déposer directement dans le courrier
+-- joignait la pile entière (cf. attachItem). On ne joint qu'après avoir RELU la case : l'objet et le
+-- compte exacts, sinon rien. Si la case refuse l'objet, ClearCursor le rend à sa pile. Rend false si
+-- la coupe n'a pas pu être tentée (pas d'API, pas de case libre) : l'appelant passe la main au joueur.
+local function splitIntoBag(C, bag, slot, n, itemID)
+    if not (C.SplitContainerItem and C.PickupContainerItem and C.GetContainerNumFreeSlots
+            and C_Timer and C_Timer.After) then return false end
+    local fb, fs = freeBagSlot(C)
+    if not fb then traceMail("-> pas de case libre dans un sac ordinaire"); return false end
+    C.SplitContainerItem(bag, slot, n)
+    C.PickupContainerItem(fb, fs)
+    if CursorHasItem and CursorHasItem() then ClearCursor() end
+    traceMail(string.format("-> coupe %d de %d/%d vers la case vide %d/%d", n, bag, slot, fb, fs))
+    -- La case se relit toutes les 0,1 s, 2 s au plus : la petite pile arrive VERROUILLÉE, le temps que
+    -- le serveur confirme la coupe (vu au banc le 2026-09-28 : coupe faite, rien de joint après un
+    -- délai fixe de 0,3 s). On ne joint qu'une pile exacte ET déverrouillée.
+    local tries = 0
+    local function tryAttach()
+        tries = tries + 1
+        local info = C.GetContainerItemInfo(fb, fs)
+        local id, cnt, locked = info and info.itemID, info and info.stackCount, info and info.isLocked
+        if id == itemID and cnt == n and not locked then
+            traceMail(string.format("case %d/%d prête après %d relecture(s) : %s×%s", fb, fs, tries, tostring(id), tostring(cnt)))
+            if _G.SendMailFrame and _G.SendMailFrame:IsShown() and not (InCombatLockdown and InCombatLockdown()) then
+                C.UseContainerItem(fb, fs)                -- la petite pile, entière
+            end
+            C_Timer.After(0.3, traceAttached)
+        elseif tries < 20 then
+            C_Timer.After(0.1, tryAttach)
+        else
+            traceMail(string.format("case %d/%d jamais prête : %s×%s, verrou %s", fb, fs, tostring(id), tostring(cnt), tostring(locked)))
+            print("|cFF33DD88Crafting Order|r " .. string.format(
+                L["La pile de %d est prête dans ton sac : dépose-la toi-même dans le courrier."], n))
+        end
+    end
+    C_Timer.After(0.1, tryAttach)
+    return true
+end
+
 -- Joint l'objet crafté (itemID) au courrier jusqu'à `qty` exemplaires, depuis les sacs. N'ENVOIE RIEN
--- (le joueur relit puis clique Envoyer). Piles entières via C_Container.UseContainerItem ; pile
--- partielle finale via SplitContainerItem + ClickSendMailItemButton (attache exactement le reste).
--- Best-effort : objet absent des sacs ou 12 slots pleins → on s'arrête sans erreur.
+-- (le joueur relit puis clique Envoyer). Best-effort : objet absent des sacs ou 12 slots pleins → on
+-- s'arrête sans erreur.
+-- ⚠️ JAMAIS PLUS QUE DEMANDÉ : on joint les piles ENTIÈRES qui tiennent dans le reste. L'ancienne
+-- coupe (SplitContainerItem puis ClickSendMailItemButton) a été RETIRÉE : relevé au banc le
+-- 2026-09-28 (trace « mail »), elle joignait la pile ENTIÈRE, 9 puis 8 pour 1 voulu, que le dépôt
+-- parte dans la même image ou 0,1 s plus tard. Un objet de trop part chez un autre joueur et ne
+-- revient pas. Le reste passe par splitIntoBag ; à défaut, la coupe revient au joueur (Maj-clic) et
+-- le chat lui dit combien. Une pile au compte illisible n'est pas jointe.
 local function attachItem(itemID, qty)
     if not (itemID and _G.SendMailFrame and _G.SendMailFrame:IsShown()) then return end
-    if InCombatLockdown and InCombatLockdown() then return end   -- UseContainerItem/Split protégés en combat
+    if InCombatLockdown and InCombatLockdown() then return end   -- UseContainerItem protégé en combat
 
     local C = C_Container
     if not (C and C.GetContainerNumSlots and C.GetContainerItemID and C.UseContainerItem) then return end
-    local remaining = math.max(qty or 1, 1)
+    local remaining, big = math.max(qty or 1, 1), nil
     for bag = 0, (NUM_BAG_SLOTS or 4) do
         for slot = 1, (C.GetContainerNumSlots(bag) or 0) do
             if remaining <= 0 then return end
             if C.GetContainerItemID(bag, slot) == itemID and freeAttachSlot() then
                 local info = C.GetContainerItemInfo and C.GetContainerItemInfo(bag, slot)
-                local count = (info and info.stackCount) or 1
-                if count <= remaining or not C.SplitContainerItem then
+                local count = info and info.stackCount
+                traceMail(string.format("sac %d/%d : objet %d, pile lue %s, voulu %d",
+                    bag, slot, itemID, tostring(count), remaining))
+                if count and count <= remaining then
                     C.UseContainerItem(bag, slot)                 -- pile entière
                     remaining = remaining - count
-                else
-                    local dest = freeAttachSlot()
-                    C.SplitContainerItem(bag, slot, remaining)    -- exactement le reste sur le curseur
-                    if dest and ClickSendMailItemButton then ClickSendMailItemButton(dest) end
-                    remaining = 0
+                elseif count and not big then
+                    big = { bag = bag, slot = slot }              -- une pile à couper, en dernier
                 end
             end
         end
+    end
+    if remaining > 0 and big and splitIntoBag(C, big.bag, big.slot, remaining, itemID) then return end
+    if remaining > 0 and big then
+        traceMail(string.format("-> reste %d, coupe impossible : au joueur de couper", remaining))
+        print("|cFF33DD88Crafting Order|r " .. string.format(
+            L["Il en manque %d au courrier : sépare-les d'une pile toi-même (Maj-clic sur la pile), puis dépose-les."], remaining))
     end
 end
 
@@ -104,7 +183,10 @@ local function fill()
             local stackSize = select(8, COC.Api.GetItemInfo(o.itemID))
             if stackSize and stackSize > 1 then wantN = wantN * stackSize end
         end
+        traceMail(string.format("Remplir : commande %s, objet %s, qty %s, par pile %s -> %d voulu(s)",
+            tostring(o.id), tostring(o.itemID), tostring(o.qty), tostring(o.byStack), wantN))
         attachItem(o.itemID, wantN)
+        if C_Timer and C_Timer.After then C_Timer.After(0.5, traceAttached) end
     end
     if SendMailFrame_CanSend then SendMailFrame_CanSend() end
 end

@@ -59,6 +59,17 @@ client.
   confirmation automatique n'écoute que `CHAT_MSG_LOOT` (`_LootAlert.lua`), rien n'écoute la prise
   d'une pièce jointe — le courrier y est noté « point de branchement futur » ; l'en-tête de
   `_Companion_Mail.lua` promettait le contraire. Pas vu : si la pièce jointe avait été prise.
+- 2026-09-28 21:20 — jusqu'a 4721828 — Forever, deux clients, client en ANGLAIS ; build déployé
+  `main-dev@4864ed4 2026-09-28 21:03` (`/co version` pas relu) — **GO sur « Fill from order » qui ne
+  joint plus que la quantité voulue** — Rédemption, commande ×1 de Lesser Magic Essence, une pile de 8
+  au sac : la quantité est coupée DANS LE SAC vers une case vide, puis cette pile de 1 est jointe
+  (rapporté par le user, capture du sac : la case coupée grisée, en pièce jointe). Trace « mail »
+  relue par l'agent, essais d'AVANT : l'ancienne coupe directe joignait la pile ENTIÈRE (20:51 : 9
+  pour 1 ; 20:55 : 8 pour 1, même avec un dépôt différé) ; la coupe dans le sac avec un délai FIXE de
+  0,3 s trouvait la case encore vide (21:01 : « nil×nil »), rien de joint — d'où la relecture toutes
+  les 0,1 s jusqu'à une pile exacte et déverrouillée.
+  Non vu : la trace de cet essai-ci (pas encore écrite sur le disque) ; les replis « pas de case
+  libre » et « case jamais prête » ; l'envoi et la réception de ce courrier.
 
 - 2026-09-28 16:05 — jusqu'a eaa4ba7 — Forever, deux clients, client en ANGLAIS ; build déployé
   `main-dev@c43f9f9 2026-09-28 15:43` (`/co version` pas relu) — **GO sur le palier 7c : la colonne
