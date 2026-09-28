@@ -64,6 +64,19 @@ local function myArtisansTexts()
     }
 end
 
+-- Zones de l'aide de Récolte. La bande des extensions n'a de boutons que pour « Élémentaire » :
+-- ailleurs la liste monte la couvrir (_AnchorGatherResHost), et sa bulle tombait sur la 1re
+-- ressource (vu en jeu le 2026-09-28). Bande vide = pas de bulle ; la bulle de la liste vise la
+-- liste elle-même, qui couvre la bande ou non, plutôt que sa zone de SPEC.
+local function gatherSec(id)
+    if id == "resources" then return UI.gatherResHost or UI:GatherSec(id) end
+    if id == "verPills" then
+        local p = UI.gatherVerPills and UI.gatherVerPills[1]
+        if not (p and p.btn:IsShown()) then return nil end
+    end
+    return UI:GatherSec(id)
+end
+
 -- Config d'aide d'un onglet, ou nil (onglet sans aide). controls = frames hors-SPEC (portrait, Poster).
 function UI:_HelpConfigFor(tab)
     if tab == "post" then
@@ -80,7 +93,7 @@ function UI:_HelpConfigFor(tab)
     if tab == "gather" then
         return {
             nodes = UI.GATHER and UI.GATHER.helpNodes,
-            sec   = function(id) return UI:GatherSec(id) end,
+            sec   = gatherSec,
             texts = gatherTexts(),
             controls = {
                 { frame = UI.frame and UI.frame._portraitBtn, text = L["Cliquer pour changer de métier"], dir = "DOWN" },

@@ -1,4 +1,4 @@
--- CraftingOrderClassic_Locale_esES_3.lua — overlay esES, 3/3. Clé FR → texte traduit.
+-- CraftingOrderClassic_Locale_esES_3.lua — overlay esES, 3/3. Clé FR » texte traduit.
 -- Troisième part, ouverte le 2026-09-26 : _2 avait atteint le plafond anti-monolithe
 -- (500 l/fichier) en accueillant les clés de la bande LFW. Même contrat que les deux
 -- autres — table à plat fusionnée dans COC.L, aucun ordre requis entre les parts.
@@ -37,6 +37,16 @@ local es3 = {
     -- Signature du build de test, /co version (2026-09-28)
     ["Build : %s"] = "Build: %s",
     ["Branches en test : %s"] = "Ramas en prueba: %s",
+    -- Aide remise à jour : onglets latéraux, cercles (2026-09-28)
+    ["Ils se rangent sur le bord droit, comme ceux de la fenêtre de métier. Survole une icône pour lire son nom ; le chiffre sur le Carnet compte tes commandes en cours."] =
+        "Están en el borde derecho, como los de la ventana de profesión. Pasa el ratón sobre un icono para leer su nombre; el número sobre el Libro cuenta tus pedidos activos.",
+    ["|cFFE8B84BMes artisans|r : les métiers de tous les personnages de ton compte, et leurs recettes."] =
+        "|cFFE8B84BMis artesanos|r: las profesiones de todos los personajes de tu cuenta, y sus recetas.",
+    ["|cFFE8B84BAide|r et |cFFE8B84BNouveautés|r : cette page, et ce qui a changé à chaque version."] =
+        "|cFFE8B84BAyuda|r y |cFFE8B84BNovedades|r: esta página, y lo que cambió en cada versión.",
+    ["cercles d'artisans (communautés) et rappel de la communauté"] =
+        "círculos de artesanos (comunidades) y el aviso de la comunidad",
+    ["ou"] = "o",   -- statuts d'une commande, Aide : « (ou Annulée / Refusée) »
 }
 
 for k, v in pairs(es3) do L[k] = v end

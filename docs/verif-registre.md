@@ -46,6 +46,20 @@ client.
 
 ## Relevés
 
+- 2026-09-28 14:45 — jusqu'a ff52e07 — Forever, deux clients, client en ANGLAIS ; build déployé
+  `main-dev@48e937c 2026-09-28 14:35` (sortie de `deploy.ps1` ; `/co version` pas relu sur ces
+  captures), branches en test `fix/aide-a-jour, feat/ui-p7a-journal, feat/ui-p7b-greffons` et
+  celles de l'autre session — **GO sur l'Aide remise à jour** — deux captures de l'onglet Aide : la
+  flèche « » » rendue (« Order tab » pick… », statuts « Pending » Accepted » Delivered »), les onglets
+  décrits sur le bord droit avec My Artisans, Help et What's New, la ligne `/co circle … nolink /
+  link`, la section réseau en chuchotements + communauté « Crafting Order PVE », les cercles dans les
+  sources de l'annuaire. Rapporté par le user : `/co help` fonctionne (seule la fin de la sortie est
+  sur la capture). Voile « i » de Récolte : la bulle isolée sur la 1re ressource a disparu, la bulle
+  de la liste couvre la liste. Vu en passant, ANTÉRIEUR : « (ou Cancelled / Declined) », le « ou »
+  était écrit en dur en français — corrigé après ce relevé, pas vu.
+  Non vu : les traductions allemande et espagnole ; les lignes `/co circle` et `/co channel` de
+  `/co help` elles-mêmes.
+
 - 2026-09-28 13:51 — jusqu'a bd537da — Forever, un client, client en ANGLAIS ; build
   `main-dev@1371803 2026-09-28 13:45`, branches en test `feat/icone-commande-recue,
   feat/ui-p5-carnet-tri, feat/ui-p6-fonds` (lu dans la signature du `.toc` déployé) — **GO sur le

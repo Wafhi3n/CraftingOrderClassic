@@ -1,4 +1,4 @@
--- CraftingOrderClassic_Locale_enUS.lua — overlay ANGLAIS (enUS/enGB). Clé FR → texte EN.
+-- CraftingOrderClassic_Locale_enUS.lua — overlay ANGLAIS (enUS/enGB). Clé FR » texte EN.
 -- Chargé APRÈS CraftingOrderClassic_Locale.lua (qui crée COC.L via setmetatable). Repli sur la clé FR
 -- pour toute chaîne non traduite. Extrait du fichier de base (plafond anti-monolithe de 500 lignes) :
 -- il vit maintenant à côté de _Locale_deDE.lua / _Locale_esES.lua, même forme, même contrat.
@@ -94,7 +94,7 @@ local en = {
     -- Détection de spam configurable (/co spam)
     ["mute auto"] = "auto-mute", ["popup"] = "popup",
     ["détection de spam : |cFFFFFFFFdésactivée|r — /co spam <max> [fenêtre] pour l'activer"] = "spam detection: |cFFFFFFFFoff|r — /co spam <max> [window] to enable",
-    ["détection de spam : |cFFFFFFFF%d|r posts / |cFFFFFFFF%ds|r → %s"] = "spam detection: |cFFFFFFFF%d|r posts / |cFFFFFFFF%ds|r → %s",
+    ["détection de spam : |cFFFFFFFF%d|r posts / |cFFFFFFFF%ds|r » %s"] = "spam detection: |cFFFFFFFF%d|r posts / |cFFFFFFFF%ds|r » %s",
     ["  /co spam <max> [fenêtre] · /co spam auto · /co spam off"] = "  /co spam <max> [window] · /co spam auto · /co spam off",
     ["réglage anti-spam : seuil, fenêtre, mute auto vs popup"] = "anti-spam tuning: threshold, window, auto-mute vs popup",
     -- Réputation sociale (crafts livrés, diffusée via SK)
@@ -126,8 +126,8 @@ local en = {
     ["statut (infra, mes recettes, réseau)"] = "status (infra, my recipes, network)",
     ["carnet d'ordres"] = "order ledger", ["poster une commande"] = "post an order",
     ["solliciter l'annuaire (présence + proximité)"] = "poll the directory (presence + proximity)",
-    ["teste l'aller-retour réseau (PING global → PONG des autres porteurs)"] =
-        "test the network round-trip (global PING → PONG from other holders)",
+    ["teste l'aller-retour réseau (PING global » PONG des autres porteurs)"] =
+        "test the network round-trip (global PING » PONG from other holders)",
     ["vue commandes d'un métier (ou menu des métiers si vide)"] =
         "a profession's orders view (or profession menu if empty)",
     ["basculer fenêtre métier custom / vue Blizzard"] = "toggle custom profession window / Blizzard view",

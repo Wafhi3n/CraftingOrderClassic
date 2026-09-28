@@ -1,6 +1,6 @@
--- CraftingOrderClassic_Locale_deDE.lua — overlay ALLEMAND (deDE). Clé FR → texte DE.
+-- CraftingOrderClassic_Locale_deDE.lua — overlay ALLEMAND (deDE). Clé FR » texte DE.
 -- Chargé APRÈS CraftingOrderClassic_Locale.lua (qui crée COC.L via setmetatable). Repli sur la clé FR
--- pour toute chaîne non traduite. Guillemets « » dans les valeurs → évite l'échappement Lua des ".
+-- pour toute chaîne non traduite. Guillemets « » dans les valeurs » évite l'échappement Lua des ".
 -- Sur un client non-deDE : early-return, coût nul.
 
 local COC = CraftingOrderClassic
@@ -95,7 +95,7 @@ local de = {
     ["affiche les messages d'info en coulisse (ex. « X peut faire une captée ») ; auto si COCMonitor est chargé"] =
         "Hintergrund-Infomeldungen anzeigen (z. B. « X kann eine erfasste Anfrage herstellen »); automatisch, wenn COCMonitor geladen ist",
     ["détection de spam : |cFFFFFFFFdésactivée|r — /co spam <max> [fenêtre] pour l'activer"] = "Spam-Erkennung: |cFFFFFFFFaus|r — /co spam <max> [Fenster] zum Aktivieren",
-    ["détection de spam : |cFFFFFFFF%d|r posts / |cFFFFFFFF%ds|r → %s"] = "Spam-Erkennung: |cFFFFFFFF%d|r Posts / |cFFFFFFFF%ds|r → %s",
+    ["détection de spam : |cFFFFFFFF%d|r posts / |cFFFFFFFF%ds|r » %s"] = "Spam-Erkennung: |cFFFFFFFF%d|r Posts / |cFFFFFFFF%ds|r » %s",
     ["  /co spam <max> [fenêtre] · /co spam auto · /co spam off"] = "  /co spam <max> [Fenster] · /co spam auto · /co spam off",
     ["réglage anti-spam : seuil, fenêtre, mute auto vs popup"] = "Anti-Spam-Einstellung: Schwelle, Fenster, Auto-Stumm vs. Popup",
     ["%d livrés"] = "%d geliefert",
@@ -124,8 +124,8 @@ local de = {
     ["statut (infra, mes recettes, réseau)"] = "Status (Infra, meine Rezepte, Netzwerk)",
     ["carnet d'ordres"] = "Auftragsbuch", ["poster une commande"] = "einen Auftrag erstellen",
     ["solliciter l'annuaire (présence + proximité)"] = "Verzeichnis abfragen (Präsenz + Nähe)",
-    ["teste l'aller-retour réseau (PING global → PONG des autres porteurs)"] =
-        "testet die Netzwerk-Rundreise (globales PING → PONG anderer Nutzer)",
+    ["teste l'aller-retour réseau (PING global » PONG des autres porteurs)"] =
+        "testet die Netzwerk-Rundreise (globales PING » PONG anderer Nutzer)",
     ["vue commandes d'un métier (ou menu des métiers si vide)"] =
         "Auftragsansicht eines Berufs (oder Berufsmenü, wenn leer)",
     ["basculer fenêtre métier custom / vue Blizzard"] = "eigenes Berufsfenster / Blizzard-Ansicht umschalten",
@@ -249,7 +249,7 @@ local de = {
     ["Mes métiers"] = "Meine Berufe", ["Aucun métier connu."] = "Kein bekannter Beruf.",
     ["Don / gratuit"] = "Geschenk / gratis",
     ["|cFFFF8800entrante|r |cFFFFFFFF%s|r (%s) : %s%s%s"] = "|cFFFF8800eingehend|r |cFFFFFFFF%s|r (%s): %s%s%s",
-    ["   |cFF33DD33→ tu sais la crafter|r — vue métier › onglet Entrantes"] = "   |cFF33DD33→ du kannst es herstellen|r — Berufsfenster › Reiter Eingehend",
+    ["   |cFF33DD33» tu sais la crafter|r — vue métier › onglet Entrantes"] = "   |cFF33DD33» du kannst es herstellen|r — Berufsfenster › Reiter Eingehend",
     ["|cFFFFCC00commande pour TOI|r de |cFFFFFFFF%s|r : %s%s%s"] = "|cFFFFCC00Auftrag für DICH|r von |cFFFFFFFF%s|r: %s%s%s",
     ["|cFFFFCC00nouvelle commande|r de |cFFFFFFFF%s|r : %s%s%s"] = "|cFFFFCC00neuer Auftrag|r von |cFFFFFFFF%s|r: %s%s%s",
     ["ton artisan |cFFFFFFFF%s|r est en ligne."] = "dein Handwerker |cFFFFFFFF%s|r ist online.",

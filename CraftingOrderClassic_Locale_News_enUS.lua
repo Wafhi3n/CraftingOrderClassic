@@ -1,7 +1,7 @@
 -- CraftingOrderClassic_Locale_News_enUS.lua — traductions de l'onglet « Nouveautés » (enUS/enGB).
 -- Extrait de _Locale_enUS.lua : l'onglet Nouveautés grossit à chaque release et faisait déborder le
 -- plafond anti-monolithe. Isolé ici, il a de la marge (fenêtre glissante côté UI_News). Même contrat :
--- clé FR → texte EN, chargé APRÈS _Locale.lua, early-return hors locale.
+-- clé FR » texte EN, chargé APRÈS _Locale.lua, early-return hors locale.
 
 local COC = CraftingOrderClassic
 local loc = GetLocale and GetLocale() or "enUS"

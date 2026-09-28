@@ -1,4 +1,4 @@
--- CraftingOrderClassic_Locale_enUS_2.lua — overlay enUS, 2/2. Clé FR → texte traduit.
+-- CraftingOrderClassic_Locale_enUS_2.lua — overlay enUS, 2/2. Clé FR » texte traduit.
 -- Suite de _Locale_enUS.lua, scindé pour rester sous le plafond anti-monolithe (500 l/fichier).
 -- Même contrat : chargé APRÈS _Locale.lua, table à plat fusionnée dans COC.L — les deux moitiés
 -- sont indépendantes (aucun ordre requis entre elles). Client d'une autre langue : early-return.
@@ -16,11 +16,11 @@ local en2 = {
     ["Don / gratuit"] = "Free / gift",
     -- Entrantes (alertes chat)
     ["|cFFFF8800entrante|r |cFFFFFFFF%s|r (%s) : %s%s%s"] = "|cFFFF8800incoming|r |cFFFFFFFF%s|r (%s): %s%s%s",
-    ["   |cFF33DD33→ tu sais la crafter|r — vue métier › onglet Entrantes"] = "   |cFF33DD33→ you can craft it|r — profession view › Incoming tab",
+    ["   |cFF33DD33» tu sais la crafter|r — vue métier › onglet Entrantes"] = "   |cFF33DD33» you can craft it|r — profession view › Incoming tab",
     ["|cFFFFCC00commande pour TOI|r de |cFFFFFFFF%s|r : %s%s%s"] = "|cFFFFCC00order for YOU|r from |cFFFFFFFF%s|r: %s%s%s",
     ["|cFFFFCC00nouvelle commande|r de |cFFFFFFFF%s|r : %s%s%s"] = "|cFFFFCC00new order|r from |cFFFFFFFF%s|r: %s%s%s",
     ["ton artisan |cFFFFFFFF%s|r est en ligne."] = "your crafter |cFFFFFFFF%s|r is online.",
-    -- Alerte plan looté (CHAT_MSG_LOOT → CraftLink:RecipeFromPlanItem)
+    -- Alerte plan looté (CHAT_MSG_LOOT » CraftLink:RecipeFromPlanItem)
     ["plan looté : |cFFFFFFFF%s|r — enseigne |cFFFFFFFF%s|r (%s) %s"] =
         "recipe looted: |cFFFFFFFF%s|r — teaches |cFFFFFFFF%s|r (%s) %s",
     ["|cFF888888(tu la connais déjà)|r"] = "|cFF888888(you already know it)|r",
@@ -95,7 +95,7 @@ local en2 = {
         "joined |cFFFFFFFF%s|r for diagnostics — it's split into separate rooms on Forever. |cFFFFFFFF/co channel off|r to leave.",
     ["réseau sans canal (whisper). |cFFFFFFFF/co channel on|r rejoint |cFFFFFFFF%s|r pour un diagnostic."] =
         "no channel, the network runs on whispers. |cFFFFFFFF/co channel on|r joins |cFFFFFFFF%s|r for diagnostics.",
-    ["(dés)activer le canal réseau global"] = "(de)activate the global network channel",
+    ["rejoindre l'ancien canal réseau, morcelé sur Forever"] = "join the old network channel, split into rooms on Forever",
     ["balise TEXTE émise=%s (canal idx=%s) — lance |cFFFFFFFF/co trace dump|r sur l'AUTRE perso et cherche |cFFFFFFFF[recv] beacon|r."] =
         "TEXT beacon sent=%s (channel idx=%s) — run |cFFFFFFFF/co trace dump|r on the OTHER char and look for |cFFFFFFFF[recv] beacon|r.",
     ["annuaire local vidé (diag) — exécute aussi |cFFFFFFFF/co wipe|r sur l'autre compte pour un test de découverte propre."] =
@@ -116,9 +116,9 @@ local en2 = {
         "Right click the minimap icon (or |cFFFFFFFF/co métier|r): opens the Profession View for one of your professions.",
     ["|cFFFFFFFF/co help|r dans le chat : liste complète des commandes slash."] =
         "|cFFFFFFFF/co help|r in chat: full list of slash commands.",
-    ["|cFFFFFFFF/co channel off|r / |cFFFFFFFF/co channel on|r : quitter/rejoindre le canal réseau."] =
-        "|cFFFFFFFF/co channel off|r / |cFFFFFFFF/co channel on|r: leave/rejoin the network channel.",
-    ["Les 4 onglets de cette fenêtre"] = "The 4 tabs of this window",
+    ["|cFFFFFFFF/co circle|r : tes cercles d'artisans ; |cFFFFFFFF/co circle nolink|r / |cFFFFFFFF/co circle link|r coupe ou rallume le rappel de la communauté."] =
+        "|cFFFFFFFF/co circle|r: your crafters' circles; |cFFFFFFFF/co circle nolink|r / |cFFFFFFFF/co circle link|r turns the community reminder off or back on.",
+    ["Les onglets de cette fenêtre"] = "The tabs of this window",
     ["|cFFE8B84BCarnet|r : tes commandes à toi (postées), en cours ou archivées."] =
         "|cFFE8B84BLedger|r: your own posted orders, active or archived.",
     ["|cFFE8B84BCommande|r : poster une demande de craft à faire réaliser par un artisan."] =
@@ -128,8 +128,8 @@ local en2 = {
     ["|cFFE8B84BArtisans|r : l'annuaire — qui sait crafter quoi, en ligne ou non."] =
         "|cFFE8B84BArtisans|r: the directory — who can craft what, online or not.",
     ["Poster une commande de craft"] = "Posting a crafting order",
-    ["Onglet |cFFE8B84BCommande|r → choisis un métier puis un plan dans la liste."] =
-        "|cFFE8B84BOrder|r tab → pick a profession then a recipe from the list.",
+    ["Onglet |cFFE8B84BCommande|r » choisis un métier puis un plan dans la liste."] =
+        "|cFFE8B84BOrder|r tab » pick a profession then a recipe from the list.",
     ["Shift-clic un objet dans un sac ou un lien de chat pour le présélectionner s'il correspond à un plan."] =
         "Shift-click an item in a bag or a chat link to preselect it if it matches a recipe.",
     ["Coche les réactifs que TU fournis toi-même (le reste reste à la charge de l'artisan)."] =
@@ -139,8 +139,8 @@ local en2 = {
     ["Clique |cFFE8B84BPoster|r : la commande apparaît dans ton Carnet et chez les artisans concernés."] =
         "Click |cFFE8B84BPost|r: the order appears in your Ledger and for the relevant crafters.",
     ["Poster une commande de récolte"] = "Posting a gathering order",
-    ["Onglet |cFFE8B84BRécolte|r → choisis un métier de récolte puis une ressource."] =
-        "|cFFE8B84BGather|r tab → pick a gathering profession then a resource.",
+    ["Onglet |cFFE8B84BRécolte|r » choisis un métier de récolte puis une ressource."] =
+        "|cFFE8B84BGather|r tab » pick a gathering profession then a resource.",
     ["Choisis à l'unité ou par pile, la quantité voulue et le prix proposé, puis le destinataire."] =
         "Pick per unit or per stack, the wanted quantity and the offered price, then the recipient.",
     ["Fonctionne comme une commande de craft, mais ciblée sur les joueurs qui ont le métier de récolte, pas de recette à connaître."] =
@@ -164,18 +164,18 @@ local en2 = {
     ["Depuis le Carnet, tu peux annuler une commande tant qu'elle n'est pas livrée."] =
         "From the Ledger, you can cancel an order as long as it isn't delivered.",
     ["Annuaire & social"] = "Directory & social",
-    ["L'onglet Artisans liste les joueurs connus par source : guilde, amis, ajoutés manuellement, croisés récemment."] =
-        "The Artisans tab lists known players by source: guild, friends, manually added, recently met.",
+    ["L'onglet Artisans liste les joueurs connus par source : guilde, amis, cercles d'artisans, ajoutés manuellement, croisés récemment."] =
+        "The Artisans tab lists known players by source: guild, friends, crafters' circles, manually added, recently met.",
     ["Survole un joueur (tooltip) pour voir ses métiers et son niveau de compétence."] =
         "Hover a player (tooltip) to see their professions and skill level.",
     ["Clic droit sur un joueur (chat, groupe...) pour l'ajouter à ton annuaire — utile pour le retrouver même hors ligne."] =
         "Right click a player (chat, party...) to add them to your directory — useful to find them again even offline.",
     ["Pastille verte : il a l'addon et répond. Jaune : en ligne sans l'addon. Grise : hors ligne."] = "Green dot: has the addon and answers. Yellow: online without the addon. Gray: offline.",
     ["Réseau, confidentialité & statuts"] = "Network, privacy & statuses",
-    ["L'addon rejoint un canal dédié pour faire circuler le carnet entre joueurs de l'addon — aucun message lisible n'y est envoyé."] =
-        "The addon joins a dedicated channel to relay the ledger between addon users — no readable text is ever sent there.",
-    ["|cFFFFFFFF/co channel off|r le quitte à tout moment (whisper et guilde restent actifs) ; |cFFFFFFFF/co channel on|r le rejoint."] =
-        "|cFFFFFFFF/co channel off|r leaves it anytime (whisper and guild stay active); |cFFFFFFFF/co channel on|r rejoins it.",
+    ["Pas de canal de discussion : l'addon échange en chuchotements invisibles avec les joueurs de tes cercles, tes amis et ta guilde — aucun message lisible n'est envoyé."] =
+        "No chat channel: the addon talks through hidden whispers with the players in your circles, your friends and your guild — no readable text is ever sent.",
+    ["Les artisans se retrouvent dans la communauté |cFFFFD100Crafting Order PVE|r, une par camp. Sans cercle, l'addon t'en envoie le lien à la connexion : rejoins-la, elle devient ton cercle d'artisans."] =
+        "Crafters meet in the |cFFFFD100Crafting Order PVE|r community, one per faction. Without a circle, the addon sends you its link at login: join it and it becomes your crafters' circle.",
     ["Statuts d'une commande : "] = "Order statuses: ",
 
     -- Aide contextuelle « bouton i » (Vue Métier) — cf. _ProfWindow_HelpPlate.lua (bulles courtes)
@@ -454,8 +454,8 @@ local en2 = {
     ["Fermer"] = "Close",
     ["Sans titre"] = "Untitled",
     ["voir une commande sous forme de quête (parchemin)"] = "view an order as a quest (parchment sheet)",
-    ["Onglet |cFFE8B84BCommande|r → |cFFE8B84BPoster en quête|r : donne un titre et un récit à ta demande, sur un vrai parchemin de quête. Elle apparaît ensuite sous ce nom chez les artisans."] =
-        "|cFFE8B84BOrder|r tab → |cFFE8B84BPost as quest|r: give your request a title and a story, on a real quest parchment. It then shows up under that name for crafters.",
+    ["Onglet |cFFE8B84BCommande|r » |cFFE8B84BPoster en quête|r : donne un titre et un récit à ta demande, sur un vrai parchemin de quête. Elle apparaît ensuite sous ce nom chez les artisans."] =
+        "|cFFE8B84BOrder|r tab » |cFFE8B84BPost as quest|r: give your request a title and a story, on a real quest parchment. It then shows up under that name for crafters.",
     ["Journal"] = "Journal",
     ["Choisis une entrée à gauche."] = "Pick an entry on the left.",
     ["journal parchemin : commandes et quêtes côte à côte (clic droit sur un en-tête du suivi)"] =

@@ -196,7 +196,7 @@ function Inbound:Alert(e)
     local msg = string.format(L["|cFFFF8800entrante|r |cFFFFFFFF%s|r (%s) : %s%s%s"], e.buyer, src, nm, qty, pr)
     pmsg((Skin and ("|T" .. Skin.tex.workorder .. ":0|t ") or "") .. msg)
     if COC.UI and COC.UI.Toast then COC.UI:Toast(msg) end
-    if e.canCraft then print(L["   |cFF33DD33→ tu sais la crafter|r — vue métier › onglet Entrantes"]) end
+    if e.canCraft then print(L["   |cFF33DD33» tu sais la crafter|r — vue métier › onglet Entrantes"]) end
     pcall(function() PlaySound(SOUNDKIT and SOUNDKIT.TELL_MESSAGE or 3081, "Master") end)
 end
 

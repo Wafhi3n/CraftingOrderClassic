@@ -1,4 +1,4 @@
--- CraftingOrderClassic_Locale_esES_2.lua — overlay esES, 2/2. Clé FR → texte traduit.
+-- CraftingOrderClassic_Locale_esES_2.lua — overlay esES, 2/2. Clé FR » texte traduit.
 -- Suite de _Locale_esES.lua, scindé pour rester sous le plafond anti-monolithe (500 l/fichier).
 -- Même contrat : chargé APRÈS _Locale.lua, table à plat fusionnée dans COC.L — les deux moitiés
 -- sont indépendantes (aucun ordre requis entre elles). Client d'une autre langue : early-return.
@@ -66,7 +66,7 @@ local es2 = {
         "unido a |cFFFFFFFF%s|r para diagnóstico — en Forever está dividido en salas separadas. |cFFFFFFFF/co channel off|r para salir.",
     ["réseau sans canal (whisper). |cFFFFFFFF/co channel on|r rejoint |cFFFFFFFF%s|r pour un diagnostic."] =
         "red sin canal (susurros). |cFFFFFFFF/co channel on|r se une a |cFFFFFFFF%s|r para diagnóstico.",
-    ["(dés)activer le canal réseau global"] = "(des)activar el canal de red global",
+    ["rejoindre l'ancien canal réseau, morcelé sur Forever"] = "unirse al antiguo canal de red, dividido en salas en Forever",
     ["balise TEXTE émise=%s (canal idx=%s) — lance |cFFFFFFFF/co trace dump|r sur l'AUTRE perso et cherche |cFFFFFFFF[recv] beacon|r."] =
         "baliza TEXTO enviada=%s (canal idx=%s) — ejecuta |cFFFFFFFF/co trace dump|r en el OTRO personaje y busca |cFFFFFFFF[recv] beacon|r.",
     ["annuaire local vidé (diag) — exécute aussi |cFFFFFFFF/co wipe|r sur l'autre compte pour un test de découverte propre."] =
@@ -86,9 +86,9 @@ local es2 = {
         "Clic derecho en el icono del minimapa (o |cFFFFFFFF/co métier|r): abre la Vista de Profesión de una de tus profesiones.",
     ["|cFFFFFFFF/co help|r dans le chat : liste complète des commandes slash."] =
         "|cFFFFFFFF/co help|r en el chat: lista completa de comandos slash.",
-    ["|cFFFFFFFF/co channel off|r / |cFFFFFFFF/co channel on|r : quitter/rejoindre le canal réseau."] =
-        "|cFFFFFFFF/co channel off|r / |cFFFFFFFF/co channel on|r: salir/unirse al canal de red.",
-    ["Les 4 onglets de cette fenêtre"] = "Las 4 pestañas de esta ventana",
+    ["|cFFFFFFFF/co circle|r : tes cercles d'artisans ; |cFFFFFFFF/co circle nolink|r / |cFFFFFFFF/co circle link|r coupe ou rallume le rappel de la communauté."] =
+        "|cFFFFFFFF/co circle|r: tus círculos de artesanos; |cFFFFFFFF/co circle nolink|r / |cFFFFFFFF/co circle link|r desactiva o reactiva el aviso de la comunidad.",
+    ["Les onglets de cette fenêtre"] = "Las pestañas de esta ventana",
     ["|cFFE8B84BCarnet|r : tes commandes à toi (postées), en cours ou archivées."] =
         "|cFFE8B84BLibro|r: tus propios pedidos (publicados), activos o archivados.",
     ["|cFFE8B84BCommande|r : poster une demande de craft à faire réaliser par un artisan."] =
@@ -98,8 +98,8 @@ local es2 = {
     ["|cFFE8B84BArtisans|r : l'annuaire — qui sait crafter quoi, en ligne ou non."] =
         "|cFFE8B84BArtesanos|r: el directorio — quién sabe fabricar qué, en línea o no.",
     ["Poster une commande de craft"] = "Publicar un pedido de fabricación",
-    ["Onglet |cFFE8B84BCommande|r → choisis un métier puis un plan dans la liste."] =
-        "Pestaña |cFFE8B84BPedir|r → elige una profesión y luego una receta de la lista.",
+    ["Onglet |cFFE8B84BCommande|r » choisis un métier puis un plan dans la liste."] =
+        "Pestaña |cFFE8B84BPedir|r » elige una profesión y luego una receta de la lista.",
     ["Shift-clic un objet dans un sac ou un lien de chat pour le présélectionner s'il correspond à un plan."] =
         "Mayús-clic en un objeto de una bolsa o un enlace de chat para preseleccionarlo si corresponde a una receta.",
     ["Coche les réactifs que TU fournis toi-même (le reste reste à la charge de l'artisan)."] =
@@ -109,8 +109,8 @@ local es2 = {
     ["Clique |cFFE8B84BPoster|r : la commande apparaît dans ton Carnet et chez les artisans concernés."] =
         "Haz clic en |cFFE8B84BPublicar|r: el pedido aparece en tu Libro y en los artesanos correspondientes.",
     ["Poster une commande de récolte"] = "Publicar un pedido de recolección",
-    ["Onglet |cFFE8B84BRécolte|r → choisis un métier de récolte puis une ressource."] =
-        "Pestaña |cFFE8B84BRecolectar|r → elige una profesión de recolección y luego un recurso.",
+    ["Onglet |cFFE8B84BRécolte|r » choisis un métier de récolte puis une ressource."] =
+        "Pestaña |cFFE8B84BRecolectar|r » elige una profesión de recolección y luego un recurso.",
     ["Choisis à l'unité ou par pile, la quantité voulue et le prix proposé, puis le destinataire."] =
         "Elige por unidad o por montón, la cantidad deseada y el precio ofrecido, y luego el destinatario.",
     ["Fonctionne comme une commande de craft, mais ciblée sur les joueurs qui ont le métier de récolte, pas de recette à connaître."] =
@@ -134,8 +134,8 @@ local es2 = {
     ["Depuis le Carnet, tu peux annuler une commande tant qu'elle n'est pas livrée."] =
         "Desde el Libro, puedes cancelar un pedido mientras no esté entregado.",
     ["Annuaire & social"] = "Directorio y social",
-    ["L'onglet Artisans liste les joueurs connus par source : guilde, amis, ajoutés manuellement, croisés récemment."] =
-        "La pestaña Artesanos lista los jugadores conocidos por fuente: hermandad, amigos, añadidos manualmente, vistos recientemente.",
+    ["L'onglet Artisans liste les joueurs connus par source : guilde, amis, cercles d'artisans, ajoutés manuellement, croisés récemment."] =
+        "La pestaña Artesanos lista los jugadores conocidos por fuente: hermandad, amigos, círculos de artesanos, añadidos manualmente, vistos recientemente.",
     ["Survole un joueur (tooltip) pour voir ses métiers et son niveau de compétence."] =
         "Pasa el cursor sobre un jugador (tooltip) para ver sus profesiones y su nivel de habilidad.",
     ["Clic droit sur un joueur (chat, groupe...) pour l'ajouter à ton annuaire — utile pour le retrouver même hors ligne."] =
@@ -143,10 +143,10 @@ local es2 = {
     ["Pastille verte : il a l'addon et répond. Jaune : en ligne sans l'addon. Grise : hors ligne."] =
         "Punto verde: tiene el addon y responde. Amarillo: en línea sin el addon. Gris: desconectado.",
     ["Réseau, confidentialité & statuts"] = "Red, privacidad y estados",
-    ["L'addon rejoint un canal dédié pour faire circuler le carnet entre joueurs de l'addon — aucun message lisible n'y est envoyé."] =
-        "El addon se une a un canal dedicado para transmitir el libro entre usuarios del addon — no se envía ningún mensaje legible.",
-    ["|cFFFFFFFF/co channel off|r le quitte à tout moment (whisper et guilde restent actifs) ; |cFFFFFFFF/co channel on|r le rejoint."] =
-        "|cFFFFFFFF/co channel off|r sale en cualquier momento (susurro y hermandad siguen activos); |cFFFFFFFF/co channel on|r vuelve a unirse.",
+    ["Pas de canal de discussion : l'addon échange en chuchotements invisibles avec les joueurs de tes cercles, tes amis et ta guilde — aucun message lisible n'est envoyé."] =
+        "Sin canal de chat: el addon se comunica por susurros invisibles con los jugadores de tus círculos, tus amigos y tu hermandad — no se envía ningún mensaje legible.",
+    ["Les artisans se retrouvent dans la communauté |cFFFFD100Crafting Order PVE|r, une par camp. Sans cercle, l'addon t'en envoie le lien à la connexion : rejoins-la, elle devient ton cercle d'artisans."] =
+        "Los artesanos se reúnen en la comunidad |cFFFFD100Crafting Order PVE|r, una por facción. Sin círculo, el addon te envía su enlace al conectarte: únete y se convierte en tu círculo de artesanos.",
     ["Statuts d'une commande : "] = "Estados de un pedido: ",
 
     -- Aide contextuelle « bouton i » (Vue Métier) — cf. _ProfWindow_HelpPlate.lua (bulles courtes)
@@ -435,8 +435,8 @@ local es2 = {
     ["Fermer"] = "Cerrar",
     ["Sans titre"] = "Sin título",
     ["voir une commande sous forme de quête (parchemin)"] = "ver un pedido como una misión (pergamino)",
-    ["Onglet |cFFE8B84BCommande|r → |cFFE8B84BPoster en quête|r : donne un titre et un récit à ta demande, sur un vrai parchemin de quête. Elle apparaît ensuite sous ce nom chez les artisans."] =
-        "Pestaña |cFFE8B84BPedido|r → |cFFE8B84BPublicar como misión|r: da un título y una historia a tu petición, sobre un pergamino de misión real. Aparecerá con ese nombre para los artesanos.",
+    ["Onglet |cFFE8B84BCommande|r » |cFFE8B84BPoster en quête|r : donne un titre et un récit à ta demande, sur un vrai parchemin de quête. Elle apparaît ensuite sous ce nom chez les artisans."] =
+        "Pestaña |cFFE8B84BPedido|r » |cFFE8B84BPublicar como misión|r: da un título y una historia a tu petición, sobre un pergamino de misión real. Aparecerá con ese nombre para los artesanos.",
     ["Journal"] = "Diario",
     ["Choisis une entrée à gauche."] = "Elige una entrada a la izquierda.",
     ["journal parchemin : commandes et quêtes côte à côte (clic droit sur un en-tête du suivi)"] =

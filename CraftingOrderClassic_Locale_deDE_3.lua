@@ -1,4 +1,4 @@
--- CraftingOrderClassic_Locale_deDE_3.lua — overlay deDE, 3/3. Clé FR → texte traduit.
+-- CraftingOrderClassic_Locale_deDE_3.lua — overlay deDE, 3/3. Clé FR » texte traduit.
 -- Troisième part, ouverte le 2026-09-26 : _2 avait atteint le plafond anti-monolithe
 -- (500 l/fichier) en accueillant les clés de la bande LFW. Même contrat que les deux
 -- autres — table à plat fusionnée dans COC.L, aucun ordre requis entre les parts.
@@ -36,6 +36,16 @@ local de3 = {
     -- Signature du build de test, /co version (2026-09-28)
     ["Build : %s"] = "Build: %s",
     ["Branches en test : %s"] = "Branches im Test: %s",
+    -- Aide remise à jour : onglets latéraux, cercles (2026-09-28)
+    ["Ils se rangent sur le bord droit, comme ceux de la fenêtre de métier. Survole une icône pour lire son nom ; le chiffre sur le Carnet compte tes commandes en cours."] =
+        "Sie sitzen am rechten Rand, wie im Berufsfenster. Fahre über ein Symbol, um seinen Namen zu lesen; die Zahl am Auftragsbuch zählt deine aktiven Aufträge.",
+    ["|cFFE8B84BMes artisans|r : les métiers de tous les personnages de ton compte, et leurs recettes."] =
+        "|cFFE8B84BMeine Handwerker|r: die Berufe aller Charaktere deines Kontos und ihre Rezepte.",
+    ["|cFFE8B84BAide|r et |cFFE8B84BNouveautés|r : cette page, et ce qui a changé à chaque version."] =
+        "|cFFE8B84BHilfe|r und |cFFE8B84BNeues|r: diese Seite und was sich in jeder Version geändert hat.",
+    ["cercles d'artisans (communautés) et rappel de la communauté"] =
+        "Handwerkerkreise (Gemeinschaften) und die Gemeinschafts-Erinnerung",
+    ["ou"] = "oder",   -- statuts d'une commande, Aide : « (ou Annulée / Refusée) »
 }
 
 for k, v in pairs(de3) do L[k] = v end
