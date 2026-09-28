@@ -46,6 +46,21 @@ client.
 
 ## Relevés
 
+- 2026-09-28 12:12 — jusqu'a 6ef2e8b — Forever, un client, client en ANGLAIS ; build
+  `main-dev@6ef2e8b 2026-09-28 12:10`, branches en test `feat/ui-p2c-listes` (lu en jeu par
+  `/co version`, capture ; même commit que le déploiement de 12:09, redéployé tel quel à 12:10:24
+  par une autre session) — **GO sur le lot 2c du palier 2 et ses retouches** — première capture
+  (`984ae25`) : liste de Récolte sur la liste moderne (barre d'en-tête « Trade Goods », sous-catégorie
+  « Herbs », +/- à droite, `MinimalScrollBar`), mais trois défauts : le « i » sous la bordure du cadre,
+  une bande vide sous la recherche, une gouttière vide à droite de la barre → `6ef2e8b`. Seconde
+  capture : le « i » entier par-dessus la bordure ; le Carnet (« Active ») vide dès l'ouverture
+  affiche « No orders. Use the « Order » tab to post one. » (il restait muet avant) ; `/co version`
+  affiche la version, le build et les branches en test (couvre `d206e2e`). Le reste rapporté par le
+  user (« c'est tout good »), sans capture : Récolte sans bande ni gouttière, listes de Commande,
+  Artisans et Mes artisans jusqu'au séparateur.
+  Non vu : un Carnet avec des commandes (clic, survol), les filtres Archivées et Confiées, les
+  pastilles d'extension d'« Élémentaire ».
+
 - 2026-09-28 11:46 — jusqu'a d708cb1 — Forever, un client, client en ANGLAIS ; build
   `main-dev@98b333c 2026-09-28 11:36`, branches en test `feat/banc-main-dev, fix/ui-p2b-debordements`
   (lu dans la signature du `.toc` déployé ; `/co version` pas montré) — **GO sur les deux
