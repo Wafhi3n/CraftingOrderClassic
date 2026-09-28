@@ -2,8 +2,11 @@
 
 > Rédigée le 2026-09-27 · Cible : WoW: Forever / Camelot (16001) · Statut : **D1-D3 tranchées le
 > 2026-09-27 ; P0 : menus EXCLUS (le client plante), sonde 26/26, minicarte : variante A choisie, 0 refus ; P0 bouclé ;
-> P1 à P4 faits et vus en jeu (2026-09-27/28 : toutes les listes et pages de la fenêtre principale,
-> onglets latéraux, champs montant et quantité) ; restent P5 à P7** · Portée : la fenêtre principale d'abord (Carnet, Commande, Récolte, Artisans, Mes
+> P1 à P6 faits et vus en jeu (2026-09-27/28 : toutes les listes et pages de la fenêtre principale,
+> onglets latéraux, champs montant et quantité, Carnet triable, encarts des métiers) ; P7 en cours :
+> 7a (Journal et fiche de quête) et 7b (panneaux Échange et Courrier) faits et vus en jeu le
+> 2026-09-28 ; reste 7c, la fenêtre Route et les listes de la colonne greffée, après un relevé en
+> combat (risque 4)** · Portée : la fenêtre principale d'abord (Carnet, Commande, Récolte, Artisans, Mes
 > artisans, Aide, Nouveautés), puis les fenêtres annexes. La colonne greffée dans la fenêtre des
 > métiers est déjà faite.
 >
@@ -151,6 +154,26 @@ avant la suivante. Chaque palier démarre par une primitive du kit (`Skin.Make*`
 | **P5** | Carnet en `TableBuilder`, colonnes triables | calqué sur « Mes commandes » |
 | **P6** | Fonds : rocher, marbre et puits vers NineSlice et atlas | le plus visible mais le moins risqué ; en dernier pour ne pas repeindre deux fois |
 | **P7** | Fenêtres annexes (Route, Journal, panneaux Échange/Courrier), puis listes de la colonne greffée | après le relevé en combat (risque 4) |
+
+**Palier 7, découpé à la réalisation** (2026-09-28) :
+
+- **7a — Journal et fiche de quête.** Sur Camelot, le journal de quêtes du jeu est celui de retail
+  (`QuestMapFrame`, `QuestLogPopupDetailFrame`) : ButtonFrameTemplate, livre
+  `UI-QuestLog-BookIcon` en médaillon, parchemin dans l'encart. Le Journal passe par
+  `Skin.MakeWindow` ; la fiche, qui doit rester portable (RPQuestMaster), construit son
+  ButtonFrameTemplate elle-même, donneur en titre, boutons sur la barre du bas. Le parchemin des
+  hauts faits reste (`QuestBG-Parchment` : couture, déjà écarté). Piège : `MakeWindow` pose un
+  `OnShow` auquel s'accroche le proxy d'Échap, le Journal doit s'y ajouter par `HookScript`.
+- **7b — panneaux Échange et Courrier.** `DefaultPanelTemplate` (le panneau sans portrait de
+  retail ; ses mixins ne touchent que le cadre), lignes dans un encart de liste, survol et
+  sélection aux atlas des recettes ; croix `UIPanelCloseButtonDefaultAnchors` (Camelot l'ancre à
+  `TOPRIGHT -2,1`), niveau au-dessus de la barre de titre (510). Au passage : le courrier ne liste
+  plus que les commandes qui produisent un objet (un enchant ne part pas par la poste).
+- **7c — reste à faire.** La fenêtre Route partage son CORPS avec la colonne greffée
+  (`PW:_BuildRouteBody`, un seul peintre pour les deux) : changer sa barre de défilement, c'est
+  toucher la colonne. Donc avec les listes de la colonne, après le relevé en combat. L'ouverture
+  automatique de l'Enchantement à l'échange reste impossible (mesure M2 du 2026-09-22 : seul un
+  vrai clic choisit le métier) ; l'onglet collé à la fenêtre d'échange est le chemin.
 
 ## Décisions
 
