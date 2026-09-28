@@ -27,16 +27,19 @@ local function contentIntro()
                 L["Clic gauche sur l'icône minimap (ou |cFFFFFFFF/co|r) : ouvre cette fenêtre."],
                 L["Clic droit sur l'icône minimap (ou |cFFFFFFFF/co métier|r) : ouvre la Vue Métier d'un de tes métiers."],
                 L["|cFFFFFFFF/co help|r dans le chat : liste complète des commandes slash."],
-                L["|cFFFFFFFF/co channel off|r / |cFFFFFFFF/co channel on|r : quitter/rejoindre le canal réseau."],
+                L["|cFFFFFFFF/co circle|r : tes cercles d'artisans ; |cFFFFFFFF/co circle nolink|r / |cFFFFFFFF/co circle link|r coupe ou rallume le rappel de la communauté."],
             },
         },
         {
-            icon = Skin.tex.broadcast, title = L["Les 4 onglets de cette fenêtre"],
+            icon = Skin.tex.broadcast, title = L["Les onglets de cette fenêtre"],
             lines = {
+                L["Ils se rangent sur le bord droit, comme ceux de la fenêtre de métier. Survole une icône pour lire son nom ; le chiffre sur le Carnet compte tes commandes en cours."],
                 L["|cFFE8B84BCarnet|r : tes commandes à toi (postées), en cours ou archivées."],
                 L["|cFFE8B84BCommande|r : poster une demande de craft à faire réaliser par un artisan."],
                 L["|cFFE8B84BRécolte|r : poster une demande de matières à un récolteur (mine, herbe, peau, pêche)."],
                 L["|cFFE8B84BArtisans|r : l'annuaire — qui sait crafter quoi, en ligne ou non."],
+                L["|cFFE8B84BMes artisans|r : les métiers de tous les personnages de ton compte, et leurs recettes."],
+                L["|cFFE8B84BAide|r et |cFFE8B84BNouveautés|r : cette page, et ce qui a changé à chaque version."],
             },
         },
     }
@@ -47,7 +50,7 @@ local function contentPosting()
         {
             icon = Skin.tex.workorder, title = L["Poster une commande de craft"],
             lines = {
-                L["Onglet |cFFE8B84BCommande|r → choisis un métier puis un plan dans la liste."],
+                L["Onglet |cFFE8B84BCommande|r » choisis un métier puis un plan dans la liste."],
                 L["Shift-clic un objet dans un sac ou un lien de chat pour le présélectionner s'il correspond à un plan."],
                 L["Coche les réactifs que TU fournis toi-même (le reste reste à la charge de l'artisan)."],
                 L["Choisis la quantité, la commission proposée, puis le destinataire (guilde, amis, un artisan précis, ou diffuser à tous)."],
@@ -57,7 +60,7 @@ local function contentPosting()
         {
             icon = Skin.tex.crate, title = L["Poster une commande de récolte"],
             lines = {
-                L["Onglet |cFFE8B84BRécolte|r → choisis un métier de récolte puis une ressource."],
+                L["Onglet |cFFE8B84BRécolte|r » choisis un métier de récolte puis une ressource."],
                 L["Choisis à l'unité ou par pile, la quantité voulue et le prix proposé, puis le destinataire."],
                 L["Fonctionne comme une commande de craft, mais ciblée sur les joueurs qui ont le métier de récolte, pas de recette à connaître."],
             },
@@ -93,7 +96,7 @@ local function contentSocial()
         {
             icon = Skin.tex.online, title = L["Annuaire & social"],
             lines = {
-                L["L'onglet Artisans liste les joueurs connus par source : guilde, amis, ajoutés manuellement, croisés récemment."],
+                L["L'onglet Artisans liste les joueurs connus par source : guilde, amis, cercles d'artisans, ajoutés manuellement, croisés récemment."],
                 L["Survole un joueur (tooltip) pour voir ses métiers et son niveau de compétence."],
                 L["Clic droit sur un joueur (chat, groupe...) pour l'ajouter à ton annuaire — utile pour le retrouver même hors ligne."],
                 L["Pastille verte : il a l'addon et répond. Jaune : en ligne sans l'addon. Grise : hors ligne."],
@@ -102,10 +105,10 @@ local function contentSocial()
         {
             icon = Skin.tex.gear, title = L["Réseau, confidentialité & statuts"],
             lines = {
-                L["L'addon rejoint un canal dédié pour faire circuler le carnet entre joueurs de l'addon — aucun message lisible n'y est envoyé."],
-                L["|cFFFFFFFF/co channel off|r le quitte à tout moment (whisper et guilde restent actifs) ; |cFFFFFFFF/co channel on|r le rejoint."],
-                L["Statuts d'une commande : "] .. "|cFFFFCC00" .. L["En attente"] .. "|r → |cFF33CCFF" .. L["Acceptée"]
-                    .. "|r → |cFF33DD33" .. L["Livrée"] .. "|r (ou |cFF888888" .. L["Annulée"] .. "|r / |cFFFF4444" .. L["Refusée"] .. "|r).",
+                L["Pas de canal de discussion : l'addon échange en chuchotements invisibles avec les joueurs de tes cercles, tes amis et ta guilde — aucun message lisible n'est envoyé."],
+                L["Les artisans se retrouvent dans la communauté |cFFFFD100Crafting Order PVE|r, une par camp. Sans cercle, l'addon t'en envoie le lien à la connexion : rejoins-la, elle devient ton cercle d'artisans."],
+                L["Statuts d'une commande : "] .. "|cFFFFCC00" .. L["En attente"] .. "|r » |cFF33CCFF" .. L["Acceptée"]
+                    .. "|r » |cFF33DD33" .. L["Livrée"] .. "|r (ou |cFF888888" .. L["Annulée"] .. "|r / |cFFFF4444" .. L["Refusée"] .. "|r).",
             },
         },
     }
@@ -137,7 +140,7 @@ local function contentTracker()
                 L["Clic gauche sur une ligne : ouvre le métier concerné. Clic droit : ouvre le Carnet. Maj-clic un réactif : le lie dans le chat."],
                 L["Glisse n'importe quelle ligne pour déplacer le suivi ; clique l'en-tête d'une section pour la replier."],
                 L["|cFFFFFFFF/co track|r affiche/masque · |cFFFFFFFF/co track reset|r remet en place · |cFFFFFFFF/co track combat|r masque en combat · |cFFFFFFFF/co track lines 5|r borne le nombre d'entrées."],
-                L["Onglet |cFFE8B84BCommande|r → |cFFE8B84BPoster en quête|r : donne un titre et un récit à ta demande, sur un vrai parchemin de quête. Elle apparaît ensuite sous ce nom chez les artisans."],
+                L["Onglet |cFFE8B84BCommande|r » |cFFE8B84BPoster en quête|r : donne un titre et un récit à ta demande, sur un vrai parchemin de quête. Elle apparaît ensuite sous ce nom chez les artisans."],
             },
         },
     }

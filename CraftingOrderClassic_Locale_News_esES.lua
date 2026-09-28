@@ -1,5 +1,5 @@
 -- CraftingOrderClassic_Locale_News_esES.lua — traductions de l'onglet « Nouveautés » (esES).
--- Extrait de _Locale_esES.lua (plafond anti-monolithe). Clé FR → texte ES, chargé APRÈS _Locale.lua.
+-- Extrait de _Locale_esES.lua (plafond anti-monolithe). Clé FR » texte ES, chargé APRÈS _Locale.lua.
 
 local COC = CraftingOrderClassic
 if (GetLocale and GetLocale() or "") ~= "esES" then return end

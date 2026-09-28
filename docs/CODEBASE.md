@@ -10,20 +10,20 @@
 
 | Fichier | Rôle | Lignes |
 |---|---|---|
-| `CraftingOrderClassic.lua` | Crafting Order - Classic — réseau GLOBAL et SOCIAL de commandes de craft. | 489 |
+| `CraftingOrderClassic.lua` | Crafting Order - Classic — réseau GLOBAL et SOCIAL de commandes de craft. | 490 |
 | `CraftingOrderClassic_Compat.lua` | couche d'adaptation d'API entre les SAVEURS de client. | 326 |
 | `CraftingOrderClassic_Trace.lua` | trace réseau PERSISTÉE, lisible hors-jeu. | 79 |
 | `CraftingOrderClassic_Migrations.lua` | versionnage du schéma SavedVariables. | 40 |
 | `CraftingOrderClassic_Locale.lua` | socle de localisation du CHROME de l'UI. | 12 |
 | `CraftingOrderClassic_Locale_enUS.lua` | overlay ANGLAIS (enUS/enGB). | 279 |
 | `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 497 |
-| `CraftingOrderClassic_Locale_enUS_3.lua` | overlay enUS, 3/3. | 42 |
+| `CraftingOrderClassic_Locale_enUS_3.lua` | overlay enUS, 3/3. | 51 |
 | `CraftingOrderClassic_Locale_deDE.lua` | overlay ALLEMAND (deDE). | 281 |
 | `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 477 |
-| `CraftingOrderClassic_Locale_deDE_3.lua` | overlay deDE, 3/3. | 41 |
+| `CraftingOrderClassic_Locale_deDE_3.lua` | overlay deDE, 3/3. | 50 |
 | `CraftingOrderClassic_Locale_esES.lua` | overlay ESPAGNOL (esES/esMX). | 282 |
 | `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 478 |
-| `CraftingOrderClassic_Locale_esES_3.lua` | overlay esES, 3/3. | 42 |
+| `CraftingOrderClassic_Locale_esES_3.lua` | overlay esES, 3/3. | 51 |
 | `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 401 |
 | `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 398 |
 | `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 398 |
@@ -63,7 +63,7 @@
 | `CraftingOrderClassic_UI_MyArtisans.lua` | onglet « Mes artisans » : vue agrégée des métiers du COMPTE (tous mes rerolls du royaume), en mode « connu ». | 475 |
 | `CraftingOrderClassic_UI_MyArtisans_Profit.lua` | onglet « Mes artisans » : couche Auctionator. | 135 |
 | `CraftingOrderClassic_UI_MyArtisans_Reroll.lua` | accès à la vue REROLL (métiers d'un AUTRE perso du compte) depuis l'onglet « Mes artisans ». | 86 |
-| `CraftingOrderClassic_UI_Help.lua` | onglet Aide : page unique défilante qui explique les autres onglets (Carnet/Commande/Récolte/Artisans), la Vue Métier et le réseau. | 196 |
+| `CraftingOrderClassic_UI_Help.lua` | onglet Aide : page unique défilante qui explique les autres onglets (Carnet/Commande/Récolte/Artisans), la Vue Métier et le réseau. | 199 |
 | `CraftingOrderClassic_UI_News.lua` | onglet « Nouveautés » : notes de version (changelog) affichées EN JEU, version par version, la plus récente en tête. | 469 |
 | `CraftingOrderClassic_Social.lua` | couche sociale passive (socle). | 402 |
 | `CraftingOrderClassic_Social_Menu.lua` | entrées « Crafting Order » du menu contextuel joueur. | 104 |
@@ -739,56 +739,56 @@
 > NB : les NOMS d'objets/recettes restent multilingues via GetItemInfo/GetSpellInfo (côté données).
 
 ### `CraftingOrderClassic_Locale_enUS.lua`
-> CraftingOrderClassic_Locale_enUS.lua — overlay ANGLAIS (enUS/enGB). Clé FR → texte EN.
+> CraftingOrderClassic_Locale_enUS.lua — overlay ANGLAIS (enUS/enGB). Clé FR » texte EN.
 > Chargé APRÈS CraftingOrderClassic_Locale.lua (qui crée COC.L via setmetatable). Repli sur la clé FR
 > pour toute chaîne non traduite. Extrait du fichier de base (plafond anti-monolithe de 500 lignes) :
 > il vit maintenant à côté de _Locale_deDE.lua / _Locale_esES.lua, même forme, même contrat.
 > Sur un client non-anglais : early-return, coût nul.
 
 ### `CraftingOrderClassic_Locale_enUS_2.lua`
-> CraftingOrderClassic_Locale_enUS_2.lua — overlay enUS, 2/2. Clé FR → texte traduit.
+> CraftingOrderClassic_Locale_enUS_2.lua — overlay enUS, 2/2. Clé FR » texte traduit.
 > Suite de _Locale_enUS.lua, scindé pour rester sous le plafond anti-monolithe (500 l/fichier).
 > Même contrat : chargé APRÈS _Locale.lua, table à plat fusionnée dans COC.L — les deux moitiés
 > sont indépendantes (aucun ordre requis entre elles). Client d'une autre langue : early-return.
 
 ### `CraftingOrderClassic_Locale_enUS_3.lua`
-> CraftingOrderClassic_Locale_enUS_3.lua — overlay enUS, 3/3. Clé FR → texte traduit.
+> CraftingOrderClassic_Locale_enUS_3.lua — overlay enUS, 3/3. Clé FR » texte traduit.
 > Troisième part, ouverte le 2026-09-26 : _2 avait atteint le plafond anti-monolithe
 > (500 l/fichier) en accueillant les clés de la bande LFW. Même contrat que les deux
 > autres — table à plat fusionnée dans COC.L, aucun ordre requis entre les parts.
 
 ### `CraftingOrderClassic_Locale_deDE.lua`
-> CraftingOrderClassic_Locale_deDE.lua — overlay ALLEMAND (deDE). Clé FR → texte DE.
+> CraftingOrderClassic_Locale_deDE.lua — overlay ALLEMAND (deDE). Clé FR » texte DE.
 > Chargé APRÈS CraftingOrderClassic_Locale.lua (qui crée COC.L via setmetatable). Repli sur la clé FR
-> pour toute chaîne non traduite. Guillemets « » dans les valeurs → évite l'échappement Lua des ".
+> pour toute chaîne non traduite. Guillemets « » dans les valeurs » évite l'échappement Lua des ".
 > Sur un client non-deDE : early-return, coût nul.
 
 ### `CraftingOrderClassic_Locale_deDE_2.lua`
-> CraftingOrderClassic_Locale_deDE_2.lua — overlay deDE, 2/2. Clé FR → texte traduit.
+> CraftingOrderClassic_Locale_deDE_2.lua — overlay deDE, 2/2. Clé FR » texte traduit.
 > Suite de _Locale_deDE.lua, scindé pour rester sous le plafond anti-monolithe (500 l/fichier).
 > Même contrat : chargé APRÈS _Locale.lua, table à plat fusionnée dans COC.L — les deux moitiés
 > sont indépendantes (aucun ordre requis entre elles). Client d'une autre langue : early-return.
 
 ### `CraftingOrderClassic_Locale_deDE_3.lua`
-> CraftingOrderClassic_Locale_deDE_3.lua — overlay deDE, 3/3. Clé FR → texte traduit.
+> CraftingOrderClassic_Locale_deDE_3.lua — overlay deDE, 3/3. Clé FR » texte traduit.
 > Troisième part, ouverte le 2026-09-26 : _2 avait atteint le plafond anti-monolithe
 > (500 l/fichier) en accueillant les clés de la bande LFW. Même contrat que les deux
 > autres — table à plat fusionnée dans COC.L, aucun ordre requis entre les parts.
 
 ### `CraftingOrderClassic_Locale_esES.lua`
-> CraftingOrderClassic_Locale_esES.lua — overlay ESPAGNOL (esES/esMX). Clé FR → texte ES.
+> CraftingOrderClassic_Locale_esES.lua — overlay ESPAGNOL (esES/esMX). Clé FR » texte ES.
 > Chargé APRÈS CraftingOrderClassic_Locale.lua (qui crée COC.L via setmetatable). Repli sur la clé FR
-> pour toute chaîne non traduite. Guillemets « » dans les valeurs → évite l'échappement Lua des ".
+> pour toute chaîne non traduite. Guillemets « » dans les valeurs » évite l'échappement Lua des ".
 > Sur un client non-hispanophone : early-return, coût nul.
 
 ### `CraftingOrderClassic_Locale_esES_2.lua`
-> CraftingOrderClassic_Locale_esES_2.lua — overlay esES, 2/2. Clé FR → texte traduit.
+> CraftingOrderClassic_Locale_esES_2.lua — overlay esES, 2/2. Clé FR » texte traduit.
 > Suite de _Locale_esES.lua, scindé pour rester sous le plafond anti-monolithe (500 l/fichier).
 > Même contrat : chargé APRÈS _Locale.lua, table à plat fusionnée dans COC.L — les deux moitiés
 > sont indépendantes (aucun ordre requis entre elles). Client d'une autre langue : early-return.
 
 ### `CraftingOrderClassic_Locale_esES_3.lua`
-> CraftingOrderClassic_Locale_esES_3.lua — overlay esES, 3/3. Clé FR → texte traduit.
+> CraftingOrderClassic_Locale_esES_3.lua — overlay esES, 3/3. Clé FR » texte traduit.
 > Troisième part, ouverte le 2026-09-26 : _2 avait atteint le plafond anti-monolithe
 > (500 l/fichier) en accueillant les clés de la bande LFW. Même contrat que les deux
 > autres — table à plat fusionnée dans COC.L, aucun ordre requis entre les parts.
@@ -797,15 +797,15 @@
 > CraftingOrderClassic_Locale_News_enUS.lua — traductions de l'onglet « Nouveautés » (enUS/enGB).
 > Extrait de _Locale_enUS.lua : l'onglet Nouveautés grossit à chaque release et faisait déborder le
 > plafond anti-monolithe. Isolé ici, il a de la marge (fenêtre glissante côté UI_News). Même contrat :
-> clé FR → texte EN, chargé APRÈS _Locale.lua, early-return hors locale.
+> clé FR » texte EN, chargé APRÈS _Locale.lua, early-return hors locale.
 
 ### `CraftingOrderClassic_Locale_News_deDE.lua`
 > CraftingOrderClassic_Locale_News_deDE.lua — traductions de l'onglet « Nouveautés » (deDE).
-> Extrait de _Locale_deDE.lua (plafond anti-monolithe). Clé FR → texte DE, chargé APRÈS _Locale.lua.
+> Extrait de _Locale_deDE.lua (plafond anti-monolithe). Clé FR » texte DE, chargé APRÈS _Locale.lua.
 
 ### `CraftingOrderClassic_Locale_News_esES.lua`
 > CraftingOrderClassic_Locale_News_esES.lua — traductions de l'onglet « Nouveautés » (esES).
-> Extrait de _Locale_esES.lua (plafond anti-monolithe). Clé FR → texte ES, chargé APRÈS _Locale.lua.
+> Extrait de _Locale_esES.lua (plafond anti-monolithe). Clé FR » texte ES, chargé APRÈS _Locale.lua.
 
 ### `CraftingOrderClassic_Elemental.lua`
 > CraftingOrderClassic_Elemental.lua — pseudo-« métier » de récolte « Élémentaire ».

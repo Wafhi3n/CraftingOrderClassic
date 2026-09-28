@@ -1,4 +1,4 @@
--- CraftingOrderClassic_Locale_deDE_2.lua — overlay deDE, 2/2. Clé FR → texte traduit.
+-- CraftingOrderClassic_Locale_deDE_2.lua — overlay deDE, 2/2. Clé FR » texte traduit.
 -- Suite de _Locale_deDE.lua, scindé pour rester sous le plafond anti-monolithe (500 l/fichier).
 -- Même contrat : chargé APRÈS _Locale.lua, table à plat fusionnée dans COC.L — les deux moitiés
 -- sont indépendantes (aucun ordre requis entre elles). Client d'une autre langue : early-return.
@@ -65,7 +65,7 @@ local de2 = {
         "|cFFFFFFFF%s|r zur Diagnose beigetreten — auf Forever ist er in getrennte Räume aufgeteilt. |cFFFFFFFF/co channel off|r zum Verlassen.",
     ["réseau sans canal (whisper). |cFFFFFFFF/co channel on|r rejoint |cFFFFFFFF%s|r pour un diagnostic."] =
         "Netzwerk ohne Kanal (Flüstern). |cFFFFFFFF/co channel on|r tritt |cFFFFFFFF%s|r zur Diagnose bei.",
-    ["(dés)activer le canal réseau global"] = "den globalen Netzwerkkanal (de)aktivieren",
+    ["rejoindre l'ancien canal réseau, morcelé sur Forever"] = "dem alten Netzwerkkanal beitreten, auf Forever in Räume aufgeteilt",
     ["balise TEXTE émise=%s (canal idx=%s) — lance |cFFFFFFFF/co trace dump|r sur l'AUTRE perso et cherche |cFFFFFFFF[recv] beacon|r."] =
         "TEXT-Bake gesendet=%s (Kanal idx=%s) — führe |cFFFFFFFF/co trace dump|r auf dem ANDEREN Char aus und suche |cFFFFFFFF[recv] beacon|r.",
     ["annuaire local vidé (diag) — exécute aussi |cFFFFFFFF/co wipe|r sur l'autre compte pour un test de découverte propre."] =
@@ -85,9 +85,9 @@ local de2 = {
         "Rechtsklick auf das Minikarten-Symbol (oder |cFFFFFFFF/co métier|r): öffnet die Berufsansicht eines deiner Berufe.",
     ["|cFFFFFFFF/co help|r dans le chat : liste complète des commandes slash."] =
         "|cFFFFFFFF/co help|r im Chat: vollständige Liste der Slash-Befehle.",
-    ["|cFFFFFFFF/co channel off|r / |cFFFFFFFF/co channel on|r : quitter/rejoindre le canal réseau."] =
-        "|cFFFFFFFF/co channel off|r / |cFFFFFFFF/co channel on|r: Netzwerkkanal verlassen/beitreten.",
-    ["Les 4 onglets de cette fenêtre"] = "Die 4 Tabs dieses Fensters",
+    ["|cFFFFFFFF/co circle|r : tes cercles d'artisans ; |cFFFFFFFF/co circle nolink|r / |cFFFFFFFF/co circle link|r coupe ou rallume le rappel de la communauté."] =
+        "|cFFFFFFFF/co circle|r: deine Handwerkerkreise; |cFFFFFFFF/co circle nolink|r / |cFFFFFFFF/co circle link|r schaltet die Gemeinschafts-Erinnerung aus oder wieder ein.",
+    ["Les onglets de cette fenêtre"] = "Die Tabs dieses Fensters",
     ["|cFFE8B84BCarnet|r : tes commandes à toi (postées), en cours ou archivées."] =
         "|cFFE8B84BAuftragsbuch|r: deine eigenen (erstellten) Aufträge, aktiv oder archiviert.",
     ["|cFFE8B84BCommande|r : poster une demande de craft à faire réaliser par un artisan."] =
@@ -97,8 +97,8 @@ local de2 = {
     ["|cFFE8B84BArtisans|r : l'annuaire — qui sait crafter quoi, en ligne ou non."] =
         "|cFFE8B84BHandwerker|r: das Verzeichnis — wer was herstellen kann, online oder nicht.",
     ["Poster une commande de craft"] = "Einen Handwerksauftrag erstellen",
-    ["Onglet |cFFE8B84BCommande|r → choisis un métier puis un plan dans la liste."] =
-        "Tab |cFFE8B84BBestellen|r → wähle einen Beruf, dann ein Rezept aus der Liste.",
+    ["Onglet |cFFE8B84BCommande|r » choisis un métier puis un plan dans la liste."] =
+        "Tab |cFFE8B84BBestellen|r » wähle einen Beruf, dann ein Rezept aus der Liste.",
     ["Shift-clic un objet dans un sac ou un lien de chat pour le présélectionner s'il correspond à un plan."] =
         "Umschalt-Klick auf einen Gegenstand im Beutel oder einen Chatlink, um ihn vorzuwählen, wenn er einem Rezept entspricht.",
     ["Coche les réactifs que TU fournis toi-même (le reste reste à la charge de l'artisan)."] =
@@ -108,8 +108,8 @@ local de2 = {
     ["Clique |cFFE8B84BPoster|r : la commande apparaît dans ton Carnet et chez les artisans concernés."] =
         "Klicke |cFFE8B84BErstellen|r: der Auftrag erscheint in deinem Auftragsbuch und bei den betreffenden Handwerkern.",
     ["Poster une commande de récolte"] = "Einen Sammelauftrag erstellen",
-    ["Onglet |cFFE8B84BRécolte|r → choisis un métier de récolte puis une ressource."] =
-        "Tab |cFFE8B84BSammeln|r → wähle einen Sammelberuf, dann eine Ressource.",
+    ["Onglet |cFFE8B84BRécolte|r » choisis un métier de récolte puis une ressource."] =
+        "Tab |cFFE8B84BSammeln|r » wähle einen Sammelberuf, dann eine Ressource.",
     ["Choisis à l'unité ou par pile, la quantité voulue et le prix proposé, puis le destinataire."] =
         "Wähle pro Stück oder pro Stapel, die gewünschte Menge und den gebotenen Preis, dann den Empfänger.",
     ["Fonctionne comme une commande de craft, mais ciblée sur les joueurs qui ont le métier de récolte, pas de recette à connaître."] =
@@ -133,8 +133,8 @@ local de2 = {
     ["Depuis le Carnet, tu peux annuler une commande tant qu'elle n'est pas livrée."] =
         "Im Auftragsbuch kannst du einen Auftrag abbrechen, solange er nicht geliefert ist.",
     ["Annuaire & social"] = "Verzeichnis & Soziales",
-    ["L'onglet Artisans liste les joueurs connus par source : guilde, amis, ajoutés manuellement, croisés récemment."] =
-        "Der Tab Handwerker listet bekannte Spieler nach Quelle: Gilde, Freunde, manuell hinzugefügt, kürzlich getroffen.",
+    ["L'onglet Artisans liste les joueurs connus par source : guilde, amis, cercles d'artisans, ajoutés manuellement, croisés récemment."] =
+        "Der Tab Handwerker listet bekannte Spieler nach Quelle: Gilde, Freunde, Handwerkerkreise, manuell hinzugefügt, kürzlich getroffen.",
     ["Survole un joueur (tooltip) pour voir ses métiers et son niveau de compétence."] =
         "Fahre über einen Spieler (Tooltip), um seine Berufe und seine Fertigkeitsstufe zu sehen.",
     ["Clic droit sur un joueur (chat, groupe...) pour l'ajouter à ton annuaire — utile pour le retrouver même hors ligne."] =
@@ -142,10 +142,10 @@ local de2 = {
     ["Pastille verte : il a l'addon et répond. Jaune : en ligne sans l'addon. Grise : hors ligne."] =
         "Grüner Punkt: hat das Addon und antwortet. Gelb: online ohne Addon. Grau: offline.",
     ["Réseau, confidentialité & statuts"] = "Netzwerk, Privatsphäre & Status",
-    ["L'addon rejoint un canal dédié pour faire circuler le carnet entre joueurs de l'addon — aucun message lisible n'y est envoyé."] =
-        "Das Addon tritt einem eigenen Kanal bei, um das Auftragsbuch zwischen Addon-Nutzern zu übertragen — es wird kein lesbarer Text gesendet.",
-    ["|cFFFFFFFF/co channel off|r le quitte à tout moment (whisper et guilde restent actifs) ; |cFFFFFFFF/co channel on|r le rejoint."] =
-        "|cFFFFFFFF/co channel off|r verlässt ihn jederzeit (Flüstern und Gilde bleiben aktiv); |cFFFFFFFF/co channel on|r tritt wieder bei.",
+    ["Pas de canal de discussion : l'addon échange en chuchotements invisibles avec les joueurs de tes cercles, tes amis et ta guilde — aucun message lisible n'est envoyé."] =
+        "Kein Chatkanal: Das Addon tauscht sich über unsichtbares Flüstern mit den Spielern deiner Kreise, deinen Freunden und deiner Gilde aus — es wird kein lesbarer Text gesendet.",
+    ["Les artisans se retrouvent dans la communauté |cFFFFD100Crafting Order PVE|r, une par camp. Sans cercle, l'addon t'en envoie le lien à la connexion : rejoins-la, elle devient ton cercle d'artisans."] =
+        "Handwerker treffen sich in der Gemeinschaft |cFFFFD100Crafting Order PVE|r, eine pro Fraktion. Ohne Kreis schickt dir das Addon beim Einloggen ihren Link: Tritt ihr bei, dann wird sie dein Handwerkerkreis.",
     ["Statuts d'une commande : "] = "Auftragsstatus: ",
 
     -- Aide contextuelle « bouton i » (Vue Métier) — cf. _ProfWindow_HelpPlate.lua (bulles courtes)
@@ -434,8 +434,8 @@ local de2 = {
     ["Fermer"] = "Schließen",
     ["Sans titre"] = "Ohne Titel",
     ["voir une commande sous forme de quête (parchemin)"] = "einen Auftrag als Quest ansehen (Pergament)",
-    ["Onglet |cFFE8B84BCommande|r → |cFFE8B84BPoster en quête|r : donne un titre et un récit à ta demande, sur un vrai parchemin de quête. Elle apparaît ensuite sous ce nom chez les artisans."] =
-        "Reiter |cFFE8B84BAuftrag|r → |cFFE8B84BAls Quest posten|r: Gib deiner Anfrage Titel und Geschichte auf echtem Quest-Pergament. Sie erscheint danach unter diesem Namen bei den Handwerkern.",
+    ["Onglet |cFFE8B84BCommande|r » |cFFE8B84BPoster en quête|r : donne un titre et un récit à ta demande, sur un vrai parchemin de quête. Elle apparaît ensuite sous ce nom chez les artisans."] =
+        "Reiter |cFFE8B84BAuftrag|r » |cFFE8B84BAls Quest posten|r: Gib deiner Anfrage Titel und Geschichte auf echtem Quest-Pergament. Sie erscheint danach unter diesem Namen bei den Handwerkern.",
     ["Journal"] = "Journal",
     ["Choisis une entrée à gauche."] = "Wähle links einen Eintrag.",
     ["journal parchemin : commandes et quêtes côte à côte (clic droit sur un en-tête du suivi)"] =

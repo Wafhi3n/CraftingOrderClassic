@@ -1,5 +1,5 @@
 -- CraftingOrderClassic_Locale_News_deDE.lua — traductions de l'onglet « Nouveautés » (deDE).
--- Extrait de _Locale_deDE.lua (plafond anti-monolithe). Clé FR → texte DE, chargé APRÈS _Locale.lua.
+-- Extrait de _Locale_deDE.lua (plafond anti-monolithe). Clé FR » texte DE, chargé APRÈS _Locale.lua.
 
 local COC = CraftingOrderClassic
 if (GetLocale and GetLocale() or "") ~= "deDE" then return end

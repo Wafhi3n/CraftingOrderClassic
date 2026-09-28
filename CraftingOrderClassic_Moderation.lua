@@ -363,7 +363,7 @@ function Mod:_PrintSpam()
     if spamMax() <= 0 then
         pmsg(L["détection de spam : |cFFFFFFFFdésactivée|r — /co spam <max> [fenêtre] pour l'activer"])
     else
-        pmsg(string.format(L["détection de spam : |cFFFFFFFF%d|r posts / |cFFFFFFFF%ds|r → %s"],
+        pmsg(string.format(L["détection de spam : |cFFFFFFFF%d|r posts / |cFFFFFFFF%ds|r » %s"],
             spamMax(), spamWindow(), spamAuto() and L["mute auto"] or L["popup"]))
         pmsg(L["  /co spam <max> [fenêtre] · /co spam auto · /co spam off"])
     end

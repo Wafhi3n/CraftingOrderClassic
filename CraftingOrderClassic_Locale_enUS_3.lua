@@ -1,4 +1,4 @@
--- CraftingOrderClassic_Locale_enUS_3.lua — overlay enUS, 3/3. Clé FR → texte traduit.
+-- CraftingOrderClassic_Locale_enUS_3.lua — overlay enUS, 3/3. Clé FR » texte traduit.
 -- Troisième part, ouverte le 2026-09-26 : _2 avait atteint le plafond anti-monolithe
 -- (500 l/fichier) en accueillant les clés de la bande LFW. Même contrat que les deux
 -- autres — table à plat fusionnée dans COC.L, aucun ordre requis entre les parts.
@@ -37,6 +37,15 @@ local en3 = {
     -- Signature du build de test, /co version (2026-09-28)
     ["Build : %s"] = "Build: %s",
     ["Branches en test : %s"] = "Branches under test: %s",
+    -- Aide remise à jour : onglets latéraux, cercles (2026-09-28)
+    ["Ils se rangent sur le bord droit, comme ceux de la fenêtre de métier. Survole une icône pour lire son nom ; le chiffre sur le Carnet compte tes commandes en cours."] =
+        "They sit along the right edge, like the ones on the profession window. Hover an icon to read its name; the number on the Ledger counts your active orders.",
+    ["|cFFE8B84BMes artisans|r : les métiers de tous les personnages de ton compte, et leurs recettes."] =
+        "|cFFE8B84BMy Artisans|r: the professions of every character on your account, and their recipes.",
+    ["|cFFE8B84BAide|r et |cFFE8B84BNouveautés|r : cette page, et ce qui a changé à chaque version."] =
+        "|cFFE8B84BHelp|r and |cFFE8B84BWhat's New|r: this page, and what changed in each version.",
+    ["cercles d'artisans (communautés) et rappel de la communauté"] =
+        "crafters' circles (communities) and the community reminder",
 }
 
 for k, v in pairs(en3) do L[k] = v end
