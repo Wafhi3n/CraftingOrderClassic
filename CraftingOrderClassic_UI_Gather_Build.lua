@@ -109,12 +109,13 @@ function UI:_BuildGatherRight(panel)
     self.gatherInfoTxt:SetJustifyH("LEFT")
     self.gatherInfoTxt:SetTextColor(Skin.unpack(Skin.color.textMuted)); Skin.ApplyShadow(self.gatherInfoTxt)
 
-    -- Prix proposé : rangée CENTRÉE dans sa zone (même formule que la commission de l'onglet Commande).
+    -- Prix proposé : le champ montant du formulaire des Commandes d'artisanat (palier 4, comme la
+    -- commission de l'onglet Commande), à 10 px de son libellé, centré dans sa zone.
     local psec = self:GatherSec("price")
-    local ROW_Y = -((G.PRICE_H or 54) - 16) / 2
     local pLbl = psec:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     pLbl:SetPoint("LEFT", G.PAD, 0); pLbl:SetText("|cFFE8B84B" .. L["Prix proposé"] .. "|r"); Skin.ApplyShadow(pLbl)
-    self.gatherGold, self.gatherSilver, self.gatherCopper = Skin.MakeMoneyRow(psec, G.PAD + 96, ROW_Y)
+    self.gatherMoney = Skin.MakeMoneyInput(psec, 200)
+    self.gatherMoney:SetPoint("LEFT", pLbl, "RIGHT", 10, 0)
 
     self:_BuildGatherArtisanSection(panel)
 end
@@ -167,10 +168,10 @@ function UI:_BuildGatherQtyRow()
         stChk.Update(); UI:_RefreshGatherDetail()
     end)
     self.gatherStackChk = stChk; stChk.Update()
-    self.gatherQty = CreateFrame("EditBox", nil, qc, "InputBoxTemplate")
-    self.gatherQty:SetSize(46, 16); self.gatherQty:SetPoint("RIGHT", stChk, "LEFT", -8, 0)
-    self.gatherQty:SetAutoFocus(false); self.gatherQty:SetNumeric(true); self.gatherQty:SetText("1")
-    self.gatherQty:SetScript("OnEscapePressed", function(b) b:ClearFocus() end)
+    -- Le compteur de « Créer tout » (palier 4) : l'ancre porte sur sa CASE, dont le [+] déborde de
+    -- 23 px à droite — d'où -31 (23 + 8) contre la case « stacks ».
+    self.gatherQty = Skin.MakeQtySpinner(qc)
+    self.gatherQty:SetPoint("RIGHT", stChk, "LEFT", -31, 0)
 end
 
 function UI:_BuildGatherArtisanSection(panel)

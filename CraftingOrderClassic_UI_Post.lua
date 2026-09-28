@@ -367,18 +367,8 @@ end
 function UI:DoPostOrder(narr)
     local e = self.postEntry
     if not e then self.postSelLbl:SetText("|cFFFF4444" .. L["Choisis d'abord un plan."] .. "|r"); return end
-    local qty = tonumber(self.postQty:GetText()) or 1
-    local g   = tonumber(self.postGold:GetText()) or 0
-    local s   = tonumber(self.postSilver:GetText()) or 0
-    local cu  = tonumber(self.postCopper:GetText()) or 0
-    local price = nil
-    if g > 0 or s > 0 or cu > 0 then
-        local parts = {}
-        if g  > 0 then parts[#parts+1] = g.."po"  end
-        if s  > 0 then parts[#parts+1] = s.."pa"  end
-        if cu > 0 then parts[#parts+1] = cu.."pc" end
-        price = table.concat(parts, " ")
-    end
+    local qty   = self.postQty:GetValue()
+    local price = Skin.PriceText(self.postMoney:GetAmount())   -- « 12po 5pa », nil pour zéro
     local provided = {}
     for iid, v in pairs(self.postProvide) do if v then provided[#provided+1] = iid end end
     COC.Orders:PostEntry(e, qty, price, {
@@ -388,8 +378,8 @@ function UI:DoPostOrder(narr)
         text       = narr and narr.text or nil,
     })
     if COC.Beacon then COC:Beacon() end   -- balise TEXTE de découverte (clic = hardware event)
-    self.postGold:SetText("0"); self.postSilver:SetText("0"); self.postCopper:SetText("0")
-    self.postQty:SetText("1"); self.postEntry = nil; self.postProvide = {}
+    self.postMoney:Clear()
+    self.postQty:SetValue(1); self.postEntry = nil; self.postProvide = {}
     self.postSelLbl:SetText("|cFF33DD33" .. L["Commande postée !"] .. "|r")
     self:ShowTab("orders")
 end
@@ -401,14 +391,12 @@ function UI:DoPostAsQuest()
     local e = self.postEntry
     if not e then self.postSelLbl:SetText("|cFFFF4444" .. L["Choisis d'abord un plan."] .. "|r"); return end
     if not COC.QuestSheet then return self:DoPostOrder() end
-    local qty = tonumber(self.postQty:GetText()) or 1
+    local qty = self.postQty:GetValue()
     local nm  = entryName(e)   -- helper déjà présent en tête de ce fichier
-    local g   = tonumber(self.postGold:GetText())   or 0
-    local s   = tonumber(self.postSilver:GetText()) or 0
-    local cu  = tonumber(self.postCopper:GetText()) or 0
+    local copper = self.postMoney:GetAmount()
     local reward
-    if g > 0 or s > 0 or cu > 0 then
-        reward = COC.Api.Coin and COC.Api.Coin(g * 10000 + s * 100 + cu) or nil
+    if copper > 0 then
+        reward = COC.Api.Coin and COC.Api.Coin(copper) or nil
     end
     COC.QuestSheet:Open({
         editable   = true,
