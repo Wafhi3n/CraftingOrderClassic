@@ -46,6 +46,10 @@ client.
 
 ## Relevés
 
+- 2026-09-28 13:20 — jusqu'a bd78702 — Forever, même build `main-dev@1ec0ce0` — **complément au relevé
+  de 13:16** — rapporté par le user : mode Édition testé, aucune erreur (que l'icône ait été affichée
+  à ce moment n'est pas précisé). Combat et `taintLog 1` non mentionnés : le critère 7 reste partiel.
+
 - 2026-09-28 13:16 — jusqu'a bd78702 — Forever, **DEUX COMPTES**, client en ANGLAIS ; build
   `main-dev@1ec0ce0 2026-09-28 13:09`, branches en test `feat/icone-commande-recue` (capture de
   `/co version`) — **GO sur l'icône « une commande t'attend »** (spec `icone-commande-recue.md`) —
