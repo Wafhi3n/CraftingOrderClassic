@@ -337,12 +337,12 @@ end
 -- Supprime le message système « No player named "X" is currently online. » quand X est un nom qu'on
 -- vient de ping (découverte whisper) → pas de spam rouge en sondant des artisans hors-ligne.
 function Dir:_InstallWhisperErrorFilter()
-    if self._errFilter or not ChatFrame_AddMessageEventFilter then return end
-    self._errFilter = true
+    if self._errFilter then return end
     local raw = ERR_CHAT_PLAYER_NOT_FOUND_S or "No player named \"%s\" is currently online."
     local pat = "^" .. raw:gsub("[%-%.%+%[%]%(%)%$%^%%%?%*]", "%%%0"):gsub("%%%%s", "(.-)") .. "$"
-    ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", function(_, _, msg)
-        local who = msg and msg:match(pat)
+    self._errFilter = COC.Api.AddChatFilter("CHAT_MSG_SYSTEM", function(_, _, msg)
+        if COC.Api.IsSecret(msg) then return false end   -- instance : texte secret, ni match ni comparaison
+        local who = type(msg) == "string" and msg:match(pat)
         if who then
             who = shortName(who)
             local pinged = Dir._lastPing and Dir._lastPing[who] and (now() - Dir._lastPing[who]) < 15

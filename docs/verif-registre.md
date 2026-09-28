@@ -36,6 +36,20 @@ client.
 
 ## Relevés
 
+- 2026-09-28 (12) — jusqu'a 3c4470c — Forever, **DEUX COMPTES**, branche `feat/communaute-sans-canal`,
+  canal coupé — **GO sur les commandes et le LFW sans canal, NO-GO sur la déconnexion** — rapporté par
+  le user (« good pour la prise et annulation de commande + publique », « lfw c'est bon aussi », 3
+  captures) et corroboré par la trace de Gnomi (SV écrite à 10:45) : `Gnomi Short-4` et `-5` postées
+  puis annulées, NEW et CANCEL partis en whisper vers Rédemption ET Sorcerer Supremes (fanout) ; alerte
+  « commande pour TOI » (nommée) et « nouvelle commande » (publique) chez Rédemption ; LFW Enchanting de
+  Rédemption reçu (`LFW|on|Enchanting`) et badge vu au-dessus de lui chez Gnomi. **Déconnexion** :
+  Rédemption quitte le jeu à 10:39:24, Gnomi le sonde à 10:39:27 (la présence du club a bien déclenché
+  le balayage), AUCUN retour → il reste « en ligne » jusqu'à sa reconnexion à 10:42:26 ; corrigé après
+  la séance (la présence du jeu fait foi). Vus aussi : whisper de rappel affiché en double (reçu +
+  « To »), ligne « Confédération » visible sans GreenWall ni /co debug — corrigés après la séance.
+  PÉRIMÈTRE : la correction de la déconnexion n'est PAS encore vue ; départ auto d'un CraftLinkNet resté
+  (12bis) et clubId Horde toujours pas éprouvés.
+
 - 2026-09-28 (11) — jusqu'a 3c4470c — Forever, **DEUX COMPTES**, branche `feat/communaute-sans-canal`
   (COC + CraftLink + outillage) — **GO sur le réseau sans canal et le rappel de la communauté** — tests
   menés par le user (captures + « ça passe »), corroborés par la trace de Gnomi (SV écrite à 10:29) :

@@ -443,7 +443,6 @@ local de2 = {
 
     -- Handwerkerkreise (WoW-Gemeinschaften) — vgl. Directory_Club.lua
     ["CERCLE"] = "KREIS",
-    ["Cercle"] = "Kreis",
     ["%d membre(s) dans l'annuaire"] = "%d Mitglied(er) im Verzeichnis",
     ["les communautés ne sont pas disponibles sur ce client."] =
         "Gemeinschaften sind auf diesem Client nicht verfügbar.",

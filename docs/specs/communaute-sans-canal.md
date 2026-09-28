@@ -122,6 +122,20 @@ Ce que le canal portait et qui se tait sans lui :
   serveur accepte qu'on se whispe, et le lien clubTicket arrive intact, sur deux lignes (« [Gnomi
   Short] whispers » + « To [Gnomi Short] »). Son clic passe par la fenêtre de chat de Blizzard, le chemin
   propre. Si l'envoi lève : repli sur une ligne d'addon. `/co circle` garde une simple ligne.
+- **2026-09-28, banc à 2 comptes (relevé 12)** :
+  - **présence** : Rédemption quitte le jeu à 10:39:24, Gnomi le sonde à 10:39:27 — AUCUN retour (ni
+    « aucun joueur nommé », ni `TargetOffline`, pour un whisper d'addon sur Forever) : il reste « en
+    ligne » jusqu'à sa reconnexion. Sur l'idée du user, **la présence du jeu (communauté, amis,
+    guilde) fait foi** : un départ l'éteint tout de suite, et le sondage reste en filet (sa réponse le
+    rallume si le jeu s'est trompé). Revient sur l'arbitrage « sondage, jamais effacement » de la revue ;
+  - **double message** : un whisper à soi-même s'affiche deux fois ; la copie « To [moi] » du rappel est
+    masquée (filtre `CHAT_MSG_WHISPER_INFORM`, lien de cette invitation, 10 s) ;
+  - **une bande par cercle** dans l'onglet Artisans, au nom de la communauté, à la place de « Cercle »
+    (demandé par le user) ; plafond 4 bandes ;
+  - **Confédération** visible sans GreenWall et hors `/co debug` (cause non trouvée : aucun fichier
+    installé ne définit `gw.ReplicateMessage`) → exige désormais que l'addon GreenWall soit CHARGÉ ;
+  - le filtre du chat passe par `ChatFrameUtil.AddMessageEventFilter` : `ChatFrame_AddMessageEventFilter`
+    n'est qu'un alias de Blizzard_DeprecatedChatInfo.
 - **2026-09-28, user** : communauté **Horde** au même nom, invitation `XGvoAXHvxd`. Son clubId 22973181
   vient de `chat-cache.txt` d'Orcaa (« Community:22973181:1 », seule communauté du perso, numéro plus
   récent que celui de l'Alliance) : c'est une déduction, que confirmera le message de marquage auto

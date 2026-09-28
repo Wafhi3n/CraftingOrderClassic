@@ -182,9 +182,23 @@ end
 -- (cf. firstTimePopup). Mesuré en jeu le 2026-09-28 (/run, envoi différé par C_Timer, donc hors action
 -- du joueur) : le serveur accepte qu'on se whispe, et le lien clubTicket arrive intact. Rend faux si
 -- l'envoi n'a pas pu partir : l'appelant retombe sur une ligne d'addon.
-local function whisperSelf(msg)
+--
+-- WoW affiche un whisper à soi-même DEUX fois : « [Moi] whispers » (reçu) et « To [Moi] » (envoyé) —
+-- le « double message » vu par le user le 2026-09-28. On masque la copie ENVOYÉE, et seulement celle du
+-- rappel qu'on vient d'émettre (lien de CETTE invitation, moins de 10 s) : un whisper du joueur passe.
+local selfEcho, echoFilter   -- { ticket, at } du dernier rappel ; filtre posé une seule fois
+
+local function hideSelfEcho(_, _, msg)
+    if not selfEcho or COC.Api.IsSecret(msg) or type(msg) ~= "string" then return false end
+    if ((GetTime and GetTime()) or 0) - selfEcho.at > 10 then return false end
+    return msg:find("clubTicket:" .. selfEcho.ticket, 1, true) ~= nil
+end
+
+local function whisperSelf(msg, ticket)
     local me = COC.Api.PlayerName()
     if not (_G.SendChatMessage and me and me ~= "?") then return false end
+    if not echoFilter then echoFilter = COC.Api.AddChatFilter("CHAT_MSG_WHISPER_INFORM", hideSelfEcho) end
+    selfEcho = { ticket = ticket, at = (GetTime and GetTime()) or 0 }
     return (pcall(_G.SendChatMessage, msg, "WHISPER", nil, me))
 end
 
@@ -209,7 +223,7 @@ function Dir:ShowJoinLink(force)
     end
     local msg = string.format(L["Rejoins la communauté des artisans : %s — c'est là que Crafting Order trouve les autres joueurs."],
         joinLink(c))
-    if force or not whisperSelf(msg) then p(msg) end   -- /co circle : demandé, une ligne suffit
+    if force or not whisperSelf(msg, c.ticket) then p(msg) end   -- /co circle : demandé, une ligne suffit
     if not force then
         p("|cFF888888" .. L["(/co circle nolink : ne plus afficher ce rappel)"] .. "|r")
         if COC.Trace then COC.Trace:Log("net", "lien de la communauté proposé") end

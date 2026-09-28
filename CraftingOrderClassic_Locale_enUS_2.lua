@@ -463,7 +463,6 @@ local en2 = {
 
     -- Cercles d'artisans (communautés WoW) — cf. Directory_Club.lua
     ["CERCLE"] = "CIRCLE",
-    ["Cercle"] = "Circle",
     ["%d membre(s) dans l'annuaire"] = "%d member(s) in the directory",
     ["les communautés ne sont pas disponibles sur ce client."] =
         "communities are not available on this client.",

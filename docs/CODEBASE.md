@@ -11,18 +11,18 @@
 | Fichier | Rôle | Lignes |
 |---|---|---|
 | `CraftingOrderClassic.lua` | Crafting Order - Classic — réseau GLOBAL et SOCIAL de commandes de craft. | 489 |
-| `CraftingOrderClassic_Compat.lua` | couche d'adaptation d'API entre les SAVEURS de client. | 316 |
+| `CraftingOrderClassic_Compat.lua` | couche d'adaptation d'API entre les SAVEURS de client. | 326 |
 | `CraftingOrderClassic_Trace.lua` | trace réseau PERSISTÉE, lisible hors-jeu. | 79 |
 | `CraftingOrderClassic_Migrations.lua` | versionnage du schéma SavedVariables. | 40 |
 | `CraftingOrderClassic_Locale.lua` | socle de localisation du CHROME de l'UI. | 12 |
 | `CraftingOrderClassic_Locale_enUS.lua` | overlay ANGLAIS (enUS/enGB). | 279 |
-| `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 498 |
+| `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 497 |
 | `CraftingOrderClassic_Locale_enUS_3.lua` | overlay enUS, 3/3. | 37 |
 | `CraftingOrderClassic_Locale_deDE.lua` | overlay ALLEMAND (deDE). | 281 |
-| `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 478 |
+| `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 477 |
 | `CraftingOrderClassic_Locale_deDE_3.lua` | overlay deDE, 3/3. | 36 |
 | `CraftingOrderClassic_Locale_esES.lua` | overlay ESPAGNOL (esES/esMX). | 282 |
-| `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 479 |
+| `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 478 |
 | `CraftingOrderClassic_Locale_esES_3.lua` | overlay esES, 3/3. | 37 |
 | `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 383 |
 | `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 380 |
@@ -49,7 +49,7 @@
 | `CraftingOrderClassic_UI_Gather.lua` | onglet « Récolte » : ressources de récolte (minéraux, herbes, cuirs, poissons) + demande de quantité + prix par pile + ciblage récolteur. | 278 |
 | `CraftingOrderClassic_UI_Gather_Categories.lua` | onglet « Récolte », panneau gauche : repliage des en-têtes et remplissage des lignes (en-tête de section/sous-catégorie, ou ressource). | 65 |
 | `CraftingOrderClassic_UI_Artisans_Layout.lua` | GÉOMÉTRIE de l'onglet « Artisans » (annuaire social). | 44 |
-| `CraftingOrderClassic_UI_Artisans.lua` | onglet « Artisans » : annuaire social. | 434 |
+| `CraftingOrderClassic_UI_Artisans.lua` | onglet « Artisans » : annuaire social. | 470 |
 | `CraftingOrderClassic_UI_Artisans_Groups.lua` | fusion « une ligne par JOUEUR » (rerolls). | 207 |
 | `CraftingOrderClassic_UI_Artisans_Icons.lua` | onglet « Artisans » : tout ce qui est ICÔNE de métier. | 190 |
 | `CraftingOrderClassic_UI_Artisans_Needs.lua` | la « BOURSE d'artisan » de l'onglet Artisans : pour un artisan du roster (partenaire, guildie, ami…), la LISTE DE COURSES des fournitures qu'il lui faut pour monter ses métiers — mats agrégés de SA route de progression (COC.Route, calculée 100 % en LOCAL depuis son rang SK diffusé + ses recettes décodées du bitfield RK ; prix Lazy Gold locaux, valables serveur entier). | 359 |
@@ -110,11 +110,11 @@
 | `CraftingOrderClassic_ProfWindow_LFW_Recipes.lua` | le SÉLECTEUR DE RECETTES de l'offre LFW. | 140 |
 | `CraftingOrderClassic_ProfWindow_Reroll.lua` | vue métier LECTURE SEULE d'un REROLL. | 118 |
 | `Directory.lua` | Crafting Order - Classic — Directory : l'annuaire des GENS (présence + qui peut crafter quoi). | 498 |
-| `Directory_Presence.lua` | présence : la vérité JEU (amis/guilde) et sa fusion avec la vérité ADDON. | 97 |
+| `Directory_Presence.lua` | présence : la vérité JEU (amis/guilde) et sa fusion avec la vérité ADDON. | 102 |
 | `Directory_Recipes.lua` | COUTURE de lecture du registre « qui sait crafter quoi » d'un artisan. | 129 |
-| `Directory_Confed.lua` | source « confédération » (GreenWall) de l'annuaire, DISPLAY-ONLY. | 51 |
-| `Directory_Club.lua` | source « cercle » (communautés WoW) de l'annuaire, DISPLAY-ONLY. | 341 |
-| `Directory_Community.lua` | le réseau SANS canal : la communauté remplace CraftLinkNet (Forever). | 246 |
+| `Directory_Confed.lua` | source « confédération » (GreenWall) de l'annuaire, DISPLAY-ONLY. | 63 |
+| `Directory_Club.lua` | source « cercle » (communautés WoW) de l'annuaire, DISPLAY-ONLY. | 357 |
+| `Directory_Community.lua` | le réseau SANS canal : la communauté remplace CraftLinkNet (Forever). | 260 |
 | `Directory_Skills.lua` | niveaux de compétence + réputation (couche « profil » de l'annuaire). | 157 |
 | `Directory_Version.lua` | détection « nouvelle version disponible » (100 % P2P, aucun serveur). | 138 |
 | `Directory_Cooldowns.lua` | cooldowns de recettes (couche « profil » de l'annuaire). | 82 |
@@ -616,7 +616,7 @@
 > NB : la lib CraftLink charge AVANT COC et ne peut donc pas s'appuyer là-dessus — elle résout
 > ses propres appels chez elle.
 
-**API** : `A.GetSpellName(spellID)` · `A.GetBNetFriend(index)` · `A.Coin(copper, fontHeight)` · `A.GetNumQuestLogEntries()` · `A.GetQuestLogTitle(index)` · `A.GetQuestSelection()` · `A.RestoreQuestSelection(token)` · `A.SelectQuestLogEntry(index)` · `A.RegisterEventSafe(frame, event)` · `A.HookScriptSafe(frame, script, handler)` · `A.RegisterEventsSafe(frame, events)` · `A.TitleFontString(frame)` · `A.PortraitTexture(frame)` · `A.ChatMessagingBlocked()` · `A.IsSecret(v)` · `A.UnitNameSafe(unit, getter)` · `A.PlayerName()` · `A.CloseProfession()`
+**API** : `A.GetSpellName(spellID)` · `A.GetBNetFriend(index)` · `A.Coin(copper, fontHeight)` · `A.GetNumQuestLogEntries()` · `A.GetQuestLogTitle(index)` · `A.GetQuestSelection()` · `A.RestoreQuestSelection(token)` · `A.SelectQuestLogEntry(index)` · `A.RegisterEventSafe(frame, event)` · `A.HookScriptSafe(frame, script, handler)` · `A.RegisterEventsSafe(frame, events)` · `A.TitleFontString(frame)` · `A.PortraitTexture(frame)` · `A.ChatMessagingBlocked()` · `A.AddChatFilter(event, fn)` · `A.IsSecret(v)` · `A.UnitNameSafe(unit, getter)` · `A.PlayerName()` · `A.CloseProfession()`
 
 ### `CraftingOrderClassic_Trace.lua`
 > CraftingOrderClassic_Trace.lua — trace réseau PERSISTÉE, lisible hors-jeu.
@@ -1994,7 +1994,7 @@
 > 
 > Même forme que Directory_Confed.lua : des méthodes greffées sur COC.Directory, zéro transport.
 
-**API** : `Dir:CircleIds()` · `Dir:IsCircle(clubId)` · `Dir:SetCircle(clubId, on)` · `Dir:EachClub(fn)` · `Dir:FocusCircles()` · `Dir:RefreshCircles()` · `Dir:RefreshCirclesSoon()` · `Dir:ForEachCircleMemberOnline(fn)` · `Dir:CircleCmd(rest)`
+**API** : `Dir:CircleIds()` · `Dir:IsCircle(clubId)` · `Dir:SetCircle(clubId, on)` · `Dir:EachClub(fn)` · `Dir:FocusCircles()` · `Dir:CircleList()` · `Dir:RefreshCircles()` · `Dir:RefreshCirclesSoon()` · `Dir:ForEachCircleMemberOnline(fn)` · `Dir:CircleCmd(rest)`
 
 ### `Directory_Community.lua`
 > Directory_Community.lua — le réseau SANS canal : la communauté remplace CraftLinkNet (Forever).

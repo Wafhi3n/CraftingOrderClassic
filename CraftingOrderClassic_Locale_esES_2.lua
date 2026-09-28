@@ -444,7 +444,6 @@ local es2 = {
 
     -- Círculos de artesanos (comunidades de WoW) — cf. Directory_Club.lua
     ["CERCLE"] = "CÍRCULO",
-    ["Cercle"] = "Círculo",
     ["%d membre(s) dans l'annuaire"] = "%d miembro(s) en el directorio",
     ["les communautés ne sont pas disponibles sur ce client."] =
         "las comunidades no están disponibles en este cliente.",
