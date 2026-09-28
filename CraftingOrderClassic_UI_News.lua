@@ -455,16 +455,14 @@ end
 function UI:BuildNewsTab(f)
     local panel = CreateFrame("Frame", nil, f); self.insetPanel(panel, f); self.newsPanel = panel
 
-    local scroll = CreateFrame("ScrollFrame", "CraftingOrderNewsScroll", panel, "UIPanelScrollFrameTemplate")
-    scroll:SetPoint("TOPLEFT", 12, -74); scroll:SetPoint("BOTTOMRIGHT", -32, 22)
+    -- Le cadre défilant moderne d'une page (palier 2d), comme l'onglet Aide.
+    local host = CreateFrame("Frame", nil, panel)
+    host:SetPoint("TOPLEFT", 12, -74); host:SetPoint("BOTTOMRIGHT", -12, 22)
+    local scroll = Skin.MakeScrollFrame(host)
     local body = CreateFrame("Frame", nil, scroll); body:SetSize(BODY_W, 10); scroll:SetScrollChild(body)
     self.newsBody = body
 
     local y = -2
     for _, ver in ipairs(versions()) do y = paintVersion(body, ver, y) end
     body:SetHeight(math.max(-y, 10))
-end
-
-function UI:RefreshNews()
-    Skin.AutoHideScroll("CraftingOrderNewsScroll", self.newsBody)
 end

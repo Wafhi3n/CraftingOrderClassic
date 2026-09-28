@@ -414,8 +414,7 @@ function UI:Refresh()
     elseif self.activeTab == "myartisans" and self.RefreshMyArtisans then self:RefreshMyArtisans()
     elseif self.activeTab == "post"   and self.RefreshPost       then self:RefreshPost()
     elseif self.activeTab == "gather" and self.RefreshGather     then self:RefreshGather()
-    elseif self.activeTab == "help"   and self.RefreshHelp       then self:RefreshHelp()
-    elseif self.activeTab == "news"   and self.RefreshNews       then self:RefreshNews()
+    elseif self.activeTab == "help" or self.activeTab == "news" then   -- pages figées ; leur barre se gère seule
     else self:RefreshOrders() end
     -- Compteur d'ordres du Carnet = ce qui est RÉELLEMENT visible (All() applique TTL + routage
     -- VisibleTo), pas le cache brut → plus d'écart « Carnet (5) mais liste vide ».

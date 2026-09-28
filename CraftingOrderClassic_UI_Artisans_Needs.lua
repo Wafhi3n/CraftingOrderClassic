@@ -137,9 +137,11 @@ function UI:_BuildNeedsWin()
         onMoved = function(p, rp, x, y) if COC.db then COC.db.needsWinPos = { p, rp, x, y } end end,
     })
     local inset = f.Inset or f
-    local scroll = CreateFrame("ScrollFrame", "CraftingOrderNeedsScroll", inset, "UIPanelScrollFrameTemplate")
-    scroll:SetPoint("TOPLEFT", 6, -6); scroll:SetPoint("BOTTOMRIGHT", -26, 44)
-    Skin.ScrollTrack("CraftingOrderNeedsScroll")
+    -- Le cadre défilant moderne d'une page (palier 2d) : la bourse est une page composée (en-têtes,
+    -- grilles de cases, notes), pas une liste. Sa barre se loge à droite et se cache si tout tient.
+    local host = CreateFrame("Frame", nil, inset)
+    host:SetPoint("TOPLEFT", 6, -6); host:SetPoint("BOTTOMRIGHT", -6, 44)
+    local scroll = Skin.MakeScrollFrame(host)
     local content = CreateFrame("Frame", nil, scroll)
     content:SetSize(CONTENT_W, 1); scroll:SetScrollChild(content)
     f.scroll, f.content = scroll, content

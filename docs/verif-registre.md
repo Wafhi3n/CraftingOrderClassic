@@ -46,6 +46,14 @@ client.
 
 ## Relevés
 
+- 2026-09-28 12:40 — jusqu'a e7fc574 — Forever, un client, client en ANGLAIS ; même build que le
+  relevé du palier 3 (`main-dev@bb4efc8`, `feat/ui-p2d-pages` parmi les branches en test) — **GO sur
+  le lot 2d du palier 2** — capture du user (« tout est ok ») : la bourse d'un artisan (« Pouch —
+  Syrine Lythaniel ») défile avec la `MinimalScrollBar`, fine et logée à droite, sur une page
+  composée (en-têtes de métier, grilles de cases, notes). Le reste rapporté par le user, sans
+  capture : l'Aide et les Nouveautés.
+  Non vu : une bourse qui tient sans défiler (barre cachée d'elle-même).
+
 - 2026-09-28 12:12 — jusqu'a 6ef2e8b — Forever, un client, client en ANGLAIS ; build
   `main-dev@6ef2e8b 2026-09-28 12:10`, branches en test `feat/ui-p2c-listes` (lu en jeu par
   `/co version`, capture ; même commit que le déploiement de 12:09, redéployé tel quel à 12:10:24
