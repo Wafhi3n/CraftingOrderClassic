@@ -55,6 +55,15 @@ client.
   lueur (voulu) et l'onglet au cadre doré « sélectionné » en permanence — corrigé par `2335752`.
   Non vu : l'onglet au repos sans son cadre doré (pas de capture après le correctif), le clic qui
   ouvre l'Enchantement, une commande acceptée PENDANT l'échange qui allume la lueur aussitôt.
+- 2026-09-28 15:25 — jusqu'a 641c512 — Forever, deux clients, client en ANGLAIS ; build déployé
+  `main-dev@373e8ef 2026-09-28 15:01` (`/co version` pas relu) — **GO sur l'envoi par le courrier,
+  côté artisan** — rapporté par le user : la commande Silverleaf de Gnomi Short envoyée depuis le
+  panneau du courrier (« Fill from order » puis Send), et sur le client de Gnomi l'annonce que la
+  commande est en cours d'envoi — donc la remise posée à `MAIL_SEND_SUCCESS` et partie sur le
+  réseau. Complète le relevé de 15:10.
+  Non vu : la réception chez Gnomi (courrier entre deux comptes : une heure d'attente), la
+  confirmation qui doit suivre quand il prend la pièce jointe ; le « ou » traduit de l'Aide (ligne des
+  statuts hors de la capture).
 
 - 2026-09-28 14:45 — jusqu'a ff52e07 — Forever, deux clients, client en ANGLAIS ; build déployé
   `main-dev@48e937c 2026-09-28 14:35` (sortie de `deploy.ps1` ; `/co version` pas relu sur ces
