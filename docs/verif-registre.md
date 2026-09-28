@@ -91,6 +91,42 @@ client.
   chat-cache d'Orcaa) ; commandes, annulation relayée, LFW, extinction d'un pair déconnecté (critères
   14 à 16) et départ auto d'un CraftLinkNet resté après /reload (12bis) PAS rejoués.
 
+- 2026-09-28 09:57 — jusqu'a 4299dce (marqueur INCHANGÉ) — Forever, deux clients, client en ANGLAIS ;
+  build = celui d'une AUTRE session (`feat/communaute-sans-canal` : `03176db` + travail non commité,
+  repéré à `Directory_Community.lua` dans le dossier de l'addon), qui a écrasé le déploiement de
+  `e784779` : le correctif des débordements n'était PAS dans le client — **GO sur « Unmute »** —
+  rapporté par le user (« c'est bon pour unmute »). Captures : annuaire de 13 lignes, la
+  `MinimalScrollBar` apparaît dès que la liste déborde ; icônes de métiers grisées sauf une par ligne
+  (mise en avant de rentabilité, `_SetArtProfitBorder`, qui ne grise que si Auctionator répond) ;
+  porteurs de Mes artisans encore sur deux lignes, attendu dans ce build.
+  Non vu : le message de liste vide des sourdines, les deux débordements corrigés.
+
+- 2026-09-28 09:50 — jusqu'a 4299dce (marqueur INCHANGÉ : `e784779`, rejoué depuis en `d708cb1`
+  sur la v1.38.0, est dans le client, mais les lignes qu'il corrige ne sont pas à l'écran) — Forever, un client, client en ANGLAIS (build =
+  `main` + `fix/ui-p2b-debordements`) — **GO sur la source « En sourdine » du lot 2b** — deux
+  captures du user : en-tête « Muted players — no notifications from them. », une ligne sur la liste
+  moderne (« Crux Vejovis », durée « permanent » en or, bouton « Unmute » à droite), compteur
+  « Muted 1 » juste. À côté, l'infobulle de joueur (`_Social`, code inchangé par le lot) : ligne
+  « CO-Classic », marque de l'addon, cinq métiers avec leurs rangs.
+  Non vu : le clic sur « Unmute », le message de liste vide, les deux débordements corrigés.
+
+- 2026-09-28 09:43 — jusqu'a 4299dce — Forever, un client, client en ANGLAIS (branche d'essai
+  `test/ui-p2-essai` : `feat/ui-p2-listes` + `fix/manquantes-faction-et-bouton-aide` ; fichiers du
+  client comparés à `4299dce`, identiques aux fins de ligne près) — **GO partiel sur le lot 2b du
+  palier 2** — deux captures du user :
+  onglet Artisans, source « All » (12) : 12 lignes sur la liste moderne (pastille, nom, sous-ligne
+  état · niveau, icônes de métiers, source FRIEND / MET / CIRCLE, étoile de partenaire, Whisper),
+  sans barre puisque tout tient ; Mes artisans : 8 métiers à gauche (porteurs tronqués par « … »),
+  Pêche sélectionnée, et à droite ses recettes : en-tête de section, sous-catégorie, 19 lignes,
+  `MinimalScrollBar` présente puisque la liste déborde.
+  Deux défauts vus, ANTÉRIEURS au lot (même largeur fixe, retour à la ligne permis, dès `4299dce^`) :
+  « [Partner] Syrine Lyrhaniel » passe sur deux lignes et recouvre sa sous-ligne ; les trois porteurs
+  d'une recette passent sur deux lignes et mordent sur la recette suivante. Corrigés sur
+  `fix/ui-p2b-debordements`, pas encore revus.
+  Non vu : la source « En sourdine » et « Rétablir », les messages de liste vide, les infobulles, les
+  clics (métier → Commande, Whisper, partenaire, clic droit sur un métier), le bas d'une liste qui
+  déborde.
+
 - 2026-09-27 (10) — jusqu'a c50f401 — Forever, un client (branche d'essai `test/ui-p2-essai` :
   `feat/ui-p2-listes` + `fix/manquantes-faction-et-bouton-aide`) — **GO sur le lot 2a du palier 2
   et sur la présélection d'artisan** — tests menés par le user, deux captures :
