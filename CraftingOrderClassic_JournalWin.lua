@@ -18,10 +18,11 @@ local Skin = COC.UI and COC.UI.Skin
 local Win  = {}
 COC.JournalWin = Win
 
-local W, H     = 700, 460
+local W, H     = 700, 490   -- cadre compris : le parchemin fait 684 × 421
 local LEFT_W   = 296
 local ROW_H    = 18   -- QuestFont fait ~13 px : 16 rognait les jambages
 local NAME     = "CraftingOrderJournal"
+local BOOK     = "Interface\\QuestFrame\\UI-QuestLog-BookIcon"
 
 local function font(name, fallback) return _G[name] or _G[fallback] end
 
@@ -231,51 +232,43 @@ end
 -- ------------------------------------------------------------------
 -- Fenêtre
 -- ------------------------------------------------------------------
+-- Le cadre du journal de quêtes de Camelot, qui est celui de retail (QuestMapFrame.xml) :
+-- ButtonFrameTemplate par le kit (portrait, titre, fermeture, Échap), le livre en médaillon, et le
+-- parchemin posé DANS l'encart, à 3 px de son bord pour en garder le liseré.
+-- ⚠️ MakeWindow pose déjà un OnShow (Raise), auquel s'accroche le proxy d'Échap : ici on s'y ajoute
+-- par HookScript. Un SetScript remplacerait tout — et Échap ne fermerait plus le journal.
 function Win:Frame()
     if self.frame then return self.frame end
-    local f = CreateFrame("Frame", NAME, UIParent, "BackdropTemplate")
-    f:SetSize(W, H); f:SetPoint("CENTER")
-    f:SetFrameStrata("HIGH"); f:SetToplevel(true)
-    f:SetMovable(true); f:EnableMouse(true); f:RegisterForDrag("LeftButton")
-    f:SetScript("OnDragStart", f.StartMoving)
-    f:SetScript("OnDragStop", f.StopMovingOrSizing)
-    f:SetClampedToScreen(true)
-    if f.SetBackdrop then
-        f:SetBackdrop({ edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border", edgeSize = 16,
-                        insets = { left = 4, right = 4, top = 4, bottom = 4 } })
-    end
-    local bg = f:CreateTexture(nil, "BACKGROUND")
-    bg:SetPoint("TOPLEFT", 5, -5); bg:SetPoint("BOTTOMRIGHT", -5, 5)
+    local f = Skin.MakeWindow(NAME, W, H, { title = L["Journal"], portrait = BOOK })
+
+    local page = CreateFrame("Frame", nil, f)
+    page:SetPoint("TOPLEFT", f.Inset, "TOPLEFT", 3, -2)
+    page:SetPoint("BOTTOMRIGHT", f.Inset, "BOTTOMRIGHT", -3, 3)
+    page:SetFrameLevel(f.Inset:GetFrameLevel() + 1)
+    local bg = page:CreateTexture(nil, "BACKGROUND")
+    bg:SetAllPoints()
     COC.QuestSheet.ApplyParchment(bg)   -- même parchemin que la fiche : une seule surface visuelle
 
-    local close = CreateFrame("Button", nil, f, "UIPanelCloseButton")
-    close:SetPoint("TOPRIGHT", 0, 0)
-    close:SetScript("OnClick", function() Win:Hide() end)
-
-    local title = f:CreateFontString(nil, "OVERLAY")
-    title:SetFontObject(font("QuestTitleFont", "GameFontNormalLarge"))
-    title:SetPoint("TOP", 0, -16); title:SetText(L["Journal"])
-    title:SetTextColor(0, 0, 0)
-
     self.frame = f
-    self:_BuildPanes(f)
+    self:_BuildPanes(page)
     -- Les seuls événements qui changent VRAIMENT le contenu : le journal de quêtes du jeu, et les
     -- sacs (les compteurs de réactifs). Enregistrés seulement pendant que la fenêtre est ouverte —
     -- un journal fermé n'a aucune raison de recalculer une route de métier.
     f:SetScript("OnEvent", function() Win:Refresh() end)
-    f:SetScript("OnShow", function(fr)
+    f:HookScript("OnShow", function(fr)
         fr:RegisterEvent("QUEST_LOG_UPDATE"); fr:RegisterEvent("BAG_UPDATE_DELAYED")
     end)
-    f:SetScript("OnHide", function(fr) fr:UnregisterAllEvents() end)
-    if UISpecialFrames then tinsert(UISpecialFrames, NAME) end
-    f:Hide()
+    f:HookScript("OnHide", function(fr) fr:UnregisterAllEvents() end)
     return f
 end
 
-function Win:_BuildPanes(f)
-    local scroll = CreateFrame("ScrollFrame", "COCJournalScroll", f, "UIPanelScrollFrameTemplate")
-    scroll:SetPoint("TOPLEFT", 18, -50)
-    scroll:SetSize(LEFT_W, H - 74)
+-- `page` = le parchemin. La liste défile avec la barre fine de retail (palier 7), logée dans son bord
+-- droit ; la réglure et le volet de détail se calent sur elle.
+function Win:_BuildPanes(page)
+    local lh = CreateFrame("Frame", nil, page)
+    lh:SetPoint("TOPLEFT", 14, -12); lh:SetPoint("BOTTOMLEFT", 14, 12)
+    lh:SetWidth(LEFT_W + 12)
+    local scroll = Skin.MakeScrollFrame(lh)
     local content = CreateFrame("Frame", nil, scroll)
     content:SetSize(LEFT_W - 4, 10)
     scroll:SetScrollChild(content)
@@ -284,16 +277,16 @@ function Win:_BuildPanes(f)
     -- Réglure verticale : une simple ligne brune, PAS `UI-HorizontalBreak` retourné. Cet art est
     -- peint horizontalement (volutes aux extrémités) ; étiré sur 370 px de haut il rendrait une
     -- traînée, pas un séparateur. Sur du parchemin, une réglure fine est de toute façon le bon geste.
-    local sep = f:CreateTexture(nil, "ARTWORK")
+    local sep = page:CreateTexture(nil, "ARTWORK")
     sep:SetWidth(2)
     if sep.SetColorTexture then sep:SetColorTexture(0.28, 0.20, 0.11, 0.45)
     else sep:SetTexture(0.28, 0.20, 0.11, 0.45) end
-    sep:SetPoint("TOP", scroll, "TOPRIGHT", 30, 0)
-    sep:SetPoint("BOTTOM", scroll, "BOTTOMRIGHT", 30, 0)
+    sep:SetPoint("TOP", lh, "TOPRIGHT", 14, 0)
+    sep:SetPoint("BOTTOM", lh, "BOTTOMRIGHT", 14, 0)
 
-    local pane = CreateFrame("Frame", nil, f)
-    pane:SetPoint("TOPLEFT", scroll, "TOPRIGHT", 46, 6)
-    pane:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -16, 16)
+    local pane = CreateFrame("Frame", nil, page)
+    pane:SetPoint("TOPLEFT", lh, "TOPRIGHT", 28, 8)
+    pane:SetPoint("BOTTOMRIGHT", page, "BOTTOMRIGHT", -4, 4)
     self.detailPane = pane
     self.detail = COC.QuestSheet:BuildContent(pane, { buttons = false, close = false })
 end

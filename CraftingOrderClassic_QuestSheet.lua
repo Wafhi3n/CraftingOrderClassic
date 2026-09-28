@@ -12,7 +12,8 @@
 -- assainissement du texte libre) — rien de l'onglet Commande, rien du kit Skin maison.
 --
 -- CONTRAT PUBLIC
---   local c = QuestSheet:BuildContent(host, { buttons = true, close = true })   -- une fois
+--   local c = QuestSheet:BuildContent(host, { buttons = true, close = true, bar = frame })   -- une fois
+--       (`bar` : les boutons se posent sur la barre du bas de ce cadre, pas sur le parchemin)
 --   QuestSheet:FillContent(c, {
 --       title, text, giver,
 --       objectives = { { text = "…", done = false }, … },   -- ou `objective` (chaîne unique)
@@ -31,10 +32,13 @@ local L     = COC.L
 local Sheet = {}
 COC.QuestSheet = Sheet
 
-local W, H, PAD = 380, 330, 22
+-- POP_W / POP_H : la popup ENTIÈRE, cadre compris. Son parchemin fait 380 × 300 : la largeur d'avant
+-- le cadre de retail, moins la bande des boutons, partie sur la barre du bas.
+local POP_W, POP_H, PAD = 396, 392, 22
 local MAX_OBJ   = 6     -- lignes d'objectifs affichables (une vraie quête en a rarement plus)
 local OBJ_H     = 18
 local NAME = "CraftingOrderQuestSheet"
+local BOOK = "Interface\\QuestFrame\\UI-QuestLog-BookIcon"
 
 local function font(name, fallback) return _G[name] or _G[fallback] end
 -- Libellés standards : ceux du CLIENT. `QUEST_OBJECTIVES` est le global que le VRAI cadre de quête
@@ -124,17 +128,20 @@ local function buildHeader(c, host)
 end
 
 -- Pied : boutons (optionnels), récompense, pool d'objectifs, en-tête « Objectifs », filet.
--- `base` = hauteur réservée au bas ; sans boutons le bloc descend jusqu'au bord.
-local function buildFooter(c, host, withButtons)
-    local base = withButtons and 44 or 10
+-- `base` = hauteur réservée au bas ; sans boutons sur le parchemin, le bloc descend jusqu'au bord.
+-- `bar` : les boutons vont sur la barre du bas de ce cadre, là où le détail de quête de retail pose
+-- les siens (QuestLogPopupDetailFrame : BOTTOMRIGHT -8,5).
+local function buildFooter(c, host, withButtons, bar)
+    local base = (withButtons and not bar) and 44 or 10
     if withButtons then
-        c.accept = CreateFrame("Button", nil, host, "UIPanelButtonTemplate")
-        c.accept:SetSize(120, 22); c.accept:SetPoint("BOTTOMRIGHT", -PAD, 14)
+        c.accept = CreateFrame("Button", nil, bar or host, "UIPanelButtonTemplate")
+        c.accept:SetSize(120, 22)
+        if bar then c.accept:SetPoint("BOTTOMRIGHT", -8, 4) else c.accept:SetPoint("BOTTOMRIGHT", -PAD, 14) end
         -- UIPanelButtonTemplate ancre son texte BOTTOM,0,12 (calibré pour h=32) : recentrer sous 32 px.
         local at = c.accept:GetFontString(); if at then at:ClearAllPoints(); at:SetPoint("CENTER") end
         c.accept:SetScript("OnClick", function() Sheet:_Accept(c) end)
 
-        c.cancel = CreateFrame("Button", nil, host, "UIPanelButtonTemplate")
+        c.cancel = CreateFrame("Button", nil, bar or host, "UIPanelButtonTemplate")
         c.cancel:SetSize(90, 22); c.cancel:SetPoint("RIGHT", c.accept, "LEFT", -8, 0)
         local ct = c.cancel:GetFontString(); if ct then ct:ClearAllPoints(); ct:SetPoint("CENTER") end
         c.cancel:SetScript("OnClick", function() Sheet:Close() end)
@@ -206,7 +213,7 @@ function Sheet:BuildContent(host, opts)
         close:SetScript("OnClick", function() Sheet:Close() end)
     end
     buildHeader(c, host)
-    buildFooter(c, host, opts.buttons ~= false)   -- avant le corps : il s'ancre sur le filet du pied
+    buildFooter(c, host, opts.buttons ~= false, opts.bar)   -- avant le corps : il s'ancre sur le filet du pied
     buildBody(c, host)
     return c
 end
@@ -304,24 +311,39 @@ end
 -- ------------------------------------------------------------------
 -- La popup autonome
 -- ------------------------------------------------------------------
+-- Médaillon : le livre du journal de quêtes, celui que retail pose sur son détail de quête. Icône
+-- 64×64, donc SetPortraitToTexture l'arrondit ; à défaut, texture brute sous l'anneau du cadre.
+local function setBookPortrait(f)
+    local p = (f.PortraitContainer and f.PortraitContainer.portrait) or f.portrait
+    if not p then return end
+    if not (SetPortraitToTexture and pcall(SetPortraitToTexture, p, BOOK)) then p:SetTexture(BOOK) end
+end
+
+-- Le cadre du détail de quête de retail (QuestLogPopupDetailFrame, QuestMapFrame.xml) :
+-- ButtonFrameTemplate, livre en médaillon, parchemin dans l'encart, boutons sur la barre du bas, et
+-- le donneur en titre, comme le nom du PNJ en haut du cadre de quête. Construit ici plutôt que par
+-- le kit Skin de COC : la fiche doit rester portable (cf. en-tête). Le parchemin s'arrête à 3 px du
+-- bord de l'encart, dont le liseré reste visible (retail : Bg à 7,-62 = encart + 3,-2).
 function Sheet:Frame()
     if self.frame then return self.frame end
-    local f = CreateFrame("Frame", NAME, UIParent, "BackdropTemplate")
-    f:SetSize(W, H); f:SetPoint("CENTER")
+    local f = CreateFrame("Frame", NAME, UIParent, "ButtonFrameTemplate")
+    f:SetSize(POP_W, POP_H); f:SetPoint("CENTER")
     f:SetFrameStrata("DIALOG"); f:SetToplevel(true)
     f:SetMovable(true); f:EnableMouse(true); f:RegisterForDrag("LeftButton")
     f:SetScript("OnDragStart", f.StartMoving)
     f:SetScript("OnDragStop", f.StopMovingOrSizing)
     f:SetClampedToScreen(true)
-    if f.SetBackdrop then
-        f:SetBackdrop({ edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border", edgeSize = 16,
-                        insets = { left = 4, right = 4, top = 4, bottom = 4 } })
-    end
-    local bg = f:CreateTexture(nil, "BACKGROUND")
-    bg:SetPoint("TOPLEFT", 5, -5); bg:SetPoint("BOTTOMRIGHT", -5, 5)
-    Sheet.ApplyParchment(bg)
+    setBookPortrait(f)
+    if f.CloseButton then f.CloseButton:SetScript("OnClick", function() Sheet:Close() end) end
+
+    local host = CreateFrame("Frame", nil, f)
+    host:SetPoint("TOPLEFT", f.Inset, "TOPLEFT", 3, -2)
+    host:SetPoint("BOTTOMRIGHT", f.Inset, "BOTTOMRIGHT", -3, 3)
+    host:SetFrameLevel(f.Inset:GetFrameLevel() + 1)
+    local bg = host:CreateTexture(nil, "BACKGROUND")
+    bg:SetAllPoints(); Sheet.ApplyParchment(bg)
     self.frame = f
-    self.content = self:BuildContent(f, { buttons = true, close = true })
+    self.content = self:BuildContent(host, { buttons = true, close = false, bar = f })
     if UISpecialFrames then tinsert(UISpecialFrames, NAME) end   -- Échap ferme
     f:Hide()
     return f
@@ -329,6 +351,7 @@ end
 
 function Sheet:Open(data)
     local f = self:Frame()
+    if f.SetTitle then f:SetTitle((data and data.giver) or "") end
     self:FillContent(self.content, data)
     f:Show(); f:Raise()
     if data and data.editable then self.content.titleBox:SetFocus() end
