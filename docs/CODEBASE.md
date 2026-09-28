@@ -148,7 +148,7 @@
 | `CraftingOrderClassic_Companion_Trade.lua` | greffon ÉCHANGE (scène A de la maquette) : panneau accroché SOUS la fenêtre d'échange native quand une commande nous lie au partenaire (dans les DEUX sens : je crafte pour lui = « vendeur », ou il crafte pour moi = « acheteur »). | 121 |
 | `CraftingOrderClassic_Enchant_Trade.lua` | « ses composants désignent quel enchant ? »  Ce fichier portait un PANNEAU flottant accroché à droite de la fenêtre d'échange : la liste de mes enchants applicables à la pièce posée, classée par pertinence. | 139 |
 | `CraftingOrderClassic_Enchant_Trade_Ask.lua` | « demande-lui la pièce » : la SILHOUETTE et le verbe ASKE. | 280 |
-| `CraftingOrderClassic_Enchant_Trade_Open.lua` | le bouton « Enchantement » sur la fenêtre d'échange (T6). | 179 |
+| `CraftingOrderClassic_Enchant_Trade_Open.lua` | le bouton « Enchantement » sur la fenêtre d'échange (T6). | 184 |
 | `CraftingOrderClassic_Journal.lua` | MODÈLE « journal » : la liste unique, triée par PRIORITÉ, de ce sur quoi le joueur peut agir maintenant. | 269 |
 | `CraftingOrderClassic_Tracker.lua` | SUIVI À L'ÉCRAN des commandes, façon suivi de quête : un cadre léger, déplaçable, hors de toute fenêtre, qui liste ce sur quoi le joueur peut agir MAINTENANT. | 217 |
 | `CraftingOrderClassic_Tracker_Rows.lua` | LIGNES du suivi à l'écran : pool réutilisable + peinture d'un groupe de sections rendu par COC.Journal:Grouped. | 238 |

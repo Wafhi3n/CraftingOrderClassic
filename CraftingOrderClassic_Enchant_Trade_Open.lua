@@ -62,6 +62,11 @@ local function build(spellName, texture)
     -- fenêtre de métier qui s'ouvrira à sa droite ne le recouvre pas — elle se pose plus loin.
     btn = Skin.MakeSideTab(TradeFrame, texture, "SecureActionButtonTemplate")
     btn:SetPoint("TOPLEFT", TradeFrame, "TOPRIGHT", 0, -60)
+    -- Le gabarit naît avec son cadre « sélectionné » (SelectedTexture) affiché, et son OnLoad ne
+    -- le masque pas : l'onglet paraissait choisi en permanence (cadre doré vu en jeu le 2026-09-28),
+    -- et la lueur (même atlas, en ADD) n'y aurait ajouté qu'un doré sur doré. Au repos, un onglet
+    -- normal ; la lueur ressort seule.
+    if btn.SetChecked then btn:SetChecked(false) end
     btn:SetScript("OnEnter", function(b)
         GameTooltip:SetOwner(b, "ANCHOR_RIGHT")
         GameTooltip:SetText(spellName, 1, 1, 1)
