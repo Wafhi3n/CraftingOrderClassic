@@ -46,6 +46,19 @@ client.
 
 ## Relevés
 
+- 2026-09-28 13:51 — jusqu'a bd537da — Forever, un client, client en ANGLAIS ; build
+  `main-dev@1371803 2026-09-28 13:45`, branches en test `feat/icone-commande-recue,
+  feat/ui-p5-carnet-tri, feat/ui-p6-fonds` (lu dans la signature du `.toc` déployé) — **GO sur le
+  palier 6 : les encarts de la fenêtre des métiers** — verdict du user (« oui ») sur cinq captures :
+  Commande (liste en encart sombre, détail en encart sur le rocher, 2 px entre eux, filets fins),
+  Artisans (sources et annuaire en encarts de liste, plus de barre sculptée), Carnet (le tableau et
+  ses en-têtes dans un encart), Aide (la page dans un encart, barre fine). Premier essai du même
+  palier REFUSÉ sur capture (`e1bf752`, l'atlas composé `Profession-Background-Template2` en fond de
+  fenêtre : traits noirs, en-tête mal dessiné) et retiré par `bd537da`.
+  Non vu : Mes artisans, Récolte, Nouveautés. Vu en passant, ANTÉRIEUR au palier : la flèche « → »
+  de l'Aide rendue en carré (police sans ce glyphe), et un texte d'Aide périmé (« 4 onglets »,
+  `/co channel`).
+
 - 2026-09-28 13:22 — jusqu'a 5ef0cab — Forever, un client, client en ANGLAIS ; build
   `main-dev@c760357 2026-09-28 13:15`, branches en test `feat/icone-commande-recue,
   feat/ui-p5-carnet-tri` (lu dans la signature du `.toc` déployé) — **GO sur le palier 5 : le Carnet
