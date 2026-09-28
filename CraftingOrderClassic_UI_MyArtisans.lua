@@ -42,7 +42,8 @@ function UI:BuildMyArtisansTab(f)
     -- Liste des métiers du compte : la liste défilante du kit (palier 2b), aux quatre coins de la zone.
     local pz = self:MyArtSec("profsList")
     local lhost = CreateFrame("Frame", nil, pz)
-    lhost:SetPoint("TOPLEFT", M.PAD, 0); lhost:SetPoint("BOTTOMRIGHT", 0, M.PAD)
+    lhost:SetPoint("TOPLEFT", M.PAD, 0)
+    lhost:SetPoint("BOTTOMRIGHT", self:MyArtSec("profsGutter"), "BOTTOMRIGHT", -Skin.LIST_EDGE, M.PAD)
     self.myArtProfList = Skin.MakeScrollList(lhost, {
         extent = PLH,
         build  = function(row) UI:_BuildMyArtProfRow(row) end,
@@ -77,7 +78,8 @@ function UI:_BuildMyArtRight()
     -- Liste des recettes : la liste défilante du kit (palier 2b), aux quatre coins de la zone.
     local rz = self:MyArtSec("recList")
     local rhost = CreateFrame("Frame", nil, rz)
-    rhost:SetPoint("TOPLEFT", M.PAD, 0); rhost:SetPoint("BOTTOMRIGHT", 0, M.PAD)
+    rhost:SetPoint("TOPLEFT", M.PAD, 0)
+    rhost:SetPoint("BOTTOMRIGHT", self:MyArtSec("recGutter"), "BOTTOMRIGHT", -Skin.LIST_EDGE, M.PAD)
     self.myArtRecList = Skin.MakeScrollList(rhost, {
         extent = RLH,
         build  = function(row) UI:_BuildMyArtRecRow(row) end,

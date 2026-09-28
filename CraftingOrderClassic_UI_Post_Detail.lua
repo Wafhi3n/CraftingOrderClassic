@@ -73,7 +73,8 @@ function UI:_BuildPostDetail()
     -- ancrée aux quatre coins de la zone (la SPEC pilote le pad), sa barre logée dans son bord droit.
     local body = self:PostSec("reagBody")
     local host = CreateFrame("Frame", nil, body)
-    host:SetPoint("TOPLEFT", P.PAD, -P.PAD); host:SetPoint("BOTTOMRIGHT", 0, P.PAD)
+    host:SetPoint("TOPLEFT", P.PAD, -P.PAD)
+    host:SetPoint("BOTTOMRIGHT", self:PostSec("reagentsGutter"), "BOTTOMRIGHT", -Skin.LIST_EDGE, P.PAD)
     self.postReagList = Skin.MakeScrollList(host, {
         extent = RRH,
         build  = function(row) UI:_BuildPostReagRow(row) end,

@@ -21,6 +21,13 @@ local Skin = COC.UI.Skin
 
 local BAR_GAP = 4   -- entre la liste et sa barre (MinimalScrollBar fait 8 px de large)
 
+-- Marge entre le bord droit d'une liste et le séparateur de sa colonne. Les SPEC réservent à côté de
+-- chaque liste une gouttière de 22 px (`plansGutter`, `resGutter`…) : elle logeait la barre de
+-- l'ancien cadre, qui DÉBORDAIT de la liste. La barre moderne est logée dedans, et la gouttière
+-- restait vide, un « jeu » entre la barre et le séparateur (vu en jeu le 2026-09-28). Une liste
+-- s'ancre donc sur le bas-droit de SA GOUTTIÈRE, à LIST_EDGE px du bord.
+Skin.LIST_EDGE = 4
+
 -- La liste défilante. `host` = le cadre qu'elle remplit ; la barre se loge dans son bord droit.
 -- opts :
 --   extent = hauteur d'une ligne : nombre, ou fonction(donnée) -> nombre (en-têtes plus hauts) ;
@@ -29,7 +36,8 @@ local BAR_GAP = 4   -- entre la liste et sa barre (MinimalScrollBar fait 8 px de
 --   empty  = texte (facultatif) affiché en haut de la liste quand elle n'a AUCUNE donnée. Une liste
 --            défilante ne crée pas de ligne sans donnée : l'ancien geste « écrire le message dans la
 --            ligne 1 du pool » n'y a plus de ligne où écrire.
--- Rend { box, bar, SetData(liste, garderLaPosition, quiet) }.
+-- Rend { box, bar, SetData(liste, garderLaPosition, quiet), SetEmpty(texte) } ; SetEmpty change ce
+-- texte pour une liste à plusieurs vues, qui n'a pas une seule raison d'être vide (Carnet).
 -- ⚠️ Une ligne du pool sert tour à tour à n'importe quelle donnée : `fill` doit TOUT reposer, jamais
 -- supposer ce qu'affichait la ligne avant.
 function Skin.MakeScrollList(host, opts)
@@ -61,11 +69,15 @@ function Skin.MakeScrollList(host, opts)
     ScrollUtil.AddManagedScrollBarVisibilityBehavior(box, bar, withBar, without)
 
     local emptyText
-    if opts.empty then
-        emptyText = host:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-        emptyText:SetPoint("TOPLEFT", 8, -8); emptyText:SetPoint("RIGHT", -8, 0)
-        emptyText:SetJustifyH("LEFT"); emptyText:SetText(opts.empty); emptyText:Hide()
+    local function emptyFS()
+        if not emptyText then
+            emptyText = host:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+            emptyText:SetPoint("TOPLEFT", 8, -8); emptyText:SetPoint("RIGHT", -8, 0)
+            emptyText:SetJustifyH("LEFT"); emptyText:Hide()
+        end
+        return emptyText
     end
+    if opts.empty then emptyFS():SetText(opts.empty) end
 
     -- `quiet` : vider la liste SANS son message d'absence, quand c'est un autre texte qui explique
     -- déjà pourquoi il n'y a rien (ex. Mes artisans sans aucun métier : l'en-tête le dit).
@@ -75,6 +87,7 @@ function Skin.MakeScrollList(host, opts)
             keepScroll and ScrollBoxConstants.RetainScrollPosition or nil)
         if emptyText then emptyText:SetShown(#items == 0 and not quiet) end
     end
+    function list:SetEmpty(text) emptyFS():SetText(text or "") end
     return list
 end
 

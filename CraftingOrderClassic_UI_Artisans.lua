@@ -127,7 +127,8 @@ end
 -- (_UI_Artisans_Muted) le masque quand il prend la place de la liste.
 function UI:_BuildArtList()
     local host = CreateFrame("Frame", nil, self:ArtSec("artisansList"))
-    host:SetPoint("TOPLEFT", A.PAD, 0); host:SetPoint("BOTTOMRIGHT", 0, A.PAD)
+    host:SetPoint("TOPLEFT", A.PAD, 0)
+    host:SetPoint("BOTTOMRIGHT", self:ArtSec("artGutter"), "BOTTOMRIGHT", -Skin.LIST_EDGE, A.PAD)
     self.artScroll = host
     self.artList = Skin.MakeScrollList(host, {
         extent = ARH,

@@ -3,7 +3,7 @@
 -- Extrait de _UI_Gather.lua (plafond anti-monolithe de 500 lignes). La coupe suit une frontière
 -- réelle et pas un simple compte de lignes : ici on POSE les cadres une fois, en face _UI_Gather.lua
 -- les RAFRAÎCHIT à chaque changement d'état. Preuve que la frontière est la bonne — aucune des
--- locales de données (GLH, ARH, GATHER_PROFS, CL, knowsProf, inSource) n'était utilisée de ce côté.
+-- locales de données (ARH, GATHER_PROFS, CL, knowsProf, inSource) n'était utilisée de ce côté.
 --
 -- GÉOMÉTRIE : SPEC déclarative dans _UI_Gather_Layout.lua (chargé avant) — zones via UI:GatherSec(id),
 -- contenu en offsets RELATIFS à sa zone, largeurs LUES sur les zones.
@@ -64,17 +64,26 @@ function UI:_BuildGatherLeft()
         vx = vx + b:GetWidth() + 4
     end
 
-    -- Liste des ressources : largeur LUE sur la zone (SPEC pilote pad/gouttière ; −6 = la scrollbar
-    -- déborde dans la gouttière voisine, iso liste de plans de l'onglet Commande).
+    -- Liste des ressources : la liste défilante du kit (palier 2c), aux coins de la zone, comme la
+    -- liste des plans de l'onglet Commande (palier 1) dont elle reprend les lignes et les en-têtes.
     local sec = self:GatherSec("resources")
-    local w = sec:GetWidth(); if w <= 1 then w = G.LIST_W + 6 end
-    self.gatherListW = w - 6
-    local gscroll = CreateFrame("ScrollFrame", "COCGatherListScroll", sec, "UIPanelScrollFrameTemplate")
-    gscroll:SetPoint("TOPLEFT", G.PAD, 0); gscroll:SetPoint("BOTTOMLEFT", G.PAD, G.PAD)
-    gscroll:SetWidth(self.gatherListW)
-    local gc = CreateFrame("Frame", nil, gscroll); gc:SetSize(self.gatherListW, 10); gscroll:SetScrollChild(gc)
-    self.gatherListContent = gc; self.gatherListRows = {}
-    Skin.ScrollTrack("COCGatherListScroll")   -- rail sombre derrière la scrollbar (iso Commande)
+    self.gatherResHost = CreateFrame("Frame", nil, sec)
+    self:_AnchorGatherResHost(false)
+    self.gatherResList = Skin.MakeScrollList(self.gatherResHost, {
+        extent = function(item) return UI:_GatherResExtent(item) end,
+        build  = function(row) UI:_BuildGatherResRow(row) end,
+        fill   = function(row, item) row.item = item; UI:_FillGatherRow(row, item) end,
+    })
+end
+
+-- La liste couvre sa gouttière (cf. Skin.LIST_EDGE) et, quand les pills d'extension sont cachées
+-- (tout métier sauf « Élémentaire »), leur bande aussi : sinon deux vides encadraient la liste, sous
+-- la recherche et à droite de la barre (vus en jeu le 2026-09-28). Rappelé par _RefreshGatherVerPills.
+function UI:_AnchorGatherResHost(pills)
+    local host = self.gatherResHost; if not host then return end
+    host:ClearAllPoints()
+    host:SetPoint("TOPLEFT", self:GatherSec(pills and "resources" or "verPills"), "TOPLEFT", G.PAD, 0)
+    host:SetPoint("BOTTOMRIGHT", self:GatherSec("resGutter"), "BOTTOMRIGHT", -Skin.LIST_EDGE, G.PAD)
 end
 
 function UI:_ToggleGatherFlyout()

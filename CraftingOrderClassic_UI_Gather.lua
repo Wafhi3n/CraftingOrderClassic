@@ -9,10 +9,6 @@ local UI   = COC.UI
 local Skin = UI.Skin
 local L    = COC.L   -- localisation du chrome (valeurs recipient canoniques en FR — cf. _GatherTargetLabel)
 
-local GLH = 20    -- hauteur ligne ressource
-
-local G = UI.GATHER   -- métriques dérivées de la SPEC (PAD, replis de largeur) — cf. _UI_Gather_Layout.lua
-
 -- Professions de récolte reconnues (clés internes CraftLink). On affiche UNIQUEMENT celles
 -- qui existent dans le catalogue CraftLink côté client.
 local GATHER_PROFS = { "Mining", "Herbalism", "Skinning", "Fishing" }
@@ -57,6 +53,7 @@ function UI:_RefreshGatherVerPills()
         p.btn:SetAlpha(enabled and 1 or 0.35)
         p.btn:EnableMouse(enabled and true or false)
     end
+    self:_AnchorGatherResHost(show)   -- la liste monte couvrir la bande quand elle est vide
 end
 
 function UI:_RefreshGatherDropdown()
@@ -85,7 +82,7 @@ function UI:_RefreshGatherDropdown()
 end
 
 function UI:RefreshGatherList()
-    local c = CL(); if not (c and self.gatherListContent) then return end
+    local c = CL(); if not (c and self.gatherResList) then return end
     local s = self.gatherSearch
     local out = {}
     if self.gatherProf == "Elemental" then
@@ -120,32 +117,36 @@ function UI:RefreshGatherList()
         collapsed = ((s or "") ~= "") and nil or self:_GatherCollapseTable(),
     })
     self.gatherDisplay = disp
-    for i, item in ipairs(disp) do
-        local row = self:_GatherListRow(i)
-        if item.isHeader then self:_FillGatherHeader(row, item) else self:_FillGatherRow(row, item) end
-        row:Show()
-    end
-    for i = #disp + 1, #self.gatherListRows do self.gatherListRows[i]:Hide() end
-    self.gatherListContent:SetHeight(math.max(#disp * GLH, 10))
-    Skin.AutoHideScroll("COCGatherListScroll", self.gatherListContent)
+    -- Même métier, même extension : la position est GARDÉE (replier une section ou choisir une
+    -- ressource ne renvoie pas en haut) ; un autre métier repart du haut de sa liste.
+    local key = tostring(self.gatherProf) .. "|" .. tostring(self.gatherExp)
+    local same = (self._gatherResFor == key)
+    self._gatherResFor = key
+    self.gatherResList:SetData(disp, same)
 end
 
 -- Repliage + remplissage des lignes (en-tête / ressource) : cf. _UI_Gather_Categories.lua
 -- (extrait pour rester sous le plafond anti-monolithe).
 
-function UI:_GatherListRow(i)
-    local r = self.gatherListRows[i]; if r then return r end
-    local lw = self.gatherListW or G.LIST_W   -- largeur de la zone resources (lue au build)
-    r = CreateFrame("Button", nil, self.gatherListContent); r:SetSize(lw, GLH); r:SetPoint("TOPLEFT", 0, -(i-1)*GLH)
-    local hi = r:CreateTexture(nil, "HIGHLIGHT"); hi:SetAllPoints(); hi:SetColorTexture(Skin.unpack(Skin.color.rowHover))
+-- Construite une fois par cadre de la liste défilante : les deux habillages (en-tête, ressource) de
+-- la liste des métiers, comme les plans de Commande (_BuildPostPlanRow). Le clic lit la donnée que
+-- la ligne porte À CE MOMENT (`row.item`, posé par la liste), jamais une fermeture du remplissage.
+function UI:_BuildGatherResRow(r)
+    Skin.ListRowArt(r)
     r.badge = Skin.MakeBadge(r, 14); r.badge:SetPoint("LEFT", 2, 0)
-    r.name  = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    r.name:SetPoint("LEFT", 20, 0); r.name:SetJustifyH("LEFT"); r.name:SetWidth(lw - 58); Skin.ApplyShadow(r.name)
     r.stack = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     r.stack:SetPoint("RIGHT", -4, 0); Skin.ApplyShadow(r.stack)
-    -- Chevron des en-têtes de section/sous-catégorie (cf. _UI_Gather_Categories.lua).
-    r.expand = r:CreateTexture(nil, "ARTWORK"); r.expand:SetSize(14, 14); r.expand:Hide()
-    self.gatherListRows[i] = r; Skin.WireItemTooltip(r); Skin.WireItemLink(r); return r
+    -- Nom ancré contre la valeur HV au lieu d'être dimensionné (la liste fixe la largeur des lignes).
+    r.name = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    r.name:SetJustifyH("LEFT"); r.name:SetWordWrap(false); Skin.ApplyShadow(r.name)
+    r.hdr = r:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    r.hdr:SetJustifyH("LEFT"); r.hdr:SetWordWrap(false); Skin.ApplyShadow(r.hdr); r.hdr:Hide()
+    r:SetScript("OnClick", function(self2)
+        local it = self2.item; if not it then return end
+        if it.isHeader then UI:ToggleGatherSection(it.ckey)
+        elseif it.e then UI:SelectGatherItem(it.e) end
+    end)
+    Skin.WireItemTooltip(r); Skin.WireItemLink(r)
 end
 
 function UI:SelectGatherItem(entry)

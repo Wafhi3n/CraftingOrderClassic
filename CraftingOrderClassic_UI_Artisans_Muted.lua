@@ -27,7 +27,8 @@ function UI:_BuildMutedList()
     -- cachée par défaut (bascule : _ShowMutedMode). Elle dit « personne en sourdine » d'elle-même.
     local lz = self:ArtSec("artisansList")
     local host = CreateFrame("Frame", nil, lz)
-    host:SetPoint("TOPLEFT", 0, 0); host:SetPoint("BOTTOMRIGHT", 0, 0); host:Hide()
+    host:SetPoint("TOPLEFT", 0, 0)
+    host:SetPoint("BOTTOMRIGHT", self:ArtSec("artGutter"), "BOTTOMRIGHT", -Skin.LIST_EDGE, 0); host:Hide()
     self.mutedScroll = host
     self.mutedList = Skin.MakeScrollList(host, {
         extent = MRH,
