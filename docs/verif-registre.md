@@ -46,6 +46,20 @@ client.
 
 ## Relevés
 
+- 2026-09-28 17:45 — jusqu'a f6e9826 — Forever, deux clients, client en ANGLAIS ; build déployé
+  après la release : `main-dev@239fad7 2026-09-28 16:29` = v1.39.0 + `feat/icone-commande-recue`
+  (`/co version` pas relu) — **GO sur les restes « non vus » de la v1.39.0** — rapporté par le user,
+  deux captures : le bas de l'Aide « Order statuses: Pending » Accepted » Delivered (or Cancelled /
+  Declined). » (le « ou » traduit) ; le Carnet de Gnomi, colonnes triables, sept commandes. Rapporté
+  sans capture : la lueur de l'onglet Enchantement « fonctionne bien » ; « J'ai reçu » côté
+  acheteur fonctionne ; barre fine de Profit, du réglage LFW et de la Route flottante, et fenêtre
+  de métier fermée/rouverte en combat : « ça bug pas » ; Journal (Échap, détail, fiche en
+  lecture) : OK.
+  ÉCART : la commande envoyée par courrier reste « Delivered » chez l'acheteur. Lu dans le code : la
+  confirmation automatique n'écoute que `CHAT_MSG_LOOT` (`_LootAlert.lua`), rien n'écoute la prise
+  d'une pièce jointe — le courrier y est noté « point de branchement futur » ; l'en-tête de
+  `_Companion_Mail.lua` promettait le contraire. Pas vu : si la pièce jointe avait été prise.
+
 - 2026-09-28 16:05 — jusqu'a eaa4ba7 — Forever, deux clients, client en ANGLAIS ; build déployé
   `main-dev@c43f9f9 2026-09-28 15:43` (`/co version` pas relu) — **GO sur le palier 7c : la colonne
   greffée à la barre fine, ÉPROUVÉE EN COMBAT** (risque 4 de la revue) — capture du user en combat
