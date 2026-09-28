@@ -375,6 +375,11 @@ local news = {
         "In WoW Forever hat jeder Charakter einen Nachnamen, und das Spiel nennt dich überall 'Vorname Nachname'. Das Addon benutzte nur deinen Vornamen und erkannte sich selbst nicht mehr: Ein Auftrag an dich kam an und wurde ignoriert, ein im Kanal geposteter Auftrag wurde verworfen, als würde jemand im Namen eines anderen posten, und du konntest in deiner eigenen Handwerkerliste auftauchen. Behoben, auch für Aufträge von Spielern, die noch 1.36.1 nutzen.",
     ["Une ligne du canal Commerce comme « dont need fire wand: [Lesser Magic Wand] » n'est plus prise pour une demande."] =
         "Eine Handelszeile wie 'dont need fire wand: [Lesser Magic Wand]' gilt nicht mehr als Anfrage.",
+    -- v1.39.1
+    ["Les commandes envoyées par courrier se terminent seules"] =
+        "Verschickte Aufträge schließen sich selbst ab",
+    ["Quand un artisan t'envoie ta commande par courrier, prendre l'objet dans ta boîte aux lettres la marque reçue, comme quand tu le ramasses. L'artisan est crédité tout de suite. Avant, elle restait « Remise » et il fallait cliquer « J'ai reçu » dans le Carnet."] =
+        "Schickt dir ein Handwerker deinen Auftrag per Post, gilt er als erhalten, sobald du den Gegenstand aus dem Briefkasten nimmst, wie beim Plündern. Der Handwerker wird sofort gutgeschrieben. Bisher blieb er auf 'Geliefert' und du musstest im Auftragsbuch 'Erhalten' klicken.",
     -- v1.39.0
     ["La fenêtre prend l'allure du jeu"] =
         "Das Fenster sieht aus wie das Spiel",

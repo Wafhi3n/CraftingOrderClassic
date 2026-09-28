@@ -378,6 +378,11 @@ local news = {
         "On WoW Forever every character has a surname, and the game calls you 'Firstname Surname' everywhere. The addon still used your first name alone and stopped recognizing itself: an order addressed to you arrived and was ignored, an order posted on the channel was thrown out as if someone were posting for another player, and you could show up in your own Artisans list. Fixed, including for orders from players still on 1.36.1.",
     ["Une ligne du canal Commerce comme « dont need fire wand: [Lesser Magic Wand] » n'est plus prise pour une demande."] =
         "A trade chat line like 'dont need fire wand: [Lesser Magic Wand]' is no longer taken for a request.",
+    -- v1.39.1
+    ["Les commandes envoyées par courrier se terminent seules"] =
+        "Mailed orders finish themselves",
+    ["Quand un artisan t'envoie ta commande par courrier, prendre l'objet dans ta boîte aux lettres la marque reçue, comme quand tu le ramasses. L'artisan est crédité tout de suite. Avant, elle restait « Remise » et il fallait cliquer « J'ai reçu » dans le Carnet."] =
+        "When a crafter mails you your order, taking the item out of your mailbox marks it as received, just like looting it. The crafter gets the credit right away. Before, it stayed on 'Delivered' and you had to click 'Received' in the Ledger.",
     -- v1.39.0
     ["La fenêtre prend l'allure du jeu"] =
         "The window looks like the game's",

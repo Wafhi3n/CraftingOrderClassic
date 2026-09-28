@@ -1,5 +1,11 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.39.1 - Mailed orders finish themselves
+
+When a crafter mails you your order, taking the item out of your mailbox now marks it as received,
+the same way looting it does. The crafter gets the credit right away. Until now the order sat on
+Delivered and you had to click Received in the Ledger yourself.
+
 ## v1.39.0 - The window looks like the game's
 
 The whole interface now uses the pieces WoW Forever builds its own windows from. Orders work exactly
