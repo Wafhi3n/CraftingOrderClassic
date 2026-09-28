@@ -14,10 +14,11 @@ local Skin = UI.Skin
 -- _UI_HelpPlate.lua). Sidebar (gauche) → RIGHT ; zone principale (droite) → LEFT.
 local SPEC = {
     x1 = 0, x2 = 848, vBottom = 18,
-    { id = "sidebar", w = 212, top = -63, bottom = 20,
+    -- inset (palier 6) : la liste des sources et l'annuaire, deux encarts de liste comme les métiers.
+    { id = "sidebar", w = 212, top = -63, bottom = 20, inset = "list",
       { id = "sources", help = "sources", helpDir = "RIGHT" },   -- en-tête SOURCE + boutons de filtre empilés (flex)
       { id = "addPlayer", h = 132, help = "addPlayer", helpDir = "RIGHT" } },   -- cluster bas : Rafraîchir · AJOUTER · scan
-    { top = -63, bottom = 20, left = 5,
+    { top = -63, bottom = 20, left = 5, inset = "list",
       { id = "profFilter", h = 34,padL= 5, bg = true, help = "profFilter", helpDir = "LEFT" },   -- « Métier : » + pills d'icônes
       { dir = "cols", sep = false,
         { id = "artisansList", help = "artisansList", helpDir = "LEFT" },

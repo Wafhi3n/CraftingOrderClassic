@@ -146,8 +146,12 @@ local function padOf(node)
     return node.padL or p, node.padR or p, node.padT or p, node.padB or p
 end
 
-local function secFrame(parent, node, secs)
+-- `inset` ("list" | "page", palier 6) : le nœud devient un ENCART de la page des métiers
+-- (Skin.WrapInset) ; ses jointures avec un voisin encart perdent leur barre sculptée — chez Blizzard,
+-- deux blocs se séparent par leurs bordures et 2 px d'écart (`dl`/`dr`), pas par un ornement.
+local function secFrame(parent, node, secs, dl, dr)
     local f = CreateFrame("Frame", nil, parent)
+    if node.inset and Skin.WrapInset then Skin.WrapInset(f, node.inset, dl, dr) end
     if node.bg then
         local t = f:CreateTexture(nil, "BACKGROUND")
         t:SetAllPoints(); t:SetColorTexture(BAND[1], BAND[2], BAND[3], BAND[4])
@@ -185,8 +189,10 @@ local function buildRows(cf, node, w, ctx, secs)
             below = below - (c.h or 0)
             f:SetPoint("BOTTOMLEFT", cf, "BOTTOMLEFT", 0, below); f:SetHeight(c.h or 0)
         end
-        if i > 1 and c.sep ~= false then
-            if c.major then
+        if i > 1 and c.sep ~= false and not (c.inset or node[i - 1].inset) then
+            -- Dans un encart (ctx.inset), une frontière de bloc reste un filet fin : la fiche des
+            -- métiers n'a pas de barre sculptée, et le débord `bleed` passerait sa bordure.
+            if c.major and not ctx.inset then
                 Skin.MakeDivider(f, ctx.fL and 0 or -ctx.bleed, w + (ctx.fR and 0 or ctx.bleed),
                     0, true, { capL = not ctx.fL, capR = not ctx.fR })
             else
@@ -212,11 +218,16 @@ local function buildCols(cf, node, w, ctx, secs)
     local x = 0
     for i, c in ipairs(node) do
         local cw = c.w or flexW
-        local f, inner = secFrame(cf, c, secs)
+        -- Deux encarts voisins : 1 px de retrait chacun à leur jointure, l'écart de 2 px de Blizzard.
+        local dl = (c.inset and i > 1 and node[i - 1].inset) and 1 or 0
+        local dr = (c.inset and i < #node and node[i + 1].inset) and 1 or 0
+        local f, inner = secFrame(cf, c, secs, dl, dr)
         f:SetWidth(cw)
         f:SetPoint("TOPLEFT", x, 0)
         f:SetPoint("BOTTOMLEFT", cf, "BOTTOMLEFT", x, 0)
-        if i > 1 and c.sep ~= false then Skin.MakeDividerV(f, 0, 0, 0, c.major) end
+        if i > 1 and c.sep ~= false and not (c.inset or node[i - 1].inset) then
+            Skin.MakeDividerV(f, 0, 0, 0, c.major)
+        end
         local pL, pR = padOf(c)
         buildNode(inner, c, cw - pL - pR, ctx, secs)
         x = x + cw
@@ -237,15 +248,16 @@ function Skin.MakeSections(panel, spec)
     local x = spec.x1
     for i, c in ipairs(spec) do
         local cw = c.w or (spec.x2 - spec.x1 - fixed)
-        local f, inner = secFrame(panel, c, secs)
+        local f, inner = secFrame(panel, c, secs, i > 1 and 1 or 0, i < #spec and 1 or 0)
         f:SetWidth(cw)
         f:SetPoint("TOPLEFT", x, c.top or 0)
         f:SetPoint("BOTTOMLEFT", panel, "BOTTOMLEFT", x, c.bottom or 0)
         local pL, pR = padOf(c)
         buildNode(inner, c, cw - pL - pR,
-            { sepInset = sepInset, bleed = bleed, fL = i > 1, fR = i < #spec }, secs)
+            { sepInset = sepInset, bleed = bleed, fL = i > 1, fR = i < #spec, inset = c.inset }, secs)
         x = x + cw
-        if i < #spec then frontiers[#frontiers + 1] = x end
+        -- Pas de barre sculptée entre deux colonnes dont l'une est un encart (palier 6).
+        if i < #spec and not (c.inset or spec[i + 1].inset) then frontiers[#frontiers + 1] = x end
     end
     for _, fx in ipairs(frontiers) do
         Skin.MakeDividerV(panel, fx, spec.vTop or -60, spec.vBottom or -8, true)

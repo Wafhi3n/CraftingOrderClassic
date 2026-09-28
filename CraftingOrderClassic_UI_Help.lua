@@ -185,6 +185,7 @@ function UI:BuildHelpTab(f)
     -- l'ancien cadre, et se cache d'elle-même quand tout tient.
     local host = CreateFrame("Frame", nil, panel)
     host:SetPoint("TOPLEFT", 12, -74); host:SetPoint("BOTTOMRIGHT", -12, 22)
+    Skin.PanelInset(panel, "list", 8, -70, -8, 18)   -- la page dans un encart (palier 6)
     local scroll = Skin.MakeScrollFrame(host)
     local body = CreateFrame("Frame", nil, scroll); body:SetSize(BODY_W, 10); scroll:SetScrollChild(body)
     self.helpBody = body

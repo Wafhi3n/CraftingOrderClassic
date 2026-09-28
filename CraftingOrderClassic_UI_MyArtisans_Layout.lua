@@ -18,12 +18,12 @@ local SPEC = {
         { id = "shareOptIn" },                       -- case « Partager mes rerolls sur le réseau »
         { id = "showcase", w = 260, sep = false } }, -- « Vitrine : » + sélecteur du perso principal
       { dir = "cols", sep = false,
-        { id = "accountProfs", w = 300,              -- colonne gauche : métiers du compte
+        { id = "accountProfs", w = 300, inset = "list",   -- colonne gauche : métiers du compte (encart, P6)
           { id = "allRealm", h = 28, help = "allRealm", helpDir = "RIGHT" },   -- bouton « Tous les plans du royaume »
           { dir = "cols", sep = false,
             { id = "profsList", help = "profsList", helpDir = "RIGHT" },
             { id = "profsGutter", w = 22, sep = false } } },
-        { id = "recipesCol", major = true,padL= 5 ,           -- colonne droite : recettes du métier choisi
+        { id = "recipesCol", major = true,padL= 5 , inset = "list",   -- colonne droite : recettes (encart, P6)
           { id = "recTools", h = 30, bg = true, dir = "cols", help = "recTools", helpDir = "LEFT",
             { id = "recTitle" },                     -- titre dynamique (métier · N recettes)
             { id = "recButtons", w = 230, sep = false } },   -- Manquantes + outils Auctionator

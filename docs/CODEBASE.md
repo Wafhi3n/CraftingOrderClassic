@@ -4,7 +4,7 @@
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
-144 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
+145 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
 
 ## Modules (ordre de chargement)
 
@@ -29,30 +29,31 @@
 | `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 398 |
 | `CraftingOrderClassic_Elemental.lua` | pseudo-« métier » de récolte « Élémentaire ». | 61 |
 | `CraftingOrderClassic_UI_Skin.lua` | tokens + helpers SÉMANTIQUES du skin (métiers, statuts, rareté, quantités, icônes natives) et petits widgets d'affichage. | 450 |
-| `CraftingOrderClassic_UI_Skin_Native.lua` | kit de chrome Blizzard NATIF (le « framework » UI de COC). | 471 |
+| `CraftingOrderClassic_UI_Skin_Native.lua` | kit de chrome Blizzard NATIF (le « framework » UI de COC). | 473 |
 | `CraftingOrderClassic_UI_Skin_ScrollList.lua` | la LISTE DÉFILANTE moderne du kit, palier 1 de la revue d'interface (docs/revue-ui-mainline.md). | 189 |
 | `CraftingOrderClassic_UI_Skin_SideTabs.lua` | la rangée d'ONGLETS LATÉRAUX de la fenêtre principale (palier 3 de la revue d'interface, décision D1 : « les onglets sur la droite, comme la vue métier »). | 77 |
 | `CraftingOrderClassic_UI_Skin_Inputs.lua` | les CHAMPS DE SAISIE du formulaire de commande (palier 4 de la revue d'interface) : le montant et la quantité, avec les briques du formulaire des Commandes d'artisanat de Forever (Blizzard_ProfessionsCustomerOrdersForm.xml, notre maquette) au lieu de nos InputBoxTemplate nus. | 83 |
 | `CraftingOrderClassic_UI_Skin_Table.lua` | l'EN-TÊTE DE TABLEAU triable (palier 5 de la revue d'interface : le Carnet façon « Mes commandes » des Commandes d'artisanat de Forever). | 65 |
 | `CraftingOrderClassic_UI_Skin_Dropdown.lua` | menu deroulant (selecteur) du kit natif. | 93 |
-| `CraftingOrderClassic_UI_Skin_Sections.lua` | kit de chrome natif, volet SECTIONS : comment on découpe l'intérieur d'une fenêtre en blocs et en zones. | 254 |
+| `CraftingOrderClassic_UI_Skin_Sections.lua` | kit de chrome natif, volet SECTIONS : comment on découpe l'intérieur d'une fenêtre en blocs et en zones. | 266 |
+| `CraftingOrderClassic_UI_Skin_Backgrounds.lua` | les FONDS façon fenêtre des métiers de Forever (palier 6 de la revue d'interface ; le user : « ça doit être le même que les métiers »). | 68 |
 | `CraftingOrderClassic_UI_Skin_HelpPlate.lua` | kit d'AIDE CONTEXTUELLE (le « bouton i » de retail). | 321 |
 | `CraftingOrderClassic_ShareReagents.lua` | « liste de courses » : diffuser en un clic les réactifs d'une recette (vue métier) ou d'une commande (carte) dans un canal de discussion, avec le LIEN objet de chaque réactif. | 157 |
 | `CraftingOrderClassic_UI.lua` | fenêtre principale (chrome Blizzard natif, kit UI_Skin_Native). | 337 |
-| `CraftingOrderClassic_UI_Ledger.lua` | onglet CARNET : MES commandes, en table (Commande · Qté · Prix · Métier · Artisan · Statut), filtres En cours / Archivées / Confiées, colonnes TRIABLES au clic sur l'en-tête (palier 5 de la revue d'interface, calqué sur « Mes commandes » des Commandes d'artisanat ; en-tête : Skin.MakeSortHeader). | 209 |
+| `CraftingOrderClassic_UI_Ledger.lua` | onglet CARNET : MES commandes, en table (Commande · Qté · Prix · Métier · Artisan · Statut), filtres En cours / Archivées / Confiées, colonnes TRIABLES au clic sur l'en-tête (palier 5 de la revue d'interface, calqué sur « Mes commandes » des Commandes d'artisanat ; en-tête : Skin.MakeSortHeader). | 210 |
 | `CraftingOrderClassic_UI_HelpPlate.lua` | AIDE CONTEXTUELLE de la FENÊTRE PRINCIPALE (« bouton i »). | 169 |
-| `CraftingOrderClassic_UI_Post_Layout.lua` | GÉOMÉTRIE de l'onglet « Commande » : colonnes, zones, séparateurs. | 134 |
+| `CraftingOrderClassic_UI_Post_Layout.lua` | GÉOMÉTRIE de l'onglet « Commande » : colonnes, zones, séparateurs. | 136 |
 | `CraftingOrderClassic_UI_Post.lua` | onglet « Commande » : sélection de plan (gauche) + réactifs « je fournis » / commission g-s-c / ciblage artisan (droite). | 418 |
 | `CraftingOrderClassic_UI_Post_Detail.lua` | onglet « Commande », PANNEAU DROIT : en-tête du plan sélectionné (icône + cadre doré + nom + niveau), liste des réactifs « je fournis », et la rangée commission. | 201 |
 | `CraftingOrderClassic_UI_Post_Artisans.lua` | onglet « Commande », section droite basse : boutons source, liste des artisans, ciblage (@Nom), libellé destinataire, bouton Poster. | 250 |
 | `CraftingOrderClassic_UI_Post_Categories.lua` | onglet « Commande », panneau gauche : regroupe la LISTE DES PLANS en sections type fenêtre native (emplacement puis type pour les équipements, type pour les armes, catégorie pour le reste). | 169 |
 | `CraftingOrderClassic_UI_Post_Paperdoll.lua` | onglet « Commande », vue SILHOUETTE de l'Enchantement. | 332 |
 | `CraftingOrderClassic_UI_Post_Profit.lua` | onglet « Commande » : couche Auctionator (lecture seule). | 154 |
-| `CraftingOrderClassic_UI_Gather_Layout.lua` | GÉOMÉTRIE de l'onglet « Récolte » : la SPEC (structure éditable, cf. | 66 |
+| `CraftingOrderClassic_UI_Gather_Layout.lua` | GÉOMÉTRIE de l'onglet « Récolte » : la SPEC (structure éditable, cf. | 67 |
 | `CraftingOrderClassic_UI_Gather_Build.lua` | onglet « Récolte », moitié CONSTRUCTION. | 246 |
 | `CraftingOrderClassic_UI_Gather.lua` | onglet « Récolte » : ressources de récolte (minéraux, herbes, cuirs, poissons) + demande de quantité + prix par pile + ciblage récolteur. | 269 |
 | `CraftingOrderClassic_UI_Gather_Categories.lua` | onglet « Récolte », panneau gauche : repliage des en-têtes et remplissage des lignes (en-tête de section/sous-catégorie, ou ressource). | 79 |
-| `CraftingOrderClassic_UI_Artisans_Layout.lua` | GÉOMÉTRIE de l'onglet « Artisans » (annuaire social). | 44 |
+| `CraftingOrderClassic_UI_Artisans_Layout.lua` | GÉOMÉTRIE de l'onglet « Artisans » (annuaire social). | 45 |
 | `CraftingOrderClassic_UI_Artisans.lua` | onglet « Artisans » : annuaire social. | 474 |
 | `CraftingOrderClassic_UI_Artisans_Groups.lua` | fusion « une ligne par JOUEUR » (rerolls). | 207 |
 | `CraftingOrderClassic_UI_Artisans_Icons.lua` | onglet « Artisans » : tout ce qui est ICÔNE de métier. | 190 |
@@ -62,8 +63,8 @@
 | `CraftingOrderClassic_UI_MyArtisans.lua` | onglet « Mes artisans » : vue agrégée des métiers du COMPTE (tous mes rerolls du royaume), en mode « connu ». | 475 |
 | `CraftingOrderClassic_UI_MyArtisans_Profit.lua` | onglet « Mes artisans » : couche Auctionator. | 135 |
 | `CraftingOrderClassic_UI_MyArtisans_Reroll.lua` | accès à la vue REROLL (métiers d'un AUTRE perso du compte) depuis l'onglet « Mes artisans ». | 86 |
-| `CraftingOrderClassic_UI_Help.lua` | onglet Aide : page unique défilante qui explique les autres onglets (Carnet/Commande/Récolte/Artisans), la Vue Métier et le réseau. | 195 |
-| `CraftingOrderClassic_UI_News.lua` | onglet « Nouveautés » : notes de version (changelog) affichées EN JEU, version par version, la plus récente en tête. | 468 |
+| `CraftingOrderClassic_UI_Help.lua` | onglet Aide : page unique défilante qui explique les autres onglets (Carnet/Commande/Récolte/Artisans), la Vue Métier et le réseau. | 196 |
+| `CraftingOrderClassic_UI_News.lua` | onglet « Nouveautés » : notes de version (changelog) affichées EN JEU, version par version, la plus récente en tête. | 469 |
 | `CraftingOrderClassic_Social.lua` | couche sociale passive (socle). | 402 |
 | `CraftingOrderClassic_Social_Menu.lua` | entrées « Crafting Order » du menu contextuel joueur. | 104 |
 | `CraftingOrderClassic_Social_Roster.lua` | affichage des métiers sur les fenêtres NATIVES. | 130 |
@@ -345,6 +346,7 @@
 >   onMoved   : function(point, relPoint, x, y) à la fin d'un drag (pour persister)
 >   onClose   : remplace le comportement du bouton fermer natif (ex. dock de la vue métier)
 >   strata    : défaut "HIGH"
+>   insets    : chaque bloc est un encart façon métiers, le marbre d'ensemble est masqué (Skin.WindowInsetLook)
 > SetToplevel : les fenêtres COC partagent la strata → un clic remonte la fenêtre entière d'un bloc
 > (fini l'interclassement des éléments) ; Raise à l'ouverture = la dernière ouverte devant.
 
@@ -612,6 +614,29 @@
 
 **`Skin.MakeSections(panel, spec)`**
 
+
+### `CraftingOrderClassic_UI_Skin_Backgrounds.lua`
+
+**`Skin.WindowInsetLook(f)`**
+
+> Une fenêtre ButtonFrameTemplate dont chaque bloc est un encart (Skin.MakeWindow, opts.insets) : le
+> marbre de `f.Inset` et sa bordure d'ensemble sont masqués — chez Blizzard, ce sont les ENCARTS qui
+> portent une bordure, pas la page entière ; le rocher du cadre se voit entre eux.
+
+**`Skin.WrapInset(frame, kind, dl, dr)`**
+
+> Encadre `frame` d'un ENCART de la fenêtre des métiers. kind = "list" (le fond sombre de la liste de
+> recettes) ou "page" (fond caché : le rocher du cadre se voit à travers). `dl`/`dr` : retrait des
+> bords gauche/droit (1 px de chaque côté d'une jointure = l'écart de 2 px que Blizzard laisse entre
+> la liste et la fiche). Le gabarit a `useParentLevel` : l'encart reste au niveau de `frame`, son
+> contenu (les enfants de `frame`) passe au-dessus.
+
+**`Skin.PanelInset(panel, kind, x1, y1, x2, y2)`**
+
+> Un encart posé sur un RECTANGLE d'un panneau (les onglets sans SPEC : Carnet, Aide, Nouveautés).
+> Le cadre porteur est au niveau du panneau : le contenu déjà posé dans le panneau (niveau + 1) reste
+> au-dessus de la bordure. Rect en coordonnées du panneau : (x1, y1) haut-gauche, (x2, y2) bas-droit
+> mesurés depuis le bord BAS-DROIT (x2 ≤ 0, y2 ≥ 0).
 
 ### `CraftingOrderClassic_UI_Skin_HelpPlate.lua`
 
@@ -913,6 +938,25 @@
 >     (`MakeDivider`/`MakeDividerV`) — le modèle de la liste d'Amis, pointé par le user.
 
 **API** : `Skin.MakeInset(parent, x1, y1, x2, y2, opts)` · `Skin.MakeDivider(parent, x1, x2, y, heavy, opts)` · `Skin.MakeDividerV(parent, x, top, bottom, heavy)` · `Skin.ScrollTrack(scrollName)` · `Skin.MakeSections(panel, spec)`
+
+### `CraftingOrderClassic_UI_Skin_Backgrounds.lua`
+> CraftingOrderClassic_UI_Skin_Backgrounds.lua — les FONDS façon fenêtre des métiers de Forever
+> (palier 6 de la revue d'interface ; le user : « ça doit être le même que les métiers »).
+> 
+> Relevé dans la source Forever : le cadre des métiers hérite PortraitFrameTemplate, donc le MÊME
+> fond rocher tuilé et les mêmes stries sous le titre que notre ButtonFrameTemplate. Ce qui fait son
+> allure, ce sont ses ENCARTS : la liste de recettes (fond `Professions-background-summarylist` +
+> bordure NineSlice `InsetFrameTemplate`, Blizzard_ProfessionsRecipeList.xml) et la fiche (même
+> bordure). Plus de marbre d'un seul tenant ni de barres sculptées entre blocs.
+> 
+> ⚠️ PAS l'atlas `Profession-Background-Template2` en fond de fenêtre (essayé le 2026-09-28, retiré) :
+> c'est l'image COMPOSÉE de la page des métiers, avec des ombres peintes là où SA liste (274 de large)
+> et SON bord droit tombent. Posée sous nos colonnes (liste de 333, autres onglets), elle traçait de
+> gros traits noirs au milieu du contenu, le miroir en recopiait un second, et son haut dessiné pour la
+> barre de rang gâchait notre bande de titre. La vue métier peut l'employer parce qu'elle prolonge la
+> page de Blizzard à l'identique ; une fenêtre à nous, non.
+
+**API** : `Skin.WindowInsetLook(f)` · `Skin.WrapInset(frame, kind, dl, dr)` · `Skin.PanelInset(panel, kind, x1, y1, x2, y2)`
 
 ### `CraftingOrderClassic_UI_Skin_HelpPlate.lua`
 > CraftingOrderClassic_UI_Skin_HelpPlate.lua — kit d'AIDE CONTEXTUELLE (le « bouton i » de retail).
