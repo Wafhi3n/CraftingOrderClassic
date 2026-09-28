@@ -34,6 +34,15 @@ local BODY_W = 780
 local function versionsHead()
     return {
         {
+            v = "v1.39.0", title = L["La fenêtre prend l'allure du jeu"],
+            lines = {
+                L["Les onglets de la fenêtre passent sur son bord droit, en icônes, comme dans la fenêtre de métier. Survole-les pour lire leur nom ; le titre dit où tu es, et l'icône du Carnet compte tes commandes en cours."],
+                L["Toutes les listes et les pages défilent avec la barre fine du jeu, qui se cache quand tout tient : ressources de Récolte, Carnet, Aide, Nouveautés, et les vues Commandes, Route, Manquantes et Profit de la fenêtre de métier. Chaque bloc est posé dans un encart, comme dans la fenêtre de métier."],
+                L["Dans Commande, la commission est la case or, argent, cuivre du jeu, et la quantité a des flèches. Le Carnet se trie : clique l'en-tête d'une colonne, reclique pour inverser. Le Journal et la fiche « Poster en quête » prennent le cadre du journal de quêtes du jeu, livre et parchemin."],
+                L["Les panneaux de l'échange et du courrier prennent l'allure de ces fenêtres. Le courrier ne liste plus que ce qui se poste : un enchantement se fait à l'échange, où l'onglet Enchantement brille quand une commande d'enchant acceptée te lie à ton partenaire. L'Aide est réécrite, et ses flèches affichées en carrés sont réparées."],
+            },
+        },
+        {
             v = "v1.38.0", title = L["Un signe quand une mise à jour est là"],
             lines = {
                 L["Quand le réseau signale une nouvelle version, le logo de Crafting Order apparaît en haut de la minicarte, là où Blizzard pose la lettre du courrier. Survole-le pour voir quelle version est sortie et laquelle tu as, clique pour le détail dans le chat. Il disparaît une fois la mise à jour faite."],
