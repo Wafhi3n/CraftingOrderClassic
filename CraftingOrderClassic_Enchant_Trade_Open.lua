@@ -62,6 +62,11 @@ local function build(spellName, texture)
     -- fenêtre de métier qui s'ouvrira à sa droite ne le recouvre pas — elle se pose plus loin.
     btn = Skin.MakeSideTab(TradeFrame, texture, "SecureActionButtonTemplate")
     btn:SetPoint("TOPLEFT", TradeFrame, "TOPRIGHT", 0, -60)
+    -- Le gabarit naît avec son cadre « sélectionné » (SelectedTexture) affiché, et son OnLoad ne
+    -- le masque pas : l'onglet paraissait choisi en permanence (cadre doré vu en jeu le 2026-09-28),
+    -- et la lueur (même atlas, en ADD) n'y aurait ajouté qu'un doré sur doré. Au repos, un onglet
+    -- normal ; la lueur ressort seule.
+    if btn.SetChecked then btn:SetChecked(false) end
     btn:SetScript("OnEnter", function(b)
         GameTooltip:SetOwner(b, "ANCHOR_RIGHT")
         GameTooltip:SetText(spellName, 1, 1, 1)
@@ -114,6 +119,21 @@ local function setNudge(on)
     end
 end
 
+-- Une commande d'enchantement que J'AI acceptée pour le partenaire de cet échange : c'est le moment
+-- d'ouvrir l'Enchantement, alors l'onglet pulse aussi fenêtre FERMÉE. Demande du user (2026-09-28,
+-- « ça devrait ouvrir l'enchant ») ; l'ouvrir tout seul reste impossible (M2 ci-dessus), le clic
+-- reste au joueur — on le lui montre. `delivered` ne compte pas : l'enchant est déjà posé.
+local function enchantOrderWithPartner()
+    local Comp, partner = COC.Companion, Api.UnitNameSafe("NPC")
+    if not (Comp and Comp.OrdersWith and partner) then return false end
+    for _, o in ipairs(Comp:OrdersWith(partner)) do
+        if o.profession == "Enchanting" and o.status == "accepted" and Comp.RoleWith(o, partner) == "sell" then
+            return true
+        end
+    end
+    return false
+end
+
 function Open:Hide()
     if lockedDown() then return end      -- masquer un bouton sécurisé en combat est refusé
     if btn then btn:Hide() end
@@ -136,8 +156,10 @@ function Open:Update()
     local armed = configure(spellName)
     btn:SetShown(armed)
     hint:SetShown(not armed)
-    -- Fenêtre ouverte sur un AUTRE métier : l'onglet pulse pour appeler le second clic (M2b).
-    setNudge(armed and _G.ProfessionsFrame and ProfessionsFrame:IsShown() and true or false)
+    -- L'onglet pulse quand la fenêtre est ouverte sur un AUTRE métier (appel au second clic, M2b), ou
+    -- quand une commande d'enchant acceptée nous lie au partenaire (appel au premier).
+    local otherProf = _G.ProfessionsFrame and ProfessionsFrame:IsShown()
+    setNudge(armed and (otherProf or enchantOrderWithPartner()) and true or false)
 end
 
 function Open:Start()
@@ -153,4 +175,10 @@ function Open:Start()
         pending = true
         C_Timer.After(0.1, function() pending = nil; Open:Update() end)
     end)
+    -- Une commande acceptée PENDANT l'échange doit allumer la lueur sans attendre un événement
+    -- d'échange : on suit le cache des commandes, comme le panneau d'échange (Comp.OnCacheRefresh).
+    -- Hors échange, Update sort dès sa première ligne.
+    if COC.Companion and COC.Companion.OnCacheRefresh then
+        COC.Companion.OnCacheRefresh(function() Open:Update() end)
+    end
 end

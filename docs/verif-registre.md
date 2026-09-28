@@ -46,6 +46,16 @@ client.
 
 ## Relevés
 
+- 2026-09-28 15:40 — jusqu'a 2335752 — Forever, deux clients, client en ANGLAIS ; build déployé
+  `main-dev@99fbb57 2026-09-28 15:33` (`/co version` pas relu ; au build précédent `0f9e9f2`, lu en
+  jeu, les branches en test étaient `feat/echange-onglet-pulse, feat/icone-commande-recue`) — **GO
+  sur la lueur de l'onglet Enchantement à l'échange** — rapporté par le user (« j'ai bien la
+  lueur »), sans capture : une commande d'enchant de Gnomi acceptée par Rédemption, fenêtre de métier
+  fermée, l'onglet collé à l'échange pulse. Au build précédent, sans commande acceptée : pas de
+  lueur (voulu) et l'onglet au cadre doré « sélectionné » en permanence — corrigé par `2335752`.
+  Non vu : l'onglet au repos sans son cadre doré (pas de capture après le correctif), le clic qui
+  ouvre l'Enchantement, une commande acceptée PENDANT l'échange qui allume la lueur aussitôt.
+
 - 2026-09-28 14:45 — jusqu'a ff52e07 — Forever, deux clients, client en ANGLAIS ; build déployé
   `main-dev@48e937c 2026-09-28 14:35` (sortie de `deploy.ps1` ; `/co version` pas relu sur ces
   captures), branches en test `fix/aide-a-jour, feat/ui-p7a-journal, feat/ui-p7b-greffons` et
