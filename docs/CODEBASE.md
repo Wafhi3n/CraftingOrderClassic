@@ -17,13 +17,13 @@
 | `CraftingOrderClassic_Locale.lua` | socle de localisation du CHROME de l'UI. | 12 |
 | `CraftingOrderClassic_Locale_enUS.lua` | overlay ANGLAIS (enUS/enGB). | 279 |
 | `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 497 |
-| `CraftingOrderClassic_Locale_enUS_3.lua` | overlay enUS, 3/3. | 46 |
+| `CraftingOrderClassic_Locale_enUS_3.lua` | overlay enUS, 3/3. | 45 |
 | `CraftingOrderClassic_Locale_deDE.lua` | overlay ALLEMAND (deDE). | 281 |
 | `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 477 |
-| `CraftingOrderClassic_Locale_deDE_3.lua` | overlay deDE, 3/3. | 45 |
+| `CraftingOrderClassic_Locale_deDE_3.lua` | overlay deDE, 3/3. | 44 |
 | `CraftingOrderClassic_Locale_esES.lua` | overlay ESPAGNOL (esES/esMX). | 282 |
 | `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 478 |
-| `CraftingOrderClassic_Locale_esES_3.lua` | overlay esES, 3/3. | 46 |
+| `CraftingOrderClassic_Locale_esES_3.lua` | overlay esES, 3/3. | 45 |
 | `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 401 |
 | `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 398 |
 | `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 398 |
@@ -64,8 +64,8 @@
 | `CraftingOrderClassic_Social_Menu.lua` | entrées « Crafting Order » du menu contextuel joueur. | 104 |
 | `CraftingOrderClassic_Social_Roster.lua` | affichage des métiers sur les fenêtres NATIVES. | 130 |
 | `CraftingOrderClassic_Minimap.lua` | bouton minimap (toggle du carnet). | 185 |
-| `CraftingOrderClassic_MinimapIndicator.lua` | icônes d'état dans la barre de la minicarte (Forever). | 106 |
-| `CraftingOrderClassic_MinimapIndicator_Orders.lua` | 2e icône de la barre de la minicarte : « une commande t'attend ». | 131 |
+| `CraftingOrderClassic_MinimapIndicator.lua` | icônes d'état dans la barre de la minicarte (Forever). | 123 |
+| `CraftingOrderClassic_MinimapIndicator_Orders.lua` | icônes « une commande t'attend » dans la barre de la minicarte. | 187 |
 | `CraftingOrderClassic_Nameplate.lua` | icône « recherche de travail » (LFW) sur les plaques. | 123 |
 | `CraftingOrderClassic_ProfOrders.lua` | COORDINATEUR d'événements de la fenêtre métier. | 83 |
 | `CraftingOrderClassic_RecipeCats.lua` | SOUS-CATÉGORIES de recettes (moteur + registre). | 122 |
@@ -1184,8 +1184,12 @@
 >                                  -- useAtlasSize="true" du XML de Blizzard) au lieu d'être étiré
 >       def.tooltip(tt)            -- remplit GameTooltip (lignes après le titre « Crafting Order »)
 >       def.onClick(button)        -- facultatif
->   UI:SetIndicator(key, shown)    -- l'allume ou l'éteint ; rend vrai si la barre existe
+>   UI:SetIndicator(key, shown[, count])
+>                                  -- l'allume ou l'éteint ; rend vrai si la barre existe. `count` :
+>                                  -- un nombre dans le coin bas droit, comme un objet des sacs (nil = rien)
 > Le cadre n'est créé qu'au premier allumage. Sans la barre (hors Forever), SetIndicator ne fait rien.
+> La barre n'est recomposée (`Layout`) que quand une icône apparaît ou disparaît : un nombre qui change
+> ne touche qu'au texte.
 > 
 > ⚠️ `MinimapCluster` est un cadre du MODE ÉDITION. Méthode mesurée dans TaintLab le 2026-09-27
 > (`/tlab indica`, variante A choisie par le user) puis revue en jeu dans COC le 2026-09-28 (relevé
@@ -1193,17 +1197,18 @@
 > bascules en combat comprises. Ne pas changer de méthode (cadre à nous collé contre la barre, SetPoint
 > à la main dans la barre…) sans remesurer au labo.
 
-**API** : `UI:DefineIndicator(key, def)` · `UI:SetIndicator(key, shown)` · `UI:SetUpdateIndicator(shown)`
+**API** : `UI:DefineIndicator(key, def)` · `UI:SetIndicator(key, shown, count)` · `UI:SetUpdateIndicator(shown)`
 
 ### `CraftingOrderClassic_MinimapIndicator_Orders.lua`
-> CraftingOrderClassic_MinimapIndicator_Orders.lua — 2e icône de la barre de la minicarte : « une
-> commande t'attend ». Spec : docs/specs/icone-commande-recue.md (rang 4, cf. icone-minicarte.md).
+> CraftingOrderClassic_MinimapIndicator_Orders.lua — icônes « une commande t'attend » dans la barre
+> de la minicarte. Spec : docs/specs/icone-commande-recue.md (rangs 4.xx, cf. icone-minicarte.md).
 > 
-> L'icône est un ÉTAT, pas un « non lu » (décision du user, 2026-09-28) : elle reste allumée tant
-> qu'au moins une commande NOMMÉE pour moi (ou pour un de mes rerolls) attend ma réponse, et s'éteint
-> seule quand plus aucune n'attend — acceptée, refusée, annulée, masquée, expirée. C'est le
-> comportement de l'icône des commandes personnelles de Blizzard (MiniMapCraftingOrderFrameMixin,
-> Blizzard_Minimap/Mainline/Minimap.lua).
+> Une icône PAR MÉTIER : l'icône du métier où la commande est arrivée, avec le nombre de commandes
+> dans le coin (décision du user, 2026-09-28, 2e tour). Chaque icône est un ÉTAT, pas un « non lu » :
+> elle reste tant qu'au moins une commande NOMMÉE pour moi (ou pour un de mes rerolls) attend ma
+> réponse dans ce métier, et s'éteint seule quand plus aucune n'attend — acceptée, refusée, annulée,
+> masquée, expirée. C'est le comportement de l'icône des commandes personnelles de Blizzard
+> (MiniMapCraftingOrderFrameMixin, Blizzard_Minimap/Mainline/Minimap.lua).
 > 
 > Une seule source de vérité, `UI:OrdersWaitingForMe()`, qui relit le cache. Les endroits où cet état
 > change appellent `UI:RefreshOrderIndicator()` : réception réseau (Orders:OnNetwork), accepter /

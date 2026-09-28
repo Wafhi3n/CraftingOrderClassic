@@ -76,10 +76,14 @@ disparaît quand on a mis à jour, ou quand l'alerte est oubliée (`/co version 
   `size`), `def.useAtlasSize` (l'atlas garde sa taille native, calé en haut à gauche, comme le
   `useAtlasSize="true"` du XML de Blizzard), `def.tooltip(tt)` (lignes après le titre « Crafting
   Order », posé par l'outil), `def.onClick(button)` facultatif.
-- `UI:SetIndicator(key, shown)` : allume ou éteint ; rend vrai si la barre existe. Le cadre n'est créé
-  qu'au premier allumage ; sans la barre (hors Forever), rien.
-- Rangs attribués : **3 = mise à jour** (`"update"`), **4 = une commande t'attend** (`"order"`,
-  spec `icone-commande-recue.md`). Réserver le suivant ici avant de le coder.
+- `UI:SetIndicator(key, shown[, count])` : allume ou éteint ; rend vrai si la barre existe. `count`
+  pose un nombre dans le coin bas droit (`NumberFontNormal`, comme un objet des sacs ; nil = rien). Le
+  cadre n'est créé qu'au premier allumage ; sans la barre (hors Forever), rien. La barre n'est
+  recomposée (`Layout`) que quand l'icône apparaît ou disparaît.
+- Rangs attribués : **3 = mise à jour** (`"update"`) ; **4.01 à 4.99 = une commande t'attend**, une
+  icône par métier (`"order:<métier>"`, spec `icone-commande-recue.md`) — la barre trie les
+  `layoutIndex` numériquement, les sous-rangs passent ; **5 = réservé** à « commande livrée ».
+  Réserver le suivant ici avant de le coder.
 
 ## Renvois
 

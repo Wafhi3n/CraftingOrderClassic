@@ -40,7 +40,6 @@ local en3 = {
     -- Icône « une commande t'attend » de la barre de la minicarte (2026-09-28)
     ["Commandes à ton nom : %d"] = "Orders in your name: %d",
     ["pour %s"] = "for %s",
-    ["Clic : ouvrir le métier de la plus récente."] = "Click: open the profession of the newest one.",
 }
 
 for k, v in pairs(en3) do L[k] = v end

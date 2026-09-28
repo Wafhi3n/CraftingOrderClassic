@@ -16,8 +16,12 @@
 --                                  -- useAtlasSize="true" du XML de Blizzard) au lieu d'être étiré
 --       def.tooltip(tt)            -- remplit GameTooltip (lignes après le titre « Crafting Order »)
 --       def.onClick(button)        -- facultatif
---   UI:SetIndicator(key, shown)    -- l'allume ou l'éteint ; rend vrai si la barre existe
+--   UI:SetIndicator(key, shown[, count])
+--                                  -- l'allume ou l'éteint ; rend vrai si la barre existe. `count` :
+--                                  -- un nombre dans le coin bas droit, comme un objet des sacs (nil = rien)
 -- Le cadre n'est créé qu'au premier allumage. Sans la barre (hors Forever), SetIndicator ne fait rien.
+-- La barre n'est recomposée (`Layout`) que quand une icône apparaît ou disparaît : un nombre qui change
+-- ne touche qu'au texte.
 --
 -- ⚠️ `MinimapCluster` est un cadre du MODE ÉDITION. Méthode mesurée dans TaintLab le 2026-09-27
 -- (`/tlab indica`, variante A choisie par le user) puis revue en jeu dans COC le 2026-09-28 (relevé
@@ -71,14 +75,27 @@ function UI:DefineIndicator(key, def)
     self._indicators[key] = { def = def }
 end
 
-function UI:SetIndicator(key, shown)
+-- Le nombre du coin, créé au premier usage. Police et coin de l'objet des sacs (NumberFontNormal).
+local function setCount(f, count)
+    if count == nil and not f.count then return end
+    if not f.count then
+        f.count = f:CreateFontString(nil, "OVERLAY", "NumberFontNormal")
+        f.count:SetPoint("BOTTOMRIGHT", 1, -1)
+    end
+    f.count:SetText(count and tostring(count) or "")
+end
+
+function UI:SetIndicator(key, shown, count)
     local b, ind = bar(), self._indicators[key]
     if not (b and ind) then return false end
     if not ind.frame then
         if not shown then return false end   -- rien à éteindre : pas de cadre créé pour rien
         ind.frame = build(b, ind.def)
     end
-    ind.frame:SetShown(shown and true or false)
+    local f, want = ind.frame, shown and true or false
+    setCount(f, count)
+    if f:IsShown() == want then return true end
+    f:SetShown(want)
     if b.Layout then b:Layout() end   -- la barre se recompose : l'icône prend ou rend sa place
     return true
 end

@@ -39,7 +39,6 @@ local de3 = {
     -- Icône « une commande t'attend » de la barre de la minicarte (2026-09-28)
     ["Commandes à ton nom : %d"] = "Aufträge auf deinen Namen: %d",
     ["pour %s"] = "für %s",
-    ["Clic : ouvrir le métier de la plus récente."] = "Klick: Beruf des neuesten öffnen.",
 }
 
 for k, v in pairs(de3) do L[k] = v end
