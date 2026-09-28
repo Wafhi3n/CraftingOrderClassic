@@ -21,6 +21,14 @@ function Skin.PriceText(copper)
     return table.concat(parts, " ")
 end
 
+-- L'inverse : un prix transporté (« 12po 5pa 3pc ») redevient un nombre de cuivre, pour TRIER le
+-- Carnet par prix. Illisible ou absent → 0.
+function Skin.PriceCopper(text)
+    if type(text) ~= "string" then return 0 end
+    local function n(unit) return tonumber(text:match("(%d+)%s*" .. unit)) or 0 end
+    return n("po") * 10000 + n("pa") * 100 + n("pc")
+end
+
 -- Repli du montant si le gabarit manquait : la rangée maison, sous le même contrat.
 local function moneyFallback(parent, w)
     local f = CreateFrame("Frame", nil, parent)
