@@ -50,6 +50,8 @@ local es3 = {
     -- Courrier : l'addon ne coupe plus une pile lui-même (2026-09-28)
     ["Il en manque %d au courrier : sépare-les d'une pile toi-même (Maj-clic sur la pile), puis dépose-les."] =
         "Faltan %d en el correo: sepáralos tú mismo de una pila (Mayús-clic en la pila) y luego colócalos.",
+    ["La pile de %d est prête dans ton sac : dépose-la toi-même dans le courrier."] =
+        "La pila de %d está lista en tu bolsa: colócala tú mismo en el correo.",
 }
 
 for k, v in pairs(es3) do L[k] = v end

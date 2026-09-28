@@ -87,16 +87,29 @@ local function splitIntoBag(C, bag, slot, n, itemID)
     C.PickupContainerItem(fb, fs)
     if CursorHasItem and CursorHasItem() then ClearCursor() end
     traceMail(string.format("-> coupe %d de %d/%d vers la case vide %d/%d", n, bag, slot, fb, fs))
-    C_Timer.After(0.3, function()
+    -- La case se relit toutes les 0,1 s, 2 s au plus : la petite pile arrive VERROUILLÉE, le temps que
+    -- le serveur confirme la coupe (vu au banc le 2026-09-28 : coupe faite, rien de joint après un
+    -- délai fixe de 0,3 s). On ne joint qu'une pile exacte ET déverrouillée.
+    local tries = 0
+    local function tryAttach()
+        tries = tries + 1
         local info = C.GetContainerItemInfo(fb, fs)
-        local id, cnt = info and info.itemID, info and info.stackCount
-        traceMail(string.format("case %d/%d après coupe : %s×%s", fb, fs, tostring(id), tostring(cnt)))
-        if id == itemID and cnt == n and _G.SendMailFrame and _G.SendMailFrame:IsShown()
-           and not (InCombatLockdown and InCombatLockdown()) then
-            C.UseContainerItem(fb, fs)                    -- la petite pile, entière
+        local id, cnt, locked = info and info.itemID, info and info.stackCount, info and info.isLocked
+        if id == itemID and cnt == n and not locked then
+            traceMail(string.format("case %d/%d prête après %d relecture(s) : %s×%s", fb, fs, tries, tostring(id), tostring(cnt)))
+            if _G.SendMailFrame and _G.SendMailFrame:IsShown() and not (InCombatLockdown and InCombatLockdown()) then
+                C.UseContainerItem(fb, fs)                -- la petite pile, entière
+            end
+            C_Timer.After(0.3, traceAttached)
+        elseif tries < 20 then
+            C_Timer.After(0.1, tryAttach)
+        else
+            traceMail(string.format("case %d/%d jamais prête : %s×%s, verrou %s", fb, fs, tostring(id), tostring(cnt), tostring(locked)))
+            print("|cFF33DD88Crafting Order|r " .. string.format(
+                L["La pile de %d est prête dans ton sac : dépose-la toi-même dans le courrier."], n))
         end
-        C_Timer.After(0.3, traceAttached)
-    end)
+    end
+    C_Timer.After(0.1, tryAttach)
     return true
 end
 
