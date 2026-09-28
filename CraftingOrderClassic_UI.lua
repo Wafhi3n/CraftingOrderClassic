@@ -27,7 +27,7 @@ function UI:Build()
     -- PAD_TOP plus bas). Les onglets sont au flanc droit depuis le palier 3 ; la hauteur est gardée.
     local f = Skin.MakeWindow("CraftingOrderClassicWindow", 868, 606, {
         title = TITLE, portrait = Skin.tex.scroll,
-        buttonBar = true,   -- barre d'actions native en bas (Destinataire/Poster de l'onglet Commande)
+        buttonBar = true, pageArt = true,   -- barre d'actions (Destinataire/Poster) ; fond des métiers (P6)
     })
     self.frame = f
 

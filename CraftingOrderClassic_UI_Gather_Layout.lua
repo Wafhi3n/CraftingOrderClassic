@@ -21,14 +21,15 @@ local PRICE_H = 54   -- hauteur de la zone « prix proposé » (centrage vertica
 -- _UI_HelpPlate.lua). Tag STRUCTUREL only ; directions : colonne gauche → RIGHT, colonne droite → LEFT.
 local SPEC = {
     x1 = 0, x2 = 848, vBottom = 18,
-    { id = "left", w = 333, top = -63, bottom = 20,
+    -- inset (palier 6) : les deux encarts de la fenêtre des métiers, comme l'onglet Commande.
+    { id = "left", w = 333, top = -63, bottom = 20, inset = "list",
       { id = "filters", h = 34, bg = true, dir = "cols", help = "filters", helpDir = "RIGHT",
         { id = "srch" } },
       { id = "verPills", h = 22, sep = false, help = "verPills", helpDir = "RIGHT" },
       { dir = "cols", sep = false,
         { id = "resources", help = "resources", helpDir = "RIGHT" },
         { id = "resGutter", w = 22, sep = false } } },
-    { top = -63, bottom = 20,
+    { top = -63, bottom = 20, inset = "page",
       { id = "detail", h = 160, padL = 5, padR = 5,
         { id = "ItemSelected", h = 46, dir = "cols", help = "ItemSelected", helpDir = "LEFT",
           { id = "resIcon",  w = 50 },

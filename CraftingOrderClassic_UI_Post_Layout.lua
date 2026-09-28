@@ -62,7 +62,9 @@ local PRICE_H = 66
 -- → RIGHT ; colonne droite (empilée) → LEFT.
 local SPEC = {
     x1 = 0, x2 = 848, vBottom = 18,
-    { id = "left", w = 333, top = -63, bottom = 20,
+    -- inset (palier 6) : la liste = l'encart sombre de la liste de recettes, le détail = l'encart sur
+    -- la pierre de la page, comme la fenêtre des métiers (Skin.WrapInset).
+    { id = "left", w = 333, top = -63, bottom = 20, inset = "list",
       { id = "filters", h = 34, bg = true, dir = "cols", help = "filters", helpDir = "RIGHT",
         { id = "srch" },
         { id = "qualityDropDown", w = 96,  sep = false },
@@ -78,7 +80,7 @@ local SPEC = {
       { dir = "cols", sep = false,
         { id = "plans", help = "plans", helpDir = "RIGHT" },
         { id = "plansGutter", w = 22, sep = false} }},
-    { top = -63, bottom = 20,
+    { top = -63, bottom = 20, inset = "page",
       -- Sous-zones de detail (SPEC user) : en-tête du plan / liste des réactifs — la jointure fine
       -- entre les deux est posée par le générateur (le filet dessiné à la main dans _BuildPostDetail
       -- a été retiré). `reagentsList` et non « Reagents » : le slot de filtre « reagents » existe déjà,
