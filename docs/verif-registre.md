@@ -36,6 +36,15 @@ client.
 
 ## Relevés
 
+- 2026-09-28 11:46 — jusqu'a d708cb1 — Forever, un client, client en ANGLAIS ; build
+  `main-dev@98b333c 2026-09-28 11:36`, branches en test `feat/banc-main-dev, fix/ui-p2b-debordements`
+  (lu dans la signature du `.toc` déployé ; `/co version` pas montré) — **GO sur les deux
+  débordements du lot 2b**, premier build servi par le banc — deux captures du user : dans
+  l'annuaire, « [Partner] Syrine Lytha… » tient sur une ligne, tronqué, sa sous-ligne intacte ; dans
+  Mes artisans (Pêche), les porteurs « Rédemption, Sheadra… » tiennent sur une ligne, tronqués.
+  Vu aussi : annuaire de 13 lignes avec sa barre, bande de cercle « CraftLinkNet » (v1.37).
+  Non vu : l'affichage du build par `/co version`, le message de liste vide des sourdines.
+
 - 2026-09-28 (15) — jusqu'a 5f7da55 — Forever, un client — **GO sur l'icône à 22 px** — capture du user
   (« c'est bien mieux ») : le logo « CO » lisible sous le nom de la zone, sans toucher la minicarte.
   PÉRIMÈTRE : la refonte en outil à plusieurs icônes qui suit (même méthode, même rendu) n'est pas revue.
