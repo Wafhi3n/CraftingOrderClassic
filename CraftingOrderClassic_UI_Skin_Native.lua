@@ -96,7 +96,7 @@ end
 --   onMoved   : function(point, relPoint, x, y) à la fin d'un drag (pour persister)
 --   onClose   : remplace le comportement du bouton fermer natif (ex. dock de la vue métier)
 --   strata    : défaut "HIGH"
---   pageArt   : le fond de page de la fenêtre des métiers au lieu du marbre (Skin.WindowPageArt)
+--   insets    : chaque bloc est un encart façon métiers, le marbre d'ensemble est masqué (Skin.WindowInsetLook)
 -- SetToplevel : les fenêtres COC partagent la strata → un clic remonte la fenêtre entière d'un bloc
 -- (fini l'interclassement des éléments) ; Raise à l'ouverture = la dernière ouverte devant.
 function Skin.MakeWindow(name, w, h, opts)
@@ -127,7 +127,7 @@ function Skin.MakeWindow(name, w, h, opts)
     end)
     if f.SetTitle and opts.title then f:SetTitle(opts.title) end
     if opts.portrait then Skin.SetWindowPortrait(f, opts.portrait) end
-    if opts.pageArt and Skin.WindowPageArt then Skin.WindowPageArt(f) end   -- fond des métiers (palier 6)
+    if opts.insets and Skin.WindowInsetLook then Skin.WindowInsetLook(f) end   -- encarts des métiers (palier 6)
     if opts.onClose and f.CloseButton then f.CloseButton:SetScript("OnClick", opts.onClose) end
     attachEscProxy(f, name, opts.onClose)
     -- BARRE D'ACTIONS native du template (opts.buttonBar) : ButtonFrameTemplate embarque une bande à

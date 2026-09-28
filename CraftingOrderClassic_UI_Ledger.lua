@@ -100,6 +100,7 @@ function UI:BuildOrdersTab(f)
         defs[i] = { id = id, label = labels[id], x = 12 + COL[id], w = nextCol and (nextCol - COL[id]) or 100 }
     end
     self.ordersHeader = Skin.MakeSortHeader(panel, -102, defs, function(id) UI:_SortOrders(id) end)
+    Skin.PanelInset(panel, "list", 8, -98, -16, 18)   -- le tableau dans un encart de liste (palier 6)
     self.hdrDest = self.ordersHeader.buttons.dest
 
     -- La liste défilante du kit (palier 2c) ; sa barre se loge dans le bord droit, où était celle de

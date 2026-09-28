@@ -218,7 +218,10 @@ local function buildCols(cf, node, w, ctx, secs)
     local x = 0
     for i, c in ipairs(node) do
         local cw = c.w or flexW
-        local f, inner = secFrame(cf, c, secs)
+        -- Deux encarts voisins : 1 px de retrait chacun à leur jointure, l'écart de 2 px de Blizzard.
+        local dl = (c.inset and i > 1 and node[i - 1].inset) and 1 or 0
+        local dr = (c.inset and i < #node and node[i + 1].inset) and 1 or 0
+        local f, inner = secFrame(cf, c, secs, dl, dr)
         f:SetWidth(cw)
         f:SetPoint("TOPLEFT", x, 0)
         f:SetPoint("BOTTOMLEFT", cf, "BOTTOMLEFT", x, 0)

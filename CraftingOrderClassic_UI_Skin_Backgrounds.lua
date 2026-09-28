@@ -1,83 +1,42 @@
--- CraftingOrderClassic_UI_Skin_Backgrounds.lua — les FONDS de la fenêtre des métiers de Forever
+-- CraftingOrderClassic_UI_Skin_Backgrounds.lua — les FONDS façon fenêtre des métiers de Forever
 -- (palier 6 de la revue d'interface ; le user : « ça doit être le même que les métiers »).
 --
--- Relevé dans la source Forever (Blizzard_ProfessionsFrame.xml, dossier Camelot, et
--- Blizzard_ProfessionsRecipeList.xml) : la page des métiers pose l'atlas PEINT
--- `Profession-Background-Template2` à sa taille sous le titre (TOPLEFT 3,-21), puis deux ENCARTS
--- séparés : la liste de recettes (fond `Professions-background-summarylist` + bordure NineSlice
--- `InsetFrameTemplate`) et la fiche (la même bordure, fond caché : la pierre de la page se voit).
--- Plus de marbre ni de barres sculptées entre blocs : c'étaient les briques de l'Era.
+-- Relevé dans la source Forever : le cadre des métiers hérite PortraitFrameTemplate, donc le MÊME
+-- fond rocher tuilé et les mêmes stries sous le titre que notre ButtonFrameTemplate. Ce qui fait son
+-- allure, ce sont ses ENCARTS : la liste de recettes (fond `Professions-background-summarylist` +
+-- bordure NineSlice `InsetFrameTemplate`, Blizzard_ProfessionsRecipeList.xml) et la fiche (même
+-- bordure). Plus de marbre d'un seul tenant ni de barres sculptées entre blocs.
+--
+-- ⚠️ PAS l'atlas `Profession-Background-Template2` en fond de fenêtre (essayé le 2026-09-28, retiré) :
+-- c'est l'image COMPOSÉE de la page des métiers, avec des ombres peintes là où SA liste (274 de large)
+-- et SON bord droit tombent. Posée sous nos colonnes (liste de 333, autres onglets), elle traçait de
+-- gros traits noirs au milieu du contenu, le miroir en recopiait un second, et son haut dessiné pour la
+-- barre de rang gâchait notre bande de titre. La vue métier peut l'employer parce qu'elle prolonge la
+-- page de Blizzard à l'identique ; une fenêtre à nous, non.
 
 local COC  = CraftingOrderClassic
 local Skin = COC.UI.Skin
 
-local PAGE_ATLAS = "Profession-Background-Template2"
 local LIST_ATLAS = "Professions-background-summarylist"
 
 local function atlasInfo(name)
     return C_Texture and C_Texture.GetAtlasInfo and C_Texture.GetAtlasInfo(name)
 end
 
--- L'art de page couvre `area` (un cadre SANS texture, qui ne sert qu'à donner le rectangle), peint
--- sur `owner` en BACKGROUND : les enfants de owner restent au-dessus. L'atlas est posé à sa LARGEUR
--- native puis prolongé par sa portion droite EN MIROIR — la méthode de la vue métier
--- (_ProfWindow_Camelot_PageArt.lua, validée en jeu) : un art peint à taille fixe s'écrase si on
--- l'étire, en miroir la couture est continue et l'échelle du motif conservée. Rend vrai si peint.
-function Skin.PageArt(owner, area)
-    local info = atlasInfo(PAGE_ATLAS)
-    if not (info and info.width and info.width > 0) then return false end
-    local file = info.file or info.fileID or info.filename
-    local uL, uR = info.leftTexCoord or 0, info.rightTexCoord or 1
-    local vT, vB = info.topTexCoord or 0, info.bottomTexCoord or 1
-    local main = owner:CreateTexture(nil, "BACKGROUND", nil, -5)
-    local fill = owner:CreateTexture(nil, "BACKGROUND", nil, -5)
-    main:SetPoint("TOPLEFT", area, "TOPLEFT"); main:SetPoint("BOTTOMLEFT", area, "BOTTOMLEFT")
-    fill:SetPoint("TOPLEFT", main, "TOPRIGHT"); fill:SetPoint("BOTTOMRIGHT", area, "BOTTOMRIGHT")
-    if not file then                       -- atlas sans fichier lisible : l'art étiré, jamais vide
-        main:SetAtlas(PAGE_ATLAS, false); main:SetWidth(info.width); fill:SetAtlas(PAGE_ATLAS, false)
-        return true
-    end
-    main:SetTexture(file); fill:SetTexture(file)
-    local function layout()
-        local w = area:GetWidth() or 0
-        if w <= 0 then return end
-        local artW = math.min(info.width, w)
-        main:SetWidth(artW)
-        main:SetTexCoord(uL, uL + (uR - uL) * (artW / info.width), vT, vB)
-        local band = w - artW
-        if band > 0 then
-            local frac = math.min(1, band / info.width)
-            fill:SetTexCoord(uR, uR - (uR - uL) * frac, vT, vB); fill:Show()
-        else
-            fill:Hide()
-        end
-    end
-    area:HookScript("OnSizeChanged", layout)
-    layout()
-    return true
-end
-
--- Le fond de page d'une fenêtre `ButtonFrameTemplate` (Skin.MakeWindow, opts.pageArt) : de sous le
--- titre (3,-21, l'ancre de Blizzard) jusqu'au bas de `f.Inset`, la bande grise comprise. Le marbre de
--- l'Inset, sa bordure d'ensemble et les stries de la bande sont masqués : chez Blizzard, ce sont les
--- ENCARTS de chaque bloc qui portent une bordure (Skin.WrapInset), pas la page entière.
-function Skin.WindowPageArt(f)
-    local area = CreateFrame("Frame", nil, f)
-    area:SetPoint("TOPLEFT", f, "TOPLEFT", 3, -21)
-    area:SetPoint("BOTTOMRIGHT", f.Inset or f, "BOTTOMRIGHT", 0, 0)
-    if not Skin.PageArt(f, area) then return false end
-    local inset = f.Inset
+-- Une fenêtre ButtonFrameTemplate dont chaque bloc est un encart (Skin.MakeWindow, opts.insets) : le
+-- marbre de `f.Inset` et sa bordure d'ensemble sont masqués — chez Blizzard, ce sont les ENCARTS qui
+-- portent une bordure, pas la page entière ; le rocher du cadre se voit entre eux.
+function Skin.WindowInsetLook(f)
+    local inset = f and f.Inset
     if inset and inset.Bg then inset.Bg:Hide() end
     if inset and inset.NineSlice then inset.NineSlice:Hide() end
-    if f.TopTileStreaks then f.TopTileStreaks:Hide() end
-    return true
 end
 
--- Encadre `frame` d'un ENCART de la page des métiers. kind = "list" (fond de la liste de recettes)
--- ou "page" (fond caché : la pierre de la page se voit à travers, comme la fiche de recette).
--- `dl`/`dr` : retrait des bords gauche/droit (1 px de chaque côté d'une jointure = l'écart de 2 px
--- que Blizzard laisse entre la liste et la fiche). Le gabarit a `useParentLevel` : l'encart reste au
--- niveau de `frame`, son contenu passe au-dessus.
+-- Encadre `frame` d'un ENCART de la fenêtre des métiers. kind = "list" (le fond sombre de la liste de
+-- recettes) ou "page" (fond caché : le rocher du cadre se voit à travers). `dl`/`dr` : retrait des
+-- bords gauche/droit (1 px de chaque côté d'une jointure = l'écart de 2 px que Blizzard laisse entre
+-- la liste et la fiche). Le gabarit a `useParentLevel` : l'encart reste au niveau de `frame`, son
+-- contenu (les enfants de `frame`) passe au-dessus.
 function Skin.WrapInset(frame, kind, dl, dr)
     local ok, ins = pcall(CreateFrame, "Frame", nil, frame, "InsetFrameTemplate")
     if not (ok and ins) then return nil end
@@ -93,4 +52,17 @@ function Skin.WrapInset(frame, kind, dl, dr)
         end
     end
     return ins
+end
+
+-- Un encart posé sur un RECTANGLE d'un panneau (les onglets sans SPEC : Carnet, Aide, Nouveautés).
+-- Le cadre porteur est au niveau du panneau : le contenu déjà posé dans le panneau (niveau + 1) reste
+-- au-dessus de la bordure. Rect en coordonnées du panneau : (x1, y1) haut-gauche, (x2, y2) bas-droit
+-- mesurés depuis le bord BAS-DROIT (x2 ≤ 0, y2 ≥ 0).
+function Skin.PanelInset(panel, kind, x1, y1, x2, y2)
+    local box = CreateFrame("Frame", nil, panel)
+    box:SetFrameLevel(panel:GetFrameLevel())
+    box:SetPoint("TOPLEFT", panel, "TOPLEFT", x1, y1)
+    box:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", x2, y2)
+    Skin.WrapInset(box, kind)
+    return box
 end
