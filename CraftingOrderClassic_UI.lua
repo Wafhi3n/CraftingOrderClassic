@@ -250,10 +250,16 @@ function UI:BuildOrdersTab(f)
     hdr(L["MÉTIER"], COL.prof); self.hdrDest = hdr(L["ARTISAN"], COL.dest); hdr(L["STATUT"], COL.status)
     Skin.MakeSeparator(panel, -118)
 
-    local scroll = CreateFrame("ScrollFrame", "CraftingOrderOrdersScroll", panel, "UIPanelScrollFrameTemplate")
-    scroll:SetPoint("TOPLEFT", 12, -124); scroll:SetPoint("BOTTOMRIGHT", -42, 22)
-    local content = CreateFrame("Frame", nil, scroll); content:SetSize(800, 10); scroll:SetScrollChild(content)
-    self.ordersContent = content; self.orderRows = {}
+    -- La liste défilante du kit (palier 2c) ; sa barre se loge dans le bord droit, où était celle de
+    -- l'ancien cadre. L'aide contextuelle (« i ») la pointe par UI.ordersHost.
+    local host = CreateFrame("Frame", nil, panel)
+    host:SetPoint("TOPLEFT", 12, -124); host:SetPoint("BOTTOMRIGHT", -20, 22)
+    self.ordersHost = host
+    self.orderList = Skin.MakeScrollList(host, {
+        extent = ROW_T,
+        build  = function(row) UI:_BuildOrderRow(row) end,
+        fill   = function(row, it) UI:_FillOrderRow(row, it) end,
+    })
 end
 
 -- Reflète l'état `orderFilter` dans le dropdown (libellé + coche). Nom conservé : ~2 appelants.
@@ -261,18 +267,17 @@ function UI:_RefreshOrderFilterTabs()
     if self.orderFilterDD then self.orderFilterDD:SetValue(self.orderFilter or "active") end
 end
 
-function UI:_OrderRow(i)
-    local row = self.orderRows[i]
-    if row then return row end
-    row = CreateFrame("Button", nil, self.ordersContent); row:SetSize(800, ROW_T)
-    row:SetPoint("TOPLEFT", 0, -(i - 1) * ROW_T)
+-- Construite une fois par cadre de la liste défilante. Colonnes à positions FIXES, alignées sur les
+-- en-têtes de BuildOrdersTab ; une ligne chacune, tronquée par « … » au lieu de passer à la ligne.
+function UI:_BuildOrderRow(row)
     row:RegisterForClicks("LeftButtonUp", "RightButtonUp")
     local hi = row:CreateTexture(nil, "HIGHLIGHT"); hi:SetAllPoints()
     hi:SetColorTexture(Skin.unpack(Skin.color.rowHover))
     row.badge = Skin.MakeBadge(row, 18); row.badge:SetPoint("LEFT", COL.name, 0)
     local function col(x, w)
         local fs = row:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-        fs:SetPoint("LEFT", x, 0); fs:SetWidth(w); fs:SetJustifyH("LEFT"); Skin.ApplyShadow(fs); return fs
+        fs:SetPoint("LEFT", x, 0); fs:SetWidth(w); fs:SetJustifyH("LEFT"); fs:SetWordWrap(false)
+        Skin.ApplyShadow(fs); return fs
     end
     row.name   = col(COL.name + 24, 284)
     row.qty    = col(COL.qty, 44)
@@ -281,8 +286,6 @@ function UI:_OrderRow(i)
     row.dest   = col(COL.dest, 96)
     row.status = col(COL.status, 80)
     row:SetScript("OnLeave", function() GameTooltip:Hide() end)
-    self.orderRows[i] = row
-    return row
 end
 
 -- Toast : notification éphémère skinnée (haut-centre), fade ≤160 ms + son. Réutilisable (ordre ciblé
@@ -319,73 +322,67 @@ function UI:RefreshOrders()
     if self.hdrDest then self.hdrDest:SetText(L["ARTISAN"]) end
     if self.orderFilter == "handoff" then return self:RefreshHandoff() end
     local archived, m = (self.orderFilter == "archived"), me()
-    local mine = {}
-    for _, o in pairs((COC.db and COC.db.orders) or {}) do if o.buyer == m then mine[#mine + 1] = o end end
-    table.sort(mine, function(a, b) return (a.ts or 0) > (b.ts or 0) end)
-    local n = 0
-    for _, o in ipairs(mine) do
-        if (archived and isPastOrder(o)) or (not archived and not isPastOrder(o)) then
-            n = n + 1
-            local row = self:_OrderRow(n)
-            local nm = COC.Orders:OrderName(o)
-            local r, g, b = Skin.RarityColor(o.itemID)
-            row.badge:Paint(r, g, b, Skin.FirstChar(nm), Skin.Icon(o.itemID, o.spellID))
-            row.name:SetText(nm); row.name:SetTextColor(r, g, b)
-            row.qty:SetText("|cFFCCCCCC" .. Skin.QtyText(o) .. "|r")
-            row.price:SetText(o.price and ("|c" .. Skin.hex.price .. o.price .. "|r") or "|cFF666666—|r")
-            row.prof:SetText("|c" .. Skin.hex.gold .. Skin.ProfLabel(o.profession) .. "|r")
-            row.dest:SetText(o.acceptedBy and ("|cFF33DD33" .. o.acceptedBy .. "|r")
-                or ("|cFF888888" .. L[o.recipient or "Tous"] .. "|r"))
-            local slabel, scol = Skin.StatusInfo(o.status)
-            row.status:SetText("|c" .. scol .. slabel .. "|r")
-            local label, fn = orderActionFor(o)
-            row:SetScript("OnClick", label and function() fn(); UI:Refresh() end or nil)
-            row:SetScript("OnEnter", label and function(rr)
-                GameTooltip:SetOwner(rr, "ANCHOR_RIGHT"); GameTooltip:AddLine(L["Clic : "] .. label, 1, 1, 1); GameTooltip:Show()
-            end or nil)
-            row:Show()
-        end
+    local items = {}
+    for _, o in pairs((COC.db and COC.db.orders) or {}) do
+        if o.buyer == m and archived == isPastOrder(o) then items[#items + 1] = { o = o } end
     end
-    for i = n + 1, #self.orderRows do self.orderRows[i]:Hide() end
-    self.ordersContent:SetHeight(math.max(n * ROW_T, 10))
-    Skin.AutoHideScroll("CraftingOrderOrdersScroll", self.ordersContent)
-    if n == 0 and self.orderRows[1] then
-        local row = self:_OrderRow(1); row.badge:Hide()
-        row.name:SetText("|cFF888888" .. L["Aucune commande. Onglet « Commande » pour en poster une."] .. "|r")
-        row.name:SetTextColor(0.6, 0.6, 0.6)
-        row.qty:SetText(""); row.price:SetText(""); row.prof:SetText(""); row.dest:SetText(""); row.status:SetText("")
-        row:SetScript("OnClick", nil); row:SetScript("OnEnter", nil); row:Show()
-    end
+    table.sort(items, function(a, b) return (a.o.ts or 0) > (b.o.ts or 0) end)
+    self:_SetOrderData(items, L["Aucune commande. Onglet « Commande » pour en poster une."])
 end
 
 -- Filtre « Confiées » : commandes (miennes + entrantes captées) qu'un artisan CONNU sait faire,
 -- gardées pour lui. Une ligne par (commande, artisan) ; statut = Remis (poussé cette session) vs
--- En attente (il n'est pas encore repassé). Réutilise le pool de lignes du Carnet (colonnes détournées).
+-- En attente (il n'est pas encore repassé). Mêmes lignes que le Carnet (colonnes détournées).
 function UI:RefreshHandoff()
-    local rows = (COC.Handoff and COC.Handoff:Pending()) or {}
-    local n = 0
-    for _, it in ipairs(rows) do
-        n = n + 1
-        local row = self:_OrderRow(n)
-        local r, g, b = Skin.RarityColor(it.itemID)
-        row.badge:Paint(r, g, b, Skin.FirstChar(it.name or "?"), Skin.Icon(it.itemID, it.spellID)); row.badge:Show()
-        row.name:SetText(it.name or "?"); row.name:SetTextColor(r, g, b)
-        row.qty:SetText("|cFFCCCCCC" .. Skin.QtyText(it) .. "|r")
-        row.price:SetText(it.price and ("|c" .. Skin.hex.price .. it.price .. "|r") or "|cFF666666—|r")
-        row.prof:SetText("|c" .. Skin.hex.gold .. Skin.ProfLabel(it.profession) .. "|r")
-        row.dest:SetText((it.online and "|cFF33DD33" or "|cFF888888") .. it.target .. "|r")
-        row.status:SetText(it.delivered and ("|cFF33DD33" .. L["Remis"] .. "|r") or ("|cFFFFCC00" .. L["En attente"] .. "|r"))
-        row:SetScript("OnClick", nil); row:SetScript("OnEnter", nil); row:Show()
-    end
-    for i = n + 1, #self.orderRows do self.orderRows[i]:Hide() end
-    self.ordersContent:SetHeight(math.max(n * ROW_T, 10))
-    Skin.AutoHideScroll("CraftingOrderOrdersScroll", self.ordersContent)
-    if n == 0 and self.orderRows[1] then
-        local row = self:_OrderRow(1); row.badge:Hide()
-        row.name:SetText("|cFF888888" .. L["Aucune commande confiée pour l'instant."] .. "|r"); row.name:SetTextColor(0.6, 0.6, 0.6)
-        row.qty:SetText(""); row.price:SetText(""); row.prof:SetText(""); row.dest:SetText(""); row.status:SetText("")
-        row:SetScript("OnClick", nil); row:SetScript("OnEnter", nil); row:Show()
-    end
+    local items = {}
+    for i, h in ipairs((COC.Handoff and COC.Handoff:Pending()) or {}) do items[i] = { h = h } end
+    self:_SetOrderData(items, L["Aucune commande confiée pour l'instant."])
+end
+
+-- Même filtre qu'au dernier remplissage : la position est gardée ; un autre filtre repart du haut.
+-- Le message de liste vide dépend du filtre. (Avant la liste défilante, il ne s'écrivait que si une
+-- ligne avait déjà existé : un Carnet vide dès l'ouverture restait muet.)
+function UI:_SetOrderData(items, emptyText)
+    if not self.orderList then return end
+    local same = (self._ordersFor == self.orderFilter)
+    self._ordersFor = self.orderFilter
+    self.orderList:SetEmpty(emptyText)
+    self.orderList:SetData(items, same)
+end
+
+-- Une ligne pour `it` = { o = commande } (En cours / Archivées) ou { h = remise } (Confiées). Le cadre
+-- sert tour à tour aux deux vues : tout est reposé, clic et survol compris.
+function UI:_FillOrderRow(row, it)
+    if it.h then return self:_FillHandoffRow(row, it.h) end
+    local o = it.o
+    local nm = COC.Orders:OrderName(o)
+    local r, g, b = Skin.RarityColor(o.itemID)
+    row.badge:Paint(r, g, b, Skin.FirstChar(nm), Skin.Icon(o.itemID, o.spellID)); row.badge:Show()
+    row.name:SetText(nm); row.name:SetTextColor(r, g, b)
+    row.qty:SetText("|cFFCCCCCC" .. Skin.QtyText(o) .. "|r")
+    row.price:SetText(o.price and ("|c" .. Skin.hex.price .. o.price .. "|r") or "|cFF666666—|r")
+    row.prof:SetText("|c" .. Skin.hex.gold .. Skin.ProfLabel(o.profession) .. "|r")
+    row.dest:SetText(o.acceptedBy and ("|cFF33DD33" .. o.acceptedBy .. "|r")
+        or ("|cFF888888" .. L[o.recipient or "Tous"] .. "|r"))
+    local slabel, scol = Skin.StatusInfo(o.status)
+    row.status:SetText("|c" .. scol .. slabel .. "|r")
+    local label, fn = orderActionFor(o)
+    row:SetScript("OnClick", label and function() fn(); UI:Refresh() end or nil)
+    row:SetScript("OnEnter", label and function(rr)
+        GameTooltip:SetOwner(rr, "ANCHOR_RIGHT"); GameTooltip:AddLine(L["Clic : "] .. label, 1, 1, 1); GameTooltip:Show()
+    end or nil)
+end
+
+function UI:_FillHandoffRow(row, h)
+    local r, g, b = Skin.RarityColor(h.itemID)
+    row.badge:Paint(r, g, b, Skin.FirstChar(h.name or "?"), Skin.Icon(h.itemID, h.spellID)); row.badge:Show()
+    row.name:SetText(h.name or "?"); row.name:SetTextColor(r, g, b)
+    row.qty:SetText("|cFFCCCCCC" .. Skin.QtyText(h) .. "|r")
+    row.price:SetText(h.price and ("|c" .. Skin.hex.price .. h.price .. "|r") or "|cFF666666—|r")
+    row.prof:SetText("|c" .. Skin.hex.gold .. Skin.ProfLabel(h.profession) .. "|r")
+    row.dest:SetText((h.online and "|cFF33DD33" or "|cFF888888") .. h.target .. "|r")
+    row.status:SetText(h.delivered and ("|cFF33DD33" .. L["Remis"] .. "|r") or ("|cFFFFCC00" .. L["En attente"] .. "|r"))
+    row:SetScript("OnClick", nil); row:SetScript("OnEnter", nil)
 end
 
 -- (Les demandes « Entrantes » captées dans /commerce et /guilde sont désormais affichées dans la

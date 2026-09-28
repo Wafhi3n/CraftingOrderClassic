@@ -28,38 +28,52 @@ function UI:ToggleGatherSection(ckey)
     self:RefreshGatherList()
 end
 
--- En-tête : chevron +/- (TEXTURE native — la police rend « ▾ » en tofu), libellé doré (section) ou
--- bronze (sous-catégorie, indentée), et compte. Cliquable → replie/déplie.
+-- Hauteur d'une ligne, lue par la liste défilante pour chaque donnée : mêmes mesures que la liste
+-- des plans de Commande (une section porte la barre d'en-tête des métiers, plus haute).
+local H_SECTION, H_SUB, H_RES = 25, 20, 20
+function UI:_GatherResExtent(item)
+    if item.isHeader then return item.depth == 2 and H_SUB or H_SECTION end
+    return H_RES
+end
+
+-- En-tête : barre sombre et libellé doré pour une section, libellé bronze indenté sans barre pour une
+-- sous-catégorie, compte en gris, +/- à DROITE comme la liste des métiers (Skin.ListRowKind).
+-- Cliquable → replie/déplie (OnClick de _BuildGatherResRow). Pendant une recherche, tout est ouvert.
 function UI:_FillGatherHeader(row, item)
     local sub  = (item.depth == 2)
     local open = not self:_GatherCollapseTable()[item.ckey] or (self.gatherSearch or "") ~= ""
-    row.badge:Hide(); row.stack:SetText(""); row.entry = nil; row.tipItemID = nil
-    row.expand:SetTexture(open and "Interface\\Buttons\\UI-MinusButton-Up" or "Interface\\Buttons\\UI-PlusButton-Up")
-    row.expand:ClearAllPoints(); row.expand:SetPoint("LEFT", sub and 14 or 2, 0); row.expand:Show()
-    row.name:ClearAllPoints(); row.name:SetPoint("LEFT", row.expand, "RIGHT", 2, 0)
-    local cnt = (item.count and item.count > 0) and string.format(" |cFF888888(%d)|r", item.count) or ""
-    row.name:SetText((sub and "|cFFC9A227" or "|cFFE8B84B") .. (item.label or "") .. "|r" .. cnt)
-    row.name:SetTextColor(1, 1, 1)
-    local ckey = item.ckey
-    row:SetScript("OnClick", function() UI:ToggleGatherSection(ckey) end)
+    row.badge:Hide(); row.name:Hide(); row.stack:SetText(""); row.tipItemID = nil
+    Skin.ListRowKind(row, sub and "subheader" or "header", not open)
+    local label = item.label or ""
+    if item.count and item.count > 0 then label = label .. string.format(" |cFF888888(%d)|r", item.count) end
+    row.hdr:SetFontObject(sub and "GameFontNormalSmall" or "GameFontNormal")
+    row.hdr:ClearAllPoints()
+    row.hdr:SetPoint("LEFT", sub and 14 or 8, 0)
+    row.hdr:SetPoint("RIGHT", row.collapse, "LEFT", -4, 0)
+    row.hdr:SetText(label); row.hdr:Show()
+    if sub then row.hdr:SetTextColor(0.79, 0.64, 0.15) else row.hdr:SetTextColor(Skin.unpack(Skin.color.gold)) end
 end
 
--- Ressource : badge de rareté + nom (indenté sous sa sous-catégorie), sélection en doré.
+-- Ressource : badge de rareté + nom (indenté sous sa sous-catégorie). La ressource choisie porte la
+-- surbrillance de sélection des métiers au lieu de voir son nom repeint en or : la couleur d'un objet
+-- dit sa RARETÉ, et le chrome n'y touche pas (invariant du kit).
 function UI:_FillGatherRow(row, item)
+    if item.isHeader then return self:_FillGatherHeader(row, item) end
+    Skin.ListRowKind(row, "item")
+    row.hdr:Hide()
     local e = item.e
     local indent = item._sub and 14 or 0
     local r, g, b = Skin.RarityColor(e.itemID)
-    row.expand:Hide()
     row.badge:ClearAllPoints(); row.badge:SetPoint("LEFT", 2 + indent, 0); row.badge:Show()
     row.badge:Paint(r, g, b, Skin.FirstChar(item.name), Skin.Icon(e.itemID))
     row.name:ClearAllPoints(); row.name:SetPoint("LEFT", 20 + indent, 0)
+    row.name:SetPoint("RIGHT", row.stack, "LEFT", -6, 0)
     local disp = item.name:match("^item:") and ("|cFF777777" .. L["Chargement…"] .. "|r") or item.name
-    row.name:SetText(disp); row.name:SetTextColor(r, g, b)
-    if e == self.gatherEntry then row.name:SetTextColor(1, 0.85, 0.27) end
+    row.name:SetText(disp); row.name:SetTextColor(r, g, b); row.name:Show()
+    row.selected:SetShown(e == self.gatherEntry)
     -- Valeur HV Auctionator (à droite) : prix vendeur ou hôtel des ventes. Vide si Auctionator absent ou
     -- prix inconnu. C'est l'usage phare de Auctionator pour la récolte (cf. sa vue Minage).
     local val = COC.Profit and COC.Profit:ItemValue(e.itemID)
     row.stack:SetText(val and COC.Api.Coin(val) or "")
-    row.entry = e; row.tipItemID = e.itemID
-    row:SetScript("OnClick", function() UI:SelectGatherItem(e) end)
+    row.tipItemID = e.itemID
 end

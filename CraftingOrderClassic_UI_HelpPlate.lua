@@ -108,7 +108,7 @@ function UI:_HelpConfigFor(tab)
             controls = {
                 { frame = UI.orderFilterDD, dir = "DOWN",
                   text = L["Filtre ton carnet : commandes En cours, Archivées, ou Confiées (gardées pour un artisan)."] },
-                { frame = _G.CraftingOrderOrdersScroll, dir = "LEFT",
+                { frame = UI.ordersHost, dir = "LEFT",
                   text = L["Le Carnet = TES commandes postées. Accepter/livrer se fait dans la Vue Métier, pas ici ; quand une commande t'est remise, le bouton « J'ai reçu » confirme la réception."] },
             },
         }
