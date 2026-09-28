@@ -375,6 +375,17 @@ local news = {
         "In WoW Forever hat jeder Charakter einen Nachnamen, und das Spiel nennt dich überall 'Vorname Nachname'. Das Addon benutzte nur deinen Vornamen und erkannte sich selbst nicht mehr: Ein Auftrag an dich kam an und wurde ignoriert, ein im Kanal geposteter Auftrag wurde verworfen, als würde jemand im Namen eines anderen posten, und du konntest in deiner eigenen Handwerkerliste auftauchen. Behoben, auch für Aufträge von Spielern, die noch 1.36.1 nutzen.",
     ["Une ligne du canal Commerce comme « dont need fire wand: [Lesser Magic Wand] » n'est plus prise pour une demande."] =
         "Eine Handelszeile wie 'dont need fire wand: [Lesser Magic Wand]' gilt nicht mehr als Anfrage.",
+    -- v1.39.0
+    ["La fenêtre prend l'allure du jeu"] =
+        "Das Fenster sieht aus wie das Spiel",
+    ["Les onglets de la fenêtre passent sur son bord droit, en icônes, comme dans la fenêtre de métier. Survole-les pour lire leur nom ; le titre dit où tu es, et l'icône du Carnet compte tes commandes en cours."] =
+        "Die Tabs des Fensters sitzen jetzt als Symbole am rechten Rand, wie im Berufsfenster. Fahre darüber, um ihren Namen zu lesen; der Titel zeigt, wo du bist, und das Symbol des Auftragsbuchs zählt deine offenen Aufträge.",
+    ["Toutes les listes et les pages défilent avec la barre fine du jeu, qui se cache quand tout tient : ressources de Récolte, Carnet, Aide, Nouveautés, et les vues Commandes, Route, Manquantes et Profit de la fenêtre de métier. Chaque bloc est posé dans un encart, comme dans la fenêtre de métier."] =
+        "Alle Listen und Seiten scrollen mit der schmalen Bildlaufleiste des Spiels, die sich versteckt, wenn alles passt: Ressourcen in Sammeln, Auftragsbuch, Hilfe, Neues sowie die Ansichten Aufträge, Route, Fehlend und Gewinn im Berufsfenster. Jeder Block sitzt in einem Einsatz, wie im Berufsfenster.",
+    ["Dans Commande, la commission est la case or, argent, cuivre du jeu, et la quantité a des flèches. Le Carnet se trie : clique l'en-tête d'une colonne, reclique pour inverser. Le Journal et la fiche « Poster en quête » prennent le cadre du journal de quêtes du jeu, livre et parchemin."] =
+        "In Auftrag ist die Provision das Gold-, Silber- und Kupferfeld des Spiels, und die Menge hat Pfeile. Das Auftragsbuch lässt sich sortieren: Klicke auf einen Spaltenkopf, erneut zum Umkehren. Das Journal und das Blatt 'Als Quest erstellen' nutzen den Rahmen des Questlogs, mit Buch und Pergament.",
+    ["Les panneaux de l'échange et du courrier prennent l'allure de ces fenêtres. Le courrier ne liste plus que ce qui se poste : un enchantement se fait à l'échange, où l'onglet Enchantement brille quand une commande d'enchant acceptée te lie à ton partenaire. L'Aide est réécrite, et ses flèches affichées en carrés sont réparées."] =
+        "Die Panels an Handel und Post passen jetzt zu diesen Fenstern. Die Post listet nur noch, was sich verschicken lässt: Eine Verzauberung geschieht im Handel, wo der Verzauberkunst-Tab leuchtet, wenn dich ein angenommener Verzauberungsauftrag mit deinem Partner verbindet. Die Hilfe ist neu geschrieben, ihre als Quadrate angezeigten Pfeile sind repariert.",
     -- v1.38.0
     ["Un signe quand une mise à jour est là"] =
         "Ein Zeichen, wenn ein Update da ist",

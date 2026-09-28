@@ -378,6 +378,17 @@ local news = {
         "On WoW Forever every character has a surname, and the game calls you 'Firstname Surname' everywhere. The addon still used your first name alone and stopped recognizing itself: an order addressed to you arrived and was ignored, an order posted on the channel was thrown out as if someone were posting for another player, and you could show up in your own Artisans list. Fixed, including for orders from players still on 1.36.1.",
     ["Une ligne du canal Commerce comme « dont need fire wand: [Lesser Magic Wand] » n'est plus prise pour une demande."] =
         "A trade chat line like 'dont need fire wand: [Lesser Magic Wand]' is no longer taken for a request.",
+    -- v1.39.0
+    ["La fenêtre prend l'allure du jeu"] =
+        "The window looks like the game's",
+    ["Les onglets de la fenêtre passent sur son bord droit, en icônes, comme dans la fenêtre de métier. Survole-les pour lire leur nom ; le titre dit où tu es, et l'icône du Carnet compte tes commandes en cours."] =
+        "The window's tabs sit along its right edge as icons, like in the profession window. Hover one to read its name; the title tells you where you are, and the Ledger icon counts your open orders.",
+    ["Toutes les listes et les pages défilent avec la barre fine du jeu, qui se cache quand tout tient : ressources de Récolte, Carnet, Aide, Nouveautés, et les vues Commandes, Route, Manquantes et Profit de la fenêtre de métier. Chaque bloc est posé dans un encart, comme dans la fenêtre de métier."] =
+        "Every list and page scrolls with the game's thin scroll bar, which hides when everything fits: Gather resources, Ledger, Help, What's New, and the Orders, Route, Missing and Profit views of the profession window. Each block sits in an inset, like in the profession window.",
+    ["Dans Commande, la commission est la case or, argent, cuivre du jeu, et la quantité a des flèches. Le Carnet se trie : clique l'en-tête d'une colonne, reclique pour inverser. Le Journal et la fiche « Poster en quête » prennent le cadre du journal de quêtes du jeu, livre et parchemin."] =
+        "In Order, the commission is the game's gold, silver and copper box, and the quantity has arrows. The Ledger sorts: click a column header, click again to flip it. The Journal and the 'Post as quest' sheet use the game's quest log frame, book and parchment.",
+    ["Les panneaux de l'échange et du courrier prennent l'allure de ces fenêtres. Le courrier ne liste plus que ce qui se poste : un enchantement se fait à l'échange, où l'onglet Enchantement brille quand une commande d'enchant acceptée te lie à ton partenaire. L'Aide est réécrite, et ses flèches affichées en carrés sont réparées."] =
+        "The trade and mail panels match those windows. The mail panel only lists what can be mailed: an enchantment happens in a trade, where the Enchanting tab glows when an accepted enchant order links you to your partner. Help is rewritten, and its arrows that showed as squares are fixed.",
     -- v1.38.0
     ["Un signe quand une mise à jour est là"] =
         "A sign when there's an update",

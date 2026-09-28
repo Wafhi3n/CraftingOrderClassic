@@ -375,6 +375,17 @@ local news = {
         "En WoW Forever cada personaje tiene apellido, y el juego te llama 'Nombre Apellido' en todas partes. El addon seguía usando solo tu nombre y dejó de reconocerse: un pedido a tu nombre llegaba y se ignoraba, un pedido publicado en el canal se descartaba como si alguien publicara en nombre de otro, y podías aparecer en tu propia lista de artesanos. Corregido, también para los pedidos de jugadores que siguen en la 1.36.1.",
     ["Une ligne du canal Commerce comme « dont need fire wand: [Lesser Magic Wand] » n'est plus prise pour une demande."] =
         "Una línea del canal de Comercio como 'dont need fire wand: [Lesser Magic Wand]' ya no se toma por una petición.",
+    -- v1.39.0
+    ["La fenêtre prend l'allure du jeu"] =
+        "La ventana se parece al juego",
+    ["Les onglets de la fenêtre passent sur son bord droit, en icônes, comme dans la fenêtre de métier. Survole-les pour lire leur nom ; le titre dit où tu es, et l'icône du Carnet compte tes commandes en cours."] =
+        "Las pestañas de la ventana pasan a su borde derecho, como iconos, igual que en la ventana de profesión. Pasa el ratón por encima para leer su nombre; el título dice dónde estás, y el icono del Libro cuenta tus pedidos abiertos.",
+    ["Toutes les listes et les pages défilent avec la barre fine du jeu, qui se cache quand tout tient : ressources de Récolte, Carnet, Aide, Nouveautés, et les vues Commandes, Route, Manquantes et Profit de la fenêtre de métier. Chaque bloc est posé dans un encart, comme dans la fenêtre de métier."] =
+        "Todas las listas y páginas se desplazan con la barra fina del juego, que se oculta cuando todo cabe: recursos de Recolección, Libro, Ayuda, Novedades, y las vistas Pedidos, Ruta, Faltantes y Beneficio de la ventana de profesión. Cada bloque va en un recuadro, como en la ventana de profesión.",
+    ["Dans Commande, la commission est la case or, argent, cuivre du jeu, et la quantité a des flèches. Le Carnet se trie : clique l'en-tête d'une colonne, reclique pour inverser. Le Journal et la fiche « Poster en quête » prennent le cadre du journal de quêtes du jeu, livre et parchemin."] =
+        "En Pedido, la comisión es la casilla de oro, plata y cobre del juego, y la cantidad tiene flechas. El Libro se ordena: haz clic en el encabezado de una columna, otra vez para invertir. El Diario y la hoja 'Publicar como misión' usan el marco del registro de misiones del juego, con libro y pergamino.",
+    ["Les panneaux de l'échange et du courrier prennent l'allure de ces fenêtres. Le courrier ne liste plus que ce qui se poste : un enchantement se fait à l'échange, où l'onglet Enchantement brille quand une commande d'enchant acceptée te lie à ton partenaire. L'Aide est réécrite, et ses flèches affichées en carrés sont réparées."] =
+        "Los paneles del comercio y del correo se parecen ahora a esas ventanas. El correo solo lista lo que se puede enviar: un encantamiento se hace en el comercio, donde la pestaña Encantamiento brilla cuando un pedido de encantamiento aceptado te une a tu compañero. La Ayuda está reescrita, y sus flechas que se veían como cuadrados están arregladas.",
     -- v1.38.0
     ["Un signe quand une mise à jour est là"] =
         "Una señal cuando hay una actualización",

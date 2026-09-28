@@ -1,5 +1,34 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.39.0 - The window looks like the game's
+
+The whole interface now uses the pieces WoW Forever builds its own windows from. Orders work exactly
+as before, but the addon should feel like part of the game.
+
+The tabs of the main window sit along its right edge as icons, the way the profession window does it.
+Hover one to read its name. The window title tells you which tab you're on, and the Ledger icon shows
+how many of your orders are still open.
+
+Every list and page scrolls with the game's thin scroll bar, which hides itself when everything fits.
+That covers the Gather resources, the Ledger, Help, What's New, and the Orders, Route, Missing and
+Profit views in the profession window. Each block sits in the same dark inset as in the profession
+window.
+
+In the Order form, the commission is the game's gold, silver and copper box, and the quantity has the
+arrows you know from "Create All". The Ledger sorts now. Click a column header (order, quantity, price,
+profession, crafter, status) and click it again to flip the order. Newest first by default.
+
+The Journal and the quest sheet from "Post as quest" use the game's quest log frame, with the book in
+the corner and the parchment inside. The sheet shows who's asking in its title bar.
+
+The panels next to the trade and mail windows match them now. The mail panel only lists orders you can
+actually mail, so enchantments are left out, since those happen in a trade. And when you trade with
+someone whose enchantment order you've accepted, the Enchanting tab on the side of the trade window
+glows until you click it.
+
+Help has been rewritten for the new tabs, `/co circle` and the whisper network. Arrows that showed up
+as empty squares are fixed, and so are a few long names that spilled onto the next row.
+
 ## v1.38.0 - A sign when there's an update
 
 When the network tells the addon a newer version is out, the Crafting Order logo now shows up at the
