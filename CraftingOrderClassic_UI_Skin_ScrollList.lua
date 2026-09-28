@@ -21,6 +21,13 @@ local Skin = COC.UI.Skin
 
 local BAR_GAP = 4   -- entre la liste et sa barre (MinimalScrollBar fait 8 px de large)
 
+-- Marge entre le bord droit d'une liste et le séparateur de sa colonne. Les SPEC réservent à côté de
+-- chaque liste une gouttière de 22 px (`plansGutter`, `resGutter`…) : elle logeait la barre de
+-- l'ancien cadre, qui DÉBORDAIT de la liste. La barre moderne est logée dedans, et la gouttière
+-- restait vide, un « jeu » entre la barre et le séparateur (vu en jeu le 2026-09-28). Une liste
+-- s'ancre donc sur le bas-droit de SA GOUTTIÈRE, à LIST_EDGE px du bord.
+Skin.LIST_EDGE = 4
+
 -- La liste défilante. `host` = le cadre qu'elle remplit ; la barre se loge dans son bord droit.
 -- opts :
 --   extent = hauteur d'une ligne : nombre, ou fonction(donnée) -> nombre (en-têtes plus hauts) ;

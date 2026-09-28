@@ -67,13 +67,23 @@ function UI:_BuildGatherLeft()
     -- Liste des ressources : la liste défilante du kit (palier 2c), aux coins de la zone, comme la
     -- liste des plans de l'onglet Commande (palier 1) dont elle reprend les lignes et les en-têtes.
     local sec = self:GatherSec("resources")
-    local host = CreateFrame("Frame", nil, sec)
-    host:SetPoint("TOPLEFT", G.PAD, 0); host:SetPoint("BOTTOMRIGHT", 0, G.PAD)
-    self.gatherResList = Skin.MakeScrollList(host, {
+    self.gatherResHost = CreateFrame("Frame", nil, sec)
+    self:_AnchorGatherResHost(false)
+    self.gatherResList = Skin.MakeScrollList(self.gatherResHost, {
         extent = function(item) return UI:_GatherResExtent(item) end,
         build  = function(row) UI:_BuildGatherResRow(row) end,
         fill   = function(row, item) row.item = item; UI:_FillGatherRow(row, item) end,
     })
+end
+
+-- La liste couvre sa gouttière (cf. Skin.LIST_EDGE) et, quand les pills d'extension sont cachées
+-- (tout métier sauf « Élémentaire »), leur bande aussi : sinon deux vides encadraient la liste, sous
+-- la recherche et à droite de la barre (vus en jeu le 2026-09-28). Rappelé par _RefreshGatherVerPills.
+function UI:_AnchorGatherResHost(pills)
+    local host = self.gatherResHost; if not host then return end
+    host:ClearAllPoints()
+    host:SetPoint("TOPLEFT", self:GatherSec(pills and "resources" or "verPills"), "TOPLEFT", G.PAD, 0)
+    host:SetPoint("BOTTOMRIGHT", self:GatherSec("resGutter"), "BOTTOMRIGHT", -Skin.LIST_EDGE, G.PAD)
 end
 
 function UI:_ToggleGatherFlyout()

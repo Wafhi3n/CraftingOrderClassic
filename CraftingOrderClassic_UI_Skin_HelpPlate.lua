@@ -102,14 +102,19 @@ function Skin.MakeHelpButton(parent, onToggle, opts)
     local b = (opts.style == "portrait") and portraitButton(parent) or ringlessButton(parent, opts.size)
     local a = opts.point or { "CENTER", parent, "TOPLEFT", 8, 6 }
     b:ClearAllPoints(); b:SetPoint(a[1], a[2], a[3], a[4], a[5])
-    -- ⚠️ AU-DESSUS DU MÉDAILLON, et « parent + 20 » n'y suffit pas. Sur Forever, `ButtonFrameTemplate`
-    -- hérite de `PortraitFrameTemplate`, dont le `PortraitContainer` est posé à un niveau ABSOLU de
-    -- 400 (SharedUIPanelTemplates.xml, Mainline) : notre pastille, à quelques dizaines, passait
-    -- DESSOUS le portrait qu'elle chevauche, et on n'en voyait qu'un croissant (relevé en jeu par un
-    -- testeur le 2026-09-27). On se cale donc sur le conteneur quand le parent en a un.
+    -- ⚠️ AU-DESSUS DE TOUT LE CADRE DE LA FENÊTRE, et « parent + 20 » n'y suffit pas. Sur Forever,
+    -- `ButtonFrameTemplate` hérite de `PortraitFrameBaseTemplate` (SharedUIPanelTemplates.xml,
+    -- Mainline), dont les couches sont posées à des niveaux ABSOLUS : `PortraitContainer` 400,
+    -- `NineSlice` 500 (la bordure ET l'anneau du médaillon), `TitleContainer` 510. Deux fois vu :
+    -- la pastille à quelques dizaines passait sous le portrait (testeur, 2026-09-27) ; calée sur le
+    -- seul portrait (401), le grand « i » à cheval sur la bordure passait SOUS elle (2026-09-28 ; le
+    -- petit d'avant ne la chevauchait pas). Le gabarit de Blizzard, MainHelpPlateButton, est
+    -- d'ailleurs à 510 (Blizzard_HelpPlate.xml) : on se cale au-dessus de la plus haute des trois.
     local level = parent:GetFrameLevel() + 20
-    local pc = parent.PortraitContainer
-    if pc and pc.GetFrameLevel then level = math.max(level, pc:GetFrameLevel() + 1) end
+    for _, key in ipairs({ "PortraitContainer", "NineSlice", "TitleContainer" }) do
+        local layer = parent[key]
+        if type(layer) == "table" and layer.GetFrameLevel then level = math.max(level, layer:GetFrameLevel() + 1) end
+    end
     b:SetFrameStrata(helpStrata(parent)); b:SetFrameLevel(level)
     b:SetScript("OnClick", function() if onToggle then onToggle() end end)
     if opts.tooltip then

@@ -53,6 +53,7 @@ function UI:_RefreshGatherVerPills()
         p.btn:SetAlpha(enabled and 1 or 0.35)
         p.btn:EnableMouse(enabled and true or false)
     end
+    self:_AnchorGatherResHost(show)   -- la liste monte couvrir la bande quand elle est vide
 end
 
 function UI:_RefreshGatherDropdown()

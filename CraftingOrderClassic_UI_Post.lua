@@ -89,11 +89,13 @@ function UI:_BuildPostLeft()
     -- première ligne de la liste depuis le passage des filtres sur une ligne, vu sur capture user.)
 
     -- La liste remplit le bloc : ancrée aux QUATRE coins (marge PAD), elle suit la zone sans recalcul,
-    -- et sa barre (8 px) se loge dans son bord droit au lieu de déborder dans la gouttière.
+    -- et sa barre (8 px) se loge dans son bord droit ; elle recouvre la gouttière, que seule l'ancienne
+    -- barre occupait (cf. Skin.LIST_EDGE).
     -- `postPlanScroll` garde son nom : la silhouette d'enchantement (_UI_Post_Paperdoll) le masque
     -- quand elle prend la place de la liste.
     local host = CreateFrame("Frame", nil, sec)
-    host:SetPoint("TOPLEFT", P.PAD, 0); host:SetPoint("BOTTOMRIGHT", 0, P.PAD)
+    host:SetPoint("TOPLEFT", P.PAD, 0)
+    host:SetPoint("BOTTOMRIGHT", self:PostSec("plansGutter"), "BOTTOMRIGHT", -Skin.LIST_EDGE, P.PAD)
     self.postPlanScroll = host
     self.postPlanList = Skin.MakeScrollList(host, {
         extent = function(item) return UI:_PostPlanExtent(item) end,
