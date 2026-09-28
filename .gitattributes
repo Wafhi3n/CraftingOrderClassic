@@ -1,0 +1,5 @@
+# Le registre de vérification en jeu reçoit des relevés de plusieurs sessions en parallèle, chacune
+# en tête de la section sur sa branche : fusionner en gardant les lignes des DEUX côtés, sans
+# conflit (cf. l'en-tête de docs/verif-registre.md). Un journal qu'on ne fait qu'allonger s'y prête ;
+# une ligne modifiée des deux côtés ressortirait en double, à relire après la fusion.
+docs/verif-registre.md merge=union

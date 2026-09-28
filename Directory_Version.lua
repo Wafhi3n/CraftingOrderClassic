@@ -131,6 +131,15 @@ function Dir:VersionCmd(rest)
         return
     end
     p(string.format(COC.L["Crafting Order — version %s"], (self:_MyVersion() and self._myVerStr) or "?"))
+    -- Signature du build posée par deploy.ps1 dans la COPIE déployée du .toc (banc main-dev, cf. le
+    -- CLAUDE.md de l'outillage) : ce qui tourne se lit dans le jeu. Une release n'en a pas.
+    local meta = (C_AddOns and C_AddOns.GetAddOnMetadata) or GetAddOnMetadata
+    local build = meta and meta("CraftingOrderClassic", "X-Build")
+    if build and build ~= "" then
+        p(string.format(COC.L["Build : %s"], build))
+        local branches = meta("CraftingOrderClassic", "X-Build-Branches")
+        if branches and branches ~= "" then p(string.format(COC.L["Branches en test : %s"], branches)) end
+    end
     if self._updateVer then
         p(string.format(COC.L["Nouvelle version disponible : %s"], self._updateVer))
         p(COC.L["(/co version reset si cette alerte est erronée)"])

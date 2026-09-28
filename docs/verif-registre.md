@@ -15,12 +15,18 @@ fonctionner ?* `scripts\untested.ps1` la pose au dépôt et rend la liste de ce 
 Après une séance au banc, on ajoute **en tête** de la section suivante une ligne de la forme :
 
 ```
-- AAAA-MM-JJ — jusqu'a <sha> — <banc> — <verdict> — <ce qui a été observé>
+- AAAA-MM-JJ HH:MM — jusqu'a <sha> — <build> — <verdict> — <ce qui a été observé>
 ```
 
 Le `<sha>` est le dernier commit **réellement présent dans le client** pendant la séance (celui que
-`deploy.ps1` a copié), pas le dernier commit du jour. Le reste est en clair, pour qu'un humain
-relise un verdict sans le décoder.
+`deploy.ps1` a copié), pas le dernier commit du jour. Le `<build>` est ce que `/co version` affiche
+dans le jeu (`main-dev@<sha>` et les branches en test) : on le recopie, on ne le déduit pas. Le
+reste est en clair, pour qu'un humain relise un verdict sans le décoder.
+
+**Plusieurs sessions écrivent ici en parallèle** (depuis le 2026-09-28), chacune sur sa branche.
+D'où l'heure plutôt qu'un numéro du jour : deux sessions prenaient le même « (14) ». Le fichier
+fusionne en `merge=union` (`.gitattributes`), les deux relevés se retrouvent l'un sous l'autre sans
+conflit, et `untested.ps1` fait l'union de tous les repères : l'ordre des lignes n'importe plus.
 
 Deux règles qui font la valeur du registre :
 
