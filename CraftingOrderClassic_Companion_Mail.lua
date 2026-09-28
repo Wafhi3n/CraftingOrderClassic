@@ -44,6 +44,23 @@ local function alreadyAttached(itemID)
     return false
 end
 
+-- Trace « mail » (/co trace, actif d'office sur Forever). Vu en jeu le 2026-09-28 : une commande ×1,
+-- une pile de 2 dans le sac, et « Remplir » en a joint DEUX — alors que ce cas doit passer par la
+-- coupe. Le raisonnement ne tranchait pas (les deux API existent, rien ne les remplace) : chaque
+-- décision se nomme ici, et ce qui est réellement joint se relit une demi-seconde plus tard.
+local function traceMail(msg) if COC.Trace then COC.Trace:Log("mail", msg) end end
+
+local function traceAttached()
+    local parts = {}
+    for i = 1, (ATTACHMENTS_MAX_SEND or 12) do
+        if HasSendMailItem(i) then
+            local _, id, _, count = GetSendMailItem(i)
+            parts[#parts + 1] = string.format("%d:%s×%s", i, tostring(id), tostring(count))
+        end
+    end
+    traceMail("pièces jointes : " .. (#parts > 0 and table.concat(parts, " ") or "aucune"))
+end
+
 -- Joint l'objet crafté (itemID) au courrier jusqu'à `qty` exemplaires, depuis les sacs. N'ENVOIE RIEN
 -- (le joueur relit puis clique Envoyer). Piles entières via C_Container.UseContainerItem ; pile
 -- partielle finale via SplitContainerItem + ClickSendMailItemButton (attache exactement le reste).
@@ -61,11 +78,16 @@ local function attachItem(itemID, qty)
             if C.GetContainerItemID(bag, slot) == itemID and freeAttachSlot() then
                 local info = C.GetContainerItemInfo and C.GetContainerItemInfo(bag, slot)
                 local count = (info and info.stackCount) or 1
+                traceMail(string.format("sac %d/%d : objet %d, pile lue %s (info %s), voulu %d",
+                    bag, slot, itemID, tostring(info and info.stackCount), type(info), remaining))
                 if count <= remaining or not C.SplitContainerItem then
+                    traceMail("-> pile entière (UseContainerItem)")
                     C.UseContainerItem(bag, slot)                 -- pile entière
                     remaining = remaining - count
                 else
                     local dest = freeAttachSlot()
+                    traceMail(string.format("-> coupe %d (SplitContainerItem), dépôt en pièce jointe %s, ClickSendMailItemButton %s",
+                        remaining, tostring(dest), tostring(ClickSendMailItemButton ~= nil)))
                     C.SplitContainerItem(bag, slot, remaining)    -- exactement le reste sur le curseur
                     if dest and ClickSendMailItemButton then ClickSendMailItemButton(dest) end
                     remaining = 0
@@ -103,7 +125,10 @@ local function fill()
             local stackSize = select(8, COC.Api.GetItemInfo(o.itemID))
             if stackSize and stackSize > 1 then wantN = wantN * stackSize end
         end
+        traceMail(string.format("Remplir : commande %s, objet %s, qty %s, par pile %s -> %d voulu(s)",
+            tostring(o.id), tostring(o.itemID), tostring(o.qty), tostring(o.byStack), wantN))
         attachItem(o.itemID, wantN)
+        if C_Timer and C_Timer.After then C_Timer.After(0.5, traceAttached) end
     end
     if SendMailFrame_CanSend then SendMailFrame_CanSend() end
 end
