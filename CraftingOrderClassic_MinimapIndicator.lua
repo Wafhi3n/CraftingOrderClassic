@@ -17,6 +17,10 @@ local L   = COC.L
 
 local ICON         = "Interface\\AddOns\\CraftingOrderClassic\\Textures\\icon"   -- le logo « CO »
 local LAYOUT_INDEX = 3   -- après la lettre (1) et les commandes de Blizzard (2)
+-- Taille : la lettre de Blizzard fait 20×15 (Minimap.xml). Notre logo, carré et détaillé, était
+-- trop petit à 16 (avis du user, 2026-09-28) ; la barre s'accroche en HAUT, une icône plus haute
+-- descend vers la minicarte, et il reste de la place sous le nom de la zone.
+local ICON_SIZE    = 22
 
 local function bar()
     local mc = _G.MinimapCluster
@@ -37,13 +41,12 @@ end
 
 local function build(parent)
     local f = CreateFrame("Frame", nil, parent)
-    f:SetSize(18, 16)
+    f:SetSize(ICON_SIZE, ICON_SIZE)
     f.layoutIndex = LAYOUT_INDEX
     f:EnableMouse(true)
     local tex = f:CreateTexture(nil, "ARTWORK")
     tex:SetTexture(ICON)
-    tex:SetSize(16, 16)
-    tex:SetPoint("CENTER")
+    tex:SetAllPoints()
     f:SetScript("OnEnter", onEnter)
     f:SetScript("OnLeave", function() GameTooltip:Hide() end)
     f:SetScript("OnMouseUp", function()   -- le détail, comme /co version

@@ -64,7 +64,7 @@
 | `CraftingOrderClassic_Social_Menu.lua` | entrées « Crafting Order » du menu contextuel joueur. | 104 |
 | `CraftingOrderClassic_Social_Roster.lua` | affichage des métiers sur les fenêtres NATIVES. | 130 |
 | `CraftingOrderClassic_Minimap.lua` | bouton minimap (toggle du carnet). | 185 |
-| `CraftingOrderClassic_MinimapIndicator.lua` | icône d'état dans la barre de la minicarte (Forever). | 69 |
+| `CraftingOrderClassic_MinimapIndicator.lua` | icône d'état dans la barre de la minicarte (Forever). | 72 |
 | `CraftingOrderClassic_Nameplate.lua` | icône « recherche de travail » (LFW) sur les plaques. | 123 |
 | `CraftingOrderClassic_ProfOrders.lua` | COORDINATEUR d'événements de la fenêtre métier. | 83 |
 | `CraftingOrderClassic_RecipeCats.lua` | SOUS-CATÉGORIES de recettes (moteur + registre). | 122 |
