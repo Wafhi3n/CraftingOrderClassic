@@ -176,6 +176,18 @@ end
 -- explicite, /co circle) : jamais si le joueur a un cercle, ni s'il a éteint le rappel. Clubs illisibles
 -- (nil) : on s'abstient.
 
+-- Le rappel de connexion part en WHISPER À SOI-MÊME, pas en ligne d'addon : il arrive comme un vrai
+-- message reçu (rose, son de whisper, onglet des whispers), là où une ligne d'addon se noie dans la
+-- rafale du login, et son lien est cliqué dans la fenêtre de chat de Blizzard — le seul chemin propre
+-- (cf. firstTimePopup). Mesuré en jeu le 2026-09-28 (/run, envoi différé par C_Timer, donc hors action
+-- du joueur) : le serveur accepte qu'on se whispe, et le lien clubTicket arrive intact. Rend faux si
+-- l'envoi n'a pas pu partir : l'appelant retombe sur une ligne d'addon.
+local function whisperSelf(msg)
+    local me = COC.Api.PlayerName()
+    if not (_G.SendChatMessage and me and me ~= "?") then return false end
+    return (pcall(_G.SendChatMessage, msg, "WHISPER", nil, me))
+end
+
 -- Chaque décision du rappel de connexion laisse sa raison dans /co trace : le 2026-09-28, un lien
 -- attendu n'est jamais venu, et rien ne disait pourquoi.
 local function skip(force, why)
@@ -195,8 +207,9 @@ function Dir:ShowJoinLink(force)
         local has = self:HasCircle()
         if has ~= false then return skip(force, has and "a déjà un cercle" or "clubs illisibles") end
     end
-    p(string.format(L["Rejoins la communauté des artisans : %s — c'est là que Crafting Order trouve les autres joueurs."],
-        joinLink(c)))
+    local msg = string.format(L["Rejoins la communauté des artisans : %s — c'est là que Crafting Order trouve les autres joueurs."],
+        joinLink(c))
+    if force or not whisperSelf(msg) then p(msg) end   -- /co circle : demandé, une ligne suffit
     if not force then
         p("|cFF888888" .. L["(/co circle nolink : ne plus afficher ce rappel)"] .. "|r")
         if COC.Trace then COC.Trace:Log("net", "lien de la communauté proposé") end

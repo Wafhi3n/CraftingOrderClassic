@@ -117,6 +117,11 @@ Ce que le canal portait et qui se tait sans lui :
   (`/reload` pour s'en remettre). « HasRestrictions » dans la doc générée VAUT protection contre un
   appel venu d'un addon. **Retour à un seul « OK »**, verrouillé par test ; un lien dans le texte de la
   popup n'y échapperait pas (son clic passe par un OnHyperlinkClick fourni par l'addon).
+- **2026-09-28, user** : le rappel de connexion part en **whisper à soi-même** (idée du user, pour qu'il
+  ne se noie pas). Mesuré avant de coder, par un `/run` différé de 2 s (donc hors action du joueur) : le
+  serveur accepte qu'on se whispe, et le lien clubTicket arrive intact, sur deux lignes (« [Gnomi
+  Short] whispers » + « To [Gnomi Short] »). Son clic passe par la fenêtre de chat de Blizzard, le chemin
+  propre. Si l'envoi lève : repli sur une ligne d'addon. `/co circle` garde une simple ligne.
 - **2026-09-28, user** : communauté **Horde** au même nom, invitation `XGvoAXHvxd`. Son clubId 22973181
   vient de `chat-cache.txt` d'Orcaa (« Community:22973181:1 », seule communauté du perso, numéro plus
   récent que celui de l'Alliance) : c'est une déduction, que confirmera le message de marquage auto
