@@ -6,6 +6,10 @@ When a crafter mails you your order, taking the item out of your mailbox now mar
 the same way looting it does. The crafter gets the credit right away. Until now the order sat on
 Delivered and you had to click Received in the Ledger yourself.
 
+On the crafter's side, "Fill from order" could attach a whole stack to a smaller order, so an order
+for 1 went out with 9. It now splits the right amount off in your bags first and attaches only that.
+If there's no free bag slot for the split, chat tells you how many to split off yourself.
+
 ## v1.39.0 - The window looks like the game's
 
 The whole interface now uses the pieces WoW Forever builds its own windows from. Orders work exactly

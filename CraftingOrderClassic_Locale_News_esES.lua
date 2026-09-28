@@ -380,6 +380,8 @@ local news = {
         "Los pedidos enviados por correo se cierran solos",
     ["Quand un artisan t'envoie ta commande par courrier, prendre l'objet dans ta boîte aux lettres la marque reçue, comme quand tu le ramasses. L'artisan est crédité tout de suite. Avant, elle restait « Remise » et il fallait cliquer « J'ai reçu » dans le Carnet."] =
         "Cuando un artesano te envía tu pedido por correo, sacar el objeto del buzón lo marca como recibido, igual que al despojarlo. El artesano recibe el crédito al momento. Antes se quedaba en 'Entregado' y había que pulsar 'Recibido' en el Libro.",
+    ["Côté artisan, « Remplir depuis commande » pouvait joindre une pile entière à une commande plus petite : une commande de 1 partait avec 9. Il coupe maintenant la bonne quantité dans tes sacs et ne joint qu'elle ; sans case libre pour la coupe, le chat te dit combien séparer toi-même."] =
+        "Del lado del artesano, 'Rellenar desde pedido' podía adjuntar una pila entera a un pedido más pequeño: un pedido de 1 salía con 9. Ahora separa la cantidad justa en tus bolsas y solo adjunta eso; sin hueco libre para separar, el chat te dice cuántos separar tú mismo.",
     -- v1.39.0
     ["La fenêtre prend l'allure du jeu"] =
         "La ventana se parece al juego",

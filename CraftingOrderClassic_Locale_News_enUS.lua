@@ -383,6 +383,8 @@ local news = {
         "Mailed orders finish themselves",
     ["Quand un artisan t'envoie ta commande par courrier, prendre l'objet dans ta boîte aux lettres la marque reçue, comme quand tu le ramasses. L'artisan est crédité tout de suite. Avant, elle restait « Remise » et il fallait cliquer « J'ai reçu » dans le Carnet."] =
         "When a crafter mails you your order, taking the item out of your mailbox marks it as received, just like looting it. The crafter gets the credit right away. Before, it stayed on 'Delivered' and you had to click 'Received' in the Ledger.",
+    ["Côté artisan, « Remplir depuis commande » pouvait joindre une pile entière à une commande plus petite : une commande de 1 partait avec 9. Il coupe maintenant la bonne quantité dans tes sacs et ne joint qu'elle ; sans case libre pour la coupe, le chat te dit combien séparer toi-même."] =
+        "On the crafter's side, 'Fill from order' could attach a whole stack to a smaller order: an order for 1 went out with 9. It now splits the right amount off in your bags and attaches only that; with no free bag slot for the split, chat tells you how many to split off yourself.",
     -- v1.39.0
     ["La fenêtre prend l'allure du jeu"] =
         "The window looks like the game's",
