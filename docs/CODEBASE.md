@@ -4,7 +4,7 @@
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
-140 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
+141 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
 
 ## Modules (ordre de chargement)
 
@@ -31,11 +31,12 @@
 | `CraftingOrderClassic_UI_Skin.lua` | tokens + helpers SÉMANTIQUES du skin (métiers, statuts, rareté, quantités, icônes natives) et petits widgets d'affichage. | 450 |
 | `CraftingOrderClassic_UI_Skin_Native.lua` | kit de chrome Blizzard NATIF (le « framework » UI de COC). | 471 |
 | `CraftingOrderClassic_UI_Skin_ScrollList.lua` | la LISTE DÉFILANTE moderne du kit, palier 1 de la revue d'interface (docs/revue-ui-mainline.md). | 163 |
+| `CraftingOrderClassic_UI_Skin_SideTabs.lua` | la rangée d'ONGLETS LATÉRAUX de la fenêtre principale (palier 3 de la revue d'interface, décision D1 : « les onglets sur la droite, comme la vue métier »). | 77 |
 | `CraftingOrderClassic_UI_Skin_Dropdown.lua` | menu deroulant (selecteur) du kit natif. | 93 |
 | `CraftingOrderClassic_UI_Skin_Sections.lua` | kit de chrome natif, volet SECTIONS : comment on découpe l'intérieur d'une fenêtre en blocs et en zones. | 254 |
 | `CraftingOrderClassic_UI_Skin_HelpPlate.lua` | kit d'AIDE CONTEXTUELLE (le « bouton i » de retail). | 321 |
 | `CraftingOrderClassic_ShareReagents.lua` | « liste de courses » : diffuser en un clic les réactifs d'une recette (vue métier) ou d'une commande (carte) dans un canal de discussion, avec le LIEN objet de chaque réactif. | 157 |
-| `CraftingOrderClassic_UI.lua` | fenêtre principale (chrome Blizzard natif, kit UI_Skin_Native). | 489 |
+| `CraftingOrderClassic_UI.lua` | fenêtre principale (chrome Blizzard natif, kit UI_Skin_Native). | 496 |
 | `CraftingOrderClassic_UI_HelpPlate.lua` | AIDE CONTEXTUELLE de la FENÊTRE PRINCIPALE (« bouton i »). | 169 |
 | `CraftingOrderClassic_UI_Post_Layout.lua` | GÉOMÉTRIE de l'onglet « Commande » : colonnes, zones, séparateurs. | 132 |
 | `CraftingOrderClassic_UI_Post.lua` | onglet « Commande » : sélection de plan (gauche) + réactifs « je fournis » / commission g-s-c / ciblage artisan (droite). | 430 |
@@ -509,6 +510,12 @@
 > Le nom est ANCRÉ contre la source au lieu d'être dimensionné : la liste fixe la largeur de ses
 > lignes elle-même (même raison que le nom d'un plan, cf. _UI_Post_Profit).
 
+### `CraftingOrderClassic_UI_Skin_SideTabs.lua`
+
+**`Skin.MakeSideTabs(f, defs, onSelect)`**
+
+> `defs` = { { id, label, icon, atlas? }, ... } dans l'ordre d'affichage ; `onSelect(id)` au clic.
+
 ### `CraftingOrderClassic_UI_Skin_Dropdown.lua`
 
 **`Skin.MakeDropdown(name, parent, w, items, opts)`**
@@ -791,6 +798,22 @@
 > (risque 4 de la revue). Fenêtre principale seulement, jusqu'à un relevé en combat.
 
 **API** : `Skin.MakeScrollList(host, opts)` · `Skin.ListRowArt(row)` · `Skin.ListRowKind(row, kind, collapsed)` · `Skin.ArtisanRowArt(r)`
+
+### `CraftingOrderClassic_UI_Skin_SideTabs.lua`
+> CraftingOrderClassic_UI_Skin_SideTabs.lua — la rangée d'ONGLETS LATÉRAUX de la fenêtre principale
+> (palier 3 de la revue d'interface, décision D1 : « les onglets sur la droite, comme la vue métier »).
+> Montage copié de la fenêtre des métiers de Camelot (Blizzard_ProfessionsFrame.xml, dossier
+> Camelot) : le premier onglet au flanc DROIT du cadre, 60 px sous son haut, chacun 2 px sous le
+> précédent. Chaque onglet est un Skin.MakeSideTab (LargeSideTabButtonTemplate) : l'art, le survol,
+> la sélection et le son du clic sont ceux de Blizzard.
+> 
+> Même contrat que Skin.MakeTabs (les languettes du haut, qui restent pour la vue métier), pour que
+> l'appelant change à peine : bar.buttons[id], bar:Select(id), bar:SetText(id, texte). En plus :
+>   bar:SetCount(id, n) — un compteur sur l'icône, puisqu'un onglet latéral n'affiche aucun texte ;
+>   bar:Label(id)       — le libellé de base, pour le titre de la fenêtre.
+> Ici SetText change l'INFOBULLE : le nom d'un onglet ne se lit plus qu'au survol et dans le titre.
+
+**API** : `Skin.MakeSideTabs(f, defs, onSelect)`
 
 ### `CraftingOrderClassic_UI_Skin_Dropdown.lua`
 > CraftingOrderClassic_UI_Skin_Dropdown.lua — menu deroulant (selecteur) du kit natif.
