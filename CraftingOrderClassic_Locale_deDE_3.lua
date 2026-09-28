@@ -17,6 +17,18 @@ local de3 = {
     ["Aucun résultat pour cette recherche."] = "Keine Treffer fuer diese Suche.",
     ["Rien à afficher pour ce métier."] = "Fuer diesen Beruf gibt es nichts anzuzeigen.",
     ["Recettes proposées (%d/%d)"] = "Angebotene Rezepte (%d/%d)",
+    -- Réseau sans canal + communauté officielle (2026-09-28)
+    ["réseau par whisper"] = "Netzwerk über Flüstern",
+    ["canal : aucun — le réseau passe en whisper (cercles, amis, guilde)"] =
+        "Kanal: keiner — das Netzwerk läuft über Flüstern (Kreise, Freunde, Gilde)",
+    ["communauté officielle marquée comme cercle d'artisans : %s"] =
+        "offizielle Gemeinschaft als Handwerkerkreis markiert: %s",
+    ["Rejoins la communauté des artisans : %s — c'est là que Crafting Order trouve les autres joueurs."] =
+        "Tritt der Handwerker-Gemeinschaft bei: %s — dort findet Crafting Order die anderen Spieler.",
+    ["(/co circle nolink : ne plus afficher ce rappel)"] = "(/co circle nolink: diese Erinnerung nicht mehr anzeigen)",
+    ["rappel de la communauté éteint — /co circle link pour le rallumer."] =
+        "Gemeinschafts-Erinnerung aus — /co circle link schaltet sie wieder ein.",
+    ["rappel de la communauté rallumé."] = "Gemeinschafts-Erinnerung wieder an.",
 }
 
 for k, v in pairs(de3) do L[k] = v end

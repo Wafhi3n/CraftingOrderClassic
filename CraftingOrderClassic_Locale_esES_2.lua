@@ -60,11 +60,12 @@ local es2 = {
     ["canal : |cFFFFFFFF%s|r"] = "canal: |cFFFFFFFF%s|r",
     ["canal : non rejoint — |cFFFFFFFF/co channel on|r pour réessayer"] =
         "canal: no unido — |cFFFFFFFF/co channel on|r para reintentar",
-    ["auto-join du canal réseau désactivé — le carnet global ne fonctionnera plus (whisper/guilde restent actifs)."] =
-        "auto-unión al canal de red desactivada — el libro global dejará de funcionar (susurro/hermandad siguen activos).",
-    ["canal réseau (re)rejoint."] = "canal de red (re)unido.",
-    ["canal global actuel : |cFFFFFFFF%s|r. |cFFFFFFFF/co channel off|r pour le quitter, |cFFFFFFFF/co channel on|r pour le rejoindre."] =
-        "canal global actual: |cFFFFFFFF%s|r. |cFFFFFFFF/co channel off|r para salir, |cFFFFFFFF/co channel on|r para volver a unirte.",
+    ["canal quitté — le réseau passe en whisper par tes cercles, amis et guilde."] =
+        "canal abandonado — la red funciona ahora por susurros a través de tus círculos, amigos y hermandad.",
+    ["canal |cFFFFFFFF%s|r rejoint pour un diagnostic — il est morcelé sur Forever. |cFFFFFFFF/co channel off|r pour en sortir."] =
+        "unido a |cFFFFFFFF%s|r para diagnóstico — en Forever está dividido en salas separadas. |cFFFFFFFF/co channel off|r para salir.",
+    ["réseau sans canal (whisper). |cFFFFFFFF/co channel on|r rejoint |cFFFFFFFF%s|r pour un diagnostic."] =
+        "red sin canal (susurros). |cFFFFFFFF/co channel on|r se une a |cFFFFFFFF%s|r para diagnóstico.",
     ["(dés)activer le canal réseau global"] = "(des)activar el canal de red global",
     ["balise TEXTE émise=%s (canal idx=%s) — lance |cFFFFFFFF/co trace dump|r sur l'AUTRE perso et cherche |cFFFFFFFF[recv] beacon|r."] =
         "baliza TEXTO enviada=%s (canal idx=%s) — ejecuta |cFFFFFFFF/co trace dump|r en el OTRO personaje y busca |cFFFFFFFF[recv] beacon|r.",

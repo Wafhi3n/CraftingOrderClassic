@@ -431,11 +431,9 @@ function UI:Refresh()
     end
     self:_RefreshOrderFilterTabs()
     self:_SyncMainPortrait()
-    local CraftLink = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
     local D = COC.Directory
     self.status:SetText(string.format("|c%s" .. L["réseau"] .. "|r %s  ·  %d " .. L["en ligne"] .. "  ·  %d " .. L["artisan(s)"],
-        Skin.hex.muted,
-        (CraftLink and CraftLink:IsNetworkReady()) and ("|cFF33DD33" .. L["canal rejoint"] .. "|r") or "|cFFFFCC00…|r",
+        Skin.hex.muted, COC:NetworkLabel(),
         D and D:CountOnline() or 0, D and D:CountKnownCrafters() or 0))
 end
 

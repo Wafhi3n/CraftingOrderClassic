@@ -465,8 +465,8 @@ function Orders:Ping()
             if name ~= m and D.roster[name] then CraftLink:Send("PING|" .. ts, "whisper", name); count = count + 1 end
         end
     end
-    pmsg(string.format(L["PING envoyé (canal %s%s). En attente des PONG…"],
-        CraftLink:IsNetworkReady() and ("|cFF33DD33" .. L["rejoint"] .. "|r") or ("|cFFFF4444" .. L["PAS rejoint"] .. "|r"),
+    pmsg(string.format(L["PING envoyé (%s%s). En attente des PONG…"],
+        COC:NetworkLabel(),   -- « canal rejoint » ou « réseau par whisper » (Directory_Community)
         count > 0 and string.format(L[", +|cFFFFFFFF%d|r whisper(s)"], count) or ""))
 end
 

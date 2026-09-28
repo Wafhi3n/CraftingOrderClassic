@@ -1,7 +1,7 @@
 -- Crafting Order - Classic — Directory : l'annuaire des GENS (présence + qui peut crafter quoi).
--- Côté PRODUIT (pas dans la lib), séparé du registre de recettes (CraftLink). Présence via JOIN/LEAVE
--- du canal caché (Dir.online) ; recettes via RK sur le canal global (Dir.roster, persistant) ; PING/PONG
--- YELL en proximité. Discipline cache : réseau → Dir.roster (COC.db.roster) → UI (jamais le réseau direct).
+-- Côté PRODUIT (pas dans la lib), séparé du registre de recettes (CraftLink). Présence (Dir.online) = qui
+-- répond ; depuis le 2026-09-28 le canal est coupé et « global » part en whisper vers ces pairs
+-- (Directory_Community). Recettes → Dir.roster (persistant). Discipline : réseau → roster → UI.
 
 local COC = CraftingOrderClassic
 local Dir = {}
@@ -17,6 +17,16 @@ local function now() return (GetTime and GetTime()) or 0 end
 -- ------------------------------------------------------------------
 -- Réception
 -- ------------------------------------------------------------------
+-- Un artisan AJOUTÉ à la main vient d'apparaître en ligne : on le dit. Appelé à l'entrée dans le canal
+-- ET à la 1re réponse (_Touch) — sans canal, c'est le seul signal qui reste.
+function Dir:_ToastIfAdded(who)
+    local r = self.roster and self.roster[who]
+    if not (r and r.source == "added") then return end
+    local msg = string.format(L["ton artisan |cFFFFFFFF%s|r est en ligne."], who)
+    print("|cFF33DD88Crafting Order|r " .. msg)
+    if COC.UI and COC.UI.Toast then COC.UI:Toast(msg) end
+end
+
 function Dir:OnPresence(kind, who)
     if not who then return end
     -- Canal CUSTOM dédié (CraftLinkNet) : tout joiner EST un porteur (pas de bruit de joueurs lambda),
@@ -24,20 +34,11 @@ function Dir:OnPresence(kind, who)
     -- au bringup, mais réagir ici accélère sa découverte sans risque de spam.
     if kind == "join" then
         self.online[who] = true
-        local r = self.roster and self.roster[who]
-        if r and r.source == "added" then
-            local msg = string.format(L["ton artisan |cFFFFFFFF%s|r est en ligne."], who)
-            print("|cFF33DD88Crafting Order|r " .. msg)
-            if COC.UI and COC.UI.Toast then COC.UI:Toast(msg) end
-        end
+        self:_ToastIfAdded(who)
         if COC.Orders and COC.Orders.OnArtisanOnline then COC.Orders:OnArtisanOnline(who) end  -- push commande ciblée
         self:AnnounceThrottled()        -- un nouveau arrive → je (re)publie mes recettes (throttlé : anti-burst login en masse)
     else
-        self.online[who] = nil
-        if self.lfw and self.lfw[who] then          -- quitte le canal → son statut « recherche de travail » s'éteint
-            self.lfw[who] = nil
-            if COC.Nameplate and COC.Nameplate.Refresh then COC.Nameplate:Refresh(who) end
-        end
+        self:MarkOffline(who)   -- quitte le canal : hors ligne, LFW éteint (Directory_Community)
     end
     if COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end
 end
@@ -190,6 +191,7 @@ function Dir:_Touch(name)
     self.online[name] = true
     self:_NoteLinked(name, r)
     -- Transition hors-ligne → en ligne : pousse-lui mes commandes ouvertes qui le concernent (whisper).
+    if not wasOnline then self:_ToastIfAdded(name) end
     if not wasOnline and COC.Orders and COC.Orders.OnArtisanOnline then COC.Orders:OnArtisanOnline(name) end
     return r
 end
@@ -343,8 +345,11 @@ function Dir:_InstallWhisperErrorFilter()
         local who = msg and msg:match(pat)
         if who then
             who = shortName(who)
-            if Dir._lastPing and Dir._lastPing[who] and (now() - Dir._lastPing[who]) < 15 then
-                return true   -- avale l'erreur : c'était notre sondage de découverte
+            local pinged = Dir._lastPing and Dir._lastPing[who] and (now() - Dir._lastPing[who]) < 15
+            if pinged or (CraftLink and CraftLink.WhisperedRecently and CraftLink:WhisperedRecently(who, 15)) then
+                -- NOTRE whisper (sondage ou fanout sans canal) : on avale l'erreur, et il est hors ligne.
+                if Dir:MarkOffline(who) and COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end
+                return true
             end
         end
         return false
@@ -404,6 +409,7 @@ function Dir:Start()
     if self.StartVersion then self:StartVersion() end       -- détection maj (Directory_Version.lua)
     CraftLink:OnPresence(function(kind, who) Dir:OnPresence(kind, who) end)
     if CraftLink.OnBeacon then CraftLink:OnBeacon(function(who) Dir:OnBeacon(who) end) end
+    if self._WireNoChannel then self:_WireNoChannel() end   -- pairs du fanout sans canal (Directory_Community)
 
     CraftLink:StartTransport()
     self:_WireEvents()

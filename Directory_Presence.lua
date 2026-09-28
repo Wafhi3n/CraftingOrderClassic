@@ -71,6 +71,13 @@ function Dir:DiscoverFriendsAndGuild()
             if mayDiscover and not prev[name] then self:DiscoverPlayer(name) end
         end)
     end
+    -- Parti selon le JEU (ami, guildmate, membre de cercle) alors qu'il répondait en addon : sans canal,
+    -- plus aucun départ ne l'éteignait. On le SONDE au lieu de l'effacer — la vérité JEU ne doit pas
+    -- écrire la vérité ADDON (en-tête de ce fichier ; revue protocole 2026-09-28) : s'il est bien parti,
+    -- le serveur répond « aucun joueur nommé » et le filtre de Directory.lua l'éteint ; sinon il répond.
+    for name in pairs(prev) do
+        if not cur[name] and self.online and self.online[name] then self:DiscoverPlayer(name) end
+    end
     self._wasOnlineRel = cur
     self.onlineGame    = cur
     if COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end

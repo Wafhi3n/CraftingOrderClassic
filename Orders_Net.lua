@@ -235,6 +235,15 @@ function Orders:_OnCycle(action, message, sender)
     local f = Codec.Decode(message)
     local o = f and f.id and COC.db.orders[f.id]
     if not o then return end
+    -- Ma commande ANNULÉE reçoit un ACK/DLV : cet artisan ne l'a pas su. Sans canal, mon annulation ne
+    -- touche que les pairs qui m'ont répondu ; celui qui la tient d'un relais de proche en proche
+    -- (OnArtisanOnline) la croit ouverte, l'accepte, la fabrique — et n'est jamais détrompé (revue
+    -- protocole 2026-09-28). Je la lui renvoie, à lui seul : il est le seul à en avoir besoin.
+    if (action == "ACK" or action == "DLV") and o.status == "cancelled" and myChar(o.buyer) then
+        local cancel = Codec.Encode("CANCEL", o)
+        if cancel and sender and CraftLink then CraftLink:Send(cancel, "whisper", sender) end
+        return
+    end
     if action == "CANCEL" then
         -- Seul l'AUTEUR peut annuler — ou un perso de son set VÉRIFIÉ (extension pure : jamais un tiers).
         if samePlayer(sender, o.buyer) then o.status = "cancelled" end

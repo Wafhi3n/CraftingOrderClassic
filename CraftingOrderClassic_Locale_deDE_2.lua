@@ -59,11 +59,12 @@ local de2 = {
     ["canal : |cFFFFFFFF%s|r"] = "Kanal: |cFFFFFFFF%s|r",
     ["canal : non rejoint — |cFFFFFFFF/co channel on|r pour réessayer"] =
         "Kanal: nicht beigetreten — |cFFFFFFFF/co channel on|r zum Wiederholen",
-    ["auto-join du canal réseau désactivé — le carnet global ne fonctionnera plus (whisper/guilde restent actifs)."] =
-        "Auto-Beitritt zum Netzwerkkanal deaktiviert — das globale Auftragsbuch funktioniert nicht mehr (Flüstern/Gilde bleiben aktiv).",
-    ["canal réseau (re)rejoint."] = "Netzwerkkanal (wieder) beigetreten.",
-    ["canal global actuel : |cFFFFFFFF%s|r. |cFFFFFFFF/co channel off|r pour le quitter, |cFFFFFFFF/co channel on|r pour le rejoindre."] =
-        "aktueller globaler Kanal: |cFFFFFFFF%s|r. |cFFFFFFFF/co channel off|r zum Verlassen, |cFFFFFFFF/co channel on|r zum Beitreten.",
+    ["canal quitté — le réseau passe en whisper par tes cercles, amis et guilde."] =
+        "Kanal verlassen — das Netzwerk läuft jetzt über Flüstern an deine Kreise, Freunde und Gilde.",
+    ["canal |cFFFFFFFF%s|r rejoint pour un diagnostic — il est morcelé sur Forever. |cFFFFFFFF/co channel off|r pour en sortir."] =
+        "|cFFFFFFFF%s|r zur Diagnose beigetreten — auf Forever ist er in getrennte Räume aufgeteilt. |cFFFFFFFF/co channel off|r zum Verlassen.",
+    ["réseau sans canal (whisper). |cFFFFFFFF/co channel on|r rejoint |cFFFFFFFF%s|r pour un diagnostic."] =
+        "Netzwerk ohne Kanal (Flüstern). |cFFFFFFFF/co channel on|r tritt |cFFFFFFFF%s|r zur Diagnose bei.",
     ["(dés)activer le canal réseau global"] = "den globalen Netzwerkkanal (de)aktivieren",
     ["balise TEXTE émise=%s (canal idx=%s) — lance |cFFFFFFFF/co trace dump|r sur l'AUTRE perso et cherche |cFFFFFFFF[recv] beacon|r."] =
         "TEXT-Bake gesendet=%s (Kanal idx=%s) — führe |cFFFFFFFF/co trace dump|r auf dem ANDEREN Char aus und suche |cFFFFFFFF[recv] beacon|r.",

@@ -1,0 +1,206 @@
+-- Directory_Community.lua — le réseau SANS canal : la communauté remplace CraftLinkNet (Forever).
+--
+-- Sur Forever, un canal custom est MORCELÉ en salles par une clé inconnue (prouvé le 2026-09-27 : deux
+-- joueurs côte à côte ne s'entendaient pas dans CraftLinkNet, leurs whispers passaient). Le canal est
+-- donc coupé pour tout le monde, et trois morceaux prennent le relais :
+--   1. la glue réseau : la lib envoie « à tous » en whisper vers les pairs que DÉSIGNE l'annuaire
+--      (Dir.online), et prévient quand l'un d'eux ne répond plus — la présence que donnait le canal ;
+--   2. la communauté OFFICIELLE : reconnue par son clubId, marquée cercle d'office ;
+--   3. le lien « Rejoindre » dans le chat, à la connexion, pour qui n'a aucun cercle.
+-- Spec : docs/specs/communaute-sans-canal.md. Satellite de Directory.lua, chargé après Directory_Club.lua.
+
+local COC = CraftingOrderClassic
+local Dir = COC.Directory
+local L = COC.L
+local CraftLink = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
+
+local function p(m) print("|cFF33DD88Crafting Order|r " .. m) end
+
+-- ------------------------------------------------------------------
+-- 1. Glue réseau
+-- ------------------------------------------------------------------
+-- Les pairs EN LIGNE : ceux qui ont répondu en CraftLink dans la session, moi exclu. C'est l'audience
+-- exacte du canal quand il marchait — les joueurs de l'addon qu'on entend.
+function Dir:OnlinePeers()
+    local out, m = {}, COC.Api.PlayerName()
+    for name in pairs(self.online or {}) do
+        if name ~= m then out[name] = true end
+    end
+    return out
+end
+
+-- Un pair ne répond plus (départ du canal, whisper refusé, jeu qui le dit déconnecté) : il sort de
+-- l'annuaire EN LIGNE, et son statut « recherche de travail » s'éteint avec lui. Rend vrai s'il était en
+-- ligne ; l'appelant rafraîchit l'interface (OnPresence le fait déjà, les autres non).
+function Dir:MarkOffline(who)
+    if not who then return false end
+    local was = self.online and self.online[who] == true
+    if self.online then self.online[who] = nil end
+    if self.lfw and self.lfw[who] then
+        self.lfw[who] = nil
+        if COC.Nameplate and COC.Nameplate.Refresh then COC.Nameplate:Refresh(who) end
+    end
+    return was
+end
+
+local function refreshUI() if COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end end
+
+-- Branché par Dir:Start AVANT StartTransport : la lib doit connaître ses pairs dès son premier envoi.
+function Dir:_WireNoChannel()
+    if not (CraftLink and CraftLink.SetPeerSource) then return end
+    CraftLink:SetPeerSource(function() return Dir:OnlinePeers() end)
+    CraftLink:OnPeerOffline(function(who) if Dir:MarkOffline(who) then refreshUI() end end)
+end
+
+-- Libellé coloré de l'état du réseau, pour /co status, la barre d'état et /co ping.
+function COC:NetworkLabel()
+    local mode = CraftLink and CraftLink.NetworkMode and CraftLink:NetworkMode()
+    if mode == "whisper" then return "|cFF33DD33" .. L["réseau par whisper"] .. "|r" end
+    if mode == "channel" then return "|cFF33DD33" .. L["canal rejoint"] .. "|r" end
+    return "|cFFFFCC00" .. L["connexion…"] .. "|r"
+end
+
+-- ------------------------------------------------------------------
+-- 2. La communauté officielle
+-- ------------------------------------------------------------------
+-- Par camp : une communauté de personnage n'accueille qu'un camp. Reconnue par son clubId (le même sur
+-- les deux comptes du banc, relevé le 2026-09-27), jamais par son nom, qu'un propriétaire peut changer.
+-- `ticket` = code du lien d'invitation ILLIMITÉ créé par le user. Horde : aucune pour l'instant.
+local OFFICIAL = {
+    Alliance = { clubId = 22961321, ticket = "XGvzjrikY", name = "Crafting Order PVE" },
+}
+
+local function officialForMe()
+    local faction = UnitFactionGroup and UnitFactionGroup("player")
+    return faction and OFFICIAL[faction] or nil
+end
+
+local function isOfficialId(clubId)
+    for _, c in pairs(OFFICIAL) do
+        if tostring(c.clubId) == tostring(clubId) then return true end
+    end
+    return false
+end
+
+-- La communauté officielle, si elle est marquée cercle : elle prend la souscription de présence
+-- (Dir:FocusCircles — un seul club peut l'avoir).
+function Dir:OfficialCircleId()
+    for _, c in pairs(OFFICIAL) do
+        if self:IsCircle(c.clubId) then return c.clubId end
+    end
+    return nil
+end
+
+-- Démarquages VOLONTAIRES (/co circle <n>) : une communauté officielle démarquée à la main n'est plus
+-- jamais re-marquée d'office. Clés en chaîne, comme Dir:CircleIds.
+function Dir:CirclesOff()
+    if not COC.db then return {} end
+    COC.db.circlesOff = COC.db.circlesOff or {}
+    return COC.db.circlesOff
+end
+
+-- Rend false si les clubs sont illisibles (valeur secrète en instance, cf. Dir:EachClub) : « illisible »
+-- ne doit JAMAIS se lire « aucun club » — un membre recevrait le lien.
+local function eachClub(fn)
+    local ok, _, readable = pcall(Dir.EachClub, Dir, fn)
+    return ok and readable == true
+end
+
+-- true / false, ou nil si les clubs sont illisibles.
+function Dir:IsMemberOf(clubId)
+    local found = false
+    if not eachClub(function(info) if tostring(info.clubId) == tostring(clubId) then found = true end end) then
+        return nil
+    end
+    return found
+end
+
+-- Ai-je au moins un cercle ? Un clubId marqué dont je ne suis plus membre ne compte pas. nil = illisible.
+function Dir:HasCircle()
+    local has = false
+    if not eachClub(function(_, isCircle) if isCircle then has = true end end) then return nil end
+    return has
+end
+
+-- Rejoindre par le lien suffit : pas de /co circle à taper ensuite. Appelé sur les événements club
+-- (Directory_Club : INITIAL_CLUBS_LOADED, CLUB_ADDED) et au branchement des clubs.
+function Dir:AutoMarkOfficial()
+    local off = self:CirclesOff()
+    eachClub(function(info, isCircle)
+        if not isCircle and isOfficialId(info.clubId) and not off[tostring(info.clubId)] then
+            self:SetCircle(info.clubId, true)
+            p(string.format(L["communauté officielle marquée comme cercle d'artisans : %s"], tostring(info.name)))
+        end
+    end)
+end
+
+-- ------------------------------------------------------------------
+-- 3. Le lien « Rejoindre »
+-- ------------------------------------------------------------------
+-- Lien natif `|HclubTicket:<code>|h` : un clic ouvre Guilde & Communautés sur l'invitation
+-- (ItemRefHandlersShared → CommunitiesHyperlink.OnClickLink → RequestTicket → AddTicket). COC ne peut
+-- pas adhérer à la place du joueur (RedeemTicket est sécurisé) : le clic « Rejoindre » reste le sien.
+local function joinLink(c)
+    if _G.GetClubTicketLink and Enum and Enum.ClubType then
+        local ok, link = pcall(_G.GetClubTicketLink, c.ticket, c.name, Enum.ClubType.Character)
+        if ok and type(link) == "string" then return link end
+    end
+    return "|cFFFFD100|HclubTicket:" .. c.ticket .. "|h[" .. c.name .. "]|h|r"
+end
+
+-- Jamais pour un membre de la communauté officielle (même s'il l'a démarquée). Hors `force` (demande
+-- explicite, /co circle) : jamais si le joueur a un cercle, ni s'il a éteint le rappel. Clubs illisibles
+-- (nil) : on s'abstient.
+function Dir:ShowJoinLink(force)
+    local c = officialForMe()
+    if not (c and self:_ClubsAvailable()) or self:IsMemberOf(c.clubId) ~= false then return false end
+    if not force and ((COC.db and COC.db.circleLinkOff) or self:HasCircle() ~= false) then return false end
+    p(string.format(L["Rejoins la communauté des artisans : %s — c'est là que Crafting Order trouve les autres joueurs."],
+        joinLink(c)))
+    if not force then p("|cFF888888" .. L["(/co circle nolink : ne plus afficher ce rappel)"] .. "|r") end
+    return true
+end
+
+function Dir:SetJoinLinkOff(off)
+    if not COC.db then return end
+    COC.db.circleLinkOff = off and true or nil
+    p(off and L["rappel de la communauté éteint — /co circle link pour le rallumer."]
+          or L["rappel de la communauté rallumé."])
+end
+
+-- À la connexion INITIALE seulement (pas au /reload), et une fois les clubs chargés : avant, la liste des
+-- clubs est vide et tout membre recevrait le lien. Aucune API ne dit « clubs prêts » : on attend
+-- INITIAL_CLUBS_LOADED, écouté dès le chargement du fichier pour ne pas le rater s'il précède le login.
+-- Le délai laisse passer la rafale de messages du login (le lien s'y noierait) et le marquage auto.
+local LINK_DELAY = 8
+
+local NO_CLUBS_TRACE = 30   -- s : sans INITIAL_CLUBS_LOADED, pas de lien — mais on le dit dans la trace
+
+local function onLoginEvent(_, event, isInitialLogin)
+    if event == "PLAYER_ENTERING_WORLD" then
+        if isInitialLogin then
+            Dir._linkPending = true
+            -- Pas de repli qui afficherait le lien quand même : avant cet événement la liste des clubs est
+            -- VIDE, et un membre recevrait le lien. Mieux vaut un rappel manqué, visible dans /co trace.
+            if C_Timer and C_Timer.After then C_Timer.After(NO_CLUBS_TRACE, function()
+                if Dir._linkPending and COC.Trace then
+                    COC.Trace:Log("net", "INITIAL_CLUBS_LOADED jamais reçu : lien de la communauté non proposé")
+                end
+            end) end
+        end
+    else
+        Dir._clubsLoaded = true
+    end
+    if Dir._linkPending and Dir._clubsLoaded then
+        Dir._linkPending = nil
+        if C_Timer and C_Timer.After then C_Timer.After(LINK_DELAY, function() Dir:ShowJoinLink() end)
+        else Dir:ShowJoinLink() end
+    end
+end
+
+if CreateFrame then
+    local f = CreateFrame("Frame")
+    pcall(f.RegisterEvent, f, "INITIAL_CLUBS_LOADED")   -- absent d'un client sans communautés : sans effet
+    f:RegisterEvent("PLAYER_ENTERING_WORLD")
+    f:SetScript("OnEvent", onLoginEvent)
+end

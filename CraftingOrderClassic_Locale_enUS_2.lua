@@ -89,11 +89,12 @@ local en2 = {
     ["canal : |cFFFFFFFF%s|r"] = "channel: |cFFFFFFFF%s|r",
     ["canal : non rejoint — |cFFFFFFFF/co channel on|r pour réessayer"] =
         "channel: not joined — |cFFFFFFFF/co channel on|r to retry",
-    ["auto-join du canal réseau désactivé — le carnet global ne fonctionnera plus (whisper/guilde restent actifs)."] =
-        "network channel auto-join disabled — the global ledger will stop working (whisper/guild stay active).",
-    ["canal réseau (re)rejoint."] = "network channel (re)joined.",
-    ["canal global actuel : |cFFFFFFFF%s|r. |cFFFFFFFF/co channel off|r pour le quitter, |cFFFFFFFF/co channel on|r pour le rejoindre."] =
-        "current global channel: |cFFFFFFFF%s|r. |cFFFFFFFF/co channel off|r to leave it, |cFFFFFFFF/co channel on|r to rejoin.",
+    ["canal quitté — le réseau passe en whisper par tes cercles, amis et guilde."] =
+        "channel left — the network now runs on whispers through your circles, friends and guild.",
+    ["canal |cFFFFFFFF%s|r rejoint pour un diagnostic — il est morcelé sur Forever. |cFFFFFFFF/co channel off|r pour en sortir."] =
+        "joined |cFFFFFFFF%s|r for diagnostics — it's split into separate rooms on Forever. |cFFFFFFFF/co channel off|r to leave.",
+    ["réseau sans canal (whisper). |cFFFFFFFF/co channel on|r rejoint |cFFFFFFFF%s|r pour un diagnostic."] =
+        "no channel, the network runs on whispers. |cFFFFFFFF/co channel on|r joins |cFFFFFFFF%s|r for diagnostics.",
     ["(dés)activer le canal réseau global"] = "(de)activate the global network channel",
     ["balise TEXTE émise=%s (canal idx=%s) — lance |cFFFFFFFF/co trace dump|r sur l'AUTRE perso et cherche |cFFFFFFFF[recv] beacon|r."] =
         "TEXT beacon sent=%s (channel idx=%s) — run |cFFFFFFFF/co trace dump|r on the OTHER char and look for |cFFFFFFFF[recv] beacon|r.",

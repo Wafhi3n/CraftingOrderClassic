@@ -145,37 +145,42 @@ function COC:Status()
     local d = COC.Directory
     if d then
         p(string.format(L["réseau global : %s — |cFFFFFFFF%d|r en ligne, |cFFFFFFFF%d|r crafteur(s) connus"],
-            CraftLink:IsNetworkReady() and ("|cFF33DD33" .. L["canal rejoint"] .. "|r") or ("|cFFFFCC00" .. L["connexion…"] .. "|r"),
-            d:CountOnline(), d:CountKnownCrafters()))
+            COC:NetworkLabel(), d:CountOnline(), d:CountKnownCrafters()))
     end
     if CraftLink.GlobalChannelKind then
         local kind  = CraftLink:GlobalChannelKind()
         local label = (CraftLink.GlobalChannelLabel and CraftLink:GlobalChannelLabel()) or "?"
         if kind == "custom" then
             p("  " .. string.format(L["canal : |cFFFFFFFF%s|r"], label))
-        else
+        elseif COC.db and COC.db.channelOptIn then
             p("  " .. L["canal : non rejoint — |cFFFFFFFF/co channel on|r pour réessayer"])
+        else
+            p("  " .. L["canal : aucun — le réseau passe en whisper (cercles, amis, guilde)"])
         end
     end
 end
 
--- /co channel [on|off] : (dés)activer l'auto-join du canal réseau. Persistant via COC.db.channelOptOut.
+-- /co channel [on|off] : le canal CraftLinkNet est RETIRÉ (morcelé sur Forever, cf. docs/specs/
+-- communaute-sans-canal.md). « on » le rejoint pour un DIAGNOSTIC (persistant : COC.db.channelOptIn) ;
+-- « off » revient au réseau sans canal. L'ancien opt-out `channelOptOut` n'a plus d'effet.
 function COC:ChannelCmd(arg)
     local L = COC.L
     if not CraftLink then p(L["CraftLink absent — l'infra réseau n'est pas chargée."]); return end
     arg = (arg or ""):lower()
+    local label = (CraftLink.GlobalChannelLabel and CraftLink:GlobalChannelLabel()) or "?"
     if arg == "off" then
-        COC.db.channelOptOut = true
+        COC.db.channelOptIn = nil
         if CraftLink.SetAutoJoin then CraftLink:SetAutoJoin(false) end
-        p(L["auto-join du canal réseau désactivé — le carnet global ne fonctionnera plus (whisper/guilde restent actifs)."])
+        p(L["canal quitté — le réseau passe en whisper par tes cercles, amis et guilde."])
     elseif arg == "on" then
-        COC.db.channelOptOut = nil
+        COC.db.channelOptIn = true
         if CraftLink.SetAutoJoin then CraftLink:SetAutoJoin(true) end
         if CraftLink.JoinNetwork then CraftLink:JoinNetwork() end
-        p(L["canal réseau (re)rejoint."])
+        p(string.format(L["canal |cFFFFFFFF%s|r rejoint pour un diagnostic — il est morcelé sur Forever. |cFFFFFFFF/co channel off|r pour en sortir."], label))
+    elseif CraftLink.NetworkMode and CraftLink:NetworkMode() == "channel" then
+        p(string.format(L["canal : |cFFFFFFFF%s|r"], label))
     else
-        local label = (CraftLink.GlobalChannelLabel and CraftLink:GlobalChannelLabel()) or "?"
-        p(string.format(L["canal global actuel : |cFFFFFFFF%s|r. |cFFFFFFFF/co channel off|r pour le quitter, |cFFFFFFFF/co channel on|r pour le rejoindre."], label))
+        p(string.format(L["réseau sans canal (whisper). |cFFFFFFFF/co channel on|r rejoint |cFFFFFFFF%s|r pour un diagnostic."], label))
     end
 end
 
@@ -220,6 +225,7 @@ end
 -- paresseusement (Locale chargé au runtime).
 function COC:ChannelNotice()
     if not COC.db or COC.db.channelNoticeShown then return end
+    if not (CraftLink and CraftLink.NetworkMode and CraftLink:NetworkMode() == "channel") then return end   -- sans canal : rien à dire
     if not (StaticPopupDialogs and StaticPopup_Show) then return end
     local L = COC.L
     local label = (CraftLink and CraftLink.GlobalChannelLabel and CraftLink:GlobalChannelLabel()) or "CraftLinkNet"
@@ -451,9 +457,9 @@ f:SetScript("OnEvent", function(_, event, arg1)
             CraftLink:SetTracer(function(c, m) if COC.Trace then COC.Trace:Log(c, m) end end)
         end
         if COC.Trace then COC.Trace:AutoEnablePTR() end   -- PTR/test → logs auto (sans /co trace)
-        -- Canal global : applique l'opt-out persistant AVANT de démarrer le transport ; et avertit le
-        -- joueur UNE FOIS qu'on passe par le canal public Services (à la première acquisition).
-        if CraftLink and CraftLink.SetAutoJoin then CraftLink:SetAutoJoin(not (COC.db and COC.db.channelOptOut)) end
+        -- Canal CraftLinkNet COUPÉ pour tous (morcelé sur Forever) : rejoint seulement sur opt-in de
+        -- diagnostic, appliqué AVANT de démarrer le transport. La popup d'info ne sert qu'à cet opt-in.
+        if CraftLink and CraftLink.SetAutoJoin then CraftLink:SetAutoJoin((COC.db and COC.db.channelOptIn) == true) end
         if CraftLink and CraftLink.OnNetworkReady then CraftLink:OnNetworkReady(function() COC:ChannelNotice() end) end
         if COC.Directory then COC.Directory:Start() end   -- transport + annuaire global
         if COC.Orders   then COC.Orders:Start()   end      -- carnet d'ordres global

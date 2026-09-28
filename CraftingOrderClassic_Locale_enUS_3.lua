@@ -18,6 +18,18 @@ local en3 = {
     ["Aucun résultat pour cette recherche."] = "Nothing matches that search.",
     ["Rien à afficher pour ce métier."] = "Nothing to show for this profession.",
     ["Recettes proposées (%d/%d)"] = "Offered recipes (%d/%d)",
+    -- Réseau sans canal + communauté officielle (2026-09-28)
+    ["réseau par whisper"] = "whisper network",
+    ["canal : aucun — le réseau passe en whisper (cercles, amis, guilde)"] =
+        "channel: none — the network runs on whispers (circles, friends, guild)",
+    ["communauté officielle marquée comme cercle d'artisans : %s"] =
+        "official community marked as your crafters' circle: %s",
+    ["Rejoins la communauté des artisans : %s — c'est là que Crafting Order trouve les autres joueurs."] =
+        "Join the crafters' community: %s — that's where Crafting Order finds other players.",
+    ["(/co circle nolink : ne plus afficher ce rappel)"] = "(/co circle nolink: stop showing this reminder)",
+    ["rappel de la communauté éteint — /co circle link pour le rallumer."] =
+        "community reminder off — /co circle link turns it back on.",
+    ["rappel de la communauté rallumé."] = "community reminder back on.",
 }
 
 for k, v in pairs(en3) do L[k] = v end
