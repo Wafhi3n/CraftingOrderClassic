@@ -110,9 +110,13 @@ Ce que le canal portait et qui se tait sans lui :
 - **2026-09-28, user** (après le 1er test du lien, qui marche) : une **popup d'explication, une fois par
   compte**, au même moment que le 1er rappel. D'abord avec un seul « OK » (crainte de taint), puis, à la
   demande du user (« les gens risquent de ne pas voir le lien dans le chat »), avec **« Rejoindre » /
-  « Plus tard »**. « Rejoindre » passe par la même porte qu'un clic sur le lien du chat (`SetItemRef`
-  clubTicket). Le risque a été rejugé faible sur la source : aucune fonction des communautés n'est
-  protégée, `RedeemTicket` ne porte que des restrictions de contexte. Il reste à mesurer (critère 13bis).
+  « Plus tard »**, passé par la même porte qu'un clic de lien (`SetItemRef` clubTicket). **DÉMENTI EN
+  JEU le 2026-09-28** : le clic a donné `ADDON_ACTION_FORBIDDEN … GetLastTicketResponse()`. Lancé depuis
+  le code de l'addon, le récepteur CLUB_TICKET_RECEIVED de Blizzard est créé « touché par l'addon », et
+  la fonction RESTREINTE qu'il appelle est refusée — pour toute la session, lien du chat compris
+  (`/reload` pour s'en remettre). « HasRestrictions » dans la doc générée VAUT protection contre un
+  appel venu d'un addon. **Retour à un seul « OK »**, verrouillé par test ; un lien dans le texte de la
+  popup n'y échapperait pas (son clic passe par un OnHyperlinkClick fourni par l'addon).
 - **2026-09-28, user** : communauté **Horde** au même nom, invitation `XGvoAXHvxd`. Son clubId 22973181
   vient de `chat-cache.txt` d'Orcaa (« Community:22973181:1 », seule communauté du perso, numéro plus
   récent que celui de l'Alliance) : c'est une déduction, que confirmera le message de marquage auto
@@ -163,12 +167,10 @@ Ce que le canal portait et qui se tait sans lui :
     clic ouvre Guilde & Communautés sur l'invitation. Après « Rejoindre », le chat dit que la
     communauté est marquée comme cercle, et Rédemption Wafhien apparaît sous « Cercle » avec ses
     métiers en moins d'une minute. Témoin : la liste Cercle vue le 2026-09-27 vers 19 h 28.
-13bis. [humain] Au tout premier rappel sur un compte, une popup explique pourquoi rejoindre, avec
-    « Rejoindre » et « Plus tard » ; le lien est dans le chat au même moment. « Rejoindre » ouvre Guilde &
-    Communautés sur l'invitation, et le « Rejoindre » de Blizzard aboutit SANS erreur
-    `ADDON_ACTION_BLOCKED` (mesure : `/console taintLog 1` avant le clic, puis `Logs\taint.log` sans
-    ligne `CraftingOrderClassic` sur RedeemTicket). Au rappel suivant, plus de popup. Témoin : le clic
-    sur le lien du chat, qui a fonctionné le 2026-09-28.
+13bis. [humain] Au tout premier rappel sur un compte, une popup explique pourquoi rejoindre, avec un seul
+    « OK » ; le lien est dans le chat au même moment, et c'est LUI qu'on clique. Au rappel suivant, plus
+    de popup. Témoin : le clic sur le lien du chat, qui a fonctionné le 2026-09-28 (la version à bouton
+    « Rejoindre » a donné ADDON_ACTION_FORBIDDEN, cf. Décisions).
     Note : rejoindre la communauté ajoute son chat à la fenêtre (« [6. CLinkN] has been added… », le nom
     court de la communauté) — c'est Blizzard (`ChatFrameUtil.AddCommunitiesChannel`), pas CraftLinkNet.
 14. [humain] Commande de Gnomi vers Rédemption (nommée, puis publique) : reçue, acceptée, livrée,
