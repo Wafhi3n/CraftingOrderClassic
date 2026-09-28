@@ -375,6 +375,11 @@ local news = {
         "En WoW Forever cada personaje tiene apellido, y el juego te llama 'Nombre Apellido' en todas partes. El addon seguía usando solo tu nombre y dejó de reconocerse: un pedido a tu nombre llegaba y se ignoraba, un pedido publicado en el canal se descartaba como si alguien publicara en nombre de otro, y podías aparecer en tu propia lista de artesanos. Corregido, también para los pedidos de jugadores que siguen en la 1.36.1.",
     ["Une ligne du canal Commerce comme « dont need fire wand: [Lesser Magic Wand] » n'est plus prise pour une demande."] =
         "Una línea del canal de Comercio como 'dont need fire wand: [Lesser Magic Wand]' ya no se toma por una petición.",
+    -- v1.38.0
+    ["Un signe quand une mise à jour est là"] =
+        "Una señal cuando hay una actualización",
+    ["Quand le réseau signale une nouvelle version, le logo de Crafting Order apparaît en haut de la minicarte, là où Blizzard pose la lettre du courrier. Survole-le pour voir quelle version est sortie et laquelle tu as, clique pour le détail dans le chat. Il disparaît une fois la mise à jour faite."] =
+        "Cuando la red avisa de una versión nueva, el logo de Crafting Order aparece en la parte superior del minimapa, donde Blizzard muestra la carta del correo. Pasa el ratón por encima para ver qué versión ha salido y cuál tienes; un clic muestra los detalles en el chat. Desaparece en cuanto actualizas.",
     -- v1.37.0
     ["Les artisans se retrouvent dans une communauté"] =
         "Los artesanos se reúnen en una comunidad",

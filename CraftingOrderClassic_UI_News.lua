@@ -34,6 +34,12 @@ local BODY_W = 780
 local function versionsHead()
     return {
         {
+            v = "v1.38.0", title = L["Un signe quand une mise à jour est là"],
+            lines = {
+                L["Quand le réseau signale une nouvelle version, le logo de Crafting Order apparaît en haut de la minicarte, là où Blizzard pose la lettre du courrier. Survole-le pour voir quelle version est sortie et laquelle tu as, clique pour le détail dans le chat. Il disparaît une fois la mise à jour faite."],
+            },
+        },
+        {
             v = "v1.37.0", title = L["Les artisans se retrouvent dans une communauté"],
             lines = {
                 L["Sur WoW Forever, le canal caché de l'addon, CraftLinkNet, est découpé en salles : deux joueurs côte à côte pouvaient ne jamais voir leurs commandes. L'addon ne l'utilise plus, et le quitte si tu y es encore. Les artisans se retrouvent dans la communauté « Crafting Order PVE », une par camp."],

@@ -1,5 +1,15 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.38.0 - A sign when there's an update
+
+When the network tells the addon a newer version is out, the Crafting Order logo now shows up at the
+top of the minimap, where Blizzard puts the mail letter. Hover it to see which version is out and
+which one you have, click it for the details in chat. It goes away once you've updated.
+
+Until now the only signs were a line in chat, easy to miss in the login spam, and a small red dot on
+the minimap button. Since 1.37 that matters more, because a player left on 1.36 can barely hear the
+network anymore.
+
 ## v1.37.0 - Crafters meet in a community
 
 On WoW Forever the addon's hidden channel, CraftLinkNet, gets split into separate rooms. Two players

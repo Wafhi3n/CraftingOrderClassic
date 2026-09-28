@@ -378,6 +378,11 @@ local news = {
         "On WoW Forever every character has a surname, and the game calls you 'Firstname Surname' everywhere. The addon still used your first name alone and stopped recognizing itself: an order addressed to you arrived and was ignored, an order posted on the channel was thrown out as if someone were posting for another player, and you could show up in your own Artisans list. Fixed, including for orders from players still on 1.36.1.",
     ["Une ligne du canal Commerce comme « dont need fire wand: [Lesser Magic Wand] » n'est plus prise pour une demande."] =
         "A trade chat line like 'dont need fire wand: [Lesser Magic Wand]' is no longer taken for a request.",
+    -- v1.38.0
+    ["Un signe quand une mise à jour est là"] =
+        "A sign when there's an update",
+    ["Quand le réseau signale une nouvelle version, le logo de Crafting Order apparaît en haut de la minicarte, là où Blizzard pose la lettre du courrier. Survole-le pour voir quelle version est sortie et laquelle tu as, clique pour le détail dans le chat. Il disparaît une fois la mise à jour faite."] =
+        "When the network reports a newer version, the Crafting Order logo shows up at the top of the minimap, where Blizzard puts the mail letter. Hover it to see which version is out and which one you have, click it for the details in chat. It goes away once you've updated.",
     -- v1.37.0
     ["Les artisans se retrouvent dans une communauté"] =
         "Crafters meet in a community",

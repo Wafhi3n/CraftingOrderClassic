@@ -375,6 +375,11 @@ local news = {
         "In WoW Forever hat jeder Charakter einen Nachnamen, und das Spiel nennt dich überall 'Vorname Nachname'. Das Addon benutzte nur deinen Vornamen und erkannte sich selbst nicht mehr: Ein Auftrag an dich kam an und wurde ignoriert, ein im Kanal geposteter Auftrag wurde verworfen, als würde jemand im Namen eines anderen posten, und du konntest in deiner eigenen Handwerkerliste auftauchen. Behoben, auch für Aufträge von Spielern, die noch 1.36.1 nutzen.",
     ["Une ligne du canal Commerce comme « dont need fire wand: [Lesser Magic Wand] » n'est plus prise pour une demande."] =
         "Eine Handelszeile wie 'dont need fire wand: [Lesser Magic Wand]' gilt nicht mehr als Anfrage.",
+    -- v1.38.0
+    ["Un signe quand une mise à jour est là"] =
+        "Ein Zeichen, wenn ein Update da ist",
+    ["Quand le réseau signale une nouvelle version, le logo de Crafting Order apparaît en haut de la minicarte, là où Blizzard pose la lettre du courrier. Survole-le pour voir quelle version est sortie et laquelle tu as, clique pour le détail dans le chat. Il disparaît une fois la mise à jour faite."] =
+        "Meldet das Netzwerk eine neuere Version, erscheint das Crafting-Order-Logo oben an der Minikarte, dort wo Blizzard den Postbrief anzeigt. Fahre darüber, um zu sehen, welche Version erschienen ist und welche du hast; ein Klick zeigt die Details im Chat. Es verschwindet, sobald du aktualisiert hast.",
     -- v1.37.0
     ["Les artisans se retrouvent dans une communauté"] =
         "Handwerker treffen sich in einer Gemeinschaft",
