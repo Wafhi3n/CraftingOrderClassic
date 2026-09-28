@@ -235,9 +235,10 @@ function PW:_BuildLFWPicker(p)
     search:SetScript("OnEscapePressed", function(b) b:SetText(""); b:ClearFocus() end)
     p.search = search
 
-    local scroll = CreateFrame("ScrollFrame", "CraftingOrderLFWCfgScroll", p, "UIPanelScrollFrameTemplate")
+    -- Barre fine (palier 7c). Le hook OnVerticalScroll s'ajoute APRÈS celui que pose la barre
+    -- (ScrollUtil, par SetScript) : les deux tournent.
+    local scroll = Skin.MakeScrollFrameIn(p)
     scroll:SetPoint("TOPLEFT", 8, -(LIST_TOP + 20)); scroll:SetPoint("BOTTOMRIGHT", -28, 10)
-    Skin.ScrollTrack("CraftingOrderLFWCfgScroll")
     local content = CreateFrame("Frame", nil, scroll)
     content:SetSize(PANEL_W - 36, VISIBLE * ROW_H); scroll:SetScrollChild(content)
     scroll:HookScript("OnVerticalScroll", function() PW:_RenderLFWList() end)

@@ -386,21 +386,6 @@ function Skin.MoneyIcon(parent, kind, anchorTo)
     return t
 end
 
--- Masque la scrollbar (et ses boutons haut/bas) d'un UIPanelScrollFrameTemplate quand le contenu
--- tient sans défilement → évite les « carrés » flottants qui débordaient sur la bordure dorée.
-function Skin.AutoHideScroll(scrollName, content)
-    local scroll, sb = _G[scrollName], _G[scrollName .. "ScrollBar"]
-    if not (scroll and content) then return end
-    local show = (content:GetHeight() or 0) > (scroll:GetHeight() or 0) + 1
-    if sb then sb:SetShown(show) end
-    -- Certains templates WoW placent les boutons haut/bas en dehors du ScrollBar (frères, pas enfants).
-    for _, sfx in ipairs({ "ScrollBarScrollUpButton", "ScrollBarScrollDownButton",
-                            "ScrollUpButton",          "ScrollDownButton" }) do
-        local btn = _G[scrollName .. sfx]
-        if btn then btn:SetShown(show) end
-    end
-end
-
 function Skin.ApplyShadow(fs)
     if fs and fs.SetShadowColor then fs:SetShadowColor(0, 0, 0, 0.95); fs:SetShadowOffset(1, -1) end
     return fs

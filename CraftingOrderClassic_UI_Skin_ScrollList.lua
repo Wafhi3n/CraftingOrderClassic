@@ -117,6 +117,24 @@ function Skin.MakeScrollFrame(host)
     return sf
 end
 
+-- Variante SUR PLACE (palier 7c, la colonne greffée) : rend un ScrollFrame que l'APPELANT ancre,
+-- en gardant à droite la marge que prenait l'ancien `UIPanelScrollFrameTemplate` ; la barre fine
+-- devient l'ENFANT du cadre, logée dans cette marge comme l'était l'ancienne. La colonne masque son
+-- cadre défilant (la barre suit), le re-cale (idem) et lit son parent pour y poser d'autres vues :
+-- avec l'hôte de MakeScrollFrame, la barre, sœur du cadre, restait affichée et le parent changeait.
+-- Ici rien de cela ne bouge, seul l'art de la barre change.
+function Skin.MakeScrollFrameIn(parent)
+    local sf = CreateFrame("ScrollFrame", nil, parent)
+    local bar = CreateFrame("EventFrame", nil, sf, "MinimalScrollBar")
+    bar:SetPoint("TOPLEFT", sf, "TOPRIGHT", 6, 0)
+    bar:SetPoint("BOTTOMLEFT", sf, "BOTTOMRIGHT", 6, 0)
+    sf:EnableMouseWheel(true)
+    bar:SetHideIfUnscrollable(true)
+    ScrollUtil.InitScrollFrameWithScrollBar(sf, bar)
+    sf.ScrollBar = bar
+    return sf
+end
+
 -- ------------------------------------------------------------------ l'habillage d'une ligne
 
 -- Emprunté à la liste de recettes des métiers (Blizzard_ProfessionsRecipeList.xml) PAR RÉFÉRENCE :
