@@ -59,13 +59,18 @@ local function sortOrders(out)
     return out
 end
 
--- Commandes que JE dois livrer à `partner` (rôle vendeur uniquement) — utilisé par le greffon courrier
--- (on ne « reçoit » pas via un courrier qu'on compose). `accepted` d'abord, puis `delivered`.
+-- Ce qui peut partir par la POSTE : une commande qui produit un OBJET (`itemID`). Un enchantement n'a
+-- que son sort (`spellID`) : il se pose sur la pièce du client pendant un échange, et au courrier
+-- « Remplir » ne trouvait rien à joindre (vu en jeu le 2026-09-28, un enchant listé au courrier).
+local function mailable(o) return o.itemID ~= nil end
+
+-- Commandes que JE dois livrer à `partner` par courrier (rôle vendeur uniquement : on ne « reçoit »
+-- pas via un courrier qu'on compose). `accepted` d'abord, puis `delivered`.
 function Comp:OrdersFor(partner)
     local out = {}
     if not (COC.db and COC.db.orders) then return out end
     for _, o in pairs(COC.db.orders) do
-        if Comp.RoleWith(o, partner) == "sell" then out[#out + 1] = o end
+        if Comp.RoleWith(o, partner) == "sell" and mailable(o) then out[#out + 1] = o end
     end
     return sortOrders(out)
 end
@@ -81,14 +86,15 @@ function Comp:OrdersWith(partner)
     return sortOrders(out)
 end
 
--- TOUTES mes commandes à livrer (rôle vendeur), quel que soit l'acheteur — utilisé par le greffon
--- courrier quand aucun destinataire n'est encore saisi (on affiche tout, cliquer remplit le « À: »).
+-- TOUTES mes commandes à livrer par courrier (rôle vendeur), quel que soit l'acheteur — quand aucun
+-- destinataire n'est encore saisi (on affiche tout, cliquer remplit le « À: »).
 function Comp:MyDeliverables()
     local out = {}
     local m = me()
     if not (COC.db and COC.db.orders) then return out end
     for _, o in pairs(COC.db.orders) do
-        if o.acceptedBy == m and o.buyer and (o.status == "accepted" or o.status == "delivered") then
+        if o.acceptedBy == m and o.buyer and (o.status == "accepted" or o.status == "delivered")
+           and mailable(o) then
             out[#out + 1] = o
         end
     end
