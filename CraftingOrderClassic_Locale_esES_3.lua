@@ -47,6 +47,9 @@ local es3 = {
     ["cercles d'artisans (communautés) et rappel de la communauté"] =
         "círculos de artesanos (comunidades) y el aviso de la comunidad",
     ["ou"] = "o",   -- statuts d'une commande, Aide : « (ou Annulée / Refusée) »
+    -- Courrier : l'addon ne coupe plus une pile lui-même (2026-09-28)
+    ["Il en manque %d au courrier : sépare-les d'une pile toi-même (Maj-clic sur la pile), puis dépose-les."] =
+        "Faltan %d en el correo: sepáralos tú mismo de una pila (Mayús-clic en la pila) y luego colócalos.",
 }
 
 for k, v in pairs(es3) do L[k] = v end

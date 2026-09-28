@@ -47,6 +47,9 @@ local en3 = {
     ["cercles d'artisans (communautés) et rappel de la communauté"] =
         "crafters' circles (communities) and the community reminder",
     ["ou"] = "or",   -- statuts d'une commande, Aide : « (ou Annulée / Refusée) »
+    -- Courrier : l'addon ne coupe plus une pile lui-même (2026-09-28)
+    ["Il en manque %d au courrier : sépare-les d'une pile toi-même (Maj-clic sur la pile), puis dépose-les."] =
+        "%d still missing from the mail: split them off a stack yourself (Shift-click the stack), then drop them in.",
 }
 
 for k, v in pairs(en3) do L[k] = v end
