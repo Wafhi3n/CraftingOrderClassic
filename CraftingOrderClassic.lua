@@ -422,7 +422,7 @@ function COC:Slash(msg)
             p(COC.db.verbose and COC.L["messages verbeux : activés"] or COC.L["messages verbeux : désactivés"])
         end
     elseif diagCmd(cmd, rest) then    -- socialdiag / trace / lvldump / pricedump / trainers / geo
-    elseif cmd == "version" or cmd == "ver" then if D and D.VersionCmd then D:VersionCmd(rest) end
+    elseif cmd == "version" or cmd == "ver" or cmd == "build" then if D and D.VersionCmd then D:VersionCmd(rest) end
     elseif cmd == "help"   then COC:Help()
     else COC:Status() end
 end

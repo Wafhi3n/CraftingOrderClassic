@@ -34,6 +34,9 @@ local es3 = {
     ["Tu as la %s. Mets l'addon à jour depuis CurseForge."] = "Tienes la %s. Actualiza el addon desde CurseForge.",
     ["Crafting Order n'utilise plus de canal de discussion : sur WoW Forever, il est découpé en salles et les joueurs ne s'y voient pas tous.\n\nLes artisans se retrouvent maintenant dans la communauté |cFFFFD100%s|r. Clique sur le lien dans ton chat pour y entrer."] =
         "Crafting Order ya no usa un canal de chat: en WoW Forever se divide en salas separadas y no todos los jugadores se ven.\n\nLos artesanos se reúnen ahora en la comunidad |cFFFFD100%s|r. Haz clic en el enlace de tu chat para unirte.",
+    -- Signature du build de test, /co version (2026-09-28)
+    ["Build : %s"] = "Build: %s",
+    ["Branches en test : %s"] = "Ramas en prueba: %s",
 }
 
 for k, v in pairs(es3) do L[k] = v end
