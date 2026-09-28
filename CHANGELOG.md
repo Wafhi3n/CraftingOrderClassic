@@ -1,5 +1,33 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.37.0 - Crafters meet in a community
+
+On WoW Forever the addon's hidden channel, CraftLinkNet, gets split into separate rooms. Two players
+standing side by side could land in different rooms and never see each other's orders. So the addon
+doesn't use it anymore, and leaves it if you're still in it. Crafters meet in a community instead,
+"Crafting Order PVE", one for the Alliance and one for the Horde.
+
+If you're not in a crafters' circle yet, you get a whisper from yourself when you log in, with a Join
+link. Click it and hit Join in the window that opens. The addon marks the community as your circle on
+its own, no command to type. The first time on an account, a popup explains why. If you'd rather not
+join, `/co circle nolink` stops the reminder.
+
+Everything that used to go out on the channel now goes by whisper to the players the addon knows are
+online: your profile, orders and their cancellations, Looking for work. If someone accepts an order
+you've already cancelled, they're told it's cancelled. Players still on 1.36 can only reach you through
+friends, guild, a shared circle or an order addressed to them, so pass the word to update.
+
+The Artisans tab has one row per community, named after it, and a player shows as offline as soon as
+the community says they've logged off. The Confederation row only appears when GreenWall is running.
+
+A few other things. The lists in Order, Gather, Artisans and My Artisans use the same scrolling list as
+Blizzard's profession window. Picking an artisan from the Artisans tab opens Order with them selected,
+even when they're further down the list. The help button is bigger, sits above the window portrait,
+and doesn't hide behind the leveling route anymore. The Missing tab stops listing the other faction's
+copy of a recipe that exists once per faction, like the Faction Banner. The leveling route spends
+what's in your bags before it buys anything at the auction house. And opening another player's
+profession link no longer files their recipes under yours.
+
 ## v1.36.2 - Orders that reach the right person
 
 Characters on WoW Forever have a surname, and the game knows you as "Firstname Surname" everywhere: whispers,

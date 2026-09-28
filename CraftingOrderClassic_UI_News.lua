@@ -34,6 +34,16 @@ local BODY_W = 780
 local function versionsHead()
     return {
         {
+            v = "v1.37.0", title = L["Les artisans se retrouvent dans une communauté"],
+            lines = {
+                L["Sur WoW Forever, le canal caché de l'addon, CraftLinkNet, est découpé en salles : deux joueurs côte à côte pouvaient ne jamais voir leurs commandes. L'addon ne l'utilise plus, et le quitte si tu y es encore. Les artisans se retrouvent dans la communauté « Crafting Order PVE », une par camp."],
+                L["Sans cercle d'artisans, tu reçois à la connexion un whisper de toi-même avec un lien Rejoindre. Clique dessus, puis Rejoindre dans la fenêtre qui s'ouvre : l'addon en fait ton cercle tout seul. « /co circle nolink » coupe ce rappel."],
+                L["Tout ce qui passait par le canal part en whisper aux joueurs de l'addon en ligne : ton profil, les commandes et leurs annulations, la recherche de travail. Les joueurs restés en 1.36 ne te joignent plus que par les amis, la guilde, un cercle commun ou une commande à leur nom : dis-leur de mettre à jour."],
+                L["L'onglet Artisans a une ligne par communauté, à son nom, et un joueur passe hors ligne dès que la communauté le dit parti. La ligne Confédération n'apparaît que si GreenWall tourne."],
+                L["Aussi : les listes de Commande, Récolte, Artisans et Mes artisans défilent comme celle des métiers de Blizzard ; un artisan choisi depuis Artisans arrive sélectionné dans Commande ; le bouton d'aide passe au-dessus du portrait et ne se cache plus derrière la Route ; Manquantes n'affiche plus l'exemplaire de l'autre camp d'une recette jumelle ; la Route puise dans tes sacs avant l'hôtel des ventes ; ouvrir le lien de métier d'un autre joueur ne range plus ses recettes dans les tiennes."],
+            },
+        },
+        {
             v = "v1.36.2", title = L["Les commandes trouvent leur destinataire"],
             lines = {
                 L["Sur WoW Forever, chaque personnage a un nom de famille, et le jeu te désigne partout par « Prénom Nom ». L'addon t'appelait par ton prénom seul et ne se reconnaissait plus : une commande à ton nom arrivait puis était ignorée, une commande postée sur le canal était rejetée comme si quelqu'un postait à la place d'un autre, et tu pouvais te retrouver dans ta propre liste d'artisans. C'est réparé, y compris pour les commandes des joueurs restés en 1.36.1."],

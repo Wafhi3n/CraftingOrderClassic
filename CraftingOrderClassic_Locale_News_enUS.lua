@@ -378,6 +378,19 @@ local news = {
         "On WoW Forever every character has a surname, and the game calls you 'Firstname Surname' everywhere. The addon still used your first name alone and stopped recognizing itself: an order addressed to you arrived and was ignored, an order posted on the channel was thrown out as if someone were posting for another player, and you could show up in your own Artisans list. Fixed, including for orders from players still on 1.36.1.",
     ["Une ligne du canal Commerce comme « dont need fire wand: [Lesser Magic Wand] » n'est plus prise pour une demande."] =
         "A trade chat line like 'dont need fire wand: [Lesser Magic Wand]' is no longer taken for a request.",
+    -- v1.37.0
+    ["Les artisans se retrouvent dans une communauté"] =
+        "Crafters meet in a community",
+    ["Sur WoW Forever, le canal caché de l'addon, CraftLinkNet, est découpé en salles : deux joueurs côte à côte pouvaient ne jamais voir leurs commandes. L'addon ne l'utilise plus, et le quitte si tu y es encore. Les artisans se retrouvent dans la communauté « Crafting Order PVE », une par camp."] =
+        "On WoW Forever the addon's hidden channel, CraftLinkNet, gets split into separate rooms: two players side by side could never see each other's orders. The addon doesn't use it anymore, and leaves it if you're still in. Crafters meet in the 'Crafting Order PVE' community instead, one per faction.",
+    ["Sans cercle d'artisans, tu reçois à la connexion un whisper de toi-même avec un lien Rejoindre. Clique dessus, puis Rejoindre dans la fenêtre qui s'ouvre : l'addon en fait ton cercle tout seul. « /co circle nolink » coupe ce rappel."] =
+        "Without a crafters' circle, you get a whisper from yourself at login with a Join link. Click it, then Join in the window that opens, and the addon makes it your circle on its own. '/co circle nolink' stops the reminder.",
+    ["Tout ce qui passait par le canal part en whisper aux joueurs de l'addon en ligne : ton profil, les commandes et leurs annulations, la recherche de travail. Les joueurs restés en 1.36 ne te joignent plus que par les amis, la guilde, un cercle commun ou une commande à leur nom : dis-leur de mettre à jour."] =
+        "Everything that went through the channel now goes by whisper to addon users who are online: your profile, orders and their cancellations, Looking for work. Players still on 1.36 can only reach you through friends, guild, a shared circle or an order in their name, so tell them to update.",
+    ["L'onglet Artisans a une ligne par communauté, à son nom, et un joueur passe hors ligne dès que la communauté le dit parti. La ligne Confédération n'apparaît que si GreenWall tourne."] =
+        "The Artisans tab has one row per community, named after it, and a player turns offline as soon as the community says they've left. The Confederation row only appears when GreenWall is running.",
+    ["Aussi : les listes de Commande, Récolte, Artisans et Mes artisans défilent comme celle des métiers de Blizzard ; un artisan choisi depuis Artisans arrive sélectionné dans Commande ; le bouton d'aide passe au-dessus du portrait et ne se cache plus derrière la Route ; Manquantes n'affiche plus l'exemplaire de l'autre camp d'une recette jumelle ; la Route puise dans tes sacs avant l'hôtel des ventes ; ouvrir le lien de métier d'un autre joueur ne range plus ses recettes dans les tiennes."] =
+        "Also: the lists in Order, Gather, Artisans and My Artisans scroll like Blizzard's profession list; an artisan picked from Artisans arrives selected in Order; the help button sits above the portrait and no longer hides behind the Route; Missing no longer shows the other faction's copy of a twin recipe; the Route uses your bags before the auction house; opening another player's profession link no longer files their recipes under yours.",
 }
 
 for k, v in pairs(news) do L[k] = v end
