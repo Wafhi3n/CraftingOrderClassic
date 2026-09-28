@@ -46,6 +46,16 @@ client.
 
 ## Relevés
 
+- 2026-09-28 13:22 — jusqu'a 5ef0cab — Forever, un client, client en ANGLAIS ; build
+  `main-dev@c760357 2026-09-28 13:15`, branches en test `feat/icone-commande-recue,
+  feat/ui-p5-carnet-tri` (lu dans la signature du `.toc` déployé) — **GO sur le palier 5 : le Carnet
+  trie ses colonnes** — capture du user : les six en-têtes au gabarit `ColumnDisplayButtonShortTemplate`
+  (ORDER, QTY, PRICE OFFERED, PROFESSION, CRAFTER, STATUS), la flèche `auctionhouse-ui-sortarrow` sur
+  PRICE OFFERED en décroissant, trois commandes rangées 12po › 1po › sans prix ; survol d'une ligne
+  avec « Click: Cancel » ; chiffre « 3 » sur l'onglet du Carnet. Rapporté par le user : l'annulation
+  fonctionne (le Carnet sorti dans `_UI_Ledger.lua` garde ses actions).
+  Non vu : le tri des autres colonnes, les filtres Archivées et Confiées depuis le déménagement.
+
 - 2026-09-28 13:06 — jusqu'a 64bf8c3 — Forever, un client, client en ANGLAIS ; build
   `main-dev@12f3479 2026-09-28 12:51`, branches en test `feat/icone-commande-recue,
   feat/ui-p4-formulaire` (lu dans la signature du `.toc` déployé) — **GO sur le palier 4 : montant et

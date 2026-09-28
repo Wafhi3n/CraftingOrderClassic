@@ -4,7 +4,7 @@
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
-142 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
+144 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
 
 ## Modules (ordre de chargement)
 
@@ -32,12 +32,14 @@
 | `CraftingOrderClassic_UI_Skin_Native.lua` | kit de chrome Blizzard NATIF (le « framework » UI de COC). | 471 |
 | `CraftingOrderClassic_UI_Skin_ScrollList.lua` | la LISTE DÉFILANTE moderne du kit, palier 1 de la revue d'interface (docs/revue-ui-mainline.md). | 189 |
 | `CraftingOrderClassic_UI_Skin_SideTabs.lua` | la rangée d'ONGLETS LATÉRAUX de la fenêtre principale (palier 3 de la revue d'interface, décision D1 : « les onglets sur la droite, comme la vue métier »). | 77 |
-| `CraftingOrderClassic_UI_Skin_Inputs.lua` | les CHAMPS DE SAISIE du formulaire de commande (palier 4 de la revue d'interface) : le montant et la quantité, avec les briques du formulaire des Commandes d'artisanat de Forever (Blizzard_ProfessionsCustomerOrdersForm.xml, notre maquette) au lieu de nos InputBoxTemplate nus. | 75 |
+| `CraftingOrderClassic_UI_Skin_Inputs.lua` | les CHAMPS DE SAISIE du formulaire de commande (palier 4 de la revue d'interface) : le montant et la quantité, avec les briques du formulaire des Commandes d'artisanat de Forever (Blizzard_ProfessionsCustomerOrdersForm.xml, notre maquette) au lieu de nos InputBoxTemplate nus. | 83 |
+| `CraftingOrderClassic_UI_Skin_Table.lua` | l'EN-TÊTE DE TABLEAU triable (palier 5 de la revue d'interface : le Carnet façon « Mes commandes » des Commandes d'artisanat de Forever). | 65 |
 | `CraftingOrderClassic_UI_Skin_Dropdown.lua` | menu deroulant (selecteur) du kit natif. | 93 |
 | `CraftingOrderClassic_UI_Skin_Sections.lua` | kit de chrome natif, volet SECTIONS : comment on découpe l'intérieur d'une fenêtre en blocs et en zones. | 254 |
 | `CraftingOrderClassic_UI_Skin_HelpPlate.lua` | kit d'AIDE CONTEXTUELLE (le « bouton i » de retail). | 321 |
 | `CraftingOrderClassic_ShareReagents.lua` | « liste de courses » : diffuser en un clic les réactifs d'une recette (vue métier) ou d'une commande (carte) dans un canal de discussion, avec le LIEN objet de chaque réactif. | 157 |
-| `CraftingOrderClassic_UI.lua` | fenêtre principale (chrome Blizzard natif, kit UI_Skin_Native). | 495 |
+| `CraftingOrderClassic_UI.lua` | fenêtre principale (chrome Blizzard natif, kit UI_Skin_Native). | 337 |
+| `CraftingOrderClassic_UI_Ledger.lua` | onglet CARNET : MES commandes, en table (Commande · Qté · Prix · Métier · Artisan · Statut), filtres En cours / Archivées / Confiées, colonnes TRIABLES au clic sur l'en-tête (palier 5 de la revue d'interface, calqué sur « Mes commandes » des Commandes d'artisanat ; en-tête : Skin.MakeSortHeader). | 209 |
 | `CraftingOrderClassic_UI_HelpPlate.lua` | AIDE CONTEXTUELLE de la FENÊTRE PRINCIPALE (« bouton i »). | 169 |
 | `CraftingOrderClassic_UI_Post_Layout.lua` | GÉOMÉTRIE de l'onglet « Commande » : colonnes, zones, séparateurs. | 134 |
 | `CraftingOrderClassic_UI_Post.lua` | onglet « Commande » : sélection de plan (gauche) + réactifs « je fournis » / commission g-s-c / ciblage artisan (droite). | 418 |
@@ -535,6 +537,11 @@
 > Le prix tel que le protocole d'ordres le transporte : « 12po 5pa 3pc », dénominations nulles
 > omises, nil pour zéro. Écrit une fois ici : Commande et Récolte le recopiaient chacune deux fois.
 
+**`Skin.PriceCopper(text)`**
+
+> L'inverse : un prix transporté (« 12po 5pa 3pc ») redevient un nombre de cuivre, pour TRIER le
+> Carnet par prix. Illisible ou absent → 0.
+
 **`Skin.MakeMoneyInput(parent, w)`**
 
 > Le champ MONTANT : `LargeMoneyInputFrameTemplate`, celui du pourboire des Commandes d'artisanat
@@ -547,6 +554,16 @@
 > métiers — [-] case [+], clic maintenu qui accélère, borné de 1 à `max` (999 par défaut : la case
 > tient trois chiffres). ⚠️ L'ancre de l'appelant porte sur la CASE : le [-] déborde de 29 px à sa
 > gauche, le [+] de 23 px à sa droite. :GetValue(), :SetValue(n).
+
+### `CraftingOrderClassic_UI_Skin_Table.lua`
+
+**`Skin.MakeSortHeader(parent, y, defs, onSort)`**
+
+> Une rangée d'en-têtes dans `parent`, sa ligne haute à `y`. `defs` = { { id, label, x, w,
+> sortable = true|false }, ... } : `x` = début de la COLONNE (le texte de l'en-tête s'y aligne,
+> le bouton démarre 8 px avant, là où le gabarit pose son texte), `w` = sa largeur. `onSort(id)`
+> au clic d'une colonne triable. Rend { buttons = { [id] = bouton }, SetSort(id, ascendant) } ;
+> SetSort(nil) cache toutes les flèches (tri par défaut).
 
 ### `CraftingOrderClassic_UI_Skin_Dropdown.lua`
 
@@ -856,7 +873,23 @@
 > (Blizzard_MoneyFrame, Blizzard_SharedXML), et la sonde du labo les a vus présents (26/26).
 > Leurs mixins ne touchent aucun objet global (risque 3 de la revue, lu avant d'hériter).
 
-**API** : `Skin.PriceText(copper)` · `Skin.MakeMoneyInput(parent, w)` · `Skin.MakeQtySpinner(parent, max)`
+**API** : `Skin.PriceText(copper)` · `Skin.PriceCopper(text)` · `Skin.MakeMoneyInput(parent, w)` · `Skin.MakeQtySpinner(parent, max)`
+
+### `CraftingOrderClassic_UI_Skin_Table.lua`
+> CraftingOrderClassic_UI_Skin_Table.lua — l'EN-TÊTE DE TABLEAU triable (palier 5 de la revue
+> d'interface : le Carnet façon « Mes commandes » des Commandes d'artisanat de Forever).
+> 
+> Pourquoi pas TableBuilder, que la revue prévoyait : il construit en-têtes et cellules à partir de
+> GABARITS XML nommés (ConstructHeader / ConstructCells), et tous ceux de Blizzard vivent dans des
+> modules chargés à la demande (hôtel des ventes, commandes d'artisanat, JcJ) qu'on n'hérite pas
+> (risque 2) ; écrire les nôtres en XML irait contre la règle du kit. Ce qui fait l'ASPECT de ces
+> tableaux tient en deux pièces toujours chargées, qu'on reprend telles quelles : l'en-tête
+> `ColumnDisplayButtonShortTemplate` (SharedXML) — les en-têtes des métiers et de l'hôtel des ventes
+> en HÉRITENT — et la flèche `auctionhouse-ui-sortarrow`, retournée par ses coordonnées de texture
+> pour dire le sens (ProfessionsCrafterTableHeaderStringMixin:UpdateArrow). Les lignes restent sur
+> la liste défilante du kit, alignées sur les mêmes positions de colonnes.
+
+**API** : `Skin.MakeSortHeader(parent, y, defs, onSort)`
 
 ### `CraftingOrderClassic_UI_Skin_Dropdown.lua`
 > CraftingOrderClassic_UI_Skin_Dropdown.lua — menu deroulant (selecteur) du kit natif.
@@ -921,7 +954,16 @@
 > Onglets : Carnet / Commande / Récolte / Artisans / Mes artisans / Aide / Nouveautés.
 > Lit le cache (COC.db.orders + Directory), jamais le réseau directement.
 
-**API** : `UI:Build()` · `UI:BuildTabs(f)` · `UI:ShowTab(id)` · `UI:BuildOrdersTab(f)` · `UI:Toast(text, icon)` · `UI:RefreshOrders()` · `UI:RefreshHandoff()` · `UI:RefreshSoon()` · `UI:Refresh()` · `UI:Toggle(tab)`
+**API** : `UI:Build()` · `UI:BuildTabs(f)` · `UI:ShowTab(id)` · `UI:Toast(text, icon)` · `UI:RefreshSoon()` · `UI:Refresh()` · `UI:Toggle(tab)`
+
+### `CraftingOrderClassic_UI_Ledger.lua`
+> CraftingOrderClassic_UI_Ledger.lua — onglet CARNET : MES commandes, en table (Commande · Qté · Prix ·
+> Métier · Artisan · Statut), filtres En cours / Archivées / Confiées, colonnes TRIABLES au clic sur
+> l'en-tête (palier 5 de la revue d'interface, calqué sur « Mes commandes » des Commandes
+> d'artisanat ; en-tête : Skin.MakeSortHeader). Sorti de _UI.lua au palier 5, qui touchait le
+> plafond des 500 lignes ; la fenêtre (_UI.lua) l'appelle par BuildOrdersTab / RefreshOrders.
+
+**API** : `UI:BuildOrdersTab(f)` · `UI:RefreshOrders()` · `UI:RefreshHandoff()`
 
 ### `CraftingOrderClassic_UI_HelpPlate.lua`
 > CraftingOrderClassic_UI_HelpPlate.lua — AIDE CONTEXTUELLE de la FENÊTRE PRINCIPALE (« bouton i »).
