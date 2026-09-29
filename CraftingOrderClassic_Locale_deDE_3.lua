@@ -49,6 +49,22 @@ local de3 = {
         "Entdeckungsraum: aus — |cFFFFFFFF/co channel room on|r, um ihn wieder einzuschalten",
     ["salle de découverte : |cFFFFFFFF%s|r — on s'y présente, les données restent en whisper"] =
         "Entdeckungsraum: |cFFFFFFFF%s|r — dient zum Vorstellen, Daten laufen weiter per Flüstern",
+    -- Annonce sur Trade (Services), Orders_AnnounceSend (2026-09-29)
+    ["Annoncer en Commerce"] = "Im Handelskanal ankündigen",
+    ["Poste aussi une ligne sur Trade (Services), lisible par tous : les joueurs avec ou sans l'addon voient ta commande. Une ligne par clic, jamais de répétition automatique ; seulement pour une commande à tous, dans une capitale."] =
+        "Schreibt zusätzlich eine für alle lesbare Zeile in Handel (Dienstleistungen): Spieler mit und ohne Addon sehen deinen Auftrag. Eine Zeile pro Klick, nie automatisch wiederholt; nur für einen Auftrag an alle, in einer Hauptstadt.",
+    ["seule une commande ouverte, à toi, s'annonce."] = "nur ein offener Auftrag von dir kann angekündigt werden.",
+    ["commande privée : elle ne s'annonce pas sur Commerce."] = "privater Auftrag: er wird nie im Handelskanal angekündigt.",
+    ["déjà annoncée : tu pourras la rappeler dans %d min."] = "schon angekündigt: du kannst ihn in %d Min. wiederholen.",
+    ["une annonce par minute au plus : attends encore %d s."] = "höchstens eine Ankündigung pro Minute: warte noch %d s.",
+    ["pas de canal Trade (Services) ici : il faut être dans une capitale."] =
+        "hier gibt es keinen Kanal Handel (Dienstleistungen): du musst in einer Hauptstadt sein.",
+    ["annonce impossible : un objet n'est pas encore connu du jeu, réessaie dans un instant."] =
+        "Ankündigung noch nicht möglich: ein Gegenstand ist noch nicht geladen, versuche es gleich noch einmal.",
+    ["annonce refusée par le jeu."] = "das Spiel hat die Ankündigung abgelehnt.",
+    ["commande annoncée sur %s."] = "Auftrag in %s angekündigt.",
+    ["Clic droit : annoncer en Commerce"] = "Rechtsklick: im Handelskanal ankündigen",
+    ["Clic droit : rappeler en Commerce"] = "Rechtsklick: im Handelskanal wiederholen",
     -- Aide remise à jour : onglets latéraux, cercles (2026-09-28)
     ["Ils se rangent sur le bord droit, comme ceux de la fenêtre de métier. Survole une icône pour lire son nom ; le chiffre sur le Carnet compte tes commandes en cours."] =
         "Sie sitzen am rechten Rand, wie im Berufsfenster. Fahre über ein Symbol, um seinen Namen zu lesen; die Zahl am Auftragsbuch zählt deine aktiven Aufträge.",

@@ -191,9 +191,22 @@ function UI:_FillOrderRow(row, it)
     local slabel, scol = Skin.StatusInfo(o.status)
     row.status:SetText("|c" .. scol .. slabel .. "|r")
     local label, fn = orderActionFor(o)
-    row:SetScript("OnClick", label and function() fn(); UI:Refresh() end or nil)
-    row:SetScript("OnEnter", label and function(rr)
-        GameTooltip:SetOwner(rr, "ANCHOR_RIGHT"); GameTooltip:AddLine(L["Clic : "] .. label, 1, 1, 1); GameTooltip:Show()
+    -- Clic DROIT : annoncer (ou rappeler) la commande sur Trade (Services) — un clic, une ligne, au plus
+    -- une fois par quart d'heure (Orders_AnnounceSend, spec annonce-commerce).
+    local AS = COC.AnnounceSend
+    local ann = AS and AS:CanRemind(o) and (o.announcedAt and L["Clic droit : rappeler en Commerce"]
+        or L["Clic droit : annoncer en Commerce"])
+    if row.RegisterForClicks then row:RegisterForClicks("LeftButtonUp", "RightButtonUp") end
+    row:SetScript("OnClick", (label or ann) and function(_, btn)
+        if btn == "RightButton" then
+            if ann then AS:Post(o, o.announcedAt ~= nil); UI:Refresh() end
+        elseif fn then fn(); UI:Refresh() end
+    end or nil)
+    row:SetScript("OnEnter", (label or ann) and function(rr)
+        GameTooltip:SetOwner(rr, "ANCHOR_RIGHT")
+        if label then GameTooltip:AddLine(L["Clic : "] .. label, 1, 1, 1) end
+        if ann then GameTooltip:AddLine(ann, 1, 1, 1) end
+        GameTooltip:Show()
     end or nil)
 end
 

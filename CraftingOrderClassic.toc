@@ -164,6 +164,7 @@ Directory_MyArtisans.lua
 Directory_LootScan.lua
 Orders_Codec.lua
 Orders_Announce.lua
+Orders_AnnounceSend.lua
 Orders.lua
 Orders_Net.lua
 Orders_Narrative.lua

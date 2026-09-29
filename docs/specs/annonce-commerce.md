@@ -2,7 +2,9 @@
 
 > État : **validée** le 2026-09-29 par le user · Idée du user, mise en forme par l'agent · Mesures
 > préalables faites le 2026-09-29 (Critères 1 à 4 : tenus) · Implémentation : palier 1 (le format,
-> `Orders_Announce.lua`, `tests/test_announce.lua`) fait le 2026-09-29, critères 5 à 7 tenus.
+> `Orders_Announce.lua`, `tests/test_announce.lua`) et palier 2 (l'envoi, `Orders_AnnounceSend.lua` :
+> case du formulaire, clic droit du Carnet ; `tests/test_announce_send.lua`) faits le 2026-09-29 ;
+> critères 5 à 7 et 10 tenus en test, 11 à voir en jeu. Paliers 3 et 4 : pas commencés.
 
 ## Le problème
 
