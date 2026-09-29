@@ -73,12 +73,21 @@ local OFFICIAL = {
     Horde    = { clubId = 22973181, ticket = "XGvoAXHvxd", name = "Crafting Order PVE" },
 }
 
+-- COUPÉE le 2026-09-29, décision du user : la communauté de l'Alliance est détruite, et l'addon doit
+-- marcher sans communauté « pour le moment ». Sans elle : ni lien d'invitation à la connexion, ni
+-- marquage d'office, ni souscription de présence. Un cercle marqué à la main (/co circle <n°) reste un
+-- cercle. Les joueurs se trouvent par les connus, amis, guilde et la salle de découverte (Directory_Room).
+-- Rallumer = passer ce drapeau à true (les tests le font pour éprouver le code tenu en réserve).
+Dir.OFFICIAL_ON = false
+
 local function officialForMe()
+    if not Dir.OFFICIAL_ON then return nil end
     local faction = UnitFactionGroup and UnitFactionGroup("player")
     return faction and OFFICIAL[faction] or nil
 end
 
 local function isOfficialId(clubId)
+    if not Dir.OFFICIAL_ON then return false end
     for _, c in pairs(OFFICIAL) do
         if tostring(c.clubId) == tostring(clubId) then return true end
     end
@@ -88,6 +97,7 @@ end
 -- La communauté officielle, si elle est marquée cercle : elle prend la souscription de présence
 -- (Dir:FocusCircles — un seul club peut l'avoir).
 function Dir:OfficialCircleId()
+    if not self.OFFICIAL_ON then return nil end
     for _, c in pairs(OFFICIAL) do
         if self:IsCircle(c.clubId) then return c.clubId end
     end
