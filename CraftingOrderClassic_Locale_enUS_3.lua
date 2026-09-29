@@ -70,6 +70,11 @@ local en3 = {
     ["dispo annoncée sur %s."] = "availability announced in %s.",
     ["Quand tu actives ta dispo, poste aussi une ligne sur Trade (Services) : les joueurs avec ou sans l'addon voient que tu cherches du travail. Une ligne par activation, jamais au renouvellement automatique ; dans une capitale. Même réglage que la case du formulaire de commande."] =
         "When you turn on looking for work, also posts one line in Trade (Services): players with or without the addon see that you are looking for work. One line each time you turn it on, never on the automatic refresh; in a capital city. Same setting as the box on the order form.",
+    -- Aide sans communauté officielle (2026-09-30)
+    ["|cFFFFFFFF/co circle|r : tes cercles d'artisans (les communautés du jeu que tu as marquées)."] =
+        "|cFFFFFFFF/co circle|r: your crafters' circles (the in-game communities you have marked).",
+    ["Les artisans se trouvent par tes amis, ta guilde et tes cercles, par la salle de découverte (|cFFFFFFFF/co channel room|r) où les porteurs de l'addon se disent bonjour, et par les annonces sur Trade (Services) que l'addon relit."] =
+        "Crafters find each other through your friends, your guild and your circles, through the discovery room (|cFFFFFFFF/co channel room|r) where addon users say hello, and through the Trade (Services) announcements the addon reads.",
     -- Aide remise à jour : onglets latéraux, cercles (2026-09-28)
     ["Ils se rangent sur le bord droit, comme ceux de la fenêtre de métier. Survole une icône pour lire son nom ; le chiffre sur le Carnet compte tes commandes en cours."] =
         "They sit along the right edge, like the ones on the profession window. Hover an icon to read its name; the number on the Ledger counts your active orders.",
