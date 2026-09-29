@@ -16,9 +16,10 @@ local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
 local PANEL_W, PANEL_H = 330, 430
 -- Pool ≥ viewport (invariant liste virtualisée) : zone liste ≈ 236 px / 20 ≈ 12 lignes → 16 = marge.
 -- 15 et non 16 : la rangee de modes (Reactifs / Recettes) a pris 20 px sur la zone de liste.
--- L'invariant tient largement -- viewport ~196 px / 20 = ~10 lignes, le pool en couvre 15.
+-- Puis la case « Annoncer en Commerce » (2026-09-30) en a pris 22 de plus : viewport ~174 px / 20
+-- = ~9 lignes, le pool en couvre toujours 15.
 local ROW_H, VISIBLE   = 20, 15
-local LIST_TOP         = 204     -- y du haut de la liste (sous modes + en-tête picker + recherche)
+local LIST_TOP         = 226     -- y du haut de la liste (sous annonce + modes + en-tête picker + recherche)
 PW.LFW_LIST_TOP        = LIST_TOP   -- lu par _ProfWindow_LFW_Recipes pour poser la rangee de modes
 
 local function maxItems() return (COC.Directory and COC.Directory.OFFER_MAX_ITEMS) or 15 end
@@ -221,11 +222,12 @@ function PW:_BuildLFWChecks(p)
         PW:_EditLFWOffer(function(o) o.fee = (fee > 0) and fee or nil end)
     end
     for _, eb in ipairs({ g, s, c }) do eb:SetScript("OnTextChanged", onFee) end
+    if self._BuildLFWAnnounceCheck then self:_BuildLFWAnnounceCheck(p, -152) end   -- sous la commission
 end
 
 -- Moitié basse : le picker des composants fournis (en-tête compteur, recherche, liste virtualisée).
 function PW:_BuildLFWPicker(p)
-    Skin.MakeSeparator(p, -(LIST_TOP - 50))   -- inchange en absolu : LIST_TOP a descendu de 20
+    Skin.MakeSeparator(p, -(LIST_TOP - 50))   -- sous la case « Annoncer en Commerce »
     p.pickHdr = p:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     p.pickHdr:SetPoint("TOPLEFT", 12, -(LIST_TOP - 24))
     local search = CreateFrame("EditBox", nil, p, "InputBoxTemplate")
@@ -440,6 +442,7 @@ function PW:_RefreshLFWPanel()
     p.gold:SetText(tostring(math.floor(fee / 10000)))
     p.silver:SetText(tostring(math.floor((fee % 10000) / 100)))
     p.copper:SetText(tostring(fee % 100))
+    if p.announce then p.announce:SetChecked(COC.db and COC.db.announceTrade == true) end   -- partagé avec le formulaire
     p._filling = nil
     self:_RefreshLFWList()
 end

@@ -73,6 +73,24 @@ end
 
 local function isPublic(o) return o.recipient == nil or o.recipient == "" or o.recipient == "Tous" end
 
+-- Le délai d'une minute et la présence du canal : communs à la commande et à la dispo (un seul
+-- compteur, c'est le même joueur sur le même canal). Texte au joueur, ou nil.
+local function channelWhyNot()
+    local left = S.COOLDOWN - (now() - ((COC.db and COC.db.announceLast) or 0))
+    if left > 0 then return string.format(L["une annonce par minute au plus : attends encore %d s."], left) end
+    if not S.ChannelIndex() then return L["pas de canal Trade (Services) ici : il faut être dans une capitale."] end
+    return nil
+end
+
+-- Écrit `line` sur Trade (Services) et arme le délai. Rend le nom du canal, ou nil (refus déjà dit).
+local function write(line)
+    local idx, name = S.ChannelIndex()
+    local send = (C_ChatInfo and C_ChatInfo.SendChatMessage) or _G.SendChatMessage
+    if not (idx and send and pcall(send, line, "CHANNEL", nil, idx)) then p(L["annonce refusée par le jeu."]); return nil end
+    if COC.db then COC.db.announceLast = now() end
+    return name
+end
+
 -- Pourquoi cette commande ne peut pas partir maintenant (texte au joueur), ou nil.
 function S:WhyNot(o, isRemind)
     if not (o and o.buyer == me() and o.status == "open") then return L["seule une commande ouverte, à toi, s'annonce."] end
@@ -81,12 +99,7 @@ function S:WhyNot(o, isRemind)
     if isRemind and o.announcedAt and t - o.announcedAt < S.REMIND then
         return string.format(L["déjà annoncée : tu pourras la rappeler dans %d min."], math.ceil((S.REMIND - (t - o.announcedAt)) / 60))
     end
-    local last = (COC.db and COC.db.announceLast) or 0
-    if t - last < S.COOLDOWN then
-        return string.format(L["une annonce par minute au plus : attends encore %d s."], S.COOLDOWN - (t - last))
-    end
-    if not S.ChannelIndex() then return L["pas de canal Trade (Services) ici : il faut être dans une capitale."] end
-    return nil
+    return channelWhyNot()
 end
 
 -- Le clic « droit » du Carnet propose-t-il d'annoncer (ou de rappeler) cette commande ?
@@ -110,13 +123,26 @@ function S:Post(o, isRemind)
     if why then p(why); return false end
     local line = self:LineFor(o)
     if not line then p(L["annonce impossible : un objet n'est pas encore connu du jeu, réessaie dans un instant."]); return false end
-    local idx, name = S.ChannelIndex()
-    local send = (C_ChatInfo and C_ChatInfo.SendChatMessage) or _G.SendChatMessage
-    if not (send and pcall(send, line, "CHANNEL", nil, idx)) then p(L["annonce refusée par le jeu."]); return false end
-    local t = now()
-    if COC.db then COC.db.announceLast = t end
-    o.announcedAt = t
+    local name = write(line)
+    if not name then return false end
+    o.announcedAt = now()
     if COC.Trace then COC.Trace:Log("send", "annonce " .. tostring(o.id) .. " sur " .. tostring(name)) end
     p(string.format(L["commande annoncée sur %s."], name))
+    return true
+end
+
+-- La dispo d'un artisan (palier 4) : « LFW <métier> #CO », quand il l'ACTIVE et seulement si la case
+-- « Annoncer en Commerce » est cochée (même réglage que le formulaire de commande). À appeler depuis
+-- son clic (bouton, bande « Chercher du travail », /co lfw) — jamais depuis le renouvellement
+-- automatique de la dispo (ticker, riposte) : le jeu exige un geste, et Commerce n'est pas à nous.
+function S:PostLFW(profKey)
+    if not (profKey and COC.db and COC.db.announceTrade) then return false end
+    local why = channelWhyNot()
+    if why then p(why); return false end
+    local line = COC.Announce.BuildLFW({ profKey })
+    local name = line and write(line)
+    if not name then return false end
+    if COC.Trace then COC.Trace:Log("send", "dispo " .. profKey .. " annoncée sur " .. tostring(name)) end
+    p(string.format(L["dispo annoncée sur %s."], name))
     return true
 end

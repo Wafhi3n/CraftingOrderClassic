@@ -66,6 +66,10 @@ local es3 = {
     ["commande annoncée sur %s."] = "pedido anunciado en %s.",
     ["Clic droit : annoncer en Commerce"] = "Clic derecho: anunciar en Comercio",
     ["Clic droit : rappeler en Commerce"] = "Clic derecho: repetir en Comercio",
+    -- Annonce de la dispo LFW (2026-09-30)
+    ["dispo annoncée sur %s."] = "disponibilidad anunciada en %s.",
+    ["Quand tu actives ta dispo, poste aussi une ligne sur Trade (Services) : les joueurs avec ou sans l'addon voient que tu cherches du travail. Une ligne par activation, jamais au renouvellement automatique ; dans une capitale. Même réglage que la case du formulaire de commande."] =
+        "Al activar tu búsqueda de trabajo, publica también una línea en Comercio (Servicios): los jugadores con o sin el addon ven que buscas trabajo. Una línea por activación, nunca en la renovación automática; solo en una capital. El mismo ajuste que la casilla del formulario de pedido.",
     -- Aide remise à jour : onglets latéraux, cercles (2026-09-28)
     ["Ils se rangent sur le bord droit, comme ceux de la fenêtre de métier. Survole une icône pour lire son nom ; le chiffre sur le Carnet compte tes commandes en cours."] =
         "Están en el borde derecho, como los de la ventana de profesión. Pasa el ratón sobre un icono para leer su nombre; el número sobre el Libro cuenta tus pedidos activos.",

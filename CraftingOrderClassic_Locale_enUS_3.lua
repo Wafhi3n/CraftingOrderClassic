@@ -66,6 +66,10 @@ local en3 = {
     ["commande annoncée sur %s."] = "order announced in %s.",
     ["Clic droit : annoncer en Commerce"] = "Right-click: announce in Trade",
     ["Clic droit : rappeler en Commerce"] = "Right-click: repeat in Trade",
+    -- Annonce de la dispo LFW (2026-09-30)
+    ["dispo annoncée sur %s."] = "availability announced in %s.",
+    ["Quand tu actives ta dispo, poste aussi une ligne sur Trade (Services) : les joueurs avec ou sans l'addon voient que tu cherches du travail. Une ligne par activation, jamais au renouvellement automatique ; dans une capitale. Même réglage que la case du formulaire de commande."] =
+        "When you turn on looking for work, also posts one line in Trade (Services): players with or without the addon see that you are looking for work. One line each time you turn it on, never on the automatic refresh; in a capital city. Same setting as the box on the order form.",
     -- Aide remise à jour : onglets latéraux, cercles (2026-09-28)
     ["Ils se rangent sur le bord droit, comme ceux de la fenêtre de métier. Survole une icône pour lire son nom ; le chiffre sur le Carnet compte tes commandes en cours."] =
         "They sit along the right edge, like the ones on the profession window. Hover an icon to read its name; the number on the Ledger counts your active orders.",

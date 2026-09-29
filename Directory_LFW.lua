@@ -335,6 +335,7 @@ function Dir:LFWCmd(arg)
     end
     self:SetLFW(key)
     pmsg(string.format(L["recherche de travail : |cFF33DD33%s|r — visible au royaume"], profLabel(key)))
+    if COC.AnnounceSend then COC.AnnounceSend:PostLFW(key) end   -- commande tapée = geste du joueur
 end
 
 -- Câblage : handlers des verbes LFW + LFO + ré-affirmation à chaque (re)acquisition du canal. Appelé

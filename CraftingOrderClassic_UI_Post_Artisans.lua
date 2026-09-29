@@ -154,6 +154,8 @@ function UI:_BuildAnnounceCheck(bar, rightOf)
     chk:SetPoint("RIGHT", rightOf, "LEFT", -(chk.text:GetStringWidth() + 16), 0)
     chk:SetChecked(COC.db and COC.db.announceTrade == true)
     chk:SetScript("OnClick", function(b) if COC.db then COC.db.announceTrade = b:GetChecked() and true or nil end end)
+    -- Le même réglage se coche aussi dans l'offre de dispo (PW:_BuildLFWChecks) : relu à chaque affichage.
+    chk:SetScript("OnShow", function(b) b:SetChecked(COC.db and COC.db.announceTrade == true) end)
     chk:SetScript("OnEnter", function(b)
         GameTooltip:SetOwner(b, "ANCHOR_TOP")
         GameTooltip:SetText(L["Annoncer en Commerce"], 1, 1, 1)

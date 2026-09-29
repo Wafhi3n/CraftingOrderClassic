@@ -65,6 +65,10 @@ local de3 = {
     ["commande annoncée sur %s."] = "Auftrag in %s angekündigt.",
     ["Clic droit : annoncer en Commerce"] = "Rechtsklick: im Handelskanal ankündigen",
     ["Clic droit : rappeler en Commerce"] = "Rechtsklick: im Handelskanal wiederholen",
+    -- Annonce de la dispo LFW (2026-09-30)
+    ["dispo annoncée sur %s."] = "Verfügbarkeit in %s angekündigt.",
+    ["Quand tu actives ta dispo, poste aussi une ligne sur Trade (Services) : les joueurs avec ou sans l'addon voient que tu cherches du travail. Une ligne par activation, jamais au renouvellement automatique ; dans une capitale. Même réglage que la case du formulaire de commande."] =
+        "Wenn du die Arbeitssuche einschaltest, wird zusätzlich eine Zeile in Handel (Dienstleistungen) gepostet: Spieler mit oder ohne das Addon sehen, dass du Arbeit suchst. Eine Zeile pro Einschalten, nie bei der automatischen Erneuerung; nur in einer Hauptstadt. Dieselbe Einstellung wie das Kästchen im Auftragsformular.",
     -- Aide remise à jour : onglets latéraux, cercles (2026-09-28)
     ["Ils se rangent sur le bord droit, comme ceux de la fenêtre de métier. Survole une icône pour lire son nom ; le chiffre sur le Carnet compte tes commandes en cours."] =
         "Sie sitzen am rechten Rand, wie im Berufsfenster. Fahre über ein Symbol, um seinen Namen zu lesen; die Zahl am Auftragsbuch zählt deine aktiven Aufträge.",

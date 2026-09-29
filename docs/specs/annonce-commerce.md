@@ -8,7 +8,8 @@
 > fait le 2026-09-29. Critères 5 à 10 et la lecture du 12 tenus en test ; **11 tenu en jeu le
 > 2026-09-30 00:19** (registre de vérification : témoin sans la case invisible pour Gnomi, `#CO6` lu,
 > bonjour, commande complète à la place de l'aperçu, une seule alerte). Palier 4 (l'envoi de la ligne
-> LFW) : pas commencé.
+> LFW, `AnnounceSend:PostLFW`, case dans le panneau « Offre ») fait le 2026-09-30, tenu en test ; le
+> critère 13 reste à voir en jeu.
 
 ## Le problème
 
@@ -204,6 +205,10 @@ de découverte (`feat/salle-decouverte`) seulement pour le bonjour ; le reste es
    → **Fait** (avec la lecture de la ligne LFW, avancée depuis le palier 4).
 4. **La dispo LFW** : la case dans l'onglet de dispo, la ligne `LFW … #CO`. Critère 13 (le 12 est
    tenu en test depuis le palier 3).
+   → **Fait** : la case vit dans le panneau « Offre » de la bande « Chercher du travail » (même
+   réglage que celle du formulaire, qui se relit à chaque affichage) ; la ligne part du clic qui
+   active la dispo (bande, bouton de la vue pleine, `/co lfw <métier>`), avec le métier activé —
+   la dispo n'en porte qu'un. Même délai d'une minute que les commandes, un seul compteur.
 5. **Relectures** avant fusion : `api-gotcha-reviewer`, `craftlink-protocol-reviewer` (critère 15),
    puis `spec-updater` sur le diff.
 
