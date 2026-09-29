@@ -34,6 +34,13 @@ local BODY_W = 780
 local function versionsHead()
     return {
         {
+            v = "v1.39.1", title = L["Les commandes envoyées par courrier se terminent seules"],
+            lines = {
+                L["Quand un artisan t'envoie ta commande par courrier, prendre l'objet dans ta boîte aux lettres la marque reçue, comme quand tu le ramasses. L'artisan est crédité tout de suite. Avant, elle restait « Remise » et il fallait cliquer « J'ai reçu » dans le Carnet."],
+                L["Côté artisan, « Remplir depuis commande » pouvait joindre une pile entière à une commande plus petite : une commande de 1 partait avec 9. Il coupe maintenant la bonne quantité dans tes sacs et ne joint qu'elle ; sans case libre pour la coupe, le chat te dit combien séparer toi-même."],
+            },
+        },
+        {
             v = "v1.39.0", title = L["La fenêtre prend l'allure du jeu"],
             lines = {
                 L["Les onglets de la fenêtre passent sur son bord droit, en icônes, comme dans la fenêtre de métier. Survole-les pour lire leur nom ; le titre dit où tu es, et l'icône du Carnet compte tes commandes en cours."],

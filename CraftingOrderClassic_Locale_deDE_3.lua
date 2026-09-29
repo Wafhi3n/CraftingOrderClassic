@@ -46,6 +46,11 @@ local de3 = {
     ["cercles d'artisans (communautés) et rappel de la communauté"] =
         "Handwerkerkreise (Gemeinschaften) und die Gemeinschafts-Erinnerung",
     ["ou"] = "oder",   -- statuts d'une commande, Aide : « (ou Annulée / Refusée) »
+    -- Courrier : l'addon ne coupe plus une pile lui-même (2026-09-28)
+    ["Il en manque %d au courrier : sépare-les d'une pile toi-même (Maj-clic sur la pile), puis dépose-les."] =
+        "Es fehlen noch %d in der Post: Trenne sie selbst von einem Stapel ab (Umschalt-Klick auf den Stapel) und lege sie hinein.",
+    ["La pile de %d est prête dans ton sac : dépose-la toi-même dans le courrier."] =
+        "Der Stapel mit %d liegt bereit in deiner Tasche: Lege ihn selbst in die Post.",
 }
 
 for k, v in pairs(de3) do L[k] = v end

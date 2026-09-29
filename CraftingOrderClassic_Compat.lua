@@ -312,6 +312,16 @@ function A.PlayerName()
     return (_G.UnitName and _G.UnitName("player")) or "?"
 end
 
+-- Deux désignations du MÊME prénom ? Le courrier nomme son expéditeur à sa façon (prénom seul, ou
+-- « Prénom Nom », avec ou sans royaume), le réseau dit « Prénom Nom » : on compare le PRÉNOM, sans
+-- casse. Un prénom n'est pas unique sur Forever : ne s'en servir que pour RESTREINDRE un choix déjà
+-- étroit (la commande « remise » de CET objet, à MOI), jamais pour identifier seul un joueur.
+function A.SameFirstName(a, b)
+    local function first(n) return type(n) == "string" and (n:match("^([^%s%-]+)") or n):lower() or nil end
+    local fa = first(a)
+    return fa ~= nil and fa == first(b)
+end
+
 -- ---------------------------------------------------------------- métiers
 
 -- Fermer la session de métier ouverte. Il y avait trois API selon la saveur — `CloseCraft` (Craft,

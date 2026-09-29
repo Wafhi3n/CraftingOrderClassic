@@ -176,13 +176,16 @@ function Orders:Confirm(id, auto)
     if COC.UI and COC.UI.Refresh then COC.UI:Refresh() end
 end
 
--- Auto-complétion à la RÉCEPTION d'un objet. `source` = "loot" aujourd'hui ; point d'entrée UNIQUE
--- pour brancher plus tard l'échange et le courrier (il suffira d'appeler ceci depuis ces détecteurs).
+-- Auto-complétion à la RÉCEPTION d'un objet. `source` = "loot" (butin, _LootAlert) ou "mail" (pièce
+-- jointe prise, _Companion_Mail) ; point d'entrée UNIQUE, l'échange s'y branchera de même.
 -- Confirme la 1re commande À MOI, « remise », dont l'objet correspond (dédup par le statut done).
-function Orders:TryAutoComplete(itemID, source)
+-- `from` = l'expéditeur, quand on le connaît (le courrier) : seule SA commande se confirme — un objet
+-- acheté à l'HdV, livré par courrier lui aussi, ne confirme plus celle d'un artisan (2026-09-29).
+function Orders:TryAutoComplete(itemID, source, from)
     if not (itemID and COC.db and COC.db.orders) then return false end
     for id, o in pairs(COC.db.orders) do
-        if actsFor(o.buyer) and o.status == "delivered" and o.itemID == itemID then
+        if actsFor(o.buyer) and o.status == "delivered" and o.itemID == itemID
+           and (from == nil or COC.Api.SameFirstName(o.acceptedBy, from)) then
             self:Confirm(id, true)
             return true
         end

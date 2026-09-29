@@ -46,6 +46,58 @@ client.
 
 ## Relevés
 
+- 2026-09-29 16:10 — jusqu'a a3ba24b — Forever, deux clients, client en ANGLAIS ; build déployé
+  `main-dev@f2e653a 2026-09-29 15:35` (`/co version` pas relu par l'agent ; la ligne de trace
+  « butin à la boîte aux lettres » n'existe que dans ce build) — **GO sur le témoin inverse de
+  l'hôtel des ventes** — traces et SavedVariables des deux comptes relues par l'agent (écrites à
+  16:10:37 et 16:10:40) : commande Silverleaf `Gnomi Short-27`, ACK puis DLV de Rédemption à
+  16:10:07 et 16:10:09 (« Mark delivered », rien d'envoyé). À 16:10:27, Gnomi prend un Silverleaf
+  acheté à l'HdV : le crochet lit l'expéditeur « Alliance Auction House » et ne confirme rien. À
+  16:10:28, le message de butin arrive et il est écarté (« laissé au crochet du courrier ») : c'est
+  maintenant VU, plus seulement déduit. Aucun `ORD|DONE` ne part, et la -27 reste `delivered` chez
+  les deux comptes.
+  Relevé en passant : à 15:47:01, Gnomi n'avait pas été rechargé depuis 15:28 et tournait sur
+  l'ancien build. Le défaut s'y est reproduit à l'identique (commande -26 confirmée dans la seconde
+  de la prise).
+  Non vu : la confirmation par un courrier de l'artisan (le courrier entre les deux comptes ne livre
+  toujours rien) ; le délai de 5 s après la fermeture de la boîte.
+- 2026-09-29 15:28 — jusqu'a 66505eb — Forever, deux clients, client en ANGLAIS ; build déployé
+  `main-dev@d17eba1 2026-09-29 15:14` (`/co version` pas relu) — **NO-GO sur le témoin inverse de
+  l'hôtel des ventes** — trace de Gnomi relue par l'agent (SavedVariable écrite à 15:28:25) : commande
+  Silverleaf `Gnomi Short-25`, ACK puis DLV de Rédemption à 15:28:03 et 15:28:04 (« Mark delivered »,
+  rien d'envoyé). À 15:28:11, Gnomi prend un Silverleaf acheté à l'HdV : le crochet du courrier est
+  appelé, l'expéditeur est lu « Alliance Auction House », l'objet 765 est lu en direct, et le crochet
+  répond « aucune commande remise par cet expéditeur » : le filtre par expéditeur tient. À 15:28:12,
+  `ORD|DONE` de la -25 part quand même (le user rapporte « commande completed »). Le seul autre chemin
+  automatique vers `TryAutoComplete` est le message de butin (`_LootAlert`, sans expéditeur) : c'est
+  DÉDUIT, pas tracé, car ce chemin n'avait pas de trace. Corrigé après ce relevé : le chat se tait à
+  la boîte aux lettres, et une trace est posée. Pas revu en jeu.
+  Non vu : le courrier entre les deux comptes, toujours.
+- 2026-09-28 17:45 — jusqu'a f6e9826 — Forever, deux clients, client en ANGLAIS ; build déployé
+  après la release : `main-dev@239fad7 2026-09-28 16:29` = v1.39.0 + `feat/icone-commande-recue`
+  (`/co version` pas relu) — **GO sur les restes « non vus » de la v1.39.0** — rapporté par le user,
+  deux captures : le bas de l'Aide « Order statuses: Pending » Accepted » Delivered (or Cancelled /
+  Declined). » (le « ou » traduit) ; le Carnet de Gnomi, colonnes triables, sept commandes. Rapporté
+  sans capture : la lueur de l'onglet Enchantement « fonctionne bien » ; « J'ai reçu » côté
+  acheteur fonctionne ; barre fine de Profit, du réglage LFW et de la Route flottante, et fenêtre
+  de métier fermée/rouverte en combat : « ça bug pas » ; Journal (Échap, détail, fiche en
+  lecture) : OK.
+  ÉCART : la commande envoyée par courrier reste « Delivered » chez l'acheteur. Lu dans le code : la
+  confirmation automatique n'écoute que `CHAT_MSG_LOOT` (`_LootAlert.lua`), rien n'écoute la prise
+  d'une pièce jointe — le courrier y est noté « point de branchement futur » ; l'en-tête de
+  `_Companion_Mail.lua` promettait le contraire. Pas vu : si la pièce jointe avait été prise.
+- 2026-09-28 21:20 — jusqu'a 4721828 — Forever, deux clients, client en ANGLAIS ; build déployé
+  `main-dev@4864ed4 2026-09-28 21:03` (`/co version` pas relu) — **GO sur « Fill from order » qui ne
+  joint plus que la quantité voulue** — Rédemption, commande ×1 de Lesser Magic Essence, une pile de 8
+  au sac : la quantité est coupée DANS LE SAC vers une case vide, puis cette pile de 1 est jointe
+  (rapporté par le user, capture du sac : la case coupée grisée, en pièce jointe). Trace « mail »
+  relue par l'agent, essais d'AVANT : l'ancienne coupe directe joignait la pile ENTIÈRE (20:51 : 9
+  pour 1 ; 20:55 : 8 pour 1, même avec un dépôt différé) ; la coupe dans le sac avec un délai FIXE de
+  0,3 s trouvait la case encore vide (21:01 : « nil×nil »), rien de joint — d'où la relecture toutes
+  les 0,1 s jusqu'à une pile exacte et déverrouillée.
+  Non vu : la trace de cet essai-ci (pas encore écrite sur le disque) ; les replis « pas de case
+  libre » et « case jamais prête » ; l'envoi et la réception de ce courrier.
+
 - 2026-09-28 16:05 — jusqu'a eaa4ba7 — Forever, deux clients, client en ANGLAIS ; build déployé
   `main-dev@c43f9f9 2026-09-28 15:43` (`/co version` pas relu) — **GO sur le palier 7c : la colonne
   greffée à la barre fine, ÉPROUVÉE EN COMBAT** (risque 4 de la revue) — capture du user en combat

@@ -375,6 +375,13 @@ local news = {
         "In WoW Forever hat jeder Charakter einen Nachnamen, und das Spiel nennt dich überall 'Vorname Nachname'. Das Addon benutzte nur deinen Vornamen und erkannte sich selbst nicht mehr: Ein Auftrag an dich kam an und wurde ignoriert, ein im Kanal geposteter Auftrag wurde verworfen, als würde jemand im Namen eines anderen posten, und du konntest in deiner eigenen Handwerkerliste auftauchen. Behoben, auch für Aufträge von Spielern, die noch 1.36.1 nutzen.",
     ["Une ligne du canal Commerce comme « dont need fire wand: [Lesser Magic Wand] » n'est plus prise pour une demande."] =
         "Eine Handelszeile wie 'dont need fire wand: [Lesser Magic Wand]' gilt nicht mehr als Anfrage.",
+    -- v1.39.1
+    ["Les commandes envoyées par courrier se terminent seules"] =
+        "Verschickte Aufträge schließen sich selbst ab",
+    ["Quand un artisan t'envoie ta commande par courrier, prendre l'objet dans ta boîte aux lettres la marque reçue, comme quand tu le ramasses. L'artisan est crédité tout de suite. Avant, elle restait « Remise » et il fallait cliquer « J'ai reçu » dans le Carnet."] =
+        "Schickt dir ein Handwerker deinen Auftrag per Post, gilt er als erhalten, sobald du den Gegenstand aus dem Briefkasten nimmst, wie beim Plündern. Der Handwerker wird sofort gutgeschrieben. Bisher blieb er auf 'Geliefert' und du musstest im Auftragsbuch 'Erhalten' klicken.",
+    ["Côté artisan, « Remplir depuis commande » pouvait joindre une pile entière à une commande plus petite : une commande de 1 partait avec 9. Il coupe maintenant la bonne quantité dans tes sacs et ne joint qu'elle ; sans case libre pour la coupe, le chat te dit combien séparer toi-même."] =
+        "Auf Handwerkerseite konnte 'Aus Auftrag füllen' einen ganzen Stapel an einen kleineren Auftrag hängen: Ein Auftrag über 1 ging mit 9 raus. Jetzt wird die richtige Menge in deinen Taschen abgetrennt und nur sie angehängt; ohne freien Taschenplatz sagt dir der Chat, wie viele du selbst abtrennen musst.",
     -- v1.39.0
     ["La fenêtre prend l'allure du jeu"] =
         "Das Fenster sieht aus wie das Spiel",
