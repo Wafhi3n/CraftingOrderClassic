@@ -125,7 +125,7 @@ local en = {
     ["commandes :"] = "commands:",
     ["statut (infra, mes recettes, réseau)"] = "status (infra, my recipes, network)",
     ["carnet d'ordres"] = "order ledger", ["poster une commande"] = "post an order",
-    ["solliciter l'annuaire (présence + proximité)"] = "poll the directory (presence + proximity)",
+    ["solliciter l'annuaire (présence des artisans connus)"] = "poll the directory (presence of known crafters)",
     ["teste l'aller-retour réseau (PING global » PONG des autres porteurs)"] =
         "test the network round-trip (global PING » PONG from other holders)",
     ["vue commandes d'un métier (ou menu des métiers si vide)"] =

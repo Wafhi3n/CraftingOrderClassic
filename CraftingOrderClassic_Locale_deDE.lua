@@ -123,7 +123,7 @@ local de = {
     ["commandes :"] = "Befehle:",
     ["statut (infra, mes recettes, réseau)"] = "Status (Infra, meine Rezepte, Netzwerk)",
     ["carnet d'ordres"] = "Auftragsbuch", ["poster une commande"] = "einen Auftrag erstellen",
-    ["solliciter l'annuaire (présence + proximité)"] = "Verzeichnis abfragen (Präsenz + Nähe)",
+    ["solliciter l'annuaire (présence des artisans connus)"] = "Verzeichnis abfragen (Präsenz bekannter Handwerker)",
     ["teste l'aller-retour réseau (PING global » PONG des autres porteurs)"] =
         "testet die Netzwerk-Rundreise (globales PING » PONG anderer Nutzer)",
     ["vue commandes d'un métier (ou menu des métiers si vide)"] =

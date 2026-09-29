@@ -124,7 +124,7 @@ local es = {
     ["commandes :"] = "comandos:",
     ["statut (infra, mes recettes, réseau)"] = "estado (infra, mis recetas, red)",
     ["carnet d'ordres"] = "libro de pedidos", ["poster une commande"] = "crear un pedido",
-    ["solliciter l'annuaire (présence + proximité)"] = "consultar el directorio (presencia + proximidad)",
+    ["solliciter l'annuaire (présence des artisans connus)"] = "consultar el directorio (presencia de los artesanos conocidos)",
     ["teste l'aller-retour réseau (PING global » PONG des autres porteurs)"] =
         "prueba el ida y vuelta de red (PING global » PONG de otros usuarios)",
     ["vue commandes d'un métier (ou menu des métiers si vide)"] =
