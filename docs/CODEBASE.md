@@ -115,7 +115,7 @@
 | `CraftingOrderClassic_ProfWindow_LFW.lua` | config de l'OFFRE « recherche de travail » par métier. | 493 |
 | `CraftingOrderClassic_ProfWindow_LFW_Recipes.lua` | le SÉLECTEUR DE RECETTES de l'offre LFW. | 140 |
 | `CraftingOrderClassic_ProfWindow_Reroll.lua` | vue métier LECTURE SEULE d'un REROLL. | 118 |
-| `Directory.lua` | Crafting Order - Classic — Directory : l'annuaire des GENS (présence + qui peut crafter quoi). | 498 |
+| `Directory.lua` | Crafting Order - Classic — Directory : l'annuaire des GENS (présence + qui peut crafter quoi). | 499 |
 | `Directory_Presence.lua` | présence : la vérité JEU (amis/guilde) et sa fusion avec la vérité ADDON. | 102 |
 | `Directory_Recipes.lua` | COUTURE de lecture du registre « qui sait crafter quoi » d'un artisan. | 129 |
 | `Directory_Confed.lua` | source « confédération » (GreenWall) de l'annuaire, DISPLAY-ONLY. | 63 |
