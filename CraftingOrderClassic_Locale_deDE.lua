@@ -117,13 +117,13 @@ local de = {
     ["réseau global : %s — |cFFFFFFFF%d|r en ligne, |cFFFFFFFF%d|r crafteur(s) connus"] =
         "globales Netzwerk: %s — |cFFFFFFFF%d|r online, |cFFFFFFFF%d|r bekannte(r) Handwerker",
     ["connexion…"] = "Verbinde…",
-    ["réseau : sollicitation envoyée (HI global + PING proximité)."] =
-        "Netzwerk: Aufruf gesendet (globales HI + Nähe-PING).",
+    ["réseau : sollicitation envoyée (HI à tous + relance des artisans connus)."] =
+        "Netzwerk: Aufruf gesendet (HI an alle + Ping bekannter Handwerker).",
     ["métier inconnu : "] = "unbekannter Beruf: ",
     ["commandes :"] = "Befehle:",
     ["statut (infra, mes recettes, réseau)"] = "Status (Infra, meine Rezepte, Netzwerk)",
     ["carnet d'ordres"] = "Auftragsbuch", ["poster une commande"] = "einen Auftrag erstellen",
-    ["solliciter l'annuaire (présence + proximité)"] = "Verzeichnis abfragen (Präsenz + Nähe)",
+    ["solliciter l'annuaire (présence des artisans connus)"] = "Verzeichnis abfragen (Präsenz bekannter Handwerker)",
     ["teste l'aller-retour réseau (PING global » PONG des autres porteurs)"] =
         "testet die Netzwerk-Rundreise (globales PING » PONG anderer Nutzer)",
     ["vue commandes d'un métier (ou menu des métiers si vide)"] =

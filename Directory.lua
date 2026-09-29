@@ -217,8 +217,10 @@ function Dir:OnHello(sender, message, distribution)
     if self.LFWRiposte then self:LFWRiposte() end
 end
 
--- PING reçu → PONG sur la MÊME portée (whisper si dirigé, sinon yell). Dirigé → profil (throttlé par
--- cible : un PING+HI groupé ne déclenche qu'UNE annonce, cf. _AnnounceToThrottled) + ping retour.
+-- PING reçu → PONG. Dirigé → profil (throttlé par cible : un PING+HI groupé ne déclenche qu'UNE
+-- annonce, cf. _AnnounceToThrottled) + ping retour. Un PING d'une autre portée (guilde) reçoit son
+-- PONG en whisper : on le criait, et crier est refusé hors instance sur Forever (InvalidChatType,
+-- banc des constats C9, 2026-09-29) — le PONG ne partait jamais.
 function Dir:OnPing(sender, _, distribution)
     if not CraftLink then return end
     self:_Touch(sender)
@@ -227,8 +229,8 @@ function Dir:OnPing(sender, _, distribution)
         self:_AnnounceToThrottled(sender)
         self:DiscoverPlayer(sender)
         if self.RelayPartnersTo then self:RelayPartnersTo(sender) end   -- fiches de mes partenaires hors ligne
-    else
-        CraftLink:Send("PONG", "yell")
+    elseif sender then
+        CraftLink:Send("PONG", "whisper", sender)
     end
 end
 
@@ -303,11 +305,11 @@ end
 -- anti-monolithe). CaptureSkills / _SkillPayload / AnnounceSkills / OnSkill restent sur COC.Directory.
 -- ------------------------------------------------------------------
 
--- Sollicite l'annuaire (sur action utilisateur) : HI global + PING proximité + re-ping des connus.
+-- Sollicite l'annuaire (sur action utilisateur) : HI global + re-ping des connus. Plus de PING crié :
+-- refusé hors instance sur Forever (InvalidChatType, banc des constats C9, 2026-09-29).
 function Dir:Refresh()
     if not CraftLink then return end
     CraftLink:Send("HI", "global")
-    CraftLink:Send("PING", "yell")
     -- /co refresh = action JOUEUR (hardware event) → on peut émettre la balise TEXTE de découverte
     -- (annonce ma présence aux INCONNUS du canal ; eux me découvriront ensuite en whisper).
     if CraftLink.SendBeacon then CraftLink:SendBeacon() end
@@ -477,10 +479,8 @@ function Dir:_WireBringup()
         Dir:CaptureSkills()
         local function bringup()
             Dir:Announce(); CraftLink:Send("HI", "global")
-            -- PING en portée : un AddonMessage, donc AUCUN hardware event requis — il n'y avait pas de
-            -- raison que seul `Dir:Refresh` l'envoie. Réveille les porteurs alentour sans passer par le
-            -- canal (le vecteur le moins fiable), et sans dépendre de la guilde ni de la liste d'amis.
-            CraftLink:Send("PING", "yell")
+            -- Plus de PING crié : sur Forever, crier est refusé hors instance (InvalidChatType, banc des
+            -- constats C9, 2026-09-29), il n'est jamais parti. Les voisins viennent de la communauté.
             -- Balise texte d'ARRIVÉE, ENFILÉE (cf. CraftLink_TextQueue). L'ancien commentaire disait ici
             -- « PAS de balise : SendChatMessage hors action joueur = ADDON_ACTION_BLOCKED ». Le constat
             -- était juste, la conclusion trop large : on ne pouvait pas l'ÉMETTRE, on pouvait l'ENFILER.

@@ -319,7 +319,7 @@ function COC:Help()
     print("  |cFFFFFFFF/co orders|r — " .. L["carnet d'ordres"])
     print("  |cFFFFFFFF/co post [shift-clic objet] [xN] [prix]|r — " .. L["poster une commande"])
     print("  |cFFFFFFFF/co accept <id>|r / |cFFFFFFFF/co done <id>|r / |cFFFFFFFF/co cancel <id>|r")
-    print("  |cFFFFFFFF/co refresh|r — " .. L["solliciter l'annuaire (présence + proximité)"])
+    print("  |cFFFFFFFF/co refresh|r — " .. L["solliciter l'annuaire (présence des artisans connus)"])
     print("  |cFFFFFFFF/co ping|r — |cFFFF8800" .. L["diag"] .. "|r : " .. L["teste l'aller-retour réseau (PING global » PONG des autres porteurs)"])
     print("  |cFFFFFFFF/co métier [nom]|r — " .. L["vue commandes d'un métier (ou menu des métiers si vide)"])
     print("  |cFFFFFFFF/co profwindow|r — " .. L["basculer fenêtre métier custom / vue Blizzard"])
@@ -377,7 +377,7 @@ function COC:Slash(msg)
         if COC.UI then COC.UI:Toggle() end
     elseif cmd == "status" then COC:Status()
     elseif cmd == "refresh" then
-        if D then D:Refresh(); p(COC.L["réseau : sollicitation envoyée (HI global + PING proximité)."]) end
+        if D then D:Refresh(); p(COC.L["réseau : sollicitation envoyée (HI à tous + relance des artisans connus)."]) end
     elseif cmd == "orders" or cmd == "list" then if O then O:PrintList() end
     elseif cmd == "post"   then if O then O:PostFromInput(rest) end
     elseif cmd == "cancel" then if O then O:Cancel(rest) end
