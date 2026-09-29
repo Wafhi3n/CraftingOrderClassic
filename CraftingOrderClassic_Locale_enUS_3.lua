@@ -65,6 +65,13 @@ local en3 = {
         "%d still missing from the mail: split them off a stack yourself (Shift-click the stack), then drop them in.",
     ["La pile de %d est prête dans ton sac : dépose-la toi-même dans le courrier."] =
         "The stack of %d is ready in your bag: drop it into the mail yourself.",
+    -- Note de membre de la communauté, /co note (2026-09-29)
+    ["le texte de tes métiers, à coller dans ta note de communauté (visible même hors ligne)"] =
+        "the text of your professions, to paste into your community note (visible even offline)",
+    ["aucun métier connu pour ce personnage : ouvre une fois ta fenêtre de métier, puis recommence."] =
+        "no profession known for this character yet: open your profession window once, then try again.",
+    ["Copie ce texte (Ctrl+C), puis colle-le dans ta note de membre : Communautés, clic droit sur ton nom, « Note ». Les autres joueurs de Crafting Order verront tes métiers, même quand tu es hors ligne."] =
+        "Copy this text (Ctrl+C), then paste it into your member note: Communities, right-click your name, \"Note\". Other Crafting Order players will see your professions, even when you're offline.",
 }
 
 for k, v in pairs(en3) do L[k] = v end

@@ -187,12 +187,15 @@ Dir._circleOnline = Dir._circleOnline or {}   -- [nom court] = true — en ligne
 -- très bien ne pas avoir COC — le marquer en ligne le rendrait faussement ciblable.
 -- `r.circle` = le cercle d'où il vient (clubId en chaîne) : une ligne par cercle dans l'onglet Artisans.
 -- Membre de deux cercles : le dernier parcouru l'emporte (une fiche, un seul classement).
-local function noteMember(name, clubId)
+local function noteMember(name, clubId, info)
     Dir.roster = Dir.roster or {}
     local r = Dir.roster[name]
     if not r then r = {}; Dir.roster[name] = r end
     if not r.manual then r.source = "circle" end
     r.circle = tostring(clubId)
+    -- Sa note de membre, posée à la main : lisible même hors ligne (constat C14, cf. Directory_Note).
+    -- Relue à chaque passage : une note effacée disparaît aussi de la fiche.
+    if Dir._CleanNote then r.memberNote = Dir:_CleanNote(info and info.memberNote) end
     -- Une communauté de personnage n'a qu'un camp, le mien : sans tampon, la fiche passerait le filtre
     -- de camp des persos d'en face du même compte (SV partagée).
     if not r.faction and Dir._MyFaction then r.faction = Dir:_MyFaction() end
@@ -223,7 +226,7 @@ function Dir:RefreshCircles()
             -- cross-royaume n'est de toute façon pas joignable en whisper, donc pas commandable.
             if realm then return end
             set[name] = raw
-            noteMember(name, raw)
+            noteMember(name, raw, info)
             if isOnline(info.presence) then online[name] = true end
         end)
     end
@@ -237,7 +240,7 @@ function Dir:RefreshCircles()
     for name, r in pairs(self.roster or {}) do
         if not set[name] then
             if r.source == "circle" and not r.manual then r.source = nil end
-            r.circle = nil
+            r.circle, r.memberNote = nil, nil
         end
     end
     self._circleSet, self._circleOnline = set, online

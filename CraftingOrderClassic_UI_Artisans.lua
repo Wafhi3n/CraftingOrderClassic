@@ -389,6 +389,8 @@ function UI:_FillArtRow(row, a)
         local rep = (a.r.rep and a.r.rep > 0) and (" · " .. string.format(L["%d livrés"], a.r.rep)) or ""
         row.sub:SetText("|cFF888888" .. (PRES_LABEL[pres] or L["Hors ligne"]) .. " · " .. lvl .. rep .. "|r")
     end
+    -- Sa note de membre de la communauté, posée à la main : visible même hors ligne (Directory_Note).
+    if a.r.memberNote then row.sub:SetText(row.sub:GetText() .. "|cFF888888 · |r|cFFD8CFA0" .. a.r.memberNote .. "|r") end
     UI:_SetArtProfIcons(row, profsList(a.r), a.r, a.name)
     row.src:SetText("|cFF888888" .. (relayed and L["RELAIS"] or nonAddon and L["VU"]
         or (SRC_TAG[a.r.source or "recent"] or "")) .. "|r")

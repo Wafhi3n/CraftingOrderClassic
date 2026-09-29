@@ -330,6 +330,7 @@ function COC:Help()
     print("  |cFFFFFFFF/co quest <id>|r — " .. L["voir une commande sous forme de quête (parchemin)"])
     print("  |cFFFFFFFF/co journal|r — " .. L["journal parchemin : commandes et quêtes côte à côte (clic droit sur un en-tête du suivi)"])
     print("  |cFFFFFFFF/co circle [n°|link|nolink]|r — " .. L["cercles d'artisans (communautés) et rappel de la communauté"])
+    print("  |cFFFFFFFF/co note|r — " .. L["le texte de tes métiers, à coller dans ta note de communauté (visible même hors ligne)"])
     print("  |cFFFFFFFF/co channel [on|off|room on|off]|r — |cFFFF8800" .. L["diag"] .. "|r : " .. L["rejoindre l'ancien canal réseau, morcelé sur Forever"])
     print("  |cFFFFFFFF/co notify [all|directed|named|off]|r — " .. L["portée des notifications de commande"])
     print("  |cFFFFFFFF/co scan [mine|all|off]|r — " .. L["portée du scan des demandes de craft en chat (défaut : mes métiers)"])
@@ -417,6 +418,7 @@ function COC:Slash(msg)
     elseif cmd == "gwroster" or cmd == "confed" then COC:GreenWallDiag()
     elseif cmd == "accole" then if COC.ProfWindow and COC.ProfWindow.CamelotSideCmd then COC.ProfWindow:CamelotSideCmd() end
     elseif cmd == "circle" or cmd == "cercle" then if D and D.CircleCmd then D:CircleCmd(rest) end
+    elseif cmd == "note" then if D and D.ShowNoteText then D:ShowNoteText() end
     elseif cmd == "wipe"   then COC:WipeRoster()
     elseif cmd == "debug"  then if COC.Debug then COC.Debug:Toggle() end
     elseif cmd == "verbose" then

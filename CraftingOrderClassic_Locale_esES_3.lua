@@ -65,6 +65,13 @@ local es3 = {
         "Faltan %d en el correo: sepáralos tú mismo de una pila (Mayús-clic en la pila) y luego colócalos.",
     ["La pile de %d est prête dans ton sac : dépose-la toi-même dans le courrier."] =
         "La pila de %d está lista en tu bolsa: colócala tú mismo en el correo.",
+    -- Note de membre de la communauté, /co note (2026-09-29)
+    ["le texte de tes métiers, à coller dans ta note de communauté (visible même hors ligne)"] =
+        "el texto de tus profesiones, para pegarlo en tu nota de comunidad (visible incluso desconectado)",
+    ["aucun métier connu pour ce personnage : ouvre une fois ta fenêtre de métier, puis recommence."] =
+        "aún no se conoce ninguna profesión de este personaje: abre una vez tu ventana de profesión y vuelve a intentarlo.",
+    ["Copie ce texte (Ctrl+C), puis colle-le dans ta note de membre : Communautés, clic droit sur ton nom, « Note ». Les autres joueurs de Crafting Order verront tes métiers, même quand tu es hors ligne."] =
+        "Copia este texto (Ctrl+C) y pégalo en tu nota de miembro: Comunidades, clic derecho en tu nombre, «Nota». Los demás jugadores de Crafting Order verán tus profesiones, incluso cuando estés desconectado.",
 }
 
 for k, v in pairs(es3) do L[k] = v end
