@@ -46,6 +46,23 @@ client.
 
 ## Relevés
 
+- 2026-09-29 22:35 — jusqu'a 3d4c113 — Forever, deux clients, client en ANGLAIS, Ironforge ; build
+  déployé `main-dev@084954c 2026-09-29 22:30` (relu dans la copie déployée du `.toc`), communauté
+  officielle coupée (`fix/sans-communaute`) — **GO sur la salle de découverte et le PING retiré** —
+  traces des deux comptes relues par l'agent : salle rejointe (idx 6 et 7), `HI|SK…` de Rédemption sur
+  la salle reçu par Gnomi, bonjour de Gnomi reçu par Rédemption qui répond à Gnomi SEUL
+  (`whisper→Gnomi Short : HI|SK…`). **Un inconnu découvert par la salle** : Prudence Gylwynn (client
+  d'avant la v1.37, qui porte encore ses données sur CraftLinkNet), profils échangés en whisper avec
+  les deux comptes, commande Silverleaf de Rédemption poussée vers elle, puis relayée par elle à Gnomi.
+  Aucune ligne « yell » dans les deux traces.
+  NO-GO : après `/co channel room off` puis `on`, le bonjour parti dans la seconde du re-join est
+  refusé (« refusé par le jeu (InvalidChannel) », la trace neuve de `fix/ping-crie`) → corrigé en
+  `52633c3` (bonjour différé de 2 s), pas revu.
+  Non vu (pas rapporté par le user) : la ligne d'explication unique, la ligne de `/co status`, /1 resté
+  Général, l'absence du lien de communauté à une connexion complète, le message de `/co refresh`.
+  Vu en passant : une balise texte `CLNK1` part sur la salle au `/co refresh` (le canal a de nouveau un
+  index) — utile aux clients d'avant la v1.37, masquée du chat de ceux qui ont l'addon ; laissée.
+
 - 2026-09-29 16:10 — jusqu'a a3ba24b — Forever, deux clients, client en ANGLAIS ; build déployé
   `main-dev@f2e653a 2026-09-29 15:35` (`/co version` pas relu par l'agent ; la ligne de trace
   « butin à la boîte aux lettres » n'existe que dans ce build) — **GO sur le témoin inverse de
