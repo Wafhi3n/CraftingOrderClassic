@@ -139,6 +139,11 @@ des commandes nommées), mais un joueur hors communauté voit et est vu dès qu'
     (l'auteur ne sait pas que je l'ai vu) ; « Accepter » sur un aperçu reste local et se perd quand la
     commande complète arrive ; un « Rappeler » ré-alerte tant que l'aperçu vit ; royaumes connectés :
     le bonjour vise le nom sans royaume, comme tout le réseau.
+- 2026-09-30, **user** : les matériaux de `PROVIDE` restent des **liens** (cliquables), en sachant
+  qu'un client d'avant cette fonctionnalité (≤ v1.39.1) lit la ligne comme une demande humaine et prend
+  chaque lien pour un objet demandé : s'il a le métier d'un matériau fourni, il voit une fausse
+  entrante pour ce matériau (et peut la « garder pour un ami capable »), jusqu'à sa mise à jour.
+  Écartés : les noms en texte (pas cliquables, dans la langue de l'auteur) et la ligne sans `PROVIDE`.
 
 ## Critères d'acceptation
 
