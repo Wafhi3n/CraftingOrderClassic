@@ -8,8 +8,8 @@
 > fait le 2026-09-29. Critères 5 à 10 et la lecture du 12 tenus en test ; **11 tenu en jeu le
 > 2026-09-30 00:19** (registre de vérification : témoin sans la case invisible pour Gnomi, `#CO6` lu,
 > bonjour, commande complète à la place de l'aperçu, une seule alerte). Palier 4 (l'envoi de la ligne
-> LFW, `AnnounceSend:PostLFW`, case dans le panneau « Offre ») fait le 2026-09-30, tenu en test ; le
-> critère 13 reste à voir en jeu.
+> LFW, `AnnounceSend:PostLFW`, case dans le panneau « Offre ») fait le 2026-09-30, tenu en test ; **13
+> tenu en jeu le 2026-09-30 00:31**. Reste le palier 5 (relectures, critère 15).
 
 ## Le problème
 
@@ -164,6 +164,7 @@ Fonctionnalité :
 13. [humain] Rédemption active sa dispo en cochant la case : la ligne LFW apparaît sur Commerce ;
     Gnomi (hors communauté) voit Rédemption passer « [Dispo] » dans l'onglet Artisans, avec ses
     métiers, quelques secondes après. Témoin connu-bon : la dispo sans la case, invisible pour Gnomi.
+    → **Tenu** le 2026-09-30 00:31 (mêmes précautions d'isolement que le 11).
 14. [porte] Toute chaîne d'interface nouvelle est traduite (`check_locale.ps1`).
 15. [agent] Aucun envoi sur Commerce hors d'un clic (`api-gotcha-reviewer`), et relecture du
     protocole (`craftlink-protocol-reviewer`) avant fusion.

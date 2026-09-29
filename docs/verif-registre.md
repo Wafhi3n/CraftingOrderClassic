@@ -46,6 +46,21 @@ client.
 
 ## Relevés
 
+- 2026-09-30 00:31 — jusqu'a c126c37 — Forever, deux clients, client en ANGLAIS, en ville ; build
+  déployé `main-dev@ed6a410 2026-09-30 00:26` (relu dans la copie déployée du `.toc`), les deux comptes
+  à nouveau « oubliés » l'un de l'autre après le /reload (00:28) — **GO sur l'annonce de la dispo LFW
+  (spec annonce-commerce, critère 13) et sur trois points du palier 2** — le user rapporte que chaque
+  étape du protocole s'est passée comme attendu ; traces des deux comptes relues par l'agent : témoin
+  case décochée, `LFW|on|Cooking` parti vers Osrik Stonefist seul, aucune ligne sur Commerce, rien chez
+  Gnomi (00:30:22) ; case cochée, `/co lfw off` puis `/co lfw Cooking` : « dispo Cooking annoncée sur
+  Trade (Services) - English » (00:31:06) ; chez Gnomi, « LFW de Rédemption Wafhien (Cooking) :
+  bonjour » et son bonjour chuchoté (00:31:07), profil de Rédemption en retour puis
+  `LFW|on|Cooking` reçu (00:31:10) — Rédemption vu en « [Dispo] » dans l'onglet Artisans (user).
+  Rapportés par le user, sans trace possible (messages de chat) : la case du panneau « Offre » déjà
+  cochée après le `/reload` (choix retenu, partagé avec le formulaire), et une commande postée dans la
+  minute refusée avec « attends encore … s » (délai commun commande/dispo).
+  Non vu : le texte du clic droit du Carnet, la case hors d'une capitale, une ligne à matériaux et prix.
+
 - 2026-09-30 00:19 — jusqu'a a52c52b — Forever, deux clients, client en ANGLAIS, en ville ; build
   déployé `main-dev@325fc89 2026-09-30 00:13` (relu dans la copie déployée du `.toc`), salle coupée,
   les deux comptes « oubliés » l'un de l'autre par `/run` (`Directory.roster/online`) — **GO sur
