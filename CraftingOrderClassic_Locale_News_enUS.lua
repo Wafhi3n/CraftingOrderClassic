@@ -414,6 +414,17 @@ local news = {
         "The Artisans tab has one row per community, named after it, and a player turns offline as soon as the community says they've left. The Confederation row only appears when GreenWall is running.",
     ["Aussi : les listes de Commande, Récolte, Artisans et Mes artisans défilent comme celle des métiers de Blizzard ; un artisan choisi depuis Artisans arrive sélectionné dans Commande ; le bouton d'aide passe au-dessus du portrait et ne se cache plus derrière la Route ; Manquantes n'affiche plus l'exemplaire de l'autre camp d'une recette jumelle ; la Route puise dans tes sacs avant l'hôtel des ventes ; ouvrir le lien de métier d'un autre joueur ne range plus ses recettes dans les tiennes."] =
         "Also: the lists in Order, Gather, Artisans and My Artisans scroll like Blizzard's profession list; an artisan picked from Artisans arrives selected in Order; the help button sits above the portrait and no longer hides behind the Route; Missing no longer shows the other faction's copy of a twin recipe; the Route uses your bags before the auction house; opening another player's profession link no longer files their recipes under yours.",
+    -- v1.40.0
+    ["Tes commandes sur Commerce, et l'addon sans communauté"] =
+        "Your orders in Trade, and the addon without a community",
+    ["Coche « Annoncer en Commerce » en postant une commande à tous : l'addon écrit aussi une ligne sur Trade (Services), dans une capitale, que tout le monde lit. Les joueurs de l'addon, même inconnus, reçoivent la vraie commande en quelques secondes ; les autres peuvent te chuchoter. Clic droit sur la commande dans le Carnet pour la rappeler, une fois par quart d'heure."] =
+        "Tick 'Announce in Trade' when you post an order to everyone: the addon also writes a line in Trade (Services), in a capital city, that everyone can read. Addon users, even ones you've never met, get the real order within seconds; everyone else can whisper you. Right-click the order in the Ledger to repeat it, once every fifteen minutes.",
+    ["La même case, dans l'offre de « Chercher du travail », annonce ta dispo : une ligne « LFW » sur Trade (Services) quand tu l'actives, et les joueurs de l'addon reçoivent ton profil."] =
+        "The same box, in the 'Look for work' offer, announces your availability: an 'LFW' line in Trade (Services) when you turn it on, and addon users receive your profile.",
+    ["L'addon marche sans la communauté Crafting Order PVE et ne t'en envoie plus le lien. Les artisans se trouvent par les amis, la guilde, tes cercles, les annonces sur Commerce et la salle de découverte, où les joueurs de l'addon se disent bonjour (« /co channel room off » pour la quitter)."] =
+        "The addon works without the Crafting Order PVE community and no longer sends you its link. Crafters find each other through friends, guild, your circles, the Trade announcements, and the discovery room where addon users say hello ('/co channel room off' to leave it).",
+    ["Aussi : l'addon ne crie plus de ping, que Forever refusait sans rien dire ; « /co note » prépare le texte de tes métiers à coller dans ta note de membre d'une communauté, et l'onglet Artisans affiche la note des autres."] =
+        "Also: the addon no longer yells a ping, which Forever silently refused; '/co note' prepares the text of your professions to paste into your member note in a community, and the Artisans tab shows other people's notes.",
 }
 
 for k, v in pairs(news) do L[k] = v end

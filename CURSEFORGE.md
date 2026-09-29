@@ -10,14 +10,15 @@ a Jewelcrafter, there's no realm-wide list of professions, and the game forgets 
 second they log off. So you spam /trade and hope someone answers.
 
 Crafting & Gathering Order fills that hole. Every profession, skill level and recipe you know travels
-with you over a hidden realm channel, and everyone else running the addon does the same. Look someone
+by hidden whispers to the other players running the addon, and theirs come back to you. Look someone
 up in the Artisans directory and you see what they can actually make, their skill level, whether
 they're online, and how you know them, then order straight from them, whether it's a guildmate or a
 stranger you've never spoken to.
 
 It's also a work-order board for crafting and gathering. No shared guild, no auction house, no server.
-Post what you want made or gathered and everyone on your realm running the addon sees it and can
-answer, even people you've never met, as long as they've got the addon too.
+Post what you want made or gathered and the addon users you're in touch with see it and can answer.
+Tick "Announce in Trade" and it goes further: one readable line in Trade (Services) reaches everyone in
+the capitals, and addon users you've never met get the full order within seconds.
 
 ## What it does
 
@@ -45,6 +46,7 @@ answer, even people you've never met, as long as they've got the addon too.
 - Read your orders and your real quests in one parchment journal with `/co journal` (new in 1.29).
 - Cooking, First Aid and Fishing count as professions in the directory, so you can look them up and order from them like anything else (new in 1.30).
 - Turn a WoW community into a crafting circle with `/co circle`, and its members show up in the Artisans directory with their presence, including the ones who are offline (new in 1.31).
+- Announce an order in Trade (Services) with one tick: everyone can read it and whisper you, and addon users you've never met get the real order within seconds. The same box announces that you're looking for work (new in 1.40).
 - Built for WoW: Forever, the 1.60.1 client. Era, Season of Discovery and Hardcore stay on 1.30.0, the last build that shipped for them.
 
 ## Order straight from a name, friend or stranger
@@ -60,19 +62,21 @@ summary sits next to their tooltip, Battle.net friends included, not just friend
 name. Click a guildmate and it sits under their detail with an Order button right there, so it works even
 when they're offline.
 
-The directory fills itself in as you cross paths with other users. When it's looking empty, the Refresh
-button calls out on the channel and everyone online answers.
+The directory fills itself in as you cross paths with other users: friends, guildmates, your circles,
+the players who say hello in the addon's discovery room, and the ones whose Trade announcements you
+read. When it's looking empty, the Refresh button says hello again to the players you know.
 
 ## Sending an order where it belongs
 
-Post to the whole realm, or keep it to your guild, your friends, or a single player. A realm-wide order
-goes out over the shared channel, not just to people you've already crossed paths with, so it reaches
-strangers running the addon too. Cancel it and the cancellation travels the same way, so it doesn't sit
-open on a stranger's board for hours. You'll only get a toast for professions you actually have, so
+Post to everyone, or keep it to your guild, your friends, or a single player. An order to everyone goes
+by whisper to every addon user you're in touch with, and hops on from them to the people they know. Tick
+"Announce in Trade" and it reaches strangers too: their addon reads your line in Trade (Services), says
+hello, and gets the order. Cancel it and the cancellation follows the same whispers, so it doesn't sit
+open on someone's board for hours. You'll only get a toast for professions you actually have, so
 someone else's Blacksmithing order won't ping your Enchanter. Scoped orders only reach people who qualify.
 Open ones re-broadcast every couple of hours and expire on their own, so the board doesn't rot with dead
-requests. Only the player who posted an order can put it on the realm channel under their name, so nobody
-can post in your name.
+requests. Only the player who posted an order can announce it under their name, so nobody can post in
+your name.
 
 Gather orders handle stacks properly. Ask by the unit or by the stack, and you always see the real
 total, so it reads *3 stacks (60)* instead of a cryptic *3 st*.
@@ -215,8 +219,8 @@ recipes for SoD realms.
 
 ## Crafting circles (WoW communities)
 
-The realm channel has no memory and no member list. Someone who wasn't logged in when you posted
-never saw it, and every session starts by working out again who's around.
+Whispers only reach players who are online and that the addon knows about. Someone who wasn't logged
+in when you posted never saw it, and every session starts by working out again who's around.
 
 If your realm has WoW communities, you can point the addon at one. Mark it with `/co circle` and its
 members appear under a Circle bucket in the Artisans tab, with their presence, including the ones who
