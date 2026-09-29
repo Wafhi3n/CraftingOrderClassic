@@ -4,26 +4,26 @@
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
-145 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
+146 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
 
 ## Modules (ordre de chargement)
 
 | Fichier | Rôle | Lignes |
 |---|---|---|
-| `CraftingOrderClassic.lua` | Crafting Order - Classic — réseau GLOBAL et SOCIAL de commandes de craft. | 490 |
+| `CraftingOrderClassic.lua` | Crafting Order - Classic — réseau GLOBAL et SOCIAL de commandes de craft. | 493 |
 | `CraftingOrderClassic_Compat.lua` | couche d'adaptation d'API entre les SAVEURS de client. | 336 |
 | `CraftingOrderClassic_Trace.lua` | trace réseau PERSISTÉE, lisible hors-jeu. | 79 |
 | `CraftingOrderClassic_Migrations.lua` | versionnage du schéma SavedVariables. | 40 |
 | `CraftingOrderClassic_Locale.lua` | socle de localisation du CHROME de l'UI. | 12 |
 | `CraftingOrderClassic_Locale_enUS.lua` | overlay ANGLAIS (enUS/enGB). | 279 |
 | `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 497 |
-| `CraftingOrderClassic_Locale_enUS_3.lua` | overlay enUS, 3/3. | 57 |
+| `CraftingOrderClassic_Locale_enUS_3.lua` | overlay enUS, 3/3. | 70 |
 | `CraftingOrderClassic_Locale_deDE.lua` | overlay ALLEMAND (deDE). | 281 |
 | `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 477 |
-| `CraftingOrderClassic_Locale_deDE_3.lua` | overlay deDE, 3/3. | 56 |
+| `CraftingOrderClassic_Locale_deDE_3.lua` | overlay deDE, 3/3. | 69 |
 | `CraftingOrderClassic_Locale_esES.lua` | overlay ESPAGNOL (esES/esMX). | 282 |
 | `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 478 |
-| `CraftingOrderClassic_Locale_esES_3.lua` | overlay esES, 3/3. | 57 |
+| `CraftingOrderClassic_Locale_esES_3.lua` | overlay esES, 3/3. | 70 |
 | `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 419 |
 | `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 416 |
 | `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 416 |
@@ -122,6 +122,7 @@
 | `Directory_Club.lua` | source « cercle » (communautés WoW) de l'annuaire, DISPLAY-ONLY. | 360 |
 | `Directory_Community.lua` | le réseau SANS canal : la communauté remplace CraftLinkNet (Forever). | 260 |
 | `Directory_Skills.lua` | niveaux de compétence + réputation (couche « profil » de l'annuaire). | 157 |
+| `Directory_Room.lua` | la salle de découverte : CraftLinkNet rejoint pour SE PRÉSENTER, pas pour transporter. | 64 |
 | `Directory_Version.lua` | détection « nouvelle version disponible » (100 % P2P, aucun serveur). | 147 |
 | `Directory_Cooldowns.lua` | cooldowns de recettes (couche « profil » de l'annuaire). | 82 |
 | `Directory_RelayCodec.lua` | codec du fil RLY : relais de la fiche d'un artisan HORS LIGNE par un de ses partenaires. | 70 |
@@ -2204,6 +2205,23 @@
 > COC.Directory (créée par Directory.lua, chargé AVANT) → self:_Touch etc. résolus sur la table partagée.
 
 **API** : `Dir:CaptureSkills()` · `Dir:AnnounceSkills()` · `Dir:OnSkill(sender, message)`
+
+### `Directory_Room.lua`
+> Directory_Room.lua — la salle de découverte : CraftLinkNet rejoint pour SE PRÉSENTER, pas pour transporter.
+> 
+> Pourquoi (2026-09-29) : sans canal général, COC chuchote aux joueurs qu'il connaît (communauté, amis,
+> guilde) ; un porteur de l'addon qui n'est dans aucun de ces cercles n'est jamais atteint. Le banc des
+> constats a fermé toutes les voies globales (messages d'addon par la communauté, canaux du jeu, crier)
+> et prouvé qu'un message d'addon passe DANS une salle de canal custom. Sur Forever, CraftLinkNet est
+> découpé en salles (2026-09-27) : on n'y fait plus passer de données, mais on peut y dire bonjour.
+> 
+> Mécanique (CraftLink, FANOUT_REV 3) : le canal est rejoint (garde anti-/1, caché des fenêtres) ; à
+> chaque arrivée, un HI avec mes métiers part sur la salle (portée « room ») ; les présents me répondent
+> en whisper (Dir:OnHello, branche canal : à moi seul), et je les connais. « À tous » reste en whisper.
+> Les porteurs d'avant la v1.37, restés sur CraftLinkNet, deviennent joignables du même coup.
+> Coupable : /co channel room off (COC.db.roomOff).
+
+**API** : `Dir:RoomEnabled()` · `Dir:OnRoomJoined()` · `Dir:RoomCmd(arg)` · `Dir:RoomStatusLine()`
 
 ### `Directory_Version.lua`
 > Directory_Version.lua — détection « nouvelle version disponible » (100 % P2P, aucun serveur).

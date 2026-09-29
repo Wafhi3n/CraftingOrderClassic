@@ -36,6 +36,19 @@ local de3 = {
     -- Signature du build de test, /co version (2026-09-28)
     ["Build : %s"] = "Build: %s",
     ["Branches en test : %s"] = "Branches im Test: %s",
+    -- Salle de découverte, Directory_Room (2026-09-29)
+    ["l'addon rejoint le canal |cFFFFFFFF%s|r pour se présenter aux autres joueurs de Crafting Order ; tes commandes, elles, restent en whisper. |cFFFFFFFF/co channel room off|r pour ne plus le rejoindre."] =
+        "das Addon betritt den Kanal |cFFFFFFFF%s|r, um sich anderen Crafting-Order-Spielern vorzustellen; deine Aufträge laufen weiter per Flüstern. |cFFFFFFFF/co channel room off|r, um ihn nicht mehr zu betreten.",
+    ["salle de découverte coupée : l'addon quitte |cFFFFFFFF%s|r et ne le rejoindra plus."] =
+        "Entdeckungsraum aus: das Addon verlässt |cFFFFFFFF%s|r und betritt ihn nicht mehr.",
+    ["salle de découverte rouverte : l'addon rejoint |cFFFFFFFF%s|r pour se présenter."] =
+        "Entdeckungsraum wieder an: das Addon betritt |cFFFFFFFF%s|r, um sich vorzustellen.",
+    ["salle de découverte : en attente du canal (quelques secondes après la connexion)"] =
+        "Entdeckungsraum: warte auf den Kanal (einige Sekunden nach dem Einloggen)",
+    ["salle de découverte : coupée — |cFFFFFFFF/co channel room on|r pour la rouvrir"] =
+        "Entdeckungsraum: aus — |cFFFFFFFF/co channel room on|r, um ihn wieder einzuschalten",
+    ["salle de découverte : |cFFFFFFFF%s|r — on s'y présente, les données restent en whisper"] =
+        "Entdeckungsraum: |cFFFFFFFF%s|r — dient zum Vorstellen, Daten laufen weiter per Flüstern",
     -- Aide remise à jour : onglets latéraux, cercles (2026-09-28)
     ["Ils se rangent sur le bord droit, comme ceux de la fenêtre de métier. Survole une icône pour lire son nom ; le chiffre sur le Carnet compte tes commandes en cours."] =
         "Sie sitzen am rechten Rand, wie im Berufsfenster. Fahre über ein Symbol, um seinen Namen zu lesen; die Zahl am Auftragsbuch zählt deine aktiven Aufträge.",

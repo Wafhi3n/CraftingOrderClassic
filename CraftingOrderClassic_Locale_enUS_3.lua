@@ -37,6 +37,19 @@ local en3 = {
     -- Signature du build de test, /co version (2026-09-28)
     ["Build : %s"] = "Build: %s",
     ["Branches en test : %s"] = "Branches under test: %s",
+    -- Salle de découverte, Directory_Room (2026-09-29)
+    ["l'addon rejoint le canal |cFFFFFFFF%s|r pour se présenter aux autres joueurs de Crafting Order ; tes commandes, elles, restent en whisper. |cFFFFFFFF/co channel room off|r pour ne plus le rejoindre."] =
+        "the addon joins the |cFFFFFFFF%s|r channel to introduce itself to other Crafting Order players; your orders still travel by whisper. |cFFFFFFFF/co channel room off|r to stop joining it.",
+    ["salle de découverte coupée : l'addon quitte |cFFFFFFFF%s|r et ne le rejoindra plus."] =
+        "discovery room off: the addon leaves |cFFFFFFFF%s|r and won't join it again.",
+    ["salle de découverte rouverte : l'addon rejoint |cFFFFFFFF%s|r pour se présenter."] =
+        "discovery room back on: the addon joins |cFFFFFFFF%s|r to introduce itself.",
+    ["salle de découverte : en attente du canal (quelques secondes après la connexion)"] =
+        "discovery room: waiting for the channel (a few seconds after login)",
+    ["salle de découverte : coupée — |cFFFFFFFF/co channel room on|r pour la rouvrir"] =
+        "discovery room: off — |cFFFFFFFF/co channel room on|r to turn it back on",
+    ["salle de découverte : |cFFFFFFFF%s|r — on s'y présente, les données restent en whisper"] =
+        "discovery room: |cFFFFFFFF%s|r — used to say hello, data still goes by whisper",
     -- Aide remise à jour : onglets latéraux, cercles (2026-09-28)
     ["Ils se rangent sur le bord droit, comme ceux de la fenêtre de métier. Survole une icône pour lire son nom ; le chiffre sur le Carnet compte tes commandes en cours."] =
         "They sit along the right edge, like the ones on the profession window. Hover an icon to read its name; the number on the Ledger counts your active orders.",

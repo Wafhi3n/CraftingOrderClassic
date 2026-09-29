@@ -37,6 +37,19 @@ local es3 = {
     -- Signature du build de test, /co version (2026-09-28)
     ["Build : %s"] = "Build: %s",
     ["Branches en test : %s"] = "Ramas en prueba: %s",
+    -- Salle de découverte, Directory_Room (2026-09-29)
+    ["l'addon rejoint le canal |cFFFFFFFF%s|r pour se présenter aux autres joueurs de Crafting Order ; tes commandes, elles, restent en whisper. |cFFFFFFFF/co channel room off|r pour ne plus le rejoindre."] =
+        "el addon entra en el canal |cFFFFFFFF%s|r para presentarse a otros jugadores de Crafting Order; tus pedidos siguen yendo por susurro. |cFFFFFFFF/co channel room off|r para no volver a entrar.",
+    ["salle de découverte coupée : l'addon quitte |cFFFFFFFF%s|r et ne le rejoindra plus."] =
+        "sala de descubrimiento desactivada: el addon sale de |cFFFFFFFF%s|r y no volverá a entrar.",
+    ["salle de découverte rouverte : l'addon rejoint |cFFFFFFFF%s|r pour se présenter."] =
+        "sala de descubrimiento reactivada: el addon entra en |cFFFFFFFF%s|r para presentarse.",
+    ["salle de découverte : en attente du canal (quelques secondes après la connexion)"] =
+        "sala de descubrimiento: esperando el canal (unos segundos tras conectarse)",
+    ["salle de découverte : coupée — |cFFFFFFFF/co channel room on|r pour la rouvrir"] =
+        "sala de descubrimiento: desactivada — |cFFFFFFFF/co channel room on|r para reactivarla",
+    ["salle de découverte : |cFFFFFFFF%s|r — on s'y présente, les données restent en whisper"] =
+        "sala de descubrimiento: |cFFFFFFFF%s|r — sirve para presentarse, los datos siguen yendo por susurro",
     -- Aide remise à jour : onglets latéraux, cercles (2026-09-28)
     ["Ils se rangent sur le bord droit, comme ceux de la fenêtre de métier. Survole une icône pour lire son nom ; le chiffre sur le Carnet compte tes commandes en cours."] =
         "Están en el borde derecho, como los de la ventana de profesión. Pasa el ratón sobre un icono para leer su nombre; el número sobre el Libro cuenta tus pedidos activos.",

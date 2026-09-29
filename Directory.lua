@@ -29,14 +29,15 @@ end
 
 function Dir:OnPresence(kind, who)
     if not who then return end
-    -- Canal CUSTOM dédié (CraftLinkNet) : tout joiner EST un porteur (pas de bruit de joueurs lambda),
-    -- donc on réagit à tous les JOIN/LEAVE, connus ou pas — un nouveau porteur s'annonce aussi via HI
-    -- au bringup, mais réagir ici accélère sa découverte sans risque de spam.
+    -- Canal CUSTOM dédié (CraftLinkNet, plein ou salle) : tout joiner EST un porteur, donc on réagit à
+    -- tous les JOIN/LEAVE, connus ou pas — ça accélère sa découverte sans risque de spam.
     if kind == "join" then
         self.online[who] = true
         self:_ToastIfAdded(who)
         if COC.Orders and COC.Orders.OnArtisanOnline then COC.Orders:OnArtisanOnline(who) end  -- push commande ciblée
-        self:AnnounceThrottled()        -- un nouveau arrive → je (re)publie mes recettes (throttlé : anti-burst login en masse)
+        -- Canal plein : je republie (un seul message). Salle de découverte : « à tous » est un whisper par pair,
+        -- donc je ne réponds qu'à LUI (il dit d'ailleurs bonjour en arrivant, cf. Directory_Room).
+        if CraftLink and CraftLink.RoomJoined and CraftLink:RoomJoined() then self:_AnnounceToThrottled(who) else self:AnnounceThrottled() end
     else
         self:MarkOffline(who)   -- quitte le canal : hors ligne, LFW éteint (Directory_Community)
     end
@@ -198,7 +199,7 @@ end
 
 -- HI reçu → j'ingère les métiers EMBARQUÉS (SK collé : "HI|SK|…", cf. _HelloPayload) puis, si DIRIGÉ,
 -- je réponds mon profil (throttlé par cible) ET le pingue en retour pour SES recettes (DiscoverPlayer).
--- Sinon l'échange serait à SENS UNIQUE (symptôme : « Croisé » en ligne sans métiers). GLOBAL → Announce jittée.
+-- Sinon l'échange serait à SENS UNIQUE (symptôme : « Croisé » en ligne sans métiers). Canal → à LUI seul.
 function Dir:OnHello(sender, message, distribution)
     if not CraftLink then return end
     self:_Touch(sender)
@@ -208,8 +209,8 @@ function Dir:OnHello(sender, message, distribution)
         self:_AnnounceToThrottled(sender)
         self:DiscoverPlayer(sender)
         if self.RelayPartnersTo then self:RelayPartnersTo(sender) end   -- fiches de mes partenaires hors ligne
-    elseif C_Timer then
-        C_Timer.After(math.random() * 3, function() Dir:Announce() end)
+    else   -- salle de découverte : une annonce COMPLÈTE par présent, à chaque arrivée, noierait le réseau
+        self:_AnnounceToThrottled(sender)
     end
     -- Il vient d'arriver : il ne sait rien de mon LFW, et `Dir.lfw` est RUNTIME chez lui comme
     -- chez moi. Je me ré-annonce (throttlé, jitté, et JAMAIS en AFK — cf. Directory_LFW).
