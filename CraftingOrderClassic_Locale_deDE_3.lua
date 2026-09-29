@@ -69,6 +69,11 @@ local de3 = {
     ["dispo annoncée sur %s."] = "Verfügbarkeit in %s angekündigt.",
     ["Quand tu actives ta dispo, poste aussi une ligne sur Trade (Services) : les joueurs avec ou sans l'addon voient que tu cherches du travail. Une ligne par activation, jamais au renouvellement automatique ; dans une capitale. Même réglage que la case du formulaire de commande."] =
         "Wenn du die Arbeitssuche einschaltest, wird zusätzlich eine Zeile in Handel (Dienstleistungen) gepostet: Spieler mit oder ohne das Addon sehen, dass du Arbeit suchst. Eine Zeile pro Einschalten, nie bei der automatischen Erneuerung; nur in einer Hauptstadt. Dieselbe Einstellung wie das Kästchen im Auftragsformular.",
+    -- Aide sans communauté officielle (2026-09-30)
+    ["|cFFFFFFFF/co circle|r : tes cercles d'artisans (les communautés du jeu que tu as marquées)."] =
+        "|cFFFFFFFF/co circle|r: deine Handwerkerkreise (die Spielgemeinschaften, die du markiert hast).",
+    ["Les artisans se trouvent par tes amis, ta guilde et tes cercles, par la salle de découverte (|cFFFFFFFF/co channel room|r) où les porteurs de l'addon se disent bonjour, et par les annonces sur Trade (Services) que l'addon relit."] =
+        "Handwerker finden sich über deine Freunde, deine Gilde und deine Kreise, über den Entdeckungsraum (|cFFFFFFFF/co channel room|r), in dem sich Addon-Nutzer begrüßen, und über die Ankündigungen in Handel (Dienstleistungen), die das Addon liest.",
     -- Aide remise à jour : onglets latéraux, cercles (2026-09-28)
     ["Ils se rangent sur le bord droit, comme ceux de la fenêtre de métier. Survole une icône pour lire son nom ; le chiffre sur le Carnet compte tes commandes en cours."] =
         "Sie sitzen am rechten Rand, wie im Berufsfenster. Fahre über ein Symbol, um seinen Namen zu lesen; die Zahl am Auftragsbuch zählt deine aktiven Aufträge.",

@@ -9,6 +9,11 @@ local L    = COC.L
 
 local BODY_W = 780
 
+-- La communauté officielle est-elle en service ? Coupée le 2026-09-29 (Dir.OFFICIAL_ON, le user l'a
+-- détruite pour tester l'addon sans elle) : l'Aide ne doit alors promettre ni son lien ni son rappel.
+-- Lu à la construction de la page, quand Directory_Community.lua est chargé depuis longtemps.
+local function officialOn() return COC.Directory and COC.Directory.OFFICIAL_ON == true end
+
 -- Table de contenu, découpée en petites fonctions thématiques (anti-monolithe) et concaténée par
 -- content(). {icon=Skin.tex.xxx, title=L[...], lines={L[...], ...}} ; un bullet natif (texture
 -- broadcast, réutilisée partout ailleurs dans l'addon) préfixe chaque ligne — pas de glyphe "•" tofu.
@@ -27,7 +32,8 @@ local function contentIntro()
                 L["Clic gauche sur l'icône minimap (ou |cFFFFFFFF/co|r) : ouvre cette fenêtre."],
                 L["Clic droit sur l'icône minimap (ou |cFFFFFFFF/co métier|r) : ouvre la Vue Métier d'un de tes métiers."],
                 L["|cFFFFFFFF/co help|r dans le chat : liste complète des commandes slash."],
-                L["|cFFFFFFFF/co circle|r : tes cercles d'artisans ; |cFFFFFFFF/co circle nolink|r / |cFFFFFFFF/co circle link|r coupe ou rallume le rappel de la communauté."],
+                officialOn() and L["|cFFFFFFFF/co circle|r : tes cercles d'artisans ; |cFFFFFFFF/co circle nolink|r / |cFFFFFFFF/co circle link|r coupe ou rallume le rappel de la communauté."]
+                    or L["|cFFFFFFFF/co circle|r : tes cercles d'artisans (les communautés du jeu que tu as marquées)."],
             },
         },
         {
@@ -107,7 +113,8 @@ local function contentSocial()
             icon = Skin.tex.gear, title = L["Réseau, confidentialité & statuts"],
             lines = {
                 L["Pas de canal de discussion : l'addon échange en chuchotements invisibles avec les joueurs de tes cercles, tes amis et ta guilde. Le seul message lisible est celui que tu choisis : la ligne sur Trade (Services), si tu coches « Annoncer en Commerce »."],
-                L["Les artisans se retrouvent dans la communauté |cFFFFD100Crafting Order PVE|r, une par camp. Sans cercle, l'addon t'en envoie le lien à la connexion : rejoins-la, elle devient ton cercle d'artisans."],
+                officialOn() and L["Les artisans se retrouvent dans la communauté |cFFFFD100Crafting Order PVE|r, une par camp. Sans cercle, l'addon t'en envoie le lien à la connexion : rejoins-la, elle devient ton cercle d'artisans."]
+                    or L["Les artisans se trouvent par tes amis, ta guilde et tes cercles, par la salle de découverte (|cFFFFFFFF/co channel room|r) où les porteurs de l'addon se disent bonjour, et par les annonces sur Trade (Services) que l'addon relit."],
                 L["Statuts d'une commande : "] .. "|cFFFFCC00" .. L["En attente"] .. "|r » |cFF33CCFF" .. L["Acceptée"]
                     .. "|r » |cFF33DD33" .. L["Livrée"] .. "|r (" .. L["ou"] .. " |cFF888888" .. L["Annulée"]
                     .. "|r / |cFFFF4444" .. L["Refusée"] .. "|r).",
