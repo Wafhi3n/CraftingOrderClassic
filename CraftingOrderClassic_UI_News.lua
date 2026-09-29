@@ -34,6 +34,15 @@ local BODY_W = 780
 local function versionsHead()
     return {
         {
+            v = "v1.40.0", title = L["Tes commandes sur Commerce, et l'addon sans communauté"],
+            lines = {
+                L["Coche « Annoncer en Commerce » en postant une commande à tous : l'addon écrit aussi une ligne sur Trade (Services), dans une capitale, que tout le monde lit. Les joueurs de l'addon, même inconnus, reçoivent la vraie commande en quelques secondes ; les autres peuvent te chuchoter. Clic droit sur la commande dans le Carnet pour la rappeler, une fois par quart d'heure."],
+                L["La même case, dans l'offre de « Chercher du travail », annonce ta dispo : une ligne « LFW » sur Trade (Services) quand tu l'actives, et les joueurs de l'addon reçoivent ton profil."],
+                L["L'addon marche sans la communauté Crafting Order PVE et ne t'en envoie plus le lien. Les artisans se trouvent par les amis, la guilde, tes cercles, les annonces sur Commerce et la salle de découverte, où les joueurs de l'addon se disent bonjour (« /co channel room off » pour la quitter)."],
+                L["Aussi : l'addon ne crie plus de ping, que Forever refusait sans rien dire ; « /co note » prépare le texte de tes métiers à coller dans ta note de membre d'une communauté, et l'onglet Artisans affiche la note des autres."],
+            },
+        },
+        {
             v = "v1.39.1", title = L["Les commandes envoyées par courrier se terminent seules"],
             lines = {
                 L["Quand un artisan t'envoie ta commande par courrier, prendre l'objet dans ta boîte aux lettres la marque reçue, comme quand tu le ramasses. L'artisan est crédité tout de suite. Avant, elle restait « Remise » et il fallait cliquer « J'ai reçu » dans le Carnet."],

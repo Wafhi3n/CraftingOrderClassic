@@ -1,5 +1,33 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.40.0 - Your orders in Trade, and the addon without a community
+
+WoW Forever has no general channel the addon can use: its messages are swallowed on the game's
+channels and inside communities. Until now an order only reached the addon users you already knew.
+
+When you post an order to everyone, you can now tick "Announce in Trade". The addon also writes one
+line in Trade (Services), in a capital city, the way a player would type it:
+`WTB [item] x1 PROVIDE [material]x2 2g50s #CO27`. Everyone can read it and whisper you. Addon users,
+even ones you've never met, reply to the line on their own and get the real order within seconds, so
+it shows up in their profession view like any other order. The line is only ever sent when you click,
+never on a timer. Right-click the order in the Ledger to repeat it, at most once every fifteen minutes.
+The addon waits a minute between two announcements.
+
+The same box, in the "Look for work" offer, announces your availability. Turning it on posts
+`LFW Enchanting #CO` in Trade (Services), and addon users who read it receive your professions and
+your offer.
+
+The addon now works without the Crafting Order PVE community and no longer whispers you its link at
+login. Crafters find each other through friends, guild, your circles, the Trade announcements, and a
+discovery room: the addon joins the hidden CraftLinkNet channel only to say hello to the addon users
+in it, then everything goes by whisper. `/co channel room off` leaves it.
+
+Also:
+- The addon no longer yells a ping. Forever refuses yelling outside instances, so it never went out.
+- `/co note` prepares the text of your professions to paste into your member note in a community,
+  and the Artisans tab shows the notes other members wrote.
+- Help explains the Trade box, and no longer promises a community link.
+
 ## v1.39.1 - Mailed orders finish themselves
 
 When a crafter mails you your order, taking the item out of your mailbox now marks it as received.
