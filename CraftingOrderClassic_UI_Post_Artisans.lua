@@ -136,6 +136,7 @@ function UI:_BuildPostActionBar(panel, sec)
     local artLbl = bar:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     artLbl:SetPoint("RIGHT", self.postArtisanName, "LEFT", -6, 0)
     artLbl:SetText("|cFFE8B84B" .. L["Destinataire :"] .. "|r"); Skin.ApplyShadow(artLbl)
+    self:_BuildAnnounceCheck(bar, artLbl)
     self:_UpdateArtisanLabel()
 
     -- Statut/aide (« Choisis un métier puis un plan. ») : en bas de la SECTION artisans, plus dans la
@@ -144,6 +145,25 @@ function UI:_BuildPostActionBar(panel, sec)
     self.postSelLbl:SetPoint("BOTTOMLEFT", P.PAD, 6); self.postSelLbl:SetWidth((self.postArtW or P.WIDE_W) - 20)
     self.postSelLbl:SetJustifyH("LEFT")
     self.postSelLbl:SetText("|cFF888888" .. L["Choisis un métier puis un plan."] .. "|r")
+end
+
+-- Case « Annoncer en Commerce » (spec annonce-commerce) : décochée au départ, le dernier choix est
+-- retenu (COC.db.announceTrade) — décision du user, 2026-09-29. Posée à gauche de « Destinataire ».
+function UI:_BuildAnnounceCheck(bar, rightOf)
+    local chk = Skin.MakeCheckButton(bar, L["Annoncer en Commerce"])
+    chk:SetPoint("RIGHT", rightOf, "LEFT", -(chk.text:GetStringWidth() + 16), 0)
+    chk:SetChecked(COC.db and COC.db.announceTrade == true)
+    chk:SetScript("OnClick", function(b) if COC.db then COC.db.announceTrade = b:GetChecked() and true or nil end end)
+    -- Le même réglage se coche aussi dans l'offre de dispo (PW:_BuildLFWChecks) : relu à chaque affichage.
+    chk:SetScript("OnShow", function(b) b:SetChecked(COC.db and COC.db.announceTrade == true) end)
+    chk:SetScript("OnEnter", function(b)
+        GameTooltip:SetOwner(b, "ANCHOR_TOP")
+        GameTooltip:SetText(L["Annoncer en Commerce"], 1, 1, 1)
+        GameTooltip:AddLine(L["Poste aussi une ligne sur Trade (Services), lisible par tous : les joueurs avec ou sans l'addon voient ta commande. Une ligne par clic, jamais de répétition automatique ; seulement pour une commande à tous, dans une capitale."], nil, nil, nil, true)
+        GameTooltip:Show()
+    end)
+    chk:SetScript("OnLeave", GameTooltip_Hide)
+    self.postAnnChk = chk
 end
 
 -- Reflète la portée courante dans le dropdown (libellé + coche). Nom conservé : plusieurs appelants.

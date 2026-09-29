@@ -1,7 +1,15 @@
 # Annoncer une commande en clair sur Commerce
 
 > État : **validée** le 2026-09-29 par le user · Idée du user, mise en forme par l'agent · Mesures
-> préalables faites le 2026-09-29 (Critères 1 à 4 : tenus) · Implémentation : pas commencée.
+> préalables faites le 2026-09-29 (Critères 1 à 4 : tenus) · Implémentation : palier 1 (le format,
+> `Orders_Announce.lua`, `tests/test_announce.lua`) et palier 2 (l'envoi, `Orders_AnnounceSend.lua` :
+> case du formulaire, clic droit du Carnet ; `tests/test_announce_send.lua`) faits le 2026-09-29 ;
+> palier 3 (la lecture, `Orders_AnnounceRecv.lua`, lignes WTB **et** LFW ; `tests/test_announce_recv.lua`)
+> fait le 2026-09-29. Critères 5 à 10 et la lecture du 12 tenus en test ; **11 tenu en jeu le
+> 2026-09-30 00:19** (registre de vérification : témoin sans la case invisible pour Gnomi, `#CO6` lu,
+> bonjour, commande complète à la place de l'aperçu, une seule alerte). Palier 4 (l'envoi de la ligne
+> LFW, `AnnounceSend:PostLFW`, case dans le panneau « Offre ») fait le 2026-09-30, tenu en test ; **13
+> tenu en jeu le 2026-09-30 00:31**. Reste le palier 5 (relectures, critère 15).
 
 ## Le problème
 
@@ -107,6 +115,35 @@ des commandes nommées), mais un joueur hors communauté voit et est vu dès qu'
 - 2026-09-29, agent (non contesté à la validation) : jetons fixes en anglais (`WTB`, `PROVIDE`, `LFW`,
   prix en `g`/`s`/`c`), quel que soit le client — le jargon commun de Commerce. Le lecteur accepte
   aussi `po`/`pa`/`pc`, `:N` et `×N` (le scanner lit déjà « 2g50s » en 2 po 50 pa).
+- 2026-09-29, agent (palier 3) : une annonce `WTB` n'est lue que si le scanner l'aurait gardée —
+  portée `/co scan` (« mine » = un métier que j'ai, « all » = tout, « off » = rien). Sinon ni aperçu
+  ni bonjour : chaque porteur en ville qui lit la ligne chuchote l'auteur, inutile d'y ajouter ceux
+  que la commande ne concerne pas. La ligne `LFW … #CO`, elle, reçoit toujours son bonjour (hors
+  « off ») : un artisan disponible intéresse tout acheteur.
+- 2026-09-29, agent (palier 3) : une commande d'**enchantement** annoncée ne pose **pas d'aperçu**
+  dans les Entrantes (elles montrent un objet, un enchantement n'en a pas) ; le bonjour part, et la
+  commande complète arrive par chuchotement. L'aperçu d'un objet, lui, sonne comme une entrante ; la
+  commande complète qui le remplace ne sonne pas une seconde fois. Un aperçu n'est jamais « gardé
+  pour un ami capable » (Handoff) : l'auteur a l'addon, la vraie commande suit par le relais.
+- 2026-09-30, agent (relectures du palier 5) :
+  - la ligne LFW ne part QUE du clic ou de `/co lfw` tapé : `LFWCmd` était aussi appelée par le
+    scanner du chat sur ma propre ligne « LFW … », donc depuis un événement (défaut corrigé, test
+    `test_announce_lfw_echo.lua`) ; l'écho de ma ligne `#CO` est ignoré par ce scanner ;
+  - une commande annoncée compte UNE fois pour l'anti-spam (l'aperçu ; la commande complète qui le
+    remplace ne recompte pas) ; un aperçu écarté par le joueur ne fait pas sonner la commande complète ;
+  - le bonjour se tait si l'auteur est déjà en contact, et s'étale sur 0 à 5 s (chaque porteur en
+    ville lit la même ligne) ; `#CO0005` vaut `#CO5` ; les lecteurs du chat public écartent une
+    valeur secrète ;
+  - limites connues, laissées : un aperçu dont l'auteur me croit déjà en ligne (commande manquée)
+    n'est pas complété et expire en 30 min ; une annulation ne touche pas un aperçu jamais complété
+    (l'auteur ne sait pas que je l'ai vu) ; « Accepter » sur un aperçu reste local et se perd quand la
+    commande complète arrive ; un « Rappeler » ré-alerte tant que l'aperçu vit ; royaumes connectés :
+    le bonjour vise le nom sans royaume, comme tout le réseau.
+- 2026-09-30, **user** : les matériaux de `PROVIDE` restent des **liens** (cliquables), en sachant
+  qu'un client d'avant cette fonctionnalité (≤ v1.39.1) lit la ligne comme une demande humaine et prend
+  chaque lien pour un objet demandé : s'il a le métier d'un matériau fourni, il voit une fausse
+  entrante pour ce matériau (et peut la « garder pour un ami capable »), jusqu'à sa mise à jour.
+  Écartés : les noms en texte (pas cliquables, dans la langue de l'auteur) et la ligne sans `PROVIDE`.
 
 ## Critères d'acceptation
 
@@ -138,11 +175,15 @@ Fonctionnalité :
     Commerce, lisible ; Gnomi (hors communauté, `/co circle 1` pour la démarquer) voit la commande
     dans ses Entrantes, puis, quelques secondes après, comme une vraie commande qu'il peut accepter.
     Témoin connu-bon : la même commande sans la case, que Gnomi ne voit pas hors communauté.
+    → **Tenu** le 2026-09-30 00:19. Sur ce banc, « hors communauté » ne suffit pas : à la connexion,
+    chaque compte chuchote aux 30 pairs vus le plus récemment, l'autre compris ; il faut d'abord les
+    rendre étrangers (`Directory.roster[n]` et `.online[n]` à nil, de chaque côté, sans relog).
 12. [test] « LFW Enchanting/Tailoring #CO » reçu : un bonjour chuchoté à l'auteur, aucune commande
     créée ; les noms de métier se lisent aussi en français, allemand, espagnol. Sans `#CO` : rien.
 13. [humain] Rédemption active sa dispo en cochant la case : la ligne LFW apparaît sur Commerce ;
     Gnomi (hors communauté) voit Rédemption passer « [Dispo] » dans l'onglet Artisans, avec ses
     métiers, quelques secondes après. Témoin connu-bon : la dispo sans la case, invisible pour Gnomi.
+    → **Tenu** le 2026-09-30 00:31 (mêmes précautions d'isolement que le 11).
 14. [porte] Toute chaîne d'interface nouvelle est traduite (`check_locale.ps1`).
 15. [agent] Aucun envoi sur Commerce hors d'un clic (`api-gotcha-reviewer`), et relecture du
     protocole (`craftlink-protocol-reviewer`) avant fusion.
@@ -155,7 +196,7 @@ reste lisible par l'ancien lecteur (on ajoute en fin de ligne, on ne réordonne 
 ```
 annonce  := "WTB " cible [" x" qté] [" PROVIDE " mat {" " mat} [" +" N]] [" " prix] " #CO" n
 cible    := lien d'objet | lien d'enchantement          (|Hitem:… ou |Henchant:…)
-mat      := lien d'objet ("x" | ":" | "×") qté
+mat      := lien d'objet [("x" | ":" | "×") qté]           (qté inconnue : le lien seul)
 prix     := [N "g"] [N "s"] [N "c"]                       lecteur : aussi « po » « pa » « pc »
 n        := entier ; id de la commande = <nom réseau de l'auteur> "-" n
 
@@ -181,8 +222,13 @@ de découverte (`feat/salle-decouverte`) seulement pour le bonjour ; le reste es
 3. **La réception** : une ligne `#CO` devient une Entrante d'id `<auteur>-<n>`, l'addon dit bonjour à
    l'auteur, la commande complète la remplace sans doublon ; écho, muté, autre royaume : rien.
    Critères 8, 9, 11.
-4. **La dispo LFW** : la case dans l'onglet de dispo, la ligne `LFW … #CO`, et le bonjour à la lecture.
-   Critères 12, 13.
+   → **Fait** (avec la lecture de la ligne LFW, avancée depuis le palier 4).
+4. **La dispo LFW** : la case dans l'onglet de dispo, la ligne `LFW … #CO`. Critère 13 (le 12 est
+   tenu en test depuis le palier 3).
+   → **Fait** : la case vit dans le panneau « Offre » de la bande « Chercher du travail » (même
+   réglage que celle du formulaire, qui se relit à chaque affichage) ; la ligne part du clic qui
+   active la dispo (bande, bouton de la vue pleine, `/co lfw <métier>`), avec le métier activé —
+   la dispo n'en porte qu'un. Même délai d'une minute que les commandes, un seul compteur.
 5. **Relectures** avant fusion : `api-gotcha-reviewer`, `craftlink-protocol-reviewer` (critère 15),
    puis `spec-updater` sur le diff.
 

@@ -371,13 +371,15 @@ function UI:DoPostOrder(narr)
     local price = Skin.PriceText(self.postMoney:GetAmount())   -- « 12po 5pa », nil pour zéro
     local provided = {}
     for iid, v in pairs(self.postProvide) do if v then provided[#provided+1] = iid end end
-    COC.Orders:PostEntry(e, qty, price, {
+    local o = COC.Orders:PostEntry(e, qty, price, {
         profession = self.postProf, provided = provided,
         recipient  = self:_PostTargetLabel(),
         title      = narr and narr.title or nil,
         text       = narr and narr.text or nil,
     })
     if COC.Beacon then COC:Beacon() end   -- balise TEXTE de découverte (clic = hardware event)
+    -- Annonce sur Trade (Services), case cochée : DANS le clic, le jeu l'exige (Orders_AnnounceSend).
+    if o and COC.db and COC.db.announceTrade and COC.AnnounceSend then COC.AnnounceSend:Post(o) end
     self.postMoney:Clear()
     self.postQty:SetValue(1); self.postEntry = nil; self.postProvide = {}
     self.postSelLbl:SetText("|cFF33DD33" .. L["Commande postée !"] .. "|r")

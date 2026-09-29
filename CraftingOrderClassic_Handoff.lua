@@ -118,7 +118,7 @@ function Handoff:ForwardInboundTo(who)
     if not self:_Related(r) then return end
     if COC.Inbound then COC.Inbound:Prune() end   -- jamais pousser une entrante périmée (demandeur déjà servi)
     for _, e in pairs(COC.db.inbound) do
-        if e.status ~= "dismissed" and e.buyer ~= who then
+        if e.status ~= "dismissed" and e.buyer ~= who and not e.announce then   -- aperçu d'annonce : la vraie suit
             local o = self:_SynthFromInbound(e)
             local key = o.id .. "@" .. who
             if not self._sent[key] and self:CanCraft(who, o) then

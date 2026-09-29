@@ -143,8 +143,10 @@ local es2 = {
     ["Pastille verte : il a l'addon et répond. Jaune : en ligne sans l'addon. Grise : hors ligne."] =
         "Punto verde: tiene el addon y responde. Amarillo: en línea sin el addon. Gris: desconectado.",
     ["Réseau, confidentialité & statuts"] = "Red, privacidad y estados",
-    ["Pas de canal de discussion : l'addon échange en chuchotements invisibles avec les joueurs de tes cercles, tes amis et ta guilde — aucun message lisible n'est envoyé."] =
-        "Sin canal de chat: el addon se comunica por susurros invisibles con los jugadores de tus círculos, tus amigos y tu hermandad — no se envía ningún mensaje legible.",
+    ["Pas de canal de discussion : l'addon échange en chuchotements invisibles avec les joueurs de tes cercles, tes amis et ta guilde. Le seul message lisible est celui que tu choisis : la ligne sur Trade (Services), si tu coches « Annoncer en Commerce »."] =
+        "Sin canal de chat: el addon se comunica por susurros invisibles con los jugadores de tus círculos, tus amigos y tu hermandad. El único mensaje legible es el que tú eliges: la línea en Comercio (Servicios), si marcas «Anunciar en Comercio».",
+    ["Coche |cFFE8B84BAnnoncer en Commerce|r pour poster aussi une ligne sur Trade (Services), dans une capitale : tous la lisent, les porteurs de l'addon reçoivent la commande en quelques secondes. Clic droit sur la commande dans le Carnet pour la rappeler, une fois par quart d'heure. La même case, dans l'offre de « Chercher du travail », annonce ta dispo."] =
+        "Marca |cFFE8B84BAnunciar en Comercio|r para publicar también una línea en Comercio (Servicios), en una capital: todos pueden leerla y los usuarios del addon reciben el pedido en segundos. Clic derecho sobre el pedido en el Libro para repetirlo, una vez cada cuarto de hora. La misma casilla, en la oferta de «Buscar trabajo», anuncia tu disponibilidad.",
     ["Les artisans se retrouvent dans la communauté |cFFFFD100Crafting Order PVE|r, une par camp. Sans cercle, l'addon t'en envoie le lien à la connexion : rejoins-la, elle devient ton cercle d'artisans."] =
         "Los artesanos se reúnen en la comunidad |cFFFFD100Crafting Order PVE|r, una por facción. Sin círculo, el addon te envía su enlace al conectarte: únete y se convierte en tu círculo de artesanos.",
     ["Statuts d'une commande : "] = "Estados de un pedido: ",

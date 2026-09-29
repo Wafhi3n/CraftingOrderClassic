@@ -50,6 +50,26 @@ local en3 = {
         "discovery room: off — |cFFFFFFFF/co channel room on|r to turn it back on",
     ["salle de découverte : |cFFFFFFFF%s|r — on s'y présente, les données restent en whisper"] =
         "discovery room: |cFFFFFFFF%s|r — used to say hello, data still goes by whisper",
+    -- Annonce sur Trade (Services), Orders_AnnounceSend (2026-09-29)
+    ["Annoncer en Commerce"] = "Announce in Trade",
+    ["Poste aussi une ligne sur Trade (Services), lisible par tous : les joueurs avec ou sans l'addon voient ta commande. Une ligne par clic, jamais de répétition automatique ; seulement pour une commande à tous, dans une capitale."] =
+        "Also posts one line in Trade (Services) that everyone can read: players with or without the addon see your order. One line per click, never repeated automatically; only for an order to everyone, in a capital city.",
+    ["seule une commande ouverte, à toi, s'annonce."] = "only an open order of yours can be announced.",
+    ["commande privée : elle ne s'annonce pas sur Commerce."] = "private order: it is never announced in Trade.",
+    ["déjà annoncée : tu pourras la rappeler dans %d min."] = "already announced: you can repeat it in %d min.",
+    ["une annonce par minute au plus : attends encore %d s."] = "one announcement per minute at most: wait %d more s.",
+    ["pas de canal Trade (Services) ici : il faut être dans une capitale."] =
+        "no Trade (Services) channel here: you need to be in a capital city.",
+    ["annonce impossible : un objet n'est pas encore connu du jeu, réessaie dans un instant."] =
+        "can't announce yet: an item isn't loaded by the game, try again in a moment.",
+    ["annonce refusée par le jeu."] = "the game refused the announcement.",
+    ["commande annoncée sur %s."] = "order announced in %s.",
+    ["Clic droit : annoncer en Commerce"] = "Right-click: announce in Trade",
+    ["Clic droit : rappeler en Commerce"] = "Right-click: repeat in Trade",
+    -- Annonce de la dispo LFW (2026-09-30)
+    ["dispo annoncée sur %s."] = "availability announced in %s.",
+    ["Quand tu actives ta dispo, poste aussi une ligne sur Trade (Services) : les joueurs avec ou sans l'addon voient que tu cherches du travail. Une ligne par activation, jamais au renouvellement automatique ; dans une capitale. Même réglage que la case du formulaire de commande."] =
+        "When you turn on looking for work, also posts one line in Trade (Services): players with or without the addon see that you are looking for work. One line each time you turn it on, never on the automatic refresh; in a capital city. Same setting as the box on the order form.",
     -- Aide remise à jour : onglets latéraux, cercles (2026-09-28)
     ["Ils se rangent sur le bord droit, comme ceux de la fenêtre de métier. Survole une icône pour lire son nom ; le chiffre sur le Carnet compte tes commandes en cours."] =
         "They sit along the right edge, like the ones on the profession window. Hover an icon to read its name; the number on the Ledger counts your active orders.",

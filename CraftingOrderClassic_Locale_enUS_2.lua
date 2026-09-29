@@ -172,8 +172,10 @@ local en2 = {
         "Right click a player (chat, party...) to add them to your directory — useful to find them again even offline.",
     ["Pastille verte : il a l'addon et répond. Jaune : en ligne sans l'addon. Grise : hors ligne."] = "Green dot: has the addon and answers. Yellow: online without the addon. Gray: offline.",
     ["Réseau, confidentialité & statuts"] = "Network, privacy & statuses",
-    ["Pas de canal de discussion : l'addon échange en chuchotements invisibles avec les joueurs de tes cercles, tes amis et ta guilde — aucun message lisible n'est envoyé."] =
-        "No chat channel: the addon talks through hidden whispers with the players in your circles, your friends and your guild — no readable text is ever sent.",
+    ["Pas de canal de discussion : l'addon échange en chuchotements invisibles avec les joueurs de tes cercles, tes amis et ta guilde. Le seul message lisible est celui que tu choisis : la ligne sur Trade (Services), si tu coches « Annoncer en Commerce »."] =
+        "No chat channel: the addon talks through hidden whispers with the players in your circles, your friends and your guild. The only readable message is the one you choose: the line in Trade (Services), if you tick “Announce in Trade”.",
+    ["Coche |cFFE8B84BAnnoncer en Commerce|r pour poster aussi une ligne sur Trade (Services), dans une capitale : tous la lisent, les porteurs de l'addon reçoivent la commande en quelques secondes. Clic droit sur la commande dans le Carnet pour la rappeler, une fois par quart d'heure. La même case, dans l'offre de « Chercher du travail », annonce ta dispo."] =
+        "Tick |cFFE8B84BAnnounce in Trade|r to also post a line in Trade (Services), in a capital city: everyone can read it, and addon users get the order within seconds. Right-click the order in the Ledger to repeat it, once every fifteen minutes. The same box, in the “Look for work” offer, announces your availability.",
     ["Les artisans se retrouvent dans la communauté |cFFFFD100Crafting Order PVE|r, une par camp. Sans cercle, l'addon t'en envoie le lien à la connexion : rejoins-la, elle devient ton cercle d'artisans."] =
         "Crafters meet in the |cFFFFD100Crafting Order PVE|r community, one per faction. Without a circle, the addon sends you its link at login: join it and it becomes your crafters' circle.",
     ["Statuts d'une commande : "] = "Order statuses: ",

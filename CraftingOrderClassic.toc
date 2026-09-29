@@ -140,6 +140,7 @@ CraftingOrderClassic_ProfWindow_Orders.lua
 CraftingOrderClassic_ProfWindow_Orders_Card.lua
 CraftingOrderClassic_ProfWindow_LFW.lua
 CraftingOrderClassic_ProfWindow_LFW_Recipes.lua
+CraftingOrderClassic_ProfWindow_LFW_Announce.lua
 CraftingOrderClassic_ProfWindow_Reroll.lua
 Directory.lua
 Directory_Presence.lua
@@ -163,6 +164,9 @@ CraftingOrderClassic_LFWChat.lua
 Directory_MyArtisans.lua
 Directory_LootScan.lua
 Orders_Codec.lua
+Orders_Announce.lua
+Orders_AnnounceSend.lua
+Orders_AnnounceRecv.lua
 Orders.lua
 Orders_Net.lua
 Orders_Narrative.lua

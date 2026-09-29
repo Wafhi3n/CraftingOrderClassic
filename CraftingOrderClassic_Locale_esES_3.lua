@@ -50,6 +50,26 @@ local es3 = {
         "sala de descubrimiento: desactivada — |cFFFFFFFF/co channel room on|r para reactivarla",
     ["salle de découverte : |cFFFFFFFF%s|r — on s'y présente, les données restent en whisper"] =
         "sala de descubrimiento: |cFFFFFFFF%s|r — sirve para presentarse, los datos siguen yendo por susurro",
+    -- Annonce sur Trade (Services), Orders_AnnounceSend (2026-09-29)
+    ["Annoncer en Commerce"] = "Anunciar en Comercio",
+    ["Poste aussi une ligne sur Trade (Services), lisible par tous : les joueurs avec ou sans l'addon voient ta commande. Une ligne par clic, jamais de répétition automatique ; seulement pour une commande à tous, dans une capitale."] =
+        "Publica también una línea en Comercio (Servicios), legible por todos: los jugadores con o sin el addon ven tu pedido. Una línea por clic, nunca repetida automáticamente; solo para un pedido a todos, en una capital.",
+    ["seule une commande ouverte, à toi, s'annonce."] = "solo se puede anunciar un pedido abierto tuyo.",
+    ["commande privée : elle ne s'annonce pas sur Commerce."] = "pedido privado: nunca se anuncia en Comercio.",
+    ["déjà annoncée : tu pourras la rappeler dans %d min."] = "ya anunciado: podrás repetirlo en %d min.",
+    ["une annonce par minute au plus : attends encore %d s."] = "un anuncio por minuto como máximo: espera %d s más.",
+    ["pas de canal Trade (Services) ici : il faut être dans une capitale."] =
+        "aquí no hay canal Comercio (Servicios): tienes que estar en una capital.",
+    ["annonce impossible : un objet n'est pas encore connu du jeu, réessaie dans un instant."] =
+        "aún no se puede anunciar: un objeto no está cargado, inténtalo de nuevo en un momento.",
+    ["annonce refusée par le jeu."] = "el juego rechazó el anuncio.",
+    ["commande annoncée sur %s."] = "pedido anunciado en %s.",
+    ["Clic droit : annoncer en Commerce"] = "Clic derecho: anunciar en Comercio",
+    ["Clic droit : rappeler en Commerce"] = "Clic derecho: repetir en Comercio",
+    -- Annonce de la dispo LFW (2026-09-30)
+    ["dispo annoncée sur %s."] = "disponibilidad anunciada en %s.",
+    ["Quand tu actives ta dispo, poste aussi une ligne sur Trade (Services) : les joueurs avec ou sans l'addon voient que tu cherches du travail. Une ligne par activation, jamais au renouvellement automatique ; dans une capitale. Même réglage que la case du formulaire de commande."] =
+        "Al activar tu búsqueda de trabajo, publica también una línea en Comercio (Servicios): los jugadores con o sin el addon ven que buscas trabajo. Una línea por activación, nunca en la renovación automática; solo en una capital. El mismo ajuste que la casilla del formulario de pedido.",
     -- Aide remise à jour : onglets latéraux, cercles (2026-09-28)
     ["Ils se rangent sur le bord droit, comme ceux de la fenêtre de métier. Survole une icône pour lire son nom ; le chiffre sur le Carnet compte tes commandes en cours."] =
         "Están en el borde derecho, como los de la ventana de profesión. Pasa el ratón sobre un icono para leer su nombre; el número sobre el Libro cuenta tus pedidos activos.",

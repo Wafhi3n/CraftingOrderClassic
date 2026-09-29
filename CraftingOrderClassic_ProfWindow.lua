@@ -148,7 +148,12 @@ end
 function PW:_ToggleLFW()
     local D = COC.Directory
     if not (D and D.SetLFW and self.profKey) or self.rerollKey then return end
-    if D.MyLFW and D:MyLFW() == self.profKey then D:SetLFW(nil) else D:SetLFW(self.profKey) end
+    if D.MyLFW and D:MyLFW() == self.profKey then D:SetLFW(nil)
+    else
+        D:SetLFW(self.profKey)
+        -- Case « Annoncer en Commerce » cochée : la ligne LFW part de CE clic (le jeu exige un geste).
+        if COC.AnnounceSend then COC.AnnounceSend:PostLFW(self.profKey) end
+    end
     self:_SyncLFWBtn(); if self.RefreshRecipes then self:RefreshRecipes() end   -- + colonne de cases « proposer »
 end
 
