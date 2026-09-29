@@ -1,7 +1,7 @@
 # Annoncer une commande en clair sur Commerce
 
-> État : **brouillon** · Idée du user le 2026-09-29, mise en forme par l'agent · Décisions ouvertes
-> signalées « À TRANCHER ». Mesures préalables en cours (`/cocprobe annonce`, § Critères 1 à 4).
+> État : **validée** le 2026-09-29 par le user · Idée du user, mise en forme par l'agent · Mesures
+> préalables faites le 2026-09-29 (Critères 1 à 4 : tenus) · Implémentation : pas commencée.
 
 ## Le problème
 
@@ -91,34 +91,38 @@ des commandes nommées), mais un joueur hors communauté voit et est vu dès qu'
   PROVIDE YYY:1 ZZZ:2 2PO50 »).
 - 2026-09-29, **user** : l'artisan s'annonce d'une ligne « LFW Enchanting/Tailoring », la suite se fait
   au chuchotement.
-- **À TRANCHER — l'étiquette `#CO` sur la ligne LFW** : elle dit aux porteurs « celui-là a l'addon » ;
-  sans elle, l'addon dirait bonjour à tout « LFW » de Commerce, pour rien chez ceux qui ne l'ont pas
-  (le bonjour est invisible, mais il coûte). Recommandation : la garder, trois caractères.
-- **À TRANCHER — ce qui déclenche l'annonce LFW** : la case « Annoncer en Commerce » au moment où
-  l'artisan active sa dispo (onglet LFW), jamais le renouvellement automatique de la dispo.
-- 2026-09-29, agent, **à valider par le user** : Commerce porte les annonces publiques et sert de
-  balise ; le protocole reste en chuchotement (raisons : clic obligatoire, espace public, ville
+- 2026-09-29, **user** : la ligne LFW porte l'étiquette **`#CO`** (sans elle, l'addon dirait bonjour à
+  tout « LFW » de Commerce, pour rien chez ceux qui ne l'ont pas).
+- 2026-09-29, agent : l'annonce LFW part de la même case « Annoncer en Commerce », au moment où
+  l'artisan active sa dispo — jamais au renouvellement automatique de la dispo.
+- 2026-09-29, agent, accepté par le user avec la validation : Commerce porte les annonces publiques
+  et sert de balise ; le protocole reste en chuchotement (clic obligatoire, espace public, ville
   seulement, rien de persistant).
-- **À TRANCHER — le canal** : Trade (Services), fait pour les services d'artisans, ou Trade (le
-  principal, plus fréquenté) ? Recommandation de l'agent : Services si la mesure montre qu'il porte
-  aussi loin (Critère 3).
-- **À TRANCHER — la langue des jetons** : jetons fixes en anglais (`WTB`, `PROVIDE`, `LFW`, prix en
-  `g`/`s`/`c`), quel que soit le client. Recommandation : oui, c'est le jargon commun de Commerce ; le
-  lecteur accepte aussi `po`/`pa`/`pc`, `:N` et `×N`.
-- **À TRANCHER — la case « Annoncer en Commerce »** : décochée par défaut, et le dernier choix est
-  retenu ? Recommandation : oui, c'est un espace public, le joueur choisit.
-- **À TRANCHER — « Rappeler »** : un bouton pour ré-annoncer une commande encore ouverte, au plus une
-  fois par 15 minutes ? Recommandation : oui, jamais plus.
+- 2026-09-29, **user** : le canal est **Trade (Services)**, celui des services d'artisans. Mesuré le
+  même soir : il relie toutes les capitales (Stormwind, Ironforge, Darnassus), comme Trade.
+- 2026-09-29, **user** : la case « Annoncer en Commerce » est **décochée au départ, et le dernier
+  choix du joueur est retenu**.
+- 2026-09-29, **user** : un bouton **« Rappeler »** ré-annonce une commande encore ouverte, **au plus
+  une fois par 15 minutes** et par commande. Jamais de rappel automatique.
+- 2026-09-29, agent (non contesté à la validation) : jetons fixes en anglais (`WTB`, `PROVIDE`, `LFW`,
+  prix en `g`/`s`/`c`), quel que soit le client — le jargon commun de Commerce. Le lecteur accepte
+  aussi `po`/`pa`/`pc`, `:N` et `×N` (le scanner lit déjà « 2g50s » en 2 po 50 pa).
 
 ## Critères d'acceptation
 
-Mesures préalables (sonde `/cocprobe annonce [services|local]`, avant tout code) :
+Mesures préalables (sonde `/cocprobe annonce [services|local]`, avant tout code) — **tenues le
+2026-09-29 (22:16-22:19, build 70058)** :
 
 1. [humain] L'addon peut écrire sur Commerce depuis une commande tapée : la ligne s'affiche dans le
    chat des deux comptes. Témoin connu-bon : la même ligne tapée à la main. Observateur : le user.
+   → **Tenu** : vu par le user sur Trade et Trade (Services) ; aucun blocage relevé.
 2. [agent] Une ligne à trois liens tient sous 255 octets (`COCProbeDB.tradePost.bytes`).
+   → **Tenu** : 218 octets (les liens de Forever sont courts : `|cnIQ1:|Hitem:…`). Un 4ᵉ lien dépasse.
 3. [humain] Portée : une ligne postée à Ironforge est lue à Stormwind (Trade, puis Services).
+   → **Tenu** : les deux canaux relient toutes les capitales (Stormwind, Ironforge, Darnassus).
 4. [humain] Le scanner de Gnomi (`/co scan all`) range la ligne de Rédemption dans ses Entrantes.
+   → **Tenu** (relevé dans la SavedVariable de Gnomi) : Entrante « Linen Bandage », métier First Aid
+   déduit, x1, commission lue « 2po 50pa ».
 
 Fonctionnalité :
 
@@ -162,6 +166,25 @@ métier   := nom anglais du métier (Enchanting, Tailoring…)  lecteur : aussi 
 - Écrit toujours dans cet ordre ; le lecteur tolère les espaces multiples et la casse des mots-clés.
 - `#CO` sans `n` : balise de découverte seule, sans commande (la ligne « LFW »).
 - Maximum 255 octets, liens compris.
+
+## Plan (2026-09-29) — volatile, meurt quand c'est fait
+
+Branches homonymes `feat/annonce-commerce` (COC + outillage pour les tests). S'appuie sur la salle
+de découverte (`feat/salle-decouverte`) seulement pour le bonjour ; le reste est indépendant.
+
+1. **Le format**, pur et testé sans jeu : fabriquer la ligne d'une commande (ordre des jetons, prix
+   en g/s/c, coupe à 255 octets avec `+N`, rien pour une commande privée) et relire une ligne `WTB …
+   #CO<n>` ou `LFW … #CO`. Critères 5, 6, 7, et la lecture de 12.
+2. **L'envoi** : la case dans le formulaire de commande (choix retenu), la ligne sur Trade (Services)
+   au clic « Poster », le délai d'une minute entre deux annonces, « Rappeler » (15 min par commande),
+   les messages hors ville ou sur refus du jeu. Critères 10, 14, et l'envoi de 11.
+3. **La réception** : une ligne `#CO` devient une Entrante d'id `<auteur>-<n>`, l'addon dit bonjour à
+   l'auteur, la commande complète la remplace sans doublon ; écho, muté, autre royaume : rien.
+   Critères 8, 9, 11.
+4. **La dispo LFW** : la case dans l'onglet de dispo, la ligne `LFW … #CO`, et le bonjour à la lecture.
+   Critères 12, 13.
+5. **Relectures** avant fusion : `api-gotcha-reviewer`, `craftlink-protocol-reviewer` (critère 15),
+   puis `spec-updater` sur le diff.
 
 ## Renvois
 
