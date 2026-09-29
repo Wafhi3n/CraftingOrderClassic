@@ -51,6 +51,13 @@ local de3 = {
         "Es fehlen noch %d in der Post: Trenne sie selbst von einem Stapel ab (Umschalt-Klick auf den Stapel) und lege sie hinein.",
     ["La pile de %d est prête dans ton sac : dépose-la toi-même dans le courrier."] =
         "Der Stapel mit %d liegt bereit in deiner Tasche: Lege ihn selbst in die Post.",
+    -- Note de membre de la communauté, /co note (2026-09-29)
+    ["le texte de tes métiers, à coller dans ta note de communauté (visible même hors ligne)"] =
+        "der Text deiner Berufe, zum Einfügen in deine Gemeinschaftsnotiz (auch offline sichtbar)",
+    ["aucun métier connu pour ce personnage : ouvre une fois ta fenêtre de métier, puis recommence."] =
+        "für diesen Charakter ist noch kein Beruf bekannt: öffne einmal dein Berufsfenster und versuche es dann erneut.",
+    ["Copie ce texte (Ctrl+C), puis colle-le dans ta note de membre : Communautés, clic droit sur ton nom, « Note ». Les autres joueurs de Crafting Order verront tes métiers, même quand tu es hors ligne."] =
+        "Kopiere diesen Text (Strg+C) und füge ihn in deine Mitgliedsnotiz ein: Gemeinschaften, Rechtsklick auf deinen Namen, „Notiz“. Andere Crafting-Order-Spieler sehen dann deine Berufe, auch wenn du offline bist.",
 }
 
 for k, v in pairs(de3) do L[k] = v end
