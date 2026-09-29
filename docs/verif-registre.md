@@ -46,6 +46,13 @@ client.
 
 ## Relevés
 
+- 2026-09-29 22:46 — jusqu'a 52633c3 — Forever, client en ANGLAIS ; build déployé `main-dev@aaeb644
+  2026-09-29 22:37` — **GO sur le bonjour différé et sur l'addon sans communauté** — trace de Gnomi
+  relue par l'agent : connexion complète, garde anti-/1 qui attend un canal par défaut (22:44:41-44),
+  « lien de la communauté non proposé : aucune communauté officielle pour ce camp » (22:44:56 ; le user
+  confirme : aucun chuchotement de communauté), salle rejointe puis bonjour 2 à 3 s après, sans refus,
+  y compris aux re-joins (22:45:53, 22:46:02, 22:46:12).
+
 - 2026-09-29 22:35 — jusqu'a 3d4c113 — Forever, deux clients, client en ANGLAIS, Ironforge ; build
   déployé `main-dev@084954c 2026-09-29 22:30` (relu dans la copie déployée du `.toc`), communauté
   officielle coupée (`fix/sans-communaute`) — **GO sur la salle de découverte et le PING retiré** —
