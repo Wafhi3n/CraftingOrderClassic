@@ -4,7 +4,7 @@
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
-149 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
+150 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
 
 ## Modules (ordre de chargement)
 
@@ -137,13 +137,14 @@
 | `Orders_Codec.lua` | codec du protocole filaire ORD\| (sérialisation ⇄ parsing, SOURCE DE VÉRITÉ). | 158 |
 | `Orders_Announce.lua` | le FORMAT d'une annonce en clair sur Commerce (spec docs/specs/annonce-commerce.md). | 166 |
 | `Orders_AnnounceSend.lua` | l'ENVOI d'une annonce sur Trade (Services) (spec annonce-commerce, palier 2). | 121 |
+| `Orders_AnnounceRecv.lua` | la LECTURE d'une annonce de Commerce (spec annonce-commerce, palier 3). | 87 |
 | `Orders.lua` | Crafting Order - Classic — Orders : carnet d'ordres GLOBAL (modèle + cycle + protocole). | 496 |
-| `Orders_Net.lua` | couche « fil réseau » du carnet d'ordres (protocole ORD\|). | 366 |
+| `Orders_Net.lua` | couche « fil réseau » du carnet d'ordres (protocole ORD\|). | 367 |
 | `Orders_Narrative.lua` | TITRE et DESCRIPTION libres d'une commande : « donne un nom et une histoire à ce que tu demandes ». | 254 |
 | `CraftingOrderClassic_QuestSheet.lua` | FICHE DE QUÊTE réutilisable : affiche (ou fait écrire) une commande sous la forme d'une vraie quête du jeu. | 363 |
 | `CraftingOrderClassic_JournalQuests.lua` | lecture EN SEULE LECTURE du journal de quêtes du JEU, pour que le journal COC affiche les vraies quêtes à côté des commandes. | 103 |
 | `CraftingOrderClassic_JournalWin.lua` | LE JOURNAL : une fenêtre parchemin où les commandes et les vraies quêtes du joueur cohabitent par sections. | 304 |
-| `CraftingOrderClassic_Inbound.lua` | couche réseau « passive » : capte les demandes de craft postées dans /commerce (Trade) et /guilde par des joueurs SANS l'addon, alerte le joueur, et les range dans une file « Entrantes » (acceptable / ignorable). | 305 |
+| `CraftingOrderClassic_Inbound.lua` | couche réseau « passive » : capte les demandes de craft postées dans /commerce (Trade) et /guilde par des joueurs SANS l'addon, alerte le joueur, et les range dans une file « Entrantes » (acceptable / ignorable). | 321 |
 | `CraftingOrderClassic_Handoff.lua` | « garder une commande pour un ami capable ». | 286 |
 | `CraftingOrderClassic_Moderation.lua` | modération / anti-spam. | 370 |
 | `CraftingOrderClassic_LootAlert.lua` | alerte quand TU loots un objet-PLAN (recette/formule/ schéma/patron) catalogué par CraftLink, MAIS seulement s'il te CONCERNE : soit tu as le métier (candidat à l'apprendre), soit un AMI/PARTENAIRE de ton annuaire ne le connaît pas encore (candidat à un don — cf. | 165 |
@@ -2432,6 +2433,18 @@
 
 **API** : `S.ChannelIndex()` · `S:WhyNot(o, isRemind)` · `S:CanRemind(o)` · `S:LineFor(o)` · `S:Post(o, isRemind)`
 
+### `Orders_AnnounceRecv.lua`
+> Orders_AnnounceRecv.lua — la LECTURE d'une annonce de Commerce (spec annonce-commerce, palier 3).
+> 
+> Une ligne qui finit par `#CO` a été écrite par l'addon d'un autre porteur. Elle sert de balise :
+>   WTB … #CO27  -> un aperçu dans mes Entrantes (id = <auteur>-27), et un bonjour chuchoté à l'auteur.
+>                   Il me découvre, et son addon me pousse la commande complète (Orders:OnArtisanOnline),
+>                   qui remplace l'aperçu (Inbound:TakeOver, appelé par Orders:_OnNew).
+>   LFW … #CO    -> un bonjour seulement : il me répond son profil et sa dispo (Dir:OnHello).
+> Une ligne sans `#CO` n'est pas pour ici : le scanner de Commerce la lit comme une demande humaine.
+
+**API** : `R:OnLine(msg, player)`
+
 ### `Orders.lua`
 > Crafting Order - Classic — Orders : carnet d'ordres GLOBAL (modèle + cycle + protocole).
 > 
@@ -2563,7 +2576,7 @@
 > Economy (TradeScanner). Ces commandes portent viaAddon=false ; l'acceptation ne prévient plus
 > automatiquement le demandeur (WhisperPub retiré, v1.2.0) — à faire manuellement dans le chat.
 
-**API** : `Inbound:OnChat(msg, player, source)` · `Inbound:Add(e)` · `Inbound:Alert(e)` · `Inbound:Expired(e)` · `Inbound:Prune()` · `Inbound:All()` · `Inbound:Count()` · `Inbound:CanCraftLive(e)` · `Inbound:VisibleInProfView(e)` · `Inbound:Accept(id)` · `Inbound:Dismiss(id)` · `Inbound:Start()`
+**API** : `Inbound:OnChat(msg, player, source)` · `Inbound:Add(e)` · `Inbound:Alert(e)` · `Inbound:Expired(e)` · `Inbound:Prune()` · `Inbound:All()` · `Inbound:Count()` · `Inbound:CanCraftLive(e)` · `Inbound:VisibleInProfView(e)` · `Inbound:Accept(id)` · `Inbound:Dismiss(id)` · `Inbound:TakeOver(o)` · `Inbound:Start()`
 
 ### `CraftingOrderClassic_Handoff.lua`
 > CraftingOrderClassic_Handoff.lua — « garder une commande pour un ami capable ».

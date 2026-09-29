@@ -215,6 +215,7 @@ function Orders:_OnNew(message, distribution, sender)
     -- Un TTL arrivé AVANT son NEW attendait dans le sas : maintenant que l'acheteur est établi en
     -- cache, on peut vérifier sa provenance et l'appliquer (cf. Orders_Narrative).
     if self.ApplyPendingTitle then self:ApplyPendingTitle(o) end
+    if COC.Inbound and COC.Inbound.TakeOver then COC.Inbound:TakeOver(o) end   -- remplace l'aperçu tiré de Commerce
     -- Garde d'alerte : `o.alerted` (PAS `existed`). _ShouldAlert peut refuser une 1re réception
     -- (gate métier, portée) sans que l'ordre ait « consommé » son alerte — une réception ultérieure
     -- dans de meilleures conditions (ordre re-reçu nommé sur moi après mutation par l'acheteur,

@@ -4,7 +4,9 @@
 > préalables faites le 2026-09-29 (Critères 1 à 4 : tenus) · Implémentation : palier 1 (le format,
 > `Orders_Announce.lua`, `tests/test_announce.lua`) et palier 2 (l'envoi, `Orders_AnnounceSend.lua` :
 > case du formulaire, clic droit du Carnet ; `tests/test_announce_send.lua`) faits le 2026-09-29 ;
-> critères 5 à 7 et 10 tenus en test, 11 à voir en jeu. Paliers 3 et 4 : pas commencés.
+> palier 3 (la lecture, `Orders_AnnounceRecv.lua`, lignes WTB **et** LFW ; `tests/test_announce_recv.lua`)
+> fait le 2026-09-29. Critères 5 à 10 et la lecture du 12 tenus en test ; 11 à voir en jeu. Palier 4
+> (l'envoi de la ligne LFW) : pas commencé.
 
 ## Le problème
 
@@ -110,6 +112,16 @@ des commandes nommées), mais un joueur hors communauté voit et est vu dès qu'
 - 2026-09-29, agent (non contesté à la validation) : jetons fixes en anglais (`WTB`, `PROVIDE`, `LFW`,
   prix en `g`/`s`/`c`), quel que soit le client — le jargon commun de Commerce. Le lecteur accepte
   aussi `po`/`pa`/`pc`, `:N` et `×N` (le scanner lit déjà « 2g50s » en 2 po 50 pa).
+- 2026-09-29, agent (palier 3) : une annonce `WTB` n'est lue que si le scanner l'aurait gardée —
+  portée `/co scan` (« mine » = un métier que j'ai, « all » = tout, « off » = rien). Sinon ni aperçu
+  ni bonjour : chaque porteur en ville qui lit la ligne chuchote l'auteur, inutile d'y ajouter ceux
+  que la commande ne concerne pas. La ligne `LFW … #CO`, elle, reçoit toujours son bonjour (hors
+  « off ») : un artisan disponible intéresse tout acheteur.
+- 2026-09-29, agent (palier 3) : une commande d'**enchantement** annoncée ne pose **pas d'aperçu**
+  dans les Entrantes (elles montrent un objet, un enchantement n'en a pas) ; le bonjour part, et la
+  commande complète arrive par chuchotement. L'aperçu d'un objet, lui, sonne comme une entrante ; la
+  commande complète qui le remplace ne sonne pas une seconde fois. Un aperçu n'est jamais « gardé
+  pour un ami capable » (Handoff) : l'auteur a l'addon, la vraie commande suit par le relais.
 
 ## Critères d'acceptation
 
@@ -184,8 +196,9 @@ de découverte (`feat/salle-decouverte`) seulement pour le bonjour ; le reste es
 3. **La réception** : une ligne `#CO` devient une Entrante d'id `<auteur>-<n>`, l'addon dit bonjour à
    l'auteur, la commande complète la remplace sans doublon ; écho, muté, autre royaume : rien.
    Critères 8, 9, 11.
-4. **La dispo LFW** : la case dans l'onglet de dispo, la ligne `LFW … #CO`, et le bonjour à la lecture.
-   Critères 12, 13.
+   → **Fait** (avec la lecture de la ligne LFW, avancée depuis le palier 4).
+4. **La dispo LFW** : la case dans l'onglet de dispo, la ligne `LFW … #CO`. Critère 13 (le 12 est
+   tenu en test depuis le palier 3).
 5. **Relectures** avant fusion : `api-gotcha-reviewer`, `craftlink-protocol-reviewer` (critère 15),
    puis `spec-updater` sur le diff.
 

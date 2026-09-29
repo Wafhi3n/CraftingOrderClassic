@@ -156,7 +156,7 @@ function Inbound:Add(e)
     if not COC.db then return end
     if e.itemID and COC.Api.GetItemInfo then COC.Api.GetItemInfo(e.itemID) end   -- amorce le cache (nom localisé + rareté)
     COC.db.inbound = COC.db.inbound or {}
-    local id = e.buyer .. "_" .. e.itemID
+    local id = e.id or (e.buyer .. "_" .. e.itemID)   -- aperçu d'annonce : l'id de la commande (<auteur>-<n>)
     local existing = COC.db.inbound[id]
     e.id = id; e.ts = time()
     e.status = (existing and existing.status == "dismissed") and "dismissed" or (existing and existing.status) or "new"
@@ -166,7 +166,8 @@ function Inbound:Add(e)
     if e.status == "new" and COC.Moderation then COC.Moderation:NotePost(e.buyer) end   -- anti-spam
     -- « Garder pour un ami capable » : si un artisan connu sait la faire, on me le signale et on la
     -- lui pousse (maintenant s'il est en ligne, sinon à sa connexion via Handoff:OnArtisanOnline).
-    if e.status == "new" and COC.Handoff then COC.Handoff:NoteInbound(e) end
+    -- Pas l'aperçu d'une annonce : son auteur a l'addon, la vraie commande suit par le relais.
+    if e.status == "new" and COC.Handoff and not e.announce then COC.Handoff:NoteInbound(e) end
     if COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end
 end
 
@@ -194,6 +195,7 @@ function Inbound:Alert(e)
     local qty = (Skin and Skin.QtySuffix(e)) or ""
     local pr  = e.price and (" — |cFFFFDD00" .. e.price .. "|r") or ""
     local msg = string.format(L["|cFFFF8800entrante|r |cFFFFFFFF%s|r (%s) : %s%s%s"], e.buyer, src, nm, qty, pr)
+    e.alerted = true   -- lu par TakeOver : la commande complète ne sonnera pas une seconde fois
     pmsg((Skin and ("|T" .. Skin.tex.workorder .. ":0|t ") or "") .. msg)
     if COC.UI and COC.UI.Toast then COC.UI:Toast(msg) end
     if e.canCraft then print(L["   |cFF33DD33» tu sais la crafter|r — vue métier › onglet Entrantes"]) end
@@ -280,6 +282,17 @@ function Inbound:Dismiss(id)
     if COC.UI and COC.UI.Refresh then COC.UI:Refresh() end
 end
 
+-- La commande complète `o` vient d'arriver (Orders:_OnNew) : l'aperçu tiré de son annonce sur Commerce
+-- (même id) lui cède la place — une seule entrée par commande. S'il a déjà sonné, elle ne sonne pas.
+function Inbound:TakeOver(o)
+    local inb = COC.db and COC.db.inbound
+    local e = o and o.id and inb and inb[o.id]
+    if not (e and e.announce) then return end
+    inb[o.id] = nil
+    if e.alerted then o.alerted = true end
+    if COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end
+end
+
 -- ------------------------------------------------------------------
 -- Démarrage
 -- ------------------------------------------------------------------
@@ -295,8 +308,11 @@ function Inbound:Start()
         local who = player and (player:match("^([^%-]+)") or player)
         if event == "CHAT_MSG_CHANNEL" then
             local cn = (channelName or ""):lower()
-            if cn:find("trade") or cn:find("commerce") or cn:find("échange") or cn:find("echange") then
-                Inbound:OnChat(msg, who, "trade")
+            if cn:find("trade") or cn:find("commerce") or cn:find("échange") or cn:find("echange")
+               or cn:find("handel") or cn:find("comercio") then
+                -- Une annonce d'un autre addon (#CO) d'abord : elle ne doit pas devenir aussi une demande humaine.
+                local R = COC.AnnounceRecv
+                if not (R and R:OnLine(msg, player)) then Inbound:OnChat(msg, who, "trade") end
             end
         elseif event == "CHAT_MSG_GUILD" then
             Inbound:OnChat(msg, who, "guild")
