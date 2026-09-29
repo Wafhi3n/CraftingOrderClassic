@@ -155,7 +155,7 @@ function COC:Status()
         elseif COC.db and COC.db.channelOptIn then
             p("  " .. L["canal : non rejoint — |cFFFFFFFF/co channel on|r pour réessayer"])
         else
-            p("  " .. L["canal : aucun — le réseau passe en whisper (cercles, amis, guilde)"])
+            p("  " .. ((d and d.RoomStatusLine and d:RoomStatusLine()) or L["canal : aucun — le réseau passe en whisper (cercles, amis, guilde)"]))
         end
     end
 end
@@ -167,6 +167,8 @@ function COC:ChannelCmd(arg)
     local L = COC.L
     if not CraftLink then p(L["CraftLink absent — l'infra réseau n'est pas chargée."]); return end
     arg = (arg or ""):lower()
+    local room = arg:match("^room%s*(.*)$") or arg:match("^salle%s*(.*)$")   -- salle de découverte (Directory_Room)
+    if room then if COC.Directory and COC.Directory.RoomCmd then COC.Directory:RoomCmd(room) end; return end
     local label = (CraftLink.GlobalChannelLabel and CraftLink:GlobalChannelLabel()) or "?"
     if arg == "off" then
         COC.db.channelOptIn = nil
@@ -328,7 +330,7 @@ function COC:Help()
     print("  |cFFFFFFFF/co quest <id>|r — " .. L["voir une commande sous forme de quête (parchemin)"])
     print("  |cFFFFFFFF/co journal|r — " .. L["journal parchemin : commandes et quêtes côte à côte (clic droit sur un en-tête du suivi)"])
     print("  |cFFFFFFFF/co circle [n°|link|nolink]|r — " .. L["cercles d'artisans (communautés) et rappel de la communauté"])
-    print("  |cFFFFFFFF/co channel [on|off]|r — |cFFFF8800" .. L["diag"] .. "|r : " .. L["rejoindre l'ancien canal réseau, morcelé sur Forever"])
+    print("  |cFFFFFFFF/co channel [on|off|room on|off]|r — |cFFFF8800" .. L["diag"] .. "|r : " .. L["rejoindre l'ancien canal réseau, morcelé sur Forever"])
     print("  |cFFFFFFFF/co notify [all|directed|named|off]|r — " .. L["portée des notifications de commande"])
     print("  |cFFFFFFFF/co scan [mine|all|off]|r — " .. L["portée du scan des demandes de craft en chat (défaut : mes métiers)"])
     print("  |cFFFFFFFF/co crafters [on|off]|r — " .. L["repérer les crafteurs sans l'addon qui craftent autour (en ville ; défaut : off)"])
@@ -461,6 +463,7 @@ f:SetScript("OnEvent", function(_, event, arg1)
         -- Canal CraftLinkNet COUPÉ pour tous (morcelé sur Forever) : rejoint seulement sur opt-in de
         -- diagnostic, appliqué AVANT de démarrer le transport. La popup d'info ne sert qu'à cet opt-in.
         if CraftLink and CraftLink.SetAutoJoin then CraftLink:SetAutoJoin((COC.db and COC.db.channelOptIn) == true) end
+        if CraftLink and CraftLink.SetDiscovery then CraftLink:SetDiscovery(not (COC.db and COC.db.roomOff)) end   -- Directory_Room
         if CraftLink and CraftLink.OnNetworkReady then CraftLink:OnNetworkReady(function() COC:ChannelNotice() end) end
         if COC.Directory then COC.Directory:Start() end   -- transport + annuaire global
         if COC.Orders   then COC.Orders:Start()   end      -- carnet d'ordres global
