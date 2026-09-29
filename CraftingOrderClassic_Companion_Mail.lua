@@ -247,33 +247,45 @@ end
 -- `AutoLootMailItem` (tout prendre), par hooksecurefunc : les remplacer contaminerait le code de
 -- Blizzard qui les appelle. Le crochet passe APRÈS l'appel ; si la pièce jointe n'est déjà plus
 -- lisible, le relevé pris à chaque MAIL_INBOX_UPDATE la donne encore.
-local seen = {}   -- [n° de courrier] = { [n° de pièce jointe] = itemID }
+-- L'EXPÉDITEUR compte (2026-09-29) : seule la commande de l'artisan qui a envoyé le courrier se
+-- confirme. Un objet acheté à l'hôtel des ventes arrive aussi par courrier, et confirmait sinon la
+-- commande d'un artisan qui n'avait rien envoyé. Expéditeur illisible = rien ne se confirme.
+local seen = {}   -- [n° de courrier] = { from = expéditeur, [n° de pièce jointe] = itemID }
+
+local function senderOf(m)
+    if not GetInboxHeaderInfo then return nil end
+    local _, _, from = GetInboxHeaderInfo(m)
+    return from
+end
 
 local function snapshot()
     seen = {}
     local n = (GetInboxNumItems and GetInboxNumItems()) or 0
     for m = 1, n do
+        seen[m] = { from = senderOf(m) }
         for i = 1, (ATTACHMENTS_MAX_RECEIVE or 16) do
             local _, id = GetInboxItem(m, i)
-            if id then seen[m] = seen[m] or {}; seen[m][i] = id end
+            if id then seen[m][i] = id end
         end
     end
 end
 
--- Tracé (« mail ») : le crochet est-il appelé, quel objet a-t-il lu (en direct ou dans le relevé), et
--- une commande « remise » a-t-elle été confirmée. Posé quand, au banc, rien ne s'est confirmé et que
--- rien ne permettait de dire si la prise avait eu lieu (2026-09-28).
+-- Tracé (« mail ») : le crochet est-il appelé, qui a envoyé, quel objet a-t-il lu (en direct ou dans
+-- le relevé), et une commande « remise » a-t-elle été confirmée. Posé quand, au banc, rien ne s'est
+-- confirmé et que rien ne permettait de dire si la prise avait eu lieu (2026-09-28).
 local function confirmFromMail(index, attach)
-    traceMail(string.format("prise de pièce jointe : courrier %s, pièce %s", tostring(index), tostring(attach or "toutes")))
     if not (index and GetInboxItem and COC.Orders and COC.Orders.TryAutoComplete) then return end
+    local from = senderOf(index) or (seen[index] and seen[index].from)
+    traceMail(string.format("prise de pièce jointe : courrier %s de %s, pièce %s",
+        tostring(index), tostring(from), tostring(attach or "toutes")))
     local first, last = attach or 1, attach or (ATTACHMENTS_MAX_RECEIVE or 16)
     for i = first, last do
         local _, live = GetInboxItem(index, i)
         local id = live or (seen[index] and seen[index][i])
         if id then
-            local ok = COC.Orders:TryAutoComplete(id, "mail")
+            local ok = COC.Orders:TryAutoComplete(id, "mail", from or "?")
             traceMail(string.format("  pièce %d : objet %s (%s) -> %s", i, tostring(id), live and "lu" or "relevé",
-                ok and "commande confirmée" or "aucune commande remise pour cet objet"))
+                ok and "commande confirmée" or "aucune commande remise par cet expéditeur pour cet objet"))
         end
     end
 end
