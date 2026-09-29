@@ -142,9 +142,9 @@
 | `CraftingOrderClassic_Inbound.lua` | couche réseau « passive » : capte les demandes de craft postées dans /commerce (Trade) et /guilde par des joueurs SANS l'addon, alerte le joueur, et les range dans une file « Entrantes » (acceptable / ignorable). | 305 |
 | `CraftingOrderClassic_Handoff.lua` | « garder une commande pour un ami capable ». | 286 |
 | `CraftingOrderClassic_Moderation.lua` | modération / anti-spam. | 370 |
-| `CraftingOrderClassic_LootAlert.lua` | alerte quand TU loots un objet-PLAN (recette/formule/ schéma/patron) catalogué par CraftLink, MAIS seulement s'il te CONCERNE : soit tu as le métier (candidat à l'apprendre), soit un AMI/PARTENAIRE de ton annuaire ne le connaît pas encore (candidat à un don — cf. | 158 |
+| `CraftingOrderClassic_LootAlert.lua` | alerte quand TU loots un objet-PLAN (recette/formule/ schéma/patron) catalogué par CraftLink, MAIS seulement s'il te CONCERNE : soit tu as le métier (candidat à l'apprendre), soit un AMI/PARTENAIRE de ton annuaire ne le connaît pas encore (candidat à un don — cf. | 165 |
 | `CraftingOrderClassic_Companion.lua` | socle des GREFFONS : panneaux compagnons accrochés aux fenêtres natives (échange, courrier) pour livrer une commande sans quitter le geste en cours. | 233 |
-| `CraftingOrderClassic_Companion_Mail.lua` | greffon COURRIER (scène B de la maquette) : panneau accroché à droite du compositeur d'envoi. | 317 |
+| `CraftingOrderClassic_Companion_Mail.lua` | greffon COURRIER (scène B de la maquette) : panneau accroché à droite du compositeur d'envoi. | 329 |
 | `CraftingOrderClassic_Companion_Trade.lua` | greffon ÉCHANGE (scène A de la maquette) : panneau accroché SOUS la fenêtre d'échange native quand une commande nous lie au partenaire (dans les DEUX sens : je crafte pour lui = « vendeur », ou il crafte pour moi = « acheteur »). | 121 |
 | `CraftingOrderClassic_Enchant_Trade.lua` | « ses composants désignent quel enchant ? »  Ce fichier portait un PANNEAU flottant accroché à droite de la fenêtre d'échange : la liste de mes enchants applicables à la pièce posée, classée par pertinence. | 139 |
 | `CraftingOrderClassic_Enchant_Trade_Ask.lua` | « demande-lui la pièce » : la SILHOUETTE et le verbe ASKE. | 280 |
@@ -2570,10 +2570,11 @@
 > renseigne le destinataire (« À: ») + objet / corps / contre-remboursement, puis marque « remise »
 > (Orders:Deliver) quand l'envoi ABOUTIT (MAIL_SEND_SUCCESS + destinataire vérifié) — jamais d'auto-envoi.
 > Si un destinataire est déjà saisi, on filtre sur ses commandes ; sinon on affiche TOUTES mes livraisons.
-> Côté acheteur, prendre la pièce jointe confirme la réception (cf. confirmFromMail, en bas) : le
-> message de butin du chat, seul détecteur jusque-là, ne vient pas d'une pièce jointe sur Forever.
+> Côté acheteur, prendre la pièce jointe confirme la réception (cf. confirmFromMail, en bas), et
+> seulement si l'expéditeur est l'artisan. À la boîte aux lettres, le message de butin du chat se tait
+> (Mail.AtMailbox, lu par _LootAlert) : il ne sait pas d'où vient l'objet.
 
-**API** : `Mail.Update()`
+**API** : `Mail.Update()` · `Mail.AtMailbox()`
 
 ### `CraftingOrderClassic_Companion_Trade.lua`
 > CraftingOrderClassic_Companion_Trade.lua — greffon ÉCHANGE (scène A de la maquette) : panneau

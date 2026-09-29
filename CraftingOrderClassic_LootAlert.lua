@@ -150,9 +150,16 @@ f:SetScript("OnEvent", function(_, _, msg)
     local link = selfLootLink(msg)
     if not link then return end
     -- Auto-confirmation d'une commande REÇUE (objet ramassé = la commande est honorée). Indépendant de
-    -- l'alerte plan (peut être off). Point de branchement futur pour l'échange et le courrier.
+    -- l'alerte plan (peut être off). À la boîte aux lettres, ce message suit la prise d'une pièce
+    -- jointe, sans dire qui l'envoie : c'est le crochet du courrier qui décide (_Companion_Mail).
     local itemID = tonumber(link:match("item:(%d+)"))
-    if itemID and COC.Orders and COC.Orders.TryAutoComplete then COC.Orders:TryAutoComplete(itemID, "loot") end
+    local mail = COC.MailPanel and COC.MailPanel.AtMailbox and COC.MailPanel.AtMailbox()
+    if itemID and mail then
+        if COC.Trace then COC.Trace:Log("mail", "butin à la boîte aux lettres : objet " .. itemID
+            .. " -> laissé au crochet du courrier") end
+    elseif itemID and COC.Orders and COC.Orders.TryAutoComplete then
+        COC.Orders:TryAutoComplete(itemID, "loot")
+    end
     -- Alerte « plan looté » (si activée).
     if Loot:IsEnabled() then onSelfLoot(link) end
 end)

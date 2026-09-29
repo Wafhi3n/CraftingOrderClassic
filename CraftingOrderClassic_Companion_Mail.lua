@@ -3,8 +3,9 @@
 -- renseigne le destinataire (« À: ») + objet / corps / contre-remboursement, puis marque « remise »
 -- (Orders:Deliver) quand l'envoi ABOUTIT (MAIL_SEND_SUCCESS + destinataire vérifié) — jamais d'auto-envoi.
 -- Si un destinataire est déjà saisi, on filtre sur ses commandes ; sinon on affiche TOUTES mes livraisons.
--- Côté acheteur, prendre la pièce jointe confirme la réception (cf. confirmFromMail, en bas) : le
--- message de butin du chat, seul détecteur jusque-là, ne vient pas d'une pièce jointe sur Forever.
+-- Côté acheteur, prendre la pièce jointe confirme la réception (cf. confirmFromMail, en bas), et
+-- seulement si l'expéditeur est l'artisan. À la boîte aux lettres, le message de butin du chat se tait
+-- (Mail.AtMailbox, lu par _LootAlert) : il ne sait pas d'où vient l'objet.
 
 local COC  = CraftingOrderClassic
 local Comp = COC.Companion
@@ -241,9 +242,8 @@ end
 -- ------------------------------------------------------------------
 -- ACHETEUR : prendre la pièce jointe confirme la commande « remise » qui attend cet objet
 -- ------------------------------------------------------------------
--- Vu en jeu le 2026-09-28 : l'acheteur prend l'objet, la commande reste « Delivered ». La
--- confirmation automatique n'écoutait que le message de butin du chat, qu'une pièce jointe ne
--- produit pas. On s'accroche donc aux DEUX gestes du jeu, `TakeInboxItem` (clic sur l'objet) et
+-- La confirmation automatique n'écoutait que le message de butin du chat, qui ignore l'expéditeur.
+-- On s'accroche donc aux DEUX gestes du jeu, `TakeInboxItem` (clic sur l'objet) et
 -- `AutoLootMailItem` (tout prendre), par hooksecurefunc : les remplacer contaminerait le code de
 -- Blizzard qui les appelle. Le crochet passe APRÈS l'appel ; si la pièce jointe n'est déjà plus
 -- lisible, le relevé pris à chaque MAIL_INBOX_UPDATE la donne encore.
@@ -251,6 +251,16 @@ end
 -- confirme. Un objet acheté à l'hôtel des ventes arrive aussi par courrier, et confirmait sinon la
 -- commande d'un artisan qui n'avait rien envoyé. Expéditeur illisible = rien ne se confirme.
 local seen = {}   -- [n° de courrier] = { from = expéditeur, [n° de pièce jointe] = itemID }
+
+-- Le message de butin SUIT la prise d'une pièce jointe, une seconde plus tard (trace du 2026-09-29 :
+-- le crochet a écarté un Silverleaf de l'HdV, puis la commande s'est confirmée quand même, par le
+-- chat). Tant que la boîte est ouverte, et un moment après sa fermeture, le chat se tait.
+local MAIL_GRACE = 5    -- secondes après MAIL_CLOSED : prendre puis Échap tout de suite
+local atMailbox, closedAt = false, nil
+
+function Mail.AtMailbox()
+    return atMailbox or (closedAt ~= nil and GetTime() - closedAt < MAIL_GRACE)
+end
 
 local function senderOf(m)
     if not GetInboxHeaderInfo then return nil end
@@ -301,9 +311,11 @@ f:RegisterEvent("MAIL_INBOX_UPDATE")
 f:SetScript("OnEvent", function(_, event)
     if event == "MAIL_INBOX_UPDATE" then snapshot(); return end
     if event == "MAIL_SHOW" then
+        atMailbox = true
         build()
         if panel then Mail.Update() end
     elseif event == "MAIL_CLOSED" then
+        atMailbox, closedAt = false, GetTime()
         pending = nil
     elseif event == "MAIL_SEND_SUCCESS" and pending then
         local o = COC.db and COC.db.orders and COC.db.orders[pending.id]

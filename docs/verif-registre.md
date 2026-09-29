@@ -46,6 +46,18 @@ client.
 
 ## Relevés
 
+- 2026-09-29 15:28 — jusqu'a 66505eb — Forever, deux clients, client en ANGLAIS ; build déployé
+  `main-dev@d17eba1 2026-09-29 15:14` (`/co version` pas relu) — **NO-GO sur le témoin inverse de
+  l'hôtel des ventes** — trace de Gnomi relue par l'agent (SavedVariable écrite à 15:28:25) : commande
+  Silverleaf `Gnomi Short-25`, ACK puis DLV de Rédemption à 15:28:03 et 15:28:04 (« Mark delivered »,
+  rien d'envoyé). À 15:28:11, Gnomi prend un Silverleaf acheté à l'HdV : le crochet du courrier est
+  appelé, l'expéditeur est lu « Alliance Auction House », l'objet 765 est lu en direct, et le crochet
+  répond « aucune commande remise par cet expéditeur » : le filtre par expéditeur tient. À 15:28:12,
+  `ORD|DONE` de la -25 part quand même (le user rapporte « commande completed »). Le seul autre chemin
+  automatique vers `TryAutoComplete` est le message de butin (`_LootAlert`, sans expéditeur) : c'est
+  DÉDUIT, pas tracé, car ce chemin n'avait pas de trace. Corrigé après ce relevé : le chat se tait à
+  la boîte aux lettres, et une trace est posée. Pas revu en jeu.
+  Non vu : le courrier entre les deux comptes, toujours.
 - 2026-09-28 17:45 — jusqu'a f6e9826 — Forever, deux clients, client en ANGLAIS ; build déployé
   après la release : `main-dev@239fad7 2026-09-28 16:29` = v1.39.0 + `feat/icone-commande-recue`
   (`/co version` pas relu) — **GO sur les restes « non vus » de la v1.39.0** — rapporté par le user,
