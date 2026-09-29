@@ -35,8 +35,8 @@ if not (IS_MAINLINE and HAS_MODERN) then return end
 
 -- ---------------------------------------------------------------- cache de la liste
 
--- `GetFilteredRecipeIDs` rend les recettes de la ligne ouverte — apprises ET non apprises (cf.
--- `getLearned`) — dans l'ordre d'affichage.
+-- `GetFilteredRecipeIDs` rend les recettes de la ligne ouverte, dans l'ordre d'affichage — les non
+-- apprises comprises ou non selon le filtre du moment (cf. `getLearned`).
 -- On la relit à chaque `getNum()` (début de passe de lecture) et on sert le reste depuis le cache :
 -- sans ça, `ReadRecipes` la rappellerait à chaque ligne, soit du O(n²) pour rien.
 local ids, infoCache, schemCache = {}, {}, {}
@@ -120,9 +120,11 @@ local MAINLINE_API = {
     -- `categoryID` sur chaque recette). Le socle filtre donc zéro ligne ici.
     isHeader = function() return false end,
 
-    -- ⚠️ Le client rend AUSSI les recettes NON APPRISES : `Professions.SetDefaultFilters`
-    -- (Blizzard_Professions.lua) pose `SetShowUnlearned(true)` À CHAQUE ouverture de la fenêtre, et
-    -- `GetFilteredRecipeIDs` respecte ce filtre. Sans ce témoin, le socle prenait tout pour acquis :
+    -- ⚠️ La liste peut contenir des recettes NON APPRISES, et le filtre qui en décide a changé de
+    -- SENS avec un patch : `SetShowUnlearned(true)` à chaque ouverture jusqu'au build 69977, forcé à
+    -- `false` par Camelot à chaque génération de la liste depuis le 70058 (2026-09-29,
+    -- `Blizzard_ProfessionsTemplates/Camelot/Blizzard_Professions.lua`). Et le repli
+    -- `GetAllRecipeIDs` les rend toujours. Sans ce témoin, le socle prenait tout pour acquis :
     -- « ce que je sais faire » incluait ce que le perso ne sait PAS faire. `learned` est non-nilable
     -- dans `TradeSkillRecipeInfo`, mais on ne suppose rien d'une fiche absente (= non apprise).
     getLearned = function(i)

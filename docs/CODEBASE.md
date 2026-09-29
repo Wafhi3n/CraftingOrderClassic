@@ -79,7 +79,7 @@
 | `CraftingOrderClassic_RecipeCats_Smelting.lua` | sous-catégorie « Lingots » du Minage (facette FONTE). | 39 |
 | `CraftingOrderClassic_RecipeCats_Enchanting.lua` | sous-catégories de l'ENCHANTEMENT. | 52 |
 | `CraftingOrderClassic_Craft.lua` | socle de lecture LIVE de la fenêtre métier. | 143 |
-| `CraftingOrderClassic_Craft_Mainline.lua` | backend de lecture de la fenêtre métier, pour les clients MAINLINE/Retail (WoW: Forever / Camelot, interface 16001). | 307 |
+| `CraftingOrderClassic_Craft_Mainline.lua` | backend de lecture de la fenêtre métier, pour les clients MAINLINE/Retail (WoW: Forever / Camelot, interface 16001). | 309 |
 | `CraftingOrderClassic_Enchant.lua` | spécifique à l'Enchantement (API Craft). | 409 |
 | `CraftingOrderClassic_Enchant_Filter.lua` | le filtre natif « Filter → Slots » de l'Enchantement (Forever). | 130 |
 | `CraftingOrderClassic_Enchant_Filter_Pilot.lua` | pose et rend le filtre natif « Slots » (T2). | 195 |
