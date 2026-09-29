@@ -118,8 +118,8 @@ local es = {
     ["réseau global : %s — |cFFFFFFFF%d|r en ligne, |cFFFFFFFF%d|r crafteur(s) connus"] =
         "red global: %s — |cFFFFFFFF%d|r en línea, |cFFFFFFFF%d|r artesano(s) conocido(s)",
     ["connexion…"] = "conectando…",
-    ["réseau : sollicitation envoyée (HI global + PING proximité)."] =
-        "red: solicitud enviada (HI global + PING de proximidad).",
+    ["réseau : sollicitation envoyée (HI à tous + relance des artisans connus)."] =
+        "red: solicitud enviada (HI a todos + ping a los artesanos conocidos).",
     ["métier inconnu : "] = "profesión desconocida: ",
     ["commandes :"] = "comandos:",
     ["statut (infra, mes recettes, réseau)"] = "estado (infra, mis recetas, red)",

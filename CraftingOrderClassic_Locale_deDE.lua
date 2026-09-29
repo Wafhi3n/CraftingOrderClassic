@@ -117,8 +117,8 @@ local de = {
     ["réseau global : %s — |cFFFFFFFF%d|r en ligne, |cFFFFFFFF%d|r crafteur(s) connus"] =
         "globales Netzwerk: %s — |cFFFFFFFF%d|r online, |cFFFFFFFF%d|r bekannte(r) Handwerker",
     ["connexion…"] = "Verbinde…",
-    ["réseau : sollicitation envoyée (HI global + PING proximité)."] =
-        "Netzwerk: Aufruf gesendet (globales HI + Nähe-PING).",
+    ["réseau : sollicitation envoyée (HI à tous + relance des artisans connus)."] =
+        "Netzwerk: Aufruf gesendet (HI an alle + Ping bekannter Handwerker).",
     ["métier inconnu : "] = "unbekannter Beruf: ",
     ["commandes :"] = "Befehle:",
     ["statut (infra, mes recettes, réseau)"] = "Status (Infra, meine Rezepte, Netzwerk)",

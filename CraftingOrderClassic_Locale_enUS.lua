@@ -119,8 +119,8 @@ local en = {
     ["réseau global : %s — |cFFFFFFFF%d|r en ligne, |cFFFFFFFF%d|r crafteur(s) connus"] =
         "global network: %s — |cFFFFFFFF%d|r online, |cFFFFFFFF%d|r known crafter(s)",
     ["connexion…"] = "connecting…",
-    ["réseau : sollicitation envoyée (HI global + PING proximité)."] =
-        "network: poll sent (global HI + proximity PING).",
+    ["réseau : sollicitation envoyée (HI à tous + relance des artisans connus)."] =
+        "network: poll sent (HI to all + ping of known crafters).",
     ["métier inconnu : "] = "unknown profession: ",
     ["commandes :"] = "commands:",
     ["statut (infra, mes recettes, réseau)"] = "status (infra, my recipes, network)",

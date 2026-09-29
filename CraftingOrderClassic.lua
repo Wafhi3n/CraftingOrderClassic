@@ -377,7 +377,7 @@ function COC:Slash(msg)
         if COC.UI then COC.UI:Toggle() end
     elseif cmd == "status" then COC:Status()
     elseif cmd == "refresh" then
-        if D then D:Refresh(); p(COC.L["réseau : sollicitation envoyée (HI global + PING proximité)."]) end
+        if D then D:Refresh(); p(COC.L["réseau : sollicitation envoyée (HI à tous + relance des artisans connus)."]) end
     elseif cmd == "orders" or cmd == "list" then if O then O:PrintList() end
     elseif cmd == "post"   then if O then O:PostFromInput(rest) end
     elseif cmd == "cancel" then if O then O:Cancel(rest) end
