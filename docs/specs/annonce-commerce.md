@@ -125,6 +125,20 @@ des commandes nommées), mais un joueur hors communauté voit et est vu dès qu'
   commande complète arrive par chuchotement. L'aperçu d'un objet, lui, sonne comme une entrante ; la
   commande complète qui le remplace ne sonne pas une seconde fois. Un aperçu n'est jamais « gardé
   pour un ami capable » (Handoff) : l'auteur a l'addon, la vraie commande suit par le relais.
+- 2026-09-30, agent (relectures du palier 5) :
+  - la ligne LFW ne part QUE du clic ou de `/co lfw` tapé : `LFWCmd` était aussi appelée par le
+    scanner du chat sur ma propre ligne « LFW … », donc depuis un événement (défaut corrigé, test
+    `test_announce_lfw_echo.lua`) ; l'écho de ma ligne `#CO` est ignoré par ce scanner ;
+  - une commande annoncée compte UNE fois pour l'anti-spam (l'aperçu ; la commande complète qui le
+    remplace ne recompte pas) ; un aperçu écarté par le joueur ne fait pas sonner la commande complète ;
+  - le bonjour se tait si l'auteur est déjà en contact, et s'étale sur 0 à 5 s (chaque porteur en
+    ville lit la même ligne) ; `#CO0005` vaut `#CO5` ; les lecteurs du chat public écartent une
+    valeur secrète ;
+  - limites connues, laissées : un aperçu dont l'auteur me croit déjà en ligne (commande manquée)
+    n'est pas complété et expire en 30 min ; une annulation ne touche pas un aperçu jamais complété
+    (l'auteur ne sait pas que je l'ai vu) ; « Accepter » sur un aperçu reste local et se perd quand la
+    commande complète arrive ; un « Rappeler » ré-alerte tant que l'aperçu vit ; royaumes connectés :
+    le bonjour vise le nom sans royaume, comme tout le réseau.
 
 ## Critères d'acceptation
 
