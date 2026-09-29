@@ -305,6 +305,8 @@ function Inbound:Start()
     f:RegisterEvent("CHAT_MSG_GUILD")
     f:SetScript("OnEvent", function(_, event, msg, player, _, channelName)
         if scanScope() == "off" then return end
+        local Api = COC.Api   -- texte secret (instance) : ni :match, ni :lower, ni comparaison
+        if Api.IsSecret(msg) or Api.IsSecret(player) or Api.IsSecret(channelName) then return end
         local who = player and (player:match("^([^%-]+)") or player)
         if event == "CHAT_MSG_CHANNEL" then
             local cn = (channelName or ""):lower()

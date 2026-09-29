@@ -16,13 +16,13 @@
 | `CraftingOrderClassic_Migrations.lua` | versionnage du schéma SavedVariables. | 40 |
 | `CraftingOrderClassic_Locale.lua` | socle de localisation du CHROME de l'UI. | 12 |
 | `CraftingOrderClassic_Locale_enUS.lua` | overlay ANGLAIS (enUS/enGB). | 279 |
-| `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 497 |
+| `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 499 |
 | `CraftingOrderClassic_Locale_enUS_3.lua` | overlay enUS, 3/3. | 97 |
 | `CraftingOrderClassic_Locale_deDE.lua` | overlay ALLEMAND (deDE). | 281 |
-| `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 477 |
+| `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 479 |
 | `CraftingOrderClassic_Locale_deDE_3.lua` | overlay deDE, 3/3. | 96 |
 | `CraftingOrderClassic_Locale_esES.lua` | overlay ESPAGNOL (esES/esMX). | 282 |
-| `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 478 |
+| `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 480 |
 | `CraftingOrderClassic_Locale_esES_3.lua` | overlay esES, 3/3. | 97 |
 | `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 419 |
 | `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 416 |
@@ -63,7 +63,7 @@
 | `CraftingOrderClassic_UI_MyArtisans.lua` | onglet « Mes artisans » : vue agrégée des métiers du COMPTE (tous mes rerolls du royaume), en mode « connu ». | 475 |
 | `CraftingOrderClassic_UI_MyArtisans_Profit.lua` | onglet « Mes artisans » : couche Auctionator. | 135 |
 | `CraftingOrderClassic_UI_MyArtisans_Reroll.lua` | accès à la vue REROLL (métiers d'un AUTRE perso du compte) depuis l'onglet « Mes artisans ». | 86 |
-| `CraftingOrderClassic_UI_Help.lua` | onglet Aide : page unique défilante qui explique les autres onglets (Carnet/Commande/Récolte/Artisans), la Vue Métier et le réseau. | 200 |
+| `CraftingOrderClassic_UI_Help.lua` | onglet Aide : page unique défilante qui explique les autres onglets (Carnet/Commande/Récolte/Artisans), la Vue Métier et le réseau. | 201 |
 | `CraftingOrderClassic_UI_News.lua` | onglet « Nouveautés » : notes de version (changelog) affichées EN JEU, version par version, la plus récente en tête. | 485 |
 | `CraftingOrderClassic_Social.lua` | couche sociale passive (socle). | 402 |
 | `CraftingOrderClassic_Social_Menu.lua` | entrées « Crafting Order » du menu contextuel joueur. | 104 |
@@ -131,21 +131,21 @@
 | `Directory_Relay.lua` | « contacts de confiance » : les données d'un joueur DÉCONNECTÉ restent servies par ses partenaires (r.isPartner). | 184 |
 | `Directory_AltCodec.lua` | codec du fil ALT (liste des persos d'un même joueur) + vérification par réciprocité. | 119 |
 | `Directory_Alts.lua` | regroupement des rerolls : identité « joueur » multi-persos (verbe ALT). | 316 |
-| `Directory_LFW.lua` | statut « recherche de travail » (Looking For Work) + OFFRE par métier. | 353 |
-| `CraftingOrderClassic_LFWChat.lua` | détection « recherche de travail » dans le CHAT VISIBLE. | 88 |
+| `Directory_LFW.lua` | statut « recherche de travail » (Looking For Work) + OFFRE par métier. | 356 |
+| `CraftingOrderClassic_LFWChat.lua` | détection « recherche de travail » dans le CHAT VISIBLE. | 93 |
 | `Directory_MyArtisans.lua` | agrégation des métiers du COMPTE (onglet « Mes artisans »). | 168 |
 | `Directory_LootScan.lua` | découverte PASSIVE des artisans NON-porteurs de l'addon qui craftent à proximité, par CHAT_MSG_TRADESKILLS « X creates Y. | 161 |
 | `Orders_Codec.lua` | codec du protocole filaire ORD\| (sérialisation ⇄ parsing, SOURCE DE VÉRITÉ). | 158 |
 | `Orders_Announce.lua` | le FORMAT d'une annonce en clair sur Commerce (spec docs/specs/annonce-commerce.md). | 166 |
 | `Orders_AnnounceSend.lua` | l'ENVOI d'une annonce sur Trade (Services) (spec annonce-commerce, palier 2). | 148 |
-| `Orders_AnnounceRecv.lua` | la LECTURE d'une annonce de Commerce (spec annonce-commerce, palier 3). | 91 |
+| `Orders_AnnounceRecv.lua` | la LECTURE d'une annonce de Commerce (spec annonce-commerce, palier 3). | 93 |
 | `Orders.lua` | Crafting Order - Classic — Orders : carnet d'ordres GLOBAL (modèle + cycle + protocole). | 496 |
 | `Orders_Net.lua` | couche « fil réseau » du carnet d'ordres (protocole ORD\|). | 367 |
 | `Orders_Narrative.lua` | TITRE et DESCRIPTION libres d'une commande : « donne un nom et une histoire à ce que tu demandes ». | 254 |
 | `CraftingOrderClassic_QuestSheet.lua` | FICHE DE QUÊTE réutilisable : affiche (ou fait écrire) une commande sous la forme d'une vraie quête du jeu. | 363 |
 | `CraftingOrderClassic_JournalQuests.lua` | lecture EN SEULE LECTURE du journal de quêtes du JEU, pour que le journal COC affiche les vraies quêtes à côté des commandes. | 103 |
 | `CraftingOrderClassic_JournalWin.lua` | LE JOURNAL : une fenêtre parchemin où les commandes et les vraies quêtes du joueur cohabitent par sections. | 304 |
-| `CraftingOrderClassic_Inbound.lua` | couche réseau « passive » : capte les demandes de craft postées dans /commerce (Trade) et /guilde par des joueurs SANS l'addon, alerte le joueur, et les range dans une file « Entrantes » (acceptable / ignorable). | 321 |
+| `CraftingOrderClassic_Inbound.lua` | couche réseau « passive » : capte les demandes de craft postées dans /commerce (Trade) et /guilde par des joueurs SANS l'addon, alerte le joueur, et les range dans une file « Entrantes » (acceptable / ignorable). | 323 |
 | `CraftingOrderClassic_Handoff.lua` | « garder une commande pour un ami capable ». | 286 |
 | `CraftingOrderClassic_Moderation.lua` | modération / anti-spam. | 370 |
 | `CraftingOrderClassic_LootAlert.lua` | alerte quand TU loots un objet-PLAN (recette/formule/ schéma/patron) catalogué par CraftLink, MAIS seulement s'il te CONCERNE : soit tu as le métier (candidat à l'apprendre), soit un AMI/PARTENAIRE de ton annuaire ne le connaît pas encore (candidat à un don — cf. | 165 |
@@ -2346,7 +2346,7 @@
 > Wire 100 % neutre en langue (IDs, cuivre, lettres). Un LFO seul VAUT LFW-on (robuste à la perte d'une
 > ligne) ; l'offre reçue vit sur l'entrée Dir.lfw[sender].offer et meurt avec elle (même TTL).
 
-**API** : `Dir:LFWOf(name)` · `Dir:OnLFW(sender, message)` · `Dir:OnLFO(sender, message)` · `Dir:OnLFR(sender, message)` · `Dir:NoteChatLFW(name, prof)` · `Dir:MyLFW()` · `Dir:MyLFWOffer(profKey)` · `Dir:SetLFWOffer(profKey, offer)` · `Dir:LFWOfferLines(name)` · `Dir:SetLFW(profKey)` · `Dir:LFWRiposte()` · `Dir:LFWCmd(arg)` · `Dir:StartLFW()`
+**API** : `Dir:LFWOf(name)` · `Dir:OnLFW(sender, message)` · `Dir:OnLFO(sender, message)` · `Dir:OnLFR(sender, message)` · `Dir:NoteChatLFW(name, prof)` · `Dir:MyLFW()` · `Dir:MyLFWOffer(profKey)` · `Dir:SetLFWOffer(profKey, offer)` · `Dir:LFWOfferLines(name)` · `Dir:SetLFW(profKey)` · `Dir:LFWRiposte()` · `Dir:LFWCmd(arg, typed)` · `Dir:StartLFW()`
 
 ### `CraftingOrderClassic_LFWChat.lua`
 > CraftingOrderClassic_LFWChat.lua — détection « recherche de travail » dans le CHAT VISIBLE.

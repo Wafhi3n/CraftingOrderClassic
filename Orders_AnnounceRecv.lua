@@ -62,6 +62,8 @@ end
 -- autre royaume), elle ne doit pas non plus devenir une demande humaine dans le scanner.
 function R:OnLine(msg, player)
     if type(msg) ~= "string" or type(player) ~= "string" then return false end
+    -- Une valeur SECRÈTE (instance) est aussi de type string : elle casserait :match, == et les clés.
+    if COC.Api.IsSecret(msg) or COC.Api.IsSecret(player) then return false end
     local author = player:match("^([^%-]+)") or player
     local t = COC.Announce and COC.Announce.Parse(msg, author, resolveProf)
     if not t then return false end

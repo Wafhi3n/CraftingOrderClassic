@@ -39,7 +39,10 @@ function LC:_OnChat(text, author)
     if not author or author == "" then return end
     local key = self:_Parse(text); if not key then return end
     if author == short(me()) then
-        if COC.Directory and COC.Directory.LFWCmd then COC.Directory:LFWCmd(key) end   -- MOI → raccourci /co lfw
+        -- L'écho de MA ligne « LFW … #CO », postée par l'addon à l'activation de ma dispo : déjà fait.
+        if text:find("#[Cc][Oo]%s*$") then return end
+        -- MOI → raccourci /co lfw, SANS annonce sur Commerce : on est dans un événement de chat.
+        if COC.Directory and COC.Directory.LFWCmd then COC.Directory:LFWCmd(key) end
         return
     end
     if COC.Moderation and COC.Moderation.IsMuted and COC.Moderation:IsMuted(author) then return end
@@ -65,6 +68,8 @@ function LC:Start()
     f:RegisterEvent("CHAT_MSG_SAY")
     f:RegisterEvent("CHAT_MSG_YELL")
     f:SetScript("OnEvent", function(_, ev, text, author, _, chanName)
+        local Api = COC.Api   -- texte secret (instance) : ni :match, ni :lower, ni comparaison
+        if Api.IsSecret(text) or Api.IsSecret(author) or Api.IsSecret(chanName) then return end
         if ev == "CHAT_MSG_CHANNEL" and not LC:_IsPublicChannel(chanName) then return end
         LC:_OnChat(text, author)
     end)

@@ -318,7 +318,10 @@ end
 
 -- /co lfw [métier|off] : me déclarer dispo pour du travail dans un métier (ou couper). Sans argument :
 -- affiche l'état. Le métier doit être un des MIENS (sinon annoncer un métier qu'on ne fait pas n'a pas de sens).
-function Dir:LFWCmd(arg)
+-- `typed` = vrai SEULEMENT depuis la commande tapée (/co lfw) : c'est elle qui autorise la ligne sur
+-- Commerce. L'autre appelant, le scanner du chat (LFWChat, ma propre ligne « LFW … »), tourne dans un
+-- événement de chat, où écrire sur un canal n'est pas un geste du joueur (relecture API, 2026-09-30).
+function Dir:LFWCmd(arg, typed)
     arg = (arg or ""):match("^%s*(.-)%s*$")
     if arg == "" then
         local cur = self:MyLFW()
@@ -335,7 +338,7 @@ function Dir:LFWCmd(arg)
     end
     self:SetLFW(key)
     pmsg(string.format(L["recherche de travail : |cFF33DD33%s|r — visible au royaume"], profLabel(key)))
-    if COC.AnnounceSend then COC.AnnounceSend:PostLFW(key) end   -- commande tapée = geste du joueur
+    if typed and COC.AnnounceSend then COC.AnnounceSend:PostLFW(key) end   -- commande tapée = geste du joueur
 end
 
 -- Câblage : handlers des verbes LFW + LFO + ré-affirmation à chaque (re)acquisition du canal. Appelé
