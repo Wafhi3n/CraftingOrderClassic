@@ -46,6 +46,26 @@ client.
 
 ## Relevés
 
+- 2026-09-30 00:19 — jusqu'a a52c52b — Forever, deux clients, client en ANGLAIS, en ville ; build
+  déployé `main-dev@325fc89 2026-09-30 00:13` (relu dans la copie déployée du `.toc`), salle coupée,
+  les deux comptes « oubliés » l'un de l'autre par `/run` (`Directory.roster/online`) — **GO sur
+  l'annonce en clair sur Commerce, envoi ET lecture (spec annonce-commerce, critère 11)** — captures
+  du user et traces des deux comptes relues par l'agent : témoin `#5` posté SANS la case, parti vers
+  deux inconnus seulement (Prudence Gylwynn, Osrik Stonefist), jamais vers Gnomi, puis annulé ;
+  `#6` posté AVEC la case : `WTB [Rough Sharpening Stone] x1 #CO6` sur « 4. Trade (Services) -
+  English » (capture), trace « annonce Rédemption Wafhien-6 sur Trade (Services) - English » (00:19:05) ;
+  chez Gnomi, dans la même seconde, « annonce Rédemption Wafhien-6 : bonjour à Rédemption Wafhien » et
+  l'alerte « incoming Rédemption Wafhien (trade): Rough Sharpening Stone » (capture) ; le bonjour de
+  Gnomi reçu par Rédemption, qui lui pousse aussitôt `ORD|NEW|…-6` (00:19:05), reçu à 00:19:06 ; dans
+  la SavedVariable de Gnomi, plus aucune entrante pour `-6` et la commande marquée `alerted` (une seule
+  alerte, aucune « new order » à l'écran) ; vue métier Forge : `-6` acceptable, à côté de `-4` (un
+  essai antérieur), pas de doublon. Avant l'oubli, le clic droit du Carnet a annoncé `-4` (00:16:38)
+  et Gnomi, qui l'avait déjà, a tracé « commande déjà reçue, rien à faire ».
+  Non vu (pas rapporté) : le refus d'une 2e annonce dans la minute, le texte du clic droit « déjà
+  annoncée … », la case retenue après `/reload`, la case grisée hors ville, une ligne à matériaux
+  (`PROVIDE`) et à prix. Piège du banc : sans l'oubli, la reconnexion relie les deux comptes
+  (`RediscoverKnown`) et la commande arrive par chuchotement avant la ligne (premier essai, 00:05).
+
 - 2026-09-29 22:46 — jusqu'a 52633c3 — Forever, client en ANGLAIS ; build déployé `main-dev@aaeb644
   2026-09-29 22:37` — **GO sur le bonjour différé et sur l'addon sans communauté** — trace de Gnomi
   relue par l'agent : connexion complète, garde anti-/1 qui attend un canal par défaut (22:44:41-44),

@@ -5,8 +5,10 @@
 > `Orders_Announce.lua`, `tests/test_announce.lua`) et palier 2 (l'envoi, `Orders_AnnounceSend.lua` :
 > case du formulaire, clic droit du Carnet ; `tests/test_announce_send.lua`) faits le 2026-09-29 ;
 > palier 3 (la lecture, `Orders_AnnounceRecv.lua`, lignes WTB **et** LFW ; `tests/test_announce_recv.lua`)
-> fait le 2026-09-29. Critères 5 à 10 et la lecture du 12 tenus en test ; 11 à voir en jeu. Palier 4
-> (l'envoi de la ligne LFW) : pas commencé.
+> fait le 2026-09-29. Critères 5 à 10 et la lecture du 12 tenus en test ; **11 tenu en jeu le
+> 2026-09-30 00:19** (registre de vérification : témoin sans la case invisible pour Gnomi, `#CO6` lu,
+> bonjour, commande complète à la place de l'aperçu, une seule alerte). Palier 4 (l'envoi de la ligne
+> LFW) : pas commencé.
 
 ## Le problème
 
@@ -153,6 +155,9 @@ Fonctionnalité :
     Commerce, lisible ; Gnomi (hors communauté, `/co circle 1` pour la démarquer) voit la commande
     dans ses Entrantes, puis, quelques secondes après, comme une vraie commande qu'il peut accepter.
     Témoin connu-bon : la même commande sans la case, que Gnomi ne voit pas hors communauté.
+    → **Tenu** le 2026-09-30 00:19. Sur ce banc, « hors communauté » ne suffit pas : à la connexion,
+    chaque compte chuchote aux 30 pairs vus le plus récemment, l'autre compris ; il faut d'abord les
+    rendre étrangers (`Directory.roster[n]` et `.online[n]` à nil, de chaque côté, sans relog).
 12. [test] « LFW Enchanting/Tailoring #CO » reçu : un bonjour chuchoté à l'auteur, aucune commande
     créée ; les noms de métier se lisent aussi en français, allemand, espagnol. Sans `#CO` : rien.
 13. [humain] Rédemption active sa dispo en cochant la case : la ligne LFW apparaît sur Commerce ;
