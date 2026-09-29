@@ -116,6 +116,7 @@ function S:Post(o, isRemind)
     local t = now()
     if COC.db then COC.db.announceLast = t end
     o.announcedAt = t
+    if COC.Trace then COC.Trace:Log("send", "annonce " .. tostring(o.id) .. " sur " .. tostring(name)) end
     p(string.format(L["commande annoncée sur %s."], name))
     return true
 end

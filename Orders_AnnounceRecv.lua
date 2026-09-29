@@ -74,7 +74,9 @@ function R:OnLine(msg, player)
         trace("LFW de " .. author .. " (" .. table.concat(t.profs, "/") .. ") : bonjour")
         hello(author); return true
     end
-    if COC.db and COC.db.orders and COC.db.orders[t.id] then return true end   -- déjà reçue en entier
+    if COC.db and COC.db.orders and COC.db.orders[t.id] then   -- déjà reçue en entier (chuchotement)
+        trace("annonce " .. t.id .. " : commande déjà reçue, rien à faire"); return true
+    end
     -- Bonjour seulement pour ce que le scanner garderait (portée « mine » : un métier que j'ai) : chaque
     -- porteur en ville qui lit la ligne chuchote l'auteur, inutile d'y ajouter ceux que ça ne concerne pas.
     local Inbound = COC.Inbound
@@ -82,6 +84,8 @@ function R:OnLine(msg, player)
        or (COC.db and COC.db.inboundScope == "all") then
         trace("annonce " .. t.id .. " : bonjour à " .. author)
         hello(author)
+    else
+        trace("annonce " .. t.id .. " : métier non surveillé (/co scan), ignorée")
     end
     return true
 end
