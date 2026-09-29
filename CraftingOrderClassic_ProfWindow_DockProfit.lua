@@ -182,8 +182,11 @@ local function profitRow(i)
     row:SetPoint("RIGHT", pp.content, "RIGHT", 0, 0)
     row:SetPoint("TOP", pp.content, "TOP", 0, -(i - 1) * ROW_H)
     local ic = row:CreateTexture(nil, "ARTWORK"); ic:SetSize(12, 12); ic:SetPoint("LEFT", 2, 0); row.ic = ic
+    -- UNE ligne, tronquée par « … » : sans `SetWordWrap(false)`, un nom long passe à la ligne et
+    -- mord sur la ligne suivante (vu le 2026-09-29 sur les enchantements, « Enchant Necklace -
+    -- Deflection » ; skill coc-native-ui, piège 28). Le nom entier reste dans l'infobulle.
     local nm = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    nm:SetPoint("LEFT", ic, "RIGHT", 4, 0); nm:SetJustifyH("LEFT"); row.nm = nm
+    nm:SetPoint("LEFT", ic, "RIGHT", 4, 0); nm:SetJustifyH("LEFT"); nm:SetWordWrap(false); row.nm = nm
     local val = row:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     val:SetPoint("RIGHT", -4, 0); val:SetJustifyH("RIGHT"); row.val = val
     nm:SetPoint("RIGHT", val, "LEFT", -4, 0)
@@ -276,10 +279,11 @@ local function fillRow(row, e, costMode)
     -- VALEUR EXACTE, pas le palier compact des pièces/étoiles : dans une liste dont le tri EST le
     -- montant, deux lignes qui affichent la même icône en se suivant font passer le classement pour
     -- arbitraire. ARRONDI À L'ENTIER : la coupe de l'HV (×0,95) rend un cuivre FRACTIONNAIRE, et le
-    -- formateur de pièces du jeu attend un entier. Un coût s'écrit en blanc, un gain en or.
+    -- formateur de pièces du jeu attend un entier. Pas de couleur par mode : le formateur de pièces
+    -- de Forever écrit ses chiffres en blanc et `SetTextColor` n'y change rien (vu le 2026-09-29,
+    -- profit et coût identiques). Le TITRE dit que c'est un coût, et l'infobulle le répète.
     local v = math.floor(e.amount + 0.5)
     row.val:SetText(COC.Api.Coin(v, 10) .. (e.p.missing and " |cFF888888(?)|r" or ""))
-    if costMode then row.val:SetTextColor(1, 1, 1) else row.val:SetTextColor(1, 0.82, 0) end
     row:Show()
 end
 

@@ -5,10 +5,10 @@
 > outillage) · Cible : WoW: Forever / Camelot (16001) uniquement · Addon : Crafting Order - Classic
 >
 > Vu en jeu le 2026-09-26 (registre) : la languette s'affiche, la liste est triée par profit
-> décroissant, la fenêtre native n'est ni fermée ni déplacée (critère 1, en partie). **Rien des
-> arbitrages 9 à 12 n'a été vu à l'écran** ; leurs portes déterministes passent (critères 7 à 10,
-> 12 à 14 côté `[test]`). Vue livrée : `CraftingOrderClassic_ProfWindow_DockProfit.lua`, languette
-> **« Profit »**.
+> décroissant, la fenêtre native n'est ni fermée ni déplacée (critère 1, en partie). Les arbitrages
+> 9 à 12 ont été **vus en partie le 2026-09-29** (captures, détail sous les critères 12 à 14) ; un
+> défaut vu ce jour-là (noms longs sur deux lignes) est corrigé et pas revu. Vue livrée :
+> `CraftingOrderClassic_ProfWindow_DockProfit.lua`, languette **« Profit »**.
 >
 > ⚠️ **Le clic sur une ligne est probablement inerte** (critère 2). Il passe par
 > `C_TradeSkillUI.OpenRecipe`, qui ne sélectionne RIEN quand la fenêtre est déjà ouverte : elle
@@ -203,9 +203,13 @@ Arbitrages 9 à 12 (codés le 2026-09-29) :
     `[test]` ✅ Case décochée : seules les recettes apprises ; cochée : les manquantes du métier
     OUVERT s'ajoutent, marquées non apprises. Tri, doublons, en-têtes, perte et zéro écartés. →
     `tests/test_profit_view.lua`.
-    `[humain]` ⏳ À l'ouverture de la fenêtre, la case est **décochée**. Cochée, des lignes au **nom
+    `[humain]` ◐ À l'ouverture de la fenêtre, la case est **décochée**. Cochée, des lignes au **nom
     gris et à l'icône éteinte** apparaissent parmi les autres, et leur infobulle renvoie à
     « Manquantes ». Le titre et la case tiennent sur une ligne, sans chevauchement avec le « i ».
+    → **Vu le 2026-09-29** (captures, Travail du cuir 45/75 et Enchantement) : titre et case sur
+    une ligne, le « i » à gauche de la rangée ; case cochée, une recette non apprise porte la phrase
+    qui renvoie à « Manquantes ». **Pas vu** : la case décochée à l'ouverture, et le gris lui-même —
+    toutes les lignes visibles étaient non apprises, rien à quoi comparer.
 13. **Source du prix et coupe HV dans le détail** (arbitrages 10 et 11).
     `[test]` ✅ Prix marchand prioritaire et nommé ; vente brute − coupe − réactifs = net au cuivre
     près ; un seul retour pour `ItemValue`. → `tests/test_profit.lua`, sections 10 et 11.
@@ -213,13 +217,24 @@ Arbitrages 9 à 12 (codés le 2026-09-29) :
     qui s'additionnent à l'œil. Pour un objet qu'un PNJ vend, la première ligne dit « Vente (prix
     marchand) », et une phrase dit que l'HV ne paiera pas plus. *Témoin :* un objet vendu en ville et
     fabricable (fil, teinture, flacon), dont Auctionator connaît le prix marchand.
+    → **Vu le 2026-09-29** pour l'HV : « Mystic Heavy Armor Kit », vente 2g 95s, coupe −14s 75c,
+    réactifs −1g 25s 88c, net +1g 54s 37c — 29500 − 1475 − 12588 = 15437, le compte tombe juste.
+    **Pas vu** : la ligne « prix marchand ».
 14. **Enchantement par le coût** (arbitrage 12).
     `[test]` ✅ En mode coût, la liste lit `RecipeCost` (client d'abord) et jamais `CraftProfit` ;
     `CraftCost` reste au catalogue. → `tests/test_profit.lua` §12, `tests/test_profit_view.lua` §3.
-    `[humain]` ⏳ Fenêtre d'Enchantement ouverte : la languette Profit s'intitule **« Coût à lancer
-    (N) »**, liste des enchantements avec un montant en **blanc** (pas en or), le plus cher en tête,
-    et l'infobulle dit que c'est un coût et pas un gain. Revenir sur un autre métier rend « Rentables
-    (N) ». *Témoin :* le coût d'un enchant recalculé à la main depuis les prix de ses composants.
+    `[humain]` ◐ Fenêtre d'Enchantement ouverte : la languette Profit s'intitule **« Coût à lancer
+    (N) »**, liste des enchantements, le plus cher en tête, et l'infobulle dit que c'est un coût et
+    pas un gain. Revenir sur un autre métier rend « Rentables (N) ». Un nom long tient sur UNE ligne,
+    tronqué par « … ». *Témoin :* le coût d'un enchant recalculé à la main depuis les prix de ses
+    composants.
+    → **Vu le 2026-09-29** : « Cost to cast (176) », trié de 81g 24s à 10g 70s. **Défaut vu** : les
+    noms longs (« Enchant Necklace - Deflection ») passaient à la ligne et mordaient sur la suivante
+    — corrigé par `SetWordWrap(false)`, pas revu. Les montants s'affichent en blanc dans les DEUX
+    modes : la couleur par mode prévue d'abord n'a aucun effet et a été retirée, le titre porte
+    seul le « c'est un coût ». **Pas vu** : l'infobulle d'un enchant, le témoin. Constat : la liste
+    comprend aussi les recettes d'Enchantement qui produisent un OBJET (Twisting Essence Jar, bâtons,
+    Truesilver Conduit), lues par le coût comme le reste — c'est le choix 13.
 
 ## Ce qui restait à vérifier — état au 2026-09-21
 
