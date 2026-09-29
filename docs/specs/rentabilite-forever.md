@@ -138,15 +138,17 @@ Rien ne change dans la fenêtre de Blizzard : on l'accompagne, on ne la touche p
     commission — et qui rejoint l'offre LFW (cf. `docs/specs/lfw-forever.md`). La page **dit** qu'elle
     affiche un coût et pas un gain : un montant dont on ignore le signe est pire que pas de montant.
 
-### Choix d'implémentation du 2026-09-29 — pris en codant, à confirmer par le user
+### Choix d'implémentation du 2026-09-29 — pris en codant
 
-Les arbitrages 9 à 12 laissaient ces points ouverts. Chacun est un réglage d'une ligne s'il ne
-convient pas.
+Les arbitrages 9 à 12 laissaient ces points ouverts. Le 13 est confirmé ; les 14 à 17 restent à
+confirmer par le user, chacun est un réglage d'une ligne s'il ne convient pas.
 
-13. **Le mode COÛT se décide par MÉTIER, pas par recette** (`COST_ONLY = { Enchanting = true }`,
-    `_ProfWindow_DockProfit.lua`). Une liste qui mêlerait les profits de ce qui a un objet produit
-    (baguettes, huiles) et les coûts du reste alignerait des montants de sens opposés sous le même
-    titre, et c'est justement ce que la décision 12 interdit.
+13. ✅ **CONFIRMÉ par le user le 2026-09-29, capture à l'appui.** **Le mode COÛT se décide par
+    MÉTIER, pas par recette** (`COST_ONLY = { Enchanting = true }`, `_ProfWindow_DockProfit.lua`).
+    Une liste qui mêlerait les profits de ce qui a un objet produit (baguettes, huiles) et les coûts
+    du reste alignerait des montants de sens opposés sous le même titre, et c'est justement ce que la
+    décision 12 interdit. Conséquence vue et acceptée : les recettes d'Enchantement qui produisent un
+    OBJET (Twisting Essence Jar, bâtons, Truesilver Conduit) s'y lisent aussi par le coût.
 14. **Mode coût : le plus cher en tête.** C'est là qu'une commission mal fixée coûte le plus. Même
     sens que la liste des profits, où le tri EST le montant.
 15. **La case « Tout le métier » est un état de SESSION**, pas une préférence enregistrée : la liste
@@ -234,7 +236,7 @@ Arbitrages 9 à 12 (codés le 2026-09-29) :
     modes : la couleur par mode prévue d'abord n'a aucun effet et a été retirée, le titre porte
     seul le « c'est un coût ». **Pas vu** : l'infobulle d'un enchant, le témoin. Constat : la liste
     comprend aussi les recettes d'Enchantement qui produisent un OBJET (Twisting Essence Jar, bâtons,
-    Truesilver Conduit), lues par le coût comme le reste — c'est le choix 13.
+    Truesilver Conduit), lues par le coût comme le reste — c'est le choix 13, confirmé par le user.
 
 ## Ce qui restait à vérifier — état au 2026-09-21
 
