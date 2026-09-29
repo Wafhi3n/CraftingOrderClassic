@@ -4,7 +4,7 @@
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
-147 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
+148 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
 
 ## Modules (ordre de chargement)
 
@@ -135,6 +135,7 @@
 | `Directory_MyArtisans.lua` | agrégation des métiers du COMPTE (onglet « Mes artisans »). | 168 |
 | `Directory_LootScan.lua` | découverte PASSIVE des artisans NON-porteurs de l'addon qui craftent à proximité, par CHAT_MSG_TRADESKILLS « X creates Y. | 161 |
 | `Orders_Codec.lua` | codec du protocole filaire ORD\| (sérialisation ⇄ parsing, SOURCE DE VÉRITÉ). | 158 |
+| `Orders_Announce.lua` | le FORMAT d'une annonce en clair sur Commerce (spec docs/specs/annonce-commerce.md). | 166 |
 | `Orders.lua` | Crafting Order - Classic — Orders : carnet d'ordres GLOBAL (modèle + cycle + protocole). | 496 |
 | `Orders_Net.lua` | couche « fil réseau » du carnet d'ordres (protocole ORD\|). | 366 |
 | `Orders_Narrative.lua` | TITRE et DESCRIPTION libres d'une commande : « donne un nom et une histoire à ce que tu demandes ». | 254 |
@@ -2401,6 +2402,22 @@
 > Ne référence que la table globale CraftingOrderClassic (pour publier COC.OrdersCodec).
 
 **API** : `Codec.CleanText(s, max)` · `Codec.Encode(verb, o)` · `Codec.Decode(message)`
+
+### `Orders_Announce.lua`
+> Orders_Announce.lua — le FORMAT d'une annonce en clair sur Commerce (spec docs/specs/annonce-commerce.md).
+> 
+> Pourquoi (2026-09-29) : sans canal général, une commande n'atteint que les porteurs connus. Commerce,
+> lui, relie toutes les capitales et se lit en clair (constat C15) : une ligne lisible par un humain,
+> que l'addon sait aussi relire, atteint à la fois les porteurs inconnus et les joueurs sans l'addon.
+> 
+>   WTB [objet] x1 PROVIDE [mat]x2 [mat]x1 2g50s #CO27      une commande publique (id = <auteur>-27)
+>   LFW Enchanting/Tailoring #CO                           un artisan disponible
+> 
+> Ce fichier ne fait QUE le format : fabriquer une ligne, relire une ligne. Aucun appel au jeu (les
+> liens d'objet sont résolus par l'appelant), donc tout se teste sans WoW (tests/test_announce.lua).
+> Contrat PUBLIC : des clients déployés liront ces lignes. On ajoute en fin de ligne, on ne réordonne pas.
+
+**API** : `A.PriceTokens(copper)` · `A.ParsePrice(text)` · `A.BuildWTB(o, targetLink, mats, copper)` · `A.BuildLFW(profs)` · `A.Parse(msg, author, resolveProf)`
 
 ### `Orders.lua`
 > Crafting Order - Classic — Orders : carnet d'ordres GLOBAL (modèle + cycle + protocole).

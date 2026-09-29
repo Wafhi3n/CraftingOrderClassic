@@ -1,7 +1,8 @@
 # Annoncer une commande en clair sur Commerce
 
 > État : **validée** le 2026-09-29 par le user · Idée du user, mise en forme par l'agent · Mesures
-> préalables faites le 2026-09-29 (Critères 1 à 4 : tenus) · Implémentation : pas commencée.
+> préalables faites le 2026-09-29 (Critères 1 à 4 : tenus) · Implémentation : palier 1 (le format,
+> `Orders_Announce.lua`, `tests/test_announce.lua`) fait le 2026-09-29, critères 5 à 7 tenus.
 
 ## Le problème
 
@@ -155,7 +156,7 @@ reste lisible par l'ancien lecteur (on ajoute en fin de ligne, on ne réordonne 
 ```
 annonce  := "WTB " cible [" x" qté] [" PROVIDE " mat {" " mat} [" +" N]] [" " prix] " #CO" n
 cible    := lien d'objet | lien d'enchantement          (|Hitem:… ou |Henchant:…)
-mat      := lien d'objet ("x" | ":" | "×") qté
+mat      := lien d'objet [("x" | ":" | "×") qté]           (qté inconnue : le lien seul)
 prix     := [N "g"] [N "s"] [N "c"]                       lecteur : aussi « po » « pa » « pc »
 n        := entier ; id de la commande = <nom réseau de l'auteur> "-" n
 
