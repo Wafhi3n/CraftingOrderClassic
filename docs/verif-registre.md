@@ -46,6 +46,21 @@ client.
 
 ## Relevés
 
+- 2026-09-29 16:10 — jusqu'a a3ba24b — Forever, deux clients, client en ANGLAIS ; build déployé
+  `main-dev@f2e653a 2026-09-29 15:35` (`/co version` pas relu par l'agent ; la ligne de trace
+  « butin à la boîte aux lettres » n'existe que dans ce build) — **GO sur le témoin inverse de
+  l'hôtel des ventes** — traces et SavedVariables des deux comptes relues par l'agent (écrites à
+  16:10:37 et 16:10:40) : commande Silverleaf `Gnomi Short-27`, ACK puis DLV de Rédemption à
+  16:10:07 et 16:10:09 (« Mark delivered », rien d'envoyé). À 16:10:27, Gnomi prend un Silverleaf
+  acheté à l'HdV : le crochet lit l'expéditeur « Alliance Auction House » et ne confirme rien. À
+  16:10:28, le message de butin arrive et il est écarté (« laissé au crochet du courrier ») : c'est
+  maintenant VU, plus seulement déduit. Aucun `ORD|DONE` ne part, et la -27 reste `delivered` chez
+  les deux comptes.
+  Relevé en passant : à 15:47:01, Gnomi n'avait pas été rechargé depuis 15:28 et tournait sur
+  l'ancien build. Le défaut s'y est reproduit à l'identique (commande -26 confirmée dans la seconde
+  de la prise).
+  Non vu : la confirmation par un courrier de l'artisan (le courrier entre les deux comptes ne livre
+  toujours rien) ; le délai de 5 s après la fermeture de la boîte.
 - 2026-09-29 15:28 — jusqu'a 66505eb — Forever, deux clients, client en ANGLAIS ; build déployé
   `main-dev@d17eba1 2026-09-29 15:14` (`/co version` pas relu) — **NO-GO sur le témoin inverse de
   l'hôtel des ventes** — trace de Gnomi relue par l'agent (SavedVariable écrite à 15:28:25) : commande
