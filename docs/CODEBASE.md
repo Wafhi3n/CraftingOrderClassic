@@ -4,7 +4,7 @@
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
-145 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
+146 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
 
 ## Modules (ordre de chargement)
 
@@ -17,13 +17,13 @@
 | `CraftingOrderClassic_Locale.lua` | socle de localisation du CHROME de l'UI. | 12 |
 | `CraftingOrderClassic_Locale_enUS.lua` | overlay ANGLAIS (enUS/enGB). | 279 |
 | `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 497 |
-| `CraftingOrderClassic_Locale_enUS_3.lua` | overlay enUS, 3/3. | 57 |
+| `CraftingOrderClassic_Locale_enUS_3.lua` | overlay enUS, 3/3. | 71 |
 | `CraftingOrderClassic_Locale_deDE.lua` | overlay ALLEMAND (deDE). | 281 |
 | `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 477 |
-| `CraftingOrderClassic_Locale_deDE_3.lua` | overlay deDE, 3/3. | 56 |
+| `CraftingOrderClassic_Locale_deDE_3.lua` | overlay deDE, 3/3. | 70 |
 | `CraftingOrderClassic_Locale_esES.lua` | overlay ESPAGNOL (esES/esMX). | 282 |
 | `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 478 |
-| `CraftingOrderClassic_Locale_esES_3.lua` | overlay esES, 3/3. | 57 |
+| `CraftingOrderClassic_Locale_esES_3.lua` | overlay esES, 3/3. | 71 |
 | `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 419 |
 | `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 416 |
 | `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 416 |
@@ -104,12 +104,13 @@
 | `CraftingOrderClassic_ProfWindow_Route_Supply.lua` | ce qui se peint SOUS les segments du plan de route : le bloc « FOURNITURES » (composants agrégés de toute la route, plans à acheter) et, quand le rang est AU PLAFOND, le bloc « débloquer le palier suivant » (livre de rang curaté, ou renvoi vers le formateur de métier). | 118 |
 | `CraftingOrderClassic_ProfWindow_Learn.lua` | section « À apprendre maintenant » du Plan de route : les recettes NON APPRISES que ton rang permet déjà d'apprendre ET qui rapportent encore un point, classées par coût espéré par point, avec l'icône de leur source. | 113 |
 | `CraftingOrderClassic_ProfWindow_DockViews.lua` | la colonne Commandes CHANGE DE CONTENU au lieu d'ouvrir des fenêtres par-dessus. | 457 |
-| `CraftingOrderClassic_ProfWindow_DockProfit.lua` | la 4ᵉ vue de la colonne : « Profit ». | 211 |
+| `CraftingOrderClassic_ProfWindow_DockProfit.lua` | la 4ᵉ vue de la colonne : « Profit ». | 305 |
 | `CraftingOrderClassic_ProfWindow_Trade.lua` | le mode ÉCHANGE de la colonne de métier (T3). | 277 |
 | `CraftingOrderClassic_ProfWindow_Geo.lua` | `/co geo` : le RELEVÉ de la colonne, en pixels écran, écrit dans la SavedVariable pour être relu HORS DU JEU. | 262 |
 | `CraftingOrderClassic_ProfWindow_Detail.lua` | colonne CENTRE : détail de la recette sélectionnée (icône, réactifs have/need) + boutons Créer / Créer tout. | 279 |
 | `CraftingOrderClassic_ProfWindow_Info.lua` | PANNEAU D'INFO en SECTIONS pour la colonne centrale de la vue métier. | 217 |
-| `CraftingOrderClassic_Profit.lua` | pont LECTURE SEULE vers l'oracle de prix, AUCTIONATOR. | 477 |
+| `CraftingOrderClassic_Profit.lua` | pont LECTURE SEULE vers l'oracle de prix, AUCTIONATOR. | 399 |
+| `CraftingOrderClassic_Profit_Best.lua` | le meilleur plan d'un métier (sorti de _Profit.lua, 2026-09-29). | 126 |
 | `CraftingOrderClassic_ProfWindow_Orders.lua` | colonne « Commandes » de la vue métier (cabine de l'artisan) : construction (onglets de relation, en-tête, scroll), vue LISTE (une ligne par commande : demandeur + prix + âge ; une ligne sourdine cliquée se réaffiche), collecte/tri et rafraîchissement. | 498 |
 | `CraftingOrderClassic_ProfWindow_Orders_Card.lua` | vue SÉLECTIONNÉE de la colonne « Commandes » : la carte complète d'une commande (composants fournis, repères Auctionator, ACCEPTER / REFUSER / CHUCHOTER ; croix en haut à droite = retour liste). | 315 |
 | `CraftingOrderClassic_ProfWindow_LFW.lua` | config de l'OFFRE « recherche de travail » par métier. | 493 |
@@ -1933,6 +1934,7 @@
 
 ### `CraftingOrderClassic_ProfWindow_DockProfit.lua`
 > CraftingOrderClassic_ProfWindow_DockProfit.lua — la 4ᵉ vue de la colonne : « Profit ».
+> Spec : docs/specs/rentabilite-forever.md.
 > 
 > CE QU'ELLE RÉPARE. Sur Classic Era, la vue métier custom affichait le profit net de chaque
 > recette et savait TRIER la liste par rentabilité : c'est comme ça qu'on décidait quoi fabriquer
@@ -1946,11 +1948,14 @@
 > déjà payé ~800 actions de barres d'action refusées pour cette leçon). Elle liste à CÔTÉ, dans
 > notre colonne, et le clic repasse la main au jeu par sa propre voie (cf. openRecipe).
 > 
-> Elle ne liste que les recettes APPRISES du métier ouvert, et seulement celles qui RAPPORTENT :
-> « est-ce que ça vaudrait le coup d'aller l'apprendre » est une question voisine mais différente,
-> et elle vit déjà dans la vue « Manquantes ». Une recette à perte n'affiche rien — c'était déjà la
-> règle de l'ancienne liste (PR:ProfitText rend une chaîne vide sous zéro), et une ligne avec un nom
-> et une colonne vide ne dit pas « à perte », elle dit « prix inconnu ».
+> Elle s'ouvre sur les recettes APPRISES du métier ouvert, et seulement celles qui RAPPORTENT. La
+> case « Tout le métier » y ajoute, en gris, celles qu'on n'a pas apprises (arbitrage 9) : « que
+> rapporterait-elle » ; « où l'apprendre » reste la vue « Manquantes ». Une recette à perte n'affiche
+> rien — une ligne avec un nom et une colonne vide ne dit pas « à perte », elle dit « prix inconnu ».
+> 
+> L'ENCHANTEMENT se lit par le COÛT (arbitrage 12) : ses recettes sont des services sans objet
+> produit, donc sans prix de vente, et la liste des profits serait VIDE — indiscernable d'une vue
+> cassée. Elle y liste ce que coûte chaque enchantement à lancer, et le DIT dans son titre.
 > 
 > ⚠️ Elle n'existe PAS sans oracle de prix : la languette n'est même pas construite (cf. VIEWS dans
 > _DockViews). Un onglet qui ne sait ouvrir qu'un message d'absence est un onglet vide.
@@ -2049,7 +2054,15 @@
 > Le COÛT des réactifs et l'objet produit viennent de NOS données CraftLink (RecipeReagents/RecipeProduct),
 > pas des tables de PR : on reste maître de la recette, PR ne sert QUE d'oracle de prix.
 
-**API** : `PR:IsAvailable()` · `PR:PriceSource()` · `PR:NoPriceMessage()` · `PR:ItemValue(itemID)` · `PR:IsVendorItem(itemID)` · `PR:PriceDump(arg)` · `PR:CoinTier(copper)` · `PR:ProfitTier(copper)` · `PR:ExactMode()` · `PR:SetExactMode(on)` · `PR:ProfitText(copper)` · `PR:Money(copper, colored)` · `PR:CraftProfit(profKey, spellID, numMade)` · `PR:EntryProfit(profKey, entry)` · `PR:CraftCost(profKey, spellID)` · `PR:EntryCost(profKey, entry)` · `PR:BestPlanFor(profKey, rank)` · `PR:BestProfitFor(profKey, rank)` · `PR:PlanName(profKey, plan)` · `PR:BestPlanName(profKey, rank)` · `PR:BestKnownPlanFor(profKey, r)` · `PR:MinProfit()` · `PR:HighlightTier(profit)`
+**API** : `PR:IsAvailable()` · `PR:PriceSource()` · `PR:NoPriceMessage()` · `PR:ItemValue(itemID)` · `PR:IsVendorItem(itemID)` · `PR:PriceDump(arg)` · `PR:CoinTier(copper)` · `PR:ProfitTier(copper)` · `PR:ExactMode()` · `PR:SetExactMode(on)` · `PR:ProfitText(copper)` · `PR:Money(copper, colored)` · `PR:CraftProfit(profKey, spellID, numMade)` · `PR:RecipeCost(profKey, spellID)` · `PR:EntryProfit(profKey, entry)` · `PR:CraftCost(profKey, spellID)` · `PR:EntryCost(profKey, entry)` · `PR:MinProfit()` · `PR:HighlightTier(profit)` · `PR:ProfitLines(p)`
+
+### `CraftingOrderClassic_Profit_Best.lua`
+> CraftingOrderClassic_Profit_Best.lua — le meilleur plan d'un métier (sorti de _Profit.lua, 2026-09-29).
+> 
+> Pur déplacement : ces fonctions ne lisent le calcul que par l'API publique de COC.Profit
+> (CraftProfit, IsAvailable). Elles ont quitté _Profit.lua pour qu'il tienne sous les 500 lignes.
+
+**API** : `PR:BestPlanFor(profKey, rank)` · `PR:BestProfitFor(profKey, rank)` · `PR:PlanName(profKey, plan)` · `PR:BestPlanName(profKey, rank)` · `PR:BestKnownPlanFor(profKey, r)`
 
 ### `CraftingOrderClassic_ProfWindow_Orders.lua`
 > CraftingOrderClassic_ProfWindow_Orders.lua — colonne « Commandes » de la vue métier (cabine de

@@ -52,6 +52,20 @@ local en3 = {
         "%d still missing from the mail: split them off a stack yourself (Shift-click the stack), then drop them in.",
     ["La pile de %d est prête dans ton sac : dépose-la toi-même dans le courrier."] =
         "The stack of %d is ready in your bag: drop it into the mail yourself.",
+    -- Vue Profit : bascule « tout le métier », source du prix, coupe HV, Enchantement par le coût (2026-09-29)
+    ["Tout le métier"] = "Whole profession",
+    ["Ajoute, en gris, les recettes que tu n'as pas encore apprises."] =
+        "Adds, in grey, the recipes you haven't learned yet.",
+    ["Pas encore apprise : la vue « Manquantes » dit où l'apprendre."] =
+        "Not learned yet: the \"Missing\" view tells you where to learn it.",
+    ["Vente (prix marchand)"] = "Sale (vendor price)",
+    ["Coupe HV (%d %%)"] = "AH cut (%d%%)",
+    ["Un marchand vend cet objet : l'HV ne le paiera pas plus cher."] =
+        "A vendor sells this item: the AH won't pay more for it.",
+    ["Coût à lancer (%d)"] = "Cost to cast (%d)",
+    ["Ce que coûte un lancer, pas un gain : ta commission vient en plus."] =
+        "What one cast costs you, not a gain: your fee comes on top.",
+    ["Aucun coût connu (prix : %s)."] = "No known cost (prices: %s).",
 }
 
 for k, v in pairs(en3) do L[k] = v end

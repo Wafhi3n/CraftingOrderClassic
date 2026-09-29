@@ -52,6 +52,20 @@ local es3 = {
         "Faltan %d en el correo: sepáralos tú mismo de una pila (Mayús-clic en la pila) y luego colócalos.",
     ["La pile de %d est prête dans ton sac : dépose-la toi-même dans le courrier."] =
         "La pila de %d está lista en tu bolsa: colócala tú mismo en el correo.",
+    -- Vue Profit : bascule « tout le métier », source du prix, coupe HV, Enchantement par le coût (2026-09-29)
+    ["Tout le métier"] = "Toda la profesión",
+    ["Ajoute, en gris, les recettes que tu n'as pas encore apprises."] =
+        "Añade, en gris, las recetas que aún no has aprendido.",
+    ["Pas encore apprise : la vue « Manquantes » dit où l'apprendre."] =
+        "Aún no aprendida: la vista «Faltantes» dice dónde aprenderla.",
+    ["Vente (prix marchand)"] = "Venta (precio de vendedor)",
+    ["Coupe HV (%d %%)"] = "Comisión CS (%d %%)",
+    ["Un marchand vend cet objet : l'HV ne le paiera pas plus cher."] =
+        "Un vendedor vende este objeto: en la CS nadie pagará más por él.",
+    ["Coût à lancer (%d)"] = "Coste por lanzamiento (%d)",
+    ["Ce que coûte un lancer, pas un gain : ta commission vient en plus."] =
+        "Lo que te cuesta un lanzamiento, no una ganancia: tu comisión va aparte.",
+    ["Aucun coût connu (prix : %s)."] = "Ningún coste conocido (precios: %s).",
 }
 
 for k, v in pairs(es3) do L[k] = v end

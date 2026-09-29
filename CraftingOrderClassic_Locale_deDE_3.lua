@@ -51,6 +51,20 @@ local de3 = {
         "Es fehlen noch %d in der Post: Trenne sie selbst von einem Stapel ab (Umschalt-Klick auf den Stapel) und lege sie hinein.",
     ["La pile de %d est prête dans ton sac : dépose-la toi-même dans le courrier."] =
         "Der Stapel mit %d liegt bereit in deiner Tasche: Lege ihn selbst in die Post.",
+    -- Vue Profit : bascule « tout le métier », source du prix, coupe HV, Enchantement par le coût (2026-09-29)
+    ["Tout le métier"] = "Ganzer Beruf",
+    ["Ajoute, en gris, les recettes que tu n'as pas encore apprises."] =
+        "Fügt die Rezepte, die du noch nicht gelernt hast, in Grau hinzu.",
+    ["Pas encore apprise : la vue « Manquantes » dit où l'apprendre."] =
+        "Noch nicht gelernt: Die Ansicht „Fehlend“ zeigt, wo du es lernst.",
+    ["Vente (prix marchand)"] = "Verkauf (Händlerpreis)",
+    ["Coupe HV (%d %%)"] = "AH-Gebühr (%d %%)",
+    ["Un marchand vend cet objet : l'HV ne le paiera pas plus cher."] =
+        "Ein Händler verkauft diesen Gegenstand: Im AH zahlt niemand mehr dafür.",
+    ["Coût à lancer (%d)"] = "Kosten pro Wirken (%d)",
+    ["Ce que coûte un lancer, pas un gain : ta commission vient en plus."] =
+        "Was dich ein Wirken kostet, kein Gewinn: Deine Provision kommt obendrauf.",
+    ["Aucun coût connu (prix : %s)."] = "Keine Kosten bekannt (Preise: %s).",
 }
 
 for k, v in pairs(de3) do L[k] = v end

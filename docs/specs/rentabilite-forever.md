@@ -1,18 +1,22 @@
 # Rentabilité des recettes sur Forever
 
-> État : **implémentée, non validée en jeu** · Rédigée le 2026-09-21 · Codée le 2026-09-21
-> Remise à niveau sur `main` le **2026-09-23** · Arbitrages 9 à 12 ajoutés le 2026-09-23 (user)
-> Cible : WoW: Forever / Camelot (16001) uniquement · Addon : Crafting Order - Classic
+> État : **implémentée** · Rédigée le 2026-09-21 · Codée le 2026-09-21 · Arbitrages 9 à 12 ajoutés
+> le 2026-09-23 (user), **codés le 2026-09-29** (branche `feat/profit-arbitrages`, dépôts COC et
+> outillage) · Cible : WoW: Forever / Camelot (16001) uniquement · Addon : Crafting Order - Classic
 >
-> Les portes déterministes (critères 7 à 10) sont **passées** ; les critères `[humain]` et `[outil]`
-> (1 à 6) attendent une session en jeu. Rien de ce qui suit n'a été vu à l'écran.
-> Vue livrée : `CraftingOrderClassic_ProfWindow_DockProfit.lua`, languette **« Profit »**.
+> Vu en jeu le 2026-09-26 (registre) : la languette s'affiche, la liste est triée par profit
+> décroissant, la fenêtre native n'est ni fermée ni déplacée (critère 1, en partie). **Rien des
+> arbitrages 9 à 12 n'a été vu à l'écran** ; leurs portes déterministes passent (critères 7 à 10,
+> 12 à 14 côté `[test]`). Vue livrée : `CraftingOrderClassic_ProfWindow_DockProfit.lua`, languette
+> **« Profit »**.
 >
-> ⚠️ **Les arbitrages 9 à 12 ne sont PAS encore codés.** La remise à niveau du 2026-09-23 a rebasé la
-> branche sur `main` (28 commits de retard) et porté le renommage `COC.LazyGold` → `COC.Profit` ;
-> elle n'a rien ajouté au comportement. Les quatre décisions nouvelles restent à implémenter, et la
-> bascule « tout le métier » (9) comme le mode COÛT de l'Enchantement (12) demandent chacune leur
-> critère d'acceptation.
+> ⚠️ **Le clic sur une ligne est probablement inerte** (critère 2). Il passe par
+> `C_TradeSkillUI.OpenRecipe`, qui ne sélectionne RIEN quand la fenêtre est déjà ouverte : elle
+> attend une réponse serveur qui ne vient pas sur Forever (skill `coc-native-ui`, piège 22). Et
+> l'autre voie, `RecipeList:SelectRecipe`, teinte la chaîne du craft — mesuré le 2026-09-22, cf. le
+> commentaire de `_ProfWindow_Trade.lua`. Le relevé du 2026-09-26 a vu une recette sélectionnée
+> sans pouvoir l'attribuer au clic. Non corrigé ici : hors des arbitrages 9 à 12, et le choix
+> (retirer le clic, ou le garder pour une recette absente de la liste) revient au user.
 
 ## Le problème
 
@@ -134,14 +138,38 @@ Rien ne change dans la fenêtre de Blizzard : on l'accompagne, on ne la touche p
     commission — et qui rejoint l'offre LFW (cf. `docs/specs/lfw-forever.md`). La page **dit** qu'elle
     affiche un coût et pas un gain : un montant dont on ignore le signe est pire que pas de montant.
 
+### Choix d'implémentation du 2026-09-29 — pris en codant, à confirmer par le user
+
+Les arbitrages 9 à 12 laissaient ces points ouverts. Chacun est un réglage d'une ligne s'il ne
+convient pas.
+
+13. **Le mode COÛT se décide par MÉTIER, pas par recette** (`COST_ONLY = { Enchanting = true }`,
+    `_ProfWindow_DockProfit.lua`). Une liste qui mêlerait les profits de ce qui a un objet produit
+    (baguettes, huiles) et les coûts du reste alignerait des montants de sens opposés sous le même
+    titre, et c'est justement ce que la décision 12 interdit.
+14. **Mode coût : le plus cher en tête.** C'est là qu'une commission mal fixée coûte le plus. Même
+    sens que la liste des profits, où le tri EST le montant.
+15. **La case « Tout le métier » est un état de SESSION**, pas une préférence enregistrée : la liste
+    s'ouvre sur ce qu'on sait fabriquer (décision 9), et aucun schéma persisté n'est touché
+    (décision 4). Elle reste cochée d'un métier à l'autre jusqu'au `/reload`.
+16. **Le détail montre la vente BRUTE du lot** (prix × quantité), plus la coupe, les réactifs et le
+    net, de sorte que vente − coupe − réactifs retombe sur le net au cuivre près. Avant, il montrait
+    le prix UNITAIRE suivi de « ×2 », et la colonne ne s'additionnait pas.
+17. **Le coût de l'Enchantement se lit comme le profit : le client d'abord** (`PR:RecipeCost`,
+    même schéma que `CraftProfit`, décision 2). `PR:CraftCost` reste au catalogue seul pour la
+    montée de métier et la bourse d'artisan (décision 8). Les deux comptent les réactifs avec le
+    même code (`reagentsCost`) : elles ne diffèrent que par la source, et ne peuvent pas diverger
+    sur la façon de compter.
+
 ## Critères d'acceptation
 
-1. `[humain]` ⏳ Fenêtre de métier ouverte sur Forever, Auctionator présent : la languette
+1. `[humain]` ◐ Fenêtre de métier ouverte sur Forever, Auctionator présent : la languette
    « Profit » est **visible et cliquable**, et sa première ligne est la recette au **plus gros
    profit**. *Témoin connu-bon :* recalculer à la main le profit de deux recettes depuis les prix
-   qu'Auctionator affiche sur les objets.
+   qu'Auctionator affiche sur les objets. → Languette et tri **vus le 2026-09-26** (registre) ; le
+   recalcul à la main n'a pas été fait.
 2. `[humain]` ⏳ Un clic sur une ligne **sélectionne cette recette dans la fenêtre native**, sans la
-   fermer ni la déplacer.
+   fermer ni la déplacer. ⚠️ Probablement **faux** aujourd'hui, cf. l'avertissement en tête.
 3. `[humain]` ⏳ Auctionator désactivé → la languette **n'apparaît pas**, les trois autres se
    repositionnent proprement, et rien d'autre ne change. Aucune erreur Lua.
 4. `[outil]` ⏳ **Les QUATRE languettes tiennent dans la rangée**, sans rognage ni chevauchement, dans
@@ -153,7 +181,7 @@ Rien ne change dans la fenêtre de Blizzard : on l'accompagne, on ne la touche p
    `Logs\taint.log`, et les barres d'action restent utilisables après le combat.
 7. `[test]` ✅ Le calcul de profit reste identique à formule constante (vente × quantité × 0,95 −
    coût) : un test headless sur `CraftProfit` avec un oracle de prix bouchonné.
-   → **`tests/test_profit.lua`** (28 vérifications, intégré à `run_all.lua` : 920 au total).
+   → **`tests/test_profit.lua`** (découvert par `run_all.lua`).
 8. `[test]` ✅ Une recette sans produit connu, une recette avec un réactif sans prix, une recette au
    profit négatif : les trois cas rendent ce que la table « Cas particuliers » annonce.
 9. `[porte]` ✅ Toute nouvelle chaîne d'interface est traduite dans les trois overlays
@@ -169,6 +197,30 @@ Rien ne change dans la fenêtre de Blizzard : on l'accompagne, on ne la touche p
     du client, cf. le commentaire de `BASIC_REAGENT`), et le fait que `VIEWS.profit.shown` ne teste
     pas la saveur — sans objet tant qu'il n'y a qu'un `.toc` 16001.
 
+Arbitrages 9 à 12 (codés le 2026-09-29) :
+
+12. **Bascule « Tout le métier »** (arbitrage 9).
+    `[test]` ✅ Case décochée : seules les recettes apprises ; cochée : les manquantes du métier
+    OUVERT s'ajoutent, marquées non apprises. Tri, doublons, en-têtes, perte et zéro écartés. →
+    `tests/test_profit_view.lua`.
+    `[humain]` ⏳ À l'ouverture de la fenêtre, la case est **décochée**. Cochée, des lignes au **nom
+    gris et à l'icône éteinte** apparaissent parmi les autres, et leur infobulle renvoie à
+    « Manquantes ». Le titre et la case tiennent sur une ligne, sans chevauchement avec le « i ».
+13. **Source du prix et coupe HV dans le détail** (arbitrages 10 et 11).
+    `[test]` ✅ Prix marchand prioritaire et nommé ; vente brute − coupe − réactifs = net au cuivre
+    près ; un seul retour pour `ItemValue`. → `tests/test_profit.lua`, sections 10 et 11.
+    `[humain]` ⏳ Au survol d'une ligne : quatre lignes (vente, « Coupe HV (5 %) », réactifs, net)
+    qui s'additionnent à l'œil. Pour un objet qu'un PNJ vend, la première ligne dit « Vente (prix
+    marchand) », et une phrase dit que l'HV ne paiera pas plus. *Témoin :* un objet vendu en ville et
+    fabricable (fil, teinture, flacon), dont Auctionator connaît le prix marchand.
+14. **Enchantement par le coût** (arbitrage 12).
+    `[test]` ✅ En mode coût, la liste lit `RecipeCost` (client d'abord) et jamais `CraftProfit` ;
+    `CraftCost` reste au catalogue. → `tests/test_profit.lua` §12, `tests/test_profit_view.lua` §3.
+    `[humain]` ⏳ Fenêtre d'Enchantement ouverte : la languette Profit s'intitule **« Coût à lancer
+    (N) »**, liste des enchantements avec un montant en **blanc** (pas en or), le plus cher en tête,
+    et l'infobulle dit que c'est un coût et pas un gain. Revenir sur un autre métier rend « Rentables
+    (N) ». *Témoin :* le coût d'un enchant recalculé à la main depuis les prix de ses composants.
+
 ## Ce qui restait à vérifier — état au 2026-09-21
 
 - **Quantité produite par craft.** ✅ *sur le papier, ❓ en jeu.* `CraftingRecipeSchematic` déclare
@@ -182,10 +234,10 @@ Rien ne change dans la fenêtre de Blizzard : on l'accompagne, on ne la touche p
   remplissage (pas à chaque défilement) et chaque recette coûte un appel d'oracle par réactif, plus
   un pour le produit. Si l'ouverture de la languette marque un temps sur un métier complet, le
   prochain geste est le calcul par lots — pas une optimisation à l'aveugle avant d'avoir vu le temps.
-- **Largeur de la rangée à quatre languettes.** ❓ **Non mesuré** — le libellé court a été choisi
-  pour cette raison (décision 5). À relever avec `/co geo` avant/après (critère 4) : le relevé porte
-  maintenant le panneau sous la clé `profit`, et la rangée `vues` sort déjà sa `marge` droite
-  (négative = ça déborde).
+- **Largeur de la rangée à quatre languettes.** ✅ **Mesurée le 2026-09-26** (`/co geo`, client
+  anglais) : colonne 227 px, rangée 212 px, marge droite 9 px — elle tient. Le même relevé a vu le
+  « i » recouvrir le coin de la languette Profit (11 × 17 px) : c'est ce chevauchement que le
+  critère 4 doit voir disparu, pas la largeur.
 - **Un `.lua` de plus = redémarrage complet du client**, pas un `/reload`. ⚠️ **S'applique :**
   `CraftingOrderClassic_ProfWindow_DockProfit.lua` est neuf dans le `.toc`.
 
@@ -193,6 +245,9 @@ Rien ne change dans la fenêtre de Blizzard : on l'accompagne, on ne la touche p
 
 - Code existant à réutiliser **tel quel** : `CraftingOrderClassic_Profit.lua` (ex-`_LazyGold.lua`)
   (`CraftProfit`, `EntryProfit`, `ProfitTier`, `ProfitText`, `IsAvailable`, `PriceSource`).
+  Ajouts du 2026-09-29 : `RecipeCost`, `ProfitLines`, `PR.AH_CUT`, et `sellSrc`/`gross`/`cut` dans
+  le résultat de `CraftProfit`. Le « meilleur plan » (`BestPlanFor`, `BestKnownPlanFor`…) est
+  passé dans `CraftingOrderClassic_Profit_Best.lua`, pour que `_Profit.lua` tienne sous 500 lignes.
 - Surface : `CraftingOrderClassic_ProfWindow_DockViews.lua` — la table `VIEWS`, `_BuildDockViewBtns`,
   `_SetDockView`, `_PlaceOrdTabs`, `_TabTop` (c'est là que la 4ᵉ languette s'ajoute) ;
   `CraftingOrderClassic_ProfWindow_Dock.lua` (`PW:OpenDock`) ;
