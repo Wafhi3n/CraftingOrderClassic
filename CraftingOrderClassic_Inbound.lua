@@ -283,14 +283,16 @@ function Inbound:Dismiss(id)
 end
 
 -- La commande complète `o` vient d'arriver (Orders:_OnNew) : l'aperçu tiré de son annonce sur Commerce
--- (même id) lui cède la place — une seule entrée par commande. S'il a déjà sonné, elle ne sonne pas.
+-- (même id) lui cède la place — une seule entrée par commande. S'il a déjà sonné, ou si je l'avais
+-- écarté, elle ne sonne pas. Rend true si un aperçu a été remplacé (il a déjà compté pour l'anti-spam).
 function Inbound:TakeOver(o)
     local inb = COC.db and COC.db.inbound
     local e = o and o.id and inb and inb[o.id]
-    if not (e and e.announce) then return end
+    if not (e and e.announce) then return false end
     inb[o.id] = nil
-    if e.alerted then o.alerted = true end
+    if e.alerted or e.status == "dismissed" then o.alerted = true end
     if COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end
+    return true
 end
 
 -- ------------------------------------------------------------------

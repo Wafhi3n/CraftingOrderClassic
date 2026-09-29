@@ -160,7 +160,8 @@ function A.Parse(msg, author, resolveProf)
     if not body then return nil end
     local verb, rest = body:match("^%s*(%a+)%s+(.+)$")
     verb = verb and verb:upper()
-    if verb == "WTB" and n ~= "" then return parseWTB(rest, author, n) end
+    -- « #CO0005 » vaut « #CO5 » : l'id doit retomber sur celui de la commande (<auteur>-5).
+    if verb == "WTB" and n ~= "" then return parseWTB(rest, author, tostring(tonumber(n))) end
     if verb == "LFW" and n == "" then return parseLFW(rest, author, resolveProf) end
     return nil
 end

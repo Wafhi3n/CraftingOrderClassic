@@ -36,8 +36,20 @@ local function resolveProf(name)
     return (CraftLink.professions and CraftLink.professions[key]) and key or nil
 end
 
+-- Chaque porteur en ville lit la MÊME ligne et chuchote l'auteur, qui répond à chacun (profil, commandes
+-- ouvertes) : on étale ces bonjours sur quelques secondes, et on se tait si l'auteur est déjà en contact
+-- (en ligne chez moi : ses données, sa commande, sa dispo me parviennent déjà). Relecture protocole, 2026-09-30.
+local HELLO_JITTER = 5   -- s
+
 local function hello(author)
-    if COC.Directory and COC.Directory.DiscoverPlayer then COC.Directory:DiscoverPlayer(author) end
+    local D = COC.Directory
+    if not (D and D.DiscoverPlayer) then return end
+    if D.online and D.online[author] then return end
+    if C_Timer and C_Timer.After then
+        C_Timer.After(math.random() * HELLO_JITTER, function() D:DiscoverPlayer(author) end)
+    else
+        D:DiscoverPlayer(author)
+    end
 end
 
 -- L'aperçu d'une commande annoncée, si le scanner l'aurait gardé (métier surveillé). Rend true s'il

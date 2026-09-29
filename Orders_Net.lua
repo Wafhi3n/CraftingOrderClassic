@@ -209,13 +209,13 @@ function Orders:_OnNew(message, distribution, sender)
     -- NotePost (anti-spam) SEULEMENT si l'émetteur EST l'acheteur : un relais mesh (sender≠buyer) ne compte pas
     -- la commande d'autrui contre lui (faux positif : 25 relais en rafale mutaient un acheteur légitime), et un
     -- buyer FORGÉ (sender≠buyer prétendu) ne peut plus « framer » une victime jusqu'au mute. Jamais mes rerolls.
-    if not existed and sender and samePlayer(sender, o.buyer) and not myChar(o.buyer) and COC.Moderation then
+    -- L'aperçu tiré de son annonce sur Commerce (même id) cède la place ; lui a DÉJÀ compté (Inbound:Add).
+    local tookOver = COC.Inbound and COC.Inbound.TakeOver and COC.Inbound:TakeOver(o)
+    if not existed and not tookOver and sender and samePlayer(sender, o.buyer) and not myChar(o.buyer) and COC.Moderation then
         COC.Moderation:NotePost(o.buyer)
     end
-    -- Un TTL arrivé AVANT son NEW attendait dans le sas : maintenant que l'acheteur est établi en
-    -- cache, on peut vérifier sa provenance et l'appliquer (cf. Orders_Narrative).
+    -- Un TTL arrivé AVANT son NEW attendait dans le sas (cf. Orders_Narrative) : l'acheteur est établi.
     if self.ApplyPendingTitle then self:ApplyPendingTitle(o) end
-    if COC.Inbound and COC.Inbound.TakeOver then COC.Inbound:TakeOver(o) end   -- remplace l'aperçu tiré de Commerce
     -- Garde d'alerte : `o.alerted` (PAS `existed`). _ShouldAlert peut refuser une 1re réception
     -- (gate métier, portée) sans que l'ordre ait « consommé » son alerte — une réception ultérieure
     -- dans de meilleures conditions (ordre re-reçu nommé sur moi après mutation par l'acheteur,
