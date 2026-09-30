@@ -46,6 +46,16 @@ client.
 
 ## Relevés
 
+- 2026-09-30 14:35 — jusqu'a 2ee1c10 — Forever, un client, en ANGLAIS, rechargé après le déploiement
+  de 14:00 : build `main-dev@bb269de 2026-09-30 14:00` (copie déployée du `.toc` ; la phrase neuve
+  n'existe que dans ce build) — **GO sur l'Aide en jeu de `feat/canaux-aide` (`2ee1c10`)** — capture
+  du user, relue par l'agent : section « Network, privacy & statuses », deuxième ligne : « Crafters
+  find each other through your friends and your guild, and through the channels you tick in the
+  Artisans tab, under "Watched channels": Trade, the discovery room, your communities, the players
+  around you. The "Setup" button there reopens the first-launch panel. » Plus aucune mention de
+  `/co channel room`. Avec le relevé de 14:10 (groupe « COMMUNITIES »), les deux changements de la
+  branche sont vus.
+
 - 2026-09-30 14:25 — jusqu'a 95eeb93 — Forever, client de Rédemption, en ANGLAIS, en ville, toujours
   PAS rechargé depuis 14:00 (groupe « DIRECTORY », et l'Aide montre encore l'ancienne phrase « …
   through the discovery room (/co channel room) … ») : build `main-dev@8098928 2026-09-30 13:27`,

@@ -25,7 +25,8 @@
 > 2026-09-30. Palier 6, première moitié, fait le même jour sur `feat/canaux-aide`, par-dessus elle :
 > l'Aide en jeu dit où se règle la recherche (onglet Artisans, « Canaux surveillés », bouton
 > « Configurer »), et le groupe « ANNUAIRE » de la liste devient « COMMUNAUTÉS » (constat 8 de la
-> revue de design : « Annuaire » portait trois sens). **Pas vu en jeu.** Reste, à la release
+> revue de design : « Annuaire » portait trois sens). **Vus en jeu le même jour** (registre, relevés
+> 14:10 et 14:35 ; la mise en page du panneau de première connexion sur capture à 14:25). Reste, à la release
 > **v1.41.0** : les Nouveautés, le CHANGELOG, `CURSEFORGE.md`, et les relectures.
 > Cible : WoW: Forever / Camelot (16001) · Addon : Crafting Order - Classic
 >
