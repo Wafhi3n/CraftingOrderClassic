@@ -186,7 +186,12 @@ function Inbound:Alert(e)
         if COC.Trace then COC.Trace:Log("mod", "entrante silencée : " .. tostring(e.buyer) .. " (muté)") end
         return
     end
-    if COC.db and COC.db.notifyScope == "off" then return end   -- mute déjà couvert par IsMuted ci-dessus
+    -- La case « Demandes lues dans le chat » (onglet Artisans) ; jamais touchée, elle suit /co notify.
+    -- L'aperçu d'une annonce est une commande de l'addon : il suit l'autre case.
+    local Ch = COC.Channels
+    if Ch then
+        if not Ch.IsWatched(e.announce and "notif_orders" or "notif_chat") then return end
+    elseif COC.db and COC.db.notifyScope == "off" then return end
     if COC.Moderation and COC.Moderation:BelowThreshold(e.buyer) then return end   -- petit perso (si connu)
     local c = CraftLink
     local nm = (c and c:ItemName(e.itemID, e.itemName)) or e.itemName or ("item:" .. e.itemID)
@@ -196,10 +201,8 @@ function Inbound:Alert(e)
     local pr  = e.price and (" — |cFFFFDD00" .. e.price .. "|r") or ""
     local msg = string.format(L["|cFFFF8800entrante|r |cFFFFFFFF%s|r (%s) : %s%s%s"], e.buyer, src, nm, qty, pr)
     e.alerted = true   -- lu par TakeOver : la commande complète ne sonnera pas une seconde fois
-    pmsg((Skin and ("|T" .. Skin.tex.workorder .. ":0|t ") or "") .. msg)
-    if COC.UI and COC.UI.Toast then COC.UI:Toast(msg) end
-    if e.canCraft then print(L["   |cFF33DD33» tu sais la crafter|r — vue métier › onglet Entrantes"]) end
-    pcall(function() PlaySound(SOUNDKIT and SOUNDKIT.TELL_MESSAGE or 3081, "Master") end)
+    if COC.Notify then COC.Notify.Emit({ chat = (Skin and ("|T" .. Skin.tex.workorder .. ":0|t ") or "") .. msg, toast = msg, sound = true,
+        more = e.canCraft and L["   |cFF33DD33» tu sais la crafter|r — vue métier › onglet Entrantes"] or nil }) end
 end
 
 -- ------------------------------------------------------------------

@@ -125,6 +125,29 @@ local es3 = {
         "Lo que los jugadores dicen o gritan cerca de ti (líneas LFW) y, en ciudad, a quienes ves fabricar.",
     ["Dire et crier"] = "Decir y gritar",
     ["Crafteurs autour"] = "Artesanos cercanos",
+    ["NOTIFICATIONS"] = "NOTIFICACIONES",
+    ["Ce qui te prévient : une ligne dans le chat, un bandeau et un son. Décochée, une case ne retire aucune commande : tout reste dans le Carnet et la vue métier."] =
+        "Lo que te avisa: una línea en el chat, un aviso y un sonido. Desmarcar una casilla no quita ningún pedido: todo sigue en el Libro y en la vista de profesión.",
+    ["Commandes de l'addon"] = "Pedidos del addon",
+    ["Les commandes que les autres joueurs de l'addon t'envoient ou publient."] =
+        "Los pedidos que otros jugadores del addon te envían o publican.",
+    ["Demandes lues dans le chat"] = "Solicitudes leídas en el chat",
+    ["Les demandes (« WTB [objet] ») lues dans les canaux cochés plus haut, pour ce que tu sais crafter."] =
+        "Las solicitudes (« WTB [objeto] ») leídas en los canales marcados arriba, para lo que sabes fabricar.",
+    ["Guilde, amis et pour moi"] = "Hermandad, amigos y yo",
+    ["Pas les commandes publiques ouvertes à tous."] = "No los pedidos públicos abiertos a todos.",
+    ["Seulement pour moi"] = "Solo para mí",
+    ["Les commandes à ton nom ou à celui d'un de tes persos."] = "Los pedidos a tu nombre o al de uno de tus personajes.",
+    ["Aussi les commandes publiques, pour un métier que tu as."] = "También los pedidos públicos, para una profesión que tienes.",
+    ["Suivi de mes commandes"] = "Seguimiento de mis pedidos",
+    ["Une commande qu'on t'a remise, dont on a confirmé la réception, ou qu'on a refusée."] = "Un pedido que te han entregado, cuya recepción se ha confirmado, o que se ha rechazado.",
+    ["Message à la connexion"] = "Mensaje al conectar",
+    ["La ligne « chargé — /co help » quand tu te connectes."] = "La línea « cargado — /co help » al conectarte.",
+    ["FAÇON DE PRÉVENIR"] = "CÓMO AVISAR",
+    ["Pour toutes les alertes cochées au-dessus."] = "Para todos los avisos marcados arriba.",
+    ["Ligne dans le chat"] = "Línea en el chat",
+    ["Bandeau à l'écran"] = "Aviso en pantalla",
+    ["Son"] = "Sonido",
     ["Tu n'es pas dans ce canal en ce moment. Ton choix est gardé pour ton retour."] =
         "No estás en este canal ahora mismo. Tu elección se guarda para cuando vuelvas.",
     -- Refonte de l'onglet Artisans (2026-09-30) : la bande des joueurs croisés, le bouton qui rouvre le panneau

@@ -125,6 +125,29 @@ local en3 = {
         "What players say or yell near you (LFW lines) and, in town, the ones you see crafting.",
     ["Dire et crier"] = "Say and yell",
     ["Crafteurs autour"] = "Crafters nearby",
+    ["NOTIFICATIONS"] = "NOTIFICATIONS",
+    ["Ce qui te prévient : une ligne dans le chat, un bandeau et un son. Décochée, une case ne retire aucune commande : tout reste dans le Carnet et la vue métier."] =
+        "What alerts you: a chat line, a banner and a sound. Unticking a box removes no order: everything stays in the Ledger and the profession view.",
+    ["Commandes de l'addon"] = "Addon orders",
+    ["Les commandes que les autres joueurs de l'addon t'envoient ou publient."] =
+        "Orders that other addon users send you or post.",
+    ["Demandes lues dans le chat"] = "Requests read in chat",
+    ["Les demandes (« WTB [objet] ») lues dans les canaux cochés plus haut, pour ce que tu sais crafter."] =
+        "Requests (\"WTB [item]\") read in the channels ticked above, for what you can craft.",
+    ["Guilde, amis et pour moi"] = "Guild, friends and me",
+    ["Pas les commandes publiques ouvertes à tous."] = "Not the public orders open to everyone.",
+    ["Seulement pour moi"] = "Only for me",
+    ["Les commandes à ton nom ou à celui d'un de tes persos."] = "Orders in your name or one of your characters'.",
+    ["Aussi les commandes publiques, pour un métier que tu as."] = "Also public orders, for a profession you have.",
+    ["Suivi de mes commandes"] = "Tracking my orders",
+    ["Une commande qu'on t'a remise, dont on a confirmé la réception, ou qu'on a refusée."] = "An order handed to you, confirmed as received, or declined.",
+    ["Message à la connexion"] = "Login message",
+    ["La ligne « chargé — /co help » quand tu te connectes."] = "The \"loaded — /co help\" line when you log in.",
+    ["FAÇON DE PRÉVENIR"] = "HOW TO ALERT",
+    ["Pour toutes les alertes cochées au-dessus."] = "For every alert ticked above.",
+    ["Ligne dans le chat"] = "Chat line",
+    ["Bandeau à l'écran"] = "On-screen banner",
+    ["Son"] = "Sound",
     ["Tu n'es pas dans ce canal en ce moment. Ton choix est gardé pour ton retour."] =
         "You're not in this channel right now. Your choice is kept for when you're back.",
     -- Refonte de l'onglet Artisans (2026-09-30) : la bande des joueurs croisés, le bouton qui rouvre le panneau

@@ -46,6 +46,32 @@ client.
 
 ## Relevés
 
+- 2026-09-30 22:20 — jusqu'a 598372c — Forever, 2 comptes (Gnomi / Sheadra), build `main-dev@7e165ee
+  2026-09-30 19:41` d'après `deploy.ps1` (`/co version` pas relu en séance) — **GO** sur les
+  cases NOTIFICATIONS (`feat/options-notifs`) — relu par l'agent dans `DevMacroDB.log`, grâce à un
+  espion DevMacro qui note chaque ligne « Crafting Order », chaque bandeau et chaque son ; les
+  étapes A, H et la disposition de la liste sont vues à l'œil par le user.
+  **Disposition** (capture) : groupe NOTIFICATIONS puis HOW TO ALERT en bas des canaux surveillés,
+  les trois portées en retrait sous « Addon orders », une seule cochée.
+  **Commandes** : témoin 21:54:47 et 21:55:05 = LIGNE + BANDEAU + SON 3081 ; « Chat line » décochée
+  (21:44:59) = BANDEAU + SON, sans LIGNE ; « Addon orders » décochée = la commande `-43` arrive
+  (`open`, `should=false`) et 0 entrée, puis elle sonne à sa réception suivante une fois recochée.
+  **Demande lue dans le chat** : témoin 21:48:28 et 21:52:22 = LIGNE « incoming … (trade) » +
+  « you can craft it » + BANDEAU + SON ; « Requests read in chat » décochée = WTB envoyé à 21:50:47,
+  0 entrée à 21:50:53.
+  **Suivi** : 21:55:10 chez Gnomi LIGNE + BANDEAU « Sheadra Wafhien delivered your order », sans son ;
+  21:55:26 chez Sheadra LIGNE « receipt confirmed by Gnomi Short! », sans bandeau ; « Tracking my
+  orders » décochée = la commande `-46` remise et confirmée, 0 alerte chez Gnomi.
+  **Connexion** : « Login message » décochée, pas de ligne « loaded » au `/reload` (capture).
+  **Portée et façons** (Gnomi de confiance, bandeau et son décochés) : portée « Guild, friends and
+  me », commande `-51` postée à 22:19:11, 0 entrée à 22:19:16 ; portée « All », commande `-52` à
+  22:19:46 = une LIGNE seule à 22:19:47, sans BANDEAU ni SON 3081 — elle sert aussi de témoin : c'est
+  bien la portée qui taisait `-51`, pas le filtre de niveau. (Un premier essai, à 22:16-22:17, ne
+  prouvait rien : Gnomi n'était plus de confiance et « All » pas recochée.)
+  ⚠️ **NON observé** : l'onglet Incoming après une demande silencée.
+  Constat au passage : une commande publique d'un perso sous le niveau 5 (Gnomi, niveau 2) n'alerte
+  pas (`muteBelowLevel`, filtre anti-bot existant) ; `/co trust` a levé le filtre pour la séance.
+
 - 2026-09-30 17:25 — jusqu'a e09e4f0 — Forever, 2 comptes, build `main-dev@dea9e9d 2026-09-30 16:37`
   avec icone-commande-recue, liste-destinataires, profit-arbitrages, valeurs-secretes-canal (copie
   déployée du `.toc`, `Directory_Club` gardé relu dedans), Rédemption en donjon — **le déclencheur est

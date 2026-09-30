@@ -124,6 +124,29 @@ local de3 = {
         "Was Spieler in deiner Nähe sagen oder schreien (LFW-Zeilen) und, in der Stadt, wen du beim Herstellen siehst.",
     ["Dire et crier"] = "Sagen und Schreien",
     ["Crafteurs autour"] = "Handwerker in der Nähe",
+    ["NOTIFICATIONS"] = "BENACHRICHTIGUNGEN",
+    ["Ce qui te prévient : une ligne dans le chat, un bandeau et un son. Décochée, une case ne retire aucune commande : tout reste dans le Carnet et la vue métier."] =
+        "Was dich benachrichtigt: eine Chatzeile, ein Banner und ein Ton. Ein abgewähltes Kästchen entfernt keinen Auftrag: alles bleibt im Auftragsbuch und in der Berufsansicht.",
+    ["Commandes de l'addon"] = "Aufträge des Addons",
+    ["Les commandes que les autres joueurs de l'addon t'envoient ou publient."] =
+        "Aufträge, die andere Addon-Nutzer dir schicken oder veröffentlichen.",
+    ["Demandes lues dans le chat"] = "Im Chat gelesene Anfragen",
+    ["Les demandes (« WTB [objet] ») lues dans les canaux cochés plus haut, pour ce que tu sais crafter."] =
+        "Anfragen („WTB [Gegenstand]“) aus den oben angehakten Kanälen, für das, was du herstellen kannst.",
+    ["Guilde, amis et pour moi"] = "Gilde, Freunde und ich",
+    ["Pas les commandes publiques ouvertes à tous."] = "Nicht die öffentlichen Aufträge für alle.",
+    ["Seulement pour moi"] = "Nur für mich",
+    ["Les commandes à ton nom ou à celui d'un de tes persos."] = "Aufträge auf deinen Namen oder den eines deiner Charaktere.",
+    ["Aussi les commandes publiques, pour un métier que tu as."] = "Auch öffentliche Aufträge, für einen Beruf, den du hast.",
+    ["Suivi de mes commandes"] = "Verlauf meiner Aufträge",
+    ["Une commande qu'on t'a remise, dont on a confirmé la réception, ou qu'on a refusée."] = "Ein Auftrag, der dir übergeben, als erhalten bestätigt oder abgelehnt wurde.",
+    ["Message à la connexion"] = "Nachricht beim Einloggen",
+    ["La ligne « chargé — /co help » quand tu te connectes."] = "Die Zeile „geladen — /co help“ beim Einloggen.",
+    ["FAÇON DE PRÉVENIR"] = "ART DER BENACHRICHTIGUNG",
+    ["Pour toutes les alertes cochées au-dessus."] = "Für alle oben angehakten Hinweise.",
+    ["Ligne dans le chat"] = "Zeile im Chat",
+    ["Bandeau à l'écran"] = "Banner auf dem Bildschirm",
+    ["Son"] = "Ton",
     ["Tu n'es pas dans ce canal en ce moment. Ton choix est gardé pour ton retour."] =
         "Du bist gerade nicht in diesem Kanal. Deine Wahl bleibt für deine Rückkehr erhalten.",
     -- Refonte de l'onglet Artisans (2026-09-30) : la bande des joueurs croisés, le bouton qui rouvre le panneau
