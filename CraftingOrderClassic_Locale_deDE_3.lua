@@ -125,8 +125,8 @@ local de3 = {
     ["Dire et crier"] = "Sagen und Schreien",
     ["Crafteurs autour"] = "Handwerker in der Nähe",
     ["NOTIFICATIONS"] = "BENACHRICHTIGUNGEN",
-    ["Ce qui te prévient : une ligne dans le chat, un bandeau et un son. Décochée, une case ne cache rien : tout reste dans le Carnet et la vue métier."] =
-        "Was dich benachrichtigt: eine Chatzeile, ein Banner und ein Ton. Ein abgewähltes Kästchen versteckt nichts: alles bleibt im Auftragsbuch und in der Berufsansicht.",
+    ["Ce qui te prévient : une ligne dans le chat, un bandeau et un son. Décochée, une case ne retire aucune commande : tout reste dans le Carnet et la vue métier."] =
+        "Was dich benachrichtigt: eine Chatzeile, ein Banner und ein Ton. Ein abgewähltes Kästchen entfernt keinen Auftrag: alles bleibt im Auftragsbuch und in der Berufsansicht.",
     ["Commandes de l'addon"] = "Aufträge des Addons",
     ["Les commandes que les autres joueurs de l'addon t'envoient ou publient."] =
         "Aufträge, die andere Addon-Nutzer dir schicken oder veröffentlichen.",

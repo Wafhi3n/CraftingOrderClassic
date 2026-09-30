@@ -126,8 +126,8 @@ local en3 = {
     ["Dire et crier"] = "Say and yell",
     ["Crafteurs autour"] = "Crafters nearby",
     ["NOTIFICATIONS"] = "NOTIFICATIONS",
-    ["Ce qui te prévient : une ligne dans le chat, un bandeau et un son. Décochée, une case ne cache rien : tout reste dans le Carnet et la vue métier."] =
-        "What alerts you: a chat line, a banner and a sound. Unticking a box hides nothing: everything stays in the Ledger and the profession view.",
+    ["Ce qui te prévient : une ligne dans le chat, un bandeau et un son. Décochée, une case ne retire aucune commande : tout reste dans le Carnet et la vue métier."] =
+        "What alerts you: a chat line, a banner and a sound. Unticking a box removes no order: everything stays in the Ledger and the profession view.",
     ["Commandes de l'addon"] = "Addon orders",
     ["Les commandes que les autres joueurs de l'addon t'envoient ou publient."] =
         "Orders that other addon users send you or post.",

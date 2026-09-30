@@ -187,9 +187,10 @@ function Inbound:Alert(e)
         return
     end
     -- La case « Demandes lues dans le chat » (onglet Artisans) ; jamais touchée, elle suit /co notify.
+    -- L'aperçu d'une annonce est une commande de l'addon : il suit l'autre case.
     local Ch = COC.Channels
     if Ch then
-        if not Ch.IsWatched("notif_chat") then return end
+        if not Ch.IsWatched(e.announce and "notif_orders" or "notif_chat") then return end
     elseif COC.db and COC.db.notifyScope == "off" then return end
     if COC.Moderation and COC.Moderation:BelowThreshold(e.buyer) then return end   -- petit perso (si connu)
     local c = CraftLink

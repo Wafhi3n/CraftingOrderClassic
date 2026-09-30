@@ -166,7 +166,7 @@ function Ch.BuildRows(joined, clubs, inGuild)
     head(L["AUTOUR DE MOI"], L["Ce que les joueurs disent ou crient près de toi (les lignes LFW), et, en ville, ceux que tu vois crafter."])
     item("sayyell", L["Dire et crier"], true)
     item("nearby", L["Crafteurs autour"], true, L["en ville"], L["Repérer les crafteurs autour (en ville)"])
-    head(L["NOTIFICATIONS"], L["Ce qui te prévient : une ligne dans le chat, un bandeau et un son. Décochée, une case ne cache rien : tout reste dans le Carnet et la vue métier."])
+    head(L["NOTIFICATIONS"], L["Ce qui te prévient : une ligne dans le chat, un bandeau et un son. Décochée, une case ne retire aucune commande : tout reste dans le Carnet et la vue métier."])
     item("notif_orders", L["Commandes de l'addon"], true, nil, L["Les commandes que les autres joueurs de l'addon t'envoient ou publient."])
     item("notif_chat", L["Demandes lues dans le chat"], true, nil, L["Les demandes (« WTB [objet] ») lues dans les canaux cochés plus haut, pour ce que tu sais crafter."])
     return rows

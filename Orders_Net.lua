@@ -361,6 +361,9 @@ function Orders:_OnSuggest(message, sender)
     local H = COC.Handoff
     -- Nommée sur moi OU un de mes persos → AlertTargeted (via _ShouldAlert) s'en charge, pas le nudge.
     if H and o.status == "open" and not myChar(o.buyer) and not myChar(o.recipient) then
+        -- Les cases NOTIFICATIONS : une demande qu'un pair a lue dans le chat suit « chat », le reste « commandes ».
+        local Ch = COC.Channels
+        if Ch and not Ch.IsWatched(o.captured and "notif_chat" or "notif_orders") then return end
         if H:ICanCraft(o) then H:AlertCapable(o)
         else local alt = H:MyRerollCanCraft(o); if alt then H:AlertReroll(o, alt) end end
     end

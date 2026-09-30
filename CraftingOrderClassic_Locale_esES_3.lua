@@ -126,8 +126,8 @@ local es3 = {
     ["Dire et crier"] = "Decir y gritar",
     ["Crafteurs autour"] = "Artesanos cercanos",
     ["NOTIFICATIONS"] = "NOTIFICACIONES",
-    ["Ce qui te prévient : une ligne dans le chat, un bandeau et un son. Décochée, une case ne cache rien : tout reste dans le Carnet et la vue métier."] =
-        "Lo que te avisa: una línea en el chat, un aviso y un sonido. Desmarcar una casilla no oculta nada: todo sigue en el Libro y en la vista de profesión.",
+    ["Ce qui te prévient : une ligne dans le chat, un bandeau et un son. Décochée, une case ne retire aucune commande : tout reste dans le Carnet et la vue métier."] =
+        "Lo que te avisa: una línea en el chat, un aviso y un sonido. Desmarcar una casilla no quita ningún pedido: todo sigue en el Libro y en la vista de profesión.",
     ["Commandes de l'addon"] = "Pedidos del addon",
     ["Les commandes que les autres joueurs de l'addon t'envoient ou publient."] =
         "Los pedidos que otros jugadores del addon te envían o publican.",
