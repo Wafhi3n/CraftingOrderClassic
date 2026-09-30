@@ -264,10 +264,9 @@ end
 -- Balise TEXTE de découverte. À n'appeler QUE depuis une action joueur (hardware event) — sinon
 -- ADDON_ACTION_BLOCKED (SendChatMessage interdit hors input). Émise au clic Poster et sur /co refresh.
 -- Throttle (30 s plancher) géré par la lib. C'est le seul créneau où l'envoi canal fonctionne.
--- Sans canal (CraftLink REV 17, pas de texte), le geste redit bonjour à la salle (Directory_Room).
 function COC:Beacon()
     if CraftLink and CraftLink.SendBeacon then CraftLink:SendBeacon() end
-    if COC.Directory and COC.Directory.RoomHello then COC.Directory:RoomHello() end
+    if COC.Directory and COC.Directory.RoomHello then COC.Directory:RoomHello() end   -- sans canal (REV 17)
 end
 
 -- /co beacon : diag. Émet une balise TEXTE sur le canal SOUS hardware event (slash = touche Entrée).
