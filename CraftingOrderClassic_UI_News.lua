@@ -36,6 +36,13 @@ local BODY_W = 780
 local function versionsTop()
     return {
         {
+            v = "v1.41.1", title = L["Plus d'erreurs pendant les combats de boss"],
+            lines = {
+                L["Pendant un combat de boss, Forever cache aux addons qui a écrit une ligne du chat et ce qu'elle dit. L'addon levait alors une erreur à chaque ligne reçue sur un canal, Général compris ; il les laisse passer sans bruit. La liste des membres de tes communautés, cachée elle aussi, ne fait plus d'erreur et ne retire plus personne de ton annuaire."],
+                L["Aussi : « Poster » et « /co refresh » n'écrivent plus de ligne « CLNK1 » sur le canal CraftLinkNet. L'addon y dit bonjour par un message d'addon, qui ne s'affiche pas dans le chat."],
+            },
+        },
+        {
             v = "v1.41.0", title = L["Tu choisis où l'addon cherche les artisans"],
             lines = {
                 L["L'onglet Artisans a une liste « Canaux surveillés » : les canaux de Commerce, la discussion de guilde, la salle de découverte, tes communautés et les joueurs autour de toi. Coche ceux où l'addon doit chercher des artisans. Hors d'une ville, les canaux de Commerce sont grisés et ton choix est gardé."],
@@ -430,13 +437,7 @@ local function versionsOldest()
                 L["L'onglet Artisans a maintenant une section « En sourdine » : chaque joueur muté y apparaît avec sa raison et le temps restant (ou « permanent »), avec un bouton pour le rétablir directement — plus besoin de deviner qui est encore muté."],
             },
         },
-        {
-            v = "v1.13.0", title = L["Modération : mutes avec raison, temporaires, liste de confiance"],
-            lines = {
-                L["Un mute porte désormais une raison et une date, et peut être temporaire : |cFFFFFFFF/co mute Bob 1h spammeur|r se lève tout seul au bout d'une heure (|cFFFFFFFF/co mute|r seul liste les mutés avec raison et temps restant). Et |cFFFFFFFF/co trust <nom>|r marque un joueur de confiance, jamais mis en sourdine automatiquement — le mute manuel restant toujours possible."],
-            },
-        },
-        -- v1.12.0 / v1.11.0 / v1.10.2 (retirées à la v1.41.0 : la Saison de la Découverte, le canal du royaume et
+        -- v1.13.0 (retirée à la v1.41.1), v1.12.0 / v1.11.0 / v1.10.2 (retirées à la v1.41.0 : la Saison de la Découverte, le canal du royaume et
         -- le bouton « Créer » sécurisé n'existent pas sur Forever), v1.10.1 / v1.9.0 / v1.8.0 / v1.7.0 / v1.7.1 /
         -- v1.6.0 / v1.5.0 / v1.4.0 retirées de l'onglet (l'historique
         -- complet vit dans CHANGELOG.md). Cet onglet ne garde qu'une fenêtre glissante de versions :

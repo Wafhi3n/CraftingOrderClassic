@@ -11,6 +11,12 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "What's New",
+    -- v1.41.1
+    ["Plus d'erreurs pendant les combats de boss"] = "No more errors during boss fights",
+    ["Pendant un combat de boss, Forever cache aux addons qui a écrit une ligne du chat et ce qu'elle dit. L'addon levait alors une erreur à chaque ligne reçue sur un canal, Général compris ; il les laisse passer sans bruit. La liste des membres de tes communautés, cachée elle aussi, ne fait plus d'erreur et ne retire plus personne de ton annuaire."] =
+        "During a boss fight, Forever hides from addons who wrote a chat line and what it says. The addon threw an error for every line that came in on a channel, General included; it now lets them go by quietly. Your communities' member lists are hidden too, and they no longer cause an error or drop anyone from your directory.",
+    ["Aussi : « Poster » et « /co refresh » n'écrivent plus de ligne « CLNK1 » sur le canal CraftLinkNet. L'addon y dit bonjour par un message d'addon, qui ne s'affiche pas dans le chat."] =
+        "Also: Post and /co refresh no longer write a CLNK1 line in the CraftLinkNet channel. The addon says hello there with an addon message, which doesn't show in chat.",
     -- v1.41.0
     ["Tu choisis où l'addon cherche les artisans"] = "You choose where the addon looks for crafters",
     ["L'onglet Artisans a une liste « Canaux surveillés » : les canaux de Commerce, la discussion de guilde, la salle de découverte, tes communautés et les joueurs autour de toi. Coche ceux où l'addon doit chercher des artisans. Hors d'une ville, les canaux de Commerce sont grisés et ton choix est gardé."] =
@@ -207,10 +213,7 @@ local news = {
     ["Au passage : les deux fenêtres ne s'emmêlent plus (un clic la ramène au premier plan), l'annuaire a un bouton partenaire et se limite à ta faction (pas d'échange cross-faction sur Classic), et un artisan ne s'affiche plus avec un métier qui n'est pas le sien."] =
         "Along the way: the two windows no longer tangle (a click brings one to the front), the directory has a partner button and sticks to your faction (no cross-faction trading on Classic), and an artisan no longer shows a profession that isn't theirs.",
     -- (clés v1.8.0/v1.7.0/v1.7.1/v1.6.0/v1.5.0/v1.4.0 retirées : ces versions ne sont plus listées dans l'onglet Nouveautés)
-    -- Onglet Nouveautés — v1.13.0
-    ["Modération : mutes avec raison, temporaires, liste de confiance"] = "Moderation: mutes with a reason, temporary mutes, a trust list",
-    ["Un mute porte désormais une raison et une date, et peut être temporaire : |cFFFFFFFF/co mute Bob 1h spammeur|r se lève tout seul au bout d'une heure (|cFFFFFFFF/co mute|r seul liste les mutés avec raison et temps restant). Et |cFFFFFFFF/co trust <nom>|r marque un joueur de confiance, jamais mis en sourdine automatiquement — le mute manuel restant toujours possible."] =
-        "A mute now carries a reason and a date, and can be temporary: |cFFFFFFFF/co mute Bob 1h spammer|r lifts itself after an hour (|cFFFFFFFF/co mute|r alone lists muted players with reason and time left). And |cFFFFFFFF/co trust <name>|r marks a player as trusted, never auto-muted — manual muting still available.",
+    -- (clés v1.13.0 retirées à la v1.41.1 : version sortie de la fenêtre glissante de l'onglet)
     -- (clés v1.12.1 retirées : version sortie de la fenêtre glissante de l'onglet Nouveautés)
     -- (clés v1.12.0, v1.11.0 et v1.10.2 retirées à la v1.41.0 : versions sorties de la fenêtre glissante de l'onglet)
     -- Onglet Nouveautés — v1.14.0
