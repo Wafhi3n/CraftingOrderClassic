@@ -144,6 +144,11 @@ end
 -- Orders:VisibleTo). Sélection seule → on poste via « Poster ». Partagé par _UI_Post + _UI_Gather.
 -- ALL_RX/RW = place par défaut (Récolte) ; ALL_ARH = hauteur d'une ligne d'artisan, SEULE source.
 local ALL_RX, ALL_RW, ALL_ARH, PIN_GAP = 316, 502, 26, 6
+-- LIST_BAR : la place de la barre de défilement au bord droit de la liste (MinimalScrollBar 8 + écart
+-- 4, Skin.MakeScrollList). Les lignes épinglées, la légende et le menu de la bande s'arrêtent là, sur
+-- la même verticale que les lignes de la liste ; la liste elle-même, barre comprise, prend toute la
+-- largeur de la bande (capture du user : le menu dépassait les lignes de 15 px, 2026-09-30).
+local LIST_BAR = 12
 local GROUP_LABEL = { guild = "Toute la guilde", friend = "Tous les amis" }
 
 -- Icône du groupe : le tabard de guilde, ou l'atlas de l'onglet Amis du volet social (vérifié en jeu
@@ -159,7 +164,7 @@ end
 
 -- Une ligne épinglée : icône 14 px, libellé doré, surbrillance de MakeFlatRow.
 local function pinnedRow(panel, w)
-    local row = Skin.MakeFlatRow(panel, w - 22, ALL_ARH)
+    local row = Skin.MakeFlatRow(panel, w - LIST_BAR, ALL_ARH)
     row.icon = row:CreateTexture(nil, "OVERLAY"); row.icon:SetSize(14, 14); row.icon:SetPoint("LEFT", 5, 0)
     row.label = row.text   -- alias historique ; ré-ancré après l'icône
     row.label:ClearAllPoints(); row.label:SetPoint("LEFT", 24, 0)
@@ -191,19 +196,20 @@ function UI:_BuildAllRowAndScroll(panel, kind, top, x, w, opts)
     local grp = pinnedRow(panel, w)
     grp:SetPoint("TOPLEFT", all, "BOTTOMLEFT", 0, -2); grp:SetScript("OnClick", pick(nil))
     -- Légende « ou un artisan » + filet : sépare les destinataires collectifs des personnes.
-    local cap = CreateFrame("Frame", nil, panel); cap:SetSize(w - 22, 16)
+    local cap = CreateFrame("Frame", nil, panel); cap:SetSize(w - LIST_BAR, 16)
     local cfs = cap:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
     cfs:SetPoint("LEFT", 6, 0); cfs:SetText(opts.caption or "")
     local rule = cap:CreateTexture(nil, "ARTWORK"); rule:SetHeight(1); rule:SetColorTexture(1, 1, 1, 0.12)
     rule:SetPoint("LEFT", cfs, "RIGHT", 6, 0); rule:SetPoint("RIGHT", cap, "RIGHT", -4, 0)
     self[kind .. "Pinned"] = { all = all, group = grp, caption = cap }
 
-    -- Liste défilante du kit (palier 2). w − 10 = largeur de la ligne épinglée + la barre de 8 px.
+    -- Liste défilante du kit (palier 2), toute la largeur : ses lignes s'arrêtent à LIST_BAR du bord,
+    -- sous les lignes épinglées, et sa barre loge dans ce reste.
     -- Elle descend jusqu'à `opts.bottom` : figée à 4 lignes, elle défilait au-dessus d'un grand vide.
     local host = CreateFrame("Frame", nil, panel)
     host:SetPoint("TOPLEFT", cap, "BOTTOMLEFT", 0, -2)
     host:SetPoint("BOTTOMLEFT", panel, "BOTTOMLEFT", x, opts.bottom or 22)
-    host:SetWidth(w - 10)
+    host:SetWidth(w)
     self[kind .. "ArtList"] = Skin.MakeScrollList(host, {
         extent = ALL_ARH,
         build  = Skin.ArtisanRowArt,
@@ -240,7 +246,7 @@ function UI:_BuildRecipientBand(scope, ddName, pad, onSelect)
     local send = scope:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     send:SetPoint("LEFT", pad, 0); send:SetText(L["Envoyer à"]); Skin.ApplyShadow(send)
     local dd = Skin.MakeDropdown(ddName, scope, 96, defs, { onSelect = onSelect })
-    dd:SetPointVisual("RIGHT", scope, "RIGHT", -pad - 4, 0)
+    dd:SetPointVisual("RIGHT", scope, "RIGHT", -pad - LIST_BAR, 0)   -- au bout des lignes du dessous
     local lbl = scope:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     lbl:SetPoint("RIGHT", dd, "LEFT", -6, 0); lbl:SetText(L["Liste"])
     lbl:SetTextColor(Skin.unpack(Skin.color.textMuted)); Skin.ApplyShadow(lbl)
