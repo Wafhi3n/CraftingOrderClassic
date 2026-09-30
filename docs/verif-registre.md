@@ -46,6 +46,31 @@ client.
 
 ## Relevés
 
+- 2026-09-30 10:56 — jusqu'a 86c6f16 — Forever, deux clients (Rédemption, Gnomi), client en ANGLAIS,
+  Ironforge ; build déployé `main-dev@507b82e 2026-09-30 10:35`, branches en test
+  `feat/canaux-surveilles`, `feat/icone-commande-recue`, `feat/liste-destinataires`,
+  `feat/profit-arbitrages` (relu dans la copie déployée du `.toc`) — **GO partiel sur les canaux
+  surveillés, paliers 1 et 2 (spec canaux-surveilles, critère 3, première moitié)** — traces des
+  deux comptes relues par l'agent, captures du user. `/co watch` liste les cases (user). Sur Gnomi,
+  `/co watch trade_services off` : `watch = { trade_services = false }` dans sa SavedVariable. Premier
+  essai (10:53, salle restée ouverte) : aucune ligne « annonce …-10 » chez Gnomi, mais la balise
+  `CLNK1` de Rédemption reçue par la salle (10:53:14), un bonjour, et la commande `#10` par
+  chuchotement (alerte « new order ») — la case ne ferme qu'UN canal. Second essai, salle coupée par
+  `/co watch room off` sur les deux comptes (Gnomi : « canal quitté (opt-out) » à 10:55:16, `roomOff`
+  posé des deux côtés) et comptes « oubliés » : `#11` annoncée à 10:56:44, chuchotée au seul Frostrobb
+  Robb ; chez Gnomi, **rien** jusqu'à son `/reload` (ni « annonce …-11 », ni `ORD|NEW`, ni bonjour ;
+  « rien » confirmé par le user). Après ce `/reload`, `#11` lui arrive RELAYÉE par Frostrobb Robb
+  (10:57:20, alerte « new order ») : le relais du réseau, pas la case. Au login de 10:57, Rédemption
+  salue tout son annuaire sans Gnomi : l'oubli par `/run` tient après un `/reload`.
+  Vu au passage : **`PROVIDE` enfin sur une ligne** — `WTB [Copper Bracers] x1 PROVIDE [Copper Bar]x2
+  1s #CO11` (capture), le dernier « non vu » de l'annonce sur Commerce ; et **le bonjour différé de
+  la salle (`52633c3`)** : salle rejointe à 09:24:17 (Gnomi) et 09:24:24 (Rédemption), `HI` sur la
+  salle 2 s plus tard, reçu par l'autre compte par le canal (09:24:26), aucun « InvalidChannel ».
+  Non vu : la case recochée qui laisse de nouveau entrer la ligne (seconde moitié du critère 3), les
+  lignes LFW (canal décoché, dire et crier), la guilde, General coché, `CraftLinkNet` qui quitte la
+  fenêtre Chat Channels (pas rapporté). Le prix s'affiche toujours « 1pa » / « 50po » sur le client
+  anglais.
+
 - 2026-09-30 08:48 — jusqu'a 8fd4cb9 — Forever, deux clients (Rédemption, Gnomi), client en ANGLAIS ;
   même build `main-dev@e61e34d 2026-09-30 00:58` (v1.40.0) — **GO sur la relecture du protocole côté
   réception (`352c1b7`) et sur l'Aide (`97ab48b`), GO partiel sur l'annonce** — traces des deux
