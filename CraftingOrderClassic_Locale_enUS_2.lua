@@ -31,7 +31,6 @@ local en2 = {
         "alert when you loot a recipe known to CraftLink (default: on)",
     -- Partenaires (P1) + proposer un don (/co gift)
     ["Partenaire (basculer)"] = "Partner (toggle)",
-    ["[Partenaire]"] = "[Partner]",
     ["|cFFFFFFFF%s|r marqué comme partenaire — priorité sur les alertes de don."] =
         "|cFFFFFFFF%s|r marked as partner — prioritized in gift alerts.",
     ["|cFFFFFFFF%s|r n'est plus marqué comme partenaire."] = "|cFFFFFFFF%s|r is no longer marked as partner.",
@@ -227,10 +226,10 @@ local en2 = {
         "The recipient: the whole source, or a specific gatherer.",
 
     -- Aide contextuelle « bouton i » — onglet Artisans (cf. _UI_HelpPlate.lua)
-    ["Filtre l'annuaire par source : guilde, amis, ajoutés manuellement, croisés, ou les joueurs en sourdine. Dessous, les canaux que l'addon surveille : coche ceux où il doit chercher des artisans."] =
-        "Filter the directory by source: guild, friends, manually added, recently met, or muted players. Below, the channels the addon watches: tick the ones where it should look for crafters.",
-    ["Ajoute un joueur manuellement (+) ou rafraîchis l'annuaire."] =
-        "Add a player manually (+) or refresh the directory.",
+    ["Filtre l'annuaire par source : guilde, amis, ajoutés manuellement, croisés. Dessous, les canaux que l'addon surveille : coche ceux où il doit chercher des artisans. « Configurer » rouvre le panneau de première connexion."] =
+        "Filter the directory by source: guild, friends, manually added, recently met. Below, the channels the addon watches: tick the ones where it should look for crafters. “Setup” reopens the first-login panel.",
+    ["Les joueurs que tu as mis en sourdine, et l'ajout manuel d'un joueur (+)."] =
+        "The players you muted, and adding a player manually (+).",
     ["Filtre les artisans par métier."] = "Filter artisans by profession.",
     ["La liste des artisans connus. Survole un nom pour ses métiers ; pastille verte = a l'addon et répond, jaune = en ligne sans l'addon, grise = hors ligne."] =
         "The list of known artisans. Hover a name for their professions; green dot = has the addon and answers, yellow = online without the addon, gray = offline.",

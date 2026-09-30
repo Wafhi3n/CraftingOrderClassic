@@ -13,6 +13,9 @@
 --
 -- Hauteur : la liste prend ce qui reste entre le dernier bouton SOURCE et le bloc du bas, et DÉFILE
 -- quand elle dépasse. Une zone de hauteur fixe aurait été recouverte par les bandes de cercles.
+--
+-- « Configurer », à droite de l'en-tête (refonte du 2026-09-30, demande du user) : rouvre le panneau
+-- de première connexion, qui n'était joignable que par /co watch setup.
 
 local COC  = CraftingOrderClassic
 local UI   = COC.UI
@@ -97,7 +100,19 @@ function UI:_BuildArtChannels(sec)
     hdr:SetText(L["CANAUX SURVEILLÉS"]); hdr:SetTextColor(Skin.unpack(Skin.color.textMuted))
     local host = CreateFrame("Frame", nil, sec)
     host:SetPoint("BOTTOMRIGHT", sec, "BOTTOMRIGHT", -10, 4)
-    self.artChanHdr, self.artChanHost = hdr, host
+    local setup = Skin.MakeGoldButton(sec, 60, 16, L["Configurer"])
+    setup:SetWidth(setup.text:GetStringWidth() + 18)   -- pas de reflow : largeur au texte, à la main
+    setup:SetScript("OnClick", function() if UI.ShowSetup then UI:ShowSetup() end end)
+    local hoverIn, hoverOut = setup:GetScript("OnEnter"), setup:GetScript("OnLeave")   -- ceux du gabarit, s'il en a
+    setup:SetScript("OnEnter", function(b)
+        if hoverIn then hoverIn(b) end
+        GameTooltip:SetOwner(b, "ANCHOR_RIGHT")
+        GameTooltip:AddLine(L["Où chercher les artisans ?"], 1, 1, 1)
+        GameTooltip:AddLine(L["Rouvre le panneau de première connexion."], nil, nil, nil, true)
+        GameTooltip:Show()
+    end)
+    setup:SetScript("OnLeave", function(b) if hoverOut then hoverOut(b) end; GameTooltip:Hide() end)
+    self.artChanHdr, self.artChanHost, self.artChanSetup = hdr, host, setup
     self.artChanList = Skin.MakeScrollList(host, { extent = ROW_H, build = buildRow, fill = fillRow })
 end
 
@@ -106,6 +121,8 @@ function UI:_PlaceArtChannels(y)
     if not self.artChanHost then return end
     self.artChanHdr:ClearAllPoints()
     self.artChanHdr:SetPoint("TOPLEFT", 14, y - 8)
+    self.artChanSetup:ClearAllPoints()
+    self.artChanSetup:SetPoint("TOPRIGHT", self:ArtSec("sources"), "TOPRIGHT", -10, y - 5)   -- sur la ligne de l'en-tête
     self.artChanHost:SetPoint("TOPLEFT", self:ArtSec("sources"), "TOPLEFT", 12, y - 24)
 end
 

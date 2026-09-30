@@ -4,7 +4,7 @@
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
-154 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
+155 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
 
 ## Modules (ordre de chargement)
 
@@ -16,20 +16,20 @@
 | `CraftingOrderClassic_Migrations.lua` | versionnage du schéma SavedVariables. | 40 |
 | `CraftingOrderClassic_Locale.lua` | socle de localisation du CHROME de l'UI. | 12 |
 | `CraftingOrderClassic_Locale_enUS.lua` | overlay ANGLAIS (enUS/enGB). | 279 |
-| `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 499 |
-| `CraftingOrderClassic_Locale_enUS_3.lua` | overlay enUS, 3/3. | 140 |
-| `CraftingOrderClassic_Locale_deDE.lua` | overlay ALLEMAND (deDE). | 281 |
+| `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 498 |
+| `CraftingOrderClassic_Locale_enUS_3.lua` | overlay enUS, 3/3. | 144 |
+| `CraftingOrderClassic_Locale_deDE.lua` | overlay ALLEMAND (deDE). | 280 |
 | `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 479 |
-| `CraftingOrderClassic_Locale_deDE_3.lua` | overlay deDE, 3/3. | 139 |
-| `CraftingOrderClassic_Locale_esES.lua` | overlay ESPAGNOL (esES/esMX). | 282 |
+| `CraftingOrderClassic_Locale_deDE_3.lua` | overlay deDE, 3/3. | 143 |
+| `CraftingOrderClassic_Locale_esES.lua` | overlay ESPAGNOL (esES/esMX). | 281 |
 | `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 480 |
-| `CraftingOrderClassic_Locale_esES_3.lua` | overlay esES, 3/3. | 140 |
+| `CraftingOrderClassic_Locale_esES_3.lua` | overlay esES, 3/3. | 144 |
 | `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 430 |
 | `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 427 |
 | `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 427 |
 | `CraftingOrderClassic_Elemental.lua` | pseudo-« métier » de récolte « Élémentaire ». | 61 |
 | `CraftingOrderClassic_UI_Skin.lua` | tokens + helpers SÉMANTIQUES du skin (métiers, statuts, rareté, quantités, icônes natives) et petits widgets d'affichage. | 435 |
-| `CraftingOrderClassic_UI_Skin_Native.lua` | kit de chrome Blizzard NATIF (le « framework » UI de COC). | 473 |
+| `CraftingOrderClassic_UI_Skin_Native.lua` | kit de chrome Blizzard NATIF (le « framework » UI de COC). | 485 |
 | `CraftingOrderClassic_UI_Skin_ScrollList.lua` | la LISTE DÉFILANTE moderne du kit, palier 1 de la revue d'interface (docs/revue-ui-mainline.md). | 207 |
 | `CraftingOrderClassic_UI_Skin_SideTabs.lua` | la rangée d'ONGLETS LATÉRAUX de la fenêtre principale (palier 3 de la revue d'interface, décision D1 : « les onglets sur la droite, comme la vue métier »). | 77 |
 | `CraftingOrderClassic_UI_Skin_Inputs.lua` | les CHAMPS DE SAISIE du formulaire de commande (palier 4 de la revue d'interface) : le montant et la quantité, avec les briques du formulaire des Commandes d'artisanat de Forever (Blizzard_ProfessionsCustomerOrdersForm.xml, notre maquette) au lieu de nos InputBoxTemplate nus. | 83 |
@@ -54,12 +54,13 @@
 | `CraftingOrderClassic_UI_Gather.lua` | onglet « Récolte » : ressources de récolte (minéraux, herbes, cuirs, poissons) + demande de quantité + prix par pile + ciblage récolteur. | 269 |
 | `CraftingOrderClassic_UI_Gather_Categories.lua` | onglet « Récolte », panneau gauche : repliage des en-têtes et remplissage des lignes (en-tête de section/sous-catégorie, ou ressource). | 79 |
 | `CraftingOrderClassic_UI_Artisans_Layout.lua` | GÉOMÉTRIE de l'onglet « Artisans » (annuaire social). | 45 |
-| `CraftingOrderClassic_UI_Artisans.lua` | onglet « Artisans » : annuaire social. | 457 |
-| `CraftingOrderClassic_UI_Artisans_Groups.lua` | fusion « une ligne par JOUEUR » (rerolls). | 207 |
-| `CraftingOrderClassic_UI_Artisans_Icons.lua` | onglet « Artisans » : tout ce qui est ICÔNE de métier. | 190 |
+| `CraftingOrderClassic_UI_Artisans_Text.lua` | onglet « Artisans » : ce qu'une ligne de l'annuaire DIT. | 75 |
+| `CraftingOrderClassic_UI_Artisans.lua` | onglet « Artisans » : annuaire social. | 467 |
+| `CraftingOrderClassic_UI_Artisans_Groups.lua` | fusion « une ligne par JOUEUR » (rerolls). | 200 |
+| `CraftingOrderClassic_UI_Artisans_Icons.lua` | onglet « Artisans » : tout ce qui est ICÔNE de métier. | 189 |
 | `CraftingOrderClassic_UI_Artisans_Needs.lua` | la « BOURSE d'artisan » de l'onglet Artisans : pour un artisan du roster (partenaire, guildie, ami…), la LISTE DE COURSES des fournitures qu'il lui faut pour monter ses métiers — mats agrégés de SA route de progression (COC.Route, calculée 100 % en LOCAL depuis son rang SK diffusé + ses recettes décodées du bitfield RK ; prix Lazy Gold locaux, valables serveur entier). | 361 |
 | `CraftingOrderClassic_UI_Artisans_Muted.lua` | panel « En sourdine » de l'onglet Artisans. | 85 |
-| `CraftingOrderClassic_UI_Artisans_Channels.lua` | la section « Canaux surveillés » de l'onglet Artisans (spec docs/specs/canaux-surveilles.md, palier 3). | 134 |
+| `CraftingOrderClassic_UI_Artisans_Channels.lua` | la section « Canaux surveillés » de l'onglet Artisans (spec docs/specs/canaux-surveilles.md, palier 3). | 151 |
 | `CraftingOrderClassic_UI_Setup.lua` | le panneau de PREMIÈRE CONNEXION : où chercher les artisans ? (spec docs/specs/canaux-surveilles.md, palier 5). | 180 |
 | `CraftingOrderClassic_UI_MyArtisans_Layout.lua` | GÉOMÉTRIE de l'onglet « Mes artisans ». | 57 |
 | `CraftingOrderClassic_UI_MyArtisans.lua` | onglet « Mes artisans » : vue agrégée des métiers du COMPTE (tous mes rerolls du royaume), en mode « connu ». | 475 |
@@ -337,6 +338,8 @@
 > nos boutons de 16–24 px il monte trop haut. On le RE-ANCRE au CENTRE.
 > Contrat conservé (≈35 appelants) : `b.text` (FontString natif, ré-ancrable/mesurable/recolorable),
 > `b:SetText`/`b:GetFontString` (natifs), `b:SetSelected(on)` (enfoncé natif, reste CLIQUABLE),
+> `b:SetQuiet(on)` (rouge éteint + texte gris, reste CLIQUABLE : une action possible mais peu utile,
+> comme chuchoter à un joueur hors ligne ; ce n'est PAS `Disable()`, qui interdirait le clic),
 > `template` = variante SÉCURISÉE ("SecureActionButtonTemplate", DoCraft protégé) — NE JAMAIS RETIRER.
 > Doré plus tard (si le user tranche) : SetDesaturated(true)+SetVertexColor(or) sur b.Left/Middle/Right.
 
@@ -1177,17 +1180,29 @@
 > CraftingOrderClassic_UI_Artisans_Layout.lua — GÉOMÉTRIE de l'onglet « Artisans » (annuaire social).
 > Chargé AVANT _UI_Artisans.lua (cf. les 3 .toc). Même contrat que les Layouts Commande/Récolte :
 > SPEC = structure éditable (zones, tailles, pads), contenu dans les builders, largeurs LUES sur les
-> zones. Deux colonnes : SIDEBAR (sources + ajout de joueur) · zone principale (bande de filtre
-> métier + liste des artisans avec sa gouttière de scrollbar).
+> zones. Deux colonnes : SIDEBAR (sources et canaux surveillés + sourdine et ajout de joueur) · zone
+> principale (bande de filtre métier + liste des artisans avec sa gouttière de scrollbar).
 > Le panneau « En sourdine » (UI_Artisans_Muted) est un MODE de la zone liste : il se superpose aux
 > mêmes zones (profFilter/artisansList), le basculement reste piloté par _ShowMutedMode.
 
 **API** : `UI:ArtSec(id)`
 
+### `CraftingOrderClassic_UI_Artisans_Text.lua`
+> CraftingOrderClassic_UI_Artisans_Text.lua — onglet « Artisans » : ce qu'une ligne de l'annuaire DIT.
+> Les textes d'une ligne (couleur du nom, sous-ligne, étiquette de source) et le compte par source,
+> fabriqués sans toucher à un cadre : l'interface ne fait que les peindre, et
+> tests/test_artisans_text.lua les vérifie sans le jeu. Chargé AVANT _UI_Artisans.lua (.toc).
+> 
+> Pourquoi (refonte du 2026-09-30, docs/specs/refonte-artisans.md) : sur une capture du user, dix
+> lignes sur douze disaient « Offline · lvl ? » et « MET ». Un texte répété sur toutes les lignes
+> n'apprend rien, et il noie celui qui compte. Règle : une ligne ne dit que ce que sa pastille et la
+> bande SOURCE choisie ne disent pas déjà.
+
 ### `CraftingOrderClassic_UI_Artisans.lua`
 > CraftingOrderClassic_UI_Artisans.lua — onglet « Artisans » : annuaire social.
-> Sidebar SOURCE (Guilde/Amis/Ajoutés + compteurs) + ajout manuel ; à droite, pills de filtre
-> métier + lignes artisan (présence, niveau, métiers, source, Chuchoter). Lit Directory (cache).
+> Sidebar SOURCE (Guilde/Amis/Croisés + compteurs), canaux surveillés, sourdine et ajout manuel ; à
+> droite, pills de filtre métier + lignes artisan (présence, niveau, métiers, source, Chuchoter).
+> Lit Directory (cache). Les TEXTES d'une ligne viennent de _UI_Artisans_Text.lua (purs, testés).
 
 **API** : `UI:BuildArtisansTab(f)` · `UI:RefreshArtisans()`
 
@@ -1200,7 +1215,7 @@
 > PERSO (résolue par _ResolvePostChar via Skin.KnowsProf STRICT sur ses données directes), et
 > Skin.KnowsProf/KnowsProfOrSeen restent intacts (règle verrouillée par le SelfTest).
 > Partage le namespace UI ; chargé APRÈS CraftingOrderClassic_UI_Artisans.lua (.toc) qui exporte
-> UI._ProfsList / UI._SrcTag.
+> UI._ProfsList ; les textes d'une ligne viennent de _UI_Artisans_Text.lua, comme pour une ligne simple.
 
 ### `CraftingOrderClassic_UI_Artisans_Icons.lua`
 > CraftingOrderClassic_UI_Artisans_Icons.lua — onglet « Artisans » : tout ce qui est ICÔNE de métier.
@@ -1251,6 +1266,9 @@
 > 
 > Hauteur : la liste prend ce qui reste entre le dernier bouton SOURCE et le bloc du bas, et DÉFILE
 > quand elle dépasse. Une zone de hauteur fixe aurait été recouverte par les bandes de cercles.
+> 
+> « Configurer », à droite de l'en-tête (refonte du 2026-09-30, demande du user) : rouvre le panneau
+> de première connexion, qui n'était joignable que par /co watch setup.
 
 ### `CraftingOrderClassic_UI_Setup.lua`
 > CraftingOrderClassic_UI_Setup.lua — le panneau de PREMIÈRE CONNEXION : où chercher les artisans ?

@@ -80,15 +80,16 @@ end
 -- =========================================================================
 -- Icônes de métier d'une ligne artisan
 -- =========================================================================
--- Mise en avant du métier RENTABLE : contour doré (+ halo au palier du haut) et icône EN COULEUR,
--- pendant que les métiers non rentables sont DÉSATURÉS. C'est le contraste qui porte l'information :
--- un coup d'œil sur la colonne suffit à repérer chez qui il y a de l'or à faire.
+-- Mise en avant du métier RENTABLE : contour doré (+ halo au palier du haut). Les autres métiers
+-- restent EN COULEUR (refonte du 2026-09-30, décision du user) : avant, ils étaient désaturés, et sur
+-- la capture du jour (artisans de niveau 11 à 18, aucun plan au-dessus du seuil) TOUTES les icônes
+-- étaient grises. On ne lisait plus qui fait quoi, et la désaturation ne distinguait personne.
 -- Le palier vient du meilleur plan RÉELLEMENT connu de cet artisan (LazyGold:BestKnownPlanFor, décodé
 -- depuis son bitmask exact de recettes) ; si ce bitmask n'est pas disponible pour ce métier (fiche
 -- relayée, jamais croisé en direct), on retombe sur l'approximation par NIVEAU (BestPlanFor) — moins
 -- fiable : elle peut désigner une recette que l'artisan n'a pas apprise (PNJ/butin/quête à part),
 -- même si son niveau de métier suffirait. Seuils : doré ≥ 10 po, doré + halo ≥ 1000 po (seuil de
--- base configurable, db.lgMinProfit). Auctionator absent → aucune désaturation.
+-- base configurable, db.lgMinProfit). Auctionator absent → aucun contour.
 -- `r` = fiche roster de l'artisan (nil si indisponible → on saute direct à l'approximation).
 function UI:_SetArtProfitBorder(ic, item, r)
     local PR = COC.Profit
@@ -97,8 +98,6 @@ function UI:_SetArtProfitBorder(ic, item, r)
     local plan = on and (PR:BestKnownPlanFor(item.key, r) or PR:BestPlanFor(item.key, item.sv and item.sv[1])) or nil
     local best = plan and plan.profit
     local tier = PR:HighlightTier(best)
-    ic.tex:SetDesaturated(on and tier == 0)
-    ic.tex:SetAlpha((on and tier == 0) and 0.55 or 1)
     if tier == 0 then
         ic.border:Hide(); if ic.glow then ic.glow:Hide() end
         ic.tipProfit = nil

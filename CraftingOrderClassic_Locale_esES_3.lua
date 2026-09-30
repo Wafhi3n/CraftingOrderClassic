@@ -127,6 +127,10 @@ local es3 = {
     ["Crafteurs autour"] = "Artesanos cercanos",
     ["Tu n'es pas dans ce canal en ce moment. Ton choix est gardé pour ton retour."] =
         "No estás en este canal ahora mismo. Tu elección se guarda para cuando vuelvas.",
+    -- Refonte de l'onglet Artisans (2026-09-30) : la bande des joueurs croisés, le bouton qui rouvre le panneau
+    ["Croisés"] = "Vistos",
+    ["Configurer"] = "Configurar",
+    ["Rouvre le panneau de première connexion."] = "Vuelve a abrir el panel de la primera conexión.",
     -- Canaux surveillés : le panneau de première connexion (2026-09-30)
     ["Où chercher les artisans ?"] = "¿Dónde buscar artesanos?",
     ["L'addon trouve les artisans par les canaux que tu coches ici. Tu pourras tout changer plus tard, dans l'onglet Artisans."] =
