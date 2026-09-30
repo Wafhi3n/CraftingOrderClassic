@@ -198,7 +198,14 @@ expiré** (`ORDER_TTL`), et la portée est respectée. `RebroadcastMine` est jit
 >   nommé » pour un joueur whispé < 15 s, et d'un **sondage** quand le jeu (amis, guilde, club) le dit
 >   parti — jamais d'un effacement sur la seule foi du jeu ;
 > - la **découverte** d'inconnus passe par la communauté (`Directory_Community.lua`). Spec :
->   `docs/specs/communaute-sans-canal.md`. Les sections qui suivent décrivent le mode canal.
+>   `docs/specs/communaute-sans-canal.md`. Les sections qui suivent décrivent le mode canal ;
+> - la **salle de découverte** (TRANSPORT_REV 16, `Directory_Room.lua`) rejoint `CraftLinkNet` pour y
+>   dire bonjour en message d'ADDON (portée « room »), jamais en texte : de la REV 16 à la REV 17,
+>   `SendBeacon` y écrivait encore `CLNK1` à chaque « Poster » et `/co refresh`. En donjon, une ligne ou
+>   une arrivée du canal arrive **secrète**, et le transport la lisait sans garde : erreur Lua relevée par
+>   BugGrabber le 2026-09-25 (canal plein, Wailing Caverns) ; que la salle y mène aussi est déduit du
+>   code, pas observé. La REV 17 coupe cette balise sans canal et écarte toute valeur secrète du chat
+>   avant de la lire (`CraftLink_Sender.lua`).
 
 > ### Confinement ROYAUME de TOUT le trafic addon (TRANSPORT_REV 10, 2026-07-11)
 >

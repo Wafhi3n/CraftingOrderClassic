@@ -15,14 +15,16 @@ local CraftLink = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
 
 local function trace(msg) if COC.Trace then COC.Trace:Log("inbound", msg) end end
 
--- Même confinement que le réseau (CraftLink_Transport, sameRealmGroup) : un émetteur d'un autre
+-- Même confinement que le réseau (CraftLink_Sender, _SameRealmGroup) : un émetteur d'un autre
 -- royaume porte « -Royaume » ; on n'accepte que le mien et ceux qui lui sont connectés.
+-- `C_AutoComplete` d'abord : le global n'est qu'un alias posé par Blizzard_DeprecatedAutoComplete.
 local function sameRealmGroup(author)
     local realm = author:match("%-(.+)$")
     if not realm then return true end
     local mine = GetNormalizedRealmName and GetNormalizedRealmName()
     if mine and realm == mine then return true end
-    for _, r in ipairs((GetAutoCompleteRealms and GetAutoCompleteRealms()) or {}) do
+    local connected = (C_AutoComplete and C_AutoComplete.GetAutoCompleteRealms) or GetAutoCompleteRealms
+    for _, r in ipairs((connected and connected()) or {}) do
         if r == realm then return true end
     end
     return false
