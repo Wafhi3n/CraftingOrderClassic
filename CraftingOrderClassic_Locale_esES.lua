@@ -251,6 +251,8 @@ local es = {
     ["Don / gratuit"] = "Regalo / gratis",
     ["|cFFFF8800entrante|r |cFFFFFFFF%s|r (%s) : %s%s%s"] = "|cFFFF8800entrante|r |cFFFFFFFF%s|r (%s): %s%s%s",
     ["   |cFF33DD33» tu sais la crafter|r — vue métier › onglet Entrantes"] = "   |cFF33DD33» sabes fabricarlo|r — ventana de profesión › pestaña Entrantes",
+    ["   |cFFAAAAAA» tu ne sais pas la crafter|r — tu reçois toutes les demandes (|cFFFFFFFF/co scan all|r, réglage du compte) ; |cFFFFFFFF/co scan mine|r pour ne garder que tes recettes"] =
+        "   |cFFAAAAAA» no sabes fabricarlo|r — recibes todas las peticiones (|cFFFFFFFF/co scan all|r, ajuste de toda la cuenta); |cFFFFFFFF/co scan mine|r para quedarte solo con tus recetas",
     ["|cFFFFCC00commande pour TOI|r de |cFFFFFFFF%s|r : %s%s%s"] = "|cFFFFCC00pedido para TI|r de |cFFFFFFFF%s|r: %s%s%s",
     ["|cFFFFCC00nouvelle commande|r de |cFFFFFFFF%s|r : %s%s%s"] = "|cFFFFCC00nuevo pedido|r de |cFFFFFFFF%s|r: %s%s%s",
     ["ton artisan |cFFFFFFFF%s|r est en ligne."] = "tu artesano |cFFFFFFFF%s|r está en línea.",

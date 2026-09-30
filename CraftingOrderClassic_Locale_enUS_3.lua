@@ -97,6 +97,9 @@ local en3 = {
         "no profession known for this character yet: open your profession window once, then try again.",
     ["Copie ce texte (Ctrl+C), puis colle-le dans ta note de membre : Communautés, clic droit sur ton nom, « Note ». Les autres joueurs de Crafting Order verront tes métiers, même quand tu es hors ligne."] =
         "Copy this text (Ctrl+C), then paste it into your member note: Communities, right-click your name, \"Note\". Other Crafting Order players will see your professions, even when you're offline.",
+    -- Entrante sonnée en portée « all » sans la recette : dire pourquoi (2026-09-30)
+    ["   |cFFAAAAAA» tu ne sais pas la crafter|r — tu reçois toutes les demandes (|cFFFFFFFF/co scan all|r, réglage du compte) ; |cFFFFFFFF/co scan mine|r pour ne garder que tes recettes"] =
+        "   |cFFAAAAAA» you can't craft it|r — you get every request (|cFFFFFFFF/co scan all|r, account-wide setting); |cFFFFFFFF/co scan mine|r to keep only your recipes",
 }
 
 for k, v in pairs(en3) do L[k] = v end

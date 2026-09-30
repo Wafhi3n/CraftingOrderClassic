@@ -250,6 +250,8 @@ local de = {
     ["Don / gratuit"] = "Geschenk / gratis",
     ["|cFFFF8800entrante|r |cFFFFFFFF%s|r (%s) : %s%s%s"] = "|cFFFF8800eingehend|r |cFFFFFFFF%s|r (%s): %s%s%s",
     ["   |cFF33DD33» tu sais la crafter|r — vue métier › onglet Entrantes"] = "   |cFF33DD33» du kannst es herstellen|r — Berufsfenster › Reiter Eingehend",
+    ["   |cFFAAAAAA» tu ne sais pas la crafter|r — tu reçois toutes les demandes (|cFFFFFFFF/co scan all|r, réglage du compte) ; |cFFFFFFFF/co scan mine|r pour ne garder que tes recettes"] =
+        "   |cFFAAAAAA» du kannst es nicht herstellen|r — du erhältst alle Anfragen (|cFFFFFFFF/co scan all|r, gilt für den ganzen Account); |cFFFFFFFF/co scan mine|r, um nur deine Rezepte zu behalten",
     ["|cFFFFCC00commande pour TOI|r de |cFFFFFFFF%s|r : %s%s%s"] = "|cFFFFCC00Auftrag für DICH|r von |cFFFFFFFF%s|r: %s%s%s",
     ["|cFFFFCC00nouvelle commande|r de |cFFFFFFFF%s|r : %s%s%s"] = "|cFFFFCC00neuer Auftrag|r von |cFFFFFFFF%s|r: %s%s%s",
     ["ton artisan |cFFFFFFFF%s|r est en ligne."] = "dein Handwerker |cFFFFFFFF%s|r ist online.",

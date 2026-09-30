@@ -17,11 +17,11 @@
 | `CraftingOrderClassic_Locale.lua` | socle de localisation du CHROME de l'UI. | 12 |
 | `CraftingOrderClassic_Locale_enUS.lua` | overlay ANGLAIS (enUS/enGB). | 279 |
 | `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 499 |
-| `CraftingOrderClassic_Locale_enUS_3.lua` | overlay enUS, 3/3. | 102 |
-| `CraftingOrderClassic_Locale_deDE.lua` | overlay ALLEMAND (deDE). | 281 |
+| `CraftingOrderClassic_Locale_enUS_3.lua` | overlay enUS, 3/3. | 105 |
+| `CraftingOrderClassic_Locale_deDE.lua` | overlay ALLEMAND (deDE). | 283 |
 | `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 479 |
 | `CraftingOrderClassic_Locale_deDE_3.lua` | overlay deDE, 3/3. | 101 |
-| `CraftingOrderClassic_Locale_esES.lua` | overlay ESPAGNOL (esES/esMX). | 282 |
+| `CraftingOrderClassic_Locale_esES.lua` | overlay ESPAGNOL (esES/esMX). | 284 |
 | `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 480 |
 | `CraftingOrderClassic_Locale_esES_3.lua` | overlay esES, 3/3. | 102 |
 | `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 430 |
@@ -145,7 +145,7 @@
 | `CraftingOrderClassic_QuestSheet.lua` | FICHE DE QUÊTE réutilisable : affiche (ou fait écrire) une commande sous la forme d'une vraie quête du jeu. | 363 |
 | `CraftingOrderClassic_JournalQuests.lua` | lecture EN SEULE LECTURE du journal de quêtes du JEU, pour que le journal COC affiche les vraies quêtes à côté des commandes. | 103 |
 | `CraftingOrderClassic_JournalWin.lua` | LE JOURNAL : une fenêtre parchemin où les commandes et les vraies quêtes du joueur cohabitent par sections. | 304 |
-| `CraftingOrderClassic_Inbound.lua` | couche réseau « passive » : capte les demandes de craft postées dans /commerce (Trade) et /guilde par des joueurs SANS l'addon, alerte le joueur, et les range dans une file « Entrantes » (acceptable / ignorable). | 325 |
+| `CraftingOrderClassic_Inbound.lua` | couche réseau « passive » : capte les demandes de craft postées dans /commerce (Trade) et /guilde par des joueurs SANS l'addon, alerte le joueur, et les range dans une file « Entrantes » (acceptable / ignorable). | 331 |
 | `CraftingOrderClassic_Handoff.lua` | « garder une commande pour un ami capable ». | 286 |
 | `CraftingOrderClassic_Moderation.lua` | modération / anti-spam. | 370 |
 | `CraftingOrderClassic_LootAlert.lua` | alerte quand TU loots un objet-PLAN (recette/formule/ schéma/patron) catalogué par CraftLink, MAIS seulement s'il te CONCERNE : soit tu as le métier (candidat à l'apprendre), soit un AMI/PARTENAIRE de ton annuaire ne le connaît pas encore (candidat à un don — cf. | 165 |

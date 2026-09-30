@@ -160,6 +160,10 @@ Mesures préalables (sonde `/cocprobe annonce [services|local]`, avant tout code
 4. [humain] Le scanner de Gnomi (`/co scan all`) range la ligne de Rédemption dans ses Entrantes.
    → **Tenu** (relevé dans la SavedVariable de Gnomi) : Entrante « Linen Bandage », métier First Aid
    déduit, x1, commission lue « 2po 50pa ».
+   ⚠️ **Après le test, remettre `/co scan mine` sur Gnomi.** La portée vaut pour tout le compte et
+   survit au relog. Oubliée le 2026-09-29, elle a fait sonner le lendemain une demande de Mithril
+   Shield Spike chez Gnomi, forgeron de compétence 1 ; depuis `fix/scan-all-alerte`, l'alerte le dit
+   (« tu ne sais pas la crafter — … /co scan all »).
 
 Fonctionnalité :
 

@@ -198,7 +198,13 @@ function Inbound:Alert(e)
     e.alerted = true   -- lu par TakeOver : la commande complète ne sonnera pas une seconde fois
     pmsg((Skin and ("|T" .. Skin.tex.workorder .. ":0|t ") or "") .. msg)
     if COC.UI and COC.UI.Toast then COC.UI:Toast(msg) end
-    if e.canCraft then print(L["   |cFF33DD33» tu sais la crafter|r — vue métier › onglet Entrantes"]) end
+    if e.canCraft then print(L["   |cFF33DD33» tu sais la crafter|r — vue métier › onglet Entrantes"])
+    elseif scanScope() == "all" then
+        -- Sans la recette, seule la portée « all » sonne : on dit POURQUOI. Le réglage vaut pour tout
+        -- le compte et survit ; un `/co scan all` posé pour un test du banc et jamais retiré a fait
+        -- sonner un forgeron de compétence 1 pour une Mithril Shield Spike, sans aucun indice (2026-09-30).
+        print(L["   |cFFAAAAAA» tu ne sais pas la crafter|r — tu reçois toutes les demandes (|cFFFFFFFF/co scan all|r, réglage du compte) ; |cFFFFFFFF/co scan mine|r pour ne garder que tes recettes"])
+    end
     pcall(function() PlaySound(SOUNDKIT and SOUNDKIT.TELL_MESSAGE or 3081, "Master") end)
 end
 
