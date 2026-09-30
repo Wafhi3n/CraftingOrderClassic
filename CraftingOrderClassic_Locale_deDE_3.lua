@@ -72,8 +72,8 @@ local de3 = {
     -- Aide sans communauté officielle (2026-09-30)
     ["|cFFFFFFFF/co circle|r : tes cercles d'artisans (les communautés du jeu que tu as marquées)."] =
         "|cFFFFFFFF/co circle|r: deine Handwerkerkreise (die Spielgemeinschaften, die du markiert hast).",
-    ["Les artisans se trouvent par tes amis, ta guilde et tes cercles, par la salle de découverte (|cFFFFFFFF/co channel room|r) où les porteurs de l'addon se disent bonjour, et par les annonces sur Trade (Services) que l'addon relit."] =
-        "Handwerker finden sich über deine Freunde, deine Gilde und deine Kreise, über den Entdeckungsraum (|cFFFFFFFF/co channel room|r), in dem sich Addon-Nutzer begrüßen, und über die Ankündigungen in Handel (Dienstleistungen), die das Addon liest.",
+    ["Les artisans se trouvent par tes amis et ta guilde, et par les canaux que tu coches dans l'onglet Artisans, liste « Canaux surveillés » : Commerce, la salle de découverte, tes communautés, les joueurs autour de toi. Le bouton « Configurer » y rouvre le panneau du premier lancement."] =
+        "Handwerker finden sich über deine Freunde und deine Gilde sowie über die Kanäle, die du im Reiter „Handwerker“ unter „Beobachtete Kanäle“ anhakst: Handel, der Entdeckungsraum, deine Gemeinschaften, die Spieler um dich herum. Der Knopf „Einrichten“ öffnet dort das Fenster des ersten Starts erneut.",
     -- Aide remise à jour : onglets latéraux, cercles (2026-09-28)
     ["Ils se rangent sur le bord droit, comme ceux de la fenêtre de métier. Survole une icône pour lire son nom ; le chiffre sur le Carnet compte tes commandes en cours."] =
         "Sie sitzen am rechten Rand, wie im Berufsfenster. Fahre über ein Symbol, um seinen Namen zu lesen; die Zahl am Auftragsbuch zählt deine aktiven Aufträge.",
@@ -115,7 +115,7 @@ local de3 = {
     ["L'addon s'y présente par un message invisible aux joueurs de ta salle ; ensuite, tout passe en chuchotement."] =
         "Das Addon stellt sich dort mit einer unsichtbaren Nachricht den Spielern in deinem Raum vor; danach läuft alles per Flüstern.",
     ["salle"] = "Raum",
-    ["ANNUAIRE"] = "VERZEICHNIS",
+    ["COMMUNAUTÉS"] = "GEMEINSCHAFTEN",
     ["Les membres d'une communauté cochée rejoignent ton annuaire, même hors ligne. Aucune donnée de l'addon n'y passe."] =
         "Die Mitglieder einer angehakten Gemeinschaft kommen in dein Verzeichnis, auch offline. Es laufen keine Addon-Daten darüber.",
     ["aucune communauté"] = "keine Gemeinschaft",

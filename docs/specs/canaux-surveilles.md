@@ -21,9 +21,13 @@
 > SavedVariables des deux comptes ; aucune capture de la mise en page). Il s'ouvre 10 s après la connexion (le jeu n'a pas encore rejoint ses canaux avant),
 > jamais en combat ni en instance ; `/co watch setup` le rouvre. Restent les paliers 4 (canaux
 > perso, reporté à une version suivante par le user) et 6 (aide, nouveautés, relectures).
-> **En attente (user, 2026-09-30)** : la version sera la **v1.41.0**, mais la release attend une
-> refonte de l'onglet Artisans, dessinée par le user dans une autre session. Le palier 6 (textes
-> d'aide et de nouveautés, qui décrivent l'onglet) se fera une fois cette refonte connue.
+> La refonte de l'onglet Artisans (`docs/specs/refonte-artisans.md`, autre session) est faite le
+> 2026-09-30. Palier 6, première moitié, fait le même jour sur `feat/canaux-aide`, par-dessus elle :
+> l'Aide en jeu dit où se règle la recherche (onglet Artisans, « Canaux surveillés », bouton
+> « Configurer »), et le groupe « ANNUAIRE » de la liste devient « COMMUNAUTÉS » (constat 8 de la
+> revue de design : « Annuaire » portait trois sens). **Vus en jeu le même jour** (registre, relevés
+> 14:10 et 14:35 ; la mise en page du panneau de première connexion sur capture à 14:25). Reste, à la release
+> **v1.41.0** : les Nouveautés, le CHANGELOG, `CURSEFORGE.md`, et les relectures.
 > Cible : WoW: Forever / Camelot (16001) · Addon : Crafting Order - Classic
 >
 > Remplace, pour la découverte des artisans, la communauté officielle de

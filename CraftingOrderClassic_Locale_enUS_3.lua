@@ -73,8 +73,8 @@ local en3 = {
     -- Aide sans communauté officielle (2026-09-30)
     ["|cFFFFFFFF/co circle|r : tes cercles d'artisans (les communautés du jeu que tu as marquées)."] =
         "|cFFFFFFFF/co circle|r: your crafters' circles (the in-game communities you have marked).",
-    ["Les artisans se trouvent par tes amis, ta guilde et tes cercles, par la salle de découverte (|cFFFFFFFF/co channel room|r) où les porteurs de l'addon se disent bonjour, et par les annonces sur Trade (Services) que l'addon relit."] =
-        "Crafters find each other through your friends, your guild and your circles, through the discovery room (|cFFFFFFFF/co channel room|r) where addon users say hello, and through the Trade (Services) announcements the addon reads.",
+    ["Les artisans se trouvent par tes amis et ta guilde, et par les canaux que tu coches dans l'onglet Artisans, liste « Canaux surveillés » : Commerce, la salle de découverte, tes communautés, les joueurs autour de toi. Le bouton « Configurer » y rouvre le panneau du premier lancement."] =
+        "Crafters find each other through your friends and your guild, and through the channels you tick in the Artisans tab, under \"Watched channels\": Trade, the discovery room, your communities, the players around you. The \"Setup\" button there reopens the first-launch panel.",
     -- Aide remise à jour : onglets latéraux, cercles (2026-09-28)
     ["Ils se rangent sur le bord droit, comme ceux de la fenêtre de métier. Survole une icône pour lire son nom ; le chiffre sur le Carnet compte tes commandes en cours."] =
         "They sit along the right edge, like the ones on the profession window. Hover an icon to read its name; the number on the Ledger counts your active orders.",
@@ -116,7 +116,7 @@ local en3 = {
     ["L'addon s'y présente par un message invisible aux joueurs de ta salle ; ensuite, tout passe en chuchotement."] =
         "The addon introduces itself there with an invisible message to the players in your room; after that, everything goes by whisper.",
     ["salle"] = "room",
-    ["ANNUAIRE"] = "DIRECTORY",
+    ["COMMUNAUTÉS"] = "COMMUNITIES",
     ["Les membres d'une communauté cochée rejoignent ton annuaire, même hors ligne. Aucune donnée de l'addon n'y passe."] =
         "Members of a ticked community join your directory, even offline. No addon data travels through it.",
     ["aucune communauté"] = "no community",

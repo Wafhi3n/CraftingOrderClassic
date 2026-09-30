@@ -114,7 +114,7 @@ local function contentSocial()
             lines = {
                 L["Pas de canal de discussion : l'addon échange en chuchotements invisibles avec les joueurs de tes cercles, tes amis et ta guilde. Le seul message lisible est celui que tu choisis : la ligne sur Trade (Services), si tu coches « Annoncer en Commerce »."],
                 officialOn() and L["Les artisans se retrouvent dans la communauté |cFFFFD100Crafting Order PVE|r, une par camp. Sans cercle, l'addon t'en envoie le lien à la connexion : rejoins-la, elle devient ton cercle d'artisans."]
-                    or L["Les artisans se trouvent par tes amis, ta guilde et tes cercles, par la salle de découverte (|cFFFFFFFF/co channel room|r) où les porteurs de l'addon se disent bonjour, et par les annonces sur Trade (Services) que l'addon relit."],
+                    or L["Les artisans se trouvent par tes amis et ta guilde, et par les canaux que tu coches dans l'onglet Artisans, liste « Canaux surveillés » : Commerce, la salle de découverte, tes communautés, les joueurs autour de toi. Le bouton « Configurer » y rouvre le panneau du premier lancement."],
                 L["Statuts d'une commande : "] .. "|cFFFFCC00" .. L["En attente"] .. "|r » |cFF33CCFF" .. L["Acceptée"]
                     .. "|r » |cFF33DD33" .. L["Livrée"] .. "|r (" .. L["ou"] .. " |cFF888888" .. L["Annulée"]
                     .. "|r / |cFFFF4444" .. L["Refusée"] .. "|r).",

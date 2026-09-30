@@ -46,6 +46,63 @@ client.
 
 ## Relevés
 
+- 2026-09-30 14:35 — jusqu'a 2ee1c10 — Forever, un client, en ANGLAIS, rechargé après le déploiement
+  de 14:00 : build `main-dev@bb269de 2026-09-30 14:00` (copie déployée du `.toc` ; la phrase neuve
+  n'existe que dans ce build) — **GO sur l'Aide en jeu de `feat/canaux-aide` (`2ee1c10`)** — capture
+  du user, relue par l'agent : section « Network, privacy & statuses », deuxième ligne : « Crafters
+  find each other through your friends and your guild, and through the channels you tick in the
+  Artisans tab, under "Watched channels": Trade, the discovery room, your communities, the players
+  around you. The "Setup" button there reopens the first-launch panel. » Plus aucune mention de
+  `/co channel room`. Avec le relevé de 14:10 (groupe « COMMUNITIES »), les deux changements de la
+  branche sont vus.
+
+- 2026-09-30 14:25 — jusqu'a 95eeb93 — Forever, client de Rédemption, en ANGLAIS, en ville, toujours
+  PAS rechargé depuis 14:00 (groupe « DIRECTORY », et l'Aide montre encore l'ancienne phrase « …
+  through the discovery room (/co channel room) … ») : build `main-dev@8098928 2026-09-30 13:27`,
+  déduit, non relu par `/co version` — **GO sur le bouton « Setup » de la refonte (`95eeb93`) et,
+  enfin sur capture, sur la mise en page du panneau de première connexion (`3e973ea`)** — capture du
+  user, relue par l'agent : le clic sur « Setup » ouvre « Where to look for crafters? » par-dessus
+  l'onglet ; la phrase d'introduction ; les quatre groupes, chacun avec son explication et ses cases
+  sur deux colonnes (« Trade (Services) », « Trade », « Trade (Local) », « Guild » cochées,
+  « General » décochée ; « CraftLinkNet » cochée, « room » ; « eaze » cochée ; « Say and yell » et
+  « Crafters nearby » cochées, « in town ») ; le filet, la case « Also announce my orders and my
+  availability in Trade (Services) » cochée et sa ligne d'explication ; « Confirm » en bas à
+  droite. La fenêtre a la hauteur de son contenu, rien n'est coupé.
+  Non vu : les deux changements de `feat/canaux-aide` SUR CE CLIENT (il faut un `/reload`) ; la
+  phrase neuve de l'Aide n'est donc toujours vue nulle part.
+
+- 2026-09-30 14:15 — jusqu'a 95eeb93 — Forever, client de Rédemption, en ANGLAIS, en ville ; build
+  NON relu par `/co version` : ce client n'a pas été rechargé depuis le déploiement de 14:00 (ses
+  SavedVariables datent de 12:36, et le groupe des communautés s'y intitule encore « DIRECTORY »),
+  il tourne donc sur `main-dev@8098928 2026-09-30 13:27`, la refonte sans `feat/canaux-aide` — **GO
+  sur ce qui manquait à la refonte de l'onglet Artisans (`95eeb93`) : un joueur EN LIGNE** — capture
+  du user, relue par l'agent : « Gnomi Short », pastille verte, nom BLANC, « Whisper » ROUGE, et
+  l'étiquette « eaze » (le nom de sa communauté, plus « CIRCLE ») ; les onze autres hors ligne, nom
+  gris, « Whisper » gris ; « Syrine Lythaniel » sans préfixe « [Partner] », icône partenaire
+  allumée, étiquette « FRIEND » ; bandes « All 29 », « Guild 0 », « Friends 2 », « Met 26 »,
+  « eaze 1 » ; la liste des canaux tient entière sous cinq bandes. Pied : « 1 online · 40
+  crafter(s) » contre « All 29 » (constat 5 de la revue, toujours là).
+  Non vu : le clic sur « Setup », la phrase neuve de l'Aide.
+
+- 2026-09-30 14:10 — jusqu'a 2ee1c10 — Forever, un client, client en ANGLAIS, en ville (un autre
+  personnage du user : Rédemption figure dans sa liste) ; build déployé `main-dev@bb269de 2026-09-30
+  14:00`, branches en test `feat/canaux-aide`, `feat/refonte-artisans`, `feat/icone-commande-recue`,
+  `feat/liste-destinataires`, `feat/profit-arbitrages` (relu dans la copie déployée du `.toc`) —
+  **GO partiel sur la refonte de l'onglet Artisans (`95eeb93`) et sur le groupe « COMMUNAUTÉS »
+  (`2ee1c10`)** — deux captures du user, relues par l'agent. Onglet Artisans : bandes SOURCE « All
+  23 », « Guild 0 », « Friends 1 », « Met 22 » (plus de « Directory », « Added » absent à 0) ;
+  « Muted 0 » descendu au-dessus de « ADD A PLAYER » ; « Refresh directory » dans la barre du bas ;
+  en-tête « WATCHED CHANNELS » avec le bouton rouge « Setup » ; la liste des canaux tient ENTIÈRE
+  sans défiler (13 lignes), groupes « ANNOUNCEMENTS READ », « ADDON NETWORK », « COMMUNITIES » (le
+  nouveau nom), « AROUND ME » ; les trois canaux de Commerce actifs et cochés (en ville), « Guild »
+  grisée, « eaze » décochée, « Crafters nearby » cochée avec « in town ». Liste : douze joueurs
+  tous hors ligne, « Whisper » GRIS sur chacun, icônes de métier en couleur, sous-ligne « Offline »
+  ou « lvl N · N delivered », aucune étiquette « MET ».
+  Non vu : la phrase neuve de l'Aide (la capture de l'Aide s'arrête avant la section « Network,
+  privacy & statuses ») ; un joueur EN LIGNE (« Whisper » rouge, nom blanc) ; un partenaire sans
+  préfixe ; l'étiquette au nom de la communauté ; le clic sur « Setup ». Vu en passant : le pied dit
+  « 24 crafter(s) », la bande « All » 23 (constat 5 de la revue de design, toujours là).
+
 - 2026-09-30 12:06 — jusqu'a 3e973ea — Forever, deux clients (Rédemption, Gnomi), client en ANGLAIS ;
   build déployé `main-dev@837aa32 2026-09-30 12:02` (relu dans la copie déployée du `.toc`) — **GO
   sur le panneau de première connexion (spec canaux-surveilles, palier 5, critères 6 et 7)** —

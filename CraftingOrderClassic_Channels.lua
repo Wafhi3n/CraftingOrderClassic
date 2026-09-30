@@ -138,7 +138,9 @@ function Ch.BuildRows(joined, clubs, inGuild)
     item("guild", L["Guilde"], inGuild)
     head(L["RÉSEAU DE L'ADDON"], L["L'addon s'y présente par un message invisible aux joueurs de ta salle ; ensuite, tout passe en chuchotement."])
     item("room", "CraftLinkNet", true, L["salle"])
-    head(L["ANNUAIRE"], L["Les membres d'une communauté cochée rejoignent ton annuaire, même hors ligne. Aucune donnée de l'addon n'y passe."])
+    -- « COMMUNAUTÉS », pas « ANNUAIRE » : le mot désignait déjà une bande SOURCE et l'annuaire entier
+    -- (revue de design de l'onglet Artisans, constat 8, 2026-09-30).
+    head(L["COMMUNAUTÉS"], L["Les membres d'une communauté cochée rejoignent ton annuaire, même hors ligne. Aucune donnée de l'addon n'y passe."])
     for _, c in ipairs(clubs) do item("club:" .. c.id, c.name, true) end
     if #clubs == 0 then rows[#rows + 1] = { kind = "note", text = L["aucune communauté"] } end
     head(L["AUTOUR DE MOI"], L["Ce que les joueurs disent ou crient près de toi (les lignes LFW), et, en ville, ceux que tu vois crafter."])
