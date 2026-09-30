@@ -119,6 +119,7 @@ function Ch.SetWatched(key, on)
         db.watch = db.watch or {}
         if db.watch.notif_chat == nil then db.watch.notif_chat = Ch.IsWatched("notif_chat") end
         db.notifyScope = on and "all" or "off"
+        if COC.UI and COC.UI.RefreshOrderIndicator then COC.UI:RefreshOrderIndicator() end   -- comme /co notify
     else
         db.watch = db.watch or {}
         db.watch[key] = on
