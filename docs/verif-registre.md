@@ -46,6 +46,19 @@ client.
 
 ## Relevés
 
+- 2026-09-30 14:15 — jusqu'a 95eeb93 — Forever, client de Rédemption, en ANGLAIS, en ville ; build
+  NON relu par `/co version` : ce client n'a pas été rechargé depuis le déploiement de 14:00 (ses
+  SavedVariables datent de 12:36, et le groupe des communautés s'y intitule encore « DIRECTORY »),
+  il tourne donc sur `main-dev@8098928 2026-09-30 13:27`, la refonte sans `feat/canaux-aide` — **GO
+  sur ce qui manquait à la refonte de l'onglet Artisans (`95eeb93`) : un joueur EN LIGNE** — capture
+  du user, relue par l'agent : « Gnomi Short », pastille verte, nom BLANC, « Whisper » ROUGE, et
+  l'étiquette « eaze » (le nom de sa communauté, plus « CIRCLE ») ; les onze autres hors ligne, nom
+  gris, « Whisper » gris ; « Syrine Lythaniel » sans préfixe « [Partner] », icône partenaire
+  allumée, étiquette « FRIEND » ; bandes « All 29 », « Guild 0 », « Friends 2 », « Met 26 »,
+  « eaze 1 » ; la liste des canaux tient entière sous cinq bandes. Pied : « 1 online · 40
+  crafter(s) » contre « All 29 » (constat 5 de la revue, toujours là).
+  Non vu : le clic sur « Setup », la phrase neuve de l'Aide.
+
 - 2026-09-30 14:10 — jusqu'a 2ee1c10 — Forever, un client, client en ANGLAIS, en ville (un autre
   personnage du user : Rédemption figure dans sa liste) ; build déployé `main-dev@bb269de 2026-09-30
   14:00`, branches en test `feat/canaux-aide`, `feat/refonte-artisans`, `feat/icone-commande-recue`,
