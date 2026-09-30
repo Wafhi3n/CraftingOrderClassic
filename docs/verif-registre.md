@@ -46,6 +46,24 @@ client.
 
 ## Relevés
 
+- 2026-09-30 16:15 — jusqu'a f677875 — Forever, 2 comptes (Gnomi = #1, Rédemption = #4), build
+  `main-dev@7a5139d 2026-09-30 15:38` avec icone-commande-recue, liste-destinataires,
+  profit-arbitrages, valeurs-secretes-canal (copie déployée du `.toc` ; `TRANSPORT_REV = 17` et
+  `CraftLink_Sender.lua` relus dans la copie déployée, `17 1` PAS relu en jeu) — **GO sur la salle
+  hors donjon, NO-GO faute de chemin sur les valeurs secrètes** — traces des deux comptes relues par
+  l'agent après `/reload` : salle rejointe (Rédemption idx 7 à 15:53:35, Gnomi idx 6 à 15:54:20) ;
+  le bonjour de Gnomi part sur la salle en message d'addon et arrive chez Rédemption
+  (`[recv] CHANNEL Gnomi Short : HI|SK…` à 15:54:25, puis 15:58:37 au « Poster »/refresh) ; aucune
+  balise texte émise par les deux comptes (zéro `[send]` de balise), aucune ligne `CLNK1` dans le
+  chat (vu par le user). La ligne témoin tapée à la main par Gnomi (`CLNK1 x`) arrive chez
+  Rédemption à 16:00:17, lisible. **En donjon, le verrou du chat ne s'est pas levé** (sonde
+  `C_RestrictedActions.GetAddOnRestrictionState(0..5)`, Rédemption) : hors combat carte=2, le reste 0,
+  `InChatMessagingLockdown()` = false ; en combat contre des monstres, combat=2 et carte=2, chat=0,
+  false. BugGrabber vide des deux côtés pour la séance (dernière erreur : 09:27 sur #4). Ce vide ne
+  prouve donc RIEN sur le correctif : le texte n'est jamais arrivé secret. Le crash du 2026-09-25
+  venait du Général des Cavernes des lamentations ; reste à lever le verrou (boss = restriction 1,
+  ou JcJ = 3), puis le témoin REV 16.
+
 - 2026-09-30 14:35 — jusqu'a 2ee1c10 — Forever, un client, en ANGLAIS, rechargé après le déploiement
   de 14:00 : build `main-dev@bb269de 2026-09-30 14:00` (copie déployée du `.toc` ; la phrase neuve
   n'existe que dans ce build) — **GO sur l'Aide en jeu de `feat/canaux-aide` (`2ee1c10`)** — capture
