@@ -46,6 +46,23 @@ client.
 
 ## Relevés
 
+- 2026-09-30 16:30 — jusqu'a f677875 — Forever, 2 comptes, même build `main-dev@7a5139d 2026-09-30
+  15:38` que le relevé de 16:15, Rédemption en donjon (le déclencheur exact du verrou, boss ou non,
+  n'a pas été relevé) — **GO sur les lignes de canal SECRÈTES (chemin texte), avec témoin dans le même
+  événement** — `!BugGrabber.lua` et traces relus par l'agent après `/reload` des deux comptes : à
+  16:27:42 un chuchotement d'addon de Rédemption est refusé (`verrouillage d'instance : message
+  perdu`, AddOnMessageLockdown) ; à 16:27:49 Gnomi envoie `CLNK1 x` sur CraftLinkNet (canal 6,
+  DevMacro) ; la même seconde, chez Rédemption, **COCMonitor** (outil local, non corrigé) lève
+  `COCMonitor_Channel.lua:36: attempt to compare local 'author' (a secret string value…)` avec
+  `chan="CraftLinkNet"`, `author=<secret string>`, `text=<secret string>` : la ligne est donc bien
+  arrivée secrète à tous les lecteurs de `CHAT_MSG_CHANNEL`. Rien de `CraftLink_*` ni de
+  `CraftingOrderClassic*` dans BugGrabber (l'ancien code levait en `Transport.lua:160`/`:396`, cf.
+  2026-09-25), et la trace de Rédemption ne note aucune balise reçue : la ligne est écartée sans
+  bruit. Vu en passant : à 16:21:37, `C_ChatInfo.SendChatMessage` vers le canal lancé par un addon
+  sur le compte verrouillé est BLOQUÉ (`ADDON_ACTION_BLOCKED`, `*** ForceTaint_Strong ***`).
+  **Pas vu** : le chemin présence (`CHAT_MSG_CHANNEL_JOIN`/`_LEAVE` sous verrou, déconnexion de Gnomi
+  pendant que Rédemption est verrouillé), ni `17 1` affiché en jeu, ni la sonde sous verrou.
+
 - 2026-09-30 16:15 — jusqu'a f677875 — Forever, 2 comptes (Gnomi = #1, Rédemption = #4), build
   `main-dev@7a5139d 2026-09-30 15:38` avec icone-commande-recue, liste-destinataires,
   profit-arbitrages, valeurs-secretes-canal (copie déployée du `.toc` ; `TRANSPORT_REV = 17` et
