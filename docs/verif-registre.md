@@ -46,6 +46,21 @@ client.
 
 ## Relevés
 
+- 2026-09-30 14:25 — jusqu'a 95eeb93 — Forever, client de Rédemption, en ANGLAIS, en ville, toujours
+  PAS rechargé depuis 14:00 (groupe « DIRECTORY », et l'Aide montre encore l'ancienne phrase « …
+  through the discovery room (/co channel room) … ») : build `main-dev@8098928 2026-09-30 13:27`,
+  déduit, non relu par `/co version` — **GO sur le bouton « Setup » de la refonte (`95eeb93`) et,
+  enfin sur capture, sur la mise en page du panneau de première connexion (`3e973ea`)** — capture du
+  user, relue par l'agent : le clic sur « Setup » ouvre « Where to look for crafters? » par-dessus
+  l'onglet ; la phrase d'introduction ; les quatre groupes, chacun avec son explication et ses cases
+  sur deux colonnes (« Trade (Services) », « Trade », « Trade (Local) », « Guild » cochées,
+  « General » décochée ; « CraftLinkNet » cochée, « room » ; « eaze » cochée ; « Say and yell » et
+  « Crafters nearby » cochées, « in town ») ; le filet, la case « Also announce my orders and my
+  availability in Trade (Services) » cochée et sa ligne d'explication ; « Confirm » en bas à
+  droite. La fenêtre a la hauteur de son contenu, rien n'est coupé.
+  Non vu : les deux changements de `feat/canaux-aide` SUR CE CLIENT (il faut un `/reload`) ; la
+  phrase neuve de l'Aide n'est donc toujours vue nulle part.
+
 - 2026-09-30 14:15 — jusqu'a 95eeb93 — Forever, client de Rédemption, en ANGLAIS, en ville ; build
   NON relu par `/co version` : ce client n'a pas été rechargé depuis le déploiement de 14:00 (ses
   SavedVariables datent de 12:36, et le groupe des communautés s'y intitule encore « DIRECTORY »),
