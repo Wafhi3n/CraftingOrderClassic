@@ -46,6 +46,21 @@ client.
 
 ## Relevés
 
+- 2026-09-30 18:25 — jusqu'a 8350171 — Forever, 2 comptes, client en ANGLAIS, en ville ; build
+  `main-dev@5ead49b 2026-09-30 18:06` avec icone-commande-recue, liste-destinataires,
+  profit-arbitrages (copie déployée du `.toc` ; chargé : les commandes DevMacro déployées à 18:07 ont
+  tourné à 18:15) — **GO sur l'icône par métier (critères 5 et 6), sauf le clic d'un métier que le
+  perso n'a pas** — `DevMacroDB.log` de Rédemption : 3 commandes de test posées à 18:15:28, effacées
+  à 18:16:24 ; le user rapporte les icônes, leurs nombres et leur disparition « ok ». Deux comptes :
+  Gnomi passe `Gnomi Short-28` puis `-29` (enchant, nommées pour Rédemption, 18:16:52 et 18:17:10),
+  Rédemption accepte `-29` puis `-28` (18:18:39, 18:18:48), relâche `-28` (NACK 18:19:01), Gnomi
+  l'annule (18:19:08) : traces des deux comptes relues par l'agent, compteurs à l'écran jugés « ok »
+  par le user. **Écart** : sur Rédemption (sans Couture), le clic sur l'icône Couture ouvre le LIVRE DES
+  MÉTIERS de Blizzard (« Professions » : Herbalism, Enchanting, Cooking, Fishing, First Aid ; capture
+  du user) au lieu d'écrire la liste dans le chat ; l'icône
+  reste (attendu, c'est un état). La spec ne tranche pas le cas « métier que le perso n'a pas »
+  (elle ne parle que du métier inconnu). **Pas vu** : l'infobulle mot pour mot, le taint (critère 7).
+
 - 2026-09-28 13:20 — jusqu'a bd78702 — Forever, même build `main-dev@1ec0ce0` — **complément au relevé
   de 13:16** — rapporté par le user : mode Édition testé, aucune erreur (que l'icône ait été affichée
   à ce moment n'est pas précisé). Combat et `taintLog 1` non mentionnés : le critère 7 reste partiel.
