@@ -40,6 +40,16 @@ local en3 = {
     -- Icône « une commande t'attend » de la barre de la minicarte (2026-09-28)
     ["Commandes à ton nom : %d"] = "Orders in your name: %d",
     ["pour %s"] = "for %s",
+    -- 3e tour : le clic vers le perso qui sait faire, les commandes non nommées (2026-09-30)
+    ["Pour ta guilde ou tes amis : %d"] = "For your guild or friends: %d",
+    ["Pour tous : %d"] = "For everyone: %d",
+    ["Clic : ouvrir %s de %s."] = "Click: open %s (%s).",
+    ["Clic : voir pourquoi."] = "Click: see why.",
+    ["Hors combat seulement."] = "Out of combat only.",
+    ["Où l'apprendre : %s"] = "Where to learn it: %s",
+    ["Aucun de tes persos ne sait faire %s."] = "None of your characters can make %s.",
+    ["%d commandes attendent dans ce métier."] = "%d orders are waiting in this profession.",
+    ["Ouvrir la fenêtre de métier"] = "Open the profession window",
 }
 
 for k, v in pairs(en3) do L[k] = v end

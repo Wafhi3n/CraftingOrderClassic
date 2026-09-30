@@ -18,7 +18,8 @@
 --       def.onClick(button)        -- facultatif
 --   UI:SetIndicator(key, shown[, count])
 --                                  -- l'allume ou l'éteint ; rend vrai si la barre existe. `count` :
---                                  -- un nombre dans le coin bas droit, comme un objet des sacs (nil = rien)
+--                                  -- un nombre dans le coin bas droit, comme un objet des sacs (nil = rien) ;
+--                                  -- 4e argument `color` = { r, g, b } du nombre (défaut : blanc)
 -- Le cadre n'est créé qu'au premier allumage. Sans la barre (hors Forever), SetIndicator ne fait rien.
 -- La barre n'est recomposée (`Layout`) que quand une icône apparaît ou disparaît : un nombre qui change
 -- ne touche qu'au texte.
@@ -76,16 +77,19 @@ function UI:DefineIndicator(key, def)
 end
 
 -- Le nombre du coin, créé au premier usage. Police et coin de l'objet des sacs (NumberFontNormal).
-local function setCount(f, count)
+-- `color` = { r, g, b } optionnel ; sans lui, le blanc de la police.
+local function setCount(f, count, color)
     if count == nil and not f.count then return end
     if not f.count then
         f.count = f:CreateFontString(nil, "OVERLAY", "NumberFontNormal")
         f.count:SetPoint("BOTTOMRIGHT", 1, -1)
     end
     f.count:SetText(count and tostring(count) or "")
+    local c = color or { 1, 1, 1 }
+    if f.count.SetTextColor then f.count:SetTextColor(c[1], c[2], c[3]) end
 end
 
-function UI:SetIndicator(key, shown, count)
+function UI:SetIndicator(key, shown, count, color)
     local b, ind = bar(), self._indicators[key]
     if not (b and ind) then return false end
     if not ind.frame then
@@ -93,7 +97,7 @@ function UI:SetIndicator(key, shown, count)
         ind.frame = build(b, ind.def)
     end
     local f, want = ind.frame, shown and true or false
-    setCount(f, count)
+    setCount(f, count, color)
     if f:IsShown() == want then return true end
     f:SetShown(want)
     if b.Layout then b:Layout() end   -- la barre se recompose : l'icône prend ou rend sa place

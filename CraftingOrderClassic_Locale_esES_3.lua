@@ -40,6 +40,16 @@ local es3 = {
     -- Icône « une commande t'attend » de la barre de la minicarte (2026-09-28)
     ["Commandes à ton nom : %d"] = "Pedidos a tu nombre: %d",
     ["pour %s"] = "para %s",
+    -- 3e tour : le clic vers le perso qui sait faire, les commandes non nommées (2026-09-30)
+    ["Pour ta guilde ou tes amis : %d"] = "Para tu hermandad o tus amigos: %d",
+    ["Pour tous : %d"] = "Para todos: %d",
+    ["Clic : ouvrir %s de %s."] = "Clic: abrir %s de %s.",
+    ["Clic : voir pourquoi."] = "Clic: ver por qué.",
+    ["Hors combat seulement."] = "Solo fuera de combate.",
+    ["Où l'apprendre : %s"] = "Dónde aprenderla: %s",
+    ["Aucun de tes persos ne sait faire %s."] = "Ninguno de tus personajes sabe hacer %s.",
+    ["%d commandes attendent dans ce métier."] = "%d pedidos esperan en esta profesión.",
+    ["Ouvrir la fenêtre de métier"] = "Abrir la ventana de profesión",
 }
 
 for k, v in pairs(es3) do L[k] = v end
