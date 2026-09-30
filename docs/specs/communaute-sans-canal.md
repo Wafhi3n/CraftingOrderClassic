@@ -1,5 +1,11 @@
 # Réseau sans canal : la communauté remplace CraftLinkNet
 
+> **Remplacée pour la découverte des artisans** : la communauté officielle « Crafting Order PVE » a
+> été détruite par le user le 2026-09-30 (`Dir.OFFICIAL_ON = false`). Chacun coche désormais ses
+> propres communautés dans la liste « Canaux surveillés » de l'onglet Artisans (spec
+> `canaux-surveilles.md`, publiée en v1.41.0). Le reste de cette spec (le réseau en chuchotement, le
+> canal coupé comme transport) tient toujours.
+>
 > État : **implémentée** (branche `feat/communaute-sans-canal`, 3 dépôts) · Rédigée le 2026-09-28 ·
 > Décisions de produit prises par le user le 2026-09-27 (canal coupé pour tous, lien cliquable à la
 > connexion) · Critères [humain] 12 à 16 **jamais observés en jeu**
