@@ -13,8 +13,8 @@
 > Trade (Local) en français, allemand et espagnol reste à mesurer (reconnu à sa forme).
 > Palier 3 (la section de l'onglet Artisans, `CraftingOrderClassic_UI_Artisans_Channels.lua`, lignes
 > fabriquées par `Channels.BuildRows`, `tests/test_channel_rows.lua`) fait le 2026-09-30, **critères
-> 1 et 2 tenus en jeu le même jour** (registre, relevé 11:25 : capture hors capitale, le reste
-> rapporté par le user) ; critère 5 pas vu. Écarts avec la maquette, voir § Décisions du 2026-09-30
+> 1, 2 et 5 tenus en jeu le même jour** (registre, relevés 11:25 et 11:40 : capture hors capitale,
+> communauté « eaze » cochée, Gnomi dans l'annuaire). Écarts avec la maquette, voir § Décisions du 2026-09-30
 > (palier 3). Restent les paliers 4 (canaux perso), 5 (panneau de première connexion) et 6 (aide,
 > nouveautés, relectures).
 > Cible : WoW: Forever / Camelot (16001) · Addon : Crafting Order - Classic

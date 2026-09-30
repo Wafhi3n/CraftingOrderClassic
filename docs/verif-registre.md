@@ -46,6 +46,15 @@ client.
 
 ## Relevés
 
+- 2026-09-30 11:40 — jusqu'a 15c7a02 — Forever, client en ANGLAIS, même build `main-dev@5e90b86
+  2026-09-30 11:17` — **GO sur une communauté cochée dont les membres entrent dans l'annuaire (spec
+  canaux-surveilles, critère 5)** — capture du user, après avoir fait entrer Gnomi dans sa communauté
+  de test « eaze » et coché sa ligne : une bande « eaze », compteur 1, est née dans SOURCE ;
+  sélectionnée, elle liste « Gnomi Short — Online · lvl 2 », étiquette « CIRCLE ». La liste des
+  canaux commence sous cette septième bande, plus courte, et défile toujours (« Trade (Services) »,
+  « Trade », « Trade (Local) » grisés « in town », « Guild » cochée, « CraftLinkNet » décochée,
+  « eaze » cochée). Non vu : plusieurs communautés cochées (une seule suivie en présence).
+
 - 2026-09-30 11:25 — jusqu'a 15c7a02 — Forever, un client (Rédemption), client en ANGLAIS ; build
   déployé `main-dev@5e90b86 2026-09-30 11:17`, branches en test `feat/canaux-surveilles`,
   `feat/icone-commande-recue`, `feat/liste-destinataires`, `feat/profit-arbitrages` (relu dans la
