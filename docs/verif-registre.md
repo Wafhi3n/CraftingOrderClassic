@@ -46,6 +46,25 @@ client.
 
 ## Relevés
 
+- 2026-09-30 14:10 — jusqu'a 2ee1c10 — Forever, un client, client en ANGLAIS, en ville (un autre
+  personnage du user : Rédemption figure dans sa liste) ; build déployé `main-dev@bb269de 2026-09-30
+  14:00`, branches en test `feat/canaux-aide`, `feat/refonte-artisans`, `feat/icone-commande-recue`,
+  `feat/liste-destinataires`, `feat/profit-arbitrages` (relu dans la copie déployée du `.toc`) —
+  **GO partiel sur la refonte de l'onglet Artisans (`95eeb93`) et sur le groupe « COMMUNAUTÉS »
+  (`2ee1c10`)** — deux captures du user, relues par l'agent. Onglet Artisans : bandes SOURCE « All
+  23 », « Guild 0 », « Friends 1 », « Met 22 » (plus de « Directory », « Added » absent à 0) ;
+  « Muted 0 » descendu au-dessus de « ADD A PLAYER » ; « Refresh directory » dans la barre du bas ;
+  en-tête « WATCHED CHANNELS » avec le bouton rouge « Setup » ; la liste des canaux tient ENTIÈRE
+  sans défiler (13 lignes), groupes « ANNOUNCEMENTS READ », « ADDON NETWORK », « COMMUNITIES » (le
+  nouveau nom), « AROUND ME » ; les trois canaux de Commerce actifs et cochés (en ville), « Guild »
+  grisée, « eaze » décochée, « Crafters nearby » cochée avec « in town ». Liste : douze joueurs
+  tous hors ligne, « Whisper » GRIS sur chacun, icônes de métier en couleur, sous-ligne « Offline »
+  ou « lvl N · N delivered », aucune étiquette « MET ».
+  Non vu : la phrase neuve de l'Aide (la capture de l'Aide s'arrête avant la section « Network,
+  privacy & statuses ») ; un joueur EN LIGNE (« Whisper » rouge, nom blanc) ; un partenaire sans
+  préfixe ; l'étiquette au nom de la communauté ; le clic sur « Setup ». Vu en passant : le pied dit
+  « 24 crafter(s) », la bande « All » 23 (constat 5 de la revue de design, toujours là).
+
 - 2026-09-30 12:06 — jusqu'a 3e973ea — Forever, deux clients (Rédemption, Gnomi), client en ANGLAIS ;
   build déployé `main-dev@837aa32 2026-09-30 12:02` (relu dans la copie déployée du `.toc`) — **GO
   sur le panneau de première connexion (spec canaux-surveilles, palier 5, critères 6 et 7)** —
