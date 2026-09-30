@@ -46,6 +46,21 @@ client.
 
 ## Relevés
 
+- 2026-09-30 19:06 — jusqu'a 92c52a1 — Forever, client de Rédemption, en ANGLAIS, en ville ; build
+  `main-dev@48bcc3f 2026-09-30 19:02` avec icone-commande-recue, liste-destinataires, options-notifs,
+  profit-arbitrages (copie déployée du `.toc`) — **GO sur le 3e tour de l'icône (critère 11 a, b, c, e,
+  f)** — commandes de test DevMacro relues par l'agent dans `DevMacroDB.log` : (a) Couture nommée pour
+  Anatarion, (b) Forge que personne ne sait, (c) Cuir « à tous » que Sheadra sait. Premier essai
+  (`main-dev@52894f9`, 18:57) : couleurs vues par le user (Couture et Forge bleues, Cuir jaune, puis
+  bleu après (e), la nommée pour Sheadra) ; **défaut trouvé** : après une fenêtre de métier native, le
+  2e clic n'ouvrait plus la vue reroll (ancres effacées au détachement) → `92c52a1`. Second essai : vue
+  d'Anatarion ouverte (détache 19:04:02), fenêtre native ouverte puis fermée (19:04:20-25), vue rouverte
+  (19:04:27) et vue par le user ; popup de la Forge « aucun problème » ; mode daltonien coché : `/dm 3`
+  (19:05:47) rend `daltonien : true`, nommées en vermillon `0.84,0.37,0.00`, « à tous » en jaune
+  `0.94,0.89,0.26`, clic Couture → `reroll Anatarion`, Forge → `popup`, Cuir → `reroll Sheadra`.
+  BugGrabber vide depuis 19:01. **Pas vu** : (d) le vert guilde/amis (l'addon ne connaît ni guilde ni
+  ami sur Rédemption), le critère 12 à deux comptes, le taint (critère 7), la popup mot pour mot.
+
 - 2026-09-30 18:25 — jusqu'a 8350171 — Forever, 2 comptes, client en ANGLAIS, en ville ; build
   `main-dev@5ead49b 2026-09-30 18:06` avec icone-commande-recue, liste-destinataires,
   profit-arbitrages (copie déployée du `.toc` ; chargé : les commandes DevMacro déployées à 18:07 ont
