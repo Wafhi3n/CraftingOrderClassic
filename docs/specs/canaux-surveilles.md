@@ -1,6 +1,8 @@
 # Canaux surveillés : le joueur choisit où l'addon cherche les artisans
 
-> État : **validée** le 2026-09-30 par le user · Idée et décisions du user, mise en forme par l'agent ·
+> État : **implémentée et publiée en v1.41.0** le 2026-09-30 (tag sur `e4fa2ee`), paliers 1, 2, 3, 5 et 6 ;
+> le palier 4 (canaux perso) reste ouvert pour une version suivante · Validée le 2026-09-30 par le
+> user · Idée et décisions du user, mise en forme par l'agent ·
 > Maquette (artefact Design, 3 écrans) : https://claude.ai/artifact/BruefzxEXeUWnMExCvo3bv
 > Implémentation : palier 1 (reconnaître un canal du jeu, `CraftingOrderClassic_Channels.lua`,
 > `tests/test_channels.lua`) fait le 2026-09-30, critère 9 tenu en test ; palier 2 (une case par
@@ -26,8 +28,10 @@
 > l'Aide en jeu dit où se règle la recherche (onglet Artisans, « Canaux surveillés », bouton
 > « Configurer »), et le groupe « ANNUAIRE » de la liste devient « COMMUNAUTÉS » (constat 8 de la
 > revue de design : « Annuaire » portait trois sens). **Vus en jeu le même jour** (registre, relevés
-> 14:10 et 14:35 ; la mise en page du panneau de première connexion sur capture à 14:25). Reste, à la release
-> **v1.41.0** : les Nouveautés, le CHANGELOG, `CURSEFORGE.md`, et les relectures.
+> 14:10 et 14:35 ; la mise en page du panneau de première connexion sur capture à 14:25). Seconde
+> moitié faite pour la release : Nouveautés, CHANGELOG, `CURSEFORGE.md` ; relectures
+> `api-gotcha-reviewer` et `locale-auditor` sans bloquant (leurs mineurs attendent la version
+> suivante, avec le palier 4).
 > Cible : WoW: Forever / Camelot (16001) · Addon : Crafting Order - Classic
 >
 > Remplace, pour la découverte des artisans, la communauté officielle de
