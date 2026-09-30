@@ -46,6 +46,24 @@ client.
 
 ## Relevés
 
+- 2026-09-30 11:25 — jusqu'a 15c7a02 — Forever, un client (Rédemption), client en ANGLAIS ; build
+  déployé `main-dev@5e90b86 2026-09-30 11:17`, branches en test `feat/canaux-surveilles`,
+  `feat/icone-commande-recue`, `feat/liste-destinataires`, `feat/profit-arbitrages` (relu dans la
+  copie déployée du `.toc`) — **GO sur la section « Canaux surveillés » de l'onglet Artisans (spec
+  canaux-surveilles, palier 3, critères 1 et 2)** — capture du user, prise HORS capitale (le chat
+  montre « Left Channel: Trade (Services) ») : la section « WATCHED CHANNELS » sous la bande
+  « Muted » ; « Trade » et « Trade (Local) » grisés, cochés, avec « in town » ; « General » actif,
+  décoché ; « Guild » cochée ; « ADDON NETWORK » : « CraftLinkNet », décochée (la salle est coupée),
+  « room » ; « DIRECTORY » : « eaze », la communauté que le user vient de créer, décochée ; « AROUND
+  ME » : « Say and yell » cochée, « Crafters nearby » décochée, « in town ». La barre fine est là
+  et la liste a défilé (le premier en-tête et « Trade (Services) » sont au-dessus). Le bloc du bas
+  (« Refresh directory », « ADD A PLAYER », le champ) sans chevauchement. Un canal perso rejoint
+  pendant l'essai (« 6. azeaz ») n'a pas de ligne, comme prévu avant le palier 4.
+  Rapporté par le user (« tout est ok », sur la fiche donnée) sans capture : la vue en capitale, les
+  clics, `/co watch general on` et `/co crafters on` onglet ouvert, les infobulles.
+  Non vu : une communauté COCHÉE dont les membres entrent dans l'annuaire (critère 5 : « eaze » n'a
+  qu'un membre), la liste avec des bandes de cercles, un client français, allemand ou espagnol.
+
 - 2026-09-30 11:02 — jusqu'a 86c6f16 — Forever, deux clients, même build `main-dev@507b82e 2026-09-30
   10:35`, salle toujours coupée, comptes « oubliés » — **GO sur la seconde moitié du critère 3 de la
   spec canaux-surveilles : la case recochée laisse de nouveau entrer la ligne** — traces des deux
