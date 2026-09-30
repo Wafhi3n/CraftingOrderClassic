@@ -46,6 +46,19 @@ client.
 
 ## Relevés
 
+- 2026-09-30 18:25 — jusqu'a 595290c — Forever, 2 comptes, client en ANGLAIS, en ville ; build
+  `main-dev@5ead49b 2026-09-30 18:06` avec icone-commande-recue, liste-destinataires,
+  profit-arbitrages (copie déployée du `.toc`) — **GO sur le reste du destinataire en une liste** —
+  capture du user : liste « Friends », ligne « All friends » avec l'icône Amis, case « Announce in
+  Trade » grisée à droite de « Everyone with the addon » ; le user confirme que la case suit la règle
+  (grisée pour la guilde, un artisan, hors capitale, rendue en ville) et « tout est ok » pour le reste
+  de la liste du relevé de 09:17. Commande à tous annoncée depuis la case, traces relues par l'agent :
+  Rédemption `annonce Rédemption Wafhien-13 sur Trade (Services) - English` et `ORD|NEW` à Gnomi
+  (18:21:08) ; Gnomi reçoit la ligne (`[inbound] annonce Rédemption Wafhien-13`) et la commande la
+  même seconde. **Pas vu en détail** (couvert par le « tout est ok » global, sans capture) :
+  « Pick a recipe first. », la colonne sombre de l'onglet Commande, le retour de la case à l'entrée
+  en ville.
+
 - 2026-09-30 09:29 — jusqu'a 09fce32 — Forever, client en ANGLAIS, un seul compte regardé ; build
   déployé `main-dev@3cbaee8 2026-09-30 09:25` (relu dans la copie déployée du `.toc` ; mêmes branches
   en test que le relevé de 09:17) — **GO sur les marges des encarts** (« tout en retrait », choix du
