@@ -102,6 +102,31 @@ local en3 = {
         "the CraftLink library failed to load: the addon's network is off (directory, orders). Type |cFFFFFFFF/reload|r; if it keeps happening, reinstall the addon.",
     -- Canaux surveillés : l'origine d'une entrante lue sur le canal Général (2026-09-30)
     ["général"] = "general",
+    -- Canaux surveillés : la section de l'onglet Artisans (2026-09-30)
+    ["CANAUX SURVEILLÉS"] = "WATCHED CHANNELS",
+    ["ANNONCES LUES"] = "ANNOUNCEMENTS READ",
+    ["L'addon y lit les demandes, les dispos et les annonces des autres joueurs de l'addon. Il n'écrit que sur Trade (Services), et seulement si tu coches « Annoncer en Commerce »."] =
+        "The addon reads requests, availability lines and other addon users' announcements there. It only writes in Trade (Services), and only if you tick \"Announce in Trade\".",
+    ["Commerce (Services)"] = "Trade (Services)",
+    ["Commerce"] = "Trade",
+    ["Commerce (local)"] = "Trade (Local)",
+    ["Général"] = "General",
+    ["en ville"] = "in town",
+    ["RÉSEAU DE L'ADDON"] = "ADDON NETWORK",
+    ["L'addon s'y présente par un message invisible aux joueurs de ta salle ; ensuite, tout passe en chuchotement."] =
+        "The addon introduces itself there with an invisible message to the players in your room; after that, everything goes by whisper.",
+    ["salle"] = "room",
+    ["ANNUAIRE"] = "DIRECTORY",
+    ["Les membres d'une communauté cochée rejoignent ton annuaire, même hors ligne. Aucune donnée de l'addon n'y passe."] =
+        "Members of a ticked community join your directory, even offline. No addon data travels through it.",
+    ["aucune communauté"] = "no community",
+    ["AUTOUR DE MOI"] = "AROUND ME",
+    ["Ce que les joueurs disent ou crient près de toi (les lignes LFW), et, en ville, ceux que tu vois crafter."] =
+        "What players say or yell near you (LFW lines) and, in town, the ones you see crafting.",
+    ["Dire et crier"] = "Say and yell",
+    ["Crafteurs autour"] = "Crafters nearby",
+    ["Tu n'es pas dans ce canal en ce moment. Ton choix est gardé pour ton retour."] =
+        "You're not in this channel right now. Your choice is kept for when you're back.",
 }
 
 for k, v in pairs(en3) do L[k] = v end

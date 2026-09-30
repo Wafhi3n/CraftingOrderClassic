@@ -198,10 +198,10 @@ local es2 = {
         "El destinatario: toda la fuente o un recolector concreto.",
 
     -- Aide contextuelle « bouton i » — onglet Artisans (cf. _UI_HelpPlate.lua)
-    ["Filtre l'annuaire par source : guilde, amis, ajoutés manuellement, croisés, ou les joueurs en sourdine."] =
-        "Filtra el directorio por fuente: hermandad, amigos, añadidos manualmente, encontrados recientemente, o jugadores silenciados.",
-    ["Ajoute un joueur manuellement (+), rafraîchis l'annuaire, ou active le repérage."] =
-        "Añade un jugador manualmente (+), actualiza el directorio o activa el rastreo.",
+    ["Filtre l'annuaire par source : guilde, amis, ajoutés manuellement, croisés, ou les joueurs en sourdine. Dessous, les canaux que l'addon surveille : coche ceux où il doit chercher des artisans."] =
+        "Filtra el directorio por fuente: hermandad, amigos, añadidos manualmente, encontrados recientemente, o jugadores silenciados. Debajo, los canales que el addon vigila: marca aquellos donde debe buscar artesanos.",
+    ["Ajoute un joueur manuellement (+) ou rafraîchis l'annuaire."] =
+        "Añade un jugador manualmente (+) o actualiza el directorio.",
     ["Filtre les artisans par métier."] = "Filtra los artesanos por profesión.",
     ["La liste des artisans connus. Survole un nom pour ses métiers ; pastille verte = a l'addon et répond, jaune = en ligne sans l'addon, grise = hors ligne."] =
         "La lista de artesanos conocidos. Pasa el ratón por un nombre para ver sus profesiones; punto verde = tiene el addon y responde, amarillo = en línea sin el addon, gris = desconectado.",

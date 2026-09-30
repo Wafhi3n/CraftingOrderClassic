@@ -32,6 +32,11 @@ Ch.KEYS = { "trade_services", "trade", "trade_local", "general" }   -- ordre d'a
 local TRADE   = { "trade", "commerce", "échange", "Échange", "echange", "handel", "comercio" }
 local SERVICE = { "servic", "dienst" }
 local GENERAL = { "general", "général", "allgemein" }
+-- Les noms COURTS du jeu, ceux de la fenêtre Chat Channels (GetChannelDisplayInfo ; mesurés le
+-- 2026-09-30, client anglais) : « Services » et « TradeLocal ». La liste et les lecteurs passent par
+-- les noms LONGS (GetChannelName, CHAT_MSG_CHANNEL) ; ceci évite seulement une réponse FAUSSE à qui
+-- donnerait un nom court (« TradeLocal » se lisait Trade, « Services » rien).
+local SHORT = { services = "trade_services", tradelocal = "trade_local" }
 
 local function has(low, list)
     for _, w in ipairs(list) do if low:find(w, 1, true) then return true end end
@@ -53,6 +58,7 @@ function Ch.KeyOf(name)
     local base = Ch.BaseName(name)
     if not base or base == "" then return nil end
     local low = base:lower()
+    if SHORT[low] then return SHORT[low] end
     if has(low, TRADE) then
         if has(low, SERVICE) then return "trade_services" end
         if low:find("(", 1, true) then return "trade_local" end
@@ -98,6 +104,47 @@ function Ch.SetWatched(key, on)
         db.watch = db.watch or {}
         db.watch[key] = on
     end
+    -- La section de l'onglet Artisans suit, d'où que vienne le changement (clic, /co watch).
+    if COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end
+end
+
+-- ------------------------------------------------------------------
+-- La liste de l'onglet Artisans
+-- ------------------------------------------------------------------
+-- Les lignes de la section « Canaux surveillés » : des en-têtes de groupe et des lignes à case.
+-- PURE : l'appelant dit où le joueur se trouve (`joined[clé]` = le nom du canal tel que le jeu
+-- l'écrit), s'il a une guilde, et ses communautés ({ id, name }). `there` = le joueur y est en ce
+-- moment (sinon la ligne est grisée ; son choix, lui, est gardé).
+-- Un canal perso autre que la salle n'a PAS de ligne tant qu'aucun lecteur ne s'en sert (palier 4
+-- de la spec) : une case qui ne fait rien est pire que pas de case.
+function Ch.BuildRows(joined, clubs, inGuild)
+    local L, rows = COC.L, {}
+    joined, clubs = joined or {}, clubs or {}
+    local function head(text, tip) rows[#rows + 1] = { kind = "header", text = text, tip = tip } end
+    local function item(key, label, there, note, tip)
+        rows[#rows + 1] = { kind = "item", key = key, label = label, there = there and true or false,
+                            note = note, tip = tip, on = Ch.IsWatched(key) }
+    end
+    head(L["ANNONCES LUES"], L["L'addon y lit les demandes, les dispos et les annonces des autres joueurs de l'addon. Il n'écrit que sur Trade (Services), et seulement si tu coches « Annoncer en Commerce »."])
+    -- Le nom du jeu quand le joueur est dans le canal ; sinon (hors d'une ville) notre libellé.
+    -- Clés écrites en toutes lettres : une clé calculée est invisible à check_locale.
+    local fallback = { trade_services = L["Commerce (Services)"], trade = L["Commerce"],
+                       trade_local = L["Commerce (local)"], general = L["Général"] }
+    for _, key in ipairs(Ch.KEYS) do
+        local name = joined[key]
+        -- General existe partout : ne pas y être n'a rien à voir avec la ville.
+        item(key, name or fallback[key], name ~= nil, (not name and key ~= "general") and L["en ville"] or nil)
+    end
+    item("guild", L["Guilde"], inGuild)
+    head(L["RÉSEAU DE L'ADDON"], L["L'addon s'y présente par un message invisible aux joueurs de ta salle ; ensuite, tout passe en chuchotement."])
+    item("room", "CraftLinkNet", true, L["salle"])
+    head(L["ANNUAIRE"], L["Les membres d'une communauté cochée rejoignent ton annuaire, même hors ligne. Aucune donnée de l'addon n'y passe."])
+    for _, c in ipairs(clubs) do item("club:" .. c.id, c.name, true) end
+    if #clubs == 0 then rows[#rows + 1] = { kind = "note", text = L["aucune communauté"] } end
+    head(L["AUTOUR DE MOI"], L["Ce que les joueurs disent ou crient près de toi (les lignes LFW), et, en ville, ceux que tu vois crafter."])
+    item("sayyell", L["Dire et crier"], true)
+    item("nearby", L["Crafteurs autour"], true, L["en ville"], L["Repérer les crafteurs autour (en ville)"])
+    return rows
 end
 
 -- /co watch [clé on|off] — diagnostic, non localisé : l'état des cases, et de quoi en changer une

@@ -11,6 +11,9 @@
 > décoché, la ligne `#CO` n'est plus lue ; recoché, elle entre) ; la salle coupée par `/co watch room
 > off` vue aussi. Pas vus en jeu : les lignes LFW, la guilde, General, dire et crier. Le nom de
 > Trade (Local) en français, allemand et espagnol reste à mesurer (reconnu à sa forme).
+> Palier 3 (la section de l'onglet Artisans, `CraftingOrderClassic_UI_Artisans_Channels.lua`, lignes
+> fabriquées par `Channels.BuildRows`, `tests/test_channel_rows.lua`) fait le 2026-09-30, **pas vu
+> en jeu**. Écarts avec la maquette, voir § Décisions du 2026-09-30 (palier 3).
 > Cible : WoW: Forever / Camelot (16001) · Addon : Crafting Order - Classic
 >
 > Remplace, pour la découverte des artisans, la communauté officielle de
@@ -127,6 +130,24 @@ Les commandes existantes restent, et agissent sur les mêmes cases que l'interfa
   - une ligne « Dire et crier » dans « Autour de moi », cochée : déjà lus pour les lignes LFW ;
   - panneau fermé sans « Valider » = accepté tel qu'affiché, il ne revient pas (un panneau qui
     revient à chaque connexion se fait détester).
+- 2026-09-30 (palier 3), **user** : la section reste dans la barre latérale (« option A »), et la
+  liste DÉFILE quand elle dépasse. La vraie fenêtre (606 px de haut) est plus basse que la maquette :
+  SOURCE prend 178 à 308 px selon les bandes de cercles, le bloc du bas 108.
+- 2026-09-30 (palier 3), agent, écarts avec la maquette :
+  - la liste n'a pas de hauteur fixe : elle commence sous la dernière bande SOURCE et prend ce qui
+    reste, sinon une bande de cercle de plus l'aurait recouverte ;
+  - une ligne grisée reste CLIQUABLE : le choix est une préférence, on peut la régler hors ville ;
+  - pas de bouton « ? » à part : chaque en-tête de groupe explique son groupe au survol, et le « i »
+    de la fenêtre dit à quoi sert la liste ;
+  - pas de ligne « canal perso rejoint » avant le palier 4 : aucun lecteur ne s'en sert encore, et
+    une case qui ne fait rien est pire que pas de case. Seul `CraftLinkNet` figure dans « Réseau de
+    l'addon » ;
+  - sans communauté, le groupe « Annuaire » dit « aucune communauté » plutôt que de rester vide.
+- 2026-09-30, mesure en jeu (client anglais, Ironforge) : `GetChannelName` rend le nom LONG
+  (« Trade (Services) - English », « Trade (Local) - Ironforge ») ; `GetChannelDisplayInfo`, celui
+  de la fenêtre Chat Channels, rend un nom COURT (« Services », « TradeLocal ») et la catégorie
+  (`CHANNEL_CATEGORY_WORLD` / `_CUSTOM`). La liste lit les noms longs ; les deux noms courts sont
+  reconnus aussi.
 
 ## Critères d'acceptation
 

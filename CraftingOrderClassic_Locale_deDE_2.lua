@@ -197,10 +197,10 @@ local de2 = {
         "Der Empfänger: die gesamte Quelle oder ein bestimmter Sammler.",
 
     -- Aide contextuelle « bouton i » — onglet Artisans (cf. _UI_HelpPlate.lua)
-    ["Filtre l'annuaire par source : guilde, amis, ajoutés manuellement, croisés, ou les joueurs en sourdine."] =
-        "Filtert das Verzeichnis nach Quelle: Gilde, Freunde, manuell hinzugefügt, kürzlich getroffen oder stummgeschaltete Spieler.",
-    ["Ajoute un joueur manuellement (+), rafraîchis l'annuaire, ou active le repérage."] =
-        "Füge einen Spieler manuell hinzu (+), aktualisiere das Verzeichnis oder aktiviere die Erfassung.",
+    ["Filtre l'annuaire par source : guilde, amis, ajoutés manuellement, croisés, ou les joueurs en sourdine. Dessous, les canaux que l'addon surveille : coche ceux où il doit chercher des artisans."] =
+        "Filtert das Verzeichnis nach Quelle: Gilde, Freunde, manuell hinzugefügt, kürzlich getroffen oder stummgeschaltete Spieler. Darunter die Kanäle, die das Addon beobachtet: Hake die an, in denen es nach Handwerkern suchen soll.",
+    ["Ajoute un joueur manuellement (+) ou rafraîchis l'annuaire."] =
+        "Füge einen Spieler manuell hinzu (+) oder aktualisiere das Verzeichnis.",
     ["Filtre les artisans par métier."] = "Filtert Handwerker nach Beruf.",
     ["La liste des artisans connus. Survole un nom pour ses métiers ; pastille verte = a l'addon et répond, jaune = en ligne sans l'addon, grise = hors ligne."] =
         "Die Liste bekannter Handwerker. Fahre über einen Namen für seine Berufe; grüner Punkt = hat das Addon und antwortet, gelb = online ohne Addon, grau = offline.",

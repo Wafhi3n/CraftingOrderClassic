@@ -18,20 +18,6 @@ local PRES_LABEL = { online = L["En ligne"], game = L["En ligne · sans addon"],
 
 local function trim(s) return s and s:gsub("^%s+", ""):gsub("%s+$", "") or "" end
 
--- Case à cocher CLIQUABLE : Skin.MakeCheck ne renvoie qu'une texture, on la pose sur un Button + libellé.
--- get() lit l'état courant, set(bool) l'applique. `.Sync()` recale la coche sur l'état réel (ex. slash).
-local function makeToggle(parent, x, y, label, get, set)
-    local btn = CreateFrame("Button", nil, parent); btn:SetPoint("BOTTOMLEFT", x, y)
-    local box = Skin.MakeCheck(btn, 16); box:SetPoint("LEFT", 0, 0)
-    local fs = btn:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    fs:SetPoint("LEFT", box, "RIGHT", 5, 0); fs:SetText(label); fs:SetTextColor(Skin.unpack(Skin.color.textMuted))
-    btn:SetSize(21 + fs:GetStringWidth() + 4, 18)
-    btn:SetScript("OnClick", function() local nv = not get(); set(nv); box:SetChecked(nv) end)
-    btn.Sync = function() box:SetChecked(get() and true or false) end
-    btn.Sync()
-    return btn
-end
-
 -- Annuaire d'affichage : on montre AUSSI les non-porteurs « vu crafter » (craftSeen) → variante OrSeen
 -- du helper partagé (cf. Skin), contrairement aux onglets Commande/Récolte qui n'incluent QUE SK/RK.
 local knowsProf = Skin.KnowsProfOrSeen
@@ -107,6 +93,7 @@ function UI:BuildArtisansTab(f)
         self.artSrcBtns[d.id] = b
         self.artSrcOrder[#self.artSrcOrder + 1] = d.id
     end
+    self:_BuildArtChannels(sz)   -- « Canaux surveillés », sous les bandes (_UI_Artisans_Channels.lua)
     self:_RelayoutArtSrcTabs()
     self:_RefreshArtSrcTabs()
 
@@ -142,13 +129,14 @@ function UI:_BuildArtList()
 end
 
 -- Cluster « remplir l'annuaire » (zone « addPlayer » de la SPEC, en bas de sidebar) : champ d'ajout
--- manuel + « Rafraîchir l'annuaire » + toggle de repérage — offsets RELATIFS au bas de la zone.
+-- manuel + « Rafraîchir l'annuaire » — offsets RELATIFS au bas de la zone. La case de repérage des
+-- crafteurs a rejoint la liste des canaux surveillés (spec canaux-surveilles, 2026-09-30).
 function UI:_BuildArtisanAddScan(sec)
     local addHdr = sec:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    addHdr:SetPoint("BOTTOMLEFT", 14, 66); addHdr:SetText(L["AJOUTER UN JOUEUR"])
+    addHdr:SetPoint("BOTTOMLEFT", 14, 42); addHdr:SetText(L["AJOUTER UN JOUEUR"])
     addHdr:SetTextColor(Skin.unpack(Skin.color.textMuted))
     local addBox = CreateFrame("EditBox", nil, sec, "InputBoxTemplate")
-    addBox:SetSize(150, 20); addBox:SetPoint("BOTTOMLEFT", 16, 40); addBox:SetAutoFocus(false)
+    addBox:SetSize(150, 20); addBox:SetPoint("BOTTOMLEFT", 16, 16); addBox:SetAutoFocus(false)
     addBox:SetScript("OnEscapePressed", function(b) b:ClearFocus() end)
     addBox:SetScript("OnEnterPressed", function(b) UI:_AddArtisan(b:GetText()); b:SetText(""); b:ClearFocus() end)
     local ghost = sec:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
@@ -159,18 +147,10 @@ function UI:_BuildArtisanAddScan(sec)
     addBtn:SetScript("OnClick", function() UI:_AddArtisan(addBox:GetText()); addBox:SetText("") end)
 
     local refreshBtn = Skin.MakeGoldButton(sec, 190, 24, L["Rafraîchir l'annuaire"])
-    refreshBtn:SetPoint("BOTTOMLEFT", 16, 92)
+    refreshBtn:SetPoint("BOTTOMLEFT", 16, 68)
     refreshBtn:SetScript("OnClick", function() UI:_RefreshDirectory() end)
     self.artRefreshBtn = refreshBtn
-
-    -- Toggle « détecter les crafteurs autour » (opt-in, en ville only) — cf. Directory_LootScan.
-    self.artScanChk = makeToggle(sec, 16, 16, L["Repérer les crafteurs autour (en ville)"],
-        function() return COC.Directory and COC.Directory:CrafterScanEnabled() end,
-        function(nv) if COC.Directory then COC.Directory:SetCrafterScan(nv) end end)
 end
-
--- Recale la case (ex. après « /co crafters on/off » en dehors de l'UI).
-function UI:_SyncCrafterScanChk() if self.artScanChk then self.artScanChk.Sync() end end
 
 function UI:_RefreshArtSrcTabs()
     for id, b in pairs(self.artSrcBtns or {}) do b:SetSelected(id == self.artSource) end
@@ -197,6 +177,7 @@ function UI:_RelayoutArtSrcTabs()
             row = row + 1
         end
     end
+    self:_PlaceArtChannels(-22 - row * 26)   -- la liste des canaux commence sous la dernière bande
 end
 
 -- Les bandes conditionnelles : « Confédération » n'existe que si GreenWall est chargé, et chaque
@@ -303,9 +284,9 @@ end
 function UI:RefreshArtisans()
     local panel = self.artisansPanel; if not panel then return end
     if not self.artPillsBuilt then self:_BuildArtPills(); self.artPillsBuilt = true end
-    self:_SyncCrafterScanChk()
     local D = COC.Directory
     self:_SyncOptionalArtTabs()   -- montre/masque « Confédération » et « Cercle » (display-only)
+    self:_RefreshArtChannels()    -- les cases des canaux surveillés (dont le repérage des crafteurs)
 
     -- Compteurs par source (+ « all » = total ; « muted » = mis en sourdine, hors roster)
     local counts = { all = 0, guild = 0, friend = 0, added = 0, recent = 0, confed = 0, circle = 0 }

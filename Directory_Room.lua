@@ -40,6 +40,7 @@ function Dir:SetRoom(on)
     if not COC.db then return end
     COC.db.roomOff = (not on) and true or nil
     if CraftLink and CraftLink.SetDiscovery then CraftLink:SetDiscovery(on and true or false) end
+    if COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end   -- la case de l'onglet Artisans suit
 end
 
 -- /co channel room [on|off]
