@@ -2,6 +2,10 @@
 
 > État : **validée** le 2026-09-30 par le user · Idée et décisions du user, mise en forme par l'agent ·
 > Maquette (artefact Design, 3 écrans) : https://claude.ai/artifact/BruefzxEXeUWnMExCvo3bv
+> Implémentation : palier 1 (reconnaître un canal du jeu, `CraftingOrderClassic_Channels.lua`,
+> `tests/test_channels.lua`) fait le 2026-09-30, critère 9 tenu en test. Rien n'est encore branché
+> sur les lecteurs du chat ; le nom de Trade (Local) en français, allemand et espagnol reste à
+> mesurer en jeu (reconnu à sa forme).
 > Cible : WoW: Forever / Camelot (16001) · Addon : Crafting Order - Classic
 >
 > Remplace, pour la découverte des artisans, la communauté officielle de

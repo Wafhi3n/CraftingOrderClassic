@@ -160,6 +160,7 @@ Directory_Relay.lua
 Directory_AltCodec.lua
 Directory_Alts.lua
 Directory_LFW.lua
+CraftingOrderClassic_Channels.lua
 CraftingOrderClassic_LFWChat.lua
 Directory_MyArtisans.lua
 Directory_LootScan.lua
