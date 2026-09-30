@@ -1,9 +1,10 @@
 # Icônes « une commande t'attend » dans la barre de la minicarte
 
-> État : **2e version codée, pas vue en jeu** (une icône par métier, avec le nombre). La 1re version
-> (une seule icône, le marteau des commandes) a été vue à deux comptes : registre, relevés 2026-09-28
-> 13:16 et 13:20 ; critère 7 (taint) partiel. · Rédigée le 2026-09-28 · Idée du user le 2026-09-27,
-> périmètre tranché par lui le 2026-09-28 en deux tours de questions (cf. Décisions).
+> État : **2e version vue en jeu à deux comptes** (relevé 2026-09-30 18:25, critères 5 et 6, sauf le
+> clic d'un métier que le perso n'a pas) ; **3e tour SPÉCIFIÉ le 2026-09-30, pas codé** (section
+> « 3e tour » ci-dessous : le clic selon qui sait faire, les commandes publiques qu'un de tes persos
+> sait faire). · Rédigée le 2026-09-28 · Idée du user le 2026-09-27, périmètre tranché par lui en trois
+> tours de questions (cf. Décisions).
 > Cible : WoW: Forever / Camelot (16001) · Addon : Crafting Order - Classic
 > Deuxième usage de l'outil d'icônes de la minicarte (spec `icone-minicarte.md`, rangs 4.xx).
 
@@ -107,6 +108,91 @@ chat s'arrête à **255 caractères** : une ligne plus longue est coupée et lè
 - **2026-09-28, défaut de l'agent** : rangs fixes par métier sous 5 ; repli sur l'atlas des commandes
   de Blizzard (20 × 15, taille native) pour un métier inconnu ; l'outil apprend `count`, `width` /
   `height`, `useAtlasSize`, et ne recompose la barre qu'à une apparition ou une disparition.
+
+- **2026-09-30, user (3e tour, après la 2e version vue en jeu)** : sur Rédemption, qui n'a pas la
+  Couture, le clic de l'icône Couture ouvrait le livre des Métiers de Blizzard. Le user veut que le
+  clic dépende de QUI sait faire : un reroll qui a le métier → sa vue métier ; personne → une popup.
+  Il valide les deux règles de départage proposées par l'agent (plusieurs rerolls ; perso connecté
+  qui a le métier sans la recette). Il veut aussi une icône pour les **commandes publiques** qu'un de
+  ses persos sait faire, **avec une marque qui dit que ce n'est pas une commande nommée** — ce qui lève
+  le « Pas les commandes publiques » de la 1re version, pour elles seulement.
+
+## 3e tour — le clic selon qui sait faire, et les commandes publiques (spécifié 2026-09-30)
+
+### Le problème
+
+L'icône dit « une commande t'attend », mais le clic suppose que le perso connecté sait la faire. Une
+commande nommée pour un reroll, ou dans un métier que tu portes sur un autre perso, ouvre une fenêtre
+qui ne te sert à rien (vu le 2026-09-30 : le livre des Métiers). Et une commande publique que ton
+couturier saurait faire ne se voit nulle part tant que tu joues ton enchanteur.
+
+### Ce qu'on veut
+
+**Le clic** va vers le perso qui sait faire, dans cet ordre :
+
+| Qui sait faire la commande | Le clic |
+|---|---|
+| Le perso connecté a le métier ET la recette | la fenêtre native de ce métier (comme aujourd'hui) |
+| Un reroll a la recette (le connecté non, ou sans la recette) | la **vue reroll** de ce reroll, en lecture seule : ses recettes et les commandes qu'il peut faire |
+| Personne n'a la recette | une **popup** : « Aucun de tes persos ne sait faire <objet> », les commandes concernées, et où apprendre la recette quand COC le sait |
+
+Plusieurs rerolls conviennent : celui à qui la commande est nommée, sinon celui qui a la recette,
+sinon celui qui a le plus haut niveau dans le métier. Une icône qui regroupe plusieurs commandes suit
+la plus récente. L'infobulle dit ce que fera le clic : « Clic : ouvrir la fenêtre de métier », « Clic :
+ouvrir la <métier> de <reroll> », ou « Clic : voir pourquoi ».
+
+**Les commandes publiques** (à tous, à la guilde, aux amis : tout ce qui n'est pas nommé) qu'**un de
+tes persos sait faire** allument aussi l'icône du métier, avec une **marque « à tous »** :
+
+- Métier où seules des publiques attendent : l'icône du métier, la **bulle bleue « à tous »** (celle
+  de la ligne « Tous (avec l'addon) » du destinataire) dans le coin haut gauche, et le nombre en
+  **bleu** au lieu du blanc.
+- Métier où une nommée attend aussi : l'icône normale, le nombre **blanc** ne compte **que les
+  nommées** (il garde son sens « on te le demande »), la bulle bleue reste pour dire qu'il y a aussi des
+  publiques.
+- Infobulle : « Commandes à ton nom : N », puis « Commandes pour tous que tu sais faire : M », chacune
+  avec ses lignes (cinq au plus en tout).
+
+Une publique s'éteint comme une nommée (prise par quelqu'un, annulée, expirée, masquée, acheteur en
+sourdine) ; et **dès que tu l'acceptes**, elle n'attend plus.
+
+### Ce qu'on NE fait PAS
+
+- **Toujours pas les Entrantes** (demandes captées dans le chat) : éphémères et bavardes.
+- **Pas une deuxième icône par métier** : une seule icône, la marque dit le reste (la barre de la
+  minicarte est étroite, et deux icônes Couture côte à côte se liraient mal).
+- **Pas de publique qu'aucun de tes persos ne sait faire** : c'est le rôle de la vue métier, pas d'un
+  rappel.
+- **Pas de réglage pour couper les publiques** dans ce tour. Si l'icône reste allumée en permanence
+  sur un réseau actif, on l'ajoutera (décision à prendre après usage).
+
+### Cas particuliers
+
+- **« Sait faire » = connaît la recette**, d'après les recettes enregistrées de chaque perso du compte
+  (même royaume, même camp que le perso connecté). Un perso dont les recettes n'ont jamais été lues
+  (métier jamais ouvert) ne compte pas : on ne devine pas.
+- **Ta propre publique** ne compte pas.
+- **Une publique acceptée par quelqu'un d'autre** s'éteint à la réception de l'ACK, comme dans le Carnet.
+- **Popup** : jamais d'appel au système de menus de Blizzard (cf. `forever-menu-addon-open-crash`) ;
+  la nôtre, fermée par Échap. Hors combat seulement pour la vue reroll (elle détache la native).
+- **Rerolls de l'autre camp** : exclus, comme dans « Mes artisans ».
+
+### Critères d'acceptation (3e tour)
+
+8. [test] La cible du clic : native si le connecté a la recette ; sinon le reroll choisi selon la
+   règle de départage (nommé > a la recette > plus haut niveau) ; sinon popup. Rerolls d'un autre
+   camp ou d'un autre royaume écartés. → `tests/test_order_indicator.lua`
+9. [test] Une publique compte si un perso du compte a la recette, et seulement alors ; la mienne, une
+   acceptée, une expirée, une masquée, un acheteur en sourdine sont écartées ; le nombre blanc ne
+   compte que les nommées ; la marque apparaît dès qu'une publique attend. → même fichier
+10. [porte] Les quatre portes ; les chaînes neuves dans les trois overlays.
+11. [humain] Un client, commandes de test DevMacro : (a) une nommée dans un métier qu'un reroll a
+    et pas le connecté → clic = vue reroll de ce reroll, titre « <reroll> — lecture seule » ;
+    (b) une nommée que personne ne sait faire → popup ; (c) une publique qu'un reroll sait faire →
+    icône avec la bulle bleue et un nombre bleu. Témoin : l'icône sans marque de la 2e version, vue le
+    2026-09-30 à 18:15. Observateur : le user, sur capture.
+12. [humain] Deux comptes : A poste à tous une commande que seul un reroll de B sait faire → l'icône
+    marquée apparaît chez B ; A l'annule → elle s'éteint.
 
 ## Contrat
 
