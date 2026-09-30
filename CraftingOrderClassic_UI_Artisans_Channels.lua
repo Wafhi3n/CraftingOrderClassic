@@ -109,10 +109,16 @@ function UI:_PlaceArtChannels(y)
     self.artChanHost:SetPoint("TOPLEFT", self:ArtSec("sources"), "TOPLEFT", 12, y - 24)
 end
 
+-- Les lignes, avec ce que le jeu dit à l'instant : canaux rejoints, guilde, communautés. Servi aussi
+-- au panneau de première connexion (_UI_Setup.lua), qui montre les mêmes cases.
+function UI:_ChannelRows()
+    local inGuild = (IsInGuild and IsInGuild()) and true or false
+    return COC.Channels.BuildRows(joinedChannels(), myClubs(), inGuild)
+end
+
 function UI:_RefreshArtChannels()
     if not self.artChanList then return end
-    local inGuild = (IsInGuild and IsInGuild()) and true or false
-    self.artChanList:SetData(COC.Channels.BuildRows(joinedChannels(), myClubs(), inGuild), true)
+    self.artChanList:SetData(self:_ChannelRows(), true)
 end
 
 -- `/co crafters on|off` recale sa case : elle vit désormais dans cette liste.

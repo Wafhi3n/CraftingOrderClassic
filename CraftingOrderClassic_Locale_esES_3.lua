@@ -127,6 +127,14 @@ local es3 = {
     ["Crafteurs autour"] = "Artesanos cercanos",
     ["Tu n'es pas dans ce canal en ce moment. Ton choix est gardé pour ton retour."] =
         "No estás en este canal ahora mismo. Tu elección se guarda para cuando vuelvas.",
+    -- Canaux surveillés : le panneau de première connexion (2026-09-30)
+    ["Où chercher les artisans ?"] = "¿Dónde buscar artesanos?",
+    ["L'addon trouve les artisans par les canaux que tu coches ici. Tu pourras tout changer plus tard, dans l'onglet Artisans."] =
+        "El addon encuentra artesanos a través de los canales que marcas aquí. Podrás cambiarlo todo más tarde, en la pestaña Artesanos.",
+    ["Annoncer aussi mes commandes et ma dispo sur Trade (Services)"] =
+        "Anunciar también mis pedidos y mi disponibilidad en Comercio (Servicios)",
+    ["Une ligne lisible par tous, seulement quand tu cliques."] = "Una línea que todos pueden leer, solo cuando haces clic.",
+    ["Valider"] = "Confirmar",
 }
 
 for k, v in pairs(es3) do L[k] = v end

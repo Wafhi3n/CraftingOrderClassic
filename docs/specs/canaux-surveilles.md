@@ -15,8 +15,11 @@
 > fabriquées par `Channels.BuildRows`, `tests/test_channel_rows.lua`) fait le 2026-09-30, **critères
 > 1, 2 et 5 tenus en jeu le même jour** (registre, relevés 11:25 et 11:40 : capture hors capitale,
 > communauté « eaze » cochée, Gnomi dans l'annuaire). Écarts avec la maquette, voir § Décisions du 2026-09-30
-> (palier 3). Restent les paliers 4 (canaux perso), 5 (panneau de première connexion) et 6 (aide,
-> nouveautés, relectures).
+> (palier 3). Palier 5 (le panneau de première connexion, `CraftingOrderClassic_UI_Setup.lua`,
+> `Channels.SetupState` / `MarkSetupSeen`) fait le 2026-09-30, critères 6 et 7 tenus en test, **pas
+> vu en jeu**. Il s'ouvre 10 s après la connexion (le jeu n'a pas encore rejoint ses canaux avant),
+> jamais en combat ni en instance ; `/co watch setup` le rouvre. Restent les paliers 4 (canaux
+> perso, reporté à une version suivante par le user) et 6 (aide, nouveautés, relectures).
 > Cible : WoW: Forever / Camelot (16001) · Addon : Crafting Order - Classic
 >
 > Remplace, pour la découverte des artisans, la communauté officielle de

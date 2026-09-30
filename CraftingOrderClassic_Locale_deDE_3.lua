@@ -126,6 +126,14 @@ local de3 = {
     ["Crafteurs autour"] = "Handwerker in der Nähe",
     ["Tu n'es pas dans ce canal en ce moment. Ton choix est gardé pour ton retour."] =
         "Du bist gerade nicht in diesem Kanal. Deine Wahl bleibt für deine Rückkehr erhalten.",
+    -- Canaux surveillés : le panneau de première connexion (2026-09-30)
+    ["Où chercher les artisans ?"] = "Wo nach Handwerkern suchen?",
+    ["L'addon trouve les artisans par les canaux que tu coches ici. Tu pourras tout changer plus tard, dans l'onglet Artisans."] =
+        "Das Addon findet Handwerker über die Kanäle, die du hier anhakst. Du kannst später alles im Reiter „Handwerker“ ändern.",
+    ["Annoncer aussi mes commandes et ma dispo sur Trade (Services)"] =
+        "Meine Aufträge und meine Verfügbarkeit auch in Handel (Dienstleistungen) ankündigen",
+    ["Une ligne lisible par tous, seulement quand tu cliques."] = "Eine Zeile, die alle lesen können, nur wenn du klickst.",
+    ["Valider"] = "Bestätigen",
 }
 
 for k, v in pairs(de3) do L[k] = v end

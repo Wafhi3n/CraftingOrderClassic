@@ -4,7 +4,7 @@
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
-153 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
+154 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
 
 ## Modules (ordre de chargement)
 
@@ -17,13 +17,13 @@
 | `CraftingOrderClassic_Locale.lua` | socle de localisation du CHROME de l'UI. | 12 |
 | `CraftingOrderClassic_Locale_enUS.lua` | overlay ANGLAIS (enUS/enGB). | 279 |
 | `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 499 |
-| `CraftingOrderClassic_Locale_enUS_3.lua` | overlay enUS, 3/3. | 132 |
+| `CraftingOrderClassic_Locale_enUS_3.lua` | overlay enUS, 3/3. | 140 |
 | `CraftingOrderClassic_Locale_deDE.lua` | overlay ALLEMAND (deDE). | 281 |
 | `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 479 |
-| `CraftingOrderClassic_Locale_deDE_3.lua` | overlay deDE, 3/3. | 131 |
+| `CraftingOrderClassic_Locale_deDE_3.lua` | overlay deDE, 3/3. | 139 |
 | `CraftingOrderClassic_Locale_esES.lua` | overlay ESPAGNOL (esES/esMX). | 282 |
 | `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 480 |
-| `CraftingOrderClassic_Locale_esES_3.lua` | overlay esES, 3/3. | 132 |
+| `CraftingOrderClassic_Locale_esES_3.lua` | overlay esES, 3/3. | 140 |
 | `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 430 |
 | `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 427 |
 | `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 427 |
@@ -59,7 +59,8 @@
 | `CraftingOrderClassic_UI_Artisans_Icons.lua` | onglet « Artisans » : tout ce qui est ICÔNE de métier. | 190 |
 | `CraftingOrderClassic_UI_Artisans_Needs.lua` | la « BOURSE d'artisan » de l'onglet Artisans : pour un artisan du roster (partenaire, guildie, ami…), la LISTE DE COURSES des fournitures qu'il lui faut pour monter ses métiers — mats agrégés de SA route de progression (COC.Route, calculée 100 % en LOCAL depuis son rang SK diffusé + ses recettes décodées du bitfield RK ; prix Lazy Gold locaux, valables serveur entier). | 361 |
 | `CraftingOrderClassic_UI_Artisans_Muted.lua` | panel « En sourdine » de l'onglet Artisans. | 85 |
-| `CraftingOrderClassic_UI_Artisans_Channels.lua` | la section « Canaux surveillés » de l'onglet Artisans (spec docs/specs/canaux-surveilles.md, palier 3). | 128 |
+| `CraftingOrderClassic_UI_Artisans_Channels.lua` | la section « Canaux surveillés » de l'onglet Artisans (spec docs/specs/canaux-surveilles.md, palier 3). | 134 |
+| `CraftingOrderClassic_UI_Setup.lua` | le panneau de PREMIÈRE CONNEXION : où chercher les artisans ? (spec docs/specs/canaux-surveilles.md, palier 5). | 180 |
 | `CraftingOrderClassic_UI_MyArtisans_Layout.lua` | GÉOMÉTRIE de l'onglet « Mes artisans ». | 57 |
 | `CraftingOrderClassic_UI_MyArtisans.lua` | onglet « Mes artisans » : vue agrégée des métiers du COMPTE (tous mes rerolls du royaume), en mode « connu ». | 475 |
 | `CraftingOrderClassic_UI_MyArtisans_Profit.lua` | onglet « Mes artisans » : couche Auctionator. | 135 |
@@ -133,7 +134,7 @@
 | `Directory_AltCodec.lua` | codec du fil ALT (liste des persos d'un même joueur) + vérification par réciprocité. | 119 |
 | `Directory_Alts.lua` | regroupement des rerolls : identité « joueur » multi-persos (verbe ALT). | 316 |
 | `Directory_LFW.lua` | statut « recherche de travail » (Looking For Work) + OFFRE par métier. | 356 |
-| `CraftingOrderClassic_Channels.lua` | RECONNAÎTRE un canal du jeu (spec docs/specs/canaux-surveilles.md). | 164 |
+| `CraftingOrderClassic_Channels.lua` | RECONNAÎTRE un canal du jeu (spec docs/specs/canaux-surveilles.md). | 189 |
 | `CraftingOrderClassic_LFWChat.lua` | détection « recherche de travail » dans le CHAT VISIBLE. | 91 |
 | `Directory_MyArtisans.lua` | agrégation des métiers du COMPTE (onglet « Mes artisans »). | 168 |
 | `Directory_LootScan.lua` | découverte PASSIVE des artisans NON-porteurs de l'addon qui craftent à proximité, par CHAT_MSG_TRADESKILLS « X creates Y. | 161 |
@@ -1250,6 +1251,26 @@
 > 
 > Hauteur : la liste prend ce qui reste entre le dernier bouton SOURCE et le bloc du bas, et DÉFILE
 > quand elle dépasse. Une zone de hauteur fixe aurait été recouverte par les bandes de cercles.
+
+### `CraftingOrderClassic_UI_Setup.lua`
+> CraftingOrderClassic_UI_Setup.lua — le panneau de PREMIÈRE CONNEXION : où chercher les artisans ?
+> (spec docs/specs/canaux-surveilles.md, palier 5).
+> 
+> Pourquoi (2026-09-30) : les cases des canaux surveillés vivent dans l'onglet Artisans, où un
+> joueur ne va pas de lui-même. Ce panneau les lui montre UNE fois, avec une phrase par groupe, à
+> tout le monde : le nouvel installé comme celui qui a déjà l'addon, à la mise à jour qui l'apporte
+> (décision du user).
+> 
+> Les cases sont VIVANTES : les mêmes lignes que l'onglet (UI:_ChannelRows), chaque clic passe par
+> COC.Channels.SetWatched. « Valider », la croix et Échap font donc la même chose : noter que le
+> panneau a été vu. Fermer vaut accepter ce qui est affiché, par construction.
+> 
+> Il ne s'ouvre PAS au login même : le jeu ne rejoint ses canaux que quelques secondes plus tard, et
+> les communautés plus tard encore. Ouvert trop tôt, il montrerait Commerce grisé « en ville » en
+> pleine capitale. Il attend donc OPEN_DELAY, la fin d'un combat, la sortie d'une instance, et se
+> redessine tant qu'il est ouvert quand un canal, une guilde ou une communauté arrive.
+
+**API** : `S.Render()` · `UI:ShowSetup()`
 
 ### `CraftingOrderClassic_UI_MyArtisans_Layout.lua`
 > CraftingOrderClassic_UI_MyArtisans_Layout.lua — GÉOMÉTRIE de l'onglet « Mes artisans ».
@@ -2392,7 +2413,7 @@
 > « Services »). Un canal PERSO qui s'appellerait « Trade » n'est pas distingué ici : c'est à
 > l'appelant de savoir, par le jeu, qu'un canal est perso.
 
-**API** : `Ch.BaseName(name)` · `Ch.KeyOf(name)` · `Ch.IsWatched(key)` · `Ch.SetWatched(key, on)` · `Ch.BuildRows(joined, clubs, inGuild)` · `Ch:Cmd(arg)`
+**API** : `Ch.BaseName(name)` · `Ch.KeyOf(name)` · `Ch.IsWatched(key)` · `Ch.SetWatched(key, on)` · `Ch.BuildRows(joined, clubs, inGuild)` · `Ch.SetupState(db, inCombat, inInstance)` · `Ch.MarkSetupSeen(db, version)` · `Ch:Cmd(arg)`
 
 ### `CraftingOrderClassic_LFWChat.lua`
 > CraftingOrderClassic_LFWChat.lua — détection « recherche de travail » dans le CHAT VISIBLE.

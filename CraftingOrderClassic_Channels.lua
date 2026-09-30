@@ -147,10 +147,35 @@ function Ch.BuildRows(joined, clubs, inGuild)
     return rows
 end
 
+-- ------------------------------------------------------------------
+-- Le panneau de première connexion
+-- ------------------------------------------------------------------
+-- Faut-il l'ouvrir ? "done" = déjà vu, "wait" = pas maintenant (combat, instance où les communautés
+-- sont illisibles, SavedVariable pas encore là), "show" = oui.
+-- `setupSeen` porte la version où le joueur l'a validé, POUR MÉMOIRE seulement : on ne la compare
+-- jamais à la version courante, sinon le panneau reviendrait à chaque mise à jour. Le jour où il
+-- doit revenir exprès, c'est un autre repère qu'il faudra, pas celui-ci.
+function Ch.SetupState(db, inCombat, inInstance)
+    if not db then return "wait" end
+    if db.setupSeen ~= nil then return "done" end
+    if inCombat or inInstance then return "wait" end
+    return "show"
+end
+
+-- Validé, ou fermé (croix, Échap) : dans les deux cas le joueur a vu ce qui est coché, et les cases
+-- agissent dès le clic. Le premier passage fait foi ; un second ne réécrit rien.
+function Ch.MarkSetupSeen(db, version)
+    if db and db.setupSeen == nil then db.setupSeen = version or true end
+end
+
 -- /co watch [clé on|off] — diagnostic, non localisé : l'état des cases, et de quoi en changer une
--- avant que l'onglet Artisans ne les montre.
+-- hors de l'onglet Artisans. /co watch setup rouvre le panneau de première connexion.
 function Ch:Cmd(arg)
     local key, state = (arg or ""):lower():match("^%s*(%S*)%s*(%S*)")
+    if key == "setup" then
+        if COC.UI and COC.UI.ShowSetup then COC.UI:ShowSetup() end
+        return
+    end
     if state == "on" or state == "off" then
         local known = false
         for _, k in ipairs(Ch.WATCH_KEYS) do known = known or k == key end

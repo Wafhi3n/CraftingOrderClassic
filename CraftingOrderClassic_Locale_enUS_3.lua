@@ -127,6 +127,14 @@ local en3 = {
     ["Crafteurs autour"] = "Crafters nearby",
     ["Tu n'es pas dans ce canal en ce moment. Ton choix est gardé pour ton retour."] =
         "You're not in this channel right now. Your choice is kept for when you're back.",
+    -- Canaux surveillés : le panneau de première connexion (2026-09-30)
+    ["Où chercher les artisans ?"] = "Where to look for crafters?",
+    ["L'addon trouve les artisans par les canaux que tu coches ici. Tu pourras tout changer plus tard, dans l'onglet Artisans."] =
+        "The addon finds crafters through the channels you tick here. You can change everything later, in the Artisans tab.",
+    ["Annoncer aussi mes commandes et ma dispo sur Trade (Services)"] =
+        "Also announce my orders and my availability in Trade (Services)",
+    ["Une ligne lisible par tous, seulement quand tu cliques."] = "One line everyone can read, only when you click.",
+    ["Valider"] = "Confirm",
 }
 
 for k, v in pairs(en3) do L[k] = v end
