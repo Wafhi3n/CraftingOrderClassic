@@ -90,7 +90,7 @@
 | `CraftingOrderClassic_ProfWindow_Layout.lua` | GÉOMÉTRIE de la vue métier (fenêtre 3 colonnes). | 184 |
 | `CraftingOrderClassic_ProfWindow_HelpPlate.lua` | AIDE CONTEXTUELLE de la Vue Métier (« bouton i »). | 113 |
 | `CraftingOrderClassic_ProfWindow_Dock.lua` | mode DOCK de la vue métier (« Vue Blizzard ») : la fenêtre native reste VISIBLE (non neutralisée) et NOTRE colonne Commandes s'épingle à sa droite. | 70 |
-| `CraftingOrderClassic_ProfWindow_Camelot.lua` | POC : notre colonne Commandes À L'INTÉRIEUR de la fenêtre de métier NATIVE de WoW: Forever (Camelot). | 469 |
+| `CraftingOrderClassic_ProfWindow_Camelot.lua` | POC : notre colonne Commandes À L'INTÉRIEUR de la fenêtre de métier NATIVE de WoW: Forever (Camelot). | 472 |
 | `CraftingOrderClassic_ProfWindow_Camelot_Open.lua` | OUVRIR un metier dans la fenetre NATIVE de WoW: Forever, et rediriger vers elle toutes nos entrees (bouton minimap, /co prof, clic du suivi). | 115 |
 | `CraftingOrderClassic_ProfWindow_Camelot_PageArt.lua` | prolonger le FOND de la page native dans la bande que notre greffe ajoute à droite de la fenêtre de métier de WoW: Forever. | 80 |
 | `CraftingOrderClassic_ProfWindow_Toolbar.lua` | barre d'outils de la colonne Recettes (vue métier) : les toggles de TRI (slot recTools, à gauche : rentabilité / valeurs exactes / progression — Auctionator) et de FILTRE (slot recFilterToggles, à droite : « j'ai les matériaux » / « montée de compétence »). | 245 |
