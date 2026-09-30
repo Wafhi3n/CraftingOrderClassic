@@ -7,8 +7,10 @@
 > canal dans les lecteurs : demandes, annonces `#CO`, lignes LFW ; `tests/test_channel_watch.lua`,
 > `tests/test_channel_readers.lua`) fait le 2026-09-30, critères 8, 10 et 11 tenus en test.
 > En attendant l'onglet Artisans, les cases se lisent et se changent par `/co watch` (diagnostic,
-> hors aide). **Jamais vu en jeu.** Le nom de Trade (Local) en français, allemand et espagnol reste
-> à mesurer (reconnu à sa forme).
+> hors aide). **Critère 3 tenu en jeu le 2026-09-30** (registre, relevés 10:56 et 11:02 : Commerce
+> décoché, la ligne `#CO` n'est plus lue ; recoché, elle entre) ; la salle coupée par `/co watch room
+> off` vue aussi. Pas vus en jeu : les lignes LFW, la guilde, General, dire et crier. Le nom de
+> Trade (Local) en français, allemand et espagnol reste à mesurer (reconnu à sa forme).
 > Cible : WoW: Forever / Camelot (16001) · Addon : Crafting Order - Classic
 >
 > Remplace, pour la découverte des artisans, la communauté officielle de

@@ -46,6 +46,15 @@ client.
 
 ## Relevés
 
+- 2026-09-30 11:02 — jusqu'a 86c6f16 — Forever, deux clients, même build `main-dev@507b82e 2026-09-30
+  10:35`, salle toujours coupée, comptes « oubliés » — **GO sur la seconde moitié du critère 3 de la
+  spec canaux-surveilles : la case recochée laisse de nouveau entrer la ligne** — traces des deux
+  comptes relues par l'agent : `watch = { trade_services = true }` chez Gnomi ; Rédemption annonce
+  `#12` à 11:02:15 et ne la chuchote qu'à Frostrobb Robb ; chez Gnomi, « post de Rédemption Wafhien :
+  1/5 en 60s » et « annonce …-12 : bonjour » à 11:02:16, `HI` chuchoté dans la même seconde,
+  `ORD|NEW|…-12` reçu de Rédemption à 11:02:17. L'alerte à l'écran n'est pas rapportée par le user.
+  Non vu, inchangé : les lignes LFW, la guilde, General, dire et crier.
+
 - 2026-09-30 10:56 — jusqu'a 86c6f16 — Forever, deux clients (Rédemption, Gnomi), client en ANGLAIS,
   Ironforge ; build déployé `main-dev@507b82e 2026-09-30 10:35`, branches en test
   `feat/canaux-surveilles`, `feat/icone-commande-recue`, `feat/liste-destinataires`,
