@@ -116,6 +116,11 @@ chat s'arrête à **255 caractères** : une ligne plus longue est coupée et lè
   qui a le métier sans la recette). Il veut aussi une icône pour les **commandes publiques** qu'un de
   ses persos sait faire, **avec une marque qui dit que ce n'est pas une commande nommée** — ce qui lève
   le « Pas les commandes publiques » de la 1re version, pour elles seulement.
+- **2026-09-30, user (même tour)** : la marque = **un code couleur du nombre**, vert guilde, bleu
+  nommée (« ça suit la liste d'amis »), jaune tous/Commerce, plutôt que la bulle proposée par l'agent ;
+  et un **mode daltonien** avec une palette publiée. Défauts de l'agent acceptés : une couleur par
+  icône (type le plus personnel, le nombre ne compte que lui), amis avec la guilde, suivre la CVar
+  `colorblindMode` du jeu, palette Okabe-Ito.
 
 ## 3e tour — le clic selon qui sait faire, et les commandes publiques (spécifié 2026-09-30)
 
@@ -141,17 +146,23 @@ sinon celui qui a le plus haut niveau dans le métier. Une icône qui regroupe p
 la plus récente. L'infobulle dit ce que fera le clic : « Clic : ouvrir la fenêtre de métier », « Clic :
 ouvrir la <métier> de <reroll> », ou « Clic : voir pourquoi ».
 
-**Les commandes publiques** (à tous, à la guilde, aux amis : tout ce qui n'est pas nommé) qu'**un de
-tes persos sait faire** allument aussi l'icône du métier, avec une **marque « à tous »** :
+**Les commandes non nommées** (à la guilde, aux amis, à tous) qu'**un de tes persos sait faire**
+allument aussi l'icône du métier. **La couleur du nombre dit d'où vient la commande** :
 
-- Métier où seules des publiques attendent : l'icône du métier, la **bulle bleue « à tous »** (celle
-  de la ligne « Tous (avec l'addon) » du destinataire) dans le coin haut gauche, et le nombre en
-  **bleu** au lieu du blanc.
-- Métier où une nommée attend aussi : l'icône normale, le nombre **blanc** ne compte **que les
-  nommées** (il garde son sens « on te le demande »), la bulle bleue reste pour dire qu'il y a aussi des
-  publiques.
-- Infobulle : « Commandes à ton nom : N », puis « Commandes pour tous que tu sais faire : M », chacune
-  avec ses lignes (cinq au plus en tout).
+| Type | Couleur | Mode daltonien du jeu (Okabe-Ito) |
+|---|---|---|
+| Nommée pour toi ou un reroll | bleu (celui de la liste d'amis) | vermillon `#D55E00` |
+| Guilde ou amis | vert (celui de la discussion de guilde) | bleu ciel `#56B4E9` |
+| À tous (réseau, annonces sur Trade comprises) | jaune | jaune `#F0E442` |
+
+- **Une couleur par icône** : celle du type **le plus personnel** présent (nommée > guilde/amis >
+  tous), et le nombre compte **ce type-là seulement**. 1 nommée et 3 publiques en Couture = un « 1 »
+  bleu : le nombre et sa couleur disent la même chose.
+- **Mode daltonien** : COC suit le réglage du jeu (Accessibilité > Mode daltonien, CVar
+  `colorblindMode`), pas une option à lui, et bascule de palette quand le joueur le change.
+- **La couleur n'est jamais seule** (comme Blizzard en mode daltonien, qui double par du texte) :
+  l'infobulle nomme chaque type, « Commandes à ton nom : N », « Pour ta guilde ou tes amis : M »,
+  « Pour tous : K », chacun avec ses lignes (cinq au plus en tout).
 
 Une publique s'éteint comme une nommée (prise par quelqu'un, annulée, expirée, masquée, acheteur en
 sourdine) ; et **dès que tu l'acceptes**, elle n'attend plus.
@@ -159,8 +170,9 @@ sourdine) ; et **dès que tu l'acceptes**, elle n'attend plus.
 ### Ce qu'on NE fait PAS
 
 - **Toujours pas les Entrantes** (demandes captées dans le chat) : éphémères et bavardes.
-- **Pas une deuxième icône par métier** : une seule icône, la marque dit le reste (la barre de la
+- **Pas une deuxième icône par métier** : une seule icône, la couleur dit le reste (la barre de la
   minicarte est étroite, et deux icônes Couture côte à côte se liraient mal).
+- **Pas d'option de couleurs propre à COC** : le mode daltonien est celui du jeu.
 - **Pas de publique qu'aucun de tes persos ne sait faire** : c'est le rôle de la vue métier, pas d'un
   rappel.
 - **Pas de réglage pour couper les publiques** dans ce tour. Si l'icône reste allumée en permanence
@@ -182,17 +194,19 @@ sourdine) ; et **dès que tu l'acceptes**, elle n'attend plus.
 8. [test] La cible du clic : native si le connecté a la recette ; sinon le reroll choisi selon la
    règle de départage (nommé > a la recette > plus haut niveau) ; sinon popup. Rerolls d'un autre
    camp ou d'un autre royaume écartés. → `tests/test_order_indicator.lua`
-9. [test] Une publique compte si un perso du compte a la recette, et seulement alors ; la mienne, une
-   acceptée, une expirée, une masquée, un acheteur en sourdine sont écartées ; le nombre blanc ne
-   compte que les nommées ; la marque apparaît dès qu'une publique attend. → même fichier
+9. [test] Une non nommée compte si un perso du compte a la recette, et seulement alors ; la mienne, une
+   acceptée, une expirée, une masquée, un acheteur en sourdine sont écartées ; la couleur et le nombre
+   suivent le type le plus personnel présent ; `colorblindMode` à 1 donne la palette Okabe-Ito, et
+   son changement repeint les icônes affichées. → même fichier
 10. [porte] Les quatre portes ; les chaînes neuves dans les trois overlays.
 11. [humain] Un client, commandes de test DevMacro : (a) une nommée dans un métier qu'un reroll a
     et pas le connecté → clic = vue reroll de ce reroll, titre « <reroll> — lecture seule » ;
-    (b) une nommée que personne ne sait faire → popup ; (c) une publique qu'un reroll sait faire →
-    icône avec la bulle bleue et un nombre bleu. Témoin : l'icône sans marque de la 2e version, vue le
-    2026-09-30 à 18:15. Observateur : le user, sur capture.
+    (b) une nommée que personne ne sait faire → popup ; (c) une « à tous » qu'un reroll sait faire →
+    nombre jaune ; (d) une « guilde » → vert ; (e) (c) + une nommée dans le même métier → « 1 » bleu ;
+    (f) Mode daltonien coché dans les options du jeu → les couleurs changent sans /reload. Témoin :
+    le nombre blanc de la 2e version, vu le 2026-09-30 à 18:15. Observateur : le user, sur capture.
 12. [humain] Deux comptes : A poste à tous une commande que seul un reroll de B sait faire → l'icône
-    marquée apparaît chez B ; A l'annule → elle s'éteint.
+    au nombre jaune apparaît chez B ; A l'annule → elle s'éteint.
 
 ## Contrat
 
