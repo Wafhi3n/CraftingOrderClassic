@@ -266,6 +266,7 @@ end
 -- Throttle (30 s plancher) géré par la lib. C'est le seul créneau où l'envoi canal fonctionne.
 function COC:Beacon()
     if CraftLink and CraftLink.SendBeacon then CraftLink:SendBeacon() end
+    if COC.Directory and COC.Directory.RoomHello then COC.Directory:RoomHello() end   -- sans canal (REV 17)
 end
 
 -- /co beacon : diag. Émet une balise TEXTE sur le canal SOUS hardware event (slash = touche Entrée).

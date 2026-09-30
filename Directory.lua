@@ -311,9 +311,9 @@ end
 function Dir:Refresh()
     if not CraftLink then return end
     CraftLink:Send("HI", "global")
-    -- /co refresh = action JOUEUR (hardware event) → on peut émettre la balise TEXTE de découverte
-    -- (annonce ma présence aux INCONNUS du canal ; eux me découvriront ensuite en whisper).
-    if CraftLink.SendBeacon then CraftLink:SendBeacon() end
+    -- /co refresh = action JOUEUR (hardware event) → balise TEXTE de découverte, ou sans canal le bonjour
+    -- de la salle (COC:Beacon) : ma présence annoncée aux INCONNUS, qui me découvriront en whisper.
+    if COC.Beacon then COC:Beacon() end
     self:RediscoverKnown(true)   -- refresh manuel : re-ping aussi les croisés récents
 end
 

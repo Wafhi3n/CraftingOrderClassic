@@ -157,11 +157,18 @@ local function isMe(info, name)
     return name ~= nil and name == me()
 end
 
+-- Rend le nombre de membres vus, ou nil si le club est ILLISIBLE : en verrouillage de messagerie,
+-- GetClubMembers et GetMemberInfo rendent des SECRÈTES (ClubDocumentation :
+-- SecretInChatMessagingLockdown) et `ipairs` levait (relevé 2026-09-30, Rédemption en donjon).
+-- Comme pour EachClub, « illisible » ne doit jamais se lire « personne ».
 function Dir:_EachCircleMember(raw, fn)
     if club("AreMembersReady", raw) ~= true then return 0 end
-    local ids, seen = club("GetClubMembers", raw) or {}, 0
-    for _, memberId in ipairs(ids) do
+    local Api = COC.Api
+    local ids, seen = club("GetClubMembers", raw), 0
+    if Api.IsSecret(ids) then return nil end
+    for _, memberId in ipairs(ids or {}) do
         local info = club("GetMemberInfo", raw, memberId)
+        if Api.IsSecret(info) or (info and Api.IsSecret(info.guid)) then return nil end
         -- La garde sort du `if`, PAS dans l'assignation : `info and memberName(...)` ne rendrait
         -- qu'UNE valeur (Lua tronque le multi-retour derrière un `and`) et `realm` serait toujours
         -- nil — donc tout membre cross-royaume passerait pour joignable.
@@ -217,7 +224,7 @@ function Dir:RefreshCircles()
     local set, online = {}, {}
     for clubId in pairs(self:CircleIds()) do
         local raw = tonumber(clubId) or clubId
-        self:_EachCircleMember(raw, function(name, realm, info)
+        local n = self:_EachCircleMember(raw, function(name, realm, info)
             -- MÊME ROYAUME uniquement. L'annuaire de COC est indexé par nom COURT : y faire entrer
             -- un « Bob » d'un autre royaume le fusionnerait silencieusement avec le Bob d'ici —
             -- mêmes recettes, mêmes niveaux, une seule fiche pour deux personnes. La limite existe
@@ -229,6 +236,9 @@ function Dir:RefreshCircles()
             noteMember(name, raw, info)
             if isOnline(info.presence) then online[name] = true end
         end)
+        -- Un cercle illisible : on garde TOUT l'état connu (classement, présence) et on repasse plus
+        -- tard. Balayer le roster avec un `set` incomplet retirerait leur cercle à des membres.
+        if n == nil then return self:_RetryCirclesLater() end
     end
     -- Quitter un cercle doit RETIRER le classement : sans ça, `_ApplySource` retombe sur
     -- `r.source or "recent"` et l'ancien « circle » survivrait indéfiniment.
@@ -249,6 +259,15 @@ function Dir:RefreshCircles()
     -- balayage ne sonde que les transitions (et éteint les partis) : l'appeler ici ne coûte rien, et sans
     -- lui un membre connecté après nous n'était découvert qu'au prochain événement amis/guilde.
     if self.DiscoverFriendsAndGuild then self:DiscoverFriendsAndGuild() end
+end
+
+-- Verrouillage de messagerie : la sortie du verrou ne redéclenche aucun événement club, d'où un
+-- repassage minuté, un seul à la fois.
+local LOCKDOWN_RETRY = 30   -- s
+function Dir:_RetryCirclesLater()
+    if self._circleRetry or not C_Timer then return end
+    self._circleRetry = true
+    C_Timer.After(LOCKDOWN_RETRY, function() Dir._circleRetry = nil; Dir:RefreshCircles() end)
 end
 
 -- Débounce : les événements club arrivent par rafales (un par membre au chargement du roster).

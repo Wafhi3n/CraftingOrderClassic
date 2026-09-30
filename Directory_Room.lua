@@ -28,10 +28,27 @@ function Dir:RoomEnabled() return not (COC.db and COC.db.roomOff) end
 function Dir:OnRoomJoined()
     if not CraftLink then return end
     CraftLink:Send((self._HelloPayload and self:_HelloPayload()) or "HI", "room")
+    self._roomHelloAt = (GetTime and GetTime()) or 0
     if COC.db and not COC.db.roomNoticeShown then
         COC.db.roomNoticeShown = true
         p(string.format(L["l'addon rejoint le canal |cFFFFFFFF%s|r pour se présenter aux autres joueurs de Crafting Order ; tes commandes, elles, restent en whisper. |cFFFFFFFF/co channel room off|r pour ne plus le rejoindre."], label()))
     end
+end
+
+-- Un nouveau bonjour sur la salle, sur un geste du joueur (« Poster », /co refresh). Il remplace la
+-- balise TEXTE `CLNK1` que ces gestes y écrivaient jusqu'à CraftLink REV 16 : une ligne de texte arrivait
+-- SECRÈTE chez un porteur en donjon, un message d'addon non. Sans lui, un bonjour d'arrivée perdu (débit
+-- du canal) laissait le joueur invisible des inconnus de la salle jusqu'à sa prochaine arrivée. Même
+-- plancher que l'ancienne balise ; le bonjour d'arrivée compte. Rend vrai s'il est parti.
+local ROOM_HELLO_MIN = 30   -- s
+
+function Dir:RoomHello()
+    if not (CraftLink and CraftLink.RoomJoined and CraftLink:RoomJoined()) then return false end
+    local t = (GetTime and GetTime()) or 0
+    if self._roomHelloAt and t - self._roomHelloAt < ROOM_HELLO_MIN then return false end
+    self._roomHelloAt = t
+    CraftLink:Send((self._HelloPayload and self:_HelloPayload()) or "HI", "room")
+    return true
 end
 
 -- Ouvre ou coupe la salle, sans rien dire : la porte commune à la commande et à la case « surveiller »

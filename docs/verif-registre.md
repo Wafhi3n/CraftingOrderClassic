@@ -46,6 +46,58 @@ client.
 
 ## Relevés
 
+- 2026-09-30 17:25 — jusqu'a e09e4f0 — Forever, 2 comptes, build `main-dev@dea9e9d 2026-09-30 16:37`
+  avec icone-commande-recue, liste-destinataires, profit-arbitrages, valeurs-secretes-canal (copie
+  déployée du `.toc`, `Directory_Club` gardé relu dedans), Rédemption en donjon — **le déclencheur est
+  le COMBAT DE BOSS** ; **GO à nouveau sur les lignes secrètes ; présence et cercles sans erreur mais
+  SANS témoin** — relu par l'agent dans `DevMacroDB.log`, `!BugGrabber.lua` et les traces : sonde
+  (`/dm 1`) à 16:41:02 en combat de trash : combat=2, carte=2, boss=0, chat=0, verrou false ; à
+  17:21:15 sur un boss : combat=2, **boss=2, chat=2**, carte=2, `InChatMessagingLockdown()` = **true**.
+  17:21:21 Gnomi envoie `CLNK1 x` ; 17:21:22 COCMonitor lève dessus (`author` secret) chez Rédemption,
+  rien de `CraftLink_*` ni de COC. 17:21:34 Gnomi se déconnecte (sauvegarde) pendant que Rédemption
+  est encore verrouillé (ses envois refusés 17:21:35-46, `verrouillage d'instance`) : aucune erreur
+  de présence, et aucune `Directory_Club.lua:163` alors que Gnomi est membre du cercle `23004771`,
+  celui qui levait ; Gnomi garde `source="circle"`, `circle="23004771"` dans la sauvegarde de
+  17:21:57. **Pas prouvé** : que `CHAT_MSG_CHANNEL_LEAVE` et l'événement de club sont bien arrivés
+  pendant le verrou (aucun lecteur témoin sur ces chemins, rien de tracé) ; le retour de Gnomi
+  (`_JOIN`) ; `17 1` en jeu. Hors sujet vus au passage : `SelectRecipe` (Auctionator, ×260) et
+  `AceBucket` de Questie sur une clé secrète.
+
+- 2026-09-30 16:30 — jusqu'a f677875 — Forever, 2 comptes, même build `main-dev@7a5139d 2026-09-30
+  15:38` que le relevé de 16:15, Rédemption en donjon (le déclencheur exact du verrou, boss ou non,
+  n'a pas été relevé) — **GO sur les lignes de canal SECRÈTES (chemin texte), avec témoin dans le même
+  événement** — `!BugGrabber.lua` et traces relus par l'agent après `/reload` des deux comptes : à
+  16:27:42 un chuchotement d'addon de Rédemption est refusé (`verrouillage d'instance : message
+  perdu`, AddOnMessageLockdown) ; à 16:27:49 Gnomi envoie `CLNK1 x` sur CraftLinkNet (canal 6,
+  DevMacro) ; la même seconde, chez Rédemption, **COCMonitor** (outil local, non corrigé) lève
+  `COCMonitor_Channel.lua:36: attempt to compare local 'author' (a secret string value…)` avec
+  `chan="CraftLinkNet"`, `author=<secret string>`, `text=<secret string>` : la ligne est donc bien
+  arrivée secrète à tous les lecteurs de `CHAT_MSG_CHANNEL`. Rien de `CraftLink_*` ni de
+  `CraftingOrderClassic*` dans BugGrabber (l'ancien code levait en `Transport.lua:160`/`:396`, cf.
+  2026-09-25), et la trace de Rédemption ne note aucune balise reçue : la ligne est écartée sans
+  bruit. Vu en passant : à 16:21:37, `C_ChatInfo.SendChatMessage` vers le canal lancé par un addon
+  sur le compte verrouillé est BLOQUÉ (`ADDON_ACTION_BLOCKED`, `*** ForceTaint_Strong ***`).
+  **Pas vu** : le chemin présence (`CHAT_MSG_CHANNEL_JOIN`/`_LEAVE` sous verrou, déconnexion de Gnomi
+  pendant que Rédemption est verrouillé), ni `17 1` affiché en jeu, ni la sonde sous verrou.
+
+- 2026-09-30 16:15 — jusqu'a f677875 — Forever, 2 comptes (Gnomi = #1, Rédemption = #4), build
+  `main-dev@7a5139d 2026-09-30 15:38` avec icone-commande-recue, liste-destinataires,
+  profit-arbitrages, valeurs-secretes-canal (copie déployée du `.toc` ; `TRANSPORT_REV = 17` et
+  `CraftLink_Sender.lua` relus dans la copie déployée, `17 1` PAS relu en jeu) — **GO sur la salle
+  hors donjon, NO-GO faute de chemin sur les valeurs secrètes** — traces des deux comptes relues par
+  l'agent après `/reload` : salle rejointe (Rédemption idx 7 à 15:53:35, Gnomi idx 6 à 15:54:20) ;
+  le bonjour de Gnomi part sur la salle en message d'addon et arrive chez Rédemption
+  (`[recv] CHANNEL Gnomi Short : HI|SK…` à 15:54:25, puis 15:58:37 au « Poster »/refresh) ; aucune
+  balise texte émise par les deux comptes (zéro `[send]` de balise), aucune ligne `CLNK1` dans le
+  chat (vu par le user). La ligne témoin tapée à la main par Gnomi (`CLNK1 x`) arrive chez
+  Rédemption à 16:00:17, lisible. **En donjon, le verrou du chat ne s'est pas levé** (sonde
+  `C_RestrictedActions.GetAddOnRestrictionState(0..5)`, Rédemption) : hors combat carte=2, le reste 0,
+  `InChatMessagingLockdown()` = false ; en combat contre des monstres, combat=2 et carte=2, chat=0,
+  false. BugGrabber vide des deux côtés pour la séance (dernière erreur : 09:27 sur #4). Ce vide ne
+  prouve donc RIEN sur le correctif : le texte n'est jamais arrivé secret. Le crash du 2026-09-25
+  venait du Général des Cavernes des lamentations ; reste à lever le verrou (boss = restriction 1,
+  ou JcJ = 3), puis le témoin REV 16.
+
 - 2026-09-30 14:35 — jusqu'a 2ee1c10 — Forever, un client, en ANGLAIS, rechargé après le déploiement
   de 14:00 : build `main-dev@bb269de 2026-09-30 14:00` (copie déployée du `.toc` ; la phrase neuve
   n'existe que dans ce build) — **GO sur l'Aide en jeu de `feat/canaux-aide` (`2ee1c10`)** — capture
