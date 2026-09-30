@@ -39,7 +39,7 @@
 | `CraftingOrderClassic_UI_Skin_Backgrounds.lua` | les FONDS façon fenêtre des métiers de Forever (palier 6 de la revue d'interface ; le user : « ça doit être le même que les métiers »). | 68 |
 | `CraftingOrderClassic_UI_Skin_HelpPlate.lua` | kit d'AIDE CONTEXTUELLE (le « bouton i » de retail). | 321 |
 | `CraftingOrderClassic_ShareReagents.lua` | « liste de courses » : diffuser en un clic les réactifs d'une recette (vue métier) ou d'une commande (carte) dans un canal de discussion, avec le LIEN objet de chaque réactif. | 157 |
-| `CraftingOrderClassic_UI.lua` | fenêtre principale (chrome Blizzard natif, kit UI_Skin_Native). | 391 |
+| `CraftingOrderClassic_UI.lua` | fenêtre principale (chrome Blizzard natif, kit UI_Skin_Native). | 394 |
 | `CraftingOrderClassic_UI_Ledger.lua` | onglet CARNET : MES commandes, en table (Commande · Qté · Prix · Métier · Artisan · Statut), filtres En cours / Archivées / Confiées, colonnes TRIABLES au clic sur l'en-tête (palier 5 de la revue d'interface, calqué sur « Mes commandes » des Commandes d'artisanat ; en-tête : Skin.MakeSortHeader). | 223 |
 | `CraftingOrderClassic_UI_HelpPlate.lua` | AIDE CONTEXTUELLE de la FENÊTRE PRINCIPALE (« bouton i »). | 182 |
 | `CraftingOrderClassic_UI_Post_Layout.lua` | GÉOMÉTRIE de l'onglet « Commande » : colonnes, zones, séparateurs. | 136 |

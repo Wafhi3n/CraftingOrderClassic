@@ -143,7 +143,7 @@ end
 -- amis), puis un joueur. Le routage est inchangé (recipient "Tous"/"Guilde"/"Amis"/Nom, cf.
 -- Orders:VisibleTo). Sélection seule → on poste via « Poster ». Partagé par _UI_Post + _UI_Gather.
 -- ALL_RX/RW = place par défaut (Récolte) ; ALL_ARH = hauteur d'une ligne d'artisan, SEULE source.
-local ALL_RX, ALL_RW, ALL_ARH = 316, 502, 26
+local ALL_RX, ALL_RW, ALL_ARH, PIN_GAP = 316, 502, 26, 6
 local GROUP_LABEL = { guild = "Toute la guilde", friend = "Tous les amis" }
 
 -- Icône du groupe : le tabard de guilde, ou l'atlas de l'onglet Amis du volet social (vérifié en jeu
@@ -182,8 +182,11 @@ function UI:_BuildAllRowAndScroll(panel, kind, top, x, w, opts)
             else UI.gatherTarget = t or UI.gatherSrc; UI:_RefreshGatherArtisans() end
         end
     end
+    -- PIN_GAP de pierre sous la bande « Envoyer à » (la maquette en laissait 6) : « Tous », choisie par
+    -- défaut, collait sa surbrillance au filet de la bande, et les deux aplats clairs se confondaient —
+    -- la bande ne se lisait plus comme un en-tête (capture du user, 2026-09-30).
     local all = pinnedRow(panel, w)
-    all:SetPoint("TOPLEFT", x, top); all.icon:SetTexture(Skin.tex.broadcast)
+    all:SetPoint("TOPLEFT", x, top - PIN_GAP); all.icon:SetTexture(Skin.tex.broadcast)
     all.label:SetText(L["Tous (avec l'addon)"]); all:SetScript("OnClick", pick("all"))
     local grp = pinnedRow(panel, w)
     grp:SetPoint("TOPLEFT", all, "BOTTOMLEFT", 0, -2); grp:SetScript("OnClick", pick(nil))
