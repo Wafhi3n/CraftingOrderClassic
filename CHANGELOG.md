@@ -1,5 +1,20 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.41.1 - No more errors during boss fights
+
+During a boss fight in a dungeon, WoW Forever hides from addons who wrote a chat line and what it
+says. The addon didn't expect that. It threw a Lua error for every line that came in on a channel,
+General included, for as long as the fight lasted. Those lines now go by quietly, and the addon picks
+things up again once the boss is down.
+
+The same fight hides your communities' member lists. That made the addon error out too, and it could
+have taken your circle members out of your directory. It now keeps what it already knew and checks
+again 30 seconds later.
+
+Pressing Post or typing `/co refresh` used to write a line starting with `CLNK1` in the CraftLinkNet
+channel. The addon now says hello there with an addon message, which you won't see in chat. There's
+also a small data fix for one Enchanting trainer.
+
 ## v1.41.0 - You choose where the addon looks for crafters
 
 Where the addon looks for crafters used to be hidden behind chat commands nobody knew

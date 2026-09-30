@@ -8,6 +8,12 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "Neues",
+    -- v1.41.1
+    ["Plus d'erreurs pendant les combats de boss"] = "Keine Fehler mehr in Bosskämpfen",
+    ["Pendant un combat de boss, Forever cache aux addons qui a écrit une ligne du chat et ce qu'elle dit. L'addon levait alors une erreur à chaque ligne reçue sur un canal, Général compris ; il les laisse passer sans bruit. La liste des membres de tes communautés, cachée elle aussi, ne fait plus d'erreur et ne retire plus personne de ton annuaire."] =
+        "Während eines Bosskampfs verbirgt Forever vor Addons, wer eine Chatzeile geschrieben hat und was darin steht. Das Addon warf bei jeder Zeile, die in einem Kanal ankam, einen Fehler, auch im Allgemein-Kanal; jetzt lässt es sie still vorbeiziehen. Die Mitgliederlisten deiner Gemeinschaften sind ebenfalls verborgen und verursachen keinen Fehler mehr und entfernen niemanden mehr aus deinem Verzeichnis.",
+    ["Aussi : « Poster » et « /co refresh » n'écrivent plus de ligne « CLNK1 » sur le canal CraftLinkNet. L'addon y dit bonjour par un message d'addon, qui ne s'affiche pas dans le chat."] =
+        "Außerdem: „Erstellen“ und /co refresh schreiben keine CLNK1-Zeile mehr in den Kanal CraftLinkNet. Das Addon grüßt dort mit einer Addon-Nachricht, die im Chat nicht erscheint.",
     -- v1.41.0
     ["Tu choisis où l'addon cherche les artisans"] = "Du bestimmst, wo das Addon nach Handwerkern sucht",
     ["L'onglet Artisans a une liste « Canaux surveillés » : les canaux de Commerce, la discussion de guilde, la salle de découverte, tes communautés et les joueurs autour de toi. Coche ceux où l'addon doit chercher des artisans. Hors d'une ville, les canaux de Commerce sont grisés et ton choix est gardé."] =
@@ -204,10 +210,7 @@ local news = {
     ["Au passage : les deux fenêtres ne s'emmêlent plus (un clic la ramène au premier plan), l'annuaire a un bouton partenaire et se limite à ta faction (pas d'échange cross-faction sur Classic), et un artisan ne s'affiche plus avec un métier qui n'est pas le sien."] =
         "Nebenbei: die zwei Fenster überlagern sich nicht mehr (ein Klick bringt eins nach vorne), das Verzeichnis hat einen Partner-Knopf und bleibt bei deiner Fraktion (kein fraktionsübergreifender Handel auf Classic), und ein Handwerker zeigt keinen Beruf mehr, der nicht seiner ist.",
     -- (clés v1.8.0/v1.7.0/v1.7.1/v1.6.0/v1.5.0/v1.4.0 retirées : ces versions ne sont plus listées dans l'onglet Nouveautés)
-    -- Onglet Nouveautés — v1.13.0
-    ["Modération : mutes avec raison, temporaires, liste de confiance"] = "Moderation: Stummschaltungen mit Grund, temporär, Vertrauensliste",
-    ["Un mute porte désormais une raison et une date, et peut être temporaire : |cFFFFFFFF/co mute Bob 1h spammeur|r se lève tout seul au bout d'une heure (|cFFFFFFFF/co mute|r seul liste les mutés avec raison et temps restant). Et |cFFFFFFFF/co trust <nom>|r marque un joueur de confiance, jamais mis en sourdine automatiquement — le mute manuel restant toujours possible."] =
-        "Eine Stummschaltung trägt jetzt einen Grund und ein Datum und kann temporär sein: |cFFFFFFFF/co mute Bob 1h Spammer|r hebt sich nach einer Stunde selbst auf (|cFFFFFFFF/co mute|r allein listet die Stummgeschalteten mit Grund und Restzeit). Und |cFFFFFFFF/co trust <Name>|r markiert einen Spieler als vertrauenswürdig, nie automatisch stummgeschaltet — manuelles Stummschalten bleibt möglich.",
+    -- (clés v1.13.0 retirées à la v1.41.1 : version sortie de la fenêtre glissante de l'onglet)
     -- (clés v1.12.1 retirées : version sortie de la fenêtre glissante de l'onglet Nouveautés)
     -- (clés v1.12.0, v1.11.0 et v1.10.2 retirées à la v1.41.0 : versions sorties de la fenêtre glissante de l'onglet)
     -- Onglet Nouveautés — v1.14.0
