@@ -59,12 +59,18 @@ function UI:_OrderClickTarget(o)
     if not o then return { kind = "popup" } end
     -- Le destinataire nommé, ramené au prénom (clé locale des persos) : « Rédemption Wafhien » → « Rédemption ».
     local named = self:_OrderKind(o) == "named" and o.recipient:match("^(%S+)") or nil
-    local best
+    local best, meKnows = nil, false
     for _, k in ipairs(self:_OrderKnowers(o)) do
-        if k.isMe then return { kind = "native" } end
-        local kNamed, bNamed = k.short == named, best ~= nil and best.short == named
-        if not best or (kNamed and not bNamed) or (kNamed == bNamed and k.rank > best.rank) then best = k end
+        if k.isMe then meKnows = true
+        else
+            local kNamed, bNamed = k.short == named, best ~= nil and best.short == named
+            if not best or (kNamed and not bNamed) or (kNamed == bNamed and k.rank > best.rank) then best = k end
+        end
     end
+    -- Nommée pour un reroll qui sait la faire : sans l'option rerolls (/co alts), LUI SEUL peut l'accepter
+    -- (Orders:Accept refuse depuis un autre perso). La native du perso connecté serait une fausse piste.
+    local onlyHim = best and best.short == named and not (COC.db and COC.db.altsEnabled)
+    if meKnows and not onlyHim then return { kind = "native" } end
     if best then return { kind = "reroll", key = best.key, short = best.short } end
     return { kind = "popup" }
 end

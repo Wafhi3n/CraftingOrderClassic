@@ -76,8 +76,9 @@ disparaît quand on a mis à jour, ou quand l'alerte est oubliée (`/co version 
   `size`), `def.useAtlasSize` (l'atlas garde sa taille native, calé en haut à gauche, comme le
   `useAtlasSize="true"` du XML de Blizzard), `def.tooltip(tt)` (lignes après le titre « Crafting
   Order », posé par l'outil), `def.onClick(button)` facultatif.
-- `UI:SetIndicator(key, shown[, count])` : allume ou éteint ; rend vrai si la barre existe. `count`
-  pose un nombre dans le coin bas droit (`NumberFontNormal`, comme un objet des sacs ; nil = rien). Le
+- `UI:SetIndicator(key, shown[, count[, color]])` : allume ou éteint ; rend vrai si la barre existe. `count`
+  pose un nombre dans le coin bas droit (`NumberFontNormal`, comme un objet des sacs ; nil = rien) ;
+  `color` = `{ r, g, b }` du nombre (défaut blanc ; ajouté le 2026-09-30 pour les commandes). Le
   cadre n'est créé qu'au premier allumage ; sans la barre (hors Forever), rien. La barre n'est
   recomposée (`Layout`) que quand l'icône apparaît ou disparaît.
 - Rangs attribués : **3 = mise à jour** (`"update"`) ; **4.01 à 4.99 = une commande t'attend**, une

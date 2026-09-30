@@ -1,9 +1,9 @@
 # Icônes « une commande t'attend » dans la barre de la minicarte
 
 > État : **2e version vue en jeu à deux comptes** (relevé 2026-09-30 18:25, critères 5 et 6, sauf le
-> clic d'un métier que le perso n'a pas) ; **3e tour SPÉCIFIÉ le 2026-09-30, pas codé** (section
-> « 3e tour » ci-dessous : le clic selon qui sait faire, les commandes publiques qu'un de tes persos
-> sait faire). · Rédigée le 2026-09-28 · Idée du user le 2026-09-27, périmètre tranché par lui en trois
+> clic d'un métier que le perso n'a pas) ; **3e tour CODÉ le 2026-09-30, pas vu en jeu** (section
+> « 3e tour » ci-dessous : le clic selon qui sait faire, les commandes non nommées qu'un de tes persos
+> sait faire, la couleur du nombre ; critères 8 à 10 verts, 11 et 12 à observer). · Rédigée le 2026-09-28 · Idée du user le 2026-09-27, périmètre tranché par lui en trois
 > tours de questions (cf. Décisions).
 > Cible : WoW: Forever / Camelot (16001) · Addon : Crafting Order - Classic
 > Deuxième usage de l'outil d'icônes de la minicarte (spec `icone-minicarte.md`, rangs 4.xx).
@@ -184,9 +184,19 @@ sourdine) ; et **dès que tu l'acceptes**, elle n'attend plus.
   (même royaume, même camp que le perso connecté). Un perso dont les recettes n'ont jamais été lues
   (métier jamais ouvert) ne compte pas : on ne devine pas.
 - **Ta propre publique** ne compte pas.
-- **Une publique acceptée par quelqu'un d'autre** s'éteint à la réception de l'ACK, comme dans le Carnet.
+- **Une publique acceptée par quelqu'un d'autre** s'éteint à la réception de l'ACK, comme dans le
+  Carnet — **quand l'ACK arrive**. Relu dans `Orders:Broadcast` le 2026-09-30 : l'ACK part à l'acheteur
+  et, sans canal, aux pairs EN LIGNE que l'accepteur connaît. Un tiers hors de cette liste garde la
+  commande « ouverte », et son icône allumée, jusqu'à l'expiration (6 h). Limite du réseau, antérieure
+  à l'icône ; c'est elle qui décidera du réglage « couper les publiques ».
+- **Nommée pour un reroll qui sait la faire, alors que le perso connecté la sait aussi** : sans
+  l'option rerolls (`/co alts`), seul le reroll nommé peut l'accepter (`Orders:Accept` refuse d'un
+  autre perso) → le clic ouvre SA vue, pas la native. Avec l'option, la native. Défaut de l'agent
+  (2026-09-30), **à confirmer par le user** : la 2e version écrivait la liste dans le chat.
 - **Popup** : jamais d'appel au système de menus de Blizzard (cf. `forever-menu-addon-open-crash`) ;
-  la nôtre, fermée par Échap. Hors combat seulement pour la vue reroll (elle détache la native).
+  un `StaticPopup` comme `COC_MISSING_ADDON` (déjà vu en jeu), fermé par Échap, avec « Où
+  l'apprendre » quand les sources le savent et un bouton « Ouvrir la fenêtre de métier » si le perso
+  connecté a le métier. Hors combat seulement pour la vue reroll (elle détache la native).
 - **Rerolls de l'autre camp** : exclus, comme dans « Mes artisans ».
 
 ### Critères d'acceptation (3e tour)
@@ -212,10 +222,16 @@ sourdine) ; et **dès que tu l'acceptes**, elle n'attend plus.
 
 `CraftingOrderClassic_MinimapIndicator_Orders.lua`, sur `COC.UI` :
 
-- `UI:OrdersWaitingForMe()` → liste des commandes qui attendent ma réponse, plus récente d'abord.
-  Seule source de vérité des icônes.
+- `UI:OrdersWaitingForMe()` → les commandes NOMMÉES qui attendent ma réponse, plus récente d'abord.
+- `UI:OrdersICanDo()` → les non nommées (guilde, amis, tous) qu'un perso du compte sait faire (3e
+  tour). Ces deux listes sont, ensemble, la seule source de vérité des icônes.
+- `CraftingOrderClassic_MinimapIndicator_Who.lua` (3e tour) : `UI:_OrderKnowers(o)` (mes persos qui
+  connaissent la recette), `UI:_OrderClickTarget(o)` (`native` / `reroll` / `popup`),
+  `UI:_OrderKind(o)` (`named` / `group` / `all`), `UI:_OrderKindColor(kind)` (palette normale ou
+  Okabe-Ito selon `colorblindMode`), `UI:ShowNobodyKnows(o, n)`.
 - `UI:RefreshOrderIndicator()` → recalcule (différé de 0,2 s, les rafales réseau arrivent groupées)
-  et pose chaque icône `"order:<métier>"` avec son nombre. À appeler partout où cet état change :
+  et pose chaque icône `"order:<métier>"` avec son nombre et sa couleur. `CVAR_UPDATE` de
+  `colorblindMode` le rappelle. À appeler partout où cet état change :
   réception réseau (`Orders:OnNetwork`), `Orders:Accept`, `Orders:Decline`, masquer ou réafficher une
   commande (vue métier), `Moderation:Mute` / `Unmute`, `/co notify`. L'entrée en jeu et l'expiration
   l'appellent d'elles-mêmes.

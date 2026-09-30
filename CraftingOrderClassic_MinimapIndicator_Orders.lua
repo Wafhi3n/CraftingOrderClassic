@@ -8,7 +8,11 @@
 -- masquée, expirée. C'est le comportement de l'icône des commandes personnelles de Blizzard
 -- (MiniMapCraftingOrderFrameMixin, Blizzard_Minimap/Mainline/Minimap.lua).
 --
--- Une seule source de vérité, `UI:OrdersWaitingForMe()`, qui relit le cache. Les endroits où cet état
+-- 3e tour (2026-09-30) : les commandes NON nommées qu'un de mes persos sait faire l'allument aussi, la
+-- couleur du nombre dit d'où vient la commande, et le clic va vers le perso qui sait faire (voir
+-- MinimapIndicator_Who.lua).
+--
+-- Deux listes font la vérité, `UI:OrdersWaitingForMe()` et `UI:OrdersICanDo()`, qui relisent le cache. Les endroits où cet état
 -- change appellent `UI:RefreshOrderIndicator()` : réception réseau (Orders:OnNetwork), accepter /
 -- refuser (Orders:Accept / Decline), masquer / réafficher une commande (vue métier), sourdine d'un
 -- joueur (Moderation:Mute / Unmute), /co notify. L'entrée en jeu et l'expiration (un minuteur unique

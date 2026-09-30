@@ -65,8 +65,8 @@
 | `CraftingOrderClassic_Social_Roster.lua` | affichage des métiers sur les fenêtres NATIVES. | 130 |
 | `CraftingOrderClassic_Minimap.lua` | bouton minimap (toggle du carnet). | 185 |
 | `CraftingOrderClassic_MinimapIndicator.lua` | icônes d'état dans la barre de la minicarte (Forever). | 127 |
-| `CraftingOrderClassic_MinimapIndicator_Who.lua` | QUI, sur mon compte, sait faire une commande, et d'où elle vient. | 127 |
-| `CraftingOrderClassic_MinimapIndicator_Orders.lua` | icônes « une commande t'attend » dans la barre de la minicarte. | 263 |
+| `CraftingOrderClassic_MinimapIndicator_Who.lua` | QUI, sur mon compte, sait faire une commande, et d'où elle vient. | 133 |
+| `CraftingOrderClassic_MinimapIndicator_Orders.lua` | icônes « une commande t'attend » dans la barre de la minicarte. | 267 |
 | `CraftingOrderClassic_Nameplate.lua` | icône « recherche de travail » (LFW) sur les plaques. | 123 |
 | `CraftingOrderClassic_ProfOrders.lua` | COORDINATEUR d'événements de la fenêtre métier. | 83 |
 | `CraftingOrderClassic_RecipeCats.lua` | SOUS-CATÉGORIES de recettes (moteur + registre). | 122 |
@@ -1226,7 +1226,11 @@
 > masquée, expirée. C'est le comportement de l'icône des commandes personnelles de Blizzard
 > (MiniMapCraftingOrderFrameMixin, Blizzard_Minimap/Mainline/Minimap.lua).
 > 
-> Une seule source de vérité, `UI:OrdersWaitingForMe()`, qui relit le cache. Les endroits où cet état
+> 3e tour (2026-09-30) : les commandes NON nommées qu'un de mes persos sait faire l'allument aussi, la
+> couleur du nombre dit d'où vient la commande, et le clic va vers le perso qui sait faire (voir
+> MinimapIndicator_Who.lua).
+> 
+> Deux listes font la vérité, `UI:OrdersWaitingForMe()` et `UI:OrdersICanDo()`, qui relisent le cache. Les endroits où cet état
 > change appellent `UI:RefreshOrderIndicator()` : réception réseau (Orders:OnNetwork), accepter /
 > refuser (Orders:Accept / Decline), masquer / réafficher une commande (vue métier), sourdine d'un
 > joueur (Moderation:Mute / Unmute), /co notify. L'entrée en jeu et l'expiration (un minuteur unique
