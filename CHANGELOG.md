@@ -1,5 +1,23 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.42.0 - You choose what alerts you
+
+A player asked how to turn off the addon's messages, and the honest answer was a chat command
+nobody knew about. Every alert now has its own checkbox, at the bottom of the Watched channels list
+in the Artisans tab.
+
+The Notifications group covers requests the addon reads in chat (someone posting "WTB [item]" in
+Trade), orders from other addon users, updates on your own orders (handed over, received, declined)
+and the line the addon prints when you log in. For orders you can also pick how wide to listen: all
+of them, only guild, friends and orders for you, or only orders in your name. That's the old
+`/co notify` setting, which finally shows up somewhere.
+
+Under How to alert, the chat line, the banner and the sound each switch off separately. If Trade
+scrolls too fast for the chat line to be any use, keep the banner and drop the line.
+
+Unticking a box never hides an order. Everything the addon picks up still lands in the Ledger and
+in the profession view's Incoming tab, it just stops pinging you about it.
+
 ## v1.41.1 - No more errors during boss fights
 
 During a boss fight in a dungeon, WoW Forever hides from addons who wrote a chat line and what it

@@ -36,6 +36,14 @@ local BODY_W = 780
 local function versionsTop()
     return {
         {
+            v = "v1.42.0", title = L["Tu choisis ce qui te prévient"],
+            lines = {
+                L["En bas des « Canaux surveillés » de l'onglet Artisans, un groupe « Notifications » règle chaque alerte : les demandes lues dans le chat (« WTB [objet] »), les commandes des autres joueurs de l'addon, le suivi de tes commandes (remise, reçue, refusée) et le message à la connexion."],
+                L["Pour les commandes, tu choisis aussi la portée : toutes, seulement guilde, amis et celles pour toi, ou seulement celles à ton nom. C'est le réglage de /co notify, qui a enfin sa case."],
+                L["« Façon de prévenir » coupe à part la ligne dans le chat, le bandeau et le son. Une case décochée ne cache aucune commande : tout reste dans le Carnet et la vue métier."],
+            },
+        },
+        {
             v = "v1.41.1", title = L["Plus d'erreurs pendant les combats de boss"],
             lines = {
                 L["Pendant un combat de boss, Forever cache aux addons qui a écrit une ligne du chat et ce qu'elle dit. L'addon levait alors une erreur à chaque ligne reçue sur un canal, Général compris ; il les laisse passer sans bruit. La liste des membres de tes communautés, cachée elle aussi, ne fait plus d'erreur et ne retire plus personne de ton annuaire."],
@@ -431,13 +439,7 @@ local function versionsOldest()
                 L["Au passage : les deux fenêtres ne s'emmêlent plus (un clic la ramène au premier plan), l'annuaire a un bouton partenaire et se limite à ta faction (pas d'échange cross-faction sur Classic), et un artisan ne s'affiche plus avec un métier qui n'est pas le sien."],
             },
         },
-        {
-            v = "v1.14.0", title = L["Un panneau pour gérer les mis en sourdine"],
-            lines = {
-                L["L'onglet Artisans a maintenant une section « En sourdine » : chaque joueur muté y apparaît avec sa raison et le temps restant (ou « permanent »), avec un bouton pour le rétablir directement — plus besoin de deviner qui est encore muté."],
-            },
-        },
-        -- v1.13.0 (retirée à la v1.41.1), v1.12.0 / v1.11.0 / v1.10.2 (retirées à la v1.41.0 : la Saison de la Découverte, le canal du royaume et
+        -- v1.14.0 (retirée à la v1.42.0), v1.13.0 (retirée à la v1.41.1), v1.12.0 / v1.11.0 / v1.10.2 (retirées à la v1.41.0 : la Saison de la Découverte, le canal du royaume et
         -- le bouton « Créer » sécurisé n'existent pas sur Forever), v1.10.1 / v1.9.0 / v1.8.0 / v1.7.0 / v1.7.1 /
         -- v1.6.0 / v1.5.0 / v1.4.0 retirées de l'onglet (l'historique
         -- complet vit dans CHANGELOG.md). Cet onglet ne garde qu'une fenêtre glissante de versions :
