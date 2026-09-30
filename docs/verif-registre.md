@@ -46,6 +46,82 @@ client.
 
 ## Relevés
 
+- 2026-09-30 12:06 — jusqu'a 3e973ea — Forever, deux clients (Rédemption, Gnomi), client en ANGLAIS ;
+  build déployé `main-dev@837aa32 2026-09-30 12:02` (relu dans la copie déployée du `.toc`) — **GO
+  sur le panneau de première connexion (spec canaux-surveilles, palier 5, critères 6 et 7)** —
+  rapporté par le user SANS capture (« tout fonctionne comme tu as décrit », sur la fiche donnée :
+  ouverture seule ~10 s après le `/reload`, quatre groupes et leurs cases, la case « Annoncer », les
+  clics qui agissent, fermeture par « Confirm » sur un compte et par la croix ou Échap sur l'autre,
+  pas de retour après un second `/reload`). Relu par l'agent dans les SavedVariables des deux comptes
+  (écrites à 12:06) : `setupSeen = "1.40.0"` des deux côtés ; chez Gnomi `watch = { trade_services =
+  true, general = true }`, donc une case cochée DANS le panneau s'est bien écrite ; `roomOff` absent
+  des deux côtés (la salle a été rallumée).
+  Non vu par l'agent : la mise en page du panneau (aucune capture), un client français, allemand ou
+  espagnol, l'ouverture différée par un combat ou une instance.
+
+- 2026-09-30 11:40 — jusqu'a 15c7a02 — Forever, client en ANGLAIS, même build `main-dev@5e90b86
+  2026-09-30 11:17` — **GO sur une communauté cochée dont les membres entrent dans l'annuaire (spec
+  canaux-surveilles, critère 5)** — capture du user, après avoir fait entrer Gnomi dans sa communauté
+  de test « eaze » et coché sa ligne : une bande « eaze », compteur 1, est née dans SOURCE ;
+  sélectionnée, elle liste « Gnomi Short — Online · lvl 2 », étiquette « CIRCLE ». La liste des
+  canaux commence sous cette septième bande, plus courte, et défile toujours (« Trade (Services) »,
+  « Trade », « Trade (Local) » grisés « in town », « Guild » cochée, « CraftLinkNet » décochée,
+  « eaze » cochée). Non vu : plusieurs communautés cochées (une seule suivie en présence).
+
+- 2026-09-30 11:25 — jusqu'a 15c7a02 — Forever, un client (Rédemption), client en ANGLAIS ; build
+  déployé `main-dev@5e90b86 2026-09-30 11:17`, branches en test `feat/canaux-surveilles`,
+  `feat/icone-commande-recue`, `feat/liste-destinataires`, `feat/profit-arbitrages` (relu dans la
+  copie déployée du `.toc`) — **GO sur la section « Canaux surveillés » de l'onglet Artisans (spec
+  canaux-surveilles, palier 3, critères 1 et 2)** — capture du user, prise HORS capitale (le chat
+  montre « Left Channel: Trade (Services) ») : la section « WATCHED CHANNELS » sous la bande
+  « Muted » ; « Trade » et « Trade (Local) » grisés, cochés, avec « in town » ; « General » actif,
+  décoché ; « Guild » cochée ; « ADDON NETWORK » : « CraftLinkNet », décochée (la salle est coupée),
+  « room » ; « DIRECTORY » : « eaze », la communauté que le user vient de créer, décochée ; « AROUND
+  ME » : « Say and yell » cochée, « Crafters nearby » décochée, « in town ». La barre fine est là
+  et la liste a défilé (le premier en-tête et « Trade (Services) » sont au-dessus). Le bloc du bas
+  (« Refresh directory », « ADD A PLAYER », le champ) sans chevauchement. Un canal perso rejoint
+  pendant l'essai (« 6. azeaz ») n'a pas de ligne, comme prévu avant le palier 4.
+  Rapporté par le user (« tout est ok », sur la fiche donnée) sans capture : la vue en capitale, les
+  clics, `/co watch general on` et `/co crafters on` onglet ouvert, les infobulles.
+  Non vu : une communauté COCHÉE dont les membres entrent dans l'annuaire (critère 5 : « eaze » n'a
+  qu'un membre), la liste avec des bandes de cercles, un client français, allemand ou espagnol.
+
+- 2026-09-30 11:02 — jusqu'a 86c6f16 — Forever, deux clients, même build `main-dev@507b82e 2026-09-30
+  10:35`, salle toujours coupée, comptes « oubliés » — **GO sur la seconde moitié du critère 3 de la
+  spec canaux-surveilles : la case recochée laisse de nouveau entrer la ligne** — traces des deux
+  comptes relues par l'agent : `watch = { trade_services = true }` chez Gnomi ; Rédemption annonce
+  `#12` à 11:02:15 et ne la chuchote qu'à Frostrobb Robb ; chez Gnomi, « post de Rédemption Wafhien :
+  1/5 en 60s » et « annonce …-12 : bonjour » à 11:02:16, `HI` chuchoté dans la même seconde,
+  `ORD|NEW|…-12` reçu de Rédemption à 11:02:17. L'alerte à l'écran n'est pas rapportée par le user.
+  Non vu, inchangé : les lignes LFW, la guilde, General, dire et crier.
+
+- 2026-09-30 10:56 — jusqu'a 86c6f16 — Forever, deux clients (Rédemption, Gnomi), client en ANGLAIS,
+  Ironforge ; build déployé `main-dev@507b82e 2026-09-30 10:35`, branches en test
+  `feat/canaux-surveilles`, `feat/icone-commande-recue`, `feat/liste-destinataires`,
+  `feat/profit-arbitrages` (relu dans la copie déployée du `.toc`) — **GO partiel sur les canaux
+  surveillés, paliers 1 et 2 (spec canaux-surveilles, critère 3, première moitié)** — traces des
+  deux comptes relues par l'agent, captures du user. `/co watch` liste les cases (user). Sur Gnomi,
+  `/co watch trade_services off` : `watch = { trade_services = false }` dans sa SavedVariable. Premier
+  essai (10:53, salle restée ouverte) : aucune ligne « annonce …-10 » chez Gnomi, mais la balise
+  `CLNK1` de Rédemption reçue par la salle (10:53:14), un bonjour, et la commande `#10` par
+  chuchotement (alerte « new order ») — la case ne ferme qu'UN canal. Second essai, salle coupée par
+  `/co watch room off` sur les deux comptes (Gnomi : « canal quitté (opt-out) » à 10:55:16, `roomOff`
+  posé des deux côtés) et comptes « oubliés » : `#11` annoncée à 10:56:44, chuchotée au seul Frostrobb
+  Robb ; chez Gnomi, **rien** jusqu'à son `/reload` (ni « annonce …-11 », ni `ORD|NEW`, ni bonjour ;
+  « rien » confirmé par le user). Après ce `/reload`, `#11` lui arrive RELAYÉE par Frostrobb Robb
+  (10:57:20, alerte « new order ») : le relais du réseau, pas la case. Au login de 10:57, Rédemption
+  salue tout son annuaire sans Gnomi : l'oubli par `/run` tient après un `/reload`.
+  Vu au passage : **`PROVIDE` enfin sur une ligne** — `WTB [Copper Bracers] x1 PROVIDE [Copper Bar]x2
+  1s #CO11` (capture), le dernier « non vu » de l'annonce sur Commerce ; et **le bonjour différé de
+  la salle (`52633c3`)** : salle rejointe à 09:24:17 (Gnomi) et 09:24:24 (Rédemption), `HI` sur la
+  salle 2 s plus tard, reçu par l'autre compte par le canal (09:24:26), aucun « InvalidChannel ».
+  Non vu : la case recochée qui laisse de nouveau entrer la ligne (seconde moitié du critère 3), les
+  lignes LFW (canal décoché, dire et crier), la guilde, General coché, `CraftLinkNet` qui quitte la
+  fenêtre Chat Channels (pas rapporté). Le prix s'affiche toujours « 1pa » / « 50po » sur le client
+  anglais. Le repère couvre aussi `7089beb` (l'addon sans sa lib CraftLink) : l'addon se charge et
+  tourne normalement avec ce commit, mais sa ligne d'avertissement n'a JAMAIS été vue (il faudrait
+  casser la lib exprès) ; ce cas ne repose que sur `tests/test_craftlink_absent.lua`.
+
 - 2026-09-30 08:48 — jusqu'a 8fd4cb9 — Forever, deux clients (Rédemption, Gnomi), client en ANGLAIS ;
   même build `main-dev@e61e34d 2026-09-30 00:58` (v1.40.0) — **GO sur la relecture du protocole côté
   réception (`352c1b7`) et sur l'Aide (`97ab48b`), GO partiel sur l'annonce** — traces des deux

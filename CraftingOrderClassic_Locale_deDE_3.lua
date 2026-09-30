@@ -99,6 +99,41 @@ local de3 = {
     -- Lib absente au chargement (2026-09-30)
     ["la bibliothèque CraftLink n'a pas pu se charger : le réseau de l'addon est coupé (annuaire, commandes). Fais |cFFFFFFFF/reload|r ; si ça continue, réinstalle l'addon."] =
         "die Bibliothek CraftLink konnte nicht geladen werden: das Netzwerk des Addons ist aus (Verzeichnis, Aufträge). Gib |cFFFFFFFF/reload|r ein; wenn es wieder passiert, installiere das Addon neu.",
+    -- Canaux surveillés : l'origine d'une entrante lue sur le canal Général (2026-09-30)
+    ["général"] = "Allgemein",
+    -- Canaux surveillés : la section de l'onglet Artisans (2026-09-30)
+    ["CANAUX SURVEILLÉS"] = "BEOBACHTETE KANÄLE",
+    ["ANNONCES LUES"] = "GELESENE ANKÜNDIGUNGEN",
+    ["L'addon y lit les demandes, les dispos et les annonces des autres joueurs de l'addon. Il n'écrit que sur Trade (Services), et seulement si tu coches « Annoncer en Commerce »."] =
+        "Das Addon liest dort Gesuche, Verfügbarkeiten und die Ankündigungen anderer Addon-Nutzer. Es schreibt nur in Handel (Dienstleistungen), und nur, wenn du „Im Handel ankündigen“ anhakst.",
+    ["Commerce (Services)"] = "Handel (Dienstleistungen)",
+    ["Commerce"] = "Handel",
+    ["Commerce (local)"] = "Handel (Lokal)",
+    ["Général"] = "Allgemein",
+    ["en ville"] = "in der Stadt",
+    ["RÉSEAU DE L'ADDON"] = "ADDON-NETZWERK",
+    ["L'addon s'y présente par un message invisible aux joueurs de ta salle ; ensuite, tout passe en chuchotement."] =
+        "Das Addon stellt sich dort mit einer unsichtbaren Nachricht den Spielern in deinem Raum vor; danach läuft alles per Flüstern.",
+    ["salle"] = "Raum",
+    ["ANNUAIRE"] = "VERZEICHNIS",
+    ["Les membres d'une communauté cochée rejoignent ton annuaire, même hors ligne. Aucune donnée de l'addon n'y passe."] =
+        "Die Mitglieder einer angehakten Gemeinschaft kommen in dein Verzeichnis, auch offline. Es laufen keine Addon-Daten darüber.",
+    ["aucune communauté"] = "keine Gemeinschaft",
+    ["AUTOUR DE MOI"] = "UM MICH HERUM",
+    ["Ce que les joueurs disent ou crient près de toi (les lignes LFW), et, en ville, ceux que tu vois crafter."] =
+        "Was Spieler in deiner Nähe sagen oder schreien (LFW-Zeilen) und, in der Stadt, wen du beim Herstellen siehst.",
+    ["Dire et crier"] = "Sagen und Schreien",
+    ["Crafteurs autour"] = "Handwerker in der Nähe",
+    ["Tu n'es pas dans ce canal en ce moment. Ton choix est gardé pour ton retour."] =
+        "Du bist gerade nicht in diesem Kanal. Deine Wahl bleibt für deine Rückkehr erhalten.",
+    -- Canaux surveillés : le panneau de première connexion (2026-09-30)
+    ["Où chercher les artisans ?"] = "Wo nach Handwerkern suchen?",
+    ["L'addon trouve les artisans par les canaux que tu coches ici. Tu pourras tout changer plus tard, dans l'onglet Artisans."] =
+        "Das Addon findet Handwerker über die Kanäle, die du hier anhakst. Du kannst später alles im Reiter „Handwerker“ ändern.",
+    ["Annoncer aussi mes commandes et ma dispo sur Trade (Services)"] =
+        "Meine Aufträge und meine Verfügbarkeit auch in Handel (Dienstleistungen) ankündigen",
+    ["Une ligne lisible par tous, seulement quand tu cliques."] = "Eine Zeile, die alle lesen können, nur wenn du klickst.",
+    ["Valider"] = "Bestätigen",
 }
 
 for k, v in pairs(de3) do L[k] = v end

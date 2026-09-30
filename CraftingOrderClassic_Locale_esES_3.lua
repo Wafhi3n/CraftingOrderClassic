@@ -100,6 +100,41 @@ local es3 = {
     -- Lib absente au chargement (2026-09-30)
     ["la bibliothèque CraftLink n'a pas pu se charger : le réseau de l'addon est coupé (annuaire, commandes). Fais |cFFFFFFFF/reload|r ; si ça continue, réinstalle l'addon."] =
         "la biblioteca CraftLink no se pudo cargar: la red del addon está desactivada (directorio, pedidos). Escribe |cFFFFFFFF/reload|r; si vuelve a pasar, reinstala el addon.",
+    -- Canaux surveillés : l'origine d'une entrante lue sur le canal Général (2026-09-30)
+    ["général"] = "general",
+    -- Canaux surveillés : la section de l'onglet Artisans (2026-09-30)
+    ["CANAUX SURVEILLÉS"] = "CANALES VIGILADOS",
+    ["ANNONCES LUES"] = "ANUNCIOS LEÍDOS",
+    ["L'addon y lit les demandes, les dispos et les annonces des autres joueurs de l'addon. Il n'écrit que sur Trade (Services), et seulement si tu coches « Annoncer en Commerce »."] =
+        "El addon lee ahí las peticiones, las disponibilidades y los anuncios de otros usuarios del addon. Solo escribe en Comercio (Servicios), y solo si marcas «Anunciar en Comercio».",
+    ["Commerce (Services)"] = "Comercio (Servicios)",
+    ["Commerce"] = "Comercio",
+    ["Commerce (local)"] = "Comercio (local)",
+    ["Général"] = "General",
+    ["en ville"] = "en ciudad",
+    ["RÉSEAU DE L'ADDON"] = "RED DEL ADDON",
+    ["L'addon s'y présente par un message invisible aux joueurs de ta salle ; ensuite, tout passe en chuchotement."] =
+        "El addon se presenta ahí con un mensaje invisible a los jugadores de tu sala; después, todo va por susurro.",
+    ["salle"] = "sala",
+    ["ANNUAIRE"] = "DIRECTORIO",
+    ["Les membres d'une communauté cochée rejoignent ton annuaire, même hors ligne. Aucune donnée de l'addon n'y passe."] =
+        "Los miembros de una comunidad marcada entran en tu directorio, incluso desconectados. Ningún dato del addon pasa por ella.",
+    ["aucune communauté"] = "ninguna comunidad",
+    ["AUTOUR DE MOI"] = "A MI ALREDEDOR",
+    ["Ce que les joueurs disent ou crient près de toi (les lignes LFW), et, en ville, ceux que tu vois crafter."] =
+        "Lo que los jugadores dicen o gritan cerca de ti (líneas LFW) y, en ciudad, a quienes ves fabricar.",
+    ["Dire et crier"] = "Decir y gritar",
+    ["Crafteurs autour"] = "Artesanos cercanos",
+    ["Tu n'es pas dans ce canal en ce moment. Ton choix est gardé pour ton retour."] =
+        "No estás en este canal ahora mismo. Tu elección se guarda para cuando vuelvas.",
+    -- Canaux surveillés : le panneau de première connexion (2026-09-30)
+    ["Où chercher les artisans ?"] = "¿Dónde buscar artesanos?",
+    ["L'addon trouve les artisans par les canaux que tu coches ici. Tu pourras tout changer plus tard, dans l'onglet Artisans."] =
+        "El addon encuentra artesanos a través de los canales que marcas aquí. Podrás cambiarlo todo más tarde, en la pestaña Artesanos.",
+    ["Annoncer aussi mes commandes et ma dispo sur Trade (Services)"] =
+        "Anunciar también mis pedidos y mi disponibilidad en Comercio (Servicios)",
+    ["Une ligne lisible par tous, seulement quand tu cliques."] = "Una línea que todos pueden leer, solo cuando haces clic.",
+    ["Valider"] = "Confirmar",
 }
 
 for k, v in pairs(es3) do L[k] = v end

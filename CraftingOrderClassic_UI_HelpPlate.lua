@@ -46,8 +46,8 @@ end
 -- Textes de l'onglet Artisans (annuaire social). Pas de contrôle hors-SPEC (ni portrait ni Poster).
 local function artisansTexts()
     return {
-        sources      = L["Filtre l'annuaire par source : guilde, amis, ajoutés manuellement, croisés, ou les joueurs en sourdine."],
-        addPlayer    = L["Ajoute un joueur manuellement (+), rafraîchis l'annuaire, ou active le repérage."],
+        sources      = L["Filtre l'annuaire par source : guilde, amis, ajoutés manuellement, croisés, ou les joueurs en sourdine. Dessous, les canaux que l'addon surveille : coche ceux où il doit chercher des artisans."],
+        addPlayer    = L["Ajoute un joueur manuellement (+) ou rafraîchis l'annuaire."],
         profFilter   = L["Filtre les artisans par métier."],
         artisansList = L["La liste des artisans connus. Survole un nom pour ses métiers ; pastille verte = a l'addon et répond, jaune = en ligne sans l'addon, grise = hors ligne."],
     }

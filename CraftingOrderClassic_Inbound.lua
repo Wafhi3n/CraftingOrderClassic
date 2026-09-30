@@ -190,7 +190,7 @@ function Inbound:Alert(e)
     if COC.Moderation and COC.Moderation:BelowThreshold(e.buyer) then return end   -- petit perso (si connu)
     local c = CraftLink
     local nm = (c and c:ItemName(e.itemID, e.itemName)) or e.itemName or ("item:" .. e.itemID)
-    local src = (e.source == "guild") and L["guilde"] or L["commerce"]
+    local src = (e.source == "guild") and L["guilde"] or (e.source == "general") and L["général"] or L["commerce"]
     local Skin = COC.UI and COC.UI.Skin
     local qty = (Skin and Skin.QtySuffix(e)) or ""
     local pr  = e.price and (" — |cFFFFDD00" .. e.price .. "|r") or ""
@@ -310,16 +310,18 @@ function Inbound:Start()
         local Api = COC.Api   -- texte secret (instance) : ni :match, ni :lower, ni comparaison
         if Api.IsSecret(msg) or Api.IsSecret(player) or Api.IsSecret(channelName) then return end
         local who = player and (player:match("^([^%-]+)") or player)
+        -- OÙ lire : un canal du jeu reconnu ET coché (COC.Channels, spec canaux-surveilles). `/co scan`
+        -- plus haut, lui, dit QUOI garder.
+        local Ch = COC.Channels
         if event == "CHAT_MSG_CHANNEL" then
-            local cn = (channelName or ""):lower()
-            if cn:find("trade") or cn:find("commerce") or cn:find("échange") or cn:find("echange")
-               or cn:find("handel") or cn:find("comercio") then
+            local key = Ch.KeyOf(channelName)
+            if key and Ch.IsWatched(key) then
                 -- Une annonce d'un autre addon (#CO) d'abord : elle ne doit pas devenir aussi une demande humaine.
                 local R = COC.AnnounceRecv
-                if not (R and R:OnLine(msg, player)) then Inbound:OnChat(msg, who, "trade") end
+                if not (R and R:OnLine(msg, player)) then Inbound:OnChat(msg, who, key == "general" and "general" or "trade") end
             end
         elseif event == "CHAT_MSG_GUILD" then
-            Inbound:OnChat(msg, who, "guild")
+            if Ch.IsWatched("guild") then Inbound:OnChat(msg, who, "guild") end
         end
     end)
 end
