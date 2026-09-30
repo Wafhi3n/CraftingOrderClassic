@@ -139,6 +139,15 @@ local es3 = {
     ["Seulement pour moi"] = "Solo para mí",
     ["Les commandes à ton nom ou à celui d'un de tes persos."] = "Los pedidos a tu nombre o al de uno de tus personajes.",
     ["Aussi les commandes publiques, pour un métier que tu as."] = "También los pedidos públicos, para una profesión que tienes.",
+    ["Suivi de mes commandes"] = "Seguimiento de mis pedidos",
+    ["Une commande qu'on t'a remise, dont on a confirmé la réception, ou qu'on a refusée."] = "Un pedido que te han entregado, cuya recepción se ha confirmado, o que se ha rechazado.",
+    ["Message à la connexion"] = "Mensaje al conectar",
+    ["La ligne « chargé — /co help » quand tu te connectes."] = "La línea « cargado — /co help » al conectarte.",
+    ["FAÇON DE PRÉVENIR"] = "CÓMO AVISAR",
+    ["Pour toutes les alertes cochées au-dessus."] = "Para todos los avisos marcados arriba.",
+    ["Ligne dans le chat"] = "Línea en el chat",
+    ["Bandeau à l'écran"] = "Aviso en pantalla",
+    ["Son"] = "Sonido",
     ["Tu n'es pas dans ce canal en ce moment. Ton choix est gardé pour ton retour."] =
         "No estás en este canal ahora mismo. Tu elección se guarda para cuando vuelvas.",
     -- Refonte de l'onglet Artisans (2026-09-30) : la bande des joueurs croisés, le bouton qui rouvre le panneau

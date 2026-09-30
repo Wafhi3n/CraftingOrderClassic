@@ -139,6 +139,15 @@ local en3 = {
     ["Seulement pour moi"] = "Only for me",
     ["Les commandes à ton nom ou à celui d'un de tes persos."] = "Orders in your name or one of your characters'.",
     ["Aussi les commandes publiques, pour un métier que tu as."] = "Also public orders, for a profession you have.",
+    ["Suivi de mes commandes"] = "Tracking my orders",
+    ["Une commande qu'on t'a remise, dont on a confirmé la réception, ou qu'on a refusée."] = "An order handed to you, confirmed as received, or declined.",
+    ["Message à la connexion"] = "Login message",
+    ["La ligne « chargé — /co help » quand tu te connectes."] = "The \"loaded — /co help\" line when you log in.",
+    ["FAÇON DE PRÉVENIR"] = "HOW TO ALERT",
+    ["Pour toutes les alertes cochées au-dessus."] = "For every alert ticked above.",
+    ["Ligne dans le chat"] = "Chat line",
+    ["Bandeau à l'écran"] = "On-screen banner",
+    ["Son"] = "Sound",
     ["Tu n'es pas dans ce canal en ce moment. Ton choix est gardé pour ton retour."] =
         "You're not in this channel right now. Your choice is kept for when you're back.",
     -- Refonte de l'onglet Artisans (2026-09-30) : la bande des joueurs croisés, le bouton qui rouvre le panneau

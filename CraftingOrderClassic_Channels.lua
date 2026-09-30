@@ -74,7 +74,9 @@ end
 -- Les réglages qui existaient AVANT la liste restent la vérité de leur case, sous leur nom (pas de
 -- migration, donc rien à perdre) : `room` lit roomOff, `nearby` lit crafterScan, `club:<id>` lit
 -- circles. Le reste vit dans COC.db.watch : absent = le défaut, false = décoché par le joueur.
-local DEFAULTS = { trade_services = true, trade = true, trade_local = true, guild = true, sayyell = true, general = false }
+local DEFAULTS = { trade_services = true, trade = true, trade_local = true, guild = true, sayyell = true, general = false,
+                   notif_follow = true, notif_login = true,
+                   notif_way_chat = true, notif_way_toast = true, notif_way_sound = true }
 -- Deux cases ne disent pas OÙ lire mais s'il faut PRÉVENIR (ligne de chat, bandeau, son) : ce réglage
 -- n'existait que par /co notify, qu'aucun joueur ne trouvait (demande du user, 2026-09-30).
 --   notif_orders = les commandes reçues par l'addon : lit notifyScope, la vérité de /co notify.
@@ -83,8 +85,11 @@ local DEFAULTS = { trade_services = true, trade = true, trade_local = true, guil
 --                  ne dépend plus que d'elle-même.
 --   notify:<mode> = les trois portées de /co notify (all, directed, named), une seule cochée. Décocher
 --                  « Commandes » garde la portée dans notifyScopeOn : la recocher la rend.
+--   notif_follow  = le suivi de MES commandes (remise, confirmée, refusée) ; notif_login = la ligne du login.
+--   notif_way_*   = COMMENT prévenir (chat, bandeau, son), pour toutes ces alertes : COC.Notify les lit.
 Ch.WATCH_KEYS = { "trade_services", "trade", "trade_local", "general", "guild", "sayyell", "room", "nearby",
-                  "notif_orders", "notif_chat" }
+                  "notif_orders", "notif_chat", "notif_follow", "notif_login",
+                  "notif_way_chat", "notif_way_toast", "notif_way_sound" }
 Ch.NOTIFY_MODES = { "all", "directed", "named" }
 
 local function clubId(key) return type(key) == "string" and key:match("^club:(.+)$") or nil end
@@ -150,6 +155,31 @@ end
 -- ------------------------------------------------------------------
 -- La liste de l'onglet Artisans
 -- ------------------------------------------------------------------
+-- Les deux derniers groupes : QUELLES alertes, puis COMMENT elles préviennent.
+local function notifRows(L, rows, head, item)
+    head(L["NOTIFICATIONS"], L["Ce qui te prévient : une ligne dans le chat, un bandeau et un son. Décochée, une case ne retire aucune commande : tout reste dans le Carnet et la vue métier."])
+    item("notif_chat", L["Demandes lues dans le chat"], true, nil, L["Les demandes (« WTB [objet] ») lues dans les canaux cochés plus haut, pour ce que tu sais crafter."])
+    item("notif_orders", L["Commandes de l'addon"], true, nil, L["Les commandes que les autres joueurs de l'addon t'envoient ou publient."])
+    -- Les portées, sous leur case (`sub` : en retrait dans l'onglet, absentes du panneau de première
+    -- connexion). Grisées quand les commandes sont coupées : le choix, lui, est gardé.
+    local ordersOn = Ch.IsWatched("notif_orders")
+    local modes = {
+        all      = { L["Toutes"], L["Aussi les commandes publiques, pour un métier que tu as."] },
+        directed = { L["Guilde, amis et pour moi"], L["Pas les commandes publiques ouvertes à tous."] },
+        named    = { L["Seulement pour moi"], L["Les commandes à ton nom ou à celui d'un de tes persos."] },
+    }
+    for _, m in ipairs(Ch.NOTIFY_MODES) do
+        item("notify:" .. m, modes[m][1], ordersOn, nil, modes[m][2])
+        rows[#rows].sub = true
+    end
+    item("notif_follow", L["Suivi de mes commandes"], true, nil, L["Une commande qu'on t'a remise, dont on a confirmé la réception, ou qu'on a refusée."])
+    item("notif_login", L["Message à la connexion"], true, nil, L["La ligne « chargé — /co help » quand tu te connectes."])
+    head(L["FAÇON DE PRÉVENIR"], L["Pour toutes les alertes cochées au-dessus."])
+    item("notif_way_chat", L["Ligne dans le chat"], true)
+    item("notif_way_toast", L["Bandeau à l'écran"], true)
+    item("notif_way_sound", L["Son"], true)
+end
+
 -- Les lignes de la section « Canaux surveillés » : des en-têtes de groupe et des lignes à case.
 -- PURE : l'appelant dit où le joueur se trouve (`joined[clé]` = le nom du canal tel que le jeu
 -- l'écrit), s'il a une guilde, et ses communautés ({ id, name }). `there` = le joueur y est en ce
@@ -185,21 +215,7 @@ function Ch.BuildRows(joined, clubs, inGuild)
     head(L["AUTOUR DE MOI"], L["Ce que les joueurs disent ou crient près de toi (les lignes LFW), et, en ville, ceux que tu vois crafter."])
     item("sayyell", L["Dire et crier"], true)
     item("nearby", L["Crafteurs autour"], true, L["en ville"], L["Repérer les crafteurs autour (en ville)"])
-    head(L["NOTIFICATIONS"], L["Ce qui te prévient : une ligne dans le chat, un bandeau et un son. Décochée, une case ne retire aucune commande : tout reste dans le Carnet et la vue métier."])
-    item("notif_chat", L["Demandes lues dans le chat"], true, nil, L["Les demandes (« WTB [objet] ») lues dans les canaux cochés plus haut, pour ce que tu sais crafter."])
-    item("notif_orders", L["Commandes de l'addon"], true, nil, L["Les commandes que les autres joueurs de l'addon t'envoient ou publient."])
-    -- Les portées, sous leur case (`sub` : en retrait dans l'onglet, absentes du panneau de première
-    -- connexion). Grisées quand les commandes sont coupées : le choix, lui, est gardé.
-    local ordersOn = Ch.IsWatched("notif_orders")
-    local modes = {
-        all      = { L["Toutes"], L["Aussi les commandes publiques, pour un métier que tu as."] },
-        directed = { L["Guilde, amis et pour moi"], L["Pas les commandes publiques ouvertes à tous."] },
-        named    = { L["Seulement pour moi"], L["Les commandes à ton nom ou à celui d'un de tes persos."] },
-    }
-    for _, m in ipairs(Ch.NOTIFY_MODES) do
-        item("notify:" .. m, modes[m][1], ordersOn, nil, modes[m][2])
-        rows[#rows].sub = true
-    end
+    notifRows(L, rows, head, item)
     return rows
 end
 

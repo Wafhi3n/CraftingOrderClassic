@@ -138,6 +138,15 @@ local de3 = {
     ["Seulement pour moi"] = "Nur für mich",
     ["Les commandes à ton nom ou à celui d'un de tes persos."] = "Aufträge auf deinen Namen oder den eines deiner Charaktere.",
     ["Aussi les commandes publiques, pour un métier que tu as."] = "Auch öffentliche Aufträge, für einen Beruf, den du hast.",
+    ["Suivi de mes commandes"] = "Verlauf meiner Aufträge",
+    ["Une commande qu'on t'a remise, dont on a confirmé la réception, ou qu'on a refusée."] = "Ein Auftrag, der dir übergeben, als erhalten bestätigt oder abgelehnt wurde.",
+    ["Message à la connexion"] = "Nachricht beim Einloggen",
+    ["La ligne « chargé — /co help » quand tu te connectes."] = "Die Zeile „geladen — /co help“ beim Einloggen.",
+    ["FAÇON DE PRÉVENIR"] = "ART DER BENACHRICHTIGUNG",
+    ["Pour toutes les alertes cochées au-dessus."] = "Für alle oben angehakten Hinweise.",
+    ["Ligne dans le chat"] = "Zeile im Chat",
+    ["Bandeau à l'écran"] = "Banner auf dem Bildschirm",
+    ["Son"] = "Ton",
     ["Tu n'es pas dans ce canal en ce moment. Ton choix est gardé pour ton retour."] =
         "Du bist gerade nicht in diesem Kanal. Deine Wahl bleibt für deine Rückkehr erhalten.",
     -- Refonte de l'onglet Artisans (2026-09-30) : la bande des joueurs croisés, le bouton qui rouvre le panneau

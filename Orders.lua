@@ -196,14 +196,11 @@ end
 -- Toast côté ACHETEUR quand le crafteur vient de remettre l'objet (reçu ORD|DLV) : l'invite à
 -- confirmer la réception. La confirmation auto au loot peut arriver juste après (double sécurité).
 function Orders:AlertDelivered(o)
-    if not o then return end
+    if not o or (COC.Channels and not COC.Channels.IsWatched("notif_follow")) then return end   -- case « Suivi de mes commandes »
     local txt = string.format(L["%s a remis ta commande : %s — clique « J'ai reçu » pour confirmer"],
         o.acceptedBy or "?", self:OrderName(o))
-    pmsg(txt)
-    if COC.UI and COC.UI.Toast then
-        local Skin = COC.UI and COC.UI.Skin
-        COC.UI:Toast(txt, Skin and Skin.tex.workorder)
-    end
+    local Skin = COC.UI and COC.UI.Skin
+    if COC.Notify then COC.Notify.Emit({ chat = txt, icon = Skin and Skin.tex.workorder }) end
 end
 
 -- Refuser/relâcher une commande (bouton « Refuser » de la vue métier ; le clic droit ne fait que
@@ -301,9 +298,7 @@ function Orders:AlertTargeted(o, tries)
     else
         msg = string.format(L["|cFFFFCC00nouvelle commande|r de |cFFFFFFFF%s|r : %s%s%s"], o.buyer, nm, qty, pr)
     end
-    pmsg((Skin and ("|T" .. Skin.tex.workorder .. ":0|t ") or "") .. msg)
-    if COC.UI and COC.UI.Toast then COC.UI:Toast(msg) end
-    pcall(function() PlaySound(SOUNDKIT and SOUNDKIT.TELL_MESSAGE or 3081, "Master") end)
+    if COC.Notify then COC.Notify.Emit({ chat = (Skin and ("|T" .. Skin.tex.workorder .. ":0|t ") or "") .. msg, toast = msg, sound = true }) end
     -- Reroll : commande nommée que mon perso COURANT ne sait pas faire, mais un alt du compte oui.
     -- Passe par Handoff:AlertReroll (chemin unique, dédupliqué par o._rerollAlertDone) pour éviter
     -- une double alerte si le même ordre arrive aussi via ORD|SUGG (_OnSuggest, Orders_Net.lua).

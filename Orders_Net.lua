@@ -13,7 +13,6 @@ local CraftLink = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
 local Codec     = COC.OrdersCodec   -- sérialisation ⇄ parsing ORD| (Orders_Codec.lua, chargé avant)
 
 local function me() return COC.Api.PlayerName() end   -- nom RÉSEAU (« Prénom Nom » sur Forever)
-local function pmsg(m) print("|cFF33DD88Crafting Order|r " .. m) end
 
 local KEYWORD_RCPT = { Tous = true, Guilde = true, Amis = true }
 
@@ -298,7 +297,9 @@ function Orders:_OnDone(o, f, sender)
     if iCrafted then
         COC.db.delivered = (COC.db.delivered or 0) + 1   -- réputation : créditée à la confirmation acheteur
         if COC.Directory then COC.Directory:AnnounceSkills() end
-        pmsg(string.format(L["réception confirmée par %s ! crafts livrés au total : %d"], o.buyer or "?", COC.db.delivered))
+        if not COC.Channels or COC.Channels.IsWatched("notif_follow") then
+            if COC.Notify then COC.Notify.Emit({ chat = string.format(L["réception confirmée par %s ! crafts livrés au total : %d"], o.buyer or "?", COC.db.delivered), toast = false }) end
+        end
     end
 end
 
@@ -318,12 +319,11 @@ function Orders:_OnNack(message, sender)
         o.status = "declined"; o.declinedBy = who; moved = true  -- commande nommée refusée (par le perso ou son reroll)
     end
     -- Notifier l'acheteur SEULEMENT sur transition réelle, et jamais de la part d'un joueur mis en sourdine.
-    if moved and myChar(o.buyer) and not (COC.Moderation and COC.Moderation.IsMuted and COC.Moderation:IsMuted(who)) then
+    if moved and myChar(o.buyer) and not (COC.Moderation and COC.Moderation.IsMuted and COC.Moderation:IsMuted(who))
+       and (not COC.Channels or COC.Channels.IsWatched("notif_follow")) then
         local txt = string.format(L["%s a refusé ta commande : %s"], who, self:OrderName(o))
-        pmsg(txt)
-        if o.status == "declined" and COC.UI and COC.UI.Toast then
-            local Skin = COC.UI.Skin; COC.UI:Toast(txt, Skin and Skin.tex.fail)
-        end
+        local Skin = COC.UI and COC.UI.Skin
+        if COC.Notify then COC.Notify.Emit({ chat = txt, toast = (o.status == "declined") and txt or false, icon = Skin and Skin.tex.fail }) end
     end
 end
 

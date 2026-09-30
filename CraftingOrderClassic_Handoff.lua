@@ -202,9 +202,8 @@ function Handoff:AlertCapable(o, tries)
     local pr  = o.price and (" — |cFFFFDD00" .. o.price .. "|r") or ""
     local msg = string.format(L["|cFF66CCFFtu sais le faire|r — demandé par |cFFFFFFFF%s|r : %s%s%s"],
         o.buyer or "?", nm, qty, pr)
-    pmsg((Skin and ("|T" .. Skin.tex.workorder .. ":0|t ") or "") .. msg)
-    if COC.UI and COC.UI.Toast then COC.UI:Toast(msg, Skin and Skin.tex.workorder) end
-    pcall(function() PlaySound(SOUNDKIT and SOUNDKIT.TELL_MESSAGE or 3081, "Master") end)
+    if COC.Notify then COC.Notify.Emit({ chat = (Skin and ("|T" .. Skin.tex.workorder .. ":0|t ") or "") .. msg, toast = msg,
+                      icon = Skin and Skin.tex.workorder, sound = true }) end
     if COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end
 end
 
@@ -245,8 +244,8 @@ function Handoff:AlertReroll(o, alt, tries)
     local Skin = COC.UI and COC.UI.Skin
     local what = nm .. ((Skin and Skin.QtySuffix(o)) or "")
     local msg  = string.format(L["ton reroll |cFFFFFFFF%s|r sait le faire : %s"], alt, what)
-    pmsg((Skin and ("|T" .. Skin.tex.workorder .. ":0|t ") or "") .. msg)
-    if COC.UI and COC.UI.Toast then COC.UI:Toast(msg, Skin and Skin.tex.workorder) end
+    if COC.Notify then COC.Notify.Emit({ chat = (Skin and ("|T" .. Skin.tex.workorder .. ":0|t ") or "") .. msg, toast = msg,
+                      icon = Skin and Skin.tex.workorder }) end
 end
 
 -- ------------------------------------------------------------------

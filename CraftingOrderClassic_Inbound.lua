@@ -201,10 +201,8 @@ function Inbound:Alert(e)
     local pr  = e.price and (" — |cFFFFDD00" .. e.price .. "|r") or ""
     local msg = string.format(L["|cFFFF8800entrante|r |cFFFFFFFF%s|r (%s) : %s%s%s"], e.buyer, src, nm, qty, pr)
     e.alerted = true   -- lu par TakeOver : la commande complète ne sonnera pas une seconde fois
-    pmsg((Skin and ("|T" .. Skin.tex.workorder .. ":0|t ") or "") .. msg)
-    if COC.UI and COC.UI.Toast then COC.UI:Toast(msg) end
-    if e.canCraft then print(L["   |cFF33DD33» tu sais la crafter|r — vue métier › onglet Entrantes"]) end
-    pcall(function() PlaySound(SOUNDKIT and SOUNDKIT.TELL_MESSAGE or 3081, "Master") end)
+    if COC.Notify then COC.Notify.Emit({ chat = (Skin and ("|T" .. Skin.tex.workorder .. ":0|t ") or "") .. msg, toast = msg, sound = true,
+        more = e.canCraft and L["   |cFF33DD33» tu sais la crafter|r — vue métier › onglet Entrantes"] or nil }) end
 end
 
 -- ------------------------------------------------------------------
