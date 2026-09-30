@@ -69,7 +69,9 @@ client.
   Non vu : la case recochée qui laisse de nouveau entrer la ligne (seconde moitié du critère 3), les
   lignes LFW (canal décoché, dire et crier), la guilde, General coché, `CraftLinkNet` qui quitte la
   fenêtre Chat Channels (pas rapporté). Le prix s'affiche toujours « 1pa » / « 50po » sur le client
-  anglais.
+  anglais. Le repère couvre aussi `7089beb` (l'addon sans sa lib CraftLink) : l'addon se charge et
+  tourne normalement avec ce commit, mais sa ligne d'avertissement n'a JAMAIS été vue (il faudrait
+  casser la lib exprès) ; ce cas ne repose que sur `tests/test_craftlink_absent.lua`.
 
 - 2026-09-30 08:48 — jusqu'a 8fd4cb9 — Forever, deux clients (Rédemption, Gnomi), client en ANGLAIS ;
   même build `main-dev@e61e34d 2026-09-30 00:58` (v1.40.0) — **GO sur la relecture du protocole côté
