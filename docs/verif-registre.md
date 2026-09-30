@@ -46,8 +46,8 @@ client.
 
 ## Relevés
 
-- 2026-09-30 22:10 — jusqu'a 598372c — Forever, 2 comptes (Gnomi / Sheadra), build `main-dev@7e165ee
-  2026-09-30 19:41` d'après `deploy.ps1` (`/co version` pas relu en séance) — **GO partiel** sur les
+- 2026-09-30 22:20 — jusqu'a 598372c — Forever, 2 comptes (Gnomi / Sheadra), build `main-dev@7e165ee
+  2026-09-30 19:41` d'après `deploy.ps1` (`/co version` pas relu en séance) — **GO** sur les
   cases NOTIFICATIONS (`feat/options-notifs`) — relu par l'agent dans `DevMacroDB.log`, grâce à un
   espion DevMacro qui note chaque ligne « Crafting Order », chaque bandeau et chaque son ; les
   étapes A, H et la disposition de la liste sont vues à l'œil par le user.
@@ -63,9 +63,12 @@ client.
   21:55:26 chez Sheadra LIGNE « receipt confirmed by Gnomi Short! », sans bandeau ; « Tracking my
   orders » décochée = la commande `-46` remise et confirmée, 0 alerte chez Gnomi.
   **Connexion** : « Login message » décochée, pas de ligne « loaded » au `/reload` (capture).
-  ⚠️ **NON observé** : la portée « Guild, friends and me » (étape I) et « On-screen banner » /
-  « Sound » décochées (étape J) : l'espion de Sheadra n'était pas réarmé après son `/reload`,
-  aucun relevé. Ni l'onglet Incoming après une demande silencée.
+  **Portée et façons** (Gnomi de confiance, bandeau et son décochés) : portée « Guild, friends and
+  me », commande `-51` postée à 22:19:11, 0 entrée à 22:19:16 ; portée « All », commande `-52` à
+  22:19:46 = une LIGNE seule à 22:19:47, sans BANDEAU ni SON 3081 — elle sert aussi de témoin : c'est
+  bien la portée qui taisait `-51`, pas le filtre de niveau. (Un premier essai, à 22:16-22:17, ne
+  prouvait rien : Gnomi n'était plus de confiance et « All » pas recochée.)
+  ⚠️ **NON observé** : l'onglet Incoming après une demande silencée.
   Constat au passage : une commande publique d'un perso sous le niveau 5 (Gnomi, niveau 2) n'alerte
   pas (`muteBelowLevel`, filtre anti-bot existant) ; `/co trust` a levé le filtre pour la séance.
 
