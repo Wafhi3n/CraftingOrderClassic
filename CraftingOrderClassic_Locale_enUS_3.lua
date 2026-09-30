@@ -134,6 +134,11 @@ local en3 = {
     ["Demandes lues dans le chat"] = "Requests read in chat",
     ["Les demandes (« WTB [objet] ») lues dans les canaux cochés plus haut, pour ce que tu sais crafter."] =
         "Requests (\"WTB [item]\") read in the channels ticked above, for what you can craft.",
+    ["Guilde, amis et pour moi"] = "Guild, friends and me",
+    ["Pas les commandes publiques ouvertes à tous."] = "Not the public orders open to everyone.",
+    ["Seulement pour moi"] = "Only for me",
+    ["Les commandes à ton nom ou à celui d'un de tes persos."] = "Orders in your name or one of your characters'.",
+    ["Aussi les commandes publiques, pour un métier que tu as."] = "Also public orders, for a profession you have.",
     ["Tu n'es pas dans ce canal en ce moment. Ton choix est gardé pour ton retour."] =
         "You're not in this channel right now. Your choice is kept for when you're back.",
     -- Refonte de l'onglet Artisans (2026-09-30) : la bande des joueurs croisés, le bouton qui rouvre le panneau

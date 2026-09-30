@@ -85,10 +85,12 @@ end
 local function fillRow(row, d)
     row.item = d
     local isItem = d.kind == "item"
+    local indent = d.sub and 14 or 0   -- une portée de notification, sous sa case
     row.check:SetShown(isItem); row.check:SetChecked(isItem and d.on)
+    row.check:ClearAllPoints(); row.check:SetPoint("LEFT", 2 + indent, 0)
     row.note:SetText(d.note or "")
     row.label:ClearAllPoints()
-    row.label:SetPoint("LEFT", (d.kind == "header") and 2 or 20, 0)   -- une note s'aligne sous les cases
+    row.label:SetPoint("LEFT", (d.kind == "header") and 2 or (20 + indent), 0)   -- une note s'aligne sous les cases
     row.label:SetPoint("RIGHT", row.note, "LEFT", -4, 0)
     row.label:SetText(d.text or d.label or "")
     local c = (isItem and d.there) and Skin.color.text or Skin.color.textMuted

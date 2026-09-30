@@ -134,6 +134,11 @@ local es3 = {
     ["Demandes lues dans le chat"] = "Solicitudes leídas en el chat",
     ["Les demandes (« WTB [objet] ») lues dans les canaux cochés plus haut, pour ce que tu sais crafter."] =
         "Las solicitudes (« WTB [objeto] ») leídas en los canales marcados arriba, para lo que sabes fabricar.",
+    ["Guilde, amis et pour moi"] = "Hermandad, amigos y yo",
+    ["Pas les commandes publiques ouvertes à tous."] = "No los pedidos públicos abiertos a todos.",
+    ["Seulement pour moi"] = "Solo para mí",
+    ["Les commandes à ton nom ou à celui d'un de tes persos."] = "Los pedidos a tu nombre o al de uno de tus personajes.",
+    ["Aussi les commandes publiques, pour un métier que tu as."] = "También los pedidos públicos, para una profesión que tienes.",
     ["Tu n'es pas dans ce canal en ce moment. Ton choix est gardé pour ton retour."] =
         "No estás en este canal ahora mismo. Tu elección se guarda para cuando vuelvas.",
     -- Refonte de l'onglet Artisans (2026-09-30) : la bande des joueurs croisés, le bouton qui rouvre le panneau

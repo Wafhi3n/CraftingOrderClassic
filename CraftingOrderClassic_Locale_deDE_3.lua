@@ -133,6 +133,11 @@ local de3 = {
     ["Demandes lues dans le chat"] = "Im Chat gelesene Anfragen",
     ["Les demandes (« WTB [objet] ») lues dans les canaux cochés plus haut, pour ce que tu sais crafter."] =
         "Anfragen („WTB [Gegenstand]“) aus den oben angehakten Kanälen, für das, was du herstellen kannst.",
+    ["Guilde, amis et pour moi"] = "Gilde, Freunde und ich",
+    ["Pas les commandes publiques ouvertes à tous."] = "Nicht die öffentlichen Aufträge für alle.",
+    ["Seulement pour moi"] = "Nur für mich",
+    ["Les commandes à ton nom ou à celui d'un de tes persos."] = "Aufträge auf deinen Namen oder den eines deiner Charaktere.",
+    ["Aussi les commandes publiques, pour un métier que tu as."] = "Auch öffentliche Aufträge, für einen Beruf, den du hast.",
     ["Tu n'es pas dans ce canal en ce moment. Ton choix est gardé pour ton retour."] =
         "Du bist gerade nicht in diesem Kanal. Deine Wahl bleibt für deine Rückkehr erhalten.",
     -- Refonte de l'onglet Artisans (2026-09-30) : la bande des joueurs croisés, le bouton qui rouvre le panneau

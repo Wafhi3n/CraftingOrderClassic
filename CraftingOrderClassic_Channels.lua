@@ -81,10 +81,30 @@ local DEFAULTS = { trade_services = true, trade = true, trade_local = true, guil
 --   notif_chat   = les demandes lues dans le chat. Jamais touchée, elle suit notifyScope : qui avait
 --                  tout coupé par /co notify off reste sans alerte. Une fois cochée ou décochée, elle
 --                  ne dépend plus que d'elle-même.
+--   notify:<mode> = les trois portées de /co notify (all, directed, named), une seule cochée. Décocher
+--                  « Commandes » garde la portée dans notifyScopeOn : la recocher la rend.
 Ch.WATCH_KEYS = { "trade_services", "trade", "trade_local", "general", "guild", "sayyell", "room", "nearby",
                   "notif_orders", "notif_chat" }
+Ch.NOTIFY_MODES = { "all", "directed", "named" }
 
 local function clubId(key) return type(key) == "string" and key:match("^club:(.+)$") or nil end
+local function notifyMode(key) return type(key) == "string" and key:match("^notify:(%a+)$") or nil end
+
+-- La portée choisie, même quand les commandes sont coupées (la case la montre alors grisée).
+local function currentMode(db)
+    local m = db and db.notifyScope
+    if m and m ~= "off" then return m end
+    return (db and db.notifyScopeOn) or "all"
+end
+
+-- Change notifyScope. La case chat suivait ce réglage : on fige d'abord ce qu'elle montrait.
+local function setScope(db, scope)
+    db.watch = db.watch or {}
+    if db.watch.notif_chat == nil then db.watch.notif_chat = Ch.IsWatched("notif_chat") end
+    if scope == "off" then db.notifyScopeOn = currentMode(db) end
+    db.notifyScope = scope
+    if COC.UI and COC.UI.RefreshOrderIndicator then COC.UI:RefreshOrderIndicator() end   -- comme /co notify
+end
 
 function Ch.IsWatched(key)
     local db = COC.db
@@ -92,6 +112,8 @@ function Ch.IsWatched(key)
     if key == "nearby" then return (db and db.crafterScan) and true or false end
     local ordersOn = not (db and db.notifyScope == "off")
     if key == "notif_orders" then return ordersOn end
+    local mode = notifyMode(key)
+    if mode then return currentMode(db) == mode end
     if key == "notif_chat" then
         local own = db and db.watch and db.watch.notif_chat
         if own == nil then return ordersOn end
@@ -114,12 +136,9 @@ function Ch.SetWatched(key, on)
     if key == "room" then if D and D.SetRoom then D:SetRoom(on) end
     elseif key == "nearby" then if D and D.SetCrafterScan then D:SetCrafterScan(on) end
     elseif id then if D and D.SetCircle then D:SetCircle(id, on) end
-    elseif key == "notif_orders" then
-        -- La case chat suivait ce réglage : on fige ce qu'elle montrait, elle ne doit pas bouger avec lui.
-        db.watch = db.watch or {}
-        if db.watch.notif_chat == nil then db.watch.notif_chat = Ch.IsWatched("notif_chat") end
-        db.notifyScope = on and "all" or "off"
-        if COC.UI and COC.UI.RefreshOrderIndicator then COC.UI:RefreshOrderIndicator() end   -- comme /co notify
+    elseif key == "notif_orders" then setScope(db, on and currentMode(db) or "off")
+    elseif notifyMode(key) then
+        if on then setScope(db, notifyMode(key)) end   -- une portée ne se décoche pas : on en choisit une autre
     else
         db.watch = db.watch or {}
         db.watch[key] = on
@@ -167,8 +186,20 @@ function Ch.BuildRows(joined, clubs, inGuild)
     item("sayyell", L["Dire et crier"], true)
     item("nearby", L["Crafteurs autour"], true, L["en ville"], L["Repérer les crafteurs autour (en ville)"])
     head(L["NOTIFICATIONS"], L["Ce qui te prévient : une ligne dans le chat, un bandeau et un son. Décochée, une case ne retire aucune commande : tout reste dans le Carnet et la vue métier."])
-    item("notif_orders", L["Commandes de l'addon"], true, nil, L["Les commandes que les autres joueurs de l'addon t'envoient ou publient."])
     item("notif_chat", L["Demandes lues dans le chat"], true, nil, L["Les demandes (« WTB [objet] ») lues dans les canaux cochés plus haut, pour ce que tu sais crafter."])
+    item("notif_orders", L["Commandes de l'addon"], true, nil, L["Les commandes que les autres joueurs de l'addon t'envoient ou publient."])
+    -- Les portées, sous leur case (`sub` : en retrait dans l'onglet, absentes du panneau de première
+    -- connexion). Grisées quand les commandes sont coupées : le choix, lui, est gardé.
+    local ordersOn = Ch.IsWatched("notif_orders")
+    local modes = {
+        all      = { L["Toutes"], L["Aussi les commandes publiques, pour un métier que tu as."] },
+        directed = { L["Guilde, amis et pour moi"], L["Pas les commandes publiques ouvertes à tous."] },
+        named    = { L["Seulement pour moi"], L["Les commandes à ton nom ou à celui d'un de tes persos."] },
+    }
+    for _, m in ipairs(Ch.NOTIFY_MODES) do
+        item("notify:" .. m, modes[m][1], ordersOn, nil, modes[m][2])
+        rows[#rows].sub = true
+    end
     return rows
 end
 

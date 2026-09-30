@@ -82,6 +82,7 @@ local function placeRows(host, rows, y)
             nd = nd + 1
             local t = text(S.descs, nd, host, "GameFontDisableSmall")
             t:SetPoint("TOPLEFT", 0, y); t:SetText(d.tip or ""); y = y - t:GetStringHeight() - 4
+        elseif d.sub then   -- les portées de notification : un réglage fin, laissé à l'onglet Artisans
         elseif d.kind == "item" then
             nl = nl + 1
             local b = S.lines[nl]
