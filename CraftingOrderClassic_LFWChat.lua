@@ -1,6 +1,6 @@
 -- CraftingOrderClassic_LFWChat.lua — détection « recherche de travail » dans le CHAT VISIBLE.
 --
--- Écoute Trade/Général/say/yell : un message « LFW <métier> » enregistre son AUTEUR comme cherchant du
+-- Écoute les canaux du jeu COCHÉS et dire/crier (COC.Channels) : un message « LFW <métier> » enregistre son AUTEUR comme cherchant du
 -- travail dans l'annuaire — même s'il N'A PAS l'addon (prospect display-only). Mon propre message = simple
 -- raccourci de /co lfw <métier>. L'auteur d'un message de chat est authentifié par le jeu → aucune
 -- usurpation possible (contrairement à un payload réseau, ici le nom = celui qui a réellement parlé).
@@ -52,14 +52,6 @@ function LC:_OnChat(text, author)
     if COC.Directory and COC.Directory.NoteChatLFW then COC.Directory:NoteChatLFW(author, key) end
 end
 
--- Canal Trade/Général uniquement (pas les canaux custom/PvP/monde). Nom localisé → on teste les bases connues.
-function LC:_IsPublicChannel(chanName)
-    if not chanName then return false end
-    local n = chanName:lower()
-    return (n:find("trade") or n:find("general") or n:find("commerce") or n:find("général")
-        or n:find("handel") or n:find("allgemein") or n:find("comercio")) and true or false
-end
-
 function LC:Start()
     if self._started then return end
     self._started = true
@@ -70,7 +62,13 @@ function LC:Start()
     f:SetScript("OnEvent", function(_, ev, text, author, _, chanName)
         local Api = COC.Api   -- texte secret (instance) : ni :match, ni :lower, ni comparaison
         if Api.IsSecret(text) or Api.IsSecret(author) or Api.IsSecret(chanName) then return end
-        if ev == "CHAT_MSG_CHANNEL" and not LC:_IsPublicChannel(chanName) then return end
+        -- OÙ lire : un canal du jeu reconnu et coché, ou « dire et crier » coché (COC.Channels, spec
+        -- canaux-surveilles). `/co lfwchat`, lui, coupe la lecture des lignes LFW partout.
+        local Ch = COC.Channels
+        if ev == "CHAT_MSG_CHANNEL" then
+            local key = Ch.KeyOf(chanName)
+            if not (key and Ch.IsWatched(key)) then return end
+        elseif not Ch.IsWatched("sayyell") then return end
         LC:_OnChat(text, author)
     end)
 end

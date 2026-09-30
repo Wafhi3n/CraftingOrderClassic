@@ -3,9 +3,12 @@
 > État : **validée** le 2026-09-30 par le user · Idée et décisions du user, mise en forme par l'agent ·
 > Maquette (artefact Design, 3 écrans) : https://claude.ai/artifact/BruefzxEXeUWnMExCvo3bv
 > Implémentation : palier 1 (reconnaître un canal du jeu, `CraftingOrderClassic_Channels.lua`,
-> `tests/test_channels.lua`) fait le 2026-09-30, critère 9 tenu en test. Rien n'est encore branché
-> sur les lecteurs du chat ; le nom de Trade (Local) en français, allemand et espagnol reste à
-> mesurer en jeu (reconnu à sa forme).
+> `tests/test_channels.lua`) fait le 2026-09-30, critère 9 tenu en test ; palier 2 (une case par
+> canal dans les lecteurs : demandes, annonces `#CO`, lignes LFW ; `tests/test_channel_watch.lua`,
+> `tests/test_channel_readers.lua`) fait le 2026-09-30, critères 8, 10 et 11 tenus en test.
+> En attendant l'onglet Artisans, les cases se lisent et se changent par `/co watch` (diagnostic,
+> hors aide). **Jamais vu en jeu.** Le nom de Trade (Local) en français, allemand et espagnol reste
+> à mesurer (reconnu à sa forme).
 > Cible : WoW: Forever / Camelot (16001) · Addon : Crafting Order - Classic
 >
 > Remplace, pour la découverte des artisans, la communauté officielle de
@@ -146,8 +149,9 @@ Les commandes existantes restent, et agissent sur les mêmes cases que l'interfa
 9. [test] Les canaux Trade (Services), Trade, Trade (Local) et General sont reconnus dans les quatre
    langues, sans confusion entre eux.
 10. [test] Un canal décoché : aucune de ses lignes n'est lue (demandes, lignes LFW, annonces `#CO`).
-11. [test] Les commandes `/co channel room`, `/co lfwchat`, `/co circle`, `/co crafters` changent la
-    case correspondante, et la case change ce que la commande affiche.
+11. [test] Les commandes `/co channel room`, `/co circle` et `/co crafters` changent la case
+    correspondante, et la case passe par la même porte que la commande. (`/co lfwchat` et `/co scan`
+    n'ont pas de case : ils disent QUOI lire, pas où. Corrigé le 2026-09-30, à l'implémentation.)
 12. [porte] Toute chaîne nouvelle est traduite (`check_locale.ps1`).
 13. [agent] Aucun envoi sur un canal hors d'un clic, et le panneau ne touche pas au système de
     panneaux protégés (`api-gotcha-reviewer`).

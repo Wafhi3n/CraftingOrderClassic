@@ -11,8 +11,10 @@
 --   « Général - Dun Morogh »             -> general
 --   LocalDefense, un canal perso…        -> nil
 --
--- Ce fichier ne fait QUE le nom -> la clé. Aucun appel au jeu : tout se teste sans WoW
--- (tests/test_channels.lua). Les clés sont PERSISTÉES (COC.db.watch) : on en ajoute, on n'en renomme pas.
+-- Deux choses ici, et rien d'autre : le nom -> la clé (KeyOf), et la case de chaque clé (IsWatched,
+-- SetWatched). Aucun appel au jeu : tout se teste sans WoW (tests/test_channels.lua,
+-- tests/test_channel_watch.lua). Les clés sont PERSISTÉES (COC.db.watch) : on en ajoute, on n'en
+-- renomme pas.
 --
 -- Mesuré sur Forever, client anglais (COCProbe, 2026-09-29) : « Trade (Services) - English » et
 -- « Trade (Local) - Ironforge ». Le nom français, allemand ou espagnol de Trade (Local) n'est PAS
@@ -58,4 +60,58 @@ function Ch.KeyOf(name)
     end
     if has(low, GENERAL) then return "general" end
     return nil
+end
+
+-- ------------------------------------------------------------------
+-- Les cases « surveiller »
+-- ------------------------------------------------------------------
+-- Les réglages qui existaient AVANT la liste restent la vérité de leur case, sous leur nom (pas de
+-- migration, donc rien à perdre) : `room` lit roomOff, `nearby` lit crafterScan, `club:<id>` lit
+-- circles. Le reste vit dans COC.db.watch : absent = le défaut, false = décoché par le joueur.
+local DEFAULTS = { trade_services = true, trade = true, trade_local = true, guild = true, sayyell = true, general = false }
+Ch.WATCH_KEYS = { "trade_services", "trade", "trade_local", "general", "guild", "sayyell", "room", "nearby" }
+
+local function clubId(key) return type(key) == "string" and key:match("^club:(.+)$") or nil end
+
+function Ch.IsWatched(key)
+    local db = COC.db
+    if key == "room" then return not (db and db.roomOff) end
+    if key == "nearby" then return (db and db.crafterScan) and true or false end
+    local id = clubId(key)
+    if id then return (db and db.circles and db.circles[id]) == true end
+    local v = db and db.watch and db.watch[key]
+    if v == nil then return DEFAULTS[key] == true end
+    return v == true
+end
+
+-- Coche ou décoche. Les anciens réglages passent par LEUR porte : elle a des effets (quitter la
+-- salle, armer le repérage, reprendre la présence d'un cercle) qu'une simple écriture manquerait.
+function Ch.SetWatched(key, on)
+    on = on and true or false
+    local db, D = COC.db, COC.Directory
+    if not db then return end
+    local id = clubId(key)
+    if key == "room" then if D and D.SetRoom then D:SetRoom(on) end
+    elseif key == "nearby" then if D and D.SetCrafterScan then D:SetCrafterScan(on) end
+    elseif id then if D and D.SetCircle then D:SetCircle(id, on) end
+    else
+        db.watch = db.watch or {}
+        db.watch[key] = on
+    end
+end
+
+-- /co watch [clé on|off] — diagnostic, non localisé : l'état des cases, et de quoi en changer une
+-- avant que l'onglet Artisans ne les montre.
+function Ch:Cmd(arg)
+    local key, state = (arg or ""):lower():match("^%s*(%S*)%s*(%S*)")
+    if state == "on" or state == "off" then
+        local known = false
+        for _, k in ipairs(Ch.WATCH_KEYS) do known = known or k == key end
+        if known then Ch.SetWatched(key, state == "on")
+        else print("|cFF33DD88Crafting Order|r clé inconnue : " .. tostring(key)) end
+    end
+    print("|cFF33DD88Crafting Order|r canaux surveillés (/co watch <clé> on/off) :")
+    for _, k in ipairs(Ch.WATCH_KEYS) do
+        print("  " .. k .. " : " .. (Ch.IsWatched(k) and "|cFF33DD33coché|r" or "|cFFFFCC00décoché|r"))
+    end
 end

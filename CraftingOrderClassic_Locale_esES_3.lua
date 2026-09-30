@@ -100,6 +100,8 @@ local es3 = {
     -- Lib absente au chargement (2026-09-30)
     ["la bibliothèque CraftLink n'a pas pu se charger : le réseau de l'addon est coupé (annuaire, commandes). Fais |cFFFFFFFF/reload|r ; si ça continue, réinstalle l'addon."] =
         "la biblioteca CraftLink no se pudo cargar: la red del addon está desactivada (directorio, pedidos). Escribe |cFFFFFFFF/reload|r; si vuelve a pasar, reinstala el addon.",
+    -- Canaux surveillés : l'origine d'une entrante lue sur le canal Général (2026-09-30)
+    ["général"] = "general",
 }
 
 for k, v in pairs(es3) do L[k] = v end

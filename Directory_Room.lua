@@ -34,16 +34,22 @@ function Dir:OnRoomJoined()
     end
 end
 
+-- Ouvre ou coupe la salle, sans rien dire : la porte commune à la commande et à la case « surveiller »
+-- (COC.Channels, clé `room`).
+function Dir:SetRoom(on)
+    if not COC.db then return end
+    COC.db.roomOff = (not on) and true or nil
+    if CraftLink and CraftLink.SetDiscovery then CraftLink:SetDiscovery(on and true or false) end
+end
+
 -- /co channel room [on|off]
 function Dir:RoomCmd(arg)
     arg = (arg or ""):lower()
     if arg == "off" then
-        COC.db.roomOff = true
-        if CraftLink and CraftLink.SetDiscovery then CraftLink:SetDiscovery(false) end
+        self:SetRoom(false)
         p(string.format(L["salle de découverte coupée : l'addon quitte |cFFFFFFFF%s|r et ne le rejoindra plus."], label()))
     elseif arg == "on" then
-        COC.db.roomOff = nil
-        if CraftLink and CraftLink.SetDiscovery then CraftLink:SetDiscovery(true) end
+        self:SetRoom(true)
         p(string.format(L["salle de découverte rouverte : l'addon rejoint |cFFFFFFFF%s|r pour se présenter."], label()))
     else
         p(self:RoomStatusLine() or L["salle de découverte : en attente du canal (quelques secondes après la connexion)"])

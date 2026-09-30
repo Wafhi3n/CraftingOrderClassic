@@ -100,6 +100,8 @@ local en3 = {
     -- Lib absente au chargement (2026-09-30)
     ["la bibliothèque CraftLink n'a pas pu se charger : le réseau de l'addon est coupé (annuaire, commandes). Fais |cFFFFFFFF/reload|r ; si ça continue, réinstalle l'addon."] =
         "the CraftLink library failed to load: the addon's network is off (directory, orders). Type |cFFFFFFFF/reload|r; if it keeps happening, reinstall the addon.",
+    -- Canaux surveillés : l'origine d'une entrante lue sur le canal Général (2026-09-30)
+    ["général"] = "general",
 }
 
 for k, v in pairs(en3) do L[k] = v end

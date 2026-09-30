@@ -99,6 +99,8 @@ local de3 = {
     -- Lib absente au chargement (2026-09-30)
     ["la bibliothèque CraftLink n'a pas pu se charger : le réseau de l'addon est coupé (annuaire, commandes). Fais |cFFFFFFFF/reload|r ; si ça continue, réinstalle l'addon."] =
         "die Bibliothek CraftLink konnte nicht geladen werden: das Netzwerk des Addons ist aus (Verzeichnis, Aufträge). Gib |cFFFFFFFF/reload|r ein; wenn es wieder passiert, installiere das Addon neu.",
+    -- Canaux surveillés : l'origine d'une entrante lue sur le canal Général (2026-09-30)
+    ["général"] = "Allgemein",
 }
 
 for k, v in pairs(de3) do L[k] = v end

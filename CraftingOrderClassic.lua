@@ -365,6 +365,8 @@ local function diagCmd(cmd, rest)
         if COC.Trainers and COC.Trainers.Dump then COC.Trainers:Dump(rest) end
     elseif cmd == "geo" then
         if COC.ProfWindow and COC.ProfWindow._GeoDump then COC.ProfWindow:_GeoDump() end
+    elseif cmd == "watch" then
+        if COC.Channels then COC.Channels:Cmd(rest) end
     else
         return false
     end
