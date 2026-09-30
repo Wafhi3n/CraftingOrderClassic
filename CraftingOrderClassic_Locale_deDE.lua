@@ -262,7 +262,6 @@ local de = {
     ["alerte quand tu loots un plan connu de CraftLink (défaut : on)"] =
         "Warnung, wenn du ein CraftLink bekanntes Rezept erbeutest (Standard: an)",
     ["Partenaire (basculer)"] = "Partner (umschalten)",
-    ["[Partenaire]"] = "[Partner]",
     ["|cFFFFFFFF%s|r marqué comme partenaire — priorité sur les alertes de don."] =
         "|cFFFFFFFF%s|r als Partner markiert — Vorrang bei Geschenk-Warnungen.",
     ["|cFFFFFFFF%s|r n'est plus marqué comme partenaire."] = "|cFFFFFFFF%s|r ist nicht mehr als Partner markiert.",

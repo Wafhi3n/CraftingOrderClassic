@@ -6,7 +6,7 @@
 -- PERSO (résolue par _ResolvePostChar via Skin.KnowsProf STRICT sur ses données directes), et
 -- Skin.KnowsProf/KnowsProfOrSeen restent intacts (règle verrouillée par le SelfTest).
 -- Partage le namespace UI ; chargé APRÈS CraftingOrderClassic_UI_Artisans.lua (.toc) qui exporte
--- UI._ProfsList / UI._SrcTag.
+-- UI._ProfsList ; les textes d'une ligne viennent de _UI_Artisans_Text.lua, comme pour une ligne simple.
 
 local COC  = CraftingOrderClassic
 local UI   = COC.UI
@@ -91,21 +91,14 @@ function UI:_FillArtGroupRow(row, g)
     local lead = g.lead
     local pres = g.onlineChar and "online" or g.gameChar and "game" or "offline"
     row.dot:SetPresence(pres)
-    local pTag = g.anyPartner and ("|cFFFFD100" .. L["[Partenaire]"] .. "|r ") or ""
+    -- Mêmes règles qu'une ligne simple (_FillArtRow) : pas de préfixe « partenaire », nom gris hors ligne.
     local lfwTag = g.anyLFW and ("|cFF4CDB6E" .. L["[Dispo]"] .. "|r ") or ""   -- cherche du travail
-    row.name:SetText(lfwTag .. pTag .. "|cFFFFFFFF" .. g.leader .. "|r |cFF888888+" .. (#g.members - 1) .. "|r")
-    local sub
-    if g.onlineChar and g.onlineChar ~= g.leader then
-        sub = string.format(L["En ligne via %s"], g.onlineChar)
-    else
-        sub = (UI._PresLabel[pres] or L["Hors ligne"])
-            .. " · " .. (lead.r.level and (L["niv "] .. lead.r.level) or L["niv ?"])
-    end
-    if g.repMax > 0 then sub = sub .. " · " .. string.format(L["%d livrés"], g.repMax) end
-    row.sub:SetText("|cFF888888" .. sub .. "|r")
+    row.name:SetText(lfwTag .. UI._ArtNameHex(pres) .. g.leader .. "|r |cFF888888+" .. (#g.members - 1) .. "|r")
+    local via = (g.onlineChar and g.onlineChar ~= g.leader) and g.onlineChar or nil
+    row.sub:SetText("|cFF888888" .. UI._ArtSubLine(pres, lead.r.level, g.repMax, via) .. "|r")
     -- 4e arg = repli si le métier n'a pas de porteur nommé (item.who) : le perso en ligne du set.
     UI:_SetArtProfIcons(row, UI:_GroupProfs(g), lead.r, g.onlineChar or g.leader)
-    row.src:SetText("|cFF888888" .. (UI._SrcTag[lead.r.source or "recent"] or "") .. "|r")
+    row.src:SetText("|cFF888888" .. UI._ArtSrcTag(lead.r, self.artSource, self.artCircleNames) .. "|r")
     -- Cible du /w : perso JOIGNABLE du set (avec addon, sinon en jeu sans addon), sinon le leader.
     self:_ArtRowButtons(row, { name = g.onlineChar or g.gameChar or g.leader,
         online = (g.onlineChar or g.gameChar) ~= nil, r = lead.r }, false, g.anyPartner)

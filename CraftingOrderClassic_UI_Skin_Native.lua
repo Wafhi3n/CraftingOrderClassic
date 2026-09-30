@@ -36,6 +36,8 @@ local Skin = COC.UI.Skin
 -- nos boutons de 16–24 px il monte trop haut. On le RE-ANCRE au CENTRE.
 -- Contrat conservé (≈35 appelants) : `b.text` (FontString natif, ré-ancrable/mesurable/recolorable),
 -- `b:SetText`/`b:GetFontString` (natifs), `b:SetSelected(on)` (enfoncé natif, reste CLIQUABLE),
+-- `b:SetQuiet(on)` (rouge éteint + texte gris, reste CLIQUABLE : une action possible mais peu utile,
+-- comme chuchoter à un joueur hors ligne ; ce n'est PAS `Disable()`, qui interdirait le clic),
 -- `template` = variante SÉCURISÉE ("SecureActionButtonTemplate", DoCraft protégé) — NE JAMAIS RETIRER.
 -- Doré plus tard (si le user tranche) : SetDesaturated(true)+SetVertexColor(or) sur b.Left/Middle/Right.
 function Skin.MakeGoldButton(parent, w, h, text, template)
@@ -57,6 +59,16 @@ function Skin.MakeGoldButton(parent, w, h, text, template)
         self.selected = on and true or false
         if self.selected then self:SetButtonState("PUSHED", true); self:LockHighlight()
         else self:SetButtonState("NORMAL"); self:UnlockHighlight() end
+    end
+    -- Le gabarit repose la TEXTURE des trois tranches à chaque clic et affichage (UIPanelButton_On*) ;
+    -- la désaturation est un réglage de la tranche elle-même, que ces scripts ne touchent pas.
+    local small = h <= 16
+    b.SetQuiet = function(self, on)
+        for _, k in ipairs({ "Left", "Middle", "Right" }) do
+            if self[k] then self[k]:SetDesaturated(on and true or false) end
+        end
+        self:SetNormalFontObject(on and (small and "GameFontDisableSmall" or "GameFontDisable")
+            or (small and "GameFontNormalSmall" or "GameFontNormal"))
     end
     return b
 end

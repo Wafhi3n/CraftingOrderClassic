@@ -126,6 +126,10 @@ local de3 = {
     ["Crafteurs autour"] = "Handwerker in der Nähe",
     ["Tu n'es pas dans ce canal en ce moment. Ton choix est gardé pour ton retour."] =
         "Du bist gerade nicht in diesem Kanal. Deine Wahl bleibt für deine Rückkehr erhalten.",
+    -- Refonte de l'onglet Artisans (2026-09-30) : la bande des joueurs croisés, le bouton qui rouvre le panneau
+    ["Croisés"] = "Getroffen",
+    ["Configurer"] = "Einrichten",
+    ["Rouvre le panneau de première connexion."] = "Öffnet das Fenster der ersten Anmeldung erneut.",
     -- Canaux surveillés : le panneau de première connexion (2026-09-30)
     ["Où chercher les artisans ?"] = "Wo nach Handwerkern suchen?",
     ["L'addon trouve les artisans par les canaux que tu coches ici. Tu pourras tout changer plus tard, dans l'onglet Artisans."] =

@@ -158,6 +158,12 @@ Les commandes existantes restent, et agissent sur les mêmes cases que l'interfa
   de la fenêtre Chat Channels, rend un nom COURT (« Services », « TradeLocal ») et la catégorie
   (`CHANNEL_CATEGORY_WORLD` / `_CUSTOM`). La liste lit les noms longs ; les deux noms courts sont
   reconnus aussi.
+- 2026-09-30 (refonte de l'onglet Artisans, `docs/specs/refonte-artisans.md`), **user** : un bouton
+  « Configurer », à droite de l'en-tête de la section, rouvre le panneau de première connexion, qui
+  n'était joignable que par `/co watch setup`. Et la liste gagne de la place : le bloc du bas passe
+  de 108 à 88 px (« Rafraîchir l'annuaire » part dans la barre du bas de la fenêtre), « En sourdine »
+  quitte la pile SOURCE et « Ajoutés » n'y figure qu'à partir d'un joueur ajouté. Le contenu de la
+  liste et ses cases ne changent pas, et elle défile toujours quand elle dépasse.
 
 ## Critères d'acceptation
 

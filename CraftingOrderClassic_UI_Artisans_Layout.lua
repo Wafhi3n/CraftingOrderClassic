@@ -1,8 +1,8 @@
 -- CraftingOrderClassic_UI_Artisans_Layout.lua — GÉOMÉTRIE de l'onglet « Artisans » (annuaire social).
 -- Chargé AVANT _UI_Artisans.lua (cf. les 3 .toc). Même contrat que les Layouts Commande/Récolte :
 -- SPEC = structure éditable (zones, tailles, pads), contenu dans les builders, largeurs LUES sur les
--- zones. Deux colonnes : SIDEBAR (sources + ajout de joueur) · zone principale (bande de filtre
--- métier + liste des artisans avec sa gouttière de scrollbar).
+-- zones. Deux colonnes : SIDEBAR (sources et canaux surveillés + sourdine et ajout de joueur) · zone
+-- principale (bande de filtre métier + liste des artisans avec sa gouttière de scrollbar).
 -- Le panneau « En sourdine » (UI_Artisans_Muted) est un MODE de la zone liste : il se superpose aux
 -- mêmes zones (profFilter/artisansList), le basculement reste piloté par _ShowMutedMode.
 
@@ -17,7 +17,7 @@ local SPEC = {
     -- inset (palier 6) : la liste des sources et l'annuaire, deux encarts de liste comme les métiers.
     { id = "sidebar", w = 212, top = -63, bottom = 20, inset = "list",
       { id = "sources", help = "sources", helpDir = "RIGHT" },   -- en-tête SOURCE + boutons de filtre empilés, puis les canaux surveillés (flex)
-      { id = "addPlayer", h = 108, help = "addPlayer", helpDir = "RIGHT" } },   -- cluster bas : Rafraîchir · AJOUTER
+      { id = "addPlayer", h = 88, help = "addPlayer", helpDir = "RIGHT" } },   -- cluster bas : En sourdine · AJOUTER (88 = bande à 58 + 24 + 6)
     { top = -63, bottom = 20, left = 5, inset = "list",
       { id = "profFilter", h = 34,padL= 5, bg = true, help = "profFilter", helpDir = "LEFT" },   -- « Métier : » + pills d'icônes
       { dir = "cols", sep = false,

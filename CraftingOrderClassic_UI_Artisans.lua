@@ -1,6 +1,7 @@
 -- CraftingOrderClassic_UI_Artisans.lua — onglet « Artisans » : annuaire social.
--- Sidebar SOURCE (Guilde/Amis/Ajoutés + compteurs) + ajout manuel ; à droite, pills de filtre
--- métier + lignes artisan (présence, niveau, métiers, source, Chuchoter). Lit Directory (cache).
+-- Sidebar SOURCE (Guilde/Amis/Croisés + compteurs), canaux surveillés, sourdine et ajout manuel ; à
+-- droite, pills de filtre métier + lignes artisan (présence, niveau, métiers, source, Chuchoter).
+-- Lit Directory (cache). Les TEXTES d'une ligne viennent de _UI_Artisans_Text.lua (purs, testés).
 
 local COC  = CraftingOrderClassic
 local UI   = COC.UI
@@ -9,12 +10,6 @@ local L    = COC.L
 
 local ARH = 40              -- hauteur ligne artisan
 local A   = UI.ART          -- métriques dérivées de la SPEC — cf. _UI_Artisans_Layout.lua
-
-local SRC_TAG = { guild = L["GUILDE"], friend = L["AMIS"], added = L["AJOUTÉ"], recent = L["CROISÉ"], confed = L["CONFÉDÉRÉ"], circle = L["CERCLE"] }
-
--- Libellés des 3 états de présence (cf. Dir:PresenceOf). « sans addon » n'est pas cosmétique : il dit
--- pourquoi ses métiers/niveaux peuvent être périmés et pourquoi une commande ne lui parviendra pas.
-local PRES_LABEL = { online = L["En ligne"], game = L["En ligne · sans addon"], offline = L["Hors ligne"] }
 
 local function trim(s) return s and s:gsub("^%s+", ""):gsub("%s+$", "") or "" end
 
@@ -55,8 +50,6 @@ local function profsList(r)
     return parts
 end
 UI._ProfsList = profsList   -- partagé avec la couche de fusion (UI_Artisans_Groups.lua)
-UI._SrcTag    = SRC_TAG
-UI._PresLabel = PRES_LABEL
 
 -- =========================================================================
 -- Construction
@@ -79,25 +72,31 @@ function UI:BuildArtisansTab(f)
     -- Deux buckets CONDITIONNELS en fin de liste : « Confédération » (masqué sans GreenWall) et
     -- « Cercle » (masqué si aucune communauté marquée). Ils ne sont plus posés à un rang fixe : dès
     -- qu'il y en a DEUX, en masquer un seul laisserait un trou au milieu de la bande. La position
-    -- est donc recalculée sur les seuls boutons visibles (cf. _RelayoutArtSrcTabs).
-    -- « muted » = panneau de gestion des mis en sourdine (données = COC.db.mutedPlayers, pas le
-    -- roster ; cf. UI_Artisans_Muted.lua).
+    -- est donc recalculée sur les seuls boutons visibles (cf. _RelayoutArtSrcTabs). « Ajoutés » aussi
+    -- est conditionnelle : pas de bande tant qu'aucun joueur n'a été ajouté (_SyncOptionalArtTabs).
+    -- « muted » n'est PAS une source : c'est le panneau de gestion des mis en sourdine (données =
+    -- COC.db.mutedPlayers, pas le roster ; cf. UI_Artisans_Muted.lua). Sa bande vit en bas, avec
+    -- l'ajout de joueur, hors de la pile des sources (refonte du 2026-09-30) : elle garde son compteur
+    -- et sa sélection (artSrcBtns), mais pas de rang dans artSrcOrder.
     -- Les cercles n'ont pas de bande fixe : une bande PAR cercle, créée à la demande (_SyncCircleTabs).
-    local srcDefs = { {id="all",label=L["Tous"]}, {id="guild",label=L["Guilde"]}, {id="friend",label=L["Amis"]}, {id="added",label=L["Ajoutés"]}, {id="recent",label=L["Annuaire"]}, {id="muted",label=L["En sourdine"]}, {id="confed",label=L["Confédération"]} }
+    local srcDefs = { {id="all",label=L["Tous"]}, {id="guild",label=L["Guilde"]}, {id="friend",label=L["Amis"]}, {id="added",label=L["Ajoutés"]}, {id="recent",label=L["Croisés"]}, {id="confed",label=L["Confédération"]}, {id="muted",label=L["En sourdine"]} }
     self.artSrcBtns, self.artSrcOrder = {}, {}
     for _, d in ipairs(srcDefs) do
-        local b = Skin.MakeFilterButton(sz, 190, 24, d.label)   -- bande de filtre style HdV (verrou doré, pas de bleu)
+        local muted = d.id == "muted"
+        local b = Skin.MakeFilterButton(muted and self:ArtSec("addPlayer") or sz, 190, 24, d.label)   -- bande de filtre style HdV (verrou doré, pas de bleu)
         local cnt = b:CreateFontString(nil, "OVERLAY", "GameFontNormal")
         cnt:SetPoint("RIGHT", -10, 0); Skin.ApplyShadow(cnt); b.count = cnt
         b:SetScript("OnClick", function() UI.artSource = d.id; UI:_RefreshArtSrcTabs(); UI:RefreshArtisans() end)
         self.artSrcBtns[d.id] = b
-        self.artSrcOrder[#self.artSrcOrder + 1] = d.id
+        if muted then b:SetPoint("BOTTOMLEFT", 12, 58)
+        else self.artSrcOrder[#self.artSrcOrder + 1] = d.id end
     end
     self:_BuildArtChannels(sz)   -- « Canaux surveillés », sous les bandes (_UI_Artisans_Channels.lua)
     self:_RelayoutArtSrcTabs()
     self:_RefreshArtSrcTabs()
 
     self:_BuildArtisanAddScan(self:ArtSec("addPlayer"))   -- cluster bas de la sidebar (sa zone)
+    self:_BuildArtRefreshBar(panel, f)                    -- « Rafraîchir l'annuaire », dans la barre du bas
 
     -- Bande de filtre métier : libellé + pills (construits paresseusement dans la zone, cf. Icons)
     local band = self:ArtSec("profFilter")
@@ -128,9 +127,10 @@ function UI:_BuildArtList()
     })
 end
 
--- Cluster « remplir l'annuaire » (zone « addPlayer » de la SPEC, en bas de sidebar) : champ d'ajout
--- manuel + « Rafraîchir l'annuaire » — offsets RELATIFS au bas de la zone. La case de repérage des
--- crafteurs a rejoint la liste des canaux surveillés (spec canaux-surveilles, 2026-09-30).
+-- Cluster du bas de la sidebar (zone « addPlayer » de la SPEC) : la bande « En sourdine » (posée par
+-- BuildArtisansTab) et le champ d'ajout manuel — offsets RELATIFS au bas de la zone. La case de
+-- repérage des crafteurs a rejoint la liste des canaux surveillés (spec canaux-surveilles), et
+-- « Rafraîchir l'annuaire » la barre du bas (_BuildArtRefreshBar) : la place va à la liste des canaux.
 function UI:_BuildArtisanAddScan(sec)
     local addHdr = sec:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
     addHdr:SetPoint("BOTTOMLEFT", 14, 42); addHdr:SetText(L["AJOUTER UN JOUEUR"])
@@ -145,11 +145,19 @@ function UI:_BuildArtisanAddScan(sec)
     local addBtn = Skin.MakeGoldButton(sec, 26, 20, "+")
     addBtn:SetPoint("LEFT", addBox, "RIGHT", 6, 0)
     addBtn:SetScript("OnClick", function() UI:_AddArtisan(addBox:GetText()); addBox:SetText("") end)
+end
 
-    local refreshBtn = Skin.MakeGoldButton(sec, 190, 24, L["Rafraîchir l'annuaire"])
-    refreshBtn:SetPoint("BOTTOMLEFT", 16, 68)
-    refreshBtn:SetScript("OnClick", function() UI:_RefreshDirectory() end)
-    self.artRefreshBtn = refreshBtn
+-- « Rafraîchir l'annuaire » dans la barre du bas de la fenêtre, à côté du compte d'artisans qu'il met
+-- à jour. Même montage que la barre d'actions de Commande (_BuildPostActionBar) : un cadre enfant du
+-- PANNEAU (il se masque avec l'onglet), calé sur la bande native ; la gauche reste à la ligne réseau.
+function UI:_BuildArtRefreshBar(panel, f)
+    local bar = CreateFrame("Frame", nil, panel)
+    bar:SetAllPoints(f.ActionBar)
+    local b = Skin.MakeGoldButton(bar, 150, 20, L["Rafraîchir l'annuaire"])
+    b:SetWidth(math.max(150, b.text:GetStringWidth() + 28))   -- pas de reflow : largeur au texte, à la main
+    b:SetPoint("RIGHT", -8, 0)
+    b:SetScript("OnClick", function() UI:_RefreshDirectory() end)
+    self.artRefreshBtn = b
 end
 
 function UI:_RefreshArtSrcTabs()
@@ -184,9 +192,14 @@ end
 -- cercle MARQUÉ a la sienne (_SyncCircleTabs). Si celle qui était sélectionnée disparaît, on retombe
 -- sur « Tous » plutôt que d'afficher une liste vide sans explication. Un cercle a sa bande dès qu'il
 -- est marqué, même vide (on s'en exclut soi-même) : une bande vide se lit « c'est bien branché ».
-function UI:_SyncOptionalArtTabs()
+-- « Ajoutés », elle, n'apparaît qu'à partir d'un joueur ajouté (`counts` = UI._ArtCounts) : à zéro,
+-- elle prenait une ligne à la liste des canaux sans rien filtrer.
+function UI:_SyncOptionalArtTabs(counts)
     local D = COC.Directory
     if not self.artSrcBtns then return end
+    local hasAdded = ((counts and counts.added) or 0) > 0
+    if self.artSrcBtns.added then self.artSrcBtns.added:SetShown(hasAdded) end
+    if not hasAdded and self.artSource == "added" then self.artSource = "all" end
     -- Mode solo (/co debug) : on montre tout, pour pouvoir travailler l'UI sans GreenWall.
     local debug = COC.db and COC.db.debug
     local shown = (D and D._GreenWallActive and D:_GreenWallActive()) or debug
@@ -205,7 +218,10 @@ end
 local MAX_CIRCLE_TABS = 4
 function UI:_SyncCircleTabs()
     local D, want = COC.Directory, {}
-    for i, c in ipairs((D and D.CircleList and D:CircleList()) or {}) do
+    local circles = (D and D.CircleList and D:CircleList()) or {}
+    self.artCircleNames = {}   -- id → nom de TOUS les cercles : l'étiquette de source d'une ligne le lit
+    for _, c in ipairs(circles) do self.artCircleNames[tostring(c.id)] = c.name end
+    for i, c in ipairs(circles) do
         if i > MAX_CIRCLE_TABS then break end
         local id = "circle:" .. c.id
         want[id] = true
@@ -285,20 +301,12 @@ function UI:RefreshArtisans()
     local panel = self.artisansPanel; if not panel then return end
     if not self.artPillsBuilt then self:_BuildArtPills(); self.artPillsBuilt = true end
     local D = COC.Directory
-    self:_SyncOptionalArtTabs()   -- montre/masque « Confédération » et « Cercle » (display-only)
-    self:_RefreshArtChannels()    -- les cases des canaux surveillés (dont le repérage des crafteurs)
-
-    -- Compteurs par source (+ « all » = total ; « muted » = mis en sourdine, hors roster)
-    local counts = { all = 0, guild = 0, friend = 0, added = 0, recent = 0, confed = 0, circle = 0 }
-    for _, r in pairs(D and D.roster or {}) do
-        if not (D and D._SameFaction) or D:_SameFaction(r) then   -- confinement faction (mêmes règles que la liste)
-            local s = r.source or "recent"; counts[s] = (counts[s] or 0) + 1; counts.all = counts.all + 1
-            if s == "circle" and r.circle then
-                local k = "circle:" .. r.circle; counts[k] = (counts[k] or 0) + 1
-            end
-        end
-    end
+    -- Compteurs par source (+ « all » = total ; « muted » = mis en sourdine, hors roster). Comptés
+    -- AVANT les bandes : « Ajoutés » n'existe qu'à partir d'un joueur ajouté.
+    local counts = UI._ArtCounts(D)
     counts.muted = (COC.Moderation and COC.Moderation.MutedList) and #COC.Moderation:MutedList() or 0
+    self:_SyncOptionalArtTabs(counts)   -- montre/masque « Ajoutés », « Confédération » et les cercles
+    self:_RefreshArtChannels()          -- les cases des canaux surveillés (dont le repérage des crafteurs)
     for id, b in pairs(self.artSrcBtns) do b.count:SetText("|cFFE8B84B" .. (counts[id] or 0) .. "|r") end
 
     -- Source « En sourdine » : panneau de gestion dédié (renderer + données propres) au lieu de la
@@ -335,10 +343,11 @@ function UI:_FillArtRow(row, a)
     local D0 = COC.Directory
     local pres = (D0 and D0.PresenceOf and D0:PresenceOf(a.name)) or (a.online and "online" or "offline")
     row.dot:SetPresence(pres)
-    local pTag = a.r.isPartner and ("|cFFFFD100" .. L["[Partenaire]"] .. "|r ") or ""   -- texte, pas de glyphe tofu
+    -- Pas de préfixe « partenaire » : l'icône allumée à droite et le tri en tête le disent déjà, et le
+    -- préfixe coupait le nom (« Syrine Lytha… », capture du 2026-09-30). Hors ligne, le nom est gris.
     local lfwE = D0 and D0.LFWOf and D0:LFWOf(a.name)
     local lfwTag = lfwE and ("|cFF4CDB6E" .. L["[Dispo]"] .. "|r ") or ""
-    row.name:SetText(lfwTag .. pTag .. "|cFFFFFFFF" .. a.name .. "|r")
+    row.name:SetText(lfwTag .. UI._ArtNameHex(pres) .. a.name .. "|r")
     -- Tooltip d'OFFRE sur la ligne [Dispo] : métier cherché + détails (mêmes lignes que le tooltip
     -- monde, source unique Dir:LFWOfferLines). Posé ICI et purgé en tête de fill : lignes poolées.
     if lfwE then
@@ -366,15 +375,12 @@ function UI:_FillArtRow(row, a)
         local mv = self:_SeenProfNames(a.r)   -- le métier VU (au moins un)
         row.sub:SetText("|cFF888888" .. L["vu crafter"] .. (mv ~= "" and (" : |cFFBBBBBB" .. mv) or "") .. "|r")
     else
-        local lvl = a.r.level and (L["niv "] .. a.r.level) or L["niv ?"]
-        local rep = (a.r.rep and a.r.rep > 0) and (" · " .. string.format(L["%d livrés"], a.r.rep)) or ""
-        row.sub:SetText("|cFF888888" .. (PRES_LABEL[pres] or L["Hors ligne"]) .. " · " .. lvl .. rep .. "|r")
+        row.sub:SetText("|cFF888888" .. UI._ArtSubLine(pres, a.r.level, a.r.rep) .. "|r")
     end
     -- Sa note de membre de la communauté, posée à la main : visible même hors ligne (Directory_Note).
     if a.r.memberNote then row.sub:SetText(row.sub:GetText() .. "|cFF888888 · |r|cFFD8CFA0" .. a.r.memberNote .. "|r") end
     UI:_SetArtProfIcons(row, profsList(a.r), a.r, a.name)
-    row.src:SetText("|cFF888888" .. (relayed and L["RELAIS"] or nonAddon and L["VU"]
-        or (SRC_TAG[a.r.source or "recent"] or "")) .. "|r")
+    row.src:SetText("|cFF888888" .. UI._ArtSrcTag(a.r, self.artSource, self.artCircleNames, relayed, nonAddon) .. "|r")
     self:_ArtRowButtons(row, a, nonAddon)
     row:Show()
 end
@@ -397,6 +403,9 @@ function UI:_ArtRowButtons(row, a, nonAddon, partnerOn)
     -- pastille jaune. Caché seulement pour une entrée « ajoutée » réellement hors ligne.
     local pres = (D and D.PresenceOf and D:PresenceOf(a.name)) or (a.online and "online" or "offline")
     row.whisper:SetShown(pres ~= "offline" or a.r.source ~= "added")
+    -- Hors ligne, le bouton reste (la présence peut se tromper, et /w marche dès son retour) mais
+    -- s'éteint : une colonne de boutons rouges, hors-ligne compris, ne disait plus qui est joignable.
+    row.whisper:SetQuiet(pres == "offline")
     if partnerOn == nil then partnerOn = a.r.isPartner and true or false end
     row.partner._on = partnerOn
     row.partner.tex:SetDesaturated(not partnerOn)
@@ -441,6 +450,7 @@ function UI:_BuildArtRow(r)
     r.profsFrame:SetPoint("TOPLEFT", 180, 0); r.profsFrame:SetPoint("BOTTOMRIGHT", -126, 0)
     r.profIconPool = {}
     r.src   = r:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall"); r.src:SetPoint("RIGHT", -116, 0); Skin.ApplyShadow(r.src)
+    r.src:SetWidth(84); r.src:SetJustifyH("RIGHT"); r.src:SetWordWrap(false)   -- un nom de communauté peut être long
     -- Toggle « Partenaire » (drapeau explicite priorisé dans l'alerte de don) : icône pleine = partenaire,
     -- désaturée = non. Câblé sur _TogglePartnerSet (agit sur tout le set de rerolls vérifiés).
     r.partner = CreateFrame("Button", nil, r); r.partner:SetSize(18, 18); r.partner:SetPoint("RIGHT", -92, 0)

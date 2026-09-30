@@ -127,6 +127,10 @@ local en3 = {
     ["Crafteurs autour"] = "Crafters nearby",
     ["Tu n'es pas dans ce canal en ce moment. Ton choix est gardé pour ton retour."] =
         "You're not in this channel right now. Your choice is kept for when you're back.",
+    -- Refonte de l'onglet Artisans (2026-09-30) : la bande des joueurs croisés, le bouton qui rouvre le panneau
+    ["Croisés"] = "Met",
+    ["Configurer"] = "Setup",
+    ["Rouvre le panneau de première connexion."] = "Reopens the first-login panel.",
     -- Canaux surveillés : le panneau de première connexion (2026-09-30)
     ["Où chercher les artisans ?"] = "Where to look for crafters?",
     ["L'addon trouve les artisans par les canaux que tu coches ici. Tu pourras tout changer plus tard, dans l'onglet Artisans."] =

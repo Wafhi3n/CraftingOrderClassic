@@ -263,7 +263,6 @@ local es = {
     ["alerte quand tu loots un plan connu de CraftLink (défaut : on)"] =
         "avisa cuando saqueas una receta conocida por CraftLink (por defecto: on)",
     ["Partenaire (basculer)"] = "Socio (alternar)",
-    ["[Partenaire]"] = "[Socio]",
     ["|cFFFFFFFF%s|r marqué comme partenaire — priorité sur les alertes de don."] =
         "|cFFFFFFFF%s|r marcado como socio — prioridad en las alertas de regalo.",
     ["|cFFFFFFFF%s|r n'est plus marqué comme partenaire."] = "|cFFFFFFFF%s|r ya no está marcado como socio.",
