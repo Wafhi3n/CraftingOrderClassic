@@ -46,6 +46,19 @@ client.
 
 ## Relevés
 
+- 2026-09-30 12:06 — jusqu'a 3e973ea — Forever, deux clients (Rédemption, Gnomi), client en ANGLAIS ;
+  build déployé `main-dev@837aa32 2026-09-30 12:02` (relu dans la copie déployée du `.toc`) — **GO
+  sur le panneau de première connexion (spec canaux-surveilles, palier 5, critères 6 et 7)** —
+  rapporté par le user SANS capture (« tout fonctionne comme tu as décrit », sur la fiche donnée :
+  ouverture seule ~10 s après le `/reload`, quatre groupes et leurs cases, la case « Annoncer », les
+  clics qui agissent, fermeture par « Confirm » sur un compte et par la croix ou Échap sur l'autre,
+  pas de retour après un second `/reload`). Relu par l'agent dans les SavedVariables des deux comptes
+  (écrites à 12:06) : `setupSeen = "1.40.0"` des deux côtés ; chez Gnomi `watch = { trade_services =
+  true, general = true }`, donc une case cochée DANS le panneau s'est bien écrite ; `roomOff` absent
+  des deux côtés (la salle a été rallumée).
+  Non vu par l'agent : la mise en page du panneau (aucune capture), un client français, allemand ou
+  espagnol, l'ouverture différée par un combat ou une instance.
+
 - 2026-09-30 11:40 — jusqu'a 15c7a02 — Forever, client en ANGLAIS, même build `main-dev@5e90b86
   2026-09-30 11:17` — **GO sur une communauté cochée dont les membres entrent dans l'annuaire (spec
   canaux-surveilles, critère 5)** — capture du user, après avoir fait entrer Gnomi dans sa communauté

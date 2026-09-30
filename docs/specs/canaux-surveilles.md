@@ -16,10 +16,14 @@
 > 1, 2 et 5 tenus en jeu le même jour** (registre, relevés 11:25 et 11:40 : capture hors capitale,
 > communauté « eaze » cochée, Gnomi dans l'annuaire). Écarts avec la maquette, voir § Décisions du 2026-09-30
 > (palier 3). Palier 5 (le panneau de première connexion, `CraftingOrderClassic_UI_Setup.lua`,
-> `Channels.SetupState` / `MarkSetupSeen`) fait le 2026-09-30, critères 6 et 7 tenus en test, **pas
-> vu en jeu**. Il s'ouvre 10 s après la connexion (le jeu n'a pas encore rejoint ses canaux avant),
+> `Channels.SetupState` / `MarkSetupSeen`) fait le 2026-09-30, **critères 6 et 7 tenus en jeu le
+> même jour** (registre, relevé 12:06 : rapporté par le user, `setupSeen` relu dans les
+> SavedVariables des deux comptes ; aucune capture de la mise en page). Il s'ouvre 10 s après la connexion (le jeu n'a pas encore rejoint ses canaux avant),
 > jamais en combat ni en instance ; `/co watch setup` le rouvre. Restent les paliers 4 (canaux
 > perso, reporté à une version suivante par le user) et 6 (aide, nouveautés, relectures).
+> **En attente (user, 2026-09-30)** : la version sera la **v1.41.0**, mais la release attend une
+> refonte de l'onglet Artisans, dessinée par le user dans une autre session. Le palier 6 (textes
+> d'aide et de nouveautés, qui décrivent l'onglet) se fera une fois cette refonte connue.
 > Cible : WoW: Forever / Camelot (16001) · Addon : Crafting Order - Classic
 >
 > Remplace, pour la découverte des artisans, la communauté officielle de
