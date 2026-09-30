@@ -96,6 +96,9 @@ local de3 = {
         "für diesen Charakter ist noch kein Beruf bekannt: öffne einmal dein Berufsfenster und versuche es dann erneut.",
     ["Copie ce texte (Ctrl+C), puis colle-le dans ta note de membre : Communautés, clic droit sur ton nom, « Note ». Les autres joueurs de Crafting Order verront tes métiers, même quand tu es hors ligne."] =
         "Kopiere diesen Text (Strg+C) und füge ihn in deine Mitgliedsnotiz ein: Gemeinschaften, Rechtsklick auf deinen Namen, „Notiz“. Andere Crafting-Order-Spieler sehen dann deine Berufe, auch wenn du offline bist.",
+    -- Lib absente au chargement (2026-09-30)
+    ["la bibliothèque CraftLink n'a pas pu se charger : le réseau de l'addon est coupé (annuaire, commandes). Fais |cFFFFFFFF/reload|r ; si ça continue, réinstalle l'addon."] =
+        "die Bibliothek CraftLink konnte nicht geladen werden: das Netzwerk des Addons ist aus (Verzeichnis, Aufträge). Gib |cFFFFFFFF/reload|r ein; wenn es wieder passiert, installiere das Addon neu.",
 }
 
 for k, v in pairs(de3) do L[k] = v end

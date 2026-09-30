@@ -10,7 +10,7 @@ local L = COC.L
 
 local CraftLink = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
 
-Dir.online = {}   -- [playerShort] = true (éphémère, mémoire)
+Dir.online, Dir.roster = {}, {}   -- présence (éphémère) ; roster TOUJOURS une table, même si Start s'arrête (lib absente)
 
 local function now() return (GetTime and GetTime()) or 0 end
 
