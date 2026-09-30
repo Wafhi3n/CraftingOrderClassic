@@ -1,5 +1,40 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.41.0 - You choose where the addon looks for crafters
+
+Where the addon looks for crafters used to be hidden behind chat commands nobody knew
+(`/co channel room`, `/co circle`, `/co crafters`), and you couldn't pick one Trade channel over
+another at all. It's now a list you can see.
+
+The Artisans tab has a "Watched channels" list under the source filters. It shows every channel the
+addon can get something out of, grouped by what it does there. The Trade channels, General and guild
+chat are where it reads requests, "LFW" lines and other addon users' announcements. CraftLinkNet is
+the discovery room where addon users say hello. Your communities add their members to your
+directory. And "Around me" covers what players say or yell near you, plus the crafters you see at
+work in town. Tick the ones you want. Outside a capital city the Trade channels are greyed out, and
+your choice is kept for when you're back.
+
+The first time you log in after updating, a panel shows you these boxes once, with a line explaining
+each group. Tick what you like and confirm. The Setup button in the Artisans tab brings it back.
+
+Trade, Trade (Services) and Trade (Local) used to be read together or not at all. Each has its own
+box now. One default changes: "LFW" lines in General are no longer read unless you tick General.
+Everything else behaves as before, and whatever you had already set with the commands is kept.
+
+The Artisans tab itself got a cleanup. Whisper is only red for players you can actually reach, and
+grey (still clickable) for the ones who are offline. Profession icons stay in color, and the gold
+border alone marks a profitable recipe. An offline player's name is grey. The "[Partner]" prefix is
+gone, since the icon already says it. The source tag only shows when it tells you something: nothing
+for a player you just met, the community's name for a circle member. The "Directory" filter is now
+called "Met", "Muted" sits next to the add-a-player box, and "Refresh directory" moved to the bottom
+bar.
+
+Also:
+- If the addon loads without its library (it can happen when you reload while an update is being
+  copied), it now says so in chat and suggests `/reload`, instead of throwing an error every time
+  you hover a player.
+- Help says where the watched channels are set, and no longer points to `/co channel room`.
+
 ## v1.40.0 - Your orders in Trade, and the addon without a community
 
 WoW Forever has no general channel the addon can use: its messages are swallowed on the game's

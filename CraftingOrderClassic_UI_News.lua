@@ -31,6 +31,23 @@ local BODY_W = 780
 -- Bloc de tête ACTUEL, créé pour v1.36.1 : versionsNewest faisait 56 lignes, l'entrée l'aurait porté
 -- à 62. Même manœuvre : un bloc DEVANT, concaténé en premier par versions(). À la prochaine release,
 -- ajouter ici, en tête.
+-- Bloc de tête ACTUEL, créé pour v1.41.0 : versionsHead faisait 58 lignes. À la prochaine release,
+-- ajouter ici, en tête.
+local function versionsTop()
+    return {
+        {
+            v = "v1.41.0", title = L["Tu choisis où l'addon cherche les artisans"],
+            lines = {
+                L["L'onglet Artisans a une liste « Canaux surveillés » : les canaux de Commerce, la discussion de guilde, la salle de découverte, tes communautés et les joueurs autour de toi. Coche ceux où l'addon doit chercher des artisans. Hors d'une ville, les canaux de Commerce sont grisés et ton choix est gardé."],
+                L["À ta première connexion après la mise à jour, un panneau te montre ces cases une fois, avec une phrase par groupe. Le bouton « Configurer » de l'onglet Artisans le rouvre."],
+                L["Trade, Trade (Services) et Trade (Local) se règlent maintenant un par un. Un seul défaut change : l'addon ne lit plus les lignes « LFW » sur le canal Général, sauf si tu le coches. Une communauté se coche dans la même liste."],
+                L["L'onglet Artisans se lit mieux : « Chuchoter » n'est rouge que pour un joueur joignable, les icônes de métier restent en couleur, un joueur hors ligne a son nom en gris, et l'étiquette de source ne s'affiche que lorsqu'elle apprend quelque chose. La bande « Annuaire » s'appelle « Croisés », et « Rafraîchir l'annuaire » est passé en bas de la fenêtre."],
+                L["Aussi : si l'addon se charge sans sa bibliothèque, par exemple pendant la copie d'une mise à jour, il le dit et propose « /reload » au lieu de planter à chaque survol d'un joueur."],
+            },
+        },
+    }
+end
+
 local function versionsHead()
     return {
         {
@@ -419,28 +436,9 @@ local function versionsOldest()
                 L["Un mute porte désormais une raison et une date, et peut être temporaire : |cFFFFFFFF/co mute Bob 1h spammeur|r se lève tout seul au bout d'une heure (|cFFFFFFFF/co mute|r seul liste les mutés avec raison et temps restant). Et |cFFFFFFFF/co trust <nom>|r marque un joueur de confiance, jamais mis en sourdine automatiquement — le mute manuel restant toujours possible."],
             },
         },
-        {
-            v = "v1.11.0", title = L["Annuler une commande publique atteint tout le royaume"],
-            lines = {
-                L["Une commande publique voyage sur le canal du royaume depuis la v1.10.0, mais pas son annulation : un artisan que tu n'as jamais croisé la voyait « ouverte » pendant six heures, l'acceptait, et farmait les réactifs pour rien. L'annulation part désormais sur le même canal."],
-                L["Poster et annuler ne perdent plus de messages. Le canal exige un clic ou une touche et n'accepte qu'une ligne par seconde : un |cFFFFFFFF/co post|r tapé au chat, ou deux commandes postées dans la même seconde, disparaissaient sans trace. Ces lignes patientent maintenant dans une file et partent à ton prochain clic."],
-                L["Seules les commandes NOUVELLES et les ANNULATIONS voyagent sur le canal, et seulement les publiques. Guilde, amis et commandes nommées restent privées ; les acceptations restent entre les deux joueurs concernés."],
-            },
-        },
-        {
-            v = "v1.10.2", title = L["Correctif : erreur en combat dans la vue métier"],
-            lines = {
-                L["Sélectionner une recette pendant un combat ne provoque plus d'erreur bloquée : le bouton « Créer » est un bouton sécurisé, que le jeu interdit de masquer en plein combat. L'addon attend maintenant la fin du combat pour l'afficher ou le masquer."],
-            },
-        },
-        {
-            v = "v1.12.0", title = L["Les recettes de la Saison de la Découverte"],
-            lines = {
-                L["304 recettes de la Saison de la Découverte entrent au catalogue : 80 en Travail du cuir, 65 en Forge, 57 en Couture, 48 en Enchantement, 29 en Ingénierie, 16 en Alchimie, plus la Cuisine, le Secourisme et le Minage. Elles apparaissent dans l'onglet Commande, avec leurs réactifs et leur palier d'apprentissage."],
-                L["Elles ne se chargent que sur un royaume Saison de la Découverte. Sur un royaume Era classique, rien ne change : l'addon voit exactement le même jeu de recettes qu'avant, et les recettes que tes amis t'ont déjà partagées restent lisibles."],
-            },
-        },
-        -- v1.10.1 / v1.9.0 / v1.8.0 / v1.7.0 / v1.7.1 / v1.6.0 / v1.5.0 / v1.4.0 retirées de l'onglet (l'historique
+        -- v1.12.0 / v1.11.0 / v1.10.2 (retirées à la v1.41.0 : la Saison de la Découverte, le canal du royaume et
+        -- le bouton « Créer » sécurisé n'existent pas sur Forever), v1.10.1 / v1.9.0 / v1.8.0 / v1.7.0 / v1.7.1 /
+        -- v1.6.0 / v1.5.0 / v1.4.0 retirées de l'onglet (l'historique
         -- complet vit dans CHANGELOG.md). Cet onglet ne garde qu'une fenêtre glissante de versions :
         -- sinon il croît sans fin, et avec lui les 3 overlays de locale, qui butent sur le plafond
         -- anti-monolithe. Retirer ici = retirer les clés correspondantes des overlays (sinon
@@ -449,7 +447,8 @@ local function versionsOldest()
 end
 
 local function versions()
-    local out = versionsHead()
+    local out = versionsTop()
+    for _, e in ipairs(versionsHead()) do out[#out + 1] = e end
     for _, e in ipairs(versionsNewest()) do out[#out + 1] = e end
     for _, e in ipairs(versionsCurrent()) do out[#out + 1] = e end
     for _, e in ipairs(versionsLatest()) do out[#out + 1] = e end
