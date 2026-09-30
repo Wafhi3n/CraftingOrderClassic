@@ -46,6 +46,24 @@ client.
 
 ## Relevés
 
+- 2026-09-30 09:17 — jusqu'a 9f7e73f — Forever, client en ANGLAIS, un seul compte regardé ; build
+  déployé `main-dev@9acd6cb 2026-09-30 09:15` (relu dans la copie déployée du `.toc` ; branches en
+  test : feat/icone-commande-recue, feat/liste-destinataires, feat/profit-arbitrages) — **GO partiel
+  sur la MISE EN PAGE du destinataire en une liste** (maquette du 2026-09-30, piste 2), jugé sur trois
+  captures du user, aucune commande postée :
+  - `main-dev@428882e`, Commande (Cooking), liste « Directory » : bande « Send to » + « List »,
+    « Everyone with the addon » choisie par défaut avec la case à droite, pas de ligne de groupe
+    (liste non routable), légende « or one crafter », invite « Pick a profession then a recipe. »
+    dans le détail sans « I PROVIDE », barre du bas « network by whisper » ;
+  - build suivant (déployé par le user, avec `f9944cc`), Commande (Alchemy), liste « Guild », case
+    cochée : « Whole guild » au tabard, rappel « Recipient: All + Trade », écart sous la bande ; le user
+    y relève des bords d'encart sur la même pierre que la fenêtre → `9f7e73f` ;
+  - `9acd6cb`, Récolte (Mining) : colonne de droite sur le fond sombre de la liste (« beaucoup mieux »,
+    user), mêmes lignes, légende « or one gatherer », « Gatherer: All ».
+  **Non vu** : la case grisée pour « Whole guild » ou un artisan, hors capitale, et son retour tout
+  seul en entrant en ville (CHANNEL_UI_UPDATE) ; « Pick a recipe first. » sous le nom ; l'icône Amis ;
+  la colonne sombre de l'onglet Commande ; une commande postée et annoncée depuis la nouvelle case.
+
 - 2026-09-30 00:31 — jusqu'a c126c37 — Forever, deux clients, client en ANGLAIS, en ville ; build
   déployé `main-dev@ed6a410 2026-09-30 00:26` (relu dans la copie déployée du `.toc`), les deux comptes
   à nouveau « oubliés » l'un de l'autre après le /reload (00:28) — **GO sur l'annonce de la dispo LFW
