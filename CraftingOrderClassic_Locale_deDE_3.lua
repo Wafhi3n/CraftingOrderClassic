@@ -105,7 +105,7 @@ local de3 = {
     ["CANAUX SURVEILLÉS"] = "BEOBACHTETE KANÄLE",
     ["ANNONCES LUES"] = "GELESENE ANKÜNDIGUNGEN",
     ["L'addon y lit les demandes, les dispos et les annonces des autres joueurs de l'addon. Il n'écrit que sur Trade (Services), et seulement si tu coches « Annoncer en Commerce »."] =
-        "Das Addon liest dort Gesuche, Verfügbarkeiten und die Ankündigungen anderer Addon-Nutzer. Es schreibt nur in Handel (Dienstleistungen), und nur, wenn du „Im Handel ankündigen“ anhakst.",
+        "Das Addon liest dort Gesuche, Verfügbarkeiten und die Ankündigungen anderer Addon-Nutzer. Es schreibt nur in Handel (Dienstleistungen), und nur, wenn du „Im Handelskanal ankündigen“ anhakst.",
     ["Commerce (Services)"] = "Handel (Dienstleistungen)",
     ["Commerce"] = "Handel",
     ["Commerce (local)"] = "Handel (Lokal)",
