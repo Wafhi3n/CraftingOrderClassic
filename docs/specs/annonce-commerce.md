@@ -77,7 +77,11 @@ des commandes nommées), mais un joueur hors communauté voit et est vu dès qu'
 
 ## Cas particuliers
 
-- **Hors d'une ville** : pas de canal Commerce, la case est grisée (et dit pourquoi).
+- **Hors d'une ville** : pas de canal Commerce. La case du formulaire reste cochable, et au moment
+  de poster un refus dit pourquoi (« pas de canal Trade (Services) ici : il faut être dans une
+  capitale. », vu en jeu le 2026-09-30, test C). C'est la ligne du canal, dans la liste « Canaux
+  surveillés » de l'onglet Artisans, qui est grisée (spec `canaux-surveilles.md`, qui tranche cet
+  écart ; la spec disait d'abord « la case est grisée »).
 - **Ligne trop longue** (le chat coupe à 255 octets, liens compris) : les matériaux en trop tombent,
   remplacés par `+N` (« et N autres ») ; la commande complète arrive de toute façon par chuchotement.
 - **Débit** : le serveur bloque vite (3ᵉ message en 10 s sur un canal = refus, relevé du 2026-09-29).
