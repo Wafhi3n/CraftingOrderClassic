@@ -482,6 +482,8 @@ f:SetScript("OnEvent", function(_, event, arg1)
         SLASH_CRAFTINGORDER2 = "/craftorder"
         SlashCmdList["CRAFTINGORDER"] = function(msg) COC:Slash(msg) end
         p(COC.L["chargé — |cFFFFFFFF/co help|r pour les commandes. (Réseau global de craft — autonome.)"])
+        -- Lib absente (vécu le 2026-09-30 : un /reload pendant la copie d'un déploiement) : le dire.
+        if not CraftLink then p("|cFFFF8800" .. COC.L["la bibliothèque CraftLink n'a pas pu se charger : le réseau de l'addon est coupé (annuaire, commandes). Fais |cFFFFFFFF/reload|r ; si ça continue, réinstalle l'addon."] .. "|r") end
     elseif event == "SKILL_LINES_CHANGED" then
         COC:OnSkillLines()
     else

@@ -46,6 +46,41 @@ client.
 
 ## Relevés
 
+- 2026-09-30 08:48 — jusqu'a 8fd4cb9 — Forever, deux clients (Rédemption, Gnomi), client en ANGLAIS ;
+  même build `main-dev@e61e34d 2026-09-30 00:58` (v1.40.0) — **GO sur la relecture du protocole côté
+  réception (`352c1b7`) et sur l'Aide (`97ab48b`), GO partiel sur l'annonce** — traces des deux
+  comptes relues par l'agent, captures du user. (A) comptes « oubliés » par `/run`, Rédemption poste
+  `#7` à tous, case cochée : `WTB [Rough Sharpening Stone] x1 2g50s #CO7` sur Trade (Services) (08:34:03,
+  capture) ; chez Gnomi, « post de Rédemption Wafhien : 1/5 en 60s » et « annonce …-7 : bonjour »
+  (08:34:03), le bonjour chuchoté à +2 s (08:34:05, dans la fenêtre 0-5 s), `ORD|NEW|…-7` reçu à
+  08:34:05 puis 08:34:10 sans second décompte anti-spam, une seule alerte (user). (B) juste après,
+  clic droit sur `#7` dans le Carnet : désactivé, rien ne s'affiche (user) — conforme au code
+  (`CanRemind` faux pendant 15 min), le texte « already announced … N min » n'est JAMAIS atteint
+  depuis le Carnet. Le rappel lui-même marche : `#6` (de la veille) ré-annoncée au clic droit à
+  08:26:30 (trace). (C) hors ville, plus d'une minute après : « no Trade (Services) channel here: you
+  need to be in a capital city. » (capture), `#8` arrivée chez Gnomi par chuchotement (08:39:50) ; la
+  case n'est pas grisée (la spec le prévoyait). (D) comptes en contact, `#9` à tous en ville : ligne à
+  08:48:02, `ORD|NEW` reçu par Gnomi dans la même seconde, **aucun `HI` renvoyé** (le bonjour se tait),
+  un seul décompte anti-spam. Non vu : `PROVIDE` (les commandes `#7` et `#9` portent `provided = {}`),
+  l'aperçu écarté qui ne sonne plus (pas rejoué), `#CO0005` = `#CO5` (couvert par test).
+  En marge : Gnomi renvoie un profil `SK`+`RI` inchangé à tous ses pairs toutes les 5 à 40 s ; le
+  prix s'affiche « 2po 50pa » dans l'alerte d'un client anglais (antérieur à la v1.40.0).
+
+- 2026-09-30 08:14 — jusqu'a 7e8057e — Forever, un client (Rédemption), client en ANGLAIS, en ville ;
+  build déployé `main-dev@e61e34d 2026-09-30 00:58`, branches en test `feat/icone-commande-recue`,
+  `feat/profit-arbitrages` (relu dans la copie déployée du `.toc`), = v1.40.0 — **GO sur la dispo
+  qui ne part plus d'un événement de chat (`7e8057e`) et sur l'Aide sans communauté (`97ab48b`,
+  `22bb22e`)** — trace de Rédemption relue par l'agent : fenêtre de métier ouverte (08:14:38), bouton
+  de dispo, UN seul envoi à 08:14:57 (`LFW|on|Cooking` + « dispo Cooking annoncée sur Trade
+  (Services) - English ») ; capture du user : « availability announced… », l'écho `LFW Cooking #CO`,
+  et aucun « wait » après ce premier geste. Le user a tapé `/co lfw Cooking` ~2 s plus tard
+  (confirmé par lui) : « looking for work » puis « one announcement per minute at most: wait 58
+  more s. », le refus attendu du délai commun. Capture de l'Aide, section « Network, privacy &
+  statuses » : pas de canal, amis/guilde/cercles, salle de découverte, annonces sur Trade ; aucune
+  mention de la communauté. Trace, 08:11:20 : « lien de la communauté non proposé : aucune
+  communauté officielle pour ce camp ». Le repère s'arrête à `7e8057e` : l'Aide (`97ab48b`) vient
+  après `352c1b7` (relecture du protocole, côté réception), qui n'est PAS vu.
+
 - 2026-09-30 00:31 — jusqu'a c126c37 — Forever, deux clients, client en ANGLAIS, en ville ; build
   déployé `main-dev@ed6a410 2026-09-30 00:26` (relu dans la copie déployée du `.toc`), les deux comptes
   à nouveau « oubliés » l'un de l'autre après le /reload (00:28) — **GO sur l'annonce de la dispo LFW

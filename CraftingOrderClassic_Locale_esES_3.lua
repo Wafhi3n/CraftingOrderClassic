@@ -97,6 +97,9 @@ local es3 = {
         "aún no se conoce ninguna profesión de este personaje: abre una vez tu ventana de profesión y vuelve a intentarlo.",
     ["Copie ce texte (Ctrl+C), puis colle-le dans ta note de membre : Communautés, clic droit sur ton nom, « Note ». Les autres joueurs de Crafting Order verront tes métiers, même quand tu es hors ligne."] =
         "Copia este texto (Ctrl+C) y pégalo en tu nota de miembro: Comunidades, clic derecho en tu nombre, «Nota». Los demás jugadores de Crafting Order verán tus profesiones, incluso cuando estés desconectado.",
+    -- Lib absente au chargement (2026-09-30)
+    ["la bibliothèque CraftLink n'a pas pu se charger : le réseau de l'addon est coupé (annuaire, commandes). Fais |cFFFFFFFF/reload|r ; si ça continue, réinstalle l'addon."] =
+        "la biblioteca CraftLink no se pudo cargar: la red del addon está desactivada (directorio, pedidos). Escribe |cFFFFFFFF/reload|r; si vuelve a pasar, reinstala el addon.",
 }
 
 for k, v in pairs(es3) do L[k] = v end

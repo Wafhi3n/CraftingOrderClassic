@@ -97,6 +97,9 @@ local en3 = {
         "no profession known for this character yet: open your profession window once, then try again.",
     ["Copie ce texte (Ctrl+C), puis colle-le dans ta note de membre : Communautés, clic droit sur ton nom, « Note ». Les autres joueurs de Crafting Order verront tes métiers, même quand tu es hors ligne."] =
         "Copy this text (Ctrl+C), then paste it into your member note: Communities, right-click your name, \"Note\". Other Crafting Order players will see your professions, even when you're offline.",
+    -- Lib absente au chargement (2026-09-30)
+    ["la bibliothèque CraftLink n'a pas pu se charger : le réseau de l'addon est coupé (annuaire, commandes). Fais |cFFFFFFFF/reload|r ; si ça continue, réinstalle l'addon."] =
+        "the CraftLink library failed to load: the addon's network is off (directory, orders). Type |cFFFFFFFF/reload|r; if it keeps happening, reinstall the addon.",
 }
 
 for k, v in pairs(en3) do L[k] = v end
