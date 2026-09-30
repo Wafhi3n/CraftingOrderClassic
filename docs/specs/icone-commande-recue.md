@@ -1,9 +1,10 @@
 # Icônes « une commande t'attend » dans la barre de la minicarte
 
 > État : **2e version vue en jeu à deux comptes** (relevé 2026-09-30 18:25, critères 5 et 6, sauf le
-> clic d'un métier que le perso n'a pas) ; **3e tour CODÉ le 2026-09-30, pas vu en jeu** (section
-> « 3e tour » ci-dessous : le clic selon qui sait faire, les commandes non nommées qu'un de tes persos
-> sait faire, la couleur du nombre ; critères 8 à 10 verts, 11 et 12 à observer). · Rédigée le 2026-09-28 · Idée du user le 2026-09-27, périmètre tranché par lui en trois
+> clic d'un métier que le perso n'a pas) ; **3e tour vu en jeu sur un client** (relevé 2026-09-30
+> 19:06, critère 11 sauf (d) le vert ; section « 3e tour » ci-dessous : le clic selon qui sait faire,
+> les commandes non nommées qu'un de tes persos sait faire, la couleur du nombre) ; 11 (d) et 12 à
+> observer à deux comptes. · Rédigée le 2026-09-28 · Idée du user le 2026-09-27, périmètre tranché par lui en trois
 > tours de questions (cf. Décisions).
 > Cible : WoW: Forever / Camelot (16001) · Addon : Crafting Order - Classic
 > Deuxième usage de l'outil d'icônes de la minicarte (spec `icone-minicarte.md`, rangs 4.xx).
@@ -177,6 +178,13 @@ sourdine) ; et **dès que tu l'acceptes**, elle n'attend plus.
   rappel.
 - **Pas de réglage pour couper les publiques** dans ce tour. Si l'icône reste allumée en permanence
   sur un réseau actif, on l'ajoutera (décision à prendre après usage).
+- **Pas encore l'allure native pour la vue reroll.** Le user l'a demandé le 2026-09-30 (« changer l'ui
+  de la vue reroll par la vue ui native si possible ») : **à étudier dans un chantier à part**. La
+  fenêtre de métier de Blizzard ne lit que le perso connecté (`C_TradeSkillUI`) et ne peut pas afficher
+  les recettes d'un reroll, qui n'existent que dans notre SavedVariable. La piste réaliste : garder
+  nos données, mais construire la vue avec les gabarits et le skin de la fenêtre native (liste de
+  recettes, panneau de détail). Il faudra vérifier que ces gabarits n'appellent pas `C_TradeSkillUI`
+  en interne, et qu'ils ne salissent pas la fenêtre native (taint).
 
 ### Cas particuliers
 
