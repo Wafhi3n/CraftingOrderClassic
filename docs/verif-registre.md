@@ -46,6 +46,14 @@ client.
 
 ## Relevés
 
+- 2026-09-30 09:29 — jusqu'a 09fce32 — Forever, client en ANGLAIS, un seul compte regardé ; build
+  déployé `main-dev@3cbaee8 2026-09-30 09:25` (relu dans la copie déployée du `.toc` ; mêmes branches
+  en test que le relevé de 09:17) — **GO sur les marges des encarts** (« tout en retrait », choix du
+  user), jugé sur une capture de Récolte (Mining) : recherche, bande de filtres et en-têtes à distance
+  du bord gauche, bande « Send to » de la largeur des lignes dessous, « Price offered » et « Send to »
+  sur la verticale des icônes, menu « Guild » au bout des lignes. « Ça a l'air tout bon » (user).
+  Onglet Commande non montré sur capture. Le « Non vu » du relevé de 09:17 tient toujours.
+
 - 2026-09-30 09:17 — jusqu'a 9f7e73f — Forever, client en ANGLAIS, un seul compte regardé ; build
   déployé `main-dev@9acd6cb 2026-09-30 09:15` (relu dans la copie déployée du `.toc` ; branches en
   test : feat/icone-commande-recue, feat/liste-destinataires, feat/profit-arbitrages) — **GO partiel
