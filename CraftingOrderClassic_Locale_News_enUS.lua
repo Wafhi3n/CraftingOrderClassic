@@ -11,6 +11,14 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "What's New",
+    -- v1.42.0
+    ["Tu choisis ce qui te prévient"] = "You choose what alerts you",
+    ["En bas des « Canaux surveillés » de l'onglet Artisans, un groupe « Notifications » règle chaque alerte : les demandes lues dans le chat (« WTB [objet] »), les commandes des autres joueurs de l'addon, le suivi de tes commandes (remise, reçue, refusée) et le message à la connexion."] =
+        "At the bottom of the Watched channels list in the Artisans tab, a Notifications group controls each alert: requests read in chat (\"WTB [item]\"), orders from other addon users, tracking of your own orders (delivered, received, declined) and the login message.",
+    ["Pour les commandes, tu choisis aussi la portée : toutes, seulement guilde, amis et celles pour toi, ou seulement celles à ton nom. C'est le réglage de /co notify, qui a enfin sa case."] =
+        "For orders you can also pick the reach: all of them, only guild, friends and the ones for you, or only the ones in your name. It's the /co notify setting, finally with a checkbox.",
+    ["« Façon de prévenir » coupe à part la ligne dans le chat, le bandeau et le son. Une case décochée ne cache aucune commande : tout reste dans le Carnet et la vue métier."] =
+        "How to alert turns off the chat line, the banner and the sound separately. An unticked box hides no order: everything stays in the Ledger and the profession view.",
     -- v1.41.1
     ["Plus d'erreurs pendant les combats de boss"] = "No more errors during boss fights",
     ["Pendant un combat de boss, Forever cache aux addons qui a écrit une ligne du chat et ce qu'elle dit. L'addon levait alors une erreur à chaque ligne reçue sur un canal, Général compris ; il les laisse passer sans bruit. La liste des membres de tes communautés, cachée elle aussi, ne fait plus d'erreur et ne retire plus personne de ton annuaire."] =
@@ -216,10 +224,7 @@ local news = {
     -- (clés v1.13.0 retirées à la v1.41.1 : version sortie de la fenêtre glissante de l'onglet)
     -- (clés v1.12.1 retirées : version sortie de la fenêtre glissante de l'onglet Nouveautés)
     -- (clés v1.12.0, v1.11.0 et v1.10.2 retirées à la v1.41.0 : versions sorties de la fenêtre glissante de l'onglet)
-    -- Onglet Nouveautés — v1.14.0
-    ["Un panneau pour gérer les mis en sourdine"] = "A panel to manage who you've muted",
-    ["L'onglet Artisans a maintenant une section « En sourdine » : chaque joueur muté y apparaît avec sa raison et le temps restant (ou « permanent »), avec un bouton pour le rétablir directement — plus besoin de deviner qui est encore muté."] =
-        "The Artisans tab now has a Muted section: every muted player shows up with their reason and time left (or \"permanent\"), with a button to unmute them right there — no more guessing who's still muted.",
+    -- (clés v1.14.0 retirées à la v1.42.0 : version sortie de la fenêtre glissante de l'onglet)
     -- (clés v1.9.0 retirées : version sortie de la fenêtre glissante de l'onglet Nouveautés)
     ["VU"] = "SEEN",
     ["vu crafter (sans l'addon)"] = "seen crafting (no addon)",

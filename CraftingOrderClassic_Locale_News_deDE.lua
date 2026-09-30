@@ -8,6 +8,14 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "Neues",
+    -- v1.42.0
+    ["Tu choisis ce qui te prévient"] = "Du bestimmst, was dich benachrichtigt",
+    ["En bas des « Canaux surveillés » de l'onglet Artisans, un groupe « Notifications » règle chaque alerte : les demandes lues dans le chat (« WTB [objet] »), les commandes des autres joueurs de l'addon, le suivi de tes commandes (remise, reçue, refusée) et le message à la connexion."] =
+        "Unten in den überwachten Kanälen im Handwerker-Reiter regelt eine Gruppe „Benachrichtigungen“ jeden Hinweis: im Chat gelesene Anfragen („WTB [Gegenstand]“), Aufträge anderer Addon-Nutzer, der Verlauf deiner eigenen Aufträge (übergeben, erhalten, abgelehnt) und die Nachricht beim Einloggen.",
+    ["Pour les commandes, tu choisis aussi la portée : toutes, seulement guilde, amis et celles pour toi, ou seulement celles à ton nom. C'est le réglage de /co notify, qui a enfin sa case."] =
+        "Bei Aufträgen wählst du auch die Reichweite: alle, nur Gilde, Freunde und die für dich, oder nur die auf deinen Namen. Das ist die Einstellung von /co notify, jetzt endlich mit Kästchen.",
+    ["« Façon de prévenir » coupe à part la ligne dans le chat, le bandeau et le son. Une case décochée ne cache aucune commande : tout reste dans le Carnet et la vue métier."] =
+        "„Art der Benachrichtigung“ schaltet Chatzeile, Banner und Ton einzeln ab. Ein abgewähltes Kästchen versteckt keinen Auftrag: alles bleibt im Auftragsbuch und in der Berufsansicht.",
     -- v1.41.1
     ["Plus d'erreurs pendant les combats de boss"] = "Keine Fehler mehr in Bosskämpfen",
     ["Pendant un combat de boss, Forever cache aux addons qui a écrit une ligne du chat et ce qu'elle dit. L'addon levait alors une erreur à chaque ligne reçue sur un canal, Général compris ; il les laisse passer sans bruit. La liste des membres de tes communautés, cachée elle aussi, ne fait plus d'erreur et ne retire plus personne de ton annuaire."] =
@@ -213,10 +221,7 @@ local news = {
     -- (clés v1.13.0 retirées à la v1.41.1 : version sortie de la fenêtre glissante de l'onglet)
     -- (clés v1.12.1 retirées : version sortie de la fenêtre glissante de l'onglet Nouveautés)
     -- (clés v1.12.0, v1.11.0 et v1.10.2 retirées à la v1.41.0 : versions sorties de la fenêtre glissante de l'onglet)
-    -- Onglet Nouveautés — v1.14.0
-    ["Un panneau pour gérer les mis en sourdine"] = "Ein Panel zur Verwaltung von Stummgeschalteten",
-    ["L'onglet Artisans a maintenant une section « En sourdine » : chaque joueur muté y apparaît avec sa raison et le temps restant (ou « permanent »), avec un bouton pour le rétablir directement — plus besoin de deviner qui est encore muté."] =
-        "Der Handwerker-Reiter hat jetzt einen Bereich „Stummgeschaltet“: jeder stummgeschaltete Spieler erscheint dort mit Grund und verbleibender Zeit (oder „dauerhaft“), mit einem Knopf, um ihn direkt wieder freizuschalten — kein Rätselraten mehr, wer noch stummgeschaltet ist.",
+    -- (clés v1.14.0 retirées à la v1.42.0 : version sortie de la fenêtre glissante de l'onglet)
     -- (clés v1.9.0 retirées : version sortie de la fenêtre glissante de l'onglet Nouveautés)
     ["VU"] = "GESEHEN",
     ["vu crafter (sans l'addon)"] = "beim Herstellen gesehen (ohne Addon)",
