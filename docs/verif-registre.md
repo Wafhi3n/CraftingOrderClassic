@@ -46,6 +46,23 @@ client.
 
 ## Relevés
 
+- 2026-09-30 17:25 — jusqu'a e09e4f0 — Forever, 2 comptes, build `main-dev@dea9e9d 2026-09-30 16:37`
+  avec icone-commande-recue, liste-destinataires, profit-arbitrages, valeurs-secretes-canal (copie
+  déployée du `.toc`, `Directory_Club` gardé relu dedans), Rédemption en donjon — **le déclencheur est
+  le COMBAT DE BOSS** ; **GO à nouveau sur les lignes secrètes ; présence et cercles sans erreur mais
+  SANS témoin** — relu par l'agent dans `DevMacroDB.log`, `!BugGrabber.lua` et les traces : sonde
+  (`/dm 1`) à 16:41:02 en combat de trash : combat=2, carte=2, boss=0, chat=0, verrou false ; à
+  17:21:15 sur un boss : combat=2, **boss=2, chat=2**, carte=2, `InChatMessagingLockdown()` = **true**.
+  17:21:21 Gnomi envoie `CLNK1 x` ; 17:21:22 COCMonitor lève dessus (`author` secret) chez Rédemption,
+  rien de `CraftLink_*` ni de COC. 17:21:34 Gnomi se déconnecte (sauvegarde) pendant que Rédemption
+  est encore verrouillé (ses envois refusés 17:21:35-46, `verrouillage d'instance`) : aucune erreur
+  de présence, et aucune `Directory_Club.lua:163` alors que Gnomi est membre du cercle `23004771`,
+  celui qui levait ; Gnomi garde `source="circle"`, `circle="23004771"` dans la sauvegarde de
+  17:21:57. **Pas prouvé** : que `CHAT_MSG_CHANNEL_LEAVE` et l'événement de club sont bien arrivés
+  pendant le verrou (aucun lecteur témoin sur ces chemins, rien de tracé) ; le retour de Gnomi
+  (`_JOIN`) ; `17 1` en jeu. Hors sujet vus au passage : `SelectRecipe` (Auctionator, ×260) et
+  `AceBucket` de Questie sur une clé secrète.
+
 - 2026-09-30 16:30 — jusqu'a f677875 — Forever, 2 comptes, même build `main-dev@7a5139d 2026-09-30
   15:38` que le relevé de 16:15, Rédemption en donjon (le déclencheur exact du verrou, boss ou non,
   n'a pas été relevé) — **GO sur les lignes de canal SECRÈTES (chemin texte), avec témoin dans le même
