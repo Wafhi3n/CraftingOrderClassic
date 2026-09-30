@@ -75,7 +75,14 @@ end
 -- migration, donc rien à perdre) : `room` lit roomOff, `nearby` lit crafterScan, `club:<id>` lit
 -- circles. Le reste vit dans COC.db.watch : absent = le défaut, false = décoché par le joueur.
 local DEFAULTS = { trade_services = true, trade = true, trade_local = true, guild = true, sayyell = true, general = false }
-Ch.WATCH_KEYS = { "trade_services", "trade", "trade_local", "general", "guild", "sayyell", "room", "nearby" }
+-- Deux cases ne disent pas OÙ lire mais s'il faut PRÉVENIR (ligne de chat, bandeau, son) : ce réglage
+-- n'existait que par /co notify, qu'aucun joueur ne trouvait (demande du user, 2026-09-30).
+--   notif_orders = les commandes reçues par l'addon : lit notifyScope, la vérité de /co notify.
+--   notif_chat   = les demandes lues dans le chat. Jamais touchée, elle suit notifyScope : qui avait
+--                  tout coupé par /co notify off reste sans alerte. Une fois cochée ou décochée, elle
+--                  ne dépend plus que d'elle-même.
+Ch.WATCH_KEYS = { "trade_services", "trade", "trade_local", "general", "guild", "sayyell", "room", "nearby",
+                  "notif_orders", "notif_chat" }
 
 local function clubId(key) return type(key) == "string" and key:match("^club:(.+)$") or nil end
 
@@ -83,6 +90,13 @@ function Ch.IsWatched(key)
     local db = COC.db
     if key == "room" then return not (db and db.roomOff) end
     if key == "nearby" then return (db and db.crafterScan) and true or false end
+    local ordersOn = not (db and db.notifyScope == "off")
+    if key == "notif_orders" then return ordersOn end
+    if key == "notif_chat" then
+        local own = db and db.watch and db.watch.notif_chat
+        if own == nil then return ordersOn end
+        return own == true
+    end
     local id = clubId(key)
     if id then return (db and db.circles and db.circles[id]) == true end
     local v = db and db.watch and db.watch[key]
@@ -100,6 +114,11 @@ function Ch.SetWatched(key, on)
     if key == "room" then if D and D.SetRoom then D:SetRoom(on) end
     elseif key == "nearby" then if D and D.SetCrafterScan then D:SetCrafterScan(on) end
     elseif id then if D and D.SetCircle then D:SetCircle(id, on) end
+    elseif key == "notif_orders" then
+        -- La case chat suivait ce réglage : on fige ce qu'elle montrait, elle ne doit pas bouger avec lui.
+        db.watch = db.watch or {}
+        if db.watch.notif_chat == nil then db.watch.notif_chat = Ch.IsWatched("notif_chat") end
+        db.notifyScope = on and "all" or "off"
     else
         db.watch = db.watch or {}
         db.watch[key] = on
@@ -146,6 +165,9 @@ function Ch.BuildRows(joined, clubs, inGuild)
     head(L["AUTOUR DE MOI"], L["Ce que les joueurs disent ou crient près de toi (les lignes LFW), et, en ville, ceux que tu vois crafter."])
     item("sayyell", L["Dire et crier"], true)
     item("nearby", L["Crafteurs autour"], true, L["en ville"], L["Repérer les crafteurs autour (en ville)"])
+    head(L["NOTIFICATIONS"], L["Ce qui te prévient : une ligne dans le chat, un bandeau et un son. Décochée, une case ne cache rien : tout reste dans le Carnet et la vue métier."])
+    item("notif_orders", L["Commandes de l'addon"], true, nil, L["Les commandes que les autres joueurs de l'addon t'envoient ou publient."])
+    item("notif_chat", L["Demandes lues dans le chat"], true, nil, L["Les demandes (« WTB [objet] ») lues dans les canaux cochés plus haut, pour ce que tu sais crafter."])
     return rows
 end
 

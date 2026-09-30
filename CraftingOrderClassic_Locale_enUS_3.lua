@@ -125,6 +125,15 @@ local en3 = {
         "What players say or yell near you (LFW lines) and, in town, the ones you see crafting.",
     ["Dire et crier"] = "Say and yell",
     ["Crafteurs autour"] = "Crafters nearby",
+    ["NOTIFICATIONS"] = "NOTIFICATIONS",
+    ["Ce qui te prévient : une ligne dans le chat, un bandeau et un son. Décochée, une case ne cache rien : tout reste dans le Carnet et la vue métier."] =
+        "What alerts you: a chat line, a banner and a sound. Unticking a box hides nothing: everything stays in the Ledger and the profession view.",
+    ["Commandes de l'addon"] = "Addon orders",
+    ["Les commandes que les autres joueurs de l'addon t'envoient ou publient."] =
+        "Orders that other addon users send you or post.",
+    ["Demandes lues dans le chat"] = "Requests read in chat",
+    ["Les demandes (« WTB [objet] ») lues dans les canaux cochés plus haut, pour ce que tu sais crafter."] =
+        "Requests (\"WTB [item]\") read in the channels ticked above, for what you can craft.",
     ["Tu n'es pas dans ce canal en ce moment. Ton choix est gardé pour ton retour."] =
         "You're not in this channel right now. Your choice is kept for when you're back.",
     -- Refonte de l'onglet Artisans (2026-09-30) : la bande des joueurs croisés, le bouton qui rouvre le panneau

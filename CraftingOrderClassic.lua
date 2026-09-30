@@ -192,7 +192,7 @@ local NOTIFY_MODES = { all = true, directed = true, named = true, off = true }
 function COC:NotifyCmd(arg)
     local L = COC.L
     arg = (arg or ""):lower()
-    if NOTIFY_MODES[arg] then COC.db.notifyScope = arg end
+    if NOTIFY_MODES[arg] then COC.db.notifyScope = arg end   -- la case de l'onglet Artisans le relit à l'ouverture
     local cur = (COC.db and COC.db.notifyScope) or "all"
     p(string.format(L["notifications : |cFFFFFFFF%s|r — /co notify [all|directed|named|off]"], cur))
 end

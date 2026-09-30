@@ -125,6 +125,15 @@ local es3 = {
         "Lo que los jugadores dicen o gritan cerca de ti (líneas LFW) y, en ciudad, a quienes ves fabricar.",
     ["Dire et crier"] = "Decir y gritar",
     ["Crafteurs autour"] = "Artesanos cercanos",
+    ["NOTIFICATIONS"] = "NOTIFICACIONES",
+    ["Ce qui te prévient : une ligne dans le chat, un bandeau et un son. Décochée, une case ne cache rien : tout reste dans le Carnet et la vue métier."] =
+        "Lo que te avisa: una línea en el chat, un aviso y un sonido. Desmarcar una casilla no oculta nada: todo sigue en el Libro y en la vista de profesión.",
+    ["Commandes de l'addon"] = "Pedidos del addon",
+    ["Les commandes que les autres joueurs de l'addon t'envoient ou publient."] =
+        "Los pedidos que otros jugadores del addon te envían o publican.",
+    ["Demandes lues dans le chat"] = "Solicitudes leídas en el chat",
+    ["Les demandes (« WTB [objet] ») lues dans les canaux cochés plus haut, pour ce que tu sais crafter."] =
+        "Las solicitudes (« WTB [objeto] ») leídas en los canales marcados arriba, para lo que sabes fabricar.",
     ["Tu n'es pas dans ce canal en ce moment. Ton choix est gardé pour ton retour."] =
         "No estás en este canal ahora mismo. Tu elección se guarda para cuando vuelvas.",
     -- Refonte de l'onglet Artisans (2026-09-30) : la bande des joueurs croisés, le bouton qui rouvre le panneau
