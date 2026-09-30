@@ -10,7 +10,7 @@
 
 | Fichier | Rôle | Lignes |
 |---|---|---|
-| `CraftingOrderClassic.lua` | Crafting Order - Classic — réseau GLOBAL et SOCIAL de commandes de craft. | 497 |
+| `CraftingOrderClassic.lua` | Crafting Order - Classic — réseau GLOBAL et SOCIAL de commandes de craft. | 499 |
 | `CraftingOrderClassic_Compat.lua` | couche d'adaptation d'API entre les SAVEURS de client. | 336 |
 | `CraftingOrderClassic_Trace.lua` | trace réseau PERSISTÉE, lisible hors-jeu. | 79 |
 | `CraftingOrderClassic_Migrations.lua` | versionnage du schéma SavedVariables. | 40 |
@@ -127,7 +127,7 @@
 | `Directory_Community.lua` | le réseau SANS canal : la communauté remplace CraftLinkNet (Forever). | 270 |
 | `Directory_Note.lua` | la note de membre de la communauté : lue dans l'annuaire, préparée pour le joueur. | 105 |
 | `Directory_Skills.lua` | niveaux de compétence + réputation (couche « profil » de l'annuaire). | 157 |
-| `Directory_Room.lua` | la salle de découverte : CraftLinkNet rejoint pour SE PRÉSENTER, pas pour transporter. | 71 |
+| `Directory_Room.lua` | la salle de découverte : CraftLinkNet rejoint pour SE PRÉSENTER, pas pour transporter. | 88 |
 | `Directory_Version.lua` | détection « nouvelle version disponible » (100 % P2P, aucun serveur). | 147 |
 | `Directory_Cooldowns.lua` | cooldowns de recettes (couche « profil » de l'annuaire). | 82 |
 | `Directory_RelayCodec.lua` | codec du fil RLY : relais de la fiche d'un artisan HORS LIGNE par un de ses partenaires. | 70 |
@@ -2308,7 +2308,7 @@
 > Les porteurs d'avant la v1.37, restés sur CraftLinkNet, deviennent joignables du même coup.
 > Coupable : /co channel room off (COC.db.roomOff).
 
-**API** : `Dir:RoomEnabled()` · `Dir:OnRoomJoined()` · `Dir:SetRoom(on)` · `Dir:RoomCmd(arg)` · `Dir:RoomStatusLine()`
+**API** : `Dir:RoomEnabled()` · `Dir:OnRoomJoined()` · `Dir:RoomHello()` · `Dir:SetRoom(on)` · `Dir:RoomCmd(arg)` · `Dir:RoomStatusLine()`
 
 ### `Directory_Version.lua`
 > Directory_Version.lua — détection « nouvelle version disponible » (100 % P2P, aucun serveur).
