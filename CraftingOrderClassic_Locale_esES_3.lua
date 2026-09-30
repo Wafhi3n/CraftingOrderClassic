@@ -73,8 +73,8 @@ local es3 = {
     -- Aide sans communauté officielle (2026-09-30)
     ["|cFFFFFFFF/co circle|r : tes cercles d'artisans (les communautés du jeu que tu as marquées)."] =
         "|cFFFFFFFF/co circle|r: tus círculos de artesanos (las comunidades del juego que has marcado).",
-    ["Les artisans se trouvent par tes amis, ta guilde et tes cercles, par la salle de découverte (|cFFFFFFFF/co channel room|r) où les porteurs de l'addon se disent bonjour, et par les annonces sur Trade (Services) que l'addon relit."] =
-        "Los artesanos se encuentran a través de tus amigos, tu hermandad y tus círculos, de la sala de descubrimiento (|cFFFFFFFF/co channel room|r) donde los usuarios del addon se saludan, y de los anuncios en Comercio (Servicios) que el addon lee.",
+    ["Les artisans se trouvent par tes amis et ta guilde, et par les canaux que tu coches dans l'onglet Artisans, liste « Canaux surveillés » : Commerce, la salle de découverte, tes communautés, les joueurs autour de toi. Le bouton « Configurer » y rouvre le panneau du premier lancement."] =
+        "Los artesanos se encuentran a través de tus amigos y tu hermandad, y de los canales que marcas en la pestaña Artesanos, en «Canales vigilados»: Comercio, la sala de descubrimiento, tus comunidades, los jugadores a tu alrededor. El botón «Configurar» reabre ahí el panel del primer inicio.",
     -- Aide remise à jour : onglets latéraux, cercles (2026-09-28)
     ["Ils se rangent sur le bord droit, comme ceux de la fenêtre de métier. Survole une icône pour lire son nom ; le chiffre sur le Carnet compte tes commandes en cours."] =
         "Están en el borde derecho, como los de la ventana de profesión. Pasa el ratón sobre un icono para leer su nombre; el número sobre el Libro cuenta tus pedidos activos.",
@@ -116,7 +116,7 @@ local es3 = {
     ["L'addon s'y présente par un message invisible aux joueurs de ta salle ; ensuite, tout passe en chuchotement."] =
         "El addon se presenta ahí con un mensaje invisible a los jugadores de tu sala; después, todo va por susurro.",
     ["salle"] = "sala",
-    ["ANNUAIRE"] = "DIRECTORIO",
+    ["COMMUNAUTÉS"] = "COMUNIDADES",
     ["Les membres d'une communauté cochée rejoignent ton annuaire, même hors ligne. Aucune donnée de l'addon n'y passe."] =
         "Los miembros de una comunidad marcada entran en tu directorio, incluso desconectados. Ningún dato del addon pasa por ella.",
     ["aucune communauté"] = "ninguna comunidad",
