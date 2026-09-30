@@ -8,6 +8,18 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "Neues",
+    -- v1.41.0
+    ["Tu choisis où l'addon cherche les artisans"] = "Du bestimmst, wo das Addon nach Handwerkern sucht",
+    ["L'onglet Artisans a une liste « Canaux surveillés » : les canaux de Commerce, la discussion de guilde, la salle de découverte, tes communautés et les joueurs autour de toi. Coche ceux où l'addon doit chercher des artisans. Hors d'une ville, les canaux de Commerce sont grisés et ton choix est gardé."] =
+        "Der Reiter „Handwerker“ hat eine Liste „Beobachtete Kanäle“: die Handelskanäle, der Gildenchat, der Entdeckungsraum, deine Gemeinschaften und die Spieler um dich herum. Hake die an, in denen das Addon nach Handwerkern suchen soll. Außerhalb einer Stadt sind die Handelskanäle ausgegraut, und deine Wahl bleibt erhalten.",
+    ["À ta première connexion après la mise à jour, un panneau te montre ces cases une fois, avec une phrase par groupe. Le bouton « Configurer » de l'onglet Artisans le rouvre."] =
+        "Beim ersten Einloggen nach dem Update zeigt dir ein Fenster diese Kästchen einmal, mit einem Satz pro Gruppe. Der Knopf „Einrichten“ im Reiter „Handwerker“ öffnet es erneut.",
+    ["Trade, Trade (Services) et Trade (Local) se règlent maintenant un par un. Un seul défaut change : l'addon ne lit plus les lignes « LFW » sur le canal Général, sauf si tu le coches. Une communauté se coche dans la même liste."] =
+        "Handel, Handel (Dienstleistungen) und Handel (Lokal) haben jetzt je ein eigenes Kästchen. Eine Voreinstellung ändert sich: Das Addon liest „LFW“-Zeilen im Allgemein-Kanal nicht mehr, außer du hakst ihn an. Eine Gemeinschaft wird in derselben Liste angehakt.",
+    ["L'onglet Artisans se lit mieux : « Chuchoter » n'est rouge que pour un joueur joignable, les icônes de métier restent en couleur, un joueur hors ligne a son nom en gris, et l'étiquette de source ne s'affiche que lorsqu'elle apprend quelque chose. La bande « Annuaire » s'appelle « Croisés », et « Rafraîchir l'annuaire » est passé en bas de la fenêtre."] =
+        "Der Reiter „Handwerker“ liest sich besser: „Flüstern“ ist nur bei erreichbaren Spielern rot, Berufssymbole bleiben farbig, der Name eines Offline-Spielers ist grau, und das Herkunftsetikett erscheint nur, wenn es etwas aussagt. Der Filter „Verzeichnis“ heißt jetzt „Getroffen“, und „Verzeichnis aktualisieren“ sitzt unten im Fenster.",
+    ["Aussi : si l'addon se charge sans sa bibliothèque, par exemple pendant la copie d'une mise à jour, il le dit et propose « /reload » au lieu de planter à chaque survol d'un joueur."] =
+        "Außerdem: Lädt das Addon ohne seine Bibliothek, etwa während ein Update kopiert wird, sagt es das und schlägt „/reload“ vor, statt bei jedem Überfahren eines Spielers einen Fehler zu werfen.",
     -- v1.30.0
     ["La cuisine, le secourisme et la pêche comptent comme des métiers"] =
         "Kochkunst, Erste Hilfe und Angeln zählen als Berufe",
@@ -197,24 +209,7 @@ local news = {
     ["Un mute porte désormais une raison et une date, et peut être temporaire : |cFFFFFFFF/co mute Bob 1h spammeur|r se lève tout seul au bout d'une heure (|cFFFFFFFF/co mute|r seul liste les mutés avec raison et temps restant). Et |cFFFFFFFF/co trust <nom>|r marque un joueur de confiance, jamais mis en sourdine automatiquement — le mute manuel restant toujours possible."] =
         "Eine Stummschaltung trägt jetzt einen Grund und ein Datum und kann temporär sein: |cFFFFFFFF/co mute Bob 1h Spammer|r hebt sich nach einer Stunde selbst auf (|cFFFFFFFF/co mute|r allein listet die Stummgeschalteten mit Grund und Restzeit). Und |cFFFFFFFF/co trust <Name>|r markiert einen Spieler als vertrauenswürdig, nie automatisch stummgeschaltet — manuelles Stummschalten bleibt möglich.",
     -- (clés v1.12.1 retirées : version sortie de la fenêtre glissante de l'onglet Nouveautés)
-    -- Onglet Nouveautés — v1.12.0
-    ["Les recettes de la Saison de la Découverte"] = "Rezepte der Saison der Entdeckungen",
-    ["304 recettes de la Saison de la Découverte entrent au catalogue : 80 en Travail du cuir, 65 en Forge, 57 en Couture, 48 en Enchantement, 29 en Ingénierie, 16 en Alchimie, plus la Cuisine, le Secourisme et le Minage. Elles apparaissent dans l'onglet Commande, avec leurs réactifs et leur palier d'apprentissage."] =
-        "304 Rezepte der Saison der Entdeckungen kommen in den Katalog: 80 für Lederverarbeitung, 65 für Schmiedekunst, 57 für Schneiderei, 48 für Verzauberkunst, 29 für Ingenieurskunst, 16 für Alchemie, dazu Kochkunst, Erste Hilfe und Bergbau. Sie erscheinen im Auftrags-Tab, mit ihren Reagenzien und Fertigkeitsstufen.",
-    ["Elles ne se chargent que sur un royaume Saison de la Découverte. Sur un royaume Era classique, rien ne change : l'addon voit exactement le même jeu de recettes qu'avant, et les recettes que tes amis t'ont déjà partagées restent lisibles."] =
-        "Sie werden nur auf einem Realm der Saison der Entdeckungen geladen. Auf einem normalen Era-Realm ändert sich nichts: das Addon sieht genau denselben Rezeptsatz wie zuvor, und die von deinen Freunden geteilten Rezepte bleiben lesbar.",
-    -- Onglet Nouveautés — v1.11.0
-    ["Annuler une commande publique atteint tout le royaume"] = "Das Abbrechen eines öffentlichen Auftrags erreicht jetzt den ganzen Realm",
-    ["Une commande publique voyage sur le canal du royaume depuis la v1.10.0, mais pas son annulation : un artisan que tu n'as jamais croisé la voyait « ouverte » pendant six heures, l'acceptait, et farmait les réactifs pour rien. L'annulation part désormais sur le même canal."] =
-        "Ein öffentlicher Auftrag reist seit v1.10.0 über den Realm-Kanal, sein Abbruch jedoch nicht. Ein Handwerker, dem du nie begegnet bist, sah ihn bis zu sechs Stunden lang als offen, konnte ihn annehmen und sammelte die Reagenzien umsonst. Der Abbruch geht jetzt über denselben Kanal.",
-    ["Poster et annuler ne perdent plus de messages. Le canal exige un clic ou une touche et n'accepte qu'une ligne par seconde : un |cFFFFFFFF/co post|r tapé au chat, ou deux commandes postées dans la même seconde, disparaissaient sans trace. Ces lignes patientent maintenant dans une file et partent à ton prochain clic."] =
-        "Aufgeben und Abbrechen verlieren keine Nachrichten mehr. Der Kanal braucht einen Klick oder Tastendruck und nimmt eine Zeile pro Sekunde: ein im Chat getipptes |cFFFFFFFF/co post|r oder zwei Aufträge in derselben Sekunde verschwanden spurlos. Diese Zeilen warten nun in einer Warteschlange und gehen beim nächsten Klick raus.",
-    ["Seules les commandes NOUVELLES et les ANNULATIONS voyagent sur le canal, et seulement les publiques. Guilde, amis et commandes nommées restent privées ; les acceptations restent entre les deux joueurs concernés."] =
-        "Nur neue Aufträge und Abbrüche reisen über den Kanal, und nur öffentliche. Gilden-, Freundes- und benannte Aufträge bleiben privat; Annahmen bleiben zwischen den beiden beteiligten Spielern.",
-    -- Onglet Nouveautés — v1.10.2
-    ["Correctif : erreur en combat dans la vue métier"] = "Behoben: Fehler im Kampf in der Berufsansicht",
-    ["Sélectionner une recette pendant un combat ne provoque plus d'erreur bloquée : le bouton « Créer » est un bouton sécurisé, que le jeu interdit de masquer en plein combat. L'addon attend maintenant la fin du combat pour l'afficher ou le masquer."] =
-        "Ein Rezept während des Kampfes auszuwählen löst keinen blockierten Fehler mehr aus. Der Erstellen-Knopf ist ein geschützter Knopf, den das Spiel mitten im Kampf nicht verbergen lässt. Das Addon wartet nun das Kampfende ab, um ihn ein- oder auszublenden.",
+    -- (clés v1.12.0, v1.11.0 et v1.10.2 retirées à la v1.41.0 : versions sorties de la fenêtre glissante de l'onglet)
     -- Onglet Nouveautés — v1.14.0
     ["Un panneau pour gérer les mis en sourdine"] = "Ein Panel zur Verwaltung von Stummgeschalteten",
     ["L'onglet Artisans a maintenant une section « En sourdine » : chaque joueur muté y apparaît avec sa raison et le temps restant (ou « permanent »), avec un bouton pour le rétablir directement — plus besoin de deviner qui est encore muté."] =
@@ -415,7 +410,7 @@ local news = {
     ["Tes commandes sur Commerce, et l'addon sans communauté"] =
         "Deine Aufträge im Handel, und das Addon ohne Gemeinschaft",
     ["Coche « Annoncer en Commerce » en postant une commande à tous : l'addon écrit aussi une ligne sur Trade (Services), dans une capitale, que tout le monde lit. Les joueurs de l'addon, même inconnus, reçoivent la vraie commande en quelques secondes ; les autres peuvent te chuchoter. Clic droit sur la commande dans le Carnet pour la rappeler, une fois par quart d'heure."] =
-        "Kreuze „Im Handel ankündigen“ an, wenn du einen Auftrag an alle postest: Das Addon schreibt zusätzlich eine Zeile in Handel (Dienstleistungen), in einer Hauptstadt, die alle lesen können. Addon-Nutzer, auch unbekannte, erhalten den echten Auftrag in wenigen Sekunden; alle anderen können dir flüstern. Rechtsklick auf den Auftrag im Auftragsbuch wiederholt ihn, einmal pro Viertelstunde.",
+        "Kreuze „Im Handelskanal ankündigen“ an, wenn du einen Auftrag an alle postest: Das Addon schreibt zusätzlich eine Zeile in Handel (Dienstleistungen), in einer Hauptstadt, die alle lesen können. Addon-Nutzer, auch unbekannte, erhalten den echten Auftrag in wenigen Sekunden; alle anderen können dir flüstern. Rechtsklick auf den Auftrag im Auftragsbuch wiederholt ihn, einmal pro Viertelstunde.",
     ["La même case, dans l'offre de « Chercher du travail », annonce ta dispo : une ligne « LFW » sur Trade (Services) quand tu l'actives, et les joueurs de l'addon reçoivent ton profil."] =
         "Dasselbe Kästchen im Angebot von „Arbeit suchen“ kündigt deine Verfügbarkeit an: eine „LFW“-Zeile in Handel (Dienstleistungen), wenn du sie einschaltest, und Addon-Nutzer erhalten dein Profil.",
     ["L'addon marche sans la communauté Crafting Order PVE et ne t'en envoie plus le lien. Les artisans se trouvent par les amis, la guilde, tes cercles, les annonces sur Commerce et la salle de découverte, où les joueurs de l'addon se disent bonjour (« /co channel room off » pour la quitter)."] =

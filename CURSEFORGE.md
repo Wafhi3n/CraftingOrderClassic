@@ -45,8 +45,9 @@ the capitals, and addon users you've never met get the full order within seconds
 - Give an order a title and a story, so it reads like a quest to whoever picks it up (new in 1.29).
 - Read your orders and your real quests in one parchment journal with `/co journal` (new in 1.29).
 - Cooking, First Aid and Fishing count as professions in the directory, so you can look them up and order from them like anything else (new in 1.30).
-- Turn a WoW community into a crafting circle with `/co circle`, and its members show up in the Artisans directory with their presence, including the ones who are offline (new in 1.31).
+- Turn a WoW community into a crafting circle with one tick in the Artisans tab, and its members show up in the directory with their presence, including the ones who are offline (new in 1.31).
 - Announce an order in Trade (Services) with one tick: everyone can read it and whisper you, and addon users you've never met get the real order within seconds. The same box announces that you're looking for work (new in 1.40).
+- Choose where the addon looks for crafters. The Artisans tab lists the channels it watches (Trade, guild chat, the discovery room, your communities, the players around you), each with a tick box (new in 1.41).
 - Built for WoW: Forever, the 1.60.1 client. Era, Season of Discovery and Hardcore stay on 1.30.0, the last build that shipped for them.
 
 ## Order straight from a name, friend or stranger
@@ -62,9 +63,11 @@ summary sits next to their tooltip, Battle.net friends included, not just friend
 name. Click a guildmate and it sits under their detail with an Order button right there, so it works even
 when they're offline.
 
-The directory fills itself in as you cross paths with other users: friends, guildmates, your circles,
-the players who say hello in the addon's discovery room, and the ones whose Trade announcements you
-read. When it's looking empty, the Refresh button says hello again to the players you know.
+The directory fills itself in as you cross paths with other users: friends, guildmates, and whatever
+you've ticked under "Watched channels" in the Artisans tab. That list covers the Trade channels, guild
+chat, the addon's discovery room, your communities and the players around you, and a panel walks you
+through it the first time you log in. When the directory is looking empty, the Refresh button says
+hello again to the players you know.
 
 ## Sending an order where it belongs
 
@@ -222,10 +225,11 @@ recipes for SoD realms.
 Whispers only reach players who are online and that the addon knows about. Someone who wasn't logged
 in when you posted never saw it, and every session starts by working out again who's around.
 
-If your realm has WoW communities, you can point the addon at one. Mark it with `/co circle` and its
-members appear under a Circle bucket in the Artisans tab, with their presence, including the ones who
-are offline right now. You create the community and you invite who you want, which is rather the
-point: a circle is a small group you picked, not the whole realm.
+If your realm has WoW communities, you can point the addon at one. Tick it under "Watched channels" in
+the Artisans tab (`/co circle` still works) and its members get their own filter in that tab, named
+after the community, with their presence, including the ones who are offline right now. You create
+the community and you invite who you want, which is rather the point: a circle is a small group you
+picked, not the whole realm.
 
 Nothing is posted to the community and nothing is read out of it. Orders and skill levels keep
 travelling the way they always have; the circle only tells the addon who belongs to it and who's

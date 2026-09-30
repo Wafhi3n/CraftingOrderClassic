@@ -8,6 +8,18 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "Novedades",
+    -- v1.41.0
+    ["Tu choisis où l'addon cherche les artisans"] = "Tú eliges dónde busca artesanos el addon",
+    ["L'onglet Artisans a une liste « Canaux surveillés » : les canaux de Commerce, la discussion de guilde, la salle de découverte, tes communautés et les joueurs autour de toi. Coche ceux où l'addon doit chercher des artisans. Hors d'une ville, les canaux de Commerce sont grisés et ton choix est gardé."] =
+        "La pestaña Artesanos tiene una lista «Canales vigilados»: los canales de Comercio, el chat de hermandad, la sala de descubrimiento, tus comunidades y los jugadores a tu alrededor. Marca aquellos donde el addon debe buscar artesanos. Fuera de una ciudad, los canales de Comercio aparecen en gris y tu elección se conserva.",
+    ["À ta première connexion après la mise à jour, un panneau te montre ces cases une fois, avec une phrase par groupe. Le bouton « Configurer » de l'onglet Artisans le rouvre."] =
+        "La primera vez que te conectas tras actualizar, un panel te muestra estas casillas una vez, con una frase por grupo. El botón «Configurar» de la pestaña Artesanos lo vuelve a abrir.",
+    ["Trade, Trade (Services) et Trade (Local) se règlent maintenant un par un. Un seul défaut change : l'addon ne lit plus les lignes « LFW » sur le canal Général, sauf si tu le coches. Une communauté se coche dans la même liste."] =
+        "Comercio, Comercio (Servicios) y Comercio (local) tienen ahora cada uno su casilla. Cambia un valor por defecto: el addon ya no lee las líneas «LFW» en el canal General, salvo que lo marques. Una comunidad se marca en la misma lista.",
+    ["L'onglet Artisans se lit mieux : « Chuchoter » n'est rouge que pour un joueur joignable, les icônes de métier restent en couleur, un joueur hors ligne a son nom en gris, et l'étiquette de source ne s'affiche que lorsqu'elle apprend quelque chose. La bande « Annuaire » s'appelle « Croisés », et « Rafraîchir l'annuaire » est passé en bas de la fenêtre."] =
+        "La pestaña Artesanos se lee mejor: «Susurrar» solo está en rojo para un jugador al que puedes llegar, los iconos de profesión siguen en color, el nombre de un jugador desconectado está en gris, y la etiqueta de origen solo aparece cuando aporta algo. El filtro «Directorio» se llama ahora «Vistos», y «Actualizar directorio» pasó a la parte inferior de la ventana.",
+    ["Aussi : si l'addon se charge sans sa bibliothèque, par exemple pendant la copie d'une mise à jour, il le dit et propose « /reload » au lieu de planter à chaque survol d'un joueur."] =
+        "Además: si el addon se carga sin su biblioteca, por ejemplo mientras se copia una actualización, lo dice y propone «/reload» en vez de dar un error cada vez que pasas el ratón sobre un jugador.",
     -- v1.30.0
     ["La cuisine, le secourisme et la pêche comptent comme des métiers"] =
         "Cocina, Primeros auxilios y Pesca cuentan como profesiones",
@@ -197,24 +209,7 @@ local news = {
     ["Un mute porte désormais une raison et une date, et peut être temporaire : |cFFFFFFFF/co mute Bob 1h spammeur|r se lève tout seul au bout d'une heure (|cFFFFFFFF/co mute|r seul liste les mutés avec raison et temps restant). Et |cFFFFFFFF/co trust <nom>|r marque un joueur de confiance, jamais mis en sourdine automatiquement — le mute manuel restant toujours possible."] =
         "Un silencio ahora lleva un motivo y una fecha, y puede ser temporal: |cFFFFFFFF/co mute Bob 1h spammer|r se levanta solo tras una hora (|cFFFFFFFF/co mute|r solo lista a los silenciados con motivo y tiempo restante). Y |cFFFFFFFF/co trust <nombre>|r marca a un jugador como de confianza, nunca silenciado automáticamente — el silencio manual sigue disponible.",
     -- (clés v1.12.1 retirées : version sortie de la fenêtre glissante de l'onglet Nouveautés)
-    -- Onglet Nouveautés — v1.12.0
-    ["Les recettes de la Saison de la Découverte"] = "Recetas de la Temporada de Descubrimientos",
-    ["304 recettes de la Saison de la Découverte entrent au catalogue : 80 en Travail du cuir, 65 en Forge, 57 en Couture, 48 en Enchantement, 29 en Ingénierie, 16 en Alchimie, plus la Cuisine, le Secourisme et le Minage. Elles apparaissent dans l'onglet Commande, avec leurs réactifs et leur palier d'apprentissage."] =
-        "304 recetas de la Temporada de Descubrimientos entran en el catálogo: 80 de Peletería, 65 de Herrería, 57 de Sastrería, 48 de Encantamiento, 29 de Ingeniería, 16 de Alquimia, más Cocina, Primeros auxilios y Minería. Aparecen en la pestaña Pedido, con sus reactivos y su nivel de aprendizaje.",
-    ["Elles ne se chargent que sur un royaume Saison de la Découverte. Sur un royaume Era classique, rien ne change : l'addon voit exactement le même jeu de recettes qu'avant, et les recettes que tes amis t'ont déjà partagées restent lisibles."] =
-        "Solo se cargan en un reino de la Temporada de Descubrimientos. En un reino Era normal no cambia nada: el addon ve exactamente el mismo conjunto de recetas que antes, y las recetas que tus amigos ya te compartieron siguen siendo legibles.",
-    -- Onglet Nouveautés — v1.11.0
-    ["Annuler une commande publique atteint tout le royaume"] = "Cancelar un pedido público ahora llega a todo el reino",
-    ["Une commande publique voyage sur le canal du royaume depuis la v1.10.0, mais pas son annulation : un artisan que tu n'as jamais croisé la voyait « ouverte » pendant six heures, l'acceptait, et farmait les réactifs pour rien. L'annulation part désormais sur le même canal."] =
-        "Un pedido público viaja por el canal del reino desde la v1.10.0, pero su cancelación no. Un artesano que nunca has cruzado lo veía « abierto » durante seis horas, lo aceptaba y reunía los reactivos para nada. La cancelación sale ahora por el mismo canal.",
-    ["Poster et annuler ne perdent plus de messages. Le canal exige un clic ou une touche et n'accepte qu'une ligne par seconde : un |cFFFFFFFF/co post|r tapé au chat, ou deux commandes postées dans la même seconde, disparaissaient sans trace. Ces lignes patientent maintenant dans une file et partent à ton prochain clic."] =
-        "Publicar y cancelar ya no pierden mensajes. El canal necesita un clic o una tecla para llevar una línea, y acepta una línea por segundo: un |cFFFFFFFF/co post|r escrito en el chat, o dos pedidos publicados en el mismo segundo, desaparecían sin rastro. Esas líneas ahora esperan en una cola y salen en tu siguiente clic.",
-    ["Seules les commandes NOUVELLES et les ANNULATIONS voyagent sur le canal, et seulement les publiques. Guilde, amis et commandes nommées restent privées ; les acceptations restent entre les deux joueurs concernés."] =
-        "Solo los pedidos NUEVOS y las CANCELACIONES viajan por el canal, y solo los públicos. Los pedidos de hermandad, de amigos y con destinatario siguen siendo privados; las aceptaciones quedan entre los dos jugadores implicados.",
-    -- Onglet Nouveautés — v1.10.2
-    ["Correctif : erreur en combat dans la vue métier"] = "Corrección: un error en combate en la vista de profesión",
-    ["Sélectionner une recette pendant un combat ne provoque plus d'erreur bloquée : le bouton « Créer » est un bouton sécurisé, que le jeu interdit de masquer en plein combat. L'addon attend maintenant la fin du combat pour l'afficher ou le masquer."] =
-        "Seleccionar una receta durante el combate ya no provoca un error bloqueado. El botón Crear es un botón seguro, y el juego prohíbe ocultarlo en pleno combate. El addon espera ahora al final del combate para mostrarlo u ocultarlo.",
+    -- (clés v1.12.0, v1.11.0 et v1.10.2 retirées à la v1.41.0 : versions sorties de la fenêtre glissante de l'onglet)
     -- Onglet Nouveautés — v1.14.0
     ["Un panneau pour gérer les mis en sourdine"] = "Un panel para gestionar a los silenciados",
     ["L'onglet Artisans a maintenant une section « En sourdine » : chaque joueur muté y apparaît avec sa raison et le temps restant (ou « permanent »), avec un bouton pour le rétablir directement — plus besoin de deviner qui est encore muté."] =
