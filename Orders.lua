@@ -469,7 +469,7 @@ function Orders:Ping()
         end
     end
     pmsg(string.format(L["PING envoyé (%s%s). En attente des PONG…"],
-        COC:NetworkLabel(),   -- « canal rejoint » ou « réseau par whisper » (Directory_Community)
+        COC:NetworkLabel(),   -- « canal rejoint » ou « par whisper » (Directory_Community)
         count > 0 and string.format(L[", +|cFFFFFFFF%d|r whisper(s)"], count) or ""))
 end
 

@@ -25,6 +25,24 @@ end
 -- =========================================================================
 -- En-tête du plan + liste des réactifs (sous-zones de "detail" dans la SPEC)
 -- =========================================================================
+-- NOM (1ʳᵉ ligne) + sous-ligne niveau : slot texte flex, ancres LEFT+RIGHT → largeur = celle du slot
+-- (paddable dans la SPEC, pas de largeur codée), paire centrée verticalement (y = +8/en-dessous).
+function UI:_BuildPostPlanText(tz)
+    self.postPlanName = tz:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    self.postPlanName:SetPoint("LEFT", 2, 8); self.postPlanName:SetPoint("RIGHT", -2, 8)
+    self.postPlanName:SetJustifyH("LEFT"); self.postPlanName:SetWordWrap(false); Skin.ApplyShadow(self.postPlanName)
+    self.postPlanSub = tz:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
+    self.postPlanSub:SetPoint("TOPLEFT", self.postPlanName, "BOTTOMLEFT", 0, -3)
+    self.postPlanSub:SetTextColor(Skin.unpack(Skin.color.textMuted)); Skin.ApplyShadow(self.postPlanSub)
+    -- Retours du formulaire (« Choisis d'abord un plan. », « Commande postée ! ») : sous le nom, à la
+    -- place de la sous-ligne, vide quand un plan est choisi. Ils vivaient en bas de la liste des
+    -- artisans et y redisaient l'invite du détail, à l'autre bout de la colonne (maquette du 2026-09-30).
+    self.postSelLbl = tz:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+    self.postSelLbl:SetPoint("TOPLEFT", self.postPlanName, "BOTTOMLEFT", 0, -3)
+    self.postSelLbl:SetPoint("TOPRIGHT", self.postPlanName, "BOTTOMRIGHT", 0, -3)
+    self.postSelLbl:SetJustifyH("LEFT"); self.postSelLbl:SetWordWrap(false)
+end
+
 function UI:_BuildPostDetail()
     -- ICÔNE DU CRAFT + CADRE DORÉ natif (slot d'objet, l'eye-candy de la vue métier — demande user).
     -- Le cadre `UI-Quickslot2` est le bord doré des boutons d'action : posé ~1,5× l'icône, centré, il
@@ -35,22 +53,14 @@ function UI:_BuildPostDetail()
     local ring = iz:CreateTexture(nil, "OVERLAY")
     ring:SetTexture("Interface\\Buttons\\UI-Quickslot2")
     ring:SetPoint("CENTER", self.postPlanBadge, "CENTER", 0, -0.5); ring:SetSize(52, 52)
+    self:_BuildPostPlanText(self:PostSec("craftText"))
 
-    -- NOM (1ʳᵉ ligne) + sous-ligne niveau : slot texte flex, ancres LEFT+RIGHT → largeur = celle du
-    -- slot (paddable dans la SPEC, pas de largeur codée), paire centrée verticalement (y = +8/en-dessous).
-    local tz = self:PostSec("craftText")
-    self.postPlanName = tz:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-    self.postPlanName:SetPoint("LEFT", 2, 8); self.postPlanName:SetPoint("RIGHT", -2, 8)
-    self.postPlanName:SetJustifyH("LEFT"); self.postPlanName:SetWordWrap(false); Skin.ApplyShadow(self.postPlanName)
-    self.postPlanSub = tz:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    self.postPlanSub:SetPoint("TOPLEFT", self.postPlanName, "BOTTOMLEFT", 0, -3)
-    self.postPlanSub:SetTextColor(Skin.unpack(Skin.color.textMuted)); Skin.ApplyShadow(self.postPlanSub)
-
-    -- « JE FOURNIS » : slot dédié, aligné à droite.
+    -- « JE FOURNIS » : slot dédié, aligné à droite. Seulement avec un plan (il en qualifie les réactifs).
     local pz = self:PostSec("providePill")
     local jeLabel = pz:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     jeLabel:SetPoint("RIGHT", -2, 0); jeLabel:SetText(L["JE FOURNIS"])
     jeLabel:SetTextColor(Skin.unpack(Skin.color.gold)); Skin.ApplyShadow(jeLabel)
+    self.postProvideLbl = jeLabel
 
     -- EN-TÊTE réactifs (slot dédié) : libellé doré à gauche + compteur « je fournis » à droite.
     local hz = self:PostSec("reagHeader")
@@ -112,15 +122,17 @@ end
 -- =========================================================================
 function UI:RefreshPostPlanDetail()
     local e = self.postEntry
+    if self.postProvideLbl then self.postProvideLbl:SetShown(e ~= nil) end
     if not e then
-        self.postPlanBadge:Hide(); self.postPlanName:SetText("|cFF888888" .. L["Aucun plan sélectionné."] .. "|r")
+        -- L'invite prend la place du nom (elle disait « aucun plan » ici et « choisis un plan » en bas).
+        self.postPlanBadge:Hide(); self.postPlanName:SetText("|cFF888888" .. L["Choisis un métier puis un plan."] .. "|r")
         if self.postPlanSub then self.postPlanSub:SetText("") end
         self.postReagHdr:SetShown(false); self.postBQCount:SetText("")
         if self.postShareBtn then self.postShareBtn:Hide() end
         self.postCurrentReag = {}
         self.postReagList:SetData({})
         if self.postPriceHint then self.postPriceHint:SetText("") end
-        if self.postSelLbl then self.postSelLbl:SetText("|cFF888888" .. L["Choisis un métier puis un plan."] .. "|r") end
+        if self.postSelLbl then self.postSelLbl:SetText("") end
         return
     end
     local nm = entryName(e); local r, g, b = Skin.RarityColor(e.itemID)

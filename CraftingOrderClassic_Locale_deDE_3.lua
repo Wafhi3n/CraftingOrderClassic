@@ -18,7 +18,7 @@ local de3 = {
     ["Rien à afficher pour ce métier."] = "Fuer diesen Beruf gibt es nichts anzuzeigen.",
     ["Recettes proposées (%d/%d)"] = "Angebotene Rezepte (%d/%d)",
     -- Réseau sans canal + communauté officielle (2026-09-28)
-    ["réseau par whisper"] = "Netzwerk über Flüstern",
+    ["par whisper"] = "über Flüstern",   -- suit « réseau » (barre du bas, /co status)
     ["canal : aucun — le réseau passe en whisper (cercles, amis, guilde)"] =
         "Kanal: keiner — das Netzwerk läuft über Flüstern (Kreise, Freunde, Gilde)",
     ["communauté officielle marquée comme cercle d'artisans : %s"] =
@@ -96,6 +96,14 @@ local de3 = {
         "für diesen Charakter ist noch kein Beruf bekannt: öffne einmal dein Berufsfenster und versuche es dann erneut.",
     ["Copie ce texte (Ctrl+C), puis colle-le dans ta note de membre : Communautés, clic droit sur ton nom, « Note ». Les autres joueurs de Crafting Order verront tes métiers, même quand tu es hors ligne."] =
         "Kopiere diesen Text (Strg+C) und füge ihn in deine Mitgliedsnotiz ein: Gemeinschaften, Rechtsklick auf deinen Namen, „Notiz“. Andere Crafting-Order-Spieler sehen dann deine Berufe, auch wenn du offline bist.",
+    -- Le destinataire en une liste, Commande et Récolte (2026-09-30)
+    ["Envoyer à"] = "Senden an",
+    ["Liste"] = "Liste",
+    ["Tous (avec l'addon)"] = "Alle mit dem Addon",
+    ["ou un artisan"] = "oder ein Handwerker",
+    ["ou un récolteur"] = "oder ein Sammler",
+    ["Annoncer en Commerce (en capitale)"] = "Im Handelskanal ankündigen (nur in Hauptstädten)",
+    ["Commerce"] = "Handel",   -- rappel du destinataire : « Alle + Handel »
 }
 
 for k, v in pairs(de3) do L[k] = v end

@@ -19,7 +19,7 @@ local es3 = {
     ["Rien à afficher pour ce métier."] = "Nada que mostrar para esta profesion.",
     ["Recettes proposées (%d/%d)"] = "Recetas ofrecidas (%d/%d)",
     -- Réseau sans canal + communauté officielle (2026-09-28)
-    ["réseau par whisper"] = "red por susurros",
+    ["par whisper"] = "por susurros",   -- suit « réseau » (barre du bas, /co status)
     ["canal : aucun — le réseau passe en whisper (cercles, amis, guilde)"] =
         "canal: ninguno — la red funciona por susurros (círculos, amigos, hermandad)",
     ["communauté officielle marquée comme cercle d'artisans : %s"] =
@@ -97,6 +97,14 @@ local es3 = {
         "aún no se conoce ninguna profesión de este personaje: abre una vez tu ventana de profesión y vuelve a intentarlo.",
     ["Copie ce texte (Ctrl+C), puis colle-le dans ta note de membre : Communautés, clic droit sur ton nom, « Note ». Les autres joueurs de Crafting Order verront tes métiers, même quand tu es hors ligne."] =
         "Copia este texto (Ctrl+C) y pégalo en tu nota de miembro: Comunidades, clic derecho en tu nombre, «Nota». Los demás jugadores de Crafting Order verán tus profesiones, incluso cuando estés desconectado.",
+    -- Le destinataire en une liste, Commande et Récolte (2026-09-30)
+    ["Envoyer à"] = "Enviar a",
+    ["Liste"] = "Lista",
+    ["Tous (avec l'addon)"] = "Todos con el addon",
+    ["ou un artisan"] = "o un artesano",
+    ["ou un récolteur"] = "o un recolector",
+    ["Annoncer en Commerce (en capitale)"] = "Anunciar en Comercio (solo en capitales)",
+    ["Commerce"] = "Comercio",   -- rappel du destinataire : « Todos + Comercio »
 }
 
 for k, v in pairs(es3) do L[k] = v end

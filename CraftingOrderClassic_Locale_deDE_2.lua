@@ -177,10 +177,10 @@ local de2 = {
         "Der gewählte Gegenstand. Die Plakette „Ich liefere“ bedeutet, dass du alle Reagenzien selbst mitbringst.",
     ["La commission que tu proposes à l'artisan pour ce craft."] =
         "Die Provision, die du dem Handwerker für diese Herstellung anbietest.",
-    ["La portée : diffuser à tous, ou restreindre (guilde / amis)."] =
-        "Die Reichweite: an alle senden oder einschränken (Gilde / Freunde).",
-    ["Le destinataire : toute la source sélectionnée, ou un artisan précis."] =
-        "Der Empfänger: die gesamte gewählte Quelle oder ein bestimmter Handwerker.",
+    ["Envoyer à : le destinataire se choisit dans la liste dessous. Le menu « Liste » change seulement les joueurs affichés."] =
+        "Senden an: wähle den Empfänger in der Liste darunter. Das Menü „Liste“ ändert nur die angezeigten Spieler.",
+    ["Le destinataire : tous les joueurs qui ont l'addon, toute la guilde (ou tous les amis), ou un artisan précis. « Annoncer en Commerce » ajoute une ligne lisible sur Trade (Services) : seulement pour une commande à tous, dans une capitale."] =
+        "Der Empfänger: alle mit dem Addon, die ganze Gilde (oder alle Freunde) oder ein bestimmter Handwerker. „Im Handelskanal ankündigen“ fügt eine für alle lesbare Zeile in Handel (Dienstleistungen) hinzu: nur für einen Auftrag an alle, in einer Hauptstadt.",
     ["Poster : envoie la commande au(x) destinataire(s) choisi(s)."] =
         "Aufgeben: Sende den Auftrag an die gewählten Empfänger.",
 
@@ -193,8 +193,8 @@ local de2 = {
     ["La ressource choisie."] = "Die gewählte Ressource.",
     ["À l'unité ou par pile, et la quantité voulue."] = "Pro Einheit oder pro Stapel und die gewünschte Menge.",
     ["Le prix que tu proposes au récolteur."] = "Der Preis, den du dem Sammler anbietest.",
-    ["Le destinataire : toute la source, ou un récolteur précis."] =
-        "Der Empfänger: die gesamte Quelle oder ein bestimmter Sammler.",
+    ["Le destinataire : tous les joueurs qui ont l'addon, toute la guilde (ou tous les amis), ou un récolteur précis."] =
+        "Der Empfänger: alle mit dem Addon, die ganze Gilde (oder alle Freunde) oder ein bestimmter Sammler.",
 
     -- Aide contextuelle « bouton i » — onglet Artisans (cf. _UI_HelpPlate.lua)
     ["Filtre l'annuaire par source : guilde, amis, ajoutés manuellement, croisés, ou les joueurs en sourdine."] =

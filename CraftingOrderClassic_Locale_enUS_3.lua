@@ -19,7 +19,7 @@ local en3 = {
     ["Rien à afficher pour ce métier."] = "Nothing to show for this profession.",
     ["Recettes proposées (%d/%d)"] = "Offered recipes (%d/%d)",
     -- Réseau sans canal + communauté officielle (2026-09-28)
-    ["réseau par whisper"] = "whisper network",
+    ["par whisper"] = "by whisper",   -- suit « réseau » (barre du bas, /co status)
     ["canal : aucun — le réseau passe en whisper (cercles, amis, guilde)"] =
         "channel: none — the network runs on whispers (circles, friends, guild)",
     ["communauté officielle marquée comme cercle d'artisans : %s"] =
@@ -97,6 +97,14 @@ local en3 = {
         "no profession known for this character yet: open your profession window once, then try again.",
     ["Copie ce texte (Ctrl+C), puis colle-le dans ta note de membre : Communautés, clic droit sur ton nom, « Note ». Les autres joueurs de Crafting Order verront tes métiers, même quand tu es hors ligne."] =
         "Copy this text (Ctrl+C), then paste it into your member note: Communities, right-click your name, \"Note\". Other Crafting Order players will see your professions, even when you're offline.",
+    -- Le destinataire en une liste, Commande et Récolte (2026-09-30)
+    ["Envoyer à"] = "Send to",
+    ["Liste"] = "List",
+    ["Tous (avec l'addon)"] = "Everyone with the addon",
+    ["ou un artisan"] = "or one crafter",
+    ["ou un récolteur"] = "or one gatherer",
+    ["Annoncer en Commerce (en capitale)"] = "Announce in Trade (capital only)",
+    ["Commerce"] = "Trade",   -- rappel du destinataire : « All + Trade »
 }
 
 for k, v in pairs(en3) do L[k] = v end

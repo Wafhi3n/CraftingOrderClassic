@@ -178,10 +178,10 @@ local es2 = {
         "El objeto elegido. La insignia «Yo aporto» indica que llevas todos los componentes tú mismo.",
     ["La commission que tu proposes à l'artisan pour ce craft."] =
         "La comisión que ofreces al artesano por esta fabricación.",
-    ["La portée : diffuser à tous, ou restreindre (guilde / amis)."] =
-        "El alcance: difundir a todos o restringir (hermandad / amigos).",
-    ["Le destinataire : toute la source sélectionnée, ou un artisan précis."] =
-        "El destinatario: toda la fuente seleccionada o un artesano concreto.",
+    ["Envoyer à : le destinataire se choisit dans la liste dessous. Le menu « Liste » change seulement les joueurs affichés."] =
+        "Enviar a: elige el destinatario en la lista de abajo. El menú «Lista» solo cambia los jugadores mostrados.",
+    ["Le destinataire : tous les joueurs qui ont l'addon, toute la guilde (ou tous les amis), ou un artisan précis. « Annoncer en Commerce » ajoute une ligne lisible sur Trade (Services) : seulement pour une commande à tous, dans une capitale."] =
+        "El destinatario: todos los que tienen el addon, toda la hermandad (o todos los amigos) o un artesano concreto. «Anunciar en Comercio» añade una línea que todos pueden leer en Comercio (Servicios): solo para un pedido a todos, en una capital.",
     ["Poster : envoie la commande au(x) destinataire(s) choisi(s)."] =
         "Publicar: envía el pedido a los destinatarios elegidos.",
 
@@ -194,8 +194,8 @@ local es2 = {
     ["La ressource choisie."] = "El recurso elegido.",
     ["À l'unité ou par pile, et la quantité voulue."] = "Por unidad o por montón, y la cantidad deseada.",
     ["Le prix que tu proposes au récolteur."] = "El precio que ofreces al recolector.",
-    ["Le destinataire : toute la source, ou un récolteur précis."] =
-        "El destinatario: toda la fuente o un recolector concreto.",
+    ["Le destinataire : tous les joueurs qui ont l'addon, toute la guilde (ou tous les amis), ou un récolteur précis."] =
+        "El destinatario: todos los que tienen el addon, toda la hermandad (o todos los amigos) o un recolector concreto.",
 
     -- Aide contextuelle « bouton i » — onglet Artisans (cf. _UI_HelpPlate.lua)
     ["Filtre l'annuaire par source : guilde, amis, ajoutés manuellement, croisés, ou les joueurs en sourdine."] =

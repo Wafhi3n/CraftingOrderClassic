@@ -182,8 +182,7 @@ local en = {
     -- Commande (Post)
     ["JE FOURNIS"] = "I PROVIDE", ["Réactifs"] = "Reagents",
     ["(cocher = je fournis)"] = "(check = I provide)", ["Commission"] = "Commission", ["Qté"] = "Qty",
-    ["Destinataire :"] = "Recipient:", ["Diffuser à tous"] = "Broadcast to all", ["Poster"] = "Post",
-    ["La commande sera visible par tout le monde (cible « Tous »)."] = "The order will be broadcast to everyone (target: \"All\").",
+    ["Destinataire :"] = "Recipient:", ["Poster"] = "Post",
     ["Choisis un métier puis un plan."] = "Pick a profession then a recipe.",
     ["Cliquer pour changer de métier"] = "Click to change profession",
     ["Rechercher"] = "Search",
@@ -197,7 +196,7 @@ local en = {
     ["Autres"] = "Other",
     -- Filtre artisan ciblé (P5) : mode d'en-tête de la liste des plans
     ["connus"] = "known", ["niv. %d"] = "lvl %d",
-    ["Choisis d'abord un plan."] = "Pick a recipe first.", ["Aucun plan sélectionné."] = "No recipe selected.",
+    ["Choisis d'abord un plan."] = "Pick a recipe first.",
     ["Ajoutés"] = "Added", ["fournis"] = "provided", ["Chargement…"] = "Loading…",
     -- Ligne « toute la liste » épinglée (destinataire groupé) — Commande + Récolte
     ["Toute la guilde"] = "Whole guild", ["Tous les amis"] = "All friends",

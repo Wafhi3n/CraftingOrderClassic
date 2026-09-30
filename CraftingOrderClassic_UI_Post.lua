@@ -379,7 +379,10 @@ function UI:DoPostOrder(narr)
     })
     if COC.Beacon then COC:Beacon() end   -- balise TEXTE de découverte (clic = hardware event)
     -- Annonce sur Trade (Services), case cochée : DANS le clic, le jeu l'exige (Orders_AnnounceSend).
-    if o and COC.db and COC.db.announceTrade and COC.AnnounceSend then COC.AnnounceSend:Post(o) end
+    -- Seulement pour « Tous » : ailleurs la case est grisée, le choix retenu ne doit pas la rallumer
+    -- (sans cette garde, chaque commande de guilde écrivait « commande privée » dans le chat).
+    local toAll = self:_PostTargetLabel() == "Tous"
+    if o and toAll and COC.db and COC.db.announceTrade and COC.AnnounceSend then COC.AnnounceSend:Post(o) end
     self.postMoney:Clear()
     self.postQty:SetValue(1); self.postEntry = nil; self.postProvide = {}
     self.postSelLbl:SetText("|cFF33DD33" .. L["Commande postée !"] .. "|r")
