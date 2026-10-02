@@ -66,12 +66,12 @@ function COC:Scan()
     local _, changed = CraftLink:ScanOpenKnown()
     if changed then
         local store = self:_MyKnownStore()
-        if store then CraftLink:SaveMyRecipes(store) end     -- persiste à chaque plan appris
+        if store then CraftLink:SaveMyRecipes(store) end     -- persiste à chaque plan appris (ou retrait)
+        if self.ProfWindow and self.ProfWindow._OnKnownChanged then self.ProfWindow:_OnKnownChanged() end
     end
     -- Cooldowns de recettes : ce même scan relit `C_TradeSkillUI.GetRecipeCooldown` et détecte le
-    -- départ du CD. Sur l'Era, une transmutation castée déclenchait TRADE_SKILL_UPDATE ; sur Forever
-    -- on écoute TRADE_SKILL_LIST_UPDATE, et qu'un CAST le déclenche n'est PAS mesuré : si non, le
-    -- départ du CD n'est vu qu'à la prochaine ouverture de la fenêtre.
+    -- départ du CD. On écoute TRADE_SKILL_LIST_UPDATE ; qu'un CAST le déclenche n'est PAS mesuré : si
+    -- non, le départ du CD n'est vu qu'à la prochaine ouverture de la fenêtre.
     local cdChanged = false
     if CraftLink.ScanOpenCooldowns then
         local _, c = CraftLink:ScanOpenCooldowns()

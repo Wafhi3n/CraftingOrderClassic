@@ -94,6 +94,17 @@ function PW:_SetDockView(view)
     self:_SyncDockViewBtns()
 end
 
+-- Mes recettes CONNUES viennent de changer (COC:Scan, capture débouncée de 0,3 s après l'évènement de
+-- liste). Les vues qui les lisent -- Manquantes, et « À apprendre maintenant » sous la Route -- ont
+-- souvent été peintes AVANT la capture, et gardaient la liste d'avant jusqu'au prochain changement
+-- d'onglet : vécu le 2026-10-02, Rough Grinding Stone encore « à apprendre » juste après l'avoir
+-- apprise. Elles se repeignent ici, la fenêtre Route flottante comprise. Pas en combat (cf. l'en-tête).
+function PW:_OnKnownChanged()
+    if lockedDown() then return end
+    if self.dockView == "learn" then self:_FillDockMissing()
+    elseif self.dockView == "route" or (self.routeWin and self.routeWin:IsShown()) then self:_FillRoute() end
+end
+
 -- Retour forcé à la vue Commandes quand la colonne change de mode (retour en vue pleine, vue
 -- reroll, métier refermé). Sans ça, les panneaux restaient AFFICHÉS par-dessus la colonne dans un
 -- mode où leurs boutons n'existent plus : plus aucun moyen de revenir en arrière.
