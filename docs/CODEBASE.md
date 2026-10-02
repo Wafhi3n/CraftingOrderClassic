@@ -137,7 +137,7 @@
 | `Directory_AltCodec.lua` | codec du fil ALT (liste des persos d'un même joueur) + vérification par réciprocité. | 119 |
 | `Directory_Alts.lua` | regroupement des rerolls : identité « joueur » multi-persos (verbe ALT). | 316 |
 | `Directory_LFW.lua` | statut « recherche de travail » (Looking For Work) + OFFRE par métier. | 356 |
-| `Directory_TradeLink.lua` | un lien de métier posté dans le chat ajoute son AUTEUR à l'annuaire, et l'annuaire ne garde que les artisans sans l'addon UTILES (spec docs/specs/lien-metier.md). | 272 |
+| `Directory_TradeLink.lua` | un lien de métier posté dans le chat ajoute son AUTEUR à l'annuaire, et l'annuaire ne garde que les artisans sans l'addon UTILES (spec docs/specs/lien-metier.md). | 281 |
 | `CraftingOrderClassic_Channels.lua` | RECONNAÎTRE un canal du jeu (spec docs/specs/canaux-surveilles.md). | 261 |
 | `CraftingOrderClassic_Notify.lua` | la SORTIE d'une alerte : ligne de chat, bandeau, son. | 39 |
 | `CraftingOrderClassic_LFWChat.lua` | détection « recherche de travail » dans le CHAT VISIBLE. | 140 |

@@ -187,10 +187,13 @@ construit (D10).
   de butin et le ciblage d'une commande n'en voient rien. Raison : dans COC, le seul endroit qui
   liste les artisans d'une recette est le ciblage d'une commande, réservé aux porteurs de l'addon
   à dessein ; un artisan sans l'addon ne peut pas recevoir une commande.
-- **D11 — Le niveau lu au clic devient le plancher** (`craftSeen[prof]`, jamais baissé). Proposée
-  par l'agent le 2026-10-02. ⚠️ Que `GetChildProfessionInfo()` rende dans une vue liée le niveau du
-  PROPRIÉTAIRE et pas le mien n'est pas encore mesuré (la barre 1/75 du relevé de 11:21 est
-  cohérente, sans trancher) : sonde au début de la prochaine séance.
+- **D11 — Le niveau lu au clic suit la DERNIÈRE lecture.** Proposée par l'agent le 2026-10-02,
+  corrigée le même jour. Il vit dans `linkRecipes[prof].lvl`, remplacé à chaque lecture, et la
+  purge (D9) comme l'infobulle le lisent là ; il ne monte JAMAIS dans le plancher `craftSeen`, qui
+  ne redescend pas : une lecture périmée (mon propre niveau servi le temps que la liste de l'autre
+  arrive) s'y collerait pour de bon. ⚠️ Que `GetChildProfessionInfo()` rende dans une vue liée le
+  niveau du PROPRIÉTAIRE et pas le mien n'est pas encore mesuré (la barre 1/75 du relevé de 11:21
+  est cohérente, sans trancher) : sonde au début de la prochaine séance.
 - **D12 — Une liste n'est retenue qu'une fois arrivée.** Proposée par l'agent le 2026-10-02.
   Quand on passe d'une vue liée à une autre, le client garde un moment l'ancienne liste sous le
   nouveau nom (vu le 2026-09-27 avec un lien fabriqué : nom de B, liste de l'Enchantement). On ne
@@ -332,4 +335,12 @@ Une branche par dépôt, même nom : `feat/lien-metier` dans COC et dans l'outil
   parce que le chat double les `|`.) Puis critères 11, 12 et 18, et le relevé de la garde du métier
   lié (D6) ; relevés au registre.
 - **Phase 2** (D6 tenu à 11:21) : lecture de la vue liée dans `Directory_TradeLink.lua`, infobulle,
-  test 19 ; puis banc : sonde D11, critères 14 et 20.
+  test 19 (`tests/test_lien_metier_vue.lua`) ; puis banc. Sur A, vue liée de B ouverte :
+  1. sonde D11 : `/dump C_TradeSkillUI.GetChildProfessionInfo()` → `skillLevel` = celui du titre ;
+  2. si l'infobulle ne montre rien (critère 20), deux `/run` départagent les causes :
+     `/run local v=CraftingOrderClassic.Directory._linkView print(v.key~=nil, v.fresh)` —
+     `false` = la vue n'est pas reconnue (nom ou métier illisible) ; `true false` = aucune mise à
+     jour de la liste n'est venue APRÈS l'ouverture (l'ordre des événements contredit D12) ;
+     `/run local l=CraftingOrderClassic.Directory.roster["<B>"] l=l and l.linkRecipes and l.linkRecipes.<Métier> print(l and #l.ids, l and l.lvl, l and l.max)`
+     — `5 1 75` pour la Forge de Gnomi = ça marche ;
+  3. critères 14 et 20.

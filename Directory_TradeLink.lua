@@ -111,6 +111,13 @@ local function forgetProf(r, prof)
     end
 end
 
+-- Niveau connu d'un artisan sans l'addon : le plancher « vu crafter », ou le niveau lu au dernier
+-- clic sur son lien (linkRecipes, remplacé à chaque lecture), le plus haut des deux.
+local function knownLevel(r, prof)
+    local lk = r.linkRecipes and r.linkRecipes[prof]
+    return math.max((r.craftSeen and r.craftSeen[prof]) or 0, (lk and lk.lvl) or 0)
+end
+
 -- Garde les `cap` mieux renseignés pour `prof` (niveau connu le plus haut, puis le plus récent) ;
 -- les autres oublient ce métier, et une fiche sans plus aucun métier disparaît. Rend le nombre oublié.
 function Dir:CapSeen(prof, cap)
@@ -118,7 +125,7 @@ function Dir:CapSeen(prof, cap)
     local list = {}
     for name, r in pairs(self.roster or {}) do
         if r.craftSeen and r.craftSeen[prof] ~= nil and self:_SeenOnly(name, r) then
-            list[#list + 1] = { name = name, r = r, lvl = r.craftSeen[prof] or 0,
+            list[#list + 1] = { name = name, r = r, lvl = knownLevel(r, prof),
                                 t = (r.linkSeen and r.linkSeen[prof]) or r.lastSeen or 0 }
         end
     end
@@ -245,7 +252,9 @@ function Dir:CaptureLinkedView()
 end
 
 -- Range ce qu'on a lu dans SA fiche. Chaque lecture REMPLACE la précédente (jamais d'union, qui
--- garderait une mauvaise lecture pour toujours) ; le niveau devient le plancher (D11).
+-- garderait une mauvaise lecture pour toujours). Le niveau aussi : il vit dans linkRecipes, pas
+-- dans le plancher craftSeen qui ne redescend jamais — une lecture périmée (mon niveau servi le
+-- temps que la liste de l'autre arrive) s'y collerait pour de bon (D11).
 function Dir:NoteLinkedView(owner, prof, ids, lvl, maxLvl)
     self.roster = self.roster or {}
     local r = self.roster[owner]; if not r then r = {}; self.roster[owner] = r end
@@ -258,7 +267,7 @@ function Dir:NoteLinkedView(owner, prof, ids, lvl, maxLvl)
         r.linkRecipes = r.linkRecipes or {}
         r.linkRecipes[prof] = { ids = ids, at = t, lvl = lvl, max = maxLvl }
         r.craftSeen = r.craftSeen or {}
-        if (r.craftSeen[prof] or -1) < (lvl or 0) then r.craftSeen[prof] = lvl or 0 end
+        if r.craftSeen[prof] == nil then r.craftSeen[prof] = 0 end   -- le métier compte et s'affiche
     end
     if not isCarrier(r) then r.nonAddon = true end
     self:CapSeen(prof)
