@@ -6,8 +6,8 @@ The October 2 patch (build 70170) changed the number WoW Forever gives addons to
 the game is running. It used to be the plain Retail value, and Forever now has one of its own. The
 addon only knew the old number, decided it wasn't on Forever, and switched off everything that
 touches professions. The orders column next to the profession window was gone, the Enchanting button
-stopped showing up on the trade window, and right-clicking the minimap button didn't open your
-professions anymore.
+stopped showing up on the trade window, and right-clicking the minimap button brought back an old
+"My professions" menu instead of the profession window.
 
 It accepts both numbers now. Nothing to change on your side, just update.
 
