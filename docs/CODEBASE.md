@@ -17,13 +17,13 @@
 | `CraftingOrderClassic_Locale.lua` | socle de localisation du CHROME de l'UI. | 12 |
 | `CraftingOrderClassic_Locale_enUS.lua` | overlay ANGLAIS (enUS/enGB). | 279 |
 | `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 498 |
-| `CraftingOrderClassic_Locale_enUS_3.lua` | overlay enUS, 3/3. | 181 |
+| `CraftingOrderClassic_Locale_enUS_3.lua` | overlay enUS, 3/3. | 180 |
 | `CraftingOrderClassic_Locale_deDE.lua` | overlay ALLEMAND (deDE). | 280 |
 | `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 479 |
-| `CraftingOrderClassic_Locale_deDE_3.lua` | overlay deDE, 3/3. | 180 |
+| `CraftingOrderClassic_Locale_deDE_3.lua` | overlay deDE, 3/3. | 179 |
 | `CraftingOrderClassic_Locale_esES.lua` | overlay ESPAGNOL (esES/esMX). | 281 |
 | `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 480 |
-| `CraftingOrderClassic_Locale_esES_3.lua` | overlay esES, 3/3. | 181 |
+| `CraftingOrderClassic_Locale_esES_3.lua` | overlay esES, 3/3. | 180 |
 | `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 432 |
 | `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 429 |
 | `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 429 |
@@ -92,8 +92,8 @@
 | `CraftingOrderClassic_Stats_Filter.lua` | sélecteur « ne montrer que ce qui donne <stat> ». | 103 |
 | `CraftingOrderClassic_Gem.lua` | spécifique à la JOAILLERIE : sous-catégorise les GEMMES TAILLÉES par TAILLE (le mot qui porte la stat). | 226 |
 | `CraftingOrderClassic_Gem_Stats.lua` | correspondance TAILLE DE GEMME → STAT (données, éditées à la main). | 41 |
-| `CraftingOrderClassic_Sources.lua` | « où j'obtiens ce plan, et lesquels me manquent ». | 456 |
-| `CraftingOrderClassic_Trainers.lua` | « le formateur, vu de nos propres yeux ». | 392 |
+| `CraftingOrderClassic_Sources.lua` | « où j'obtiens ce plan, et lesquels me manquent ». | 429 |
+| `CraftingOrderClassic_Trainers.lua` | « le formateur, vu de nos propres yeux ». | 344 |
 | `CraftingOrderClassic_ProfWindow.lua` | fenêtre métier custom 3 colonnes (migration depuis Guild Economy) : Recettes \| Détail+Craft \| Commandes du métier. | 490 |
 | `CraftingOrderClassic_ProfWindow_Layout.lua` | GÉOMÉTRIE de la vue métier (fenêtre 3 colonnes). | 184 |
 | `CraftingOrderClassic_ProfWindow_HelpPlate.lua` | AIDE CONTEXTUELLE de la Vue Métier (« bouton i »). | 113 |
@@ -104,8 +104,8 @@
 | `CraftingOrderClassic_ProfWindow_Toolbar.lua` | barre d'outils de la colonne Recettes (vue métier) : les toggles de TRI (slot recTools, à gauche : rentabilité / valeurs exactes / progression — Auctionator) et de FILTRE (slot recFilterToggles, à droite : « j'ai les matériaux » / « montée de compétence »). | 245 |
 | `CraftingOrderClassic_ProfWindow_Recipes.lua` | colonne GAUCHE : liste de recettes virtualisée (scroll), recherche, couleur par difficulté, sélection, badge « demandé » (nb de commandes ouvertes pour l'objet). | 485 |
 | `CraftingOrderClassic_ProfWindow_Leveling.lua` | aide à la MONTÉE DE MÉTIER dans la liste de recettes : coût de progression (réactifs au prix Auctionator ÷ chance de point selon la couleur), badge « meilleur coût/point » sur la recette recommandée, icônes de SOURCE sur les manquantes (formateur / vendeur PNJ / coté à l'HV / à farmer) et tri « progression » affiné par coût. | 219 |
-| `CraftingOrderClassic_Route.lua` | cœur de CALCUL du plan de route de montée de métier, PARAMÉTRABLE : marche gloutonne rang par rang (recette au meilleur coût/point ESPÉRÉ), seuils réels CraftLink `skillColors` aux rangs futurs, amortissement du prix des plans à acheter, exclusion des recettes à cooldown et des coûts partiels, STOCK (sacs + produits de la route) déduit avant de payer quoi que ce soit au prix HV. | 497 |
-| `CraftingOrderClassic_ProfWindow_Route.lua` | fenêtre « PLAN DE ROUTE » de montée de métier (étage ③ de l'aide à la progression) : « du rang actuel au plafond, quoi crafter, combien de fois, pour combien ». | 454 |
+| `CraftingOrderClassic_Route.lua` | cœur de CALCUL du plan de route de montée de métier, PARAMÉTRABLE : marche gloutonne rang par rang (recette au meilleur coût/point ESPÉRÉ), seuils réels CraftLink `skillColors` aux rangs futurs, amortissement du prix des plans à acheter, exclusion des recettes à cooldown et des coûts partiels, STOCK (sacs + produits de la route) déduit avant de payer quoi que ce soit au prix HV. | 459 |
+| `CraftingOrderClassic_ProfWindow_Route.lua` | fenêtre « PLAN DE ROUTE » de montée de métier (étage ③ de l'aide à la progression) : « du rang actuel au plafond, quoi crafter, combien de fois, pour combien ». | 449 |
 | `CraftingOrderClassic_ProfWindow_Route_Supply.lua` | ce qui se peint SOUS les segments du plan de route : le bloc « FOURNITURES » (composants agrégés de toute la route, plans à acheter) et, quand le rang est AU PLAFOND, le bloc « débloquer le palier suivant » (livre de rang curaté, ou renvoi vers le formateur de métier). | 118 |
 | `CraftingOrderClassic_ProfWindow_Learn.lua` | section « À apprendre maintenant » du Plan de route : les recettes NON APPRISES que ton rang permet déjà d'apprendre ET qui rapportent encore un point, classées par coût espéré par point, avec l'icône de leur source. | 113 |
 | `CraftingOrderClassic_ProfWindow_DockViews.lua` | la colonne Commandes CHANGE DE CONTENU au lieu d'ouvrir des fenêtres par-dessus. | 460 |
@@ -1810,12 +1810,10 @@
 >      sur chaque saveur, et rafraîchie par le même geste que le reste des données.
 > 
 > CE QU'ON PERD EN ABANDONNANT MTSL, et qu'il faut assumer plutôt que masquer :
->   · le prix d'un plan de FORMATEUR : aucune source de données ne le donne. Il revient par la
->     moisson du formateur (COC.Trainers, depuis le 2026-10-02) -- mais seulement une fois qu'on y
->     est passé : avant, SourcePrice rend nil, et nil veut dire INCONNU, jamais zéro -- un appelant
->     qui confondrait les deux conseillerait d'acheter un plan « gratuit » qui ne l'est pas. (Le
->     prix chez un MARCHAND, lui, est revenu : les pages d'objet de Wowhead le portent, cf.
->     tools/gen_origins.lua) ;
+>   · le prix d'un plan de FORMATEUR : aucune source ne le donne, SourcePrice rend nil, et nil veut
+>     dire INCONNU, jamais zéro -- un appelant qui confondrait les deux conseillerait d'acheter un
+>     plan « gratuit » qui ne l'est pas. (Le prix chez un MARCHAND, lui, est revenu : les pages
+>     d'objet de Wowhead le portent, cf. tools/gen_origins.lua) ;
 >   · les COORDONNÉES d'un PNJ du catalogue : on donne son nom et sa zone, pas ses coordonnées.
 >     Seul un formateur qu'on a VU en jeu en a (cf. COC.Trainers -- on y était) ;
 >   · le nom du PNJ dans la langue du client : il arrive en anglais. La ZONE, elle, reste
@@ -1825,7 +1823,7 @@
 > Contrat identique à l'ancien pont (mêmes noms, mêmes retours) : les appelants n'ont eu qu'à
 > changer de table. « unknown » reste la réponse honnête quand on ne sait pas.
 
-**API** : `S:IsAvailable()` · `S:RecipeItem(profKey, spellID)` · `S:SourceKind(profKey, spellID)` · `S:IsInferred(profKey, spellID)` · `S:TrainerConfirmed(profKey, spellID)` · `S:MinSkill(profKey, spellID)` · `S:SourcePrice(profKey, spellID)` · `S:SourceText(profKey, spellID)` · `S:SourceOrigin(profKey, spellID)` · `S:SourceNpcLine(profKey, spellID)` · `S:IsOtherSideTwin(profKey, spellID)` · `S:MissingRecipes(profKey)` · `S:SkillDetail(profKey, spellID)`
+**API** : `S:IsAvailable()` · `S:RecipeItem(profKey, spellID)` · `S:SourceKind(profKey, spellID)` · `S:IsInferred(profKey, spellID)` · `S:MinSkill(profKey, spellID)` · `S:SourcePrice(profKey, spellID)` · `S:SourceText(profKey, spellID)` · `S:SourceOrigin(profKey, spellID)` · `S:SourceNpcLine(profKey, spellID)` · `S:IsOtherSideTwin(profKey, spellID)` · `S:MissingRecipes(profKey)` · `S:SkillDetail(profKey, spellID)`
 
 ### `CraftingOrderClassic_Trainers.lua`
 > CraftingOrderClassic_Trainers.lua — « le formateur, vu de nos propres yeux ».
@@ -1848,7 +1846,7 @@
 > reste doit continuer à marcher sans elle : l'observation ENRICHIT la déduction, elle ne la
 > remplace pas. Tant qu'aucun formateur n'a été vu, rien ne change nulle part.
 
-**API** : `T:Harvest()` · `T:Teaches(profKey, spellID)` · `T:Rank(profKey, spellID)` · `T:Price(profKey, spellID)` · `T:Npc(profKey)` · `T:Line(profKey)` · `T:Dump(rest)`
+**API** : `T:Harvest()` · `T:Teaches(profKey, spellID)` · `T:Npc(profKey)` · `T:Line(profKey)` · `T:Dump(rest)`
 
 ### `CraftingOrderClassic_ProfWindow.lua`
 > CraftingOrderClassic_ProfWindow.lua — fenêtre métier custom 3 colonnes (migration depuis

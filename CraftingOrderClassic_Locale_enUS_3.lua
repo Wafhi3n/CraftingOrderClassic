@@ -90,6 +90,8 @@ local en3 = {
         "%d still missing from the mail: split them off a stack yourself (Shift-click the stack), then drop them in.",
     ["La pile de %d est prête dans ton sac : dépose-la toi-même dans le courrier."] =
         "The stack of %d is ready in your bag: drop it into the mail yourself.",
+    -- Plan de route : le prix d'un plan de formateur, relevé chez lui (2026-10-02)
+    ["Prix du plan inconnu : COC le relèvera à ton prochain passage chez le formateur."] = "Recipe price unknown: COC will note it next time you visit the trainer.",
     -- Note de membre de la communauté, /co note (2026-09-29)
     ["le texte de tes métiers, à coller dans ta note de communauté (visible même hors ligne)"] =
         "the text of your professions, to paste into your community note (visible even offline)",
@@ -175,7 +177,6 @@ local en3 = {
     ["Aucun de tes persos ne sait faire %s."] = "None of your characters can make %s.",
     ["%d commandes attendent dans ce métier."] = "%d orders are waiting in this profession.",
     ["Ouvrir la fenêtre de métier"] = "Open the profession window",
-    ["Prix du plan inconnu : COC le relèvera à ton prochain passage chez le formateur."] = "Recipe price unknown: COC will note it next time you visit the trainer.",
 }
 
 for k, v in pairs(en3) do L[k] = v end

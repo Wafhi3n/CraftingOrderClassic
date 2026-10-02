@@ -90,6 +90,8 @@ local es3 = {
         "Faltan %d en el correo: sepáralos tú mismo de una pila (Mayús-clic en la pila) y luego colócalos.",
     ["La pile de %d est prête dans ton sac : dépose-la toi-même dans le courrier."] =
         "La pila de %d está lista en tu bolsa: colócala tú mismo en el correo.",
+    -- Plan de route : le prix d'un plan de formateur, relevé chez lui (2026-10-02)
+    ["Prix du plan inconnu : COC le relèvera à ton prochain passage chez le formateur."] = "Precio de la receta desconocido: COC lo anotará en tu próxima visita al maestro.",
     -- Note de membre de la communauté, /co note (2026-09-29)
     ["le texte de tes métiers, à coller dans ta note de communauté (visible même hors ligne)"] =
         "el texto de tus profesiones, para pegarlo en tu nota de comunidad (visible incluso desconectado)",
@@ -175,7 +177,6 @@ local es3 = {
     ["Aucun de tes persos ne sait faire %s."] = "Ninguno de tus personajes sabe hacer %s.",
     ["%d commandes attendent dans ce métier."] = "%d pedidos esperan en esta profesión.",
     ["Ouvrir la fenêtre de métier"] = "Abrir la ventana de profesión",
-    ["Prix du plan inconnu : COC le relèvera à ton prochain passage chez le formateur."] = "Precio de la receta desconocido: COC lo anotará en tu próxima visita al maestro.",
 }
 
 for k, v in pairs(es3) do L[k] = v end
