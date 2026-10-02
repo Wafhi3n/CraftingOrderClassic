@@ -46,6 +46,37 @@ client.
 
 ## Relevés
 
+- 2026-10-02 09:37 — jusqu'a a1560ee — Forever build client 70170, même build addon `main-dev@2709aa5`
+  — **GO** — fin de la liste de la v1.42.1 : `/dump CraftingOrderClassic.Api.IS_MAINLINE` → `[1]=true`
+  (capture du user) ; le clic droit sur le bouton COC de la minimap ouvre la fenêtre des métiers
+  (parole du user). Avec les relevés de 08:55, 09:20 et 09:30, tout ce que touchait le correctif
+  `WOW_PROJECT_ID` = 18 a été vu.
+
+- 2026-10-02 09:30 — jusqu'a a1560ee — Forever build client 70170, même build addon `main-dev@2709aa5`
+  — **GO, sur la parole du user** — suite du relevé de 09:20 sur la v1.42.1 : l'onglet Nouveautés
+  montre la v1.42.1 ; la relance du dernier métier à l'ouverture de la fenêtre (nouveauté du 70170)
+  « fonctionne » ; le bouton Enchantement de la fenêtre d'échange « fonctionne ». Le détail (sur quel
+  métier la fenêtre s'est ouverte, quel compte, une erreur ou non) n'a pas été dit.
+  ⚠️ **Toujours non observé** : `/dump … IS_MAINLINE` (la capture de Rédemption montre `/dump` parti
+  SANS expression : « empty result » ne dit rien de COC), et le clic droit sur le BOUTON minimap de COC
+  (le user cliquait sur la minimap elle-même : un ping).
+
+- 2026-10-02 09:20 — jusqu'a 321029b — Forever build client 70170, build addon `main-dev@2709aa5
+  2026-10-02 09:11` d'après `deploy.ps1` (`/co version` pas relu), Enchantement 102/150, client en
+  ANGLAIS — **GO partiel**, deux captures du user.
+  **v1.42.1** : la colonne COC (onglets Orders / Route / Missing / Profit) est greffée à droite de la
+  fenêtre de métier native. Ce que le relevé de 08:55 ne détaillait pas.
+  **`feat/profit-arbitrages` (`321029b`)** : vue Profit en mode « Cost to cast (22) » ; les noms longs
+  tiennent sur une ligne, coupés par « … » (« Enchant 2H Weapon - Lesser Intel… », « Enchant Weapon -
+  Minor Beastsla… ») ; tous les montants en blanc ; infobulle « What one cast costs you, not a gain:
+  your fee comes on top. » puis « Click: open this recipe. ». ⚠️ Non vu : l'infobulle d'une ligne
+  TRONQUÉE (celle survolée, « Enchant Chest - Lesser Stamina », tient en entier).
+  **Constat, vue Missing (239)** : « Enchant Cloak - Lesser Shadow Resistance » passe sur deux lignes
+  et mord sur « Arcane Salvager » (entouré par le user). Même piège que la vue Profit, corrigé sur
+  `fix/manquantes-nom-long`, pas encore vu en jeu.
+  ⚠️ **Non observé** : `/dump … IS_MAINLINE`, le clic droit minimap, l'onglet Nouveautés v1.42.1, la
+  relance du dernier métier à l'ouverture (70170), le bouton Enchantement de l'échange.
+
 - 2026-10-02 08:55 — jusqu'a 154cd1c — Forever build client **70170** (jour de patch), build addon
   `main-dev@ce5e9fc 2026-10-02 08:50` d'après `deploy.ps1` (`/co version` pas relu en séance) —
   **GO, sur la parole du user** — `fix/wow-project-camelot`.

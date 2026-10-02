@@ -263,8 +263,11 @@ local function missRow(i)
     row:SetPoint("RIGHT", mp.content, "RIGHT", 0, 0)
     row:SetPoint("TOP", mp.content, "TOP", 0, -(i - 1) * ROW_H)
     local ic = row:CreateTexture(nil, "ARTWORK"); ic:SetSize(12, 12); ic:SetPoint("LEFT", 2, 0); row.ic = ic
+    -- UNE ligne, tronquée par « … » : vu le 2026-10-02, « Enchant Cloak - Lesser Shadow Resistance »
+    -- passait à la ligne et mordait sur la suivante (même piège que la vue Profit, coc-native-ui
+    -- piège 28). Le nom entier reste dans l'infobulle (missHead).
     local nm = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-    nm:SetPoint("LEFT", ic, "RIGHT", 4, 0); nm:SetJustifyH("LEFT"); row.nm = nm
+    nm:SetPoint("LEFT", ic, "RIGHT", 4, 0); nm:SetJustifyH("LEFT"); nm:SetWordWrap(false); row.nm = nm
     local lv = row:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
     lv:SetPoint("RIGHT", -4, 0); row.lv = lv
     nm:SetPoint("RIGHT", lv, "LEFT", -4, 0)
