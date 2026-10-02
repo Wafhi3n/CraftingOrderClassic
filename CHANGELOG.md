@@ -1,5 +1,26 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.43.0 - An icon when an order is waiting for you
+
+When someone sent you an order, you got a line in chat and maybe a banner, and that was it. Miss
+those and the order sat in the Orders tab until it expired.
+
+Now the profession's icon shows up by the minimap, next to the mail letter, with the number of orders
+waiting. There's one icon per profession. Hover it to see who wants what and click it to open the
+right window. It goes away once you've accepted or declined everything.
+
+It counts more than orders in your name. An order named for one of your alts lights it too, and so
+does a public order (guild, friends or everyone) that one of your characters knows the recipe for.
+The number's colour tells you where it comes from: blue for you, green for guild or friends, yellow
+for everyone. With the game's colorblind mode on, the colours switch to a palette made for it.
+
+The click goes to whoever knows the recipe. If the character you're on knows it, your profession
+window opens. If only an alt does, you get that alt's recipes in a read-only view. If none of your
+characters can make it, a small window says so and tells you where the recipe is learned.
+
+Public orders from characters under level 5 don't light it, the same way they don't ping you (that's
+the anti-bot filter). `/co trust <name>` lifts it for someone you know.
+
 ## v1.42.1 - Professions work again after the October 2 patch
 
 The October 2 patch (build 70170) changed the number WoW Forever gives addons to say which version of
