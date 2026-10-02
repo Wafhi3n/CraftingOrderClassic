@@ -36,7 +36,10 @@ local function profsList(r)
     end
     for key, floor in pairs(r.craftSeen or {}) do   -- non-porteur vu crafter (ou lien de métier) : plancher estimé
         local link, lk = (r.linkSeen and r.linkSeen[key]) and true or nil, r.linkRecipes and r.linkRecipes[key]
-        if not (SEC[key] or seen[key]) then seen[key] = true; parts[#parts + 1] = { key = key, est = floor, link = link, lk = lk } end
+        local spell = r.linkSpell and r.linkSpell[key]   -- sort de rang du lien → tranche (D14)
+        if not (SEC[key] or seen[key]) then
+            seen[key] = true; parts[#parts + 1] = { key = key, est = floor, link = link, lk = lk, spell = spell }
+        end
     end
     local rel = r.relayed                            -- fiche relayée par un partenaire (hors ligne)
     if rel then
@@ -374,7 +377,7 @@ function UI:_FillArtRow(row, a)
             Skin.FormatDuration(math.max(0, time() - (rel.ts or time())))) .. "|r")
     elseif nonAddon then
         local mv = self:_SeenProfNames(a.r)   -- le métier VU (au moins un)
-        local how = UI._SeenOnlyByLink(a.r) and L["a lié son métier"] or L["vu crafter"]
+        local how = UI._SeenOnlyByLink(a.r) and L["par lien"] or L["vu crafter"]
         row.sub:SetText("|cFF888888" .. how .. (mv ~= "" and (" : |cFFBBBBBB" .. mv) or "") .. "|r")
     else
         row.sub:SetText("|cFF888888" .. UI._ArtSubLine(pres, a.r.level, a.r.rep) .. "|r")

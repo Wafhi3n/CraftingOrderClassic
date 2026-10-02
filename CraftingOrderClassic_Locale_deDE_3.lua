@@ -66,9 +66,13 @@ local de3 = {
     ["Clic droit : annoncer en Commerce"] = "Rechtsklick: im Handelskanal ankündigen",
     ["Clic droit : rappeler en Commerce"] = "Rechtsklick: im Handelskanal wiederholen",
     -- Lien de métier posté dans le chat (spec lien-metier, 2026-10-02)
-    ["a lié son métier"] = "Beruf verlinkt",
+    ["par lien"] = "per Link",
     ["lien de métier (sans l'addon)"] = "Berufslink (ohne Addon)",
     ["%d/%d · lien de métier, %d recettes"] = "%d/%d · Berufslink, %d Rezepte",
+    ["%d-%d · lien de métier"] = "%d-%d · Berufslink",
+    ["sans l'addon : %d"] = "ohne Addon: %d",
+    ["Savent la faire, sans l'addon :"] = "Können es, ohne Addon:",
+    ["Clic : chuchoter à %s"] = "Klick: %s anflüstern",
     -- Annonce de la dispo LFW (2026-09-30)
     ["dispo annoncée sur %s."] = "Verfügbarkeit in %s angekündigt.",
     ["Quand tu actives ta dispo, poste aussi une ligne sur Trade (Services) : les joueurs avec ou sans l'addon voient que tu cherches du travail. Une ligne par activation, jamais au renouvellement automatique ; dans une capitale. Même réglage que la case du formulaire de commande."] =

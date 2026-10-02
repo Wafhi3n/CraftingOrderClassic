@@ -67,9 +67,13 @@ local es3 = {
     ["Clic droit : annoncer en Commerce"] = "Clic derecho: anunciar en Comercio",
     ["Clic droit : rappeler en Commerce"] = "Clic derecho: repetir en Comercio",
     -- Lien de métier posté dans le chat (spec lien-metier, 2026-10-02)
-    ["a lié son métier"] = "enlazó su profesión",
+    ["par lien"] = "por enlace",
     ["lien de métier (sans l'addon)"] = "enlace de profesión (sin el addon)",
     ["%d/%d · lien de métier, %d recettes"] = "%d/%d · enlace de profesión, %d recetas",
+    ["%d-%d · lien de métier"] = "%d-%d · enlace de profesión",
+    ["sans l'addon : %d"] = "sin el addon: %d",
+    ["Savent la faire, sans l'addon :"] = "La saben hacer, sin el addon:",
+    ["Clic : chuchoter à %s"] = "Clic: susurrar a %s",
     -- Annonce de la dispo LFW (2026-09-30)
     ["dispo annoncée sur %s."] = "disponibilidad anunciada en %s.",
     ["Quand tu actives ta dispo, poste aussi une ligne sur Trade (Services) : les joueurs avec ou sans l'addon voient que tu cherches du travail. Une ligne par activation, jamais au renouvellement automatique ; dans une capitale. Même réglage que la case du formulaire de commande."] =

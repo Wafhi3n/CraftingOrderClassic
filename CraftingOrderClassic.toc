@@ -66,6 +66,7 @@ CraftingOrderClassic_UI_HelpPlate.lua
 CraftingOrderClassic_UI_Post_Layout.lua
 CraftingOrderClassic_UI_Post.lua
 CraftingOrderClassic_UI_Post_Detail.lua
+CraftingOrderClassic_UI_Post_SeenWho.lua
 CraftingOrderClassic_UI_Post_Artisans.lua
 CraftingOrderClassic_UI_Post_Categories.lua
 CraftingOrderClassic_UI_Post_Paperdoll.lua
@@ -165,6 +166,7 @@ Directory_Relay.lua
 Directory_AltCodec.lua
 Directory_Alts.lua
 Directory_LFW.lua
+Directory_Seen.lua
 Directory_TradeLink.lua
 CraftingOrderClassic_Channels.lua
 CraftingOrderClassic_Notify.lua

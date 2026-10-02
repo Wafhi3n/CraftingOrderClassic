@@ -4,7 +4,7 @@
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
-159 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
+161 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
 
 ## Modules (ordre de chargement)
 
@@ -17,13 +17,13 @@
 | `CraftingOrderClassic_Locale.lua` | socle de localisation du CHROME de l'UI. | 12 |
 | `CraftingOrderClassic_Locale_enUS.lua` | overlay ANGLAIS (enUS/enGB). | 279 |
 | `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 498 |
-| `CraftingOrderClassic_Locale_enUS_3.lua` | overlay enUS, 3/3. | 184 |
+| `CraftingOrderClassic_Locale_enUS_3.lua` | overlay enUS, 3/3. | 188 |
 | `CraftingOrderClassic_Locale_deDE.lua` | overlay ALLEMAND (deDE). | 280 |
 | `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 479 |
-| `CraftingOrderClassic_Locale_deDE_3.lua` | overlay deDE, 3/3. | 183 |
+| `CraftingOrderClassic_Locale_deDE_3.lua` | overlay deDE, 3/3. | 187 |
 | `CraftingOrderClassic_Locale_esES.lua` | overlay ESPAGNOL (esES/esMX). | 281 |
 | `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 480 |
-| `CraftingOrderClassic_Locale_esES_3.lua` | overlay esES, 3/3. | 184 |
+| `CraftingOrderClassic_Locale_esES_3.lua` | overlay esES, 3/3. | 188 |
 | `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 432 |
 | `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 429 |
 | `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 429 |
@@ -44,7 +44,8 @@
 | `CraftingOrderClassic_UI_HelpPlate.lua` | AIDE CONTEXTUELLE de la FENÊTRE PRINCIPALE (« bouton i »). | 182 |
 | `CraftingOrderClassic_UI_Post_Layout.lua` | GÉOMÉTRIE de l'onglet « Commande » : colonnes, zones, séparateurs. | 136 |
 | `CraftingOrderClassic_UI_Post.lua` | onglet « Commande » : sélection de plan (gauche) + réactifs « je fournis » / commission g-s-c / ciblage artisan (droite). | 420 |
-| `CraftingOrderClassic_UI_Post_Detail.lua` | onglet « Commande », PANNEAU DROIT : en-tête du plan sélectionné (icône + cadre doré + nom + niveau), liste des réactifs « je fournis », et la rangée commission. | 201 |
+| `CraftingOrderClassic_UI_Post_Detail.lua` | onglet « Commande », PANNEAU DROIT : en-tête du plan sélectionné (icône + cadre doré + nom + niveau), liste des réactifs « je fournis », et la rangée commission. | 203 |
+| `CraftingOrderClassic_UI_Post_SeenWho.lua` | POC (spec lien-metier, D16) : sous le nom du plan choisi dans l'onglet Commande, « · sans l'addon : N » quand des artisans SANS l'addon savent le faire (recettes lues au clic sur leur lien, ou vues crafter). | 55 |
 | `CraftingOrderClassic_UI_Post_Artisans.lua` | onglet « Commande », section droite basse : boutons source, liste des artisans, ciblage (@Nom), libellé destinataire, bouton Poster. | 270 |
 | `CraftingOrderClassic_UI_Post_Categories.lua` | onglet « Commande », panneau gauche : regroupe la LISTE DES PLANS en sections type fenêtre native (emplacement puis type pour les équipements, type pour les armes, catégorie pour le reste). | 169 |
 | `CraftingOrderClassic_UI_Post_Paperdoll.lua` | onglet « Commande », vue SILHOUETTE de l'Enchantement. | 332 |
@@ -54,8 +55,8 @@
 | `CraftingOrderClassic_UI_Gather.lua` | onglet « Récolte » : ressources de récolte (minéraux, herbes, cuirs, poissons) + demande de quantité + prix par pile + ciblage récolteur. | 269 |
 | `CraftingOrderClassic_UI_Gather_Categories.lua` | onglet « Récolte », panneau gauche : repliage des en-têtes et remplissage des lignes (en-tête de section/sous-catégorie, ou ressource). | 79 |
 | `CraftingOrderClassic_UI_Artisans_Layout.lua` | GÉOMÉTRIE de l'onglet « Artisans » (annuaire social). | 45 |
-| `CraftingOrderClassic_UI_Artisans_Text.lua` | onglet « Artisans » : ce qu'une ligne de l'annuaire DIT. | 97 |
-| `CraftingOrderClassic_UI_Artisans.lua` | onglet « Artisans » : annuaire social. | 469 |
+| `CraftingOrderClassic_UI_Artisans_Text.lua` | onglet « Artisans » : ce qu'une ligne de l'annuaire DIT. | 102 |
+| `CraftingOrderClassic_UI_Artisans.lua` | onglet « Artisans » : annuaire social. | 472 |
 | `CraftingOrderClassic_UI_Artisans_Groups.lua` | fusion « une ligne par JOUEUR » (rerolls). | 200 |
 | `CraftingOrderClassic_UI_Artisans_Icons.lua` | onglet « Artisans » : tout ce qui est ICÔNE de métier. | 189 |
 | `CraftingOrderClassic_UI_Artisans_Needs.lua` | la « BOURSE d'artisan » de l'onglet Artisans : pour un artisan du roster (partenaire, guildie, ami…), la LISTE DE COURSES des fournitures qu'il lui faut pour monter ses métiers — mats agrégés de SA route de progression (COC.Route, calculée 100 % en LOCAL depuis son rang SK diffusé + ses recettes décodées du bitfield RK ; prix Lazy Gold locaux, valables serveur entier). | 361 |
@@ -137,12 +138,13 @@
 | `Directory_AltCodec.lua` | codec du fil ALT (liste des persos d'un même joueur) + vérification par réciprocité. | 119 |
 | `Directory_Alts.lua` | regroupement des rerolls : identité « joueur » multi-persos (verbe ALT). | 316 |
 | `Directory_LFW.lua` | statut « recherche de travail » (Looking For Work) + OFFRE par métier. | 356 |
-| `Directory_TradeLink.lua` | un lien de métier posté dans le chat ajoute son AUTEUR à l'annuaire, et l'annuaire ne garde que les artisans sans l'addon UTILES (spec docs/specs/lien-metier.md). | 281 |
+| `Directory_Seen.lua` | les artisans connus SANS l'addon (vus crafter, lien de métier, clic sur son lien) : ce qu'on en garde, et qui sait faire quoi (spec docs/specs/lien-metier.md). | 191 |
+| `Directory_TradeLink.lua` | un lien de métier posté dans le chat ajoute son AUTEUR à l'annuaire, et l'annuaire ne garde que les artisans sans l'addon UTILES (spec docs/specs/lien-metier.md). | 231 |
 | `CraftingOrderClassic_Channels.lua` | RECONNAÎTRE un canal du jeu (spec docs/specs/canaux-surveilles.md). | 261 |
 | `CraftingOrderClassic_Notify.lua` | la SORTIE d'une alerte : ligne de chat, bandeau, son. | 39 |
 | `CraftingOrderClassic_LFWChat.lua` | détection « recherche de travail » dans le CHAT VISIBLE. | 140 |
 | `Directory_MyArtisans.lua` | agrégation des métiers du COMPTE (onglet « Mes artisans »). | 168 |
-| `Directory_LootScan.lua` | découverte PASSIVE des artisans NON-porteurs de l'addon qui craftent à proximité, par CHAT_MSG_TRADESKILLS « X creates Y. | 162 |
+| `Directory_LootScan.lua` | découverte PASSIVE des artisans NON-porteurs de l'addon qui craftent à proximité, par CHAT_MSG_TRADESKILLS « X creates Y. | 167 |
 | `Orders_Codec.lua` | codec du protocole filaire ORD\| (sérialisation ⇄ parsing, SOURCE DE VÉRITÉ). | 158 |
 | `Orders_Announce.lua` | le FORMAT d'une annonce en clair sur Commerce (spec docs/specs/annonce-commerce.md). | 167 |
 | `Orders_AnnounceSend.lua` | l'ENVOI d'une annonce sur Trade (Services) (spec annonce-commerce, palier 2). | 148 |
@@ -1084,6 +1086,13 @@
 > Ajouter du padding à l'un = éditer la SPEC, rien ici. Le CONTENU (textes, widgets) vit ici.
 
 **API** : `UI:RefreshPostPlanDetail()` · `UI:RefreshPostReagents()`
+
+### `CraftingOrderClassic_UI_Post_SeenWho.lua`
+> CraftingOrderClassic_UI_Post_SeenWho.lua — POC (spec lien-metier, D16) : sous le nom du plan
+> choisi dans l'onglet Commande, « · sans l'addon : N » quand des artisans SANS l'addon savent le
+> faire (recettes lues au clic sur leur lien, ou vues crafter). Survol : qui, et d'où on le sait ;
+> clic : chuchoter au plus récent. Ne touche pas au ciblage de la commande (D10).
+> Retirable d'un geste : ce fichier, sa ligne du .toc, et l'appel dans RefreshPostPlanDetail.
 
 ### `CraftingOrderClassic_UI_Post_Artisans.lua`
 > CraftingOrderClassic_UI_Post_Artisans.lua — onglet « Commande », section droite basse :
@@ -2455,20 +2464,35 @@
 
 **API** : `Dir:LFWOf(name)` · `Dir:OnLFW(sender, message)` · `Dir:OnLFO(sender, message)` · `Dir:OnLFR(sender, message)` · `Dir:NoteChatLFW(name, prof)` · `Dir:MyLFW()` · `Dir:MyLFWOffer(profKey)` · `Dir:SetLFWOffer(profKey, offer)` · `Dir:LFWOfferLines(name)` · `Dir:SetLFW(profKey)` · `Dir:LFWRiposte()` · `Dir:LFWCmd(arg, typed)` · `Dir:StartLFW()`
 
+### `Directory_Seen.lua`
+> Directory_Seen.lua — les artisans connus SANS l'addon (vus crafter, lien de métier, clic sur son
+> lien) : ce qu'on en garde, et qui sait faire quoi (spec docs/specs/lien-metier.md).
+> 
+> Deux purges, à la connexion, après Dir:PruneRoster (7 jours, 500 fiches) :
+>   * la REDONDANCE (D13, règle du user) : un artisan dont un porteur de l'addon de ma guilde, ou vu
+>     ces derniers jours, sait déjà faire ce qu'il sait faire, n'est gardé qu'une journée ;
+>   * le PLAFOND (D9, filet de sécurité) : au plus SEEN_CAP par métier, les mieux renseignés.
+> Et la requête du POC (D16) : qui, sans l'addon, sait faire telle recette. Ces données ne servent
+> jamais à router une commande (D10) : RecipeTester ne lit que les vraies données réseau.
+> Méthodes sur COC.Directory (créé par Directory.lua, chargé avant dans le .toc).
+
+**API** : `Dir:CapSeen(prof, cap)` · `Dir:CapSeenAll(cap)` · `Dir:PruneRedundant()` · `Dir:SeenWhoKnows(prof, spellID)`
+
 ### `Directory_TradeLink.lua`
 > Directory_TradeLink.lua — un lien de métier posté dans le chat ajoute son AUTEUR à l'annuaire, et
 > l'annuaire ne garde que les artisans sans l'addon UTILES (spec docs/specs/lien-metier.md).
 > 
 > Le lien sur Forever (mesuré le 2026-09-27, docs/test-lien-metier.md) :
 >   |Htrade:<GUID du propriétaire>:<sort de rang>:<ligne de métier>|h[Enchanting]|h
-> Ni niveau ni recettes : le serveur ne les envoie qu'au CLIC. Le métier entre donc « connu, niveau
-> inconnu » (craftSeen = 0, D4) ; le sort de rang est gardé BRUT (linkSpell), jamais interprété.
+> Ni niveau ni recettes : le serveur ne les envoie qu'au CLIC. Le métier entre avec le plancher 0,
+> et le sort de rang, gardé brut (linkSpell), donne une TRANCHE à la lecture (D14).
 > Rien n'est envoyé à l'auteur (D7) : ni DiscoverPlayer, ni réponse. La lecture du chat elle-même
-> vit dans CraftingOrderClassic_LFWChat.lua ; ici, le décodage, la fiche, la purge, et (phase 2) la
-> vue liée qu'ouvre MON clic sur son lien : ses recettes et son niveau, rangés dans SA fiche.
+> vit dans CraftingOrderClassic_LFWChat.lua, la purge dans Directory_Seen.lua ; ici, le décodage,
+> la fiche, la tranche, et (phase 2) la vue liée qu'ouvre MON clic sur son lien : ses recettes et
+> son niveau, rangés dans SA fiche.
 > Méthodes sur COC.Directory (créé par Directory.lua, chargé avant dans le .toc).
 
-**API** : `Dir.ParseTradeLinks(text, guid)` · `Dir:NoteLinkSeen(name, prof, spell)` · `Dir:CapSeen(prof, cap)` · `Dir:CapSeenAll(cap)` · `Dir:CaptureLinkedView()` · `Dir:NoteLinkedView(owner, prof, ids, lvl, maxLvl)`
+**API** : `Dir.ParseTradeLinks(text, guid)` · `Dir:NoteLinkSeen(name, prof, spell)` · `Dir.LinkTier(spell)` · `Dir:CaptureLinkedView()` · `Dir:NoteLinkedView(owner, prof, ids, lvl, maxLvl)`
 
 ### `CraftingOrderClassic_Channels.lua`
 > CraftingOrderClassic_Channels.lua — RECONNAÎTRE un canal du jeu (spec docs/specs/canaux-surveilles.md).

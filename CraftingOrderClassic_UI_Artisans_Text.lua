@@ -42,8 +42,9 @@ function UI._ArtSubLine(pres, level, rep, via)
     return table.concat(parts, " · ")
 end
 
--- Sous-ligne d'un non-porteur : « a lié son métier » si TOUS ses métiers vus sans l'addon viennent
--- d'un lien (Directory_TradeLink) ; un seul métier vu crafter garde « vu crafter ».
+-- Sous-ligne d'un non-porteur : « par lien » si TOUS ses métiers vus sans l'addon viennent d'un lien
+-- (Directory_TradeLink) ; un seul métier vu crafter garde « vu crafter ». Court à dessein : la
+-- version longue coupait le nom du métier (relevé du 2026-10-02 11:17, spec D15).
 function UI._SeenOnlyByLink(r)
     if not (r and r.linkSeen and r.craftSeen) then return false end
     for key in pairs(r.craftSeen) do
@@ -54,12 +55,16 @@ end
 
 -- Infobulle d'un métier connu sans l'addon (item de la liste des métiers d'une ligne). Un clic sur
 -- son lien donne son niveau EXACT et ses recettes (`lk`, Directory_TradeLink) : on le dit tel quel,
--- « N+ · vu crafter » serait faux. Sinon le plancher vu crafter, sinon d'où on le connaît.
+-- « N+ · vu crafter » serait faux. Sinon la tranche de son lien (D14), sinon le plancher vu crafter,
+-- sinon d'où on le connaît.
 function UI._SeenSub(item)
     local lk = item.lk
     if lk and lk.lvl then
         return string.format(L["%d/%d · lien de métier, %d recettes"], lk.lvl, lk.max or lk.lvl, #(lk.ids or {}))
     end
+    local D, lo, hi = COC.Directory, nil, nil
+    if item.link and D and D.LinkTier then lo, hi = D.LinkTier(item.spell) end   -- pas de `and` : il tronque le 2e retour
+    if lo and (item.est or 0) <= lo then return string.format(L["%d-%d · lien de métier"], lo, hi) end
     if (item.est or 0) > 0 then return string.format(L["%d+ · vu crafter"], item.est) end
     return item.link and L["lien de métier (sans l'addon)"] or L["vu crafter (sans l'addon)"]
 end

@@ -74,6 +74,11 @@ function Dir:_NoteSeen(who, prof, spellID)
     local c = CL(); local floor = (c and spellID and c:RecipeLearnedAt(prof, spellID)) or 0
     r.craftSeen = r.craftSeen or {}
     if floor > (r.craftSeen[prof] or 0) then r.craftSeen[prof] = floor end
+    if spellID then   -- QUELLE recette : la redondance et le POC « qui sait la faire » en ont besoin
+        r.seenRecipes = r.seenRecipes or {}
+        local s = r.seenRecipes[prof]; if not s then s = {}; r.seenRecipes[prof] = s end
+        s[spellID] = time and time() or 0
+    end
     noteCdSeen(c, r, prof, spellID)
     if not (r.skill or r.recipes) then r.nonAddon = true end
     r.lastSeen = time and time() or 0

@@ -3,11 +3,12 @@
 --
 -- Le lien sur Forever (mesuré le 2026-09-27, docs/test-lien-metier.md) :
 --   |Htrade:<GUID du propriétaire>:<sort de rang>:<ligne de métier>|h[Enchanting]|h
--- Ni niveau ni recettes : le serveur ne les envoie qu'au CLIC. Le métier entre donc « connu, niveau
--- inconnu » (craftSeen = 0, D4) ; le sort de rang est gardé BRUT (linkSpell), jamais interprété.
+-- Ni niveau ni recettes : le serveur ne les envoie qu'au CLIC. Le métier entre avec le plancher 0,
+-- et le sort de rang, gardé brut (linkSpell), donne une TRANCHE à la lecture (D14).
 -- Rien n'est envoyé à l'auteur (D7) : ni DiscoverPlayer, ni réponse. La lecture du chat elle-même
--- vit dans CraftingOrderClassic_LFWChat.lua ; ici, le décodage, la fiche, la purge, et (phase 2) la
--- vue liée qu'ouvre MON clic sur son lien : ses recettes et son niveau, rangés dans SA fiche.
+-- vit dans CraftingOrderClassic_LFWChat.lua, la purge dans Directory_Seen.lua ; ici, le décodage,
+-- la fiche, la tranche, et (phase 2) la vue liée qu'ouvre MON clic sur son lien : ses recettes et
+-- son niveau, rangés dans SA fiche.
 -- Méthodes sur COC.Directory (créé par Directory.lua, chargé avant dans le .toc).
 
 local COC = CraftingOrderClassic
@@ -15,12 +16,9 @@ local Dir = COC.Directory
 
 local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true) end
 
--- Vraies données réseau de ce métier (SK, RK, RI) : elles priment toujours sur ce qu'un lien dit.
-local function hasNetData(r, prof)
-    return ((r.skill and r.skill[prof]) or (r.recipes and r.recipes[prof])
-        or (r.recipeIDs and r.recipeIDs[prof])) ~= nil
-end
-local function isCarrier(r) return (r.skill or r.recipes or r.recipeIDs or r.cooldowns) ~= nil end
+-- Vraies données réseau (SK, RK, RI) : elles priment toujours sur ce qu'un lien dit.
+-- Définis par Directory_Seen.lua, chargé avant (.toc), avec la purge qui les partage.
+local hasNetData, isCarrier = Dir._HasNetData, Dir._IsCarrier
 
 -- Lignes de métier du client : mêmes identifiants de Vanilla à Retail (333 et 185 mesurés sur
 -- Camelot). Repli quand le libellé du lien ne se résout pas (langue sans alias dans CraftLink).
@@ -86,75 +84,27 @@ function Dir:NoteLinkSeen(name, prof, spell)
 end
 
 -- ------------------------------------------------------------------
--- Purge par métier (D9) : au plus SEEN_CAP artisans connus SEULEMENT sans l'addon par métier.
--- S'ajoute à Dir:PruneRoster (7 jours, 500 fiches), ne la remplace pas.
+-- Tranche d'un lien (D14) : le lien porte le sort de RANG du métier, pas le niveau. Identifiants
+-- Vanilla ; trois mesurés sur Camelot le 2026-10-02 (7412 Enchantement Compagnon vu à 102/150,
+-- 2550 Cuisine Apprenti, 2018 Forge Apprenti vu à 1/75). Un sort absent = tranche INCONNUE, jamais
+-- devinée. La tranche se déduit à la lecture : jamais copiée dans le plancher craftSeen (D11).
 -- ------------------------------------------------------------------
-local SEEN_CAP = 10   -- nombre PROPOSÉ par l'agent le 2026-10-02, à confirmer par le user (spec, D9)
-Dir.SEEN_CAP = SEEN_CAP
--- Mêmes relations que celles que garde PruneRoster : on ne les oublie jamais.
-local KEEP_SOURCE = { guild = true, friend = true, added = true, circle = true }
-local SEEN_FIELDS = { "craftSeen", "linkSeen", "linkSpell", "linkRecipes", "cdSeen" }
+local TIERS = { { 1, 75 }, { 50, 150 }, { 125, 225 }, { 200, 300 } }   -- niveau requis, plafond
+local RANK_SPELLS = {
+    [2259] = 1, [3101] = 2, [3464] = 3, [11611] = 4,   -- Alchimie
+    [2018] = 1, [3100] = 2, [3538] = 3, [9785]  = 4,   -- Forge
+    [7411] = 1, [7412] = 2, [7413] = 3, [13920] = 4,   -- Enchantement
+    [4036] = 1, [4037] = 2, [4038] = 3, [12656] = 4,   -- Ingénierie
+    [2108] = 1, [3104] = 2, [3811] = 3, [10662] = 4,   -- Travail du cuir
+    [3908] = 1, [3909] = 2, [3910] = 3, [12180] = 4,   -- Couture
+    [2575] = 1, [2576] = 2, [3564] = 3, [10248] = 4,   -- Minage
+}
 
--- Fiche qui ne porte RIEN d'autre que des métiers vus sans l'addon : seule candidate à l'oubli.
--- Un [Dispo] en cours en est exclu, sinon un « LFW [lien] » frais serait oublié à son arrivée.
-function Dir:_SeenOnly(name, r)
-    if r.manual or KEEP_SOURCE[r.source or ""] or r.isPartner or r.relayed then return false end
-    if isCarrier(r) then return false end
-    if self.LFWOf and self:LFWOf(name) then return false end
-    return true
-end
-
-local function forgetProf(r, prof)
-    for _, f in ipairs(SEEN_FIELDS) do
-        local t = r[f]
-        if t then t[prof] = nil; if next(t) == nil then r[f] = nil end end
-    end
-end
-
--- Niveau connu d'un artisan sans l'addon : le plancher « vu crafter », ou le niveau lu au dernier
--- clic sur son lien (linkRecipes, remplacé à chaque lecture), le plus haut des deux.
-local function knownLevel(r, prof)
-    local lk = r.linkRecipes and r.linkRecipes[prof]
-    return math.max((r.craftSeen and r.craftSeen[prof]) or 0, (lk and lk.lvl) or 0)
-end
-
--- Garde les `cap` mieux renseignés pour `prof` (niveau connu le plus haut, puis le plus récent) ;
--- les autres oublient ce métier, et une fiche sans plus aucun métier disparaît. Rend le nombre oublié.
-function Dir:CapSeen(prof, cap)
-    cap = cap or SEEN_CAP
-    local list = {}
-    for name, r in pairs(self.roster or {}) do
-        if r.craftSeen and r.craftSeen[prof] ~= nil and self:_SeenOnly(name, r) then
-            list[#list + 1] = { name = name, r = r, lvl = knownLevel(r, prof),
-                                t = (r.linkSeen and r.linkSeen[prof]) or r.lastSeen or 0 }
-        end
-    end
-    if #list <= cap then return 0 end
-    table.sort(list, function(a, b)
-        if a.lvl ~= b.lvl then return a.lvl > b.lvl end
-        if a.t ~= b.t then return a.t > b.t end
-        return a.name < b.name                   -- départage stable : même résultat à chaque passe
-    end)
-    for i = cap + 1, #list do
-        local e = list[i]
-        forgetProf(e.r, prof)
-        if not e.r.craftSeen then self.roster[e.name] = nil end
-    end
-    return #list - cap
-end
-
-function Dir:CapSeenAll(cap)
-    local profs = {}
-    for _, r in pairs(self.roster or {}) do
-        for p in pairs(r.craftSeen or {}) do profs[p] = true end
-    end
-    for p in pairs(profs) do self:CapSeen(p, cap) end
-end
-
--- Passe complète à la connexion, juste après la purge existante. Directory.lua est à 499 lignes
--- (plafond anti-monolithe) : on s'accroche à PruneRoster plutôt que d'y ajouter un appel.
-if hooksecurefunc and Dir.PruneRoster then
-    hooksecurefunc(Dir, "PruneRoster", function(self) self:CapSeenAll() end)
+-- Sort de rang → (niveau requis pour la tranche, plafond de la tranche), ou nil.
+function Dir.LinkTier(spell)
+    local t = spell and RANK_SPELLS[spell]
+    if not t then return nil end
+    return TIERS[t][1], TIERS[t][2]
 end
 
 -- ------------------------------------------------------------------
