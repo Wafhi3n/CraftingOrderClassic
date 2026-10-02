@@ -1,7 +1,8 @@
 # Plan de route au coût NET : ce que tu as en sac a un prix, ce que tu fabriques aussi
 
-> État : **brouillon validé sur le principe** — décisions 1 à 5 tranchées par le user le 2026-10-02,
-> questions ouvertes en fin de document. Rien de codé. · Rédigée le 2026-10-02
+> État : **implémentée le 2026-10-02, pas vue en jeu** (branche COC `feat/route-cout-net`, tests
+> `tests/test_route_net.lua`) — décisions 1 à 5 tranchées par le user le 2026-10-02 ; les deux
+> questions ouvertes sont codées sur leur valeur proposée, en attente du user. · Rédigée le 2026-10-02
 > Cible : WoW: Forever / Camelot (16001) · Addon : Crafting Order - Classic
 > Prolonge `rentabilite-forever.md` (dont la décision 8 laissait le coût de montée hors champ, « à
 > rouvrir sciemment ») et le Plan de route (mémoire `coc-leveling-cheapest-recipe-idea`).
@@ -103,14 +104,34 @@ s'applique telle quelle.
    hérite de l'arbitrage 10 de `rentabilite-forever.md` : le prix d'un marchand qui VEND l'objet
    plafonne sa revente ; et d'un fait du jeu : un objet lié ou sans prix HV ne vaut que son prix de
    rachat par un marchand.
-7. *(conséquence)* **On construit sur `feat/profit-arbitrages`** (COC, autre session, au banc) : elle
-   réécrit `CraftingOrderClassic_Profit.lua`, ajoute la provenance du prix et expose la coupe HV.
-   Travailler sur `main` en parallèle garantit un conflit dans le fichier même où vit la valeur de
-   revente.
+7. *(choix d'implémentation, 2026-10-02 — remplace la version d'origine de ce point)* **On ne touche
+   PAS à `CraftingOrderClassic_Profit.lua`**, que `feat/profit-arbitrages` (autre session, au banc,
+   118 commits derrière `main`) réécrit. La valeur de revente vit dans un fichier à elle
+   (`CraftingOrderClassic_Route_Value.lua`) et ne lit de Profit que ce qui se comporte pareil des
+   deux côtés (`IsAvailable`, `ItemValue`, `AH_CUT` s'il existe, 5 % sinon). Les deux branches
+   atterrissent dans l'ordre qu'on veut, sans conflit. La version d'origine (« construire sur
+   `feat/profit-arbitrages` ») aurait obligé à résoudre les conflits de l'autre session et à
+   fusionner les deux chantiers ensemble.
+8. *(choix d'implémentation)* **Le coût net est une OPTION du calcul** (`opts.value`), pas son
+   défaut : la fenêtre et le suivi à l'écran la passent, identique (`Route:MyValuation`) ; la bourse
+   d'artisan et tout appel sans elle gardent la route d'avant, à l'identique. C'est ce qui laisse
+   `test_route_stock` et `test_route_trainer` intacts, et qui code la question ouverte 1 sur sa
+   valeur proposée.
+9. *(choix d'implémentation)* **Le type de lien n'est pas lu.** Auctionator ne cote que ce qui a été
+   MIS en vente : un objet lié quand ramassé n'a donc jamais de prix HV, et tombe de lui-même sur le
+   prix de rachat marchand. Une lecture de moins à mesurer (critère 12 réduit au `sellPrice`).
+10. *(choix d'implémentation)* **Un objet fabriqué = un objet** : la lib ne connaît pas la quantité
+   produite par craft. Une recette qui en fait plusieurs est sous-créditée : erreur du côté sûr.
+11. *(choix d'implémentation)* **Le montant d'une étape est son coût net** (plan compris) : les lignes
+   s'additionnent au « Coût net » de l'en-tête. Un gain s'écrit « +X » en vert ; une étape dont les
+   matières valent plus que ce qu'elle produit s'écrit en orange, l'infobulle dit de combien. Le
+   suivi à l'écran, lui, affiche toujours ce qui sort de la bourse pour le prochain point.
 
 ## Critères d'acceptation
 
-Tests (Elune, sur les vrais `CraftingOrderClassic_Route.lua` et `_Profit.lua`, oracle factice) :
+Tests (Elune, sur les vrais `CraftingOrderClassic_Route.lua` et `_Route_Value.lua`, oracle factice) —
+**tous dans `tests/test_route_net.lua`, verts le 2026-10-02** ; trois sabotages du code (débit du
+fabriqué retiré, choix en caisse, sac gratuit) les font tomber :
 
 1. `[test]` Deux recettes, même coût d'achat ; l'une produit un objet qui se revend : avec la case
    cochée, la route prend celle-là ; décochée, l'ordre d'aujourd'hui revient.
@@ -123,8 +144,8 @@ Tests (Elune, sur les vrais `CraftingOrderClassic_Route.lua` et `_Profit.lua`, o
 5. `[test]` Sans sacs et case décochée (rien à valoriser), la route et son total sont ceux
    d'aujourd'hui au cuivre près : le bloc « sans sacs » de `test_route_stock` (Light Armor Kit de 7 à
    45, 50 pa 74 pc) et `test_route_trainer` passent sans changement.
-6. `[test]` Produit sans prix : revente nulle, aucun « (?) » ajouté. Produit lié : prix marchand
-   seul. Produit vendu par un marchand : revente plafonnée.
+6. `[test]` Produit sans prix : revente nulle, aucun « (?) » ajouté. Sans prix coté (objet lié
+   compris) : prix de rachat marchand. Produit vendu par un marchand : revente plafonnée.
 7. `[test]` `Route:NextStep` choisit la même recette que le premier segment de `Route:Compute`, case
    cochée et décochée.
 8. `[porte]` Libellés traduits dans les trois overlays (`check_locale.ps1`).
@@ -140,20 +161,23 @@ En jeu (le user, Forge sur le banc) :
     marque.
 11. `[humain]` Décocher « Compter la revente » : la route se recalcule sur-le-champ ; recocher la
     rend.
-12. `[agent]` Le prix de rachat marchand et le lien de l'objet se lisent sur Forever avec l'appel
-    retenu (cf. Contrat) : **mesure** sur le client vivant (`/cocprobe` ou un `/dump`) avant de
-    coder la branche « produit lié » — la doc générée ne prouve pas qu'un champ répond.
+12. `[humain]` Le prix de rachat marchand se lit sur Forever : `/dump select(11,
+    C_Item.GetItemInfo(2840))` (Copper Bar) rend un nombre > 0. Témoin : le prix de vente au
+    marchand affiché dans l'infobulle de l'objet. La doc générée ne prouve pas qu'un champ répond.
 
 ## Contrat
 
 - **Préférence persistée** : `COC.db.routeResale` — `nil` = cochée (même convention que
   `db.routePlans`, rien à migrer), `false` = décochée. Par compte, comme `routePlans`.
-- **Valeur de revente** (Profit) : une fonction, un retour en cuivre ou `nil`, de la forme
-  `PR:ResaleValue(itemID)` — HV × (1 − coupe), plafonné par le prix d'achat marchand s'il existe ;
-  objet lié ou sans prix HV : prix de rachat marchand. Le prix de rachat et le type de lien viennent
-  du client (`C_Item.GetItemInfo`, retours `sellPrice` et `bindType`) — **à mesurer** (critère 12).
-- **Segment de route** : gagne des champs (`resale`, `resaleQty`, `bagValue`), n'en perd aucun.
-  Les lecteurs actuels (fenêtre, colonne greffée, suivi, bourse) les ignorent sans casser.
+- **Valeur de revente** : `COC.Route:ResaleValue(itemID)` (`CraftingOrderClassic_Route_Value.lua`),
+  un retour en cuivre ou `nil` — `PR:ItemValue` × (1 − coupe) (marchand d'abord : il plafonne) ;
+  sans prix coté, le prix de rachat marchand (11e retour de `C_Item.GetItemInfo`, `sellPrice`, à
+  confirmer en jeu : critère 12).
+- **Option de calcul** : `opts.value = { resale = bool }` pour `Route:Compute` et `Route:NextStep` ;
+  `Route:MyValuation()` la construit depuis `db.routeResale`.
+- **Route** : gagne `net`, `bagValue`, `resale` (nil sans `opts.value`). **Segment** : gagne `net`,
+  `bagValue`, `resale`, `resaleQty`, n'en perd aucun. **NextStep** : gagne `perPointNet`. Les
+  lecteurs d'avant (bourse) les ignorent sans casser.
 - Rien sur le fil réseau : la route est locale.
 
 ## Deuxième étape — l'arbitrage entre métiers (décision 5)
@@ -171,12 +195,15 @@ En jeu (le user, Forge sur le banc) :
 
 ## Questions ouvertes (pour le user)
 
+Codées sur leur valeur proposée le 2026-10-02 (le user a dit « vas-y » sans les trancher) ; une
+réponse contraire est un petit chantier, pas une reprise.
+
 1. **La bourse d'artisan** (route d'un autre joueur, onglet Artisans) : elle dit ce qu'il faut
-   FOURNIR à cet artisan. Garder le coût d'achat (proposé : c'est ce que le client paie), ou passer
-   au coût net comme la fenêtre ?
-2. **Le badge « meilleur coût/point »** de la liste pleine vue : le passer au net aussi, pour que
-   badge et route racontent la même histoire (règle d'origine de la fonctionnalité), ou le laisser
-   au coût d'achat ?
+   FOURNIR à cet artisan. **Codé : coût d'achat** (c'est ce que le client paie). Ou passer au coût
+   net comme la fenêtre ?
+2. **Le badge « meilleur coût/point »** de la liste pleine vue : **codé : inchangé, coût d'achat**.
+   Le passer au net aussi, pour que badge et route racontent la même histoire (règle d'origine de la
+   fonctionnalité) ?
 
 ## Renvois
 
@@ -191,10 +218,12 @@ En jeu (le user, Forge sur le banc) :
 
 ## Plan (2026-10-02 — volatil, à barrer au fil de l'eau)
 
-Base : `feat/profit-arbitrages` fusionnée dans `main` ; sinon une branche partie d'elle, et le dire.
+Base : `fix/route-formateur` (COC + outillage), dont la route est le socle ; pas
+`feat/profit-arbitrages` (décision 7).
 
-1. Mesurer `sellPrice` et `bindType` sur le client (critère 12). Une séance courte, un `/dump`.
-2. `PR:ResaleValue` + tests (critère 6). Une session.
-3. Route : valeur du sac, crédit/débit du produit, deux totaux, case ; tests 1 à 5 et 7. Une session.
-4. Affichage : deux totaux, infobulle d'étape, marque « matières > produit », valeur du sac
-   consommé ; locale. Puis banc (critères 9 à 11).
+1. ~~Valeur de revente + tests (critère 6).~~ Fait.
+2. ~~Route : valeur du sac, crédit/débit du produit, totaux ; tests 1 à 5 et 7.~~ Fait.
+3. ~~Affichage : deux totaux, montant net par étape, infobulle (`_ProfWindow_Route_Tip.lua`), case
+   « Compter la revente », valeur du sac consommé ; locale.~~ Fait. Pour la place :
+   `_Route_Gateway.lua` sorti de `Route.lua`, l'infobulle sortie de `_ProfWindow_Route.lua`.
+4. Banc : critères 9 à 12.

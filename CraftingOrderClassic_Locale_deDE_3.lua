@@ -91,6 +91,19 @@ local de3 = {
         "Der Stapel mit %d liegt bereit in deiner Tasche: Lege ihn selbst in die Post.",
     -- Plan de route : le prix d'un plan de formateur, relevé chez lui (2026-10-02)
     ["Prix du plan inconnu : COC le relèvera à ton prochain passage chez le formateur."] = "Rezeptpreis unbekannt: COC notiert ihn bei deinem nächsten Besuch beim Lehrer.",
+    -- Plan de route au coût NET, spec route-cout-net (2026-10-02)
+    ["Compter la revente"] = "Weiterverkauf zählen",
+    ["Cochée : ce que la route fabrique est compté à son prix de revente (HV moins 5 %), et ce qu'elle prend dans tes sacs aussi. La route choisit alors au coût net."] = "Aktiviert: Was die Route herstellt, zählt zu seinem Wiederverkaufspreis (AH minus 5 %), ebenso was sie aus deinen Taschen nimmt. Die Route wählt dann nach Nettokosten.",
+    ["À débourser : %s"] = "Auszugeben: %s",
+    ["Coût net : %s"] = "Nettokosten: %s",
+    ["Gain net : %s"] = "Nettogewinn: %s",
+    ["Pris dans tes sacs : ~%s"] = "Aus deinen Taschen: ~%s",
+    ["Revente : ~%s (%d objet(s) à vendre)"] = "Wiederverkauf: ~%s (%d Gegenstand/Gegenstände zu verkaufen)",
+    ["Revente inconnue : comptée nulle."] = "Wiederverkauf unbekannt: als null gezählt.",
+    ["Coût net de l'étape : %s"] = "Nettokosten dieses Schritts: %s",
+    ["Gain net de l'étape : %s"] = "Nettogewinn dieses Schritts: %s",
+    ["Les matières valent ~%s de plus que ce que l'étape produit."] = "Die Materialien sind ~%s mehr wert als das, was dieser Schritt herstellt.",
+    ["Ce que la route prend dans tes sacs vaudrait ~%s à l'HV."] = "Was die Route aus deinen Taschen nimmt, brächte im AH ~%s.",
     -- Note de membre de la communauté, /co note (2026-09-29)
     ["le texte de tes métiers, à coller dans ta note de communauté (visible même hors ligne)"] =
         "der Text deiner Berufe, zum Einfügen in deine Gemeinschaftsnotiz (auch offline sichtbar)",

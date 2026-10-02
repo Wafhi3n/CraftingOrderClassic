@@ -92,6 +92,19 @@ local es3 = {
         "La pila de %d está lista en tu bolsa: colócala tú mismo en el correo.",
     -- Plan de route : le prix d'un plan de formateur, relevé chez lui (2026-10-02)
     ["Prix du plan inconnu : COC le relèvera à ton prochain passage chez le formateur."] = "Precio de la receta desconocido: COC lo anotará en tu próxima visita al maestro.",
+    -- Plan de route au coût NET, spec route-cout-net (2026-10-02)
+    ["Compter la revente"] = "Contar la reventa",
+    ["Cochée : ce que la route fabrique est compté à son prix de revente (HV moins 5 %), et ce qu'elle prend dans tes sacs aussi. La route choisit alors au coût net."] = "Marcada: lo que fabrica la ruta cuenta a su precio de reventa (subasta menos 5 %), y también lo que toma de tus bolsas. La ruta elige entonces por coste neto.",
+    ["À débourser : %s"] = "A desembolsar: %s",
+    ["Coût net : %s"] = "Coste neto: %s",
+    ["Gain net : %s"] = "Ganancia neta: %s",
+    ["Pris dans tes sacs : ~%s"] = "Tomado de tus bolsas: ~%s",
+    ["Revente : ~%s (%d objet(s) à vendre)"] = "Reventa: ~%s (%d objeto(s) por vender)",
+    ["Revente inconnue : comptée nulle."] = "Reventa desconocida: se cuenta como cero.",
+    ["Coût net de l'étape : %s"] = "Coste neto de este paso: %s",
+    ["Gain net de l'étape : %s"] = "Ganancia neta de este paso: %s",
+    ["Les matières valent ~%s de plus que ce que l'étape produit."] = "Los materiales valen ~%s más que lo que produce este paso.",
+    ["Ce que la route prend dans tes sacs vaudrait ~%s à l'HV."] = "Lo que la ruta toma de tus bolsas valdría ~%s en la subasta.",
     -- Note de membre de la communauté, /co note (2026-09-29)
     ["le texte de tes métiers, à coller dans ta note de communauté (visible même hors ligne)"] =
         "el texto de tus profesiones, para pegarlo en tu nota de comunidad (visible incluso desconectado)",

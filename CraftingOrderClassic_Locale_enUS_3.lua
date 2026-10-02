@@ -92,6 +92,19 @@ local en3 = {
         "The stack of %d is ready in your bag: drop it into the mail yourself.",
     -- Plan de route : le prix d'un plan de formateur, relevé chez lui (2026-10-02)
     ["Prix du plan inconnu : COC le relèvera à ton prochain passage chez le formateur."] = "Recipe price unknown: COC will note it next time you visit the trainer.",
+    -- Plan de route au coût NET, spec route-cout-net (2026-10-02)
+    ["Compter la revente"] = "Count resale",
+    ["Cochée : ce que la route fabrique est compté à son prix de revente (HV moins 5 %), et ce qu'elle prend dans tes sacs aussi. La route choisit alors au coût net."] = "Checked: what the route crafts counts at its resale price (AH minus 5%), and so does what it takes from your bags. The route then picks by net cost.",
+    ["À débourser : %s"] = "To spend: %s",
+    ["Coût net : %s"] = "Net cost: %s",
+    ["Gain net : %s"] = "Net gain: %s",
+    ["Pris dans tes sacs : ~%s"] = "Taken from your bags: ~%s",
+    ["Revente : ~%s (%d objet(s) à vendre)"] = "Resale: ~%s (%d item(s) to sell)",
+    ["Revente inconnue : comptée nulle."] = "Resale unknown: counted as zero.",
+    ["Coût net de l'étape : %s"] = "Net cost of this step: %s",
+    ["Gain net de l'étape : %s"] = "Net gain of this step: %s",
+    ["Les matières valent ~%s de plus que ce que l'étape produit."] = "The materials are worth ~%s more than what this step makes.",
+    ["Ce que la route prend dans tes sacs vaudrait ~%s à l'HV."] = "What the route takes from your bags would fetch ~%s at the AH.",
     -- Note de membre de la communauté, /co note (2026-09-29)
     ["le texte de tes métiers, à coller dans ta note de communauté (visible même hors ligne)"] =
         "the text of your professions, to paste into your community note (visible even offline)",
