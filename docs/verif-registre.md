@@ -46,6 +46,19 @@ client.
 
 ## Relevés
 
+- 2026-10-02 11:21 — jusqu'a 60cccd0 — même séance, même build `main-dev@2bf827b 2026-10-02 11:04`
+  — **GO sur la garde du métier lié (D6 de la spec lien-metier, correctif `IsOwnProfessionOpen` du
+  2026-09-27)** — capture et parole du user : l'observateur clique le lien `[Blacksmithing]` de
+  Gnomi Short ; la fenêtre native « Blacksmithing [Gnomi Short] » s'ouvre (5 recettes, barre
+  « Blacksmithing 1/75 ») **sans** colonne Crafting Order à côté ; le `/run` qui compte les recettes
+  de Forge de l'observateur (`_MyKnownStore().Blacksmithing`) rend `A 0` avant et après le clic.
+  Les lignes « To Craft / Profit » de la fenêtre sont celles d'Auctionator. Au passage : le titre
+  vient de `IsTradeSkillLinked()` (Blizzard_ProfessionsFrame.lua:255), qui rend donc le nom COMPLET ;
+  le niveau du propriétaire s'affiche dans la vue liée ; 1/75 = tranche Apprenti, celle du sort de
+  rang 2018 relevé à 11:12. Le témoin vaut : le 2026-09-27, sans la garde, le même geste avait fait
+  passer un compte de 0 à 21 recettes (docs/test-lien-metier.md). **Pas observé** : la colonne qui
+  revient quand l'observateur rouvre SON métier, fenêtre déjà ouverte.
+
 - 2026-10-02 11:17 — jusqu'a 60cccd0 — même séance, même build `main-dev@2bf827b 2026-10-02 11:04`
   — **GO sur le critère 11 de `feat/lien-metier`** — capture du user, onglet Artisans de
   l'observateur : « Gnomi Short », étiquette `SEEN`, icône Forge, sous-ligne « linked their
