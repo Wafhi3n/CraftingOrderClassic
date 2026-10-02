@@ -46,6 +46,17 @@ client.
 
 ## Relevés
 
+- 2026-10-02 11:12 — jusqu'a 60cccd0 — Forever, deux comptes, client de l'observateur en ANGLAIS ;
+  build `main-dev@2bf827b 2026-10-02 11:04` avec docs/spec-lien-metier, feat/lien-metier,
+  feat/liste-destinataires, feat/profit-arbitrages, fix/clic-recette-connue, release/v1.43.1 (copie
+  déployée du `.toc`) — **GO partiel sur `feat/lien-metier` : palier 0 (critère 1) seulement** —
+  capture du user : Gnomi Short poste `[Blacksmithing]` sur `3. Trade - English`, la sonde `/run`
+  de la spec affiche `Gnomi Short 3. Trade - English trade:Player-4620-00B33568:2018:164 GUID=OK`.
+  Donc : le lien arrive intact par `CHAT_MSG_CHANNEL`, son GUID est celui de l'émetteur, l'émetteur
+  arrive au nom COMPLET (« Prénom Nom »), sort de rang 2018 = identifiant Vanilla de Forge Apprenti
+  (3e valeur conforme à Vanilla après 7412 et 2550, cf. D4bis). **Pas observé** : Trade (Services)
+  (le geste a eu lieu sur Trade) ; tout ce que fait COC du lien (critères 11, 12, 18, garde D6).
+
 - 2026-10-02 10:20 — jusqu'a 8e7c062 — Forever, client de Rédemption, en ANGLAIS, Forgefer ; build
   `main-dev@ce68ef3 2026-10-02 10:16` avec icone-commande-recue, liste-destinataires,
   profit-arbitrages, release/v1.43.0 (copie déployée du `.toc`) — **GO sur `fix/manquantes-nom-long`**
