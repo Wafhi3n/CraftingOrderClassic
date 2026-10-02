@@ -46,6 +46,14 @@ client.
 
 ## Relevés
 
+- 2026-10-02 11:24 — jusqu'a 60cccd0 — même séance, même build `main-dev@2bf827b 2026-10-02 11:04`
+  — **GO sur les critères 12 et 18 de `feat/lien-metier`, sur la parole du user, sans capture** —
+  « LFW » suivi du lien de métier dans la même ligne met l'auteur [LFW] chez l'observateur (12) ;
+  le lien posté hors des canaux du jeu est lu aussi (18) — la voie (guilde ou chuchotement) n'a pas
+  été précisée, ni le nom affiché sur la ligne. Avec 11:12, 11:17 et 11:21, toute la phase 1 de la
+  spec est vue en jeu, sauf : Trade (Services) (le geste a eu lieu sur Trade), l'infobulle de
+  l'icône, et la purge par métier (plafond de 10, vérifiée seulement par les tests).
+
 - 2026-10-02 11:21 — jusqu'a 60cccd0 — même séance, même build `main-dev@2bf827b 2026-10-02 11:04`
   — **GO sur la garde du métier lié (D6 de la spec lien-metier, correctif `IsOwnProfessionOpen` du
   2026-09-27)** — capture et parole du user : l'observateur clique le lien `[Blacksmithing]` de
