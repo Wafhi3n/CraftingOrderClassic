@@ -112,6 +112,7 @@ end
 -- =========================================================================
 function UI:RefreshPostPlanDetail()
     local e = self.postEntry
+    if self._RefreshPostSeenWho and not e then self:_RefreshPostSeenWho(nil) end   -- POC lien-metier (D16)
     if not e then
         self.postPlanBadge:Hide(); self.postPlanName:SetText("|cFF888888" .. L["Aucun plan sélectionné."] .. "|r")
         if self.postPlanSub then self.postPlanSub:SetText("") end
@@ -121,7 +122,6 @@ function UI:RefreshPostPlanDetail()
         self.postReagList:SetData({})
         if self.postPriceHint then self.postPriceHint:SetText("") end
         if self.postSelLbl then self.postSelLbl:SetText("|cFF888888" .. L["Choisis un métier puis un plan."] .. "|r") end
-        if self._RefreshPostSeenWho then self:_RefreshPostSeenWho(nil) end   -- POC lien-metier (D16)
         return
     end
     local nm = entryName(e); local r, g, b = Skin.RarityColor(e.itemID)
