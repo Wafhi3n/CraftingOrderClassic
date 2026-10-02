@@ -1,6 +1,6 @@
 # CraftingOrderClassic — carte du code
 
-> **GÉNÉRÉ** le 2026-09-30 (v1.42.0) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
+> **GÉNÉRÉ** le 2026-10-02 (v1.42.0) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
@@ -11,7 +11,7 @@
 | Fichier | Rôle | Lignes |
 |---|---|---|
 | `CraftingOrderClassic.lua` | Crafting Order - Classic — réseau GLOBAL et SOCIAL de commandes de craft. | 498 |
-| `CraftingOrderClassic_Compat.lua` | couche d'adaptation d'API entre les SAVEURS de client. | 336 |
+| `CraftingOrderClassic_Compat.lua` | couche d'adaptation d'API entre les SAVEURS de client. | 346 |
 | `CraftingOrderClassic_Trace.lua` | trace réseau PERSISTÉE, lisible hors-jeu. | 79 |
 | `CraftingOrderClassic_Migrations.lua` | versionnage du schéma SavedVariables. | 40 |
 | `CraftingOrderClassic_Locale.lua` | socle de localisation du CHROME de l'UI. | 12 |
@@ -97,7 +97,7 @@
 | `CraftingOrderClassic_ProfWindow_HelpPlate.lua` | AIDE CONTEXTUELLE de la Vue Métier (« bouton i »). | 113 |
 | `CraftingOrderClassic_ProfWindow_Dock.lua` | mode DOCK de la vue métier (« Vue Blizzard ») : la fenêtre native reste VISIBLE (non neutralisée) et NOTRE colonne Commandes s'épingle à sa droite. | 70 |
 | `CraftingOrderClassic_ProfWindow_Camelot.lua` | POC : notre colonne Commandes À L'INTÉRIEUR de la fenêtre de métier NATIVE de WoW: Forever (Camelot). | 469 |
-| `CraftingOrderClassic_ProfWindow_Camelot_Open.lua` | OUVRIR un metier dans la fenetre NATIVE de WoW: Forever, et rediriger vers elle toutes nos entrees (bouton minimap, /co prof, clic du suivi). | 115 |
+| `CraftingOrderClassic_ProfWindow_Camelot_Open.lua` | OUVRIR un metier dans la fenetre NATIVE de WoW: Forever, et rediriger vers elle toutes nos entrees (bouton minimap, /co prof, clic du suivi). | 117 |
 | `CraftingOrderClassic_ProfWindow_Camelot_PageArt.lua` | prolonger le FOND de la page native dans la bande que notre greffe ajoute à droite de la fenêtre de métier de WoW: Forever. | 80 |
 | `CraftingOrderClassic_ProfWindow_Toolbar.lua` | barre d'outils de la colonne Recettes (vue métier) : les toggles de TRI (slot recTools, à gauche : rentabilité / valeurs exactes / progression — Auctionator) et de FILTRE (slot recFilterToggles, à droite : « j'ai les matériaux » / « montée de compétence »). | 245 |
 | `CraftingOrderClassic_ProfWindow_Recipes.lua` | colonne GAUCHE : liste de recettes virtualisée (scroll), recherche, couleur par difficulté, sélection, badge « demandé » (nb de commandes ouvertes pour l'objet). | 485 |

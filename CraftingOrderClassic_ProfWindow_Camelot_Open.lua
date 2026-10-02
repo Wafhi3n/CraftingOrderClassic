@@ -42,9 +42,11 @@ end
 -- `C_SpellBook.CastSpellBookItem`, protégée elle aussi : il n'existe aucun équivalent appelable
 -- depuis un addon. On passe donc par les globales FrameXML, qui ne font que charger le module et
 -- montrer le panneau.
--- ⚠️ À ÉPROUVER EN JEU. `ProfessionsMixin:OnShow` déclenche `ProfessionsFrame.Show`, sur lequel
--- CHAQUE onglet latéral rappelle `CastProfessionSpell()`. Si notre appel teinte cette chaîne, le
--- blocage revient — déplacé, pas supprimé. Le chemin PROUVÉ est `ToggleProfessionsBook()` : c'est mot
+-- ⚠️ À ÉPROUVER EN JEU. `ProfessionsMixin:OnShow` relance le sort d'un métier : jusqu'au build 70124,
+-- CHAQUE onglet latéral rappelait `CastProfessionSpell()` sur `ProfessionsFrame.Show` ; depuis le
+-- 70170, un seul `RecastSelectedProfession()`, et seulement quand AUCUN métier n'est ouvert et qu'un
+-- onglet avait été choisi plus tôt dans la session. Si notre appel teinte cette chaîne, le blocage
+-- revient — déplacé, pas supprimé. Le chemin PROUVÉ est `ToggleProfessionsBook()` : c'est mot
 -- pour mot ce qu'appelle le micro-bouton « Métiers » de Blizzard, et c'est celui du bouton minimap
 -- (cf. _Minimap.lua, validé en jeu le 2026-09-19). Il ouvre la page d'ensemble au lieu du métier
 -- visé, d'où l'essai d'`OpenProfessionUIToSkillLine` d'abord. Cette fonction ne sert qu'aux entrées
