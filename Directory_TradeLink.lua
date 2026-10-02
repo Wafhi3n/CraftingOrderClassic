@@ -6,13 +6,21 @@
 -- Ni niveau ni recettes : le serveur ne les envoie qu'au CLIC. Le métier entre donc « connu, niveau
 -- inconnu » (craftSeen = 0, D4) ; le sort de rang est gardé BRUT (linkSpell), jamais interprété.
 -- Rien n'est envoyé à l'auteur (D7) : ni DiscoverPlayer, ni réponse. La lecture du chat elle-même
--- vit dans CraftingOrderClassic_LFWChat.lua ; ici, le décodage, la fiche et la purge.
+-- vit dans CraftingOrderClassic_LFWChat.lua ; ici, le décodage, la fiche, la purge, et (phase 2) la
+-- vue liée qu'ouvre MON clic sur son lien : ses recettes et son niveau, rangés dans SA fiche.
 -- Méthodes sur COC.Directory (créé par Directory.lua, chargé avant dans le .toc).
 
 local COC = CraftingOrderClassic
 local Dir = COC.Directory
 
 local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true) end
+
+-- Vraies données réseau de ce métier (SK, RK, RI) : elles priment toujours sur ce qu'un lien dit.
+local function hasNetData(r, prof)
+    return ((r.skill and r.skill[prof]) or (r.recipes and r.recipes[prof])
+        or (r.recipeIDs and r.recipeIDs[prof])) ~= nil
+end
+local function isCarrier(r) return (r.skill or r.recipes or r.recipeIDs or r.cooldowns) ~= nil end
 
 -- Lignes de métier du client : mêmes identifiants de Vanilla à Retail (333 et 185 mesurés sur
 -- Camelot). Repli quand le libellé du lien ne se résout pas (langue sans alias dans CraftLink).
@@ -68,11 +76,11 @@ function Dir:NoteLinkSeen(name, prof, spell)
     r.lastSeen = t
     r.linkSeen = r.linkSeen or {};   r.linkSeen[prof] = t
     r.linkSpell = r.linkSpell or {}; r.linkSpell[prof] = spell
-    if not ((r.skill and r.skill[prof]) or (r.recipes and r.recipes[prof])) then
+    if not hasNetData(r, prof) then
         r.craftSeen = r.craftSeen or {}
         if r.craftSeen[prof] == nil then r.craftSeen[prof] = 0 end   -- 0 = connu sans l'addon, niveau inconnu
     end
-    if not (r.skill or r.recipes) then r.nonAddon = true end
+    if not isCarrier(r) then r.nonAddon = true end
     self:CapSeen(prof)
     if COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end
 end
@@ -85,13 +93,13 @@ local SEEN_CAP = 10   -- nombre PROPOSÉ par l'agent le 2026-10-02, à confirmer
 Dir.SEEN_CAP = SEEN_CAP
 -- Mêmes relations que celles que garde PruneRoster : on ne les oublie jamais.
 local KEEP_SOURCE = { guild = true, friend = true, added = true, circle = true }
-local SEEN_FIELDS = { "craftSeen", "linkSeen", "linkSpell", "cdSeen" }
+local SEEN_FIELDS = { "craftSeen", "linkSeen", "linkSpell", "linkRecipes", "cdSeen" }
 
 -- Fiche qui ne porte RIEN d'autre que des métiers vus sans l'addon : seule candidate à l'oubli.
 -- Un [Dispo] en cours en est exclu, sinon un « LFW [lien] » frais serait oublié à son arrivée.
 function Dir:_SeenOnly(name, r)
     if r.manual or KEEP_SOURCE[r.source or ""] or r.isPartner or r.relayed then return false end
-    if r.skill or r.recipes or r.cooldowns then return false end
+    if isCarrier(r) then return false end
     if self.LFWOf and self:LFWOf(name) then return false end
     return true
 end
@@ -140,4 +148,125 @@ end
 -- (plafond anti-monolithe) : on s'accroche à PruneRoster plutôt que d'y ajouter un appel.
 if hooksecurefunc and Dir.PruneRoster then
     hooksecurefunc(Dir, "PruneRoster", function(self) self:CapSeenAll() end)
+end
+
+-- ------------------------------------------------------------------
+-- Phase 2 : quand JE clique le lien d'un autre, le jeu m'envoie sa liste et son niveau. Ils vont
+-- dans SA fiche, à part (linkRecipes) : jamais dans mes recettes (CraftLink les garde,
+-- IsOwnProfessionOpen), jamais dans r.recipes, et RecipeTester n'en voit rien — aucune commande
+-- ne vise quelqu'un qui ne peut pas la recevoir (D10).
+-- ------------------------------------------------------------------
+local LINK_MAX_IDS = 400   -- borne de la SavedVariable, par métier
+local LV_QUIET = 1         -- s sans nouvel événement de la fenêtre avant de lire (D12)
+Dir._linkView = { key = nil, fresh = false, gen = 0 }
+
+-- Propriétaire (nom réseau, sans -Royaume, comme la lecture du chat) et métier de la vue liée
+-- ouverte ; nil pour ma vue, celle de la guilde ou d'un PNJ, ou un métier illisible.
+local function linkedViewKey()
+    local T = C_TradeSkillUI
+    if not (T and T.IsTradeSkillLinked) then return nil end
+    local ok, linked, owner = pcall(T.IsTradeSkillLinked)
+    if not (ok and linked) or COC.Api.IsSecret(owner) or type(owner) ~= "string" or owner == "" then return nil end
+    owner = owner:match("^([^%-]+)") or owner
+    local c = CL()
+    local prof = c and c.OpenProfession and c:OpenProfession()   -- nom lu dans la FENÊTRE, vide = nil
+    if not (prof and c:GetProfession(prof)) then return nil end
+    return owner, prof
+end
+
+local catCache = {}
+local function catalogueSet(c, prof)
+    local set = catCache[prof]
+    if set then return set end
+    set = {}
+    for _, e in ipairs(c:ProfessionCatalogue(prof)) do if e.spellID then set[e.spellID] = true end end
+    catCache[prof] = set
+    return set
+end
+
+-- Recettes APPRISES de la vue ouverte (`learned == true` exigé), et combien sont au catalogue de `prof`.
+local function readLearned(c, prof)
+    local T = C_TradeSkillUI
+    local enum = T.GetAllRecipeIDs or T.GetFilteredRecipeIDs   -- la 1re ignore les filtres de la fenêtre
+    if not (enum and T.GetRecipeInfo) then return nil end
+    local ok, list = pcall(enum)
+    if not (ok and type(list) == "table") then return nil end
+    local cat, ids, inCat = catalogueSet(c, prof), {}, 0
+    for _, id in ipairs(list) do
+        local ok2, info = pcall(T.GetRecipeInfo, id)
+        if ok2 and type(info) == "table" and info.learned == true then
+            ids[#ids + 1] = id
+            if cat[id] then inCat = inCat + 1 end
+            if #ids >= LINK_MAX_IDS then break end
+        end
+    end
+    return ids, inCat
+end
+
+-- Niveau affiché par la fenêtre (même source que la barre de Blizzard, Professions.GetProfessionInfo).
+local function readLevel()
+    local T, info = C_TradeSkillUI, nil
+    if T.GetChildProfessionInfo then local ok, i = pcall(T.GetChildProfessionInfo); if ok then info = i end end
+    if not (type(info) == "table" and (info.professionID or 0) ~= 0) and T.GetBaseProfessionInfo then
+        local ok, i = pcall(T.GetBaseProfessionInfo); info = ok and i or nil
+    end
+    local lvl = type(info) == "table" and tonumber(info.skillLevel)
+    if lvl and lvl > 0 then return lvl, tonumber(info.maxSkillLevel) end
+    return nil
+end
+
+-- Un événement de la fenêtre de métier (D12). Changement de propriétaire ou de métier : le client
+-- sert encore un moment l'ANCIENNE liste sous le nouveau nom, donc on attend une mise à jour de la
+-- liste survenue APRÈS le changement ; puis on lit au calme (LV_QUIET sans nouvel événement).
+function Dir:_OnTradeSkillEvent(event)
+    local view = self._linkView
+    local owner, prof = linkedViewKey()
+    local key = owner and (owner .. "\1" .. prof) or nil
+    if key ~= view.key then view.key, view.fresh = key, false
+    elseif event == "TRADE_SKILL_LIST_UPDATE" then view.fresh = true end
+    if not (key and view.fresh) then return end
+    view.gen = view.gen + 1
+    local gen = view.gen
+    local function run() if view.gen == gen then Dir:CaptureLinkedView() end end
+    if C_Timer and C_Timer.After then C_Timer.After(LV_QUIET, run) else run() end
+end
+
+-- Lit la vue liée, si elle est toujours celle qu'on suit et que sa liste est arrivée. Rend true si
+-- une fiche a été écrite.
+function Dir:CaptureLinkedView()
+    local view = self._linkView
+    local owner, prof = linkedViewKey()
+    if not (owner and view.fresh and (owner .. "\1" .. prof) == view.key) then return false end
+    if owner == COC.Api.PlayerName() or (COC.SECONDARY_PROF and COC.SECONDARY_PROF[prof]) then return false end
+    local ids, inCat = readLearned(CL(), prof)
+    if not ids or #ids == 0 or inCat * 2 < #ids then return false end   -- vide, ou liste d'un autre métier
+    self:NoteLinkedView(owner, prof, ids, readLevel())
+    return true
+end
+
+-- Range ce qu'on a lu dans SA fiche. Chaque lecture REMPLACE la précédente (jamais d'union, qui
+-- garderait une mauvaise lecture pour toujours) ; le niveau devient le plancher (D11).
+function Dir:NoteLinkedView(owner, prof, ids, lvl, maxLvl)
+    self.roster = self.roster or {}
+    local r = self.roster[owner]; if not r then r = {}; self.roster[owner] = r end
+    if self._ApplySource then self:_ApplySource(owner, r) end
+    r.faction = self._MyFaction and self:_MyFaction() or r.faction
+    local t = time()
+    r.lastSeen = t
+    r.linkSeen = r.linkSeen or {}; r.linkSeen[prof] = t
+    if not hasNetData(r, prof) then
+        r.linkRecipes = r.linkRecipes or {}
+        r.linkRecipes[prof] = { ids = ids, at = t, lvl = lvl, max = maxLvl }
+        r.craftSeen = r.craftSeen or {}
+        if (r.craftSeen[prof] or -1) < (lvl or 0) then r.craftSeen[prof] = lvl or 0 end
+    end
+    if not isCarrier(r) then r.nonAddon = true end
+    self:CapSeen(prof)
+    if COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end
+end
+
+if CreateFrame and COC.Api and COC.Api.RegisterEventsSafe then
+    local f = CreateFrame("Frame")
+    COC.Api.RegisterEventsSafe(f, { "TRADE_SKILL_SHOW", "TRADE_SKILL_LIST_UPDATE", "TRADE_SKILL_DATA_SOURCE_CHANGED" })
+    f:SetScript("OnEvent", function(_, event) Dir:_OnTradeSkillEvent(event) end)
 end

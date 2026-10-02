@@ -52,6 +52,18 @@ function UI._SeenOnlyByLink(r)
     return true
 end
 
+-- Infobulle d'un métier connu sans l'addon (item de la liste des métiers d'une ligne). Un clic sur
+-- son lien donne son niveau EXACT et ses recettes (`lk`, Directory_TradeLink) : on le dit tel quel,
+-- « N+ · vu crafter » serait faux. Sinon le plancher vu crafter, sinon d'où on le connaît.
+function UI._SeenSub(item)
+    local lk = item.lk
+    if lk and lk.lvl then
+        return string.format(L["%d/%d · lien de métier, %d recettes"], lk.lvl, lk.max or lk.lvl, #(lk.ids or {}))
+    end
+    if (item.est or 0) > 0 then return string.format(L["%d+ · vu crafter"], item.est) end
+    return item.link and L["lien de métier (sans l'addon)"] or L["vu crafter (sans l'addon)"]
+end
+
 -- Étiquette de droite. RELAIS et VU sont des états de la fiche : toujours dits. La source, elle, ne se
 -- dit que si elle apprend quelque chose : rien pour un joueur croisé (le cas général), rien quand une
 -- bande SOURCE est choisie (toutes les lignes porteraient la même), et le NOM de la communauté plutôt

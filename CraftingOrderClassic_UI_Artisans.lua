@@ -35,8 +35,8 @@ local function profsList(r)
         end
     end
     for key, floor in pairs(r.craftSeen or {}) do   -- non-porteur vu crafter (ou lien de métier) : plancher estimé
-        local link = (r.linkSeen and r.linkSeen[key]) and true or nil
-        if not (SEC[key] or seen[key]) then seen[key] = true; parts[#parts + 1] = { key = key, est = floor, link = link } end
+        local link, lk = (r.linkSeen and r.linkSeen[key]) and true or nil, r.linkRecipes and r.linkRecipes[key]
+        if not (SEC[key] or seen[key]) then seen[key] = true; parts[#parts + 1] = { key = key, est = floor, link = link, lk = lk } end
     end
     local rel = r.relayed                            -- fiche relayée par un partenaire (hors ligne)
     if rel then

@@ -17,13 +17,13 @@
 | `CraftingOrderClassic_Locale.lua` | socle de localisation du CHROME de l'UI. | 12 |
 | `CraftingOrderClassic_Locale_enUS.lua` | overlay ANGLAIS (enUS/enGB). | 279 |
 | `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 498 |
-| `CraftingOrderClassic_Locale_enUS_3.lua` | overlay enUS, 3/3. | 183 |
+| `CraftingOrderClassic_Locale_enUS_3.lua` | overlay enUS, 3/3. | 184 |
 | `CraftingOrderClassic_Locale_deDE.lua` | overlay ALLEMAND (deDE). | 280 |
 | `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 479 |
-| `CraftingOrderClassic_Locale_deDE_3.lua` | overlay deDE, 3/3. | 182 |
+| `CraftingOrderClassic_Locale_deDE_3.lua` | overlay deDE, 3/3. | 183 |
 | `CraftingOrderClassic_Locale_esES.lua` | overlay ESPAGNOL (esES/esMX). | 281 |
 | `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 480 |
-| `CraftingOrderClassic_Locale_esES_3.lua` | overlay esES, 3/3. | 183 |
+| `CraftingOrderClassic_Locale_esES_3.lua` | overlay esES, 3/3. | 184 |
 | `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 432 |
 | `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 429 |
 | `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 429 |
@@ -54,10 +54,10 @@
 | `CraftingOrderClassic_UI_Gather.lua` | onglet « Récolte » : ressources de récolte (minéraux, herbes, cuirs, poissons) + demande de quantité + prix par pile + ciblage récolteur. | 269 |
 | `CraftingOrderClassic_UI_Gather_Categories.lua` | onglet « Récolte », panneau gauche : repliage des en-têtes et remplissage des lignes (en-tête de section/sous-catégorie, ou ressource). | 79 |
 | `CraftingOrderClassic_UI_Artisans_Layout.lua` | GÉOMÉTRIE de l'onglet « Artisans » (annuaire social). | 45 |
-| `CraftingOrderClassic_UI_Artisans_Text.lua` | onglet « Artisans » : ce qu'une ligne de l'annuaire DIT. | 85 |
+| `CraftingOrderClassic_UI_Artisans_Text.lua` | onglet « Artisans » : ce qu'une ligne de l'annuaire DIT. | 97 |
 | `CraftingOrderClassic_UI_Artisans.lua` | onglet « Artisans » : annuaire social. | 469 |
 | `CraftingOrderClassic_UI_Artisans_Groups.lua` | fusion « une ligne par JOUEUR » (rerolls). | 200 |
-| `CraftingOrderClassic_UI_Artisans_Icons.lua` | onglet « Artisans » : tout ce qui est ICÔNE de métier. | 190 |
+| `CraftingOrderClassic_UI_Artisans_Icons.lua` | onglet « Artisans » : tout ce qui est ICÔNE de métier. | 189 |
 | `CraftingOrderClassic_UI_Artisans_Needs.lua` | la « BOURSE d'artisan » de l'onglet Artisans : pour un artisan du roster (partenaire, guildie, ami…), la LISTE DE COURSES des fournitures qu'il lui faut pour monter ses métiers — mats agrégés de SA route de progression (COC.Route, calculée 100 % en LOCAL depuis son rang SK diffusé + ses recettes décodées du bitfield RK ; prix Lazy Gold locaux, valables serveur entier). | 361 |
 | `CraftingOrderClassic_UI_Artisans_Muted.lua` | panel « En sourdine » de l'onglet Artisans. | 85 |
 | `CraftingOrderClassic_UI_Artisans_Channels.lua` | la section « Canaux surveillés » de l'onglet Artisans (spec docs/specs/canaux-surveilles.md, palier 3). | 153 |
@@ -137,7 +137,7 @@
 | `Directory_AltCodec.lua` | codec du fil ALT (liste des persos d'un même joueur) + vérification par réciprocité. | 119 |
 | `Directory_Alts.lua` | regroupement des rerolls : identité « joueur » multi-persos (verbe ALT). | 316 |
 | `Directory_LFW.lua` | statut « recherche de travail » (Looking For Work) + OFFRE par métier. | 356 |
-| `Directory_TradeLink.lua` | un lien de métier posté dans le chat ajoute son AUTEUR à l'annuaire, et l'annuaire ne garde que les artisans sans l'addon UTILES (spec docs/specs/lien-metier.md). | 143 |
+| `Directory_TradeLink.lua` | un lien de métier posté dans le chat ajoute son AUTEUR à l'annuaire, et l'annuaire ne garde que les artisans sans l'addon UTILES (spec docs/specs/lien-metier.md). | 272 |
 | `CraftingOrderClassic_Channels.lua` | RECONNAÎTRE un canal du jeu (spec docs/specs/canaux-surveilles.md). | 261 |
 | `CraftingOrderClassic_Notify.lua` | la SORTIE d'une alerte : ligne de chat, bandeau, son. | 39 |
 | `CraftingOrderClassic_LFWChat.lua` | détection « recherche de travail » dans le CHAT VISIBLE. | 140 |
@@ -2464,10 +2464,11 @@
 > Ni niveau ni recettes : le serveur ne les envoie qu'au CLIC. Le métier entre donc « connu, niveau
 > inconnu » (craftSeen = 0, D4) ; le sort de rang est gardé BRUT (linkSpell), jamais interprété.
 > Rien n'est envoyé à l'auteur (D7) : ni DiscoverPlayer, ni réponse. La lecture du chat elle-même
-> vit dans CraftingOrderClassic_LFWChat.lua ; ici, le décodage, la fiche et la purge.
+> vit dans CraftingOrderClassic_LFWChat.lua ; ici, le décodage, la fiche, la purge, et (phase 2) la
+> vue liée qu'ouvre MON clic sur son lien : ses recettes et son niveau, rangés dans SA fiche.
 > Méthodes sur COC.Directory (créé par Directory.lua, chargé avant dans le .toc).
 
-**API** : `Dir.ParseTradeLinks(text, guid)` · `Dir:NoteLinkSeen(name, prof, spell)` · `Dir:CapSeen(prof, cap)` · `Dir:CapSeenAll(cap)`
+**API** : `Dir.ParseTradeLinks(text, guid)` · `Dir:NoteLinkSeen(name, prof, spell)` · `Dir:CapSeen(prof, cap)` · `Dir:CapSeenAll(cap)` · `Dir:CaptureLinkedView()` · `Dir:NoteLinkedView(owner, prof, ids, lvl, maxLvl)`
 
 ### `CraftingOrderClassic_Channels.lua`
 > CraftingOrderClassic_Channels.lua — RECONNAÎTRE un canal du jeu (spec docs/specs/canaux-surveilles.md).

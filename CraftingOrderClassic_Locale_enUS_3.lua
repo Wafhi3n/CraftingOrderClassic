@@ -69,6 +69,7 @@ local en3 = {
     -- Lien de métier posté dans le chat (spec lien-metier, 2026-10-02)
     ["a lié son métier"] = "linked their profession",
     ["lien de métier (sans l'addon)"] = "profession link (no addon)",
+    ["%d/%d · lien de métier, %d recettes"] = "%d/%d · profession link, %d recipes",
     -- Annonce de la dispo LFW (2026-09-30)
     ["dispo annoncée sur %s."] = "availability announced in %s.",
     ["Quand tu actives ta dispo, poste aussi une ligne sur Trade (Services) : les joueurs avec ou sans l'addon voient que tu cherches du travail. Une ligne par activation, jamais au renouvellement automatique ; dans une capitale. Même réglage que la case du formulaire de commande."] =
