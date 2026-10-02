@@ -46,6 +46,16 @@ client.
 
 ## Relevés
 
+- 2026-10-02 11:17 — jusqu'a 60cccd0 — même séance, même build `main-dev@2bf827b 2026-10-02 11:04`
+  — **GO sur le critère 11 de `feat/lien-metier`** — capture du user, onglet Artisans de
+  l'observateur : « Gnomi Short », étiquette `SEEN`, icône Forge, sous-ligne « linked their
+  profession : Bla… », après son lien `[Blacksmithing]` sur Trade (relevé de 11:12). Remarques : la
+  sous-ligne coupe le nom du métier (largeur) ; la ligne porte aussi `[LFW]`, d'origine NON établie
+  à cette heure (la ligne de Trade vue à 11:12 n'avait pas de « LFW ») — le critère 12 n'est donc pas
+  tenu par ce relevé. **Pas observé** : l'infobulle de l'icône ; critères 12 et 18 ; garde D6
+  (un `/run` a rendu `A 0` après le clic sur le lien, mais le métier compté et la valeur d'avant
+  restent à confirmer).
+
 - 2026-10-02 11:12 — jusqu'a 60cccd0 — Forever, deux comptes, client de l'observateur en ANGLAIS ;
   build `main-dev@2bf827b 2026-10-02 11:04` avec docs/spec-lien-metier, feat/lien-metier,
   feat/liste-destinataires, feat/profit-arbitrages, fix/clic-recette-connue, release/v1.43.1 (copie
