@@ -50,7 +50,8 @@ Où on lit les liens :
 
 Ce qu'on en tire :
 
-- Le niveau reste **inconnu** : le lien n'en porte pas (D4).
+- Le lien ne porte pas le niveau, seulement le sort de rang du métier : on en déduit une
+  **tranche** (Apprenti 1–75, Compagnon 50–150…), D14.
 - S'il a l'addon, ses vraies données remplacent cette estimation quand elles arrivent par les
   voies habituelles (salle de découverte, annonces). Le lien seul ne lui envoie **rien** (D7).
 - Si la ligne est une ligne « LFW » et que le métier est donné par un lien, il passe aussi
@@ -60,11 +61,12 @@ Ce qu'on en tire :
 
 ### Phase 1 — l'annuaire ne garde que les artisans utiles
 
-Pour chaque métier, l'annuaire garde au plus **10** artisans connus seulement sans l'addon (D9).
-Au-delà, il oublie ce métier chez ceux qui en savent le moins (le niveau connu le plus bas, puis le
-signe de vie le plus ancien). Une fiche qui n'a plus rien à dire disparaît. Mes relations, mes
-partenaires, les porteurs de l'addon et les artisans qui sont [Dispo] en ce moment ne sont jamais
-touchés.
+Un artisan sans l'addon croisé en passant ne vaut d'être gardé que s'il apporte quelque chose :
+si un porteur de l'addon de ma guilde, ou vu ces derniers jours, sait déjà faire ce qu'il sait
+faire, l'annuaire l'oublie au bout d'une journée (D13). Et pour chaque métier, il en garde au plus
+**10** (D9, filet de sécurité), ceux qui en savent le plus. Une fiche qui n'a plus rien à dire
+disparaît. Mes relations, mes partenaires, les porteurs de l'addon et les artisans qui sont [Dispo]
+en ce moment ne sont jamais touchés.
 
 ### Phase 2 — quand je clique son lien
 
@@ -79,16 +81,15 @@ garde qui a corrigé ce bug (`IsOwnProfessionOpen` dans CraftLink) tient en jeu 
 2026-10-02 11:21) : la phase 2 se branche à côté d'elle, sur la même définition de « vue d'un
 autre ».
 
-Où montrer « il sait faire **cette** recette, sans l'addon » : voir Questions ouvertes. Pas encore
-construit (D10).
+« Il sait faire **cette** recette, sans l'addon » : un POC dans l'onglet Commande (D16), qui ne
+touche pas au ciblage d'une commande (D10).
 
 ## Ce qu'on NE fait PAS
 
 - **Ouvrir un lien tout seul pour lire les recettes.** Ce n'est plus passif : ça ouvre une
   fenêtre, ça interroge le serveur, et ça refermerait le métier que le joueur a ouvert. Les
   recettes ne viennent que d'un clic du joueur (phase 2).
-- **Interpréter le sort de rang** contenu dans le lien (Apprenti, Compagnon…) : voir D4 et la
-  question D4bis. On le garde brut dans la fiche, sans rien en déduire.
+- **Deviner une tranche** pour un sort de rang absent de la table (D14) : tranche inconnue.
 - **Attribuer un lien relayé.** « Demande à X [Enchantement] » : le lien appartient à X, pas à
   celui qui parle. On l'ignore (D3).
 - **Étendre les lignes LFW tapées à la guilde et aux chuchotements.** Seuls les liens y sont lus ;
@@ -148,8 +149,8 @@ construit (D10).
 - **D3 — Le lien compte seulement si son GUID est celui de l'émetteur** (12e argument de
   l'événement de chat). Sinon, il est ignoré. Raison : le jeu authentifie l'émetteur, pas ce dont
   il parle.
-- **D4 — Niveau inconnu.** Le métier entre « connu, niveau inconnu », comme une ligne LFW lue dans
-  le chat. Pas de tranche tirée du sort de rang tant qu'elle n'est pas mesurée (voir D4bis).
+- ~~**D4 — Niveau inconnu.**~~ Remplacée par D14 le 2026-10-02 (décision du user). Le plancher
+  `craftSeen` d'un lien reste à 0 ; la tranche se déduit du sort de rang à la lecture.
 - **D5 — LFW + lien = [Dispo].** Combler le trou de `_Parse` fait partie de la fonctionnalité, pas
   d'un chantier à part.
 - **D6 — La phase 2 attend le banc.** Pas une ligne de code de phase 2 avant un relevé, au
@@ -163,25 +164,24 @@ construit (D10).
 - **D8 — Les liens se lisent aussi en guilde et en chuchotement.** Décidé par le user le
   2026-10-02 (« oui, on lit les liens en guilde, ceux qui n'ont pas l'addon »). La guilde et le
   canal des officiers suivent la case « guilde » de « Canaux surveillés » ; les chuchotements n'ont
-  pas de case et suivent `/co lfwchat` seul. ⚠️ Les chuchotements viennent du « oui » du user à la
-  question « chuchotements et guilde ? », sa phrase ne nommant que la guilde : **à rayer s'il ne
-  les voulait pas.**
-- **D9 — Au plus 10 artisans sans l'addon par métier.** Décidé par le user le 2026-10-02 (« on
-  pourrait purger les inutiles, inutile de garder 50 travailleurs du cuir niveau 20 ») ; la règle
-  et le nombre **10** sont une proposition de l'agent, le nombre est à confirmer.
+  pas de case et suivent `/co lfwchat` seul. Chuchotements **confirmés** par le user le 2026-10-02
+  (« oui on garde la lecture des chuchotements »).
+- **D9 — Au plus 10 artisans sans l'addon par métier : FILET DE SÉCURITÉ.** Décidé par le user le
+  2026-10-02 (« on pourrait purger les inutiles, inutile de garder 50 travailleurs du cuir niveau
+  20 ») ; règle et nombre **10** proposés par l'agent. Le user a précisé ensuite ce qu'il visait
+  (D13) : la règle qui trie vraiment est la redondance ; ce plafond ne joue que si un métier se
+  remplit quand même.
   - *Candidats* : les fiches qui ne sont ni une relation (guilde, ami, ajout à la main, cercle —
     la liste que garde déjà `PruneRoster`), ni un partenaire, ni une fiche relayée, ni porteuses de
     vraies données réseau (`skill`, `recipes`), ni [Dispo] en ce moment.
-  - *Classement* : le niveau connu le plus haut d'abord (`craftSeen[prof]`), puis le signe de vie le
-    plus récent pour ce métier.
-  - *Au-delà de 10* : la fiche oublie ce métier (`craftSeen`, `linkSeen`, `linkSpell`, `cdSeen` de
-    ce métier). Si elle n'a plus aucun métier, elle disparaît.
+  - *Classement* : le niveau connu le plus haut d'abord (plancher « vu crafter », niveau du dernier
+    clic (D11) ou plancher de la tranche du lien (D14), le plus haut), puis le signe de vie le plus
+    récent pour ce métier.
+  - *Au-delà de 10* : la fiche oublie ce métier (`craftSeen`, `linkSeen`, `linkSpell`,
+    `linkRecipes`, `seenRecipes`, `cdSeen` de ce métier). Si elle n'a plus aucun métier, elle
+    disparaît.
   - *Quand* : à chaque nouvelle entrée d'un métier (lien, ou « vu crafter » du repérage alentour),
     pour ce métier ; et une fois à la connexion, pour tous.
-  - *Limite connue* : un lien ne donne pas de niveau (D4). Entre artisans connus seulement par un
-    lien, la purge garde donc les plus récents, pas les meilleurs ; elle ne sait distinguer « niveau
-    20 » de « niveau 280 » que si un niveau est connu (« vu crafter », clic sur son lien (D11), ou
-    D4bis).
 - **D10 — Les recettes d'un lien ne servent jamais à commander.** Proposée par l'agent le
   2026-10-02. Elles vivent à part (`linkRecipes`) et `RecipeTester`, `Handoff:CanCraft`, l'alerte
   de butin et le ciblage d'une commande n'en voient rien. Raison : dans COC, le seul endroit qui
@@ -201,20 +201,44 @@ construit (D10).
   changement de propriétaire ou de métier, au calme (1 s sans nouvel événement) ; on écarte une
   liste dont moins de la moitié des recettes appartient au métier lu ; et chaque lecture REMPLACE
   la précédente (jamais d'union, qui garderait une mauvaise lecture pour toujours).
+- **D13 — Un artisan sans l'addon déjà COUVERT par un porteur ne reste qu'une journée.** Décidé par
+  le user le 2026-10-02 : « si on scanne quelqu'un qui a un plan que quelqu'un a déjà avec l'addon
+  et qui est co récemment / guilde, inutile de le garder, ou alors le temps de la session ou une
+  journée ». Mise en forme par l'agent :
+  - *Porteur qui couvre* : une fiche à vraies données réseau, de ma guilde OU avec un signe de vie
+    de moins de **3 jours** (« co récemment », durée proposée par l'agent).
+  - *Couvert* : si on connaît ses recettes (vues crafter, ou lues au clic sur son lien), chacune
+    est connue d'au moins un porteur qui couvre (son registre réseau, `RecipeTester`) ; si on ne
+    connaît que le métier, un porteur qui couvre l'exerce à un niveau au moins égal au sien.
+  - *Gardé une journée* : un artisan couvert n'est oublié (pour ce métier) que si son dernier signe
+    de vie a plus de **24 h** — il survit donc à la séance où on l'a croisé.
+  - *Candidats* : les mêmes que D9 (jamais une relation, un partenaire, un porteur, un [Dispo]).
+  - *Quand* : à la connexion, avant le plafond D9.
+  - Pour savoir quelle recette un artisan a crafté sous nos yeux, le repérage alentour la retient
+    désormais (`seenRecipes[prof][spellID]`) ; il ne gardait qu'un plancher de niveau.
+- **D14 — Le sort de rang du lien donne une TRANCHE.** Décidé par le user le 2026-10-02 (« oui
+  très bonne idée », sur D4bis), revient sur D4. Table des sorts de rang Vanilla (Apprenti 1–75,
+  Compagnon 50–150, Expert 125–225, Artisan 200–300, le premier nombre = le niveau requis pour
+  apprendre la tranche) ; trois mesurés sur Camelot le 2026-10-02 (7412 Enchantement Compagnon vu à
+  102/150, 2550 Cuisine Apprenti, 2018 Forge Apprenti vu à 1/75). La tranche se DÉDUIT de
+  `linkSpell` à la lecture (jamais copiée dans le plancher `craftSeen`, même raison que D11) ; elle
+  sert au classement D9, à la couverture D13 et à l'infobulle (« 50-150 · lien de métier »). Un
+  sort absent de la table = tranche inconnue, jamais devinée.
+- **D15 — Sous-ligne « par lien : <métier> ».** Décidé par le user le 2026-10-02 : « a lié son
+  métier » coupait le nom du métier (relevé de 11:17).
+- **D16 — POC « sait faire cette recette, sans l'addon » dans l'onglet Commande.** Demandé par le
+  user le 2026-10-02 (« fais un POC »), emplacement proposé par l'agent : sous le nom du plan
+  choisi, la sous-ligne ajoute « · sans l'addon : N » ; au survol, une infobulle nomme ces artisans
+  et dit d'où on le sait (par lien / vu crafter) ; un clic chuchote au premier. Sources : recettes
+  lues au clic sur leur lien (D11) et recettes vues crafter (D13). Ne touche pas au ciblage de la
+  commande (D10). Fichier à part, retirable d'un geste si le POC ne convainc pas.
 
 ## Questions ouvertes
 
-- **Où montrer « sait faire cette recette, sans l'addon » ?** (D10) Par exemple une ligne sous la
-  liste d'artisans de l'onglet Commande (« sans l'addon, la connaissent : X, Y — chuchoter »), ou
-  dans l'infobulle d'une recette. **Au user de choisir** ; rien n'est construit en attendant.
-
-- **D4bis — lire la tranche du sort de rang ?** Le lien porte le sort de rang du métier. Sur
-  Camelot, deux valeurs mesurées correspondent aux identifiants Vanilla : 7412 = Enchantement
-  Compagnon (vu à 102/150), 2550 = Cuisine Apprenti. Une table Vanilla (Apprenti / Compagnon /
-  Expert / Artisan, planchers 0 / 50 / 125 / 200) permettrait à la purge d'oublier d'abord les
-  Apprentis, ce qui est exactement le « niveau 20 » du user. **Revient sur D4 : au user de
-  trancher.** En attendant, le sort est gardé brut (`linkSpell`).
-- **D9 : 10 par métier, le bon nombre ?** Proposé par l'agent.
+- **D13 : 3 jours pour « co récemment », 24 h de grâce : les bons nombres ?** Proposés par l'agent.
+- **D16 : le POC convainc-il ?** À juger en jeu ; s'il reste, l'emplacement et la forme sont à
+  revoir avec le user.
+- **D9 : 10 par métier, le bon nombre ?** Proposé par l'agent ; filet de sécurité depuis D13.
 - ~~Phase 2, à mesurer avant de coder~~ — **mesuré le 2026-10-02 11:21** : `IsTradeSkillLinked()`
   rend le nom COMPLET (le titre « Blacksmithing [Gnomi Short] » en vient,
   Blizzard_ProfessionsFrame.lua:255) ; le niveau du propriétaire s'affiche dans la vue liée (1/75).
@@ -282,6 +306,19 @@ construit (D10).
     pour la Forge de Gnomi vue le 2026-10-02). Avant : sonde `/dump C_TradeSkillUI.GetChildProfessionInfo()`
     dans la vue liée, `skillLevel` = celui du titre de la fenêtre (D11). Témoin : la barre de la
     fenêtre native.
+21. **[test]** Tranche (D14) : 7412 → 50–150, 2018 → 1–75, un sort inconnu → rien ; le classement
+    D9 la lit ; l'infobulle d'un lien sans clic dit « 50-150 · lien de métier » ; le plancher
+    `craftSeen` n'est pas touché.
+22. **[test]** Redondance (D13) : un artisan vu crafter une recette qu'un porteur de ma guilde
+    connaît, vu il y a plus de 24 h, est oublié ; moins de 24 h, gardé ; une recette que personne
+    ne connaît, gardé ; un porteur hors guilde vu il y a plus de 3 jours ne couvre pas ; seulement
+    un métier connu : couvert par un porteur de niveau au moins égal ; jamais une relation, un
+    partenaire, un [Dispo].
+23. **[test]** POC (D16) : les artisans sans l'addon qui savent faire une recette (lue au clic ou
+    vue crafter) sont rendus, les porteurs non ; la sous-ligne « par lien : » (D15).
+24. **[humain]** Au banc, onglet Commande, plan connu de Gnomi (clic sur son lien d'abord) : la
+    sous-ligne du plan dit « · without addon: 1 », l'infobulle nomme Gnomi Short « via link », un clic
+    ouvre un chuchotement à Gnomi. Témoin : un plan que Gnomi ne connaît pas n'affiche rien.
 
 ## Contrat
 
@@ -293,7 +330,8 @@ Rien ne change sur le fil : rien n'est envoyé. Le contrat est la fiche persist�
 | `craftSeen[prof]` | plancher de niveau ; `0` = connu sans l'addon, niveau inconnu. Jamais baissé | oui |
 | `nonAddon` | connu seulement sans l'addon ; l'affichage le recalcule si des vraies données arrivent | oui |
 | `linkSeen[prof]` | horodatage du dernier lien vu pour ce métier (sous-ligne, classement de la purge) | **nouveau** |
-| `linkSpell[prof]` | sort de rang lu dans le dernier lien, brut, jamais interprété (D4bis) | **nouveau** |
+| `linkSpell[prof]` | sort de rang lu dans le dernier lien, brut ; la tranche s'en déduit à la lecture (D14) | **nouveau** |
+| `seenRecipes[prof]` | `{ [spellID] = horodatage }` des recettes vues crafter par le repérage alentour (D13, D16) | **nouveau** |
 | `linkRecipes[prof]` | phase 2 : `{ ids = {…}, at, lvl, max }`, recettes apprises et niveau lus en cliquant son lien ; remplacé à chaque lecture, oublié par la purge | **nouveau** |
 
 Invariants : `skill` et `recipes` d'une fiche restent réservés aux données réseau ; un lien n'y
