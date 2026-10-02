@@ -46,6 +46,15 @@ client.
 
 ## Relevés
 
+- 2026-10-02 09:30 — jusqu'a a1560ee — Forever build client 70170, même build addon `main-dev@2709aa5`
+  — **GO, sur la parole du user** — suite du relevé de 09:20 sur la v1.42.1 : l'onglet Nouveautés
+  montre la v1.42.1 ; la relance du dernier métier à l'ouverture de la fenêtre (nouveauté du 70170)
+  « fonctionne » ; le bouton Enchantement de la fenêtre d'échange « fonctionne ». Le détail (sur quel
+  métier la fenêtre s'est ouverte, quel compte, une erreur ou non) n'a pas été dit.
+  ⚠️ **Toujours non observé** : `/dump … IS_MAINLINE` (la capture de Rédemption montre `/dump` parti
+  SANS expression : « empty result » ne dit rien de COC), et le clic droit sur le BOUTON minimap de COC
+  (le user cliquait sur la minimap elle-même : un ping).
+
 - 2026-10-02 09:20 — jusqu'a 321029b — Forever build client 70170, build addon `main-dev@2709aa5
   2026-10-02 09:11` d'après `deploy.ps1` (`/co version` pas relu), Enchantement 102/150, client en
   ANGLAIS — **GO partiel**, deux captures du user.
