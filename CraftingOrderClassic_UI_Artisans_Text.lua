@@ -42,6 +42,16 @@ function UI._ArtSubLine(pres, level, rep, via)
     return table.concat(parts, " · ")
 end
 
+-- Sous-ligne d'un non-porteur : « a lié son métier » si TOUS ses métiers vus sans l'addon viennent
+-- d'un lien (Directory_TradeLink) ; un seul métier vu crafter garde « vu crafter ».
+function UI._SeenOnlyByLink(r)
+    if not (r and r.linkSeen and r.craftSeen) then return false end
+    for key in pairs(r.craftSeen) do
+        if not r.linkSeen[key] then return false end
+    end
+    return true
+end
+
 -- Étiquette de droite. RELAIS et VU sont des états de la fiche : toujours dits. La source, elle, ne se
 -- dit que si elle apprend quelque chose : rien pour un joueur croisé (le cas général), rien quand une
 -- bande SOURCE est choisie (toutes les lignes porteraient la même), et le NOM de la communauté plutôt

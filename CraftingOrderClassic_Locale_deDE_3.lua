@@ -174,6 +174,9 @@ local de3 = {
     ["Aucun de tes persos ne sait faire %s."] = "Keiner deiner Charaktere kann %s herstellen.",
     ["%d commandes attendent dans ce métier."] = "%d Aufträge warten in diesem Beruf.",
     ["Ouvrir la fenêtre de métier"] = "Berufsfenster öffnen",
+    -- Lien de métier posté dans le chat (spec lien-metier, 2026-10-02)
+    ["a lié son métier"] = "Beruf verlinkt",
+    ["lien de métier (sans l'addon)"] = "Berufslink (ohne Addon)",
 }
 
 for k, v in pairs(de3) do L[k] = v end

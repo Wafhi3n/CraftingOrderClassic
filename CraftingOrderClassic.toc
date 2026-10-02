@@ -165,6 +165,7 @@ Directory_Relay.lua
 Directory_AltCodec.lua
 Directory_Alts.lua
 Directory_LFW.lua
+Directory_TradeLink.lua
 CraftingOrderClassic_Channels.lua
 CraftingOrderClassic_Notify.lua
 CraftingOrderClassic_LFWChat.lua

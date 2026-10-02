@@ -37,7 +37,7 @@ local en2 = {
     ["Marquer comme partenaire"] = "Mark as partner", ["Retirer des partenaires"] = "Remove from partners",
     -- Recherche de travail (LFW) : /co lfw
     ["[Dispo]"] = "[LFW]",
-    ["Chercher du travail"] = "Look for work", ["scan LFW du chat : |cFF33DD33activé|r"] = "chat LFW scan: |cFF33DD33on|r", ["scan LFW du chat : |cFFFFCC00désactivé|r"] = "chat LFW scan: |cFFFFCC00off|r", ["propose : %s"] = "offers: %s", ["Proposer cette recette (recherche de travail)"] = "Offer this recipe (looking for work)", ["Maximum %d recettes proposées."] = "Up to %d offered recipes.",
+    ["Chercher du travail"] = "Look for work", ["lecture du chat (LFW, liens de métier) : |cFF33DD33activé|r"] = "chat reading (LFW, profession links): |cFF33DD33on|r", ["lecture du chat (LFW, liens de métier) : |cFFFFCC00désactivé|r"] = "chat reading (LFW, profession links): |cFFFFCC00off|r", ["propose : %s"] = "offers: %s", ["Proposer cette recette (recherche de travail)"] = "Offer this recipe (looking for work)", ["Maximum %d recettes proposées."] = "Up to %d offered recipes.",
     ["Tu cherches du travail — clic pour arrêter."] = "You're looking for work — click to stop.",
     ["Signale au royaume que tu cherches du travail dans ce métier."] = "Tell the realm you're looking for work in this profession.",
     ["recherche de travail : |cFF33DD33%s|r — /co lfw off pour arrêter"] = "looking for work: |cFF33DD33%s|r — /co lfw off to stop",

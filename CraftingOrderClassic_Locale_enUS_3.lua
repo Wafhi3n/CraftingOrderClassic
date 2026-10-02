@@ -175,6 +175,9 @@ local en3 = {
     ["Aucun de tes persos ne sait faire %s."] = "None of your characters can make %s.",
     ["%d commandes attendent dans ce métier."] = "%d orders are waiting in this profession.",
     ["Ouvrir la fenêtre de métier"] = "Open the profession window",
+    -- Lien de métier posté dans le chat (spec lien-metier, 2026-10-02)
+    ["a lié son métier"] = "linked their profession",
+    ["lien de métier (sans l'addon)"] = "profession link (no addon)",
 }
 
 for k, v in pairs(en3) do L[k] = v end

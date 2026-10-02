@@ -10,7 +10,7 @@ local L = COC.L
 local de2 = {
     -- Arbeitssuche (LFW) : /co lfw
     ["[Dispo]"] = "[Sucht]",
-    ["Chercher du travail"] = "Arbeit suchen", ["scan LFW du chat : |cFF33DD33activé|r"] = "Chat-LFW-Scan: |cFF33DD33an|r", ["scan LFW du chat : |cFFFFCC00désactivé|r"] = "Chat-LFW-Scan: |cFFFFCC00aus|r", ["propose : %s"] = "bietet an: %s", ["Proposer cette recette (recherche de travail)"] = "Dieses Rezept anbieten (Arbeit suchen)", ["Maximum %d recettes proposées."] = "Höchstens %d angebotene Rezepte.",
+    ["Chercher du travail"] = "Arbeit suchen", ["lecture du chat (LFW, liens de métier) : |cFF33DD33activé|r"] = "Chat lesen (LFW, Berufslinks): |cFF33DD33an|r", ["lecture du chat (LFW, liens de métier) : |cFFFFCC00désactivé|r"] = "Chat lesen (LFW, Berufslinks): |cFFFFCC00aus|r", ["propose : %s"] = "bietet an: %s", ["Proposer cette recette (recherche de travail)"] = "Dieses Rezept anbieten (Arbeit suchen)", ["Maximum %d recettes proposées."] = "Höchstens %d angebotene Rezepte.",
     ["Tu cherches du travail — clic pour arrêter."] = "Du suchst Arbeit — Klick zum Beenden.",
     ["Signale au royaume que tu cherches du travail dans ce métier."] = "Sag dem Realm, dass du in diesem Beruf Arbeit suchst.",
     ["recherche de travail : |cFF33DD33%s|r — /co lfw off pour arrêter"] = "Arbeit gesucht: |cFF33DD33%s|r — /co lfw off zum Beenden",

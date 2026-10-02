@@ -79,6 +79,7 @@ function Dir:_NoteSeen(who, prof, spellID)
     r.lastSeen = time and time() or 0
     self:_ApplySource(who, r)          -- guilde/ami si relation, sinon « recent » (Annuaire)
     self:DiscoverPlayer(who)           -- s'il a l'addon → vraies données (ping throttlé 60 s, invisible sinon)
+    if self.CapSeen then self:CapSeen(prof) end   -- au plus Dir.SEEN_CAP par métier (Directory_TradeLink, D9)
     if COC.UI and COC.UI.artisansPanel and COC.UI.artisansPanel:IsShown() and COC.UI.RefreshArtisans then
         COC.UI:RefreshArtisans()
     end

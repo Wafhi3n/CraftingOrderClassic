@@ -175,6 +175,9 @@ local es3 = {
     ["Aucun de tes persos ne sait faire %s."] = "Ninguno de tus personajes sabe hacer %s.",
     ["%d commandes attendent dans ce métier."] = "%d pedidos esperan en esta profesión.",
     ["Ouvrir la fenêtre de métier"] = "Abrir la ventana de profesión",
+    -- Lien de métier posté dans le chat (spec lien-metier, 2026-10-02)
+    ["a lié son métier"] = "enlazó su profesión",
+    ["lien de métier (sans l'addon)"] = "enlace de profesión (sin el addon)",
 }
 
 for k, v in pairs(es3) do L[k] = v end

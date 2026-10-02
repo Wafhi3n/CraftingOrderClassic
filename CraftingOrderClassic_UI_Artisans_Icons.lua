@@ -174,7 +174,8 @@ function UI:_SetArtProfIcons(row, list, r, name)
         local rr = item.r or r                       -- fusion : rentabilité/CD viennent du PORTEUR, pas de la vitrine
         self:_SetArtProfitBorder(ic, item, rr)
         local sub = item.sv and ((item.sv[1] or "?") .. "/" .. (item.sv[2] or "?"))
-            or (item.est ~= nil and ((item.est > 0) and string.format(L["%d+ · vu crafter"], item.est) or L["vu crafter (sans l'addon)"]))
+            or (item.est ~= nil and ((item.est > 0) and string.format(L["%d+ · vu crafter"], item.est)
+                or (item.link and L["lien de métier (sans l'addon)"]) or L["vu crafter (sans l'addon)"]))
             or nil
         if item.who then sub = (sub and (sub .. " — ") or "") .. item.who end   -- ligne fusionnée : PORTEUR du métier
         ic.tipSub = sub
