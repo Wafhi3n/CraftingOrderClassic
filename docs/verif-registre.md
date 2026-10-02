@@ -46,6 +46,22 @@ client.
 
 ## Relevés
 
+- 2026-10-02 10:06 — jusqu'a 92c52a1 — Forever, DEUX comptes (Gnomi poste, Rédemption reçoit), en
+  ville ; build `main-dev@2709aa5 2026-10-02 09:11` avec icone-commande-recue, liste-destinataires,
+  profit-arbitrages (copie déployée du `.toc`) — **GO sur le critère 12 et le vert (11 d) de l'icône,
+  avec une amitié SIMULÉE** — Gnomi poste deux vraies commandes par DevMacro (`PostEntry`) :
+  Gnomi Short-53 « Amis », Cape en lin (Couture, seul Anatarion sait) ; Gnomi Short-54 « Tous », Kit
+  d'armure léger (Cuir, seule Sheadra sait). Les deux arrivent chez Rédemption sans numéro de recette,
+  avec leur métier ; l'addon retrouve la recette par l'objet (2387, 2152) et le reroll qui sait faire.
+  **1er essai (2026-10-01 18:15) : rien ne s'allume**, et c'est la règle : Gnomi est niveau 2, sous le
+  seuil anti-robots (5) que l'alerte applique aussi (`sousSeuil=true niveau=2` relevé par `/dm 4`).
+  Après `/co trust Gnomi Short` et `/reload` : **icône Cuir au « 1 » jaune, pas d'icône Couture** (vu
+  par le user) ; `/dm 1` met Gnomi dans les amis de l'addon → **icône Couture au « 1 » vert** (vu) ;
+  Gnomi annule (`/dm 5`) → **les deux s'éteignent** (vu ; relu par l'agent : statut `cancelled`,
+  icônes `cachée` à 10:05:50). Mode daltonien coupé. BugGrabber : rien de COC ce jour. **Pas
+  observé** : la vraie liste d'amis (le système d'amis du jeu est COUPÉ sur la bêta, « This system is
+  currently disabled ») ; une vraie guilde ; le taint (critère 7) ; le clic depuis une commande reçue
+  par le réseau (vu le 2026-09-30 sur les commandes posées localement).
 - 2026-09-30 19:06 — jusqu'a 92c52a1 — Forever, client de Rédemption, en ANGLAIS, en ville ; build
   `main-dev@48bcc3f 2026-09-30 19:02` avec icone-commande-recue, liste-destinataires, options-notifs,
   profit-arbitrages (copie déployée du `.toc`) — **GO sur le 3e tour de l'icône (critère 11 a, b, c, e,

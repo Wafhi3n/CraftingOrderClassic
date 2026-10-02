@@ -1,10 +1,11 @@
 # Icônes « une commande t'attend » dans la barre de la minicarte
 
 > État : **2e version vue en jeu à deux comptes** (relevé 2026-09-30 18:25, critères 5 et 6, sauf le
-> clic d'un métier que le perso n'a pas) ; **3e tour vu en jeu sur un client** (relevé 2026-09-30
-> 19:06, critère 11 sauf (d) le vert ; section « 3e tour » ci-dessous : le clic selon qui sait faire,
-> les commandes non nommées qu'un de tes persos sait faire, la couleur du nombre) ; 11 (d) et 12 à
-> observer à deux comptes. · Rédigée le 2026-09-28 · Idée du user le 2026-09-27, périmètre tranché par lui en trois
+> clic d'un métier que le perso n'a pas) ; **3e tour vu en jeu** (section « 3e tour » ci-dessous : le
+> clic selon qui sait faire, les commandes non nommées qu'un de tes persos sait faire, la couleur du
+> nombre) : critère 11 sur un client (relevé 2026-09-30 19:06), 11 (d) le vert et 12 à deux comptes
+> (relevé 2026-10-02 10:06, amitié simulée : la liste d'amis du jeu est coupée sur la bêta). Reste
+> non vu : le taint (critère 7). · Rédigée le 2026-09-28 · Idée du user le 2026-09-27, périmètre tranché par lui en trois
 > tours de questions (cf. Décisions).
 > Cible : WoW: Forever / Camelot (16001) · Addon : Crafting Order - Classic
 > Deuxième usage de l'outil d'icônes de la minicarte (spec `icone-minicarte.md`, rangs 4.xx).
@@ -206,6 +207,12 @@ sourdine) ; et **dès que tu l'acceptes**, elle n'attend plus.
   l'apprendre » quand les sources le savent et un bouton « Ouvrir la fenêtre de métier » si le perso
   connecté a le métier. Hors combat seulement pour la vue reroll (elle détache la native).
 - **Rerolls de l'autre camp** : exclus, comme dans « Mes artisans ».
+- **Acheteur sous le seuil anti-robots** (niveau connu < 5, `/co lowlevel`) : sa non nommée n'allume
+  rien, comme elle ne sonne pas (`Orders:_ShouldAlert`). Vu en jeu le 2026-10-01 : Gnomi, niveau 2,
+  n'allumait rien avant `/co trust`. Ce n'est pas un défaut ; un testeur qui poste depuis un petit
+  perso doit le savoir.
+- **Commande reçue par le réseau** : une commande d'objet voyage SANS son numéro de recette, avec son
+  métier ; la recette se retrouve par l'objet (catalogue `itemToSpell`). Vu en jeu le 2026-10-02.
 
 ### Critères d'acceptation (3e tour)
 
