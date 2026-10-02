@@ -46,6 +46,12 @@ client.
 
 ## Relevés
 
+- 2026-10-02 09:37 — jusqu'a a1560ee — Forever build client 70170, même build addon `main-dev@2709aa5`
+  — **GO** — fin de la liste de la v1.42.1 : `/dump CraftingOrderClassic.Api.IS_MAINLINE` → `[1]=true`
+  (capture du user) ; le clic droit sur le bouton COC de la minimap ouvre la fenêtre des métiers
+  (parole du user). Avec les relevés de 08:55, 09:20 et 09:30, tout ce que touchait le correctif
+  `WOW_PROJECT_ID` = 18 a été vu.
+
 - 2026-10-02 09:30 — jusqu'a a1560ee — Forever build client 70170, même build addon `main-dev@2709aa5`
   — **GO, sur la parole du user** — suite du relevé de 09:20 sur la v1.42.1 : l'onglet Nouveautés
   montre la v1.42.1 ; la relance du dernier métier à l'ouverture de la fenêtre (nouveauté du 70170)
