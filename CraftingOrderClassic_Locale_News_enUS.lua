@@ -11,6 +11,10 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "What's New",
+    -- v1.42.1
+    ["Les métiers remarchent après le patch du 2 octobre"] = "Professions work again after the October 2 patch",
+    ["Le patch du 2 octobre (build 70170) a changé le numéro par lequel le jeu indique quelle version de WoW tourne. L'addon ne le reconnaissait pas et éteignait tout ce qui touche aux métiers : plus de colonne Commandes à côté de la fenêtre de métier, plus de bouton Enchantement sur la fenêtre d'échange. Il reconnaît maintenant les deux numéros, rien à faire de ton côté."] =
+        "The October 2 patch (build 70170) changed the number the game uses to say which version of WoW is running. The addon didn't recognise it and switched off everything profession-related: no orders column next to the profession window, no Enchanting button on the trade window. It knows both numbers now, nothing to do on your side.",
     -- v1.42.0
     ["Tu choisis ce qui te prévient"] = "You choose what alerts you",
     ["En bas des « Canaux surveillés » de l'onglet Artisans, un groupe « Notifications » règle chaque alerte : les demandes lues dans le chat (« WTB [objet] »), les commandes des autres joueurs de l'addon, le suivi de tes commandes (remise, reçue, refusée) et le message à la connexion."] =
@@ -214,16 +218,11 @@ local news = {
         "Nobody can get you muted by posting fake orders under your name, and a buyer whose orders get relayed in a burst is no longer muted by mistake. \"X declined your order\" and the \"you can craft this\" nudge no longer replay on a loop, and nothing gets through from someone you've muted.",
     ["La vue métier n'affiche plus les commandes privées destinées à quelqu'un d'autre, ni les expirées. Ton compteur de crafts livrés ne peut plus être gonflé par un tiers. Et croiser un artisan coûte deux fois moins de messages : le bonjour porte maintenant tes métiers, ce qui règle aussi les artisans qui s'affichaient sans aucun métier."] =
         "The profession window no longer shows private orders meant for someone else, nor expired ones. Your delivered count can't be padded by a stranger. And crossing paths with an artisan costs half the messages it used to: saying hello now carries your professions, which also fixes artisans showing up with no professions at all.",
-    -- v1.15.0
-    ["Recherche de travail : signale que tu es dispo"] = "Looking for work: flag yourself as available",
-    ["Ouvre un métier et clique « Chercher du travail » : tout le royaume sait que tu es dispo, une icône d'artisan s'affiche au-dessus de ta tête pour ceux qui passent, et tu apparais « [Dispo] » dans leur annuaire. Ça s'éteint tout seul au bout d'un moment si tu oublies."] =
-        "Open a profession and click \"Look for work\": the whole realm knows you're available, an artisan icon shows over your head for anyone passing by, and you appear as \"[LFW]\" in their directory. It lapses on its own after a while if you forget.",
-    ["Au passage : les deux fenêtres ne s'emmêlent plus (un clic la ramène au premier plan), l'annuaire a un bouton partenaire et se limite à ta faction (pas d'échange cross-faction sur Classic), et un artisan ne s'affiche plus avec un métier qui n'est pas le sien."] =
-        "Along the way: the two windows no longer tangle (a click brings one to the front), the directory has a partner button and sticks to your faction (no cross-faction trading on Classic), and an artisan no longer shows a profession that isn't theirs.",
     -- (clés v1.8.0/v1.7.0/v1.7.1/v1.6.0/v1.5.0/v1.4.0 retirées : ces versions ne sont plus listées dans l'onglet Nouveautés)
     -- (clés v1.13.0 retirées à la v1.41.1 : version sortie de la fenêtre glissante de l'onglet)
     -- (clés v1.12.1 retirées : version sortie de la fenêtre glissante de l'onglet Nouveautés)
     -- (clés v1.12.0, v1.11.0 et v1.10.2 retirées à la v1.41.0 : versions sorties de la fenêtre glissante de l'onglet)
+    -- (clés v1.15.0 retirées à la v1.42.1 : version sortie de la fenêtre glissante de l'onglet)
     -- (clés v1.14.0 retirées à la v1.42.0 : version sortie de la fenêtre glissante de l'onglet)
     -- (clés v1.9.0 retirées : version sortie de la fenêtre glissante de l'onglet Nouveautés)
     ["VU"] = "SEEN",

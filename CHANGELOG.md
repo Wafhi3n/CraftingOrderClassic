@@ -1,5 +1,16 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.42.1 - Professions work again after the October 2 patch
+
+The October 2 patch (build 70170) changed the number WoW Forever gives addons to say which version of
+the game is running. It used to be the plain Retail value, and Forever now has one of its own. The
+addon only knew the old number, decided it wasn't on Forever, and switched off everything that
+touches professions. The orders column next to the profession window was gone, the Enchanting button
+stopped showing up on the trade window, and right-clicking the minimap button didn't open your
+professions anymore.
+
+It accepts both numbers now. Nothing to change on your side, just update.
+
 ## v1.42.0 - You choose what alerts you
 
 A player asked how to turn off the addon's messages, and the honest answer was a chat command

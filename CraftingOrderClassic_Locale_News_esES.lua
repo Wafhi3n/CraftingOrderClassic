@@ -8,6 +8,10 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "Novedades",
+    -- v1.42.1
+    ["Les métiers remarchent après le patch du 2 octobre"] = "Las profesiones vuelven a funcionar tras el parche del 2 de octubre",
+    ["Le patch du 2 octobre (build 70170) a changé le numéro par lequel le jeu indique quelle version de WoW tourne. L'addon ne le reconnaissait pas et éteignait tout ce qui touche aux métiers : plus de colonne Commandes à côté de la fenêtre de métier, plus de bouton Enchantement sur la fenêtre d'échange. Il reconnaît maintenant les deux numéros, rien à faire de ton côté."] =
+        "El parche del 2 de octubre (build 70170) cambió el número con el que el juego indica qué versión de WoW se está ejecutando. El addon no lo reconocía y apagaba todo lo relacionado con las profesiones: sin columna de pedidos junto a la ventana de profesión, sin botón de Encantamiento en la ventana de comercio. Ahora reconoce ambos números, no tienes que hacer nada.",
     -- v1.42.0
     ["Tu choisis ce qui te prévient"] = "Tú eliges qué te avisa",
     ["En bas des « Canaux surveillés » de l'onglet Artisans, un groupe « Notifications » règle chaque alerte : les demandes lues dans le chat (« WTB [objet] »), les commandes des autres joueurs de l'addon, le suivi de tes commandes (remise, reçue, refusée) et le message à la connexion."] =
@@ -211,16 +215,11 @@ local news = {
         "Nadie puede conseguir que te silencien publicando pedidos falsos en tu nombre, y un comprador cuyos pedidos se retransmiten en ráfaga ya no se silencia por error. «X ha rechazado tu pedido» y el aviso «sabes hacerlo» ya no se repiten en bucle, y no pasa nada de alguien a quien has silenciado.",
     ["La vue métier n'affiche plus les commandes privées destinées à quelqu'un d'autre, ni les expirées. Ton compteur de crafts livrés ne peut plus être gonflé par un tiers. Et croiser un artisan coûte deux fois moins de messages : le bonjour porte maintenant tes métiers, ce qui règle aussi les artisans qui s'affichaient sans aucun métier."] =
         "La ventana de profesión ya no muestra pedidos privados destinados a otra persona, ni los caducados. Tu contador de encargos entregados no puede inflarlo un tercero. Y cruzarte con un artesano cuesta la mitad de mensajes: el saludo ahora lleva tus profesiones, lo que también arregla los artesanos que aparecían sin ninguna profesión.",
-    -- v1.15.0
-    ["Recherche de travail : signale que tu es dispo"] = "Buscar trabajo: avisa que estás disponible",
-    ["Ouvre un métier et clique « Chercher du travail » : tout le royaume sait que tu es dispo, une icône d'artisan s'affiche au-dessus de ta tête pour ceux qui passent, et tu apparais « [Dispo] » dans leur annuaire. Ça s'éteint tout seul au bout d'un moment si tu oublies."] =
-        "Abre una profesión y haz clic en «Buscar trabajo»: todo el reino sabe que estás disponible, un icono de artesano aparece sobre tu cabeza para quien pase, y sales como «[Busca]» en su directorio. Se apaga solo al cabo de un rato si lo olvidas.",
-    ["Au passage : les deux fenêtres ne s'emmêlent plus (un clic la ramène au premier plan), l'annuaire a un bouton partenaire et se limite à ta faction (pas d'échange cross-faction sur Classic), et un artisan ne s'affiche plus avec un métier qui n'est pas le sien."] =
-        "De paso: las dos ventanas ya no se enredan (un clic la trae al frente), el directorio tiene un botón de socio y se limita a tu facción (sin comercio entre facciones en Classic), y un artesano ya no muestra una profesión que no es suya.",
     -- (clés v1.8.0/v1.7.0/v1.7.1/v1.6.0/v1.5.0/v1.4.0 retirées : ces versions ne sont plus listées dans l'onglet Nouveautés)
     -- (clés v1.13.0 retirées à la v1.41.1 : version sortie de la fenêtre glissante de l'onglet)
     -- (clés v1.12.1 retirées : version sortie de la fenêtre glissante de l'onglet Nouveautés)
     -- (clés v1.12.0, v1.11.0 et v1.10.2 retirées à la v1.41.0 : versions sorties de la fenêtre glissante de l'onglet)
+    -- (clés v1.15.0 retirées à la v1.42.1 : version sortie de la fenêtre glissante de l'onglet)
     -- (clés v1.14.0 retirées à la v1.42.0 : version sortie de la fenêtre glissante de l'onglet)
     -- (clés v1.9.0 retirées : version sortie de la fenêtre glissante de l'onglet Nouveautés)
     ["VU"] = "VISTO",
