@@ -237,10 +237,20 @@ A.TabTemplate = resolveTemplate({ "TabButtonTemplate", "PanelTabButtonTemplate" 
 
 -- ---------------------------------------------------------------- saveur courante
 
--- `WOW_PROJECT_ID == 1` (MAINLINE) sur Forever, valeurs Classic ailleurs. Sert à borner les
--- comportements qui ne peuvent PAS être normalisés (ex. métiers), pas à dupliquer du code.
-A.IS_MAINLINE = (_G.WOW_PROJECT_ID ~= nil and _G.WOW_PROJECT_MAINLINE ~= nil
-    and _G.WOW_PROJECT_ID == _G.WOW_PROJECT_MAINLINE) or false
+-- Vrai sur Forever (API MAINLINE), faux sur les valeurs Classic. Sert à borner les comportements
+-- qui ne peuvent PAS être normalisés (ex. métiers), pas à dupliquer du code.
+-- Forever a changé d'identifiant en cours de bêta : `WOW_PROJECT_ID == 1` (MAINLINE) jusqu'au
+-- build 70124, puis 18 (`WOW_PROJECT_CAMELOT`, nouveau fichier `Blizzard_ProjectConstants/Camelot/`)
+-- depuis le 70170. Relevé en jeu le 2026-10-02 : `18, 18, false` — l'ancienne comparaison au seul
+-- MAINLINE éteignait le backend métier, la greffe et l'échange d'enchant. Les deux valeurs
+-- désignent la même API ; une valeur Classic reste refusée (cf. tests/test_craft_flavor.lua).
+local function isMainlineProject()
+    local id = _G.WOW_PROJECT_ID
+    if id == nil then return false end
+    if _G.WOW_PROJECT_MAINLINE ~= nil and id == _G.WOW_PROJECT_MAINLINE then return true end
+    return _G.WOW_PROJECT_CAMELOT ~= nil and id == _G.WOW_PROJECT_CAMELOT
+end
+A.IS_MAINLINE = isMainlineProject()
 
 -- Les comms addon peuvent être bridées (instances sur Retail). Mesuré en jeu le 2026-09-18 :
 -- le prédicat rend `true` en monde ouvert sans pour autant bloquer — un envoi réel passe. On ne

@@ -36,6 +36,12 @@ local BODY_W = 780
 local function versionsTop()
     return {
         {
+            v = "v1.42.1", title = L["Les métiers remarchent après le patch du 2 octobre"],
+            lines = {
+                L["Le patch du 2 octobre (build 70170) a changé le numéro par lequel le jeu indique quelle version de WoW tourne. L'addon ne le reconnaissait pas et éteignait tout ce qui touche aux métiers : plus de colonne Commandes à côté de la fenêtre de métier, plus de bouton Enchantement sur la fenêtre d'échange. Il reconnaît maintenant les deux numéros, rien à faire de ton côté."],
+            },
+        },
+        {
             v = "v1.42.0", title = L["Tu choisis ce qui te prévient"],
             lines = {
                 L["En bas des « Canaux surveillés » de l'onglet Artisans, un groupe « Notifications » règle chaque alerte : les demandes lues dans le chat (« WTB [objet] »), les commandes des autres joueurs de l'addon, le suivi de tes commandes (remise, reçue, refusée) et le message à la connexion."],
@@ -432,14 +438,7 @@ local function versionsOldest()
                 L["La vue métier n'affiche plus les commandes privées destinées à quelqu'un d'autre, ni les expirées. Ton compteur de crafts livrés ne peut plus être gonflé par un tiers. Et croiser un artisan coûte deux fois moins de messages : le bonjour porte maintenant tes métiers, ce qui règle aussi les artisans qui s'affichaient sans aucun métier."],
             },
         },
-        {
-            v = "v1.15.0", title = L["Recherche de travail : signale que tu es dispo"],
-            lines = {
-                L["Ouvre un métier et clique « Chercher du travail » : tout le royaume sait que tu es dispo, une icône d'artisan s'affiche au-dessus de ta tête pour ceux qui passent, et tu apparais « [Dispo] » dans leur annuaire. Ça s'éteint tout seul au bout d'un moment si tu oublies."],
-                L["Au passage : les deux fenêtres ne s'emmêlent plus (un clic la ramène au premier plan), l'annuaire a un bouton partenaire et se limite à ta faction (pas d'échange cross-faction sur Classic), et un artisan ne s'affiche plus avec un métier qui n'est pas le sien."],
-            },
-        },
-        -- v1.14.0 (retirée à la v1.42.0), v1.13.0 (retirée à la v1.41.1), v1.12.0 / v1.11.0 / v1.10.2 (retirées à la v1.41.0 : la Saison de la Découverte, le canal du royaume et
+        -- v1.15.0 (retirée à la v1.42.1), v1.14.0 (retirée à la v1.42.0), v1.13.0 (retirée à la v1.41.1), v1.12.0 / v1.11.0 / v1.10.2 (retirées à la v1.41.0 : la Saison de la Découverte, le canal du royaume et
         -- le bouton « Créer » sécurisé n'existent pas sur Forever), v1.10.1 / v1.9.0 / v1.8.0 / v1.7.0 / v1.7.1 /
         -- v1.6.0 / v1.5.0 / v1.4.0 retirées de l'onglet (l'historique
         -- complet vit dans CHANGELOG.md). Cet onglet ne garde qu'une fenêtre glissante de versions :

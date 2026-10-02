@@ -46,6 +46,16 @@ client.
 
 ## Relevés
 
+- 2026-10-02 08:55 — jusqu'a 154cd1c — Forever build client **70170** (jour de patch), build addon
+  `main-dev@ce5e9fc 2026-10-02 08:50` d'après `deploy.ps1` (`/co version` pas relu en séance) —
+  **GO, sur la parole du user** — `fix/wow-project-camelot`.
+  **Avant le correctif** (v1.42.0, capture du user) : `/dump WOW_PROJECT_ID, WOW_PROJECT_CAMELOT,
+  CraftingOrderClassic.Api.IS_MAINLINE` → `18, 18, false` : le 70170 a changé l'identifiant de
+  Forever, et la garde de saveur éteignait le backend métier.
+  **Après** : le user rapporte « COC fonctionne correctement ». ⚠️ Le détail de ce qu'il a regardé
+  n'a pas été dit : le `/dump` de `IS_MAINLINE` à `true`, la colonne à côté de la fenêtre de
+  métier et `/co métier` étaient proposés, aucun n'est cité un par un.
+
 - 2026-09-30 22:20 — jusqu'a 598372c — Forever, 2 comptes (Gnomi / Sheadra), build `main-dev@7e165ee
   2026-09-30 19:41` d'après `deploy.ps1` (`/co version` pas relu en séance) — **GO** sur les
   cases NOTIFICATIONS (`feat/options-notifs`) — relu par l'agent dans `DevMacroDB.log`, grâce à un

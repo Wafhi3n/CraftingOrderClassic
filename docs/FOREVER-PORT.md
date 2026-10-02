@@ -14,7 +14,7 @@ Ce n'est **pas** une 1.15 modifiée. C'est le moteur d'UI **Retail** avec du con
 | Flavor | `wow_classic_beta` | `.flavor.info` |
 | Interface `.toc` | **16001** | capture d'API + manifestes tiers |
 | Suffixe `.toc` | **`_Camelot.toc`** | manifestes tiers — *à confirmer* |
-| `WOW_PROJECT_ID` | **1 (MAINLINE)** | capture d'API |
+| `WOW_PROJECT_ID` | **1 (MAINLINE)** — ⚠️ **18 (`WOW_PROJECT_CAMELOT`) depuis le build 70170** (2026-10-02, relevé en jeu ; `Api.IS_MAINLINE` accepte les deux) | capture d'API |
 | Base d'API | Mainline ~12.1.5 (Midnight), restrictions « addon disarmament » comprises | Blizzard / presse |
 | Beta → sortie | 17 sept → 21 oct ; sortie **4 novembre 2026** | presse |
 
