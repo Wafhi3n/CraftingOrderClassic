@@ -2,14 +2,14 @@
 
 > État : **validée** le 2026-10-02 · Idée du user (« si un joueur link son métier, ça l'ajoute
 > aussi ») · D1 à D7 proposées par l'agent, acceptées par le user ; D8 et D9 décidées par le user le
-> 2026-10-02 (sa réponse, mise en forme par l'agent) · Phase 1 en cours sur `feat/lien-metier`
-> Cible : WoW: Forever / Camelot (16001) uniquement · Addon : Crafting Order - Classic
+> 2026-10-02 (sa réponse, mise en forme par l'agent) ; D10 à D12 proposées par l'agent le même jour
+> · Cible : WoW: Forever / Camelot (16001) uniquement · Addon : Crafting Order - Classic
 >
-> Deux phases. **Phase 1** (lire le lien sans cliquer, et la purge qui va avec) se code maintenant ;
-> la mesure en jeu (palier 0) ouvre la séance de banc. **Phase 2** (garder ses recettes quand on
-> clique) est voulue par le user mais **attend le banc** : elle passe par la garde du métier lié du
-> 2026-09-27, fusionnée mais jamais vue en jeu (aucun relevé dans `docs/verif-registre.md` au
-> 2026-10-02).
+> **Phase 1 implémentée et vue en jeu** le 2026-10-02 (registre, relevés 11:12 à 11:24, build
+> `main-dev@2bf827b`) : critères 1, 11, 12, 18 tenus, plus la garde du métier lié (D6). Reste non vu :
+> Trade (Services), l'infobulle de l'icône, la purge (tests seulement).
+> **Phase 2** (garder ses recettes quand on clique) **débloquée** par le relevé D6 de 11:21 ; codée
+> sur `feat/lien-metier`, pas encore vue en jeu.
 
 ## Le problème
 
@@ -66,18 +66,21 @@ signe de vie le plus ancien). Une fiche qui n'a plus rien à dire disparaît. Me
 partenaires, les porteurs de l'addon et les artisans qui sont [Dispo] en ce moment ne sont jamais
 touchés.
 
-### Phase 2 — quand je clique son lien (attend le banc)
+### Phase 2 — quand je clique son lien
 
-Quand **je** clique le lien de métier d'un autre joueur, le jeu m'envoie sa liste de recettes. COC
-la range **dans sa fiche à lui**, jamais dans la mienne. L'onglet Artisans peut alors dire ce qu'il
-sait faire, et il peut apparaître parmi les artisans d'une recette, avec la mention « sans l'addon »
-(on le joint en chuchotant, pas par une commande). Le user le veut (2026-10-02 : « si on clique sur
-le lien d'une personne, on enregistre »).
+Quand **je** clique le lien de métier d'un autre joueur, le jeu m'envoie sa liste de recettes et
+son niveau. COC les range **dans sa fiche à lui**, jamais dans la mienne : l'infobulle du métier,
+dans l'onglet Artisans, dit son niveau et combien de recettes il connaît. Le niveau sert aussi à
+la purge (D9), qui garde alors les mieux placés au lieu des plus récents. Le user le veut
+(2026-10-02 : « si on clique sur le lien d'une personne, on enregistre »).
 
 C'est l'inverse du bug du 2026-09-27, quand COC s'appropriait les recettes du lien cliqué. La
-garde qui a corrigé ce bug (`IsOwnProfessionOpen` dans CraftLink, drapeau `PW._foreign` dans la
-colonne) est exactement le point où la phase 2 se branche. Tant qu'elle n'a pas été vue en jeu, on
-ne construit rien dessus (D6).
+garde qui a corrigé ce bug (`IsOwnProfessionOpen` dans CraftLink) tient en jeu (relevé du
+2026-10-02 11:21) : la phase 2 se branche à côté d'elle, sur la même définition de « vue d'un
+autre ».
+
+Où montrer « il sait faire **cette** recette, sans l'addon » : voir Questions ouvertes. Pas encore
+construit (D10).
 
 ## Ce qu'on NE fait PAS
 
@@ -177,9 +180,30 @@ ne construit rien dessus (D6).
     pour ce métier ; et une fois à la connexion, pour tous.
   - *Limite connue* : un lien ne donne pas de niveau (D4). Entre artisans connus seulement par un
     lien, la purge garde donc les plus récents, pas les meilleurs ; elle ne sait distinguer « niveau
-    20 » de « niveau 280 » que si un niveau est connu (« vu crafter », ou D4bis).
+    20 » de « niveau 280 » que si un niveau est connu (« vu crafter », clic sur son lien (D11), ou
+    D4bis).
+- **D10 — Les recettes d'un lien ne servent jamais à commander.** Proposée par l'agent le
+  2026-10-02. Elles vivent à part (`linkRecipes`) et `RecipeTester`, `Handoff:CanCraft`, l'alerte
+  de butin et le ciblage d'une commande n'en voient rien. Raison : dans COC, le seul endroit qui
+  liste les artisans d'une recette est le ciblage d'une commande, réservé aux porteurs de l'addon
+  à dessein ; un artisan sans l'addon ne peut pas recevoir une commande.
+- **D11 — Le niveau lu au clic devient le plancher** (`craftSeen[prof]`, jamais baissé). Proposée
+  par l'agent le 2026-10-02. ⚠️ Que `GetChildProfessionInfo()` rende dans une vue liée le niveau du
+  PROPRIÉTAIRE et pas le mien n'est pas encore mesuré (la barre 1/75 du relevé de 11:21 est
+  cohérente, sans trancher) : sonde au début de la prochaine séance.
+- **D12 — Une liste n'est retenue qu'une fois arrivée.** Proposée par l'agent le 2026-10-02.
+  Quand on passe d'une vue liée à une autre, le client garde un moment l'ancienne liste sous le
+  nouveau nom (vu le 2026-09-27 avec un lien fabriqué : nom de B, liste de l'Enchantement). On ne
+  lit donc qu'après une mise à jour de la liste (`TRADE_SKILL_LIST_UPDATE`) survenue APRÈS le
+  changement de propriétaire ou de métier, au calme (1 s sans nouvel événement) ; on écarte une
+  liste dont moins de la moitié des recettes appartient au métier lu ; et chaque lecture REMPLACE
+  la précédente (jamais d'union, qui garderait une mauvaise lecture pour toujours).
 
 ## Questions ouvertes
+
+- **Où montrer « sait faire cette recette, sans l'addon » ?** (D10) Par exemple une ligne sous la
+  liste d'artisans de l'onglet Commande (« sans l'addon, la connaissent : X, Y — chuchoter »), ou
+  dans l'infobulle d'une recette. **Au user de choisir** ; rien n'est construit en attendant.
 
 - **D4bis — lire la tranche du sort de rang ?** Le lien porte le sort de rang du métier. Sur
   Camelot, deux valeurs mesurées correspondent aux identifiants Vanilla : 7412 = Enchantement
@@ -188,9 +212,10 @@ ne construit rien dessus (D6).
   Apprentis, ce qui est exactement le « niveau 20 » du user. **Revient sur D4 : au user de
   trancher.** En attendant, le sort est gardé brut (`linkSpell`).
 - **D9 : 10 par métier, le bon nombre ?** Proposé par l'agent.
-- **Phase 2, à mesurer avant de coder** : le format du nom rendu par `IsTradeSkillLinked()` sur
-  Forever (prénom seul ou « Prénom Nom » ? un prénom seul est ambigu, il faudrait alors partir du
-  GUID du lien) ; le niveau du propriétaire lisible dans la vue liée.
+- ~~Phase 2, à mesurer avant de coder~~ — **mesuré le 2026-10-02 11:21** : `IsTradeSkillLinked()`
+  rend le nom COMPLET (le titre « Blacksmithing [Gnomi Short] » en vient,
+  Blizzard_ProfessionsFrame.lua:255) ; le niveau du propriétaire s'affiche dans la vue liée (1/75).
+  Reste à mesurer, voir D11 : que l'API rende bien SON niveau.
 
 ## Critères d'acceptation
 
@@ -243,7 +268,17 @@ ne construit rien dessus (D6).
     `/co trace`, armé avant le clic, ne montre aucun envoi provoqué par lui. Témoin : le relevé
     de la garde du métier lié (D6).
 15. **[test]** Des recettes lues dans une vue liée ne vont jamais dans mes recettes connues ni dans
-    les recettes réseau d'une fiche (`r.recipes`).
+    les recettes réseau d'une fiche (`r.recipes`), et `RecipeTester` n'en voit rien (D10).
+19. **[test]** Vue liée de B : sa fiche reçoit ses recettes apprises, son niveau et son métier ;
+    rien si la vue est la mienne, celle de la guilde ou d'un PNJ, si le métier est secondaire ou
+    illisible, si le nom est secret, ou si c'est mon propre lien. Changement de propriétaire avec
+    l'ancienne liste encore servie : rien n'est attribué tant que la liste n'a pas été mise à jour
+    (D12) ; une liste d'un autre métier est écartée ; une 2e lecture remplace la 1re.
+20. **[humain]** Au banc, A clique le lien de B : l'infobulle du métier de B, dans l'onglet
+    Artisans d'A, dit son niveau et son nombre de recettes (« 1/75 · lien de métier, 5 recettes »
+    pour la Forge de Gnomi vue le 2026-10-02). Avant : sonde `/dump C_TradeSkillUI.GetChildProfessionInfo()`
+    dans la vue liée, `skillLevel` = celui du titre de la fenêtre (D11). Témoin : la barre de la
+    fenêtre native.
 
 ## Contrat
 
@@ -256,7 +291,7 @@ Rien ne change sur le fil : rien n'est envoyé. Le contrat est la fiche persist�
 | `nonAddon` | connu seulement sans l'addon ; l'affichage le recalcule si des vraies données arrivent | oui |
 | `linkSeen[prof]` | horodatage du dernier lien vu pour ce métier (sous-ligne, classement de la purge) | **nouveau** |
 | `linkSpell[prof]` | sort de rang lu dans le dernier lien, brut, jamais interprété (D4bis) | **nouveau** |
-| `linkRecipes[prof]` | phase 2 : `{ ids = {…}, at = <horodatage> }`, recettes lues en cliquant son lien | **nouveau** (nom proposé) |
+| `linkRecipes[prof]` | phase 2 : `{ ids = {…}, at, lvl, max }`, recettes apprises et niveau lus en cliquant son lien ; remplacé à chaque lecture, oublié par la purge | **nouveau** |
 
 Invariants : `skill` et `recipes` d'une fiche restent réservés aux données réseau ; un lien n'y
 écrit jamais. La purge D9 n'efface jamais une fiche qui a autre chose que des métiers vus sans
@@ -296,4 +331,5 @@ Une branche par dépôt, même nom : `feat/lien-metier` dans COC et dans l'outil
   sort de rang lu (une 3e valeur pour D4bis). (237 caractères, sous la limite de `/run` ; `\124`
   parce que le chat double les `|`.) Puis critères 11, 12 et 18, et le relevé de la garde du métier
   lié (D6) ; relevés au registre.
-- **Phase 2** : après le relevé de D6 ; mesures de la question ouverte d'abord.
+- **Phase 2** (D6 tenu à 11:21) : lecture de la vue liée dans `Directory_TradeLink.lua`, infobulle,
+  test 19 ; puis banc : sonde D11, critères 14 et 20.
