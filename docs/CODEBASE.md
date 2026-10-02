@@ -140,7 +140,7 @@
 | `Directory_TradeLink.lua` | un lien de métier posté dans le chat ajoute son AUTEUR à l'annuaire, et l'annuaire ne garde que les artisans sans l'addon UTILES (spec docs/specs/lien-metier.md). | 143 |
 | `CraftingOrderClassic_Channels.lua` | RECONNAÎTRE un canal du jeu (spec docs/specs/canaux-surveilles.md). | 261 |
 | `CraftingOrderClassic_Notify.lua` | la SORTIE d'une alerte : ligne de chat, bandeau, son. | 39 |
-| `CraftingOrderClassic_LFWChat.lua` | détection « recherche de travail » dans le CHAT VISIBLE. | 138 |
+| `CraftingOrderClassic_LFWChat.lua` | détection « recherche de travail » dans le CHAT VISIBLE. | 140 |
 | `Directory_MyArtisans.lua` | agrégation des métiers du COMPTE (onglet « Mes artisans »). | 168 |
 | `Directory_LootScan.lua` | découverte PASSIVE des artisans NON-porteurs de l'addon qui craftent à proximité, par CHAT_MSG_TRADESKILLS « X creates Y. | 162 |
 | `Orders_Codec.lua` | codec du protocole filaire ORD\| (sérialisation ⇄ parsing, SOURCE DE VÉRITÉ). | 158 |

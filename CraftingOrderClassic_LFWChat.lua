@@ -59,9 +59,11 @@ function LC:_OnLinks(text, author, guid, lfwOK)
         local k = author .. "\1" .. l.prof
         if (self._last[k] or 0) + THROTTLE <= t then
             self._last[k] = t
-            D:NoteLinkSeen(author, l.prof, l.spell)
             -- LFW = UN métier : le premier lien reconnu ; les autres entrent seulement à l'annuaire.
+            -- Le [Dispo] AVANT la fiche : NoteLinkSeen plafonne le métier (D9), et un [Dispo] doit
+            -- déjà exister pour en être exempté, sinon un « LFW [lien] » frais serait oublié aussitôt.
             if isLFW and i == 1 and D.NoteChatLFW then D:NoteChatLFW(author, l.prof) end
+            D:NoteLinkSeen(author, l.prof, l.spell)
         end
     end
 end
