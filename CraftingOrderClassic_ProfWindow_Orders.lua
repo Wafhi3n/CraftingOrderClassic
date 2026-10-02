@@ -302,7 +302,7 @@ function PW:_OrdRow(i)
     r:SetScript("OnClick", function(b)
         local it = b.it; if not it then return end
         if it.muted then
-            if COC.db and COC.db.muted then COC.db.muted[it.o.id] = nil end
+            if COC.db and COC.db.muted then COC.db.muted[it.o.id] = nil; UI:RefreshOrderIndicator() end
         else
             PW.ordSelected = it.o.id
         end

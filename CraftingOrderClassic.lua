@@ -193,6 +193,7 @@ function COC:NotifyCmd(arg)
     local L = COC.L
     arg = (arg or ""):lower()
     if NOTIFY_MODES[arg] then COC.db.notifyScope = arg end
+    if COC.UI and COC.UI.RefreshOrderIndicator then COC.UI:RefreshOrderIndicator() end   -- « off » éteint l'icône
     local cur = (COC.db and COC.db.notifyScope) or "all"
     p(string.format(L["notifications : |cFFFFFFFF%s|r — /co notify [all|directed|named|off]"], cur))
 end

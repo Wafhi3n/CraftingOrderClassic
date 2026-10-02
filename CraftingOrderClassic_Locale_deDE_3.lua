@@ -161,6 +161,19 @@ local de3 = {
         "Meine Aufträge und meine Verfügbarkeit auch in Handel (Dienstleistungen) ankündigen",
     ["Une ligne lisible par tous, seulement quand tu cliques."] = "Eine Zeile, die alle lesen können, nur wenn du klickst.",
     ["Valider"] = "Bestätigen",
+    -- Icône « une commande t'attend » de la barre de la minicarte (2026-09-28)
+    ["Commandes à ton nom : %d"] = "Aufträge auf deinen Namen: %d",
+    ["pour %s"] = "für %s",
+    -- 3e tour : le clic vers le perso qui sait faire, les commandes non nommées (2026-09-30)
+    ["Pour ta guilde ou tes amis : %d"] = "Für deine Gilde oder Freunde: %d",
+    ["Pour tous : %d"] = "Für alle: %d",
+    ["Clic : ouvrir %s de %s."] = "Klick: %s von %s öffnen.",
+    ["Clic : voir pourquoi."] = "Klick: Grund anzeigen.",
+    ["Hors combat seulement."] = "Nur außerhalb des Kampfes.",
+    ["Où l'apprendre : %s"] = "Wo man es lernt: %s",
+    ["Aucun de tes persos ne sait faire %s."] = "Keiner deiner Charaktere kann %s herstellen.",
+    ["%d commandes attendent dans ce métier."] = "%d Aufträge warten in diesem Beruf.",
+    ["Ouvrir la fenêtre de métier"] = "Berufsfenster öffnen",
 }
 
 for k, v in pairs(de3) do L[k] = v end

@@ -376,9 +376,12 @@ function PW:CamelotDetach(native)
         self.frame:Hide()
         restoreChrome(self.frame)   -- le cadre redevient une vraie fenêtre (vue reroll, cf. stripChrome)
         -- Rendre le parent ET les ancres : sans ça la colonne resterait liée au cadre natif (et
-        -- étirée à SA hauteur) si on rebascule un jour sur la vue custom.
-        self.frame:ClearAllPoints()
+        -- étirée à SA hauteur) si on rebascule un jour sur la vue custom. Et reposer une ancre :
+        -- un cadre sans ancre ne s'affiche pas. Vécu le 2026-09-30 : après une fenêtre de métier
+        -- native, la vue reroll (clic de l'icône de minicarte) s'ouvrait invisible.
         self.frame:SetParent(UIParent)
+        if self._RestorePlacement then self:_RestorePlacement() else self.frame:ClearAllPoints() end
+        if self.FRAME_H then self.frame:SetHeight(self.FRAME_H) end   -- greffée, la hauteur venait des ancres
         -- Redevenue flottante, elle retrouve son comportement de fenêtre (cf. CamelotAttach).
         self.frame:SetMovable(true)
         self.frame:RegisterForDrag("LeftButton")

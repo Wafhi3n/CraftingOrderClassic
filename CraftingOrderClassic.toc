@@ -94,6 +94,8 @@ CraftingOrderClassic_Social_Menu.lua
 CraftingOrderClassic_Social_Roster.lua
 CraftingOrderClassic_Minimap.lua
 CraftingOrderClassic_MinimapIndicator.lua
+CraftingOrderClassic_MinimapIndicator_Who.lua
+CraftingOrderClassic_MinimapIndicator_Orders.lua
 CraftingOrderClassic_Nameplate.lua
 CraftingOrderClassic_ProfOrders.lua
 # Sous-catégories de recettes : le moteur d'abord, les tables de données ensuite (elles s'y enregistrent).

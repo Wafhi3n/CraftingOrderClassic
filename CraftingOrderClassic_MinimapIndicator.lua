@@ -11,10 +11,18 @@
 --       def.texture | def.atlas    -- l'image (chemin de fichier, ou atlas VÉRIFIÉ sur le client)
 --       def.order                  -- rang dans la barre, ≥ 3 (1 et 2 sont à Blizzard)
 --       def.size                   -- côté en px (défaut 22, cf. ICON_SIZE)
+--       def.width / def.height     -- facultatif, pour une icône qui n'est pas carrée (priment sur size)
+--       def.useAtlasSize           -- l'atlas garde sa taille native, calé en haut à gauche (comme le
+--                                  -- useAtlasSize="true" du XML de Blizzard) au lieu d'être étiré
 --       def.tooltip(tt)            -- remplit GameTooltip (lignes après le titre « Crafting Order »)
 --       def.onClick(button)        -- facultatif
---   UI:SetIndicator(key, shown)    -- l'allume ou l'éteint ; rend vrai si la barre existe
+--   UI:SetIndicator(key, shown[, count])
+--                                  -- l'allume ou l'éteint ; rend vrai si la barre existe. `count` :
+--                                  -- un nombre dans le coin bas droit, comme un objet des sacs (nil = rien) ;
+--                                  -- 4e argument `color` = { r, g, b } du nombre (défaut : blanc)
 -- Le cadre n'est créé qu'au premier allumage. Sans la barre (hors Forever), SetIndicator ne fait rien.
+-- La barre n'est recomposée (`Layout`) que quand une icône apparaît ou disparaît : un nombre qui change
+-- ne touche qu'au texte.
 --
 -- ⚠️ `MinimapCluster` est un cadre du MODE ÉDITION. Méthode mesurée dans TaintLab le 2026-09-27
 -- (`/tlab indica`, variante A choisie par le user) puis revue en jeu dans COC le 2026-09-28 (relevé
@@ -41,12 +49,17 @@ end
 local function build(parent, def)
     local f = CreateFrame("Frame", nil, parent)
     local size = def.size or ICON_SIZE
-    f:SetSize(size, size)
+    f:SetSize(def.width or size, def.height or size)
     f.layoutIndex = def.order
     f:EnableMouse(true)
     local tex = f:CreateTexture(nil, "ARTWORK")
-    if def.atlas then tex:SetAtlas(def.atlas) else tex:SetTexture(def.texture) end
-    tex:SetAllPoints()
+    if def.atlas and def.useAtlasSize then
+        tex:SetAtlas(def.atlas, true)
+        tex:SetPoint("TOPLEFT")
+    else
+        if def.atlas then tex:SetAtlas(def.atlas) else tex:SetTexture(def.texture) end
+        tex:SetAllPoints()
+    end
     f:SetScript("OnEnter", function(self)
         GameTooltip:SetOwner(self, "ANCHOR_BOTTOMLEFT")
         GameTooltip:AddLine("Crafting Order")
@@ -63,14 +76,30 @@ function UI:DefineIndicator(key, def)
     self._indicators[key] = { def = def }
 end
 
-function UI:SetIndicator(key, shown)
+-- Le nombre du coin, créé au premier usage. Police et coin de l'objet des sacs (NumberFontNormal).
+-- `color` = { r, g, b } optionnel ; sans lui, le blanc de la police.
+local function setCount(f, count, color)
+    if count == nil and not f.count then return end
+    if not f.count then
+        f.count = f:CreateFontString(nil, "OVERLAY", "NumberFontNormal")
+        f.count:SetPoint("BOTTOMRIGHT", 1, -1)
+    end
+    f.count:SetText(count and tostring(count) or "")
+    local c = color or { 1, 1, 1 }
+    if f.count.SetTextColor then f.count:SetTextColor(c[1], c[2], c[3]) end
+end
+
+function UI:SetIndicator(key, shown, count, color)
     local b, ind = bar(), self._indicators[key]
     if not (b and ind) then return false end
     if not ind.frame then
         if not shown then return false end   -- rien à éteindre : pas de cadre créé pour rien
         ind.frame = build(b, ind.def)
     end
-    ind.frame:SetShown(shown and true or false)
+    local f, want = ind.frame, shown and true or false
+    setCount(f, count, color)
+    if f:IsShown() == want then return true end
+    f:SetShown(want)
     if b.Layout then b:Layout() end   -- la barre se recompose : l'icône prend ou rend sa place
     return true
 end
