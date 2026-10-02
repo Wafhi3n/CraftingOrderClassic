@@ -46,6 +46,15 @@ client.
 
 ## Relevés
 
+- 2026-10-02 10:36 — jusqu'a 191a238 — Forever, client de Rédemption, en ANGLAIS, Forgefer ; build
+  `main-dev@6936b40 2026-10-02 10:26` avec feat/liste-destinataires, feat/profit-arbitrages,
+  fix/clic-recette-connue (copie déployée du `.toc`) — **GO sur `fix/clic-recette-connue`** — deux
+  commandes de test DevMacro nommées pour le reroll Anatarion, `/co alts` coupé : (a) Secourisme,
+  recette 1244431 que Rédemption connaît aussi → le clic ouvre la fenêtre de métier de Rédemption ;
+  (b) Couture, qu'Anatarion seul connaît → le clic ouvre la vue d'Anatarion (témoin). Vu par le user
+  (« ça fonctionne comme décrit », capture des deux icônes) et relu par l'agent dans `DevMacroDB.log`
+  (10:35:37 : `T-a clic=native`, `T-b clic=reroll Anatarion`). **Pas observé** : le refus
+  d'acceptation depuis Rédemption d'une commande nommée pour Anatarion (règle inchangée).
 - 2026-10-02 10:20 — jusqu'a 8e7c062 — Forever, client de Rédemption, en ANGLAIS, Forgefer ; build
   `main-dev@ce68ef3 2026-10-02 10:16` avec icone-commande-recue, liste-destinataires,
   profit-arbitrages, release/v1.43.0 (copie déployée du `.toc`) — **GO sur `fix/manquantes-nom-long`**
