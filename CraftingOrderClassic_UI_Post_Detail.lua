@@ -112,7 +112,6 @@ end
 -- =========================================================================
 function UI:RefreshPostPlanDetail()
     local e = self.postEntry
-    if self._RefreshPostSeenWho and not e then self:_RefreshPostSeenWho(nil) end   -- POC lien-metier (D16)
     if not e then
         self.postPlanBadge:Hide(); self.postPlanName:SetText("|cFF888888" .. L["Aucun plan sélectionné."] .. "|r")
         if self.postPlanSub then self.postPlanSub:SetText("") end
@@ -132,7 +131,6 @@ function UI:RefreshPostPlanDetail()
     local c = CL()   -- sous-ligne : niveau d'apprentissage (learnedAt) ; vide si inconnu (matières, désench.)
     local lvl = c and e.spellID and c:RecipeLearnedAt(self.postProf, e.spellID)
     self.postPlanSub:SetText(lvl and (L["niveau"] .. " " .. lvl) or "")
-    if self._RefreshPostSeenWho then self:_RefreshPostSeenWho(e) end   -- POC lien-metier (D16)
     self:_RefreshPostPriceHint(e)
     self:RefreshPostReagents()
 end

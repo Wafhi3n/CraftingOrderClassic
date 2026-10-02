@@ -44,8 +44,8 @@
 | `CraftingOrderClassic_UI_HelpPlate.lua` | AIDE CONTEXTUELLE de la FENÊTRE PRINCIPALE (« bouton i »). | 182 |
 | `CraftingOrderClassic_UI_Post_Layout.lua` | GÉOMÉTRIE de l'onglet « Commande » : colonnes, zones, séparateurs. | 136 |
 | `CraftingOrderClassic_UI_Post.lua` | onglet « Commande » : sélection de plan (gauche) + réactifs « je fournis » / commission g-s-c / ciblage artisan (droite). | 420 |
-| `CraftingOrderClassic_UI_Post_Detail.lua` | onglet « Commande », PANNEAU DROIT : en-tête du plan sélectionné (icône + cadre doré + nom + niveau), liste des réactifs « je fournis », et la rangée commission. | 203 |
-| `CraftingOrderClassic_UI_Post_SeenWho.lua` | POC (spec lien-metier, D16) : sous le nom du plan choisi dans l'onglet Commande, « · sans l'addon : N » quand des artisans SANS l'addon savent le faire (recettes lues au clic sur leur lien, ou vues crafter). | 55 |
+| `CraftingOrderClassic_UI_Post_Detail.lua` | onglet « Commande », PANNEAU DROIT : en-tête du plan sélectionné (icône + cadre doré + nom + niveau), liste des réactifs « je fournis », et la rangée commission. | 201 |
+| `CraftingOrderClassic_UI_Post_SeenWho.lua` | POC (spec lien-metier, D16) : sous le nom du plan choisi dans l'onglet Commande, « · sans l'addon : N » quand des artisans SANS l'addon savent le faire (recettes lues au clic sur leur lien, ou vues crafter). | 60 |
 | `CraftingOrderClassic_UI_Post_Artisans.lua` | onglet « Commande », section droite basse : boutons source, liste des artisans, ciblage (@Nom), libellé destinataire, bouton Poster. | 270 |
 | `CraftingOrderClassic_UI_Post_Categories.lua` | onglet « Commande », panneau gauche : regroupe la LISTE DES PLANS en sections type fenêtre native (emplacement puis type pour les équipements, type pour les armes, catégorie pour le reste). | 169 |
 | `CraftingOrderClassic_UI_Post_Paperdoll.lua` | onglet « Commande », vue SILHOUETTE de l'Enchantement. | 332 |
@@ -1092,7 +1092,8 @@
 > choisi dans l'onglet Commande, « · sans l'addon : N » quand des artisans SANS l'addon savent le
 > faire (recettes lues au clic sur leur lien, ou vues crafter). Survol : qui, et d'où on le sait ;
 > clic : chuchoter au plus récent. Ne touche pas au ciblage de la commande (D10).
-> Retirable d'un geste : ce fichier, sa ligne du .toc, et l'appel dans RefreshPostPlanDetail.
+> Retirable d'un geste : ce fichier et sa ligne du .toc. Il s'accroche APRÈS RefreshPostPlanDetail
+> (bas de fichier) au lieu d'y ajouter un appel : la fonction est retravaillée par d'autres branches.
 
 ### `CraftingOrderClassic_UI_Post_Artisans.lua`
 > CraftingOrderClassic_UI_Post_Artisans.lua — onglet « Commande », section droite basse :

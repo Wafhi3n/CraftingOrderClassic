@@ -2,7 +2,8 @@
 -- choisi dans l'onglet Commande, « · sans l'addon : N » quand des artisans SANS l'addon savent le
 -- faire (recettes lues au clic sur leur lien, ou vues crafter). Survol : qui, et d'où on le sait ;
 -- clic : chuchoter au plus récent. Ne touche pas au ciblage de la commande (D10).
--- Retirable d'un geste : ce fichier, sa ligne du .toc, et l'appel dans RefreshPostPlanDetail.
+-- Retirable d'un geste : ce fichier et sa ligne du .toc. Il s'accroche APRÈS RefreshPostPlanDetail
+-- (bas de fichier) au lieu d'y ajouter un appel : la fonction est retravaillée par d'autres branches.
 
 local COC = CraftingOrderClassic
 local UI  = COC.UI
@@ -38,7 +39,7 @@ local function hoverButton(self)
     return b
 end
 
--- Appelé par RefreshPostPlanDetail, APRÈS qu'il a posé la sous-ligne du plan `e` (nil = aucun plan).
+-- Après RefreshPostPlanDetail, qui a posé la sous-ligne du plan `e` (nil = aucun plan).
 function UI:_RefreshPostSeenWho(e)
     local D = COC.Directory
     local who = (e and e.spellID and D and D.SeenWhoKnows) and D:SeenWhoKnows(self.postProf, e.spellID) or {}
@@ -52,4 +53,8 @@ function UI:_RefreshPostSeenWho(e)
     local b = hoverButton(self)
     b.who = who
     b:Show()
+end
+
+if hooksecurefunc and UI.RefreshPostPlanDetail then
+    hooksecurefunc(UI, "RefreshPostPlanDetail", function(self) self:_RefreshPostSeenWho(self.postEntry) end)
 end
