@@ -138,8 +138,13 @@ local function segTooltip(row)
         if (s.plan or 0) > 0 then
             GameTooltip:AddLine(L["Plan à acheter"] .. " : " .. COC.Api.Coin(s.plan), 0.91, 0.72, 0.29)
         end
-        if s.partial then
+        -- Deux raisons au « (?) », et le joueur n'y peut pas la même chose : un réactif sans prix
+        -- attend un scan de l'HV, un plan de formateur sans prix attend une visite chez lui.
+        if s.missing or (s.partial and not s.planUnknown) then
             GameTooltip:AddLine(L["Coût partiel : au moins un réactif sans prix HV."], 0.8, 0.8, 0.8, true)
+        end
+        if s.planUnknown then
+            GameTooltip:AddLine(L["Prix du plan inconnu : COC le relèvera à ton prochain passage chez le formateur."], 0.8, 0.8, 0.8, true)
         end
     end
     GameTooltip:Show()
@@ -283,7 +288,7 @@ local function fillSegRow(row, s)
         local stocked = (next(s.bag or {}) or next(s.made or {})) and true or false
         local coin = (total > 0 or not stocked) and COC.Api.Coin(total) or ""
         row.cost:SetText((stocked and (BAG .. (coin ~= "" and " " or "")) or "") .. coin
-            .. (s.partial and " |cFF888888(?)|r" or ""))   -- coût partiel : réactif sans prix HV
+            .. (s.partial and " |cFF888888(?)|r" or ""))   -- coût partiel : réactif ou plan sans prix
     end
     row:Show()
 end

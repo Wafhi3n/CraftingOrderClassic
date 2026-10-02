@@ -73,9 +73,45 @@ local function pricedReagents(PR, reags)
     return out, cost, missing
 end
 
+-- Prix du plan d'une recette NON apprise, vu par la route : planPrice (nil = pas achetable par la
+-- route), planUnknown (prix inconnu : le segment s'affiche « (?) », le total « > »), planDoubt
+-- (candidate de REPLI seulement, cf. pickBest). Fonction locale appelée directement : son
+-- multi-retour ne passe par aucun `X and X:f()`, il ne se tronque pas.
+local function planOf(M, PR, profKey, sid)
+    local kind = (M and M:IsAvailable()) and M:SourceKind(profKey, sid) or "unknown"
+    if kind ~= "trainer" and kind ~= "vendor" then
+        -- butin/quête/inconnu : achetable seulement si l'objet-plan est coté à l'HV
+        local ri = M and M:RecipeItem(profKey, sid)
+        return ri and PR:ItemValue(ri) or nil
+    end
+    local price = M and M:SourcePrice(profKey, sid)
+    if price then return price end
+    -- Prix INCONNU (un plan de formateur tant qu'on n'est pas passé chez lui). On garde la recette
+    -- candidate -- « va l'apprendre au formateur » reste le bon conseil -- mais on ne fait PAS
+    -- passer l'inconnu pour de la gratuité : le segment est marqué partiel, donc le total
+    -- s'affiche comme sous-évalué.
+    -- ⚠️ PARTIEL N'EST PAS DOUTEUX. Un formateur ATTESTÉ (Sources:TrainerConfirmed) dont seul le prix
+    -- manque concourt à part entière : quelques pièces amorties sur des dizaines de points ne
+    -- renversent pas un choix. Le reléguer en repli, comme un réactif sans prix, l'excluait de la
+    -- route dès qu'une autre recette était chiffrée -- capture user 2026-10-02 : Rough Grinding
+    -- Stone (2 pierres, orange) écartée au profit de la Rough Sharpening Stone verte (4 pierres le
+    -- point), jusqu'à ce qu'il l'apprenne. Le marchand au prix inconnu et le formateur seulement
+    -- DÉDUIT restent en repli : l'un peut coûter cher, l'autre n'existe peut-être pas.
+    local sure = kind == "trainer" and M.TrainerConfirmed and M:TrainerConfirmed(profKey, sid)
+    return 0, true, not sure
+end
+
+-- Rang requis pour apprendre la recette : celui que le formateur EXIGE quand on l'a lu chez lui
+-- (Sources:MinSkill), sinon celui des données, sinon le seuil orange.
+local function learnAtOf(lib, M, profKey, sid, colors)
+    local at = M and M.MinSkill and M:MinSkill(profKey, sid)
+    if not at then at = lib.RecipeLearnedAt and lib:RecipeLearnedAt(profKey, sid) end
+    return at or colors[1]
+end
+
 -- Candidates de la route. opts = { known = set clé "s<spellID>"/"i<itemID>", live = map même clé →
 -- difficulté client (nil pour un tiers), plans = inclure les manquantes ACHETABLES (prix
--- formateur/vendeur MTSL, sinon objet-plan coté à l'HV) }. Sans opts.plans : recettes CONNUES
+-- formateur/vendeur, sinon objet-plan coté à l'HV) }. Sans opts.plans : recettes CONNUES
 -- seulement (pour un tiers, on ne présume pas de ce qu'il accepterait d'acheter — sauf demande).
 -- nil si les briques manquent (lib sans seuils, Auctionator absent). Indépendantes du stock (il
 -- se déduit au moment du choix, cf. pickBest) : c'est ce qui les rend cachables (CachedCandidates).
@@ -91,26 +127,15 @@ function Route:Candidates(profKey, opts)
         local cd = lib.RecipeCooldown and lib:RecipeCooldown(profKey, sid)
         local reags = (colors and not cd) and lib.RecipeReagents and lib:RecipeReagents(profKey, sid) or nil
         if reags and #reags > 0 then
-            local priced, cost, missing = pricedReagents(PR, reags)
+            local priced, cost = pricedReagents(PR, reags)
             local prod = lib.RecipeProduct and lib:RecipeProduct(profKey, sid)
             local isKnown = (known["s" .. sid] or (prod and known["i" .. prod])) and true or false
-            local planPrice, planUnknown
+            local planPrice, planUnknown, planDoubt
             -- L'exemplaire de l'AUTRE camp d'une recette jumelle (cf. Sources:IsOtherSideTwin) n'est
             -- pas un plan à acheter : aucun formateur ne l'enseignera à ce joueur.
             local otherSide = M and M.IsOtherSideTwin and M:IsOtherSideTwin(profKey, sid)
             if not isKnown and opts.plans and not otherSide then
-                local kind = (M and M:IsAvailable()) and M:SourceKind(profKey, sid) or "unknown"
-                if kind == "trainer" or kind == "vendor" then
-                    planPrice = M and M:SourcePrice(profKey, sid)
-                    -- Prix INCONNU (le cas de tous les plans de formateur : aucune source ne les
-                    -- donne). On garde la recette candidate -- « va l'apprendre au formateur » reste
-                    -- le bon conseil -- mais on ne fait PAS passer l'inconnu pour de la gratuité :
-                    -- le segment est marqué partiel, donc le total s'affiche comme sous-évalué.
-                    if not planPrice then planPrice, planUnknown = 0, true end
-                else   -- butin/quête/inconnu : achetable seulement si l'objet-plan est coté à l'HV
-                    local ri = M and M:RecipeItem(profKey, sid)
-                    planPrice = ri and PR:ItemValue(ri) or nil
-                end
+                planPrice, planUnknown, planDoubt = planOf(M, PR, profKey, sid)
             end
             if isKnown or planPrice then
                 out[#out + 1] = {
@@ -118,9 +143,9 @@ function Route:Candidates(profKey, opts)
                     conv = (prod and isReagent[prod]) or nil,
                     known = isKnown, planPrice = planPrice,
                     -- missing n'est PAS figé ici : un réactif sans prix mais en sac ne manque pas.
-                    planUnknown = planUnknown or nil,
+                    planUnknown = planUnknown or nil, planDoubt = planDoubt or nil,
                     live = live["s" .. sid] or (prod and live["i" .. prod]) or nil,
-                    learnAt = (lib.RecipeLearnedAt and lib:RecipeLearnedAt(profKey, sid)) or colors[1],
+                    learnAt = learnAtOf(lib, M, profKey, sid, colors),
                 }
             end
         end
@@ -184,8 +209,9 @@ local function consume(c, crafts, st, seg)
     if c.prod then st.made[c.prod] = (st.made[c.prod] or 0) + crafts end
 end
 
--- Départage de pickBest. Deux étages : une candidate au coût PARTIEL (réactif sans prix,
--- sous-estimé) ne détrône JAMAIS une candidate au coût complet — repli quand le rang n'a qu'elle.
+-- Départage de pickBest. Deux étages : une candidate DOUTEUSE (réactif sans prix, donc coût
+-- sous-estimé ; plan au prix inconnu dont la source n'est pas attestée, cf. planOf) ne détrône
+-- JAMAIS une candidate sûre — repli quand le rang n'a qu'elle. `p`/`bestP` = ce doute.
 -- À coût ÉGAL — typiquement deux recettes gratuites parce que tout est en sac —, celle qui grisera
 -- la PREMIÈRE passe devant : bientôt elle ne rapportera plus rien, l'autre peut attendre. C'est ce
 -- qui met les retailles → cuir léger (gris à 40) AVANT le kit d'armure (gris à 60), qui mange
@@ -206,9 +232,13 @@ end
 -- >= cur). Sans ça, la couleur live l'écartait au rang courant mais les seuils Wowhead la
 -- RESSUSCITAIENT en « vert » aux rangs suivants (données ≠ jeu à la frontière vert→gris) → la route
 -- comptait, et recommandait, une recette DÉJÀ grise dans la liste du joueur.
--- Rend best, chance, partiel, et le coût des réactifs de CE point (stock déduit, plan exclu).
+-- Rend best, chance, partiel, le coût des réactifs de CE point (stock déduit, plan exclu), et
+-- « un réactif manque de prix ».
+-- DEUX drapeaux, à ne pas confondre : le DOUTE classe (better), le PARTIEL s'affiche (« (?) » sur le
+-- segment, « > » devant le total). Un plan de formateur attesté au prix inconnu est partiel sans
+-- être douteux : il concourt, et le joueur voit quand même que le total est sous-évalué.
 local function pickBest(cands, r, cur, target, bought, st)
-    local best, bestPer, bestChance, bestPartial, bestCost
+    local best, bestPer, bestChance, bestDoubt, bestCost, bestMissing
     for _, c in ipairs(cands) do
         if c.learnAt <= r and c.live ~= "trivial" then
             local col
@@ -221,14 +251,18 @@ local function pickBest(cands, r, cur, target, bought, st)
                 if not c.known and not bought[c.sid] then
                     per = per + (c.planPrice or 0) / math.max(1, math.min(c.colors[4], target) - r)
                 end
-                local p = (missing or c.planUnknown) and true or false
-                if not best or better(p, per, c, bestPartial, bestPer, best) then
-                    best, bestPer, bestChance, bestPartial, bestCost = c, per, chance, p, cost
+                local doubt = (missing or c.planDoubt) and true or false
+                if not best or better(doubt, per, c, bestDoubt, bestPer, best) then
+                    best, bestPer, bestChance, bestDoubt, bestCost = c, per, chance, doubt, cost
+                    bestMissing = missing and true or false
                 end
             end
         end
     end
-    return best, bestChance, bestPartial, bestCost
+    -- Partiel : un réactif sans prix, ou un plan au prix inconnu PAS ENCORE payé (une fois que la
+    -- route l'a « acheté », les points suivants sont chiffrés juste).
+    local partial = best and (bestMissing or (best.planUnknown and not bought[best.sid])) and true or false
+    return best, bestChance, partial, bestCost, bestMissing
 end
 
 -- Plafond visé : maxRank s'il est connu, sinon le prochain palier CAPS au-dessus de `rank`.
@@ -253,7 +287,7 @@ local function addPoint(segs, r, best, chance, cost, planCost, boughtNow, isPart
 end
 
 -- La route : segments consécutifs { sid, from, to, crafts, cost, plan, prod, bought, partial,
--- bag, made } (ou { gap = true }), + totaux mats/plans. `done` = déjà au plafond. maxRank nil →
+-- missing, planUnknown, bag, made } (ou { gap = true }), + totaux mats/plans. `done` = déjà au plafond. maxRank nil →
 -- prochain palier CAPS. nil si briques absentes (cf. Candidates). opts : voir Candidates, plus
 -- opts.bag(itemID) → quantité en sac (MON perso seulement). `bag` est gardé sur la route : Materials
 -- en a besoin pour dire ce qu'il reste à réunir.
@@ -267,7 +301,7 @@ function Route:Compute(profKey, rank, maxRank, opts)
     local st = newStock(opts.bag)
     local segs, mats, plans, bought, anyPartial = {}, 0, 0, {}, false
     for r = rank, target - 1 do
-        local best, chance, isPartial, cost = pickBest(cands, r, rank, target, bought, st)
+        local best, chance, isPartial, cost, missing = pickBest(cands, r, rank, target, bought, st)
         local seg = segs[#segs]
         if not best then
             if seg and seg.gap then seg.to = r + 1
@@ -280,7 +314,11 @@ function Route:Compute(profKey, rank, maxRank, opts)
             end
             if isPartial then anyPartial = true end
             mats = mats + cost   -- coût espéré des réactifs pour CE point, stock déduit
-            consume(best, 1 / chance, st, addPoint(segs, r, best, chance, cost, planCost, boughtNow, isPartial))
+            seg = addPoint(segs, r, best, chance, cost, planCost, boughtNow, isPartial)
+            -- La RAISON du partiel, pour l'infobulle : le joueur n'y peut pas la même chose.
+            if missing then seg.missing = true end
+            if boughtNow and best.planUnknown then seg.planUnknown = true end
+            consume(best, 1 / chance, st, seg)
         end
     end
     return { rank = rank, target = target, segments = segs, mats = mats, plans = plans,

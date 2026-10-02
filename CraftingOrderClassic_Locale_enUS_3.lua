@@ -175,6 +175,7 @@ local en3 = {
     ["Aucun de tes persos ne sait faire %s."] = "None of your characters can make %s.",
     ["%d commandes attendent dans ce métier."] = "%d orders are waiting in this profession.",
     ["Ouvrir la fenêtre de métier"] = "Open the profession window",
+    ["Prix du plan inconnu : COC le relèvera à ton prochain passage chez le formateur."] = "Recipe price unknown: COC will note it next time you visit the trainer.",
 }
 
 for k, v in pairs(en3) do L[k] = v end

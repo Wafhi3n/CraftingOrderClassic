@@ -29,12 +29,14 @@ local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
 -- ------------------------------------------------------------------
 
 -- db.trainers[profKey] = { npc = { id, name, mapID, x, y, at }, teaches = { [spellID] = true },
---                          ranks = { [spellID] = rang de metier exige } }
+--                          ranks = { [spellID] = rang de metier exige },
+--                          prices = { [spellID] = prix du formateur, en cuivre } }
 --
 -- `ranks` est une table PARALLELE, pas un changement de forme de `teaches`. Recense le 2026-09-23 :
 -- un seul lecteur compare `teaches[sid] == true` (Trainers:Teaches), tous les autres n'en lisent
 -- que les CLES. Y ranger un nombre aurait casse ce lecteur-la, en silence. Une table de plus ne
--- casse personne et les anciennes bases restent lisibles telles quelles.
+-- casse personne et les anciennes bases restent lisibles telles quelles. `prices` (2026-10-02)
+-- suit la meme regle, pour la meme raison.
 --
 -- UN SEUL PNJ retenu par métier, le DERNIER VU. La question à laquelle on répond est « où
 -- j'apprends ça », pas « donne-moi l'annuaire complet des formateurs » ; et le dernier vu est le
@@ -118,13 +120,27 @@ local function serviceSpellID(i)
 end
 
 -- Rang de METIER exige par le service. `GetTrainerServiceSkillReq(i)` rend (nom du metier, rang,
--- le joueur l'a-t-il). C'est CE rang qui comble les niveaux d'apprentissage absents des donnees.
+-- le joueur l'a-t-il). CE rang passe devant celui des donnees, qu'il comble ou qu'il CORRIGE (cf.
+-- Sources:MinSkill) : Wowhead donne Copper Chain Pants au rang 1, le formateur de Forever la
+-- demande au rang 15 (capture user 2026-10-02).
 -- Ne vaut que chez un formateur de METIER : chez un formateur de classe il n'y a pas de rang, et
 -- la fonction rend alors un couple vide qu'il ne faut pas prendre pour un zero.
 local function serviceRank(i, isTradeskill)
     if not (isTradeskill and _G.GetTrainerServiceSkillReq) then return nil end
     local ok, _, rank = pcall(_G.GetTrainerServiceSkillReq, i)
     if ok and type(rank) == "number" and rank > 0 then return rank end
+    return nil
+end
+
+-- PRIX du service, en cuivre : `GetTrainerServiceCost(i)` rend (prix, est-ce un metier) -- l'UI de
+-- Blizzard l'affiche elle-meme a cote de chaque ligne (Blizzard_TrainerUI, Mainline). C'est le seul
+-- endroit ou le prix d'un plan de FORMATEUR existe : aucune page de donnees ne le porte, et sans
+-- lui la route ne savait pas chiffrer « va l'apprendre ». Zero ne s'ecrit pas : il ne se distingue
+-- pas d'une reponse vide, et un prix inconnu doit rester inconnu (Sources:SourcePrice).
+local function serviceCost(i)
+    if not _G.GetTrainerServiceCost then return nil end
+    local ok, cost = pcall(_G.GetTrainerServiceCost, i)
+    if ok and type(cost) == "number" and cost > 0 then return cost end
     return nil
 end
 
@@ -153,7 +169,9 @@ local function readServices()
             end
             -- COPIE : `idx[name]` est la table de l'INDEX, partagee par toutes les visites. Y
             -- ecrire le rang du service courant le collerait a toutes les occurrences suivantes.
-            if prof and sid then out[#out + 1] = { prof, sid, serviceRank(i, isTradeskill) } end
+            if prof and sid then
+                out[#out + 1] = { prof, sid, serviceRank(i, isTradeskill), serviceCost(i) }
+            end
         end
     end
     return out, seen, sample
@@ -213,17 +231,10 @@ local function npcIdentity()
     return id, name
 end
 
--- Appelé sur TRAINER_SHOW. Ne fait rien chez un formateur de classe, rien si aucun service ne
--- correspond au catalogue, rien si la base n'est pas encore montée (login en cours).
-function T:Harvest()
-    self._lastVisit = nil   -- une sortie anticipée ne doit pas laisser la visite PRÉCÉDENTE en vue
-    if not COC.db then return nil end
-    if _G.IsTradeskillTrainer and not _G.IsTradeskillTrainer() then return nil end
-    local list, seen, sample = readServices()
-    self._lastSeen, self._lastSample, self._lastIndex = seen, sample, select(2, nameIndex())
-    local prof, n = winningProf(list)
-    if not prof then return nil, 0, seen end
-    local st, spells, ranks = store(prof, true), {}, {}
+-- Verse dans la base du métier ce que la visite a vu. Rend les sorts et les rangs de CETTE visite
+-- (cf. `_lastVisit`).
+local function record(st, prof, list)
+    local spells, ranks = {}, {}
     for _, p in ipairs(list) do
         if p[1] == prof then
             st.teaches[p[2]] = true
@@ -236,8 +247,32 @@ function T:Harvest()
                 st.ranks[p[2]] = p[3]
                 ranks[p[2]] = p[3]
             end
+            -- Le prix, meme regle. Le dernier vu l'emporte : la remise de reputation peut le faire
+            -- varier d'une ville a l'autre, et le dernier formateur vu est le plus proche du joueur.
+            if p[4] then
+                st.prices = st.prices or {}
+                st.prices[p[2]] = p[4]
+            end
         end
     end
+    return spells, ranks
+end
+
+-- Appelé sur TRAINER_SHOW. Ne fait rien chez un formateur de classe, rien si aucun service ne
+-- correspond au catalogue, rien si la base n'est pas encore montée (login en cours).
+function T:Harvest()
+    self._lastVisit = nil   -- une sortie anticipée ne doit pas laisser la visite PRÉCÉDENTE en vue
+    if not COC.db then return nil end
+    if _G.IsTradeskillTrainer and not _G.IsTradeskillTrainer() then return nil end
+    local list, seen, sample = readServices()
+    self._lastSeen, self._lastSample, self._lastIndex = seen, sample, select(2, nameIndex())
+    local prof, n = winningProf(list)
+    if not prof then return nil, 0, seen end
+    local st = store(prof, true)
+    local spells, ranks = record(st, prof, list)
+    -- Les candidates du suivi à l'écran sont cachées deux minutes : un prix ou un rang qu'on vient
+    -- de lire doit changer le prochain point TOUT DE SUITE, pas au prochain passage du cache.
+    if COC.Route and COC.Route.InvalidateCandidates then COC.Route:InvalidateCandidates(prof) end
     local id, name = npcIdentity()
     local map, x, y
     if name then
@@ -276,6 +311,19 @@ end
 function T:Teaches(profKey, spellID)
     local st = store(profKey)
     return (st and st.teaches and st.teaches[spellID]) == true
+end
+
+-- Rang de métier que le formateur EXIGE pour cette recette, tel qu'on l'a lu chez lui, ou nil.
+function T:Rank(profKey, spellID)
+    local st = store(profKey)
+    return st and st.ranks and st.ranks[spellID] or nil
+end
+
+-- Prix de cette recette chez le formateur, en cuivre, tel qu'on l'a lu chez lui, ou nil. nil veut
+-- dire « jamais lu » (visite d'avant cette version, ou recette jamais croisée), jamais « gratuit ».
+function T:Price(profKey, spellID)
+    local st = store(profKey)
+    return st and st.prices and st.prices[spellID] or nil
 end
 
 -- Le PNJ à qui aller parler, tel qu'on l'a rencontré : { name, mapID, x, y, zone }, ou nil tant
