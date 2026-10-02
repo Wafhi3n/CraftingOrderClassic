@@ -66,6 +66,9 @@ local en3 = {
     ["commande annoncée sur %s."] = "order announced in %s.",
     ["Clic droit : annoncer en Commerce"] = "Right-click: announce in Trade",
     ["Clic droit : rappeler en Commerce"] = "Right-click: repeat in Trade",
+    -- Lien de métier posté dans le chat (spec lien-metier, 2026-10-02)
+    ["a lié son métier"] = "linked their profession",
+    ["lien de métier (sans l'addon)"] = "profession link (no addon)",
     -- Annonce de la dispo LFW (2026-09-30)
     ["dispo annoncée sur %s."] = "availability announced in %s.",
     ["Quand tu actives ta dispo, poste aussi une ligne sur Trade (Services) : les joueurs avec ou sans l'addon voient que tu cherches du travail. Une ligne par activation, jamais au renouvellement automatique ; dans une capitale. Même réglage que la case du formulaire de commande."] =
@@ -175,9 +178,6 @@ local en3 = {
     ["Aucun de tes persos ne sait faire %s."] = "None of your characters can make %s.",
     ["%d commandes attendent dans ce métier."] = "%d orders are waiting in this profession.",
     ["Ouvrir la fenêtre de métier"] = "Open the profession window",
-    -- Lien de métier posté dans le chat (spec lien-metier, 2026-10-02)
-    ["a lié son métier"] = "linked their profession",
-    ["lien de métier (sans l'addon)"] = "profession link (no addon)",
 }
 
 for k, v in pairs(en3) do L[k] = v end

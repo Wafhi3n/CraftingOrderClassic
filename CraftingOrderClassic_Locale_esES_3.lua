@@ -66,6 +66,9 @@ local es3 = {
     ["commande annoncée sur %s."] = "pedido anunciado en %s.",
     ["Clic droit : annoncer en Commerce"] = "Clic derecho: anunciar en Comercio",
     ["Clic droit : rappeler en Commerce"] = "Clic derecho: repetir en Comercio",
+    -- Lien de métier posté dans le chat (spec lien-metier, 2026-10-02)
+    ["a lié son métier"] = "enlazó su profesión",
+    ["lien de métier (sans l'addon)"] = "enlace de profesión (sin el addon)",
     -- Annonce de la dispo LFW (2026-09-30)
     ["dispo annoncée sur %s."] = "disponibilidad anunciada en %s.",
     ["Quand tu actives ta dispo, poste aussi une ligne sur Trade (Services) : les joueurs avec ou sans l'addon voient que tu cherches du travail. Une ligne par activation, jamais au renouvellement automatique ; dans une capitale. Même réglage que la case du formulaire de commande."] =
@@ -175,9 +178,6 @@ local es3 = {
     ["Aucun de tes persos ne sait faire %s."] = "Ninguno de tus personajes sabe hacer %s.",
     ["%d commandes attendent dans ce métier."] = "%d pedidos esperan en esta profesión.",
     ["Ouvrir la fenêtre de métier"] = "Abrir la ventana de profesión",
-    -- Lien de métier posté dans le chat (spec lien-metier, 2026-10-02)
-    ["a lié son métier"] = "enlazó su profesión",
-    ["lien de métier (sans l'addon)"] = "enlace de profesión (sin el addon)",
 }
 
 for k, v in pairs(es3) do L[k] = v end

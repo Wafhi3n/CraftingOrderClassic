@@ -65,6 +65,9 @@ local de3 = {
     ["commande annoncée sur %s."] = "Auftrag in %s angekündigt.",
     ["Clic droit : annoncer en Commerce"] = "Rechtsklick: im Handelskanal ankündigen",
     ["Clic droit : rappeler en Commerce"] = "Rechtsklick: im Handelskanal wiederholen",
+    -- Lien de métier posté dans le chat (spec lien-metier, 2026-10-02)
+    ["a lié son métier"] = "Beruf verlinkt",
+    ["lien de métier (sans l'addon)"] = "Berufslink (ohne Addon)",
     -- Annonce de la dispo LFW (2026-09-30)
     ["dispo annoncée sur %s."] = "Verfügbarkeit in %s angekündigt.",
     ["Quand tu actives ta dispo, poste aussi une ligne sur Trade (Services) : les joueurs avec ou sans l'addon voient que tu cherches du travail. Une ligne par activation, jamais au renouvellement automatique ; dans une capitale. Même réglage que la case du formulaire de commande."] =
@@ -174,9 +177,6 @@ local de3 = {
     ["Aucun de tes persos ne sait faire %s."] = "Keiner deiner Charaktere kann %s herstellen.",
     ["%d commandes attendent dans ce métier."] = "%d Aufträge warten in diesem Beruf.",
     ["Ouvrir la fenêtre de métier"] = "Berufsfenster öffnen",
-    -- Lien de métier posté dans le chat (spec lien-metier, 2026-10-02)
-    ["a lié son métier"] = "Beruf verlinkt",
-    ["lien de métier (sans l'addon)"] = "Berufslink (ohne Addon)",
 }
 
 for k, v in pairs(de3) do L[k] = v end
