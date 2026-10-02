@@ -1,8 +1,8 @@
 # Un lien de métier posté dans le chat ajoute son auteur à l'annuaire
 
 > État : **brouillon** · Rédigée le 2026-10-02 · Idée du user (« si un joueur link son métier, ça
-> l'ajoute aussi »), décisions D1 à D6 proposées par l'agent et acceptées par le user le 2026-10-02 ·
-> Pas encore implémentée
+> l'ajoute aussi »), décisions D1 à D6 proposées par l'agent et acceptées par le user le 2026-10-02,
+> **D7 proposée, à confirmer par le user** · Pas encore implémentée
 > Cible : WoW: Forever / Camelot (16001) uniquement · Addon : Crafting Order - Classic
 >
 > Deux phases. **Phase 1** (lire le lien sans cliquer) est prête à coder dès que la mesure du
@@ -37,8 +37,8 @@ La sous-ligne dit que le métier vient d'un lien, pour qu'on ne le confonde pas 
 « vu crafter ».
 
 - Le niveau reste **inconnu** : le lien n'en porte pas.
-- S'il a l'addon, ses vraies données remplacent cette estimation dès qu'elles arrivent, comme pour
-  un artisan vu crafter.
+- S'il a l'addon, ses vraies données remplacent cette estimation quand elles arrivent par les
+  voies habituelles (salle de découverte, annonces). Le lien seul ne lui envoie **rien** (D7).
 - Si la ligne est une ligne « LFW » et que le métier est donné par un lien, il passe aussi
   **[Dispo]**, exactement comme s'il avait tapé « LFW Enchanting ».
 - Le métier est reconnu quelle que soit la langue du joueur qui l'a posté (`[Enchanting]`,
@@ -97,7 +97,9 @@ ne construit rien dessus.
 - **GUID de l'émetteur absent** de l'événement : on ne peut pas vérifier à qui est le lien, donc on
   l'ignore.
 - **Auteur en sourdine** (`/co mute`) : ignoré.
-- **Canal décoché** dans « Canaux surveillés », ou `/co lfwchat off` : ignoré.
+- **Canal décoché** dans « Canaux surveillés », ou `/co lfwchat off` : ignoré. Couper `/co lfwchat`
+  coupe donc aussi les liens : son message de retour (aujourd'hui « scan LFW du chat ») et l'aide
+  doivent le dire, sinon on perd les liens sans le savoir.
 - **Commerce relie toutes les capitales** (constat C15) : un lien posté à Hurlevent arrive à
   Forgefer. Ce n'est pas un repérage « alentour » comme le message « X crée Y ».
 - **Lien fabriqué à la main** : avec D3, on ne peut s'attribuer un métier qu'à soi-même, ce qui ne
@@ -123,6 +125,13 @@ Toutes proposées par l'agent le 2026-10-02, acceptées par le user le même jou
 - **D6 — La phase 2 attend le banc.** Pas une ligne de code de phase 2 avant un relevé, au
   registre, de la garde du métier lié (B lie, A clique : pas de colonne COC, `knownRecipes` d'A
   inchangé).
+- **D7 — Lire un lien n'envoie rien** (proposée par l'agent le 2026-10-02, **à confirmer par le
+  user**). Le repérage « vu crafter » salue l'artisan (`DiscoverPlayer` : mon profil HI+SK en
+  chuchotement d'addon, 1 fois par minute et par joueur) ; une ligne LFW lue dans le chat, non. Le
+  lien suit la ligne LFW. Raison : Commerce relie toutes les capitales, et le chuchotement est la
+  seule voie globale qui reste (constats) ; saluer chaque auteur de lien enverrait mon profil à des
+  inconnus de toutes les capitales. Un porteur de COC se fait déjà connaître par la salle et ses
+  annonces.
 
 ## Questions ouvertes
 
@@ -134,6 +143,7 @@ Toutes proposées par l'agent le 2026-10-02, acceptées par le user le même jou
 - **Un artisan connu par un seul lien doit-il s'effacer ?** Un état déduit du réseau doit expirer
   (leçon de la notification de version). Aujourd'hui, rien n'expire dans l'annuaire, lignes LFW et
   « vu crafter » compris. À mesurer : combien d'entrées une soirée en Commerce ajoute.
+- **D7 à confirmer** : ne rien envoyer à l'auteur d'un lien (voir Décisions).
 - **Phase 2, à mesurer avant de coder** : le format du nom rendu par `IsTradeSkillLinked()` sur
   Forever (prénom seul ou « Prénom Nom » ? un prénom seul est ambigu, il faudrait alors partir du
   GUID du lien) ; le niveau du propriétaire lisible dans la vue liée.
@@ -160,7 +170,8 @@ Toutes proposées par l'agent le 2026-10-02, acceptées par le user le même jou
    qu'une ligne LFW tapée.
 8. **[test]** Un joueur dont on a les vraies données réseau garde ses données ; un plancher « vu
    crafter » ne baisse pas.
-9. **[test]** Canal décoché, `/co lfwchat off`, ou auteur en sourdine → rien.
+9. **[test]** Canal décoché, `/co lfwchat off`, ou auteur en sourdine → rien. Et lire un lien,
+   retenu ou non, n'envoie aucun message (D7).
 10. **[porte]** Toute chaîne nouvelle est localisée (`check_locale.ps1`) ; Lua 5.1 valide, tailles
     de fichier et de fonction tenues (`check_lua.ps1`, `check_size.ps1`).
 11. **[humain]** Au banc, B **sans COC activé** lie son Enchantement dans Commerce (Services). Chez
@@ -176,7 +187,8 @@ Toutes proposées par l'agent le 2026-10-02, acceptées par le user le même jou
 
 14. **[humain]** A clique le lien d'Enchantement de B : la fiche de B chez A annonce ses recettes ;
     le nombre de recettes d'Enchantement **d'A** (`knownRecipes`) est le même avant et après ;
-    rien de neuf ne part sur le réseau. Témoin : le relevé de la garde du métier lié (D6).
+    `/co trace`, armé avant le clic, ne montre aucun envoi provoqué par lui. Témoin : le relevé
+    de la garde du métier lié (D6).
 15. **[test]** Des recettes lues dans une vue liée ne vont jamais dans mes recettes connues ni dans
     les recettes réseau d'une fiche (`r.recipes`).
 
