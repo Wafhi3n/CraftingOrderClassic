@@ -20,11 +20,17 @@ local AH_CUT = 0.05   -- repli : `feat/profit-arbitrages` expose PR.AH_CUT, `mai
 -- ⚠️ Pris par `select` sous pcall, jamais derrière un `X and X:f()` : la garde ne garderait qu'UN
 -- retour (piège maison n° 10). Un objet pas encore en cache client rend nil : revente INCONNUE, donc
 -- nulle pour la route -- l'hypothèse pessimiste, qui ne fabrique jamais de gain imaginaire.
+-- Gardé une fois connu : ce prix est FIXE, et la fenêtre Route se recalcule chaque seconde sur des
+-- centaines de produits. Une réponse vide n'est pas gardée : l'objet peut entrer en cache plus tard.
+local BUYBACK = {}
 local function merchantBuyback(itemID)
+    if BUYBACK[itemID] then return BUYBACK[itemID] end
     local get = (C_Item and C_Item.GetItemInfo) or _G.GetItemInfo
     if not get then return nil end
     local ok, sell = pcall(function() return (select(11, get(itemID))) end)
-    return (ok and type(sell) == "number" and sell > 0) and sell or nil
+    if not (ok and type(sell) == "number" and sell > 0) then return nil end
+    BUYBACK[itemID] = sell
+    return sell
 end
 
 -- Valeur de REVENTE d'un objet, en cuivre, ou nil si on ne sait pas.
