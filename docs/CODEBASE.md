@@ -1,29 +1,29 @@
 # CraftingOrderClassic — carte du code
 
-> **GÉNÉRÉ** le 2026-10-02 (v1.42.1) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
+> **GÉNÉRÉ** le 2026-10-02 (v1.43.0) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
-156 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
+158 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
 
 ## Modules (ordre de chargement)
 
 | Fichier | Rôle | Lignes |
 |---|---|---|
-| `CraftingOrderClassic.lua` | Crafting Order - Classic — réseau GLOBAL et SOCIAL de commandes de craft. | 498 |
+| `CraftingOrderClassic.lua` | Crafting Order - Classic — réseau GLOBAL et SOCIAL de commandes de craft. | 499 |
 | `CraftingOrderClassic_Compat.lua` | couche d'adaptation d'API entre les SAVEURS de client. | 346 |
 | `CraftingOrderClassic_Trace.lua` | trace réseau PERSISTÉE, lisible hors-jeu. | 79 |
 | `CraftingOrderClassic_Migrations.lua` | versionnage du schéma SavedVariables. | 40 |
 | `CraftingOrderClassic_Locale.lua` | socle de localisation du CHROME de l'UI. | 12 |
 | `CraftingOrderClassic_Locale_enUS.lua` | overlay ANGLAIS (enUS/enGB). | 279 |
 | `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 498 |
-| `CraftingOrderClassic_Locale_enUS_3.lua` | overlay enUS, 3/3. | 167 |
+| `CraftingOrderClassic_Locale_enUS_3.lua` | overlay enUS, 3/3. | 180 |
 | `CraftingOrderClassic_Locale_deDE.lua` | overlay ALLEMAND (deDE). | 280 |
 | `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 479 |
-| `CraftingOrderClassic_Locale_deDE_3.lua` | overlay deDE, 3/3. | 166 |
+| `CraftingOrderClassic_Locale_deDE_3.lua` | overlay deDE, 3/3. | 179 |
 | `CraftingOrderClassic_Locale_esES.lua` | overlay ESPAGNOL (esES/esMX). | 281 |
 | `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 480 |
-| `CraftingOrderClassic_Locale_esES_3.lua` | overlay esES, 3/3. | 167 |
+| `CraftingOrderClassic_Locale_esES_3.lua` | overlay esES, 3/3. | 180 |
 | `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 432 |
 | `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 429 |
 | `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 429 |
@@ -67,12 +67,14 @@
 | `CraftingOrderClassic_UI_MyArtisans_Profit.lua` | onglet « Mes artisans » : couche Auctionator. | 135 |
 | `CraftingOrderClassic_UI_MyArtisans_Reroll.lua` | accès à la vue REROLL (métiers d'un AUTRE perso du compte) depuis l'onglet « Mes artisans ». | 86 |
 | `CraftingOrderClassic_UI_Help.lua` | onglet Aide : page unique défilante qui explique les autres onglets (Carnet/Commande/Récolte/Artisans), la Vue Métier et le réseau. | 208 |
-| `CraftingOrderClassic_UI_News.lua` | onglet « Nouveautés » : notes de version (changelog) affichées EN JEU, version par version, la plus récente en tête. | 495 |
+| `CraftingOrderClassic_UI_News.lua` | onglet « Nouveautés » : notes de version (changelog) affichées EN JEU, version par version, la plus récente en tête. | 494 |
 | `CraftingOrderClassic_Social.lua` | couche sociale passive (socle). | 402 |
 | `CraftingOrderClassic_Social_Menu.lua` | entrées « Crafting Order » du menu contextuel joueur. | 104 |
 | `CraftingOrderClassic_Social_Roster.lua` | affichage des métiers sur les fenêtres NATIVES. | 130 |
 | `CraftingOrderClassic_Minimap.lua` | bouton minimap (toggle du carnet). | 185 |
-| `CraftingOrderClassic_MinimapIndicator.lua` | icônes d'état dans la barre de la minicarte (Forever). | 98 |
+| `CraftingOrderClassic_MinimapIndicator.lua` | icônes d'état dans la barre de la minicarte (Forever). | 127 |
+| `CraftingOrderClassic_MinimapIndicator_Who.lua` | QUI, sur mon compte, sait faire une commande, et d'où elle vient. | 133 |
+| `CraftingOrderClassic_MinimapIndicator_Orders.lua` | icônes « une commande t'attend » dans la barre de la minicarte. | 267 |
 | `CraftingOrderClassic_Nameplate.lua` | icône « recherche de travail » (LFW) sur les plaques. | 123 |
 | `CraftingOrderClassic_ProfOrders.lua` | COORDINATEUR d'événements de la fenêtre métier. | 83 |
 | `CraftingOrderClassic_RecipeCats.lua` | SOUS-CATÉGORIES de recettes (moteur + registre). | 122 |
@@ -96,7 +98,7 @@
 | `CraftingOrderClassic_ProfWindow_Layout.lua` | GÉOMÉTRIE de la vue métier (fenêtre 3 colonnes). | 184 |
 | `CraftingOrderClassic_ProfWindow_HelpPlate.lua` | AIDE CONTEXTUELLE de la Vue Métier (« bouton i »). | 113 |
 | `CraftingOrderClassic_ProfWindow_Dock.lua` | mode DOCK de la vue métier (« Vue Blizzard ») : la fenêtre native reste VISIBLE (non neutralisée) et NOTRE colonne Commandes s'épingle à sa droite. | 70 |
-| `CraftingOrderClassic_ProfWindow_Camelot.lua` | POC : notre colonne Commandes À L'INTÉRIEUR de la fenêtre de métier NATIVE de WoW: Forever (Camelot). | 469 |
+| `CraftingOrderClassic_ProfWindow_Camelot.lua` | POC : notre colonne Commandes À L'INTÉRIEUR de la fenêtre de métier NATIVE de WoW: Forever (Camelot). | 472 |
 | `CraftingOrderClassic_ProfWindow_Camelot_Open.lua` | OUVRIR un metier dans la fenetre NATIVE de WoW: Forever, et rediriger vers elle toutes nos entrees (bouton minimap, /co prof, clic du suivi). | 117 |
 | `CraftingOrderClassic_ProfWindow_Camelot_PageArt.lua` | prolonger le FOND de la page native dans la bande que notre greffe ajoute à droite de la fenêtre de métier de WoW: Forever. | 80 |
 | `CraftingOrderClassic_ProfWindow_Toolbar.lua` | barre d'outils de la colonne Recettes (vue métier) : les toggles de TRI (slot recTools, à gauche : rentabilité / valeurs exactes / progression — Auctionator) et de FILTRE (slot recFilterToggles, à droite : « j'ai les matériaux » / « montée de compétence »). | 245 |
@@ -114,7 +116,7 @@
 | `CraftingOrderClassic_ProfWindow_Info.lua` | PANNEAU D'INFO en SECTIONS pour la colonne centrale de la vue métier. | 217 |
 | `CraftingOrderClassic_Profit.lua` | pont LECTURE SEULE vers l'oracle de prix, AUCTIONATOR. | 477 |
 | `CraftingOrderClassic_ProfWindow_Orders.lua` | colonne « Commandes » de la vue métier (cabine de l'artisan) : construction (onglets de relation, en-tête, scroll), vue LISTE (une ligne par commande : demandeur + prix + âge ; une ligne sourdine cliquée se réaffiche), collecte/tri et rafraîchissement. | 498 |
-| `CraftingOrderClassic_ProfWindow_Orders_Card.lua` | vue SÉLECTIONNÉE de la colonne « Commandes » : la carte complète d'une commande (composants fournis, repères Auctionator, ACCEPTER / REFUSER / CHUCHOTER ; croix en haut à droite = retour liste). | 315 |
+| `CraftingOrderClassic_ProfWindow_Orders_Card.lua` | vue SÉLECTIONNÉE de la colonne « Commandes » : la carte complète d'une commande (composants fournis, repères Auctionator, ACCEPTER / REFUSER / CHUCHOTER ; croix en haut à droite = retour liste). | 316 |
 | `CraftingOrderClassic_ProfWindow_LFW.lua` | config de l'OFFRE « recherche de travail » par métier. | 496 |
 | `CraftingOrderClassic_ProfWindow_LFW_Recipes.lua` | le SÉLECTEUR DE RECETTES de l'offre LFW. | 140 |
 | `CraftingOrderClassic_ProfWindow_LFW_Announce.lua` | la case « Annoncer en Commerce » de l'offre LFW. | 28 |
@@ -144,15 +146,15 @@
 | `Orders_Announce.lua` | le FORMAT d'une annonce en clair sur Commerce (spec docs/specs/annonce-commerce.md). | 167 |
 | `Orders_AnnounceSend.lua` | l'ENVOI d'une annonce sur Trade (Services) (spec annonce-commerce, palier 2). | 148 |
 | `Orders_AnnounceRecv.lua` | la LECTURE d'une annonce de Commerce (spec annonce-commerce, palier 3). | 107 |
-| `Orders.lua` | Crafting Order - Classic — Orders : carnet d'ordres GLOBAL (modèle + cycle + protocole). | 491 |
-| `Orders_Net.lua` | couche « fil réseau » du carnet d'ordres (protocole ORD\|). | 370 |
+| `Orders.lua` | Crafting Order - Classic — Orders : carnet d'ordres GLOBAL (modèle + cycle + protocole). | 493 |
+| `Orders_Net.lua` | couche « fil réseau » du carnet d'ordres (protocole ORD\|). | 371 |
 | `Orders_Narrative.lua` | TITRE et DESCRIPTION libres d'une commande : « donne un nom et une histoire à ce que tu demandes ». | 254 |
 | `CraftingOrderClassic_QuestSheet.lua` | FICHE DE QUÊTE réutilisable : affiche (ou fait écrire) une commande sous la forme d'une vraie quête du jeu. | 363 |
 | `CraftingOrderClassic_JournalQuests.lua` | lecture EN SEULE LECTURE du journal de quêtes du JEU, pour que le journal COC affiche les vraies quêtes à côté des commandes. | 103 |
 | `CraftingOrderClassic_JournalWin.lua` | LE JOURNAL : une fenêtre parchemin où les commandes et les vraies quêtes du joueur cohabitent par sections. | 304 |
 | `CraftingOrderClassic_Inbound.lua` | couche réseau « passive » : capte les demandes de craft postées dans /commerce (Trade) et /guilde par des joueurs SANS l'addon, alerte le joueur, et les range dans une file « Entrantes » (acceptable / ignorable). | 330 |
 | `CraftingOrderClassic_Handoff.lua` | « garder une commande pour un ami capable ». | 285 |
-| `CraftingOrderClassic_Moderation.lua` | modération / anti-spam. | 370 |
+| `CraftingOrderClassic_Moderation.lua` | modération / anti-spam. | 372 |
 | `CraftingOrderClassic_LootAlert.lua` | alerte quand TU loots un objet-PLAN (recette/formule/ schéma/patron) catalogué par CraftLink, MAIS seulement s'il te CONCERNE : soit tu as le métier (candidat à l'apprendre), soit un AMI/PARTENAIRE de ton annuaire ne le connaît pas encore (candidat à un don — cf. | 165 |
 | `CraftingOrderClassic_Companion.lua` | socle des GREFFONS : panneaux compagnons accrochés aux fenêtres natives (échange, courrier) pour livrer une commande sans quitter le geste en cours. | 233 |
 | `CraftingOrderClassic_Companion_Mail.lua` | greffon COURRIER (scène B de la maquette) : panneau accroché à droite du compositeur d'envoi. | 329 |
@@ -1400,10 +1402,18 @@
 >       def.texture | def.atlas    -- l'image (chemin de fichier, ou atlas VÉRIFIÉ sur le client)
 >       def.order                  -- rang dans la barre, ≥ 3 (1 et 2 sont à Blizzard)
 >       def.size                   -- côté en px (défaut 22, cf. ICON_SIZE)
+>       def.width / def.height     -- facultatif, pour une icône qui n'est pas carrée (priment sur size)
+>       def.useAtlasSize           -- l'atlas garde sa taille native, calé en haut à gauche (comme le
+>                                  -- useAtlasSize="true" du XML de Blizzard) au lieu d'être étiré
 >       def.tooltip(tt)            -- remplit GameTooltip (lignes après le titre « Crafting Order »)
 >       def.onClick(button)        -- facultatif
->   UI:SetIndicator(key, shown)    -- l'allume ou l'éteint ; rend vrai si la barre existe
+>   UI:SetIndicator(key, shown[, count])
+>                                  -- l'allume ou l'éteint ; rend vrai si la barre existe. `count` :
+>                                  -- un nombre dans le coin bas droit, comme un objet des sacs (nil = rien) ;
+>                                  -- 4e argument `color` = { r, g, b } du nombre (défaut : blanc)
 > Le cadre n'est créé qu'au premier allumage. Sans la barre (hors Forever), SetIndicator ne fait rien.
+> La barre n'est recomposée (`Layout`) que quand une icône apparaît ou disparaît : un nombre qui change
+> ne touche qu'au texte.
 > 
 > ⚠️ `MinimapCluster` est un cadre du MODE ÉDITION. Méthode mesurée dans TaintLab le 2026-09-27
 > (`/tlab indica`, variante A choisie par le user) puis revue en jeu dans COC le 2026-09-28 (relevé
@@ -1411,7 +1421,44 @@
 > bascules en combat comprises. Ne pas changer de méthode (cadre à nous collé contre la barre, SetPoint
 > à la main dans la barre…) sans remesurer au labo.
 
-**API** : `UI:DefineIndicator(key, def)` · `UI:SetIndicator(key, shown)` · `UI:SetUpdateIndicator(shown)`
+**API** : `UI:DefineIndicator(key, def)` · `UI:SetIndicator(key, shown, count, color)` · `UI:SetUpdateIndicator(shown)`
+
+### `CraftingOrderClassic_MinimapIndicator_Who.lua`
+> CraftingOrderClassic_MinimapIndicator_Who.lua — QUI, sur mon compte, sait faire une commande, et
+> d'où elle vient. Sert les icônes de la minicarte (MinimapIndicator_Orders), 3e tour de la spec
+> docs/specs/icone-commande-recue.md (décisions du user du 2026-09-30) :
+>   * le clic va vers le perso qui sait faire (native / vue reroll / popup) ;
+>   * une commande non nommée n'allume l'icône que si un de mes persos sait la faire ;
+>   * la couleur du nombre dit d'où vient la commande, avec la palette daltonienne du jeu.
+> 
+> « Sait faire » = CONNAÎT LA RECETTE d'après les partitions persistées db.knownRecipes["Prénom-Royaume"]
+> [métier] = { [spellID] = true } (patron Handoff:MyRerollCanCraft). Un perso dont le métier n'a jamais
+> été ouvert n'a pas de partition : il ne compte pas, on ne devine pas.
+
+**API** : `UI:ShowNobodyKnows(o, count)`
+
+### `CraftingOrderClassic_MinimapIndicator_Orders.lua`
+> CraftingOrderClassic_MinimapIndicator_Orders.lua — icônes « une commande t'attend » dans la barre
+> de la minicarte. Spec : docs/specs/icone-commande-recue.md (rangs 4.xx, cf. icone-minicarte.md).
+> 
+> Une icône PAR MÉTIER : l'icône du métier où la commande est arrivée, avec le nombre de commandes
+> dans le coin (décision du user, 2026-09-28, 2e tour). Chaque icône est un ÉTAT, pas un « non lu » :
+> elle reste tant qu'au moins une commande NOMMÉE pour moi (ou pour un de mes rerolls) attend ma
+> réponse dans ce métier, et s'éteint seule quand plus aucune n'attend — acceptée, refusée, annulée,
+> masquée, expirée. C'est le comportement de l'icône des commandes personnelles de Blizzard
+> (MiniMapCraftingOrderFrameMixin, Blizzard_Minimap/Mainline/Minimap.lua).
+> 
+> 3e tour (2026-09-30) : les commandes NON nommées qu'un de mes persos sait faire l'allument aussi, la
+> couleur du nombre dit d'où vient la commande, et le clic va vers le perso qui sait faire (voir
+> MinimapIndicator_Who.lua).
+> 
+> Deux listes font la vérité, `UI:OrdersWaitingForMe()` et `UI:OrdersICanDo()`, qui relisent le cache. Les endroits où cet état
+> change appellent `UI:RefreshOrderIndicator()` : réception réseau (Orders:OnNetwork), accepter /
+> refuser (Orders:Accept / Decline), masquer / réafficher une commande (vue métier), sourdine d'un
+> joueur (Moderation:Mute / Unmute), /co notify. L'entrée en jeu et l'expiration (un minuteur unique
+> armé sur la plus proche échéance) sont gérées ici. Pas de ticker.
+
+**API** : `UI:OrdersWaitingForMe()` · `UI:OrdersICanDo()` · `UI:RefreshOrderIndicator()`
 
 ### `CraftingOrderClassic_Nameplate.lua`
 > CraftingOrderClassic_Nameplate.lua — icône « recherche de travail » (LFW) sur les plaques.

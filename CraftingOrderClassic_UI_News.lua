@@ -36,7 +36,14 @@ local BODY_W = 780
 local function versionsTop()
     return {
         {
-            v = "v1.42.1", title = L["Les métiers remarchent après le patch du 2 octobre"],
+            v = "v1.43.0", title = L["Une icône quand une commande t'attend"],
+            lines = {
+                L["Quand une commande t'attend, l'icône de son métier s'affiche à côté de la minicarte, près de la lettre du courrier, avec le nombre de commandes. Survole-la pour voir qui demande quoi, clique pour ouvrir la bonne fenêtre. Elle s'éteint quand tu as tout accepté ou refusé."],
+                L["Elle compte aussi les commandes nommées pour tes rerolls, et les commandes publiques qu'un de tes persos sait faire. La couleur du nombre dit d'où vient la commande : bleu pour toi, vert pour ta guilde ou tes amis, jaune pour tous (le mode daltonien du jeu passe à une palette adaptée). Le clic va vers le perso qui connaît la recette : ta fenêtre de métier, la vue de ton reroll, ou une fenêtre qui dit où l'apprendre."],
+            },
+        },
+        {
+            v = "v1.42.1",title = L["Les métiers remarchent après le patch du 2 octobre"],
             lines = {
                 L["Le patch du 2 octobre (build 70170) a changé le numéro par lequel le jeu indique quelle version de WoW tourne. L'addon ne le reconnaissait pas et éteignait tout ce qui touche aux métiers : plus de colonne Commandes à côté de la fenêtre de métier, plus de bouton Enchantement sur la fenêtre d'échange. Il reconnaît maintenant les deux numéros, rien à faire de ton côté."],
             },
@@ -430,15 +437,7 @@ end
 
 local function versionsOldest()
     return {
-        {
-            v = "v1.15.1", title = L["Tes commandes n'appartiennent qu'à toi"],
-            lines = {
-                L["Les identifiants de commande étaient devinables : n'importe qui pouvait réécrire la tienne (acheteur, prix, quantité). C'est fermé : seul son auteur peut la modifier. Le relais entre joueurs, lui, continue de fonctionner — c'est comme ça qu'une commande atteint quelqu'un que le canal n'a jamais touché."],
-                L["On ne peut plus te faire mettre en sourdine en postant de fausses commandes en ton nom, et un acheteur dont les commandes sont relayées en rafale n'est plus muté par erreur. « X a refusé ta commande » et le rappel « tu sais le faire » ne se rejouent plus en boucle, et rien ne passe d'un joueur que tu as mis en sourdine."],
-                L["La vue métier n'affiche plus les commandes privées destinées à quelqu'un d'autre, ni les expirées. Ton compteur de crafts livrés ne peut plus être gonflé par un tiers. Et croiser un artisan coûte deux fois moins de messages : le bonjour porte maintenant tes métiers, ce qui règle aussi les artisans qui s'affichaient sans aucun métier."],
-            },
-        },
-        -- v1.15.0 (retirée à la v1.42.1), v1.14.0 (retirée à la v1.42.0), v1.13.0 (retirée à la v1.41.1), v1.12.0 / v1.11.0 / v1.10.2 (retirées à la v1.41.0 : la Saison de la Découverte, le canal du royaume et
+        -- v1.15.1 (retirée à la v1.43.0), v1.15.0 (retirée à la v1.42.1), v1.14.0 (retirée à la v1.42.0), v1.13.0 (retirée à la v1.41.1), v1.12.0 / v1.11.0 / v1.10.2 (retirées à la v1.41.0 : la Saison de la Découverte, le canal du royaume et
         -- le bouton « Créer » sécurisé n'existent pas sur Forever), v1.10.1 / v1.9.0 / v1.8.0 / v1.7.0 / v1.7.1 /
         -- v1.6.0 / v1.5.0 / v1.4.0 retirées de l'onglet (l'historique
         -- complet vit dans CHANGELOG.md). Cet onglet ne garde qu'une fenêtre glissante de versions :

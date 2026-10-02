@@ -149,6 +149,7 @@ function Orders:Accept(id)
     end
     o.status = "accepted"; o.acceptedBy = me(); self:Broadcast("ACK", o)
     pmsg(string.format(L["commande acceptée : %s (%s)"], id, itemName(o.itemID)))
+    if COC.UI and COC.UI.RefreshOrderIndicator then COC.UI:RefreshOrderIndicator() end
 end
 
 -- Le crafteur REMET l'objet (bouton « Livrer » de la vue métier) : la commande passe « remise »
@@ -228,6 +229,7 @@ function Orders:Decline(o)
             CraftLink:Send(Codec.Encode("NACK", { id = o.id, who = m }), "whisper", o.buyer)
         end
     end
+    if COC.UI and COC.UI.RefreshOrderIndicator then COC.UI:RefreshOrderIndicator() end
 end
 
 -- Action d'une ligne de commande dans la VUE MÉTIER (fenêtre de craft) : c'est LÀ qu'un artisan

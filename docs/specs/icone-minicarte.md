@@ -26,8 +26,8 @@ disparaît quand on a mis à jour, ou quand l'alerte est oubliée (`/co version 
 
 ## Ce qu'on NE fait PAS (pour l'instant)
 
-- **Pas d'icône « commande reçue ».** L'idée du 2026-09-27 reste à spécifier ; cette barre et ce
-  module l'accueilleront, avec une icône par type ou un atlas qui change (idée du user).
+- **Pas d'icône « commande reçue » ici.** Elle a sa propre spec, `icone-commande-recue.md` (rang 4,
+  2026-09-28). D'autres types viendront chacun à son rang (idée du user : une icône par type).
 - **Pas de nouvelle règle d'alerte.** Mêmes déclencheurs que la pastille (deux joueurs distincts,
   TTL de 7 jours) : l'icône n'est qu'un deuxième affichage du même état.
 - **Pas d'icône hors Forever.** Sans `MinimapCluster.IndicatorFrame`, rien ; la pastille reste.
@@ -72,11 +72,19 @@ disparaît quand on a mis à jour, ou quand l'alerte est oubliée (`/co version 
 
 - `UI:DefineIndicator(key, def)`, une fois au chargement. `def.texture` (chemin) ou `def.atlas` (atlas
   VÉRIFIÉ sur le client), `def.order` (rang dans la barre, **≥ 3** : 1 et 2 sont à Blizzard ; un rang
-  par icône), `def.size` (défaut 22), `def.tooltip(tt)` (lignes après le titre « Crafting Order »,
-  posé par l'outil), `def.onClick(button)` facultatif.
-- `UI:SetIndicator(key, shown)` : allume ou éteint ; rend vrai si la barre existe. Le cadre n'est créé
-  qu'au premier allumage ; sans la barre (hors Forever), rien.
-- Rangs attribués : **3 = mise à jour** (`"update"`). Réserver le suivant ici avant de le coder.
+  par icône), `def.size` (défaut 22), `def.width` / `def.height` (icône non carrée, priment sur
+  `size`), `def.useAtlasSize` (l'atlas garde sa taille native, calé en haut à gauche, comme le
+  `useAtlasSize="true"` du XML de Blizzard), `def.tooltip(tt)` (lignes après le titre « Crafting
+  Order », posé par l'outil), `def.onClick(button)` facultatif.
+- `UI:SetIndicator(key, shown[, count[, color]])` : allume ou éteint ; rend vrai si la barre existe. `count`
+  pose un nombre dans le coin bas droit (`NumberFontNormal`, comme un objet des sacs ; nil = rien) ;
+  `color` = `{ r, g, b }` du nombre (défaut blanc ; ajouté le 2026-09-30 pour les commandes). Le
+  cadre n'est créé qu'au premier allumage ; sans la barre (hors Forever), rien. La barre n'est
+  recomposée (`Layout`) que quand l'icône apparaît ou disparaît.
+- Rangs attribués : **3 = mise à jour** (`"update"`) ; **4.01 à 4.99 = une commande t'attend**, une
+  icône par métier (`"order:<métier>"`, spec `icone-commande-recue.md`) — la barre trie les
+  `layoutIndex` numériquement, les sous-rangs passent ; **5 = réservé** à « commande livrée ».
+  Réserver le suivant ici avant de le coder.
 
 ## Renvois
 

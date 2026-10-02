@@ -339,6 +339,7 @@ function Orders:OnNetwork(sender, message, distribution)
     elseif action == "TTL" or action == "TXQ" or action == "TXT" then return
     else self:_OnCycle(action, message, sender) end
     if COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end   -- maj live coalescée (rafales de fanout)
+    if COC.UI and COC.UI.RefreshOrderIndicator then COC.UI:RefreshOrderIndicator() end   -- icône « une commande t'attend »
     local PW = COC.ProfWindow
     if PW and PW.RefreshOrders and PW.frame and PW.frame:IsShown() then PW:RefreshOrders() end
 end

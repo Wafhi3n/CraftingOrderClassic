@@ -1,0 +1,259 @@
+# Icônes « une commande t'attend » dans la barre de la minicarte
+
+> État : **2e version vue en jeu à deux comptes** (relevé 2026-09-30 18:25, critères 5 et 6, sauf le
+> clic d'un métier que le perso n'a pas) ; **3e tour vu en jeu** (section « 3e tour » ci-dessous : le
+> clic selon qui sait faire, les commandes non nommées qu'un de tes persos sait faire, la couleur du
+> nombre) : critère 11 sur un client (relevé 2026-09-30 19:06), 11 (d) le vert et 12 à deux comptes
+> (relevé 2026-10-02 10:06, amitié simulée : la liste d'amis du jeu est coupée sur la bêta). Reste
+> non vu : le taint (critère 7). · Rédigée le 2026-09-28 · Idée du user le 2026-09-27, périmètre tranché par lui en trois
+> tours de questions (cf. Décisions).
+> Cible : WoW: Forever / Camelot (16001) · Addon : Crafting Order - Classic
+> Deuxième usage de l'outil d'icônes de la minicarte (spec `icone-minicarte.md`, rangs 4.xx).
+
+## Le problème
+
+Quand quelqu'un passe une commande **à ton nom**, COC sonne une fois : une ligne dans le chat, un
+toast, un son. Si tu étais en combat, dans une conversation ou loin du clavier, tu as raté l'alerte,
+et plus rien ne te le rappelle tant que tu n'ouvres pas la fenêtre du métier. La commande attend
+pourtant ta réponse, et l'acheteur attend avec elle.
+
+L'icône des commandes personnelles de Blizzard, en haut de la minicarte, règle ce problème pour leur
+système : elle reste là tant qu'une commande personnelle est disponible.
+
+## Ce qu'on veut
+
+Tant qu'au moins une commande **nommée pour toi** (ou pour un de tes rerolls) attend ta réponse dans
+un métier, **l'icône de ce métier** apparaît dans la barre de la minicarte, après la lettre du
+courrier, avec **le nombre de commandes** dans le coin bas droit. Deux métiers, deux icônes. Chacune
+**s'éteint seule** quand plus aucune commande n'attend dans son métier : acceptée ou refusée, annulée
+par l'acheteur, masquée, acheteur en sourdine, ou expirée (6 h).
+
+- **Survol** : le nom du métier, « Commandes à ton nom : N », puis une ligne par commande (acheteur,
+  objet, quantité ; « pour <reroll> » si elle vise un autre de tes persos), cinq au plus, puis
+  « +N de plus » ; en bas, « Clic : ouvrir cette fenêtre de métier » quand le clic peut l'ouvrir.
+- **Clic** : ouvre la fenêtre de CE métier (le même chemin que le clic du suivi,
+  `ProfWindow:OpenFor`). Si seules des commandes pour un reroll y attendent, ou si le métier est
+  inconnu, la liste s'écrit dans le chat.
+
+## Ce qu'on NE fait PAS (pour l'instant)
+
+- **Pas les commandes publiques, de guilde ou d'amis**, même celles de ton métier qui déclenchent un
+  toast : elles vivent 6 h et sont visibles de tous, l'icône serait allumée presque en permanence.
+- **Pas les demandes captées dans le chat** (Entrantes) : éphémères, et très bavardes.
+- **Pas d'icône « commande livrée »** côté acheteur. Ce sera une autre icône, au rang 5, dans un
+  chantier à part (idée du user : une icône par type de notification).
+- **Pas de « non lu »** : regarder la commande sans y répondre ne l'éteint pas.
+
+## Cas particuliers
+
+- **Mêmes règles que l'alerte.** Une commande qui ne sonnerait pas n'allume pas d'icône :
+  `/co notify off`, acheteur en sourdine, commande masquée (clic droit dans la vue métier). Un filtre
+  d'alerte sans son jumeau côté affichage finit toujours par se contredire (vécu avec les Entrantes).
+- **Ta propre commande** nommée pour un de tes rerolls ne compte pas : elle ne t'attend pas.
+- **Ordre des icônes** : fixe par métier (Alchimie, Forge, Enchantement, Ingénierie, …, Couture,
+  Cuisine, Secourisme…), rangs 4.01 à 4.16. Une commande qui arrive dans un nouveau métier ne fait pas
+  sauter les icônes déjà là. Tout reste sous 5.
+- **Métier inconnu** (objet hors catalogue) ou **sans icône connue** : l'icône des commandes de
+  Blizzard, à sa taille native (20 × 15), au rang 4.99 ; celle de la 1re version, vue en jeu.
+- **Expiration** : aucun événement ne dit qu'une commande a expiré. Un minuteur unique est armé sur
+  la plus proche échéance et rappelle le recalcul ; pas de ticker.
+- **Rerolls** : une commande nommée pour un autre perso du compte compte (elle sonne déjà), mais le
+  clic n'ouvre que le métier du perso connecté : la fenêtre native ne connaît que lui.
+- **Taille et nombre** : icône carrée de 22 px (celle du logo « CO »), nombre en `NumberFontNormal`
+  dans le coin bas droit, comme un objet des sacs. À valider sur capture.
+- **Barre** : elle n'est recomposée que quand une icône apparaît ou disparaît. Un nombre qui change ne
+  touche qu'au texte.
+
+## Critères d'acceptation
+
+1. [test] `UI:OrdersWaitingForMe()` retient une commande ouverte nommée pour moi ou pour un de mes
+   rerolls, et écarte : une commande publique, la mienne, une expirée, une masquée, un acheteur en
+   sourdine, `notify off`, une commande acceptée, annulée ou refusée. Plus récente d'abord.
+   → `tests/test_order_indicator.lua`
+2. [test] Une icône par métier, enfant de la barre, à son rang fixe (4.xx) ; l'icône du métier,
+   22 px ; le nombre du métier dans le coin ; un nombre qui baisse ne recompose pas la barre ; le
+   dernier départ d'un métier retire son icône ; repli sur l'icône des commandes pour un métier
+   inconnu ; minuteur sur la plus proche expiration. → même fichier
+3. [test] L'infobulle nomme le métier, compte, liste, plafonne à cinq ; le clic ouvre ce métier ;
+   reroll seul : pas de ligne « Clic », la liste part dans le chat. → même fichier
+4. [porte] Les quatre portes ; les chaînes neuves sont dans les trois overlays.
+5. [humain] Un client, les deux commandes de test ci-dessous : deux icônes (Couture avec « 2 »,
+   Alchimie avec « 1 ») à côté de la lettre, dans cet ordre (Alchimie d'abord) ; l'infobulle de la
+   Couture dit « Tailoring », « Orders in your name: 2 » ; le clic ouvre la Couture ; les lignes
+   d'effacement les font disparaître. Témoin : le marteau de la 1re version, vu au même endroit le
+   2026-09-28 (relevé 13:16).
+6. [humain] Deux comptes : A passe une commande nommée pour B → l'icône du métier apparaît chez B avec
+   « 1 » ; une deuxième → « 2 » ; B en accepte une → « 1 » ; A annule l'autre → l'icône disparaît.
+7. [humain] `/console taintLog 1`, icônes affichées, mode Édition ouvert puis fermé, un combat : aucune
+   erreur, rien de COC dans `Logs\taint.log`.
+
+Commandes de test (un client ; Couture requise pour le clic), une ligne à la fois. ⚠️ La saisie du
+chat s'arrête à **255 caractères** : une ligne plus longue est coupée et lève « unfinished string »
+(vécu le 2026-09-28). D'où la fonction posée d'abord :
+
+```
+/run COCm=CraftingOrderClassic.Api.PlayerName() function COCT(k,p,i,q) CraftingOrderClassic.db.orders[k]={id=k,buyer="Test Un",recipient=COCm,status="open",ts=time(),itemID=i,profession=p,qty=q} end
+/run COCT("T-1","Tailoring",2996,1) COCT("T-2","Tailoring",2996,2) COCT("T-3","Alchemy",118,1) CraftingOrderClassic.UI:RefreshOrderIndicator()
+/run for _,k in ipairs({"T-1","T-2","T-3"}) do CraftingOrderClassic.db.orders[k]=nil end CraftingOrderClassic.UI:RefreshOrderIndicator()
+```
+
+## Décisions
+
+- **2026-09-28, user (1er tour)** : les commandes **nommées pour moi** (pas les publiques ni les
+  Entrantes) ; un **état** qui s'éteint quand plus rien n'attend (pas un « non lu ») ; le **clic ouvre
+  le métier** ; « commande livrée » viendra **plus tard**, dans un autre chantier.
+- **2026-09-28, défaut de l'agent** : les règles de l'alerte s'appliquent (`notify off`, sourdines,
+  commande masquée).
+- **2026-09-28, user (2e tour, après la 1re version vue en jeu)** : « une icône du métier où on a
+  reçu la commande, avec le nombre de commandes dessus » → **une icône par métier** (plutôt qu'une
+  seule au total), **carrée, nombre en bas à droite** (plutôt que ronde).
+- **2026-09-28, défaut de l'agent** : rangs fixes par métier sous 5 ; repli sur l'atlas des commandes
+  de Blizzard (20 × 15, taille native) pour un métier inconnu ; l'outil apprend `count`, `width` /
+  `height`, `useAtlasSize`, et ne recompose la barre qu'à une apparition ou une disparition.
+
+- **2026-09-30, user (3e tour, après la 2e version vue en jeu)** : sur Rédemption, qui n'a pas la
+  Couture, le clic de l'icône Couture ouvrait le livre des Métiers de Blizzard. Le user veut que le
+  clic dépende de QUI sait faire : un reroll qui a le métier → sa vue métier ; personne → une popup.
+  Il valide les deux règles de départage proposées par l'agent (plusieurs rerolls ; perso connecté
+  qui a le métier sans la recette). Il veut aussi une icône pour les **commandes publiques** qu'un de
+  ses persos sait faire, **avec une marque qui dit que ce n'est pas une commande nommée** — ce qui lève
+  le « Pas les commandes publiques » de la 1re version, pour elles seulement.
+- **2026-09-30, user (même tour)** : la marque = **un code couleur du nombre**, vert guilde, bleu
+  nommée (« ça suit la liste d'amis »), jaune tous/Commerce, plutôt que la bulle proposée par l'agent ;
+  et un **mode daltonien** avec une palette publiée. Défauts de l'agent acceptés : une couleur par
+  icône (type le plus personnel, le nombre ne compte que lui), amis avec la guilde, suivre la CVar
+  `colorblindMode` du jeu, palette Okabe-Ito.
+
+## 3e tour — le clic selon qui sait faire, et les commandes publiques (spécifié 2026-09-30)
+
+### Le problème
+
+L'icône dit « une commande t'attend », mais le clic suppose que le perso connecté sait la faire. Une
+commande nommée pour un reroll, ou dans un métier que tu portes sur un autre perso, ouvre une fenêtre
+qui ne te sert à rien (vu le 2026-09-30 : le livre des Métiers). Et une commande publique que ton
+couturier saurait faire ne se voit nulle part tant que tu joues ton enchanteur.
+
+### Ce qu'on veut
+
+**Le clic** va vers le perso qui sait faire, dans cet ordre :
+
+| Qui sait faire la commande | Le clic |
+|---|---|
+| Le perso connecté a le métier ET la recette | la fenêtre native de ce métier (comme aujourd'hui) |
+| Un reroll a la recette (le connecté non, ou sans la recette) | la **vue reroll** de ce reroll, en lecture seule : ses recettes et les commandes qu'il peut faire |
+| Personne n'a la recette | une **popup** : « Aucun de tes persos ne sait faire <objet> », les commandes concernées, et où apprendre la recette quand COC le sait |
+
+Plusieurs rerolls conviennent : celui à qui la commande est nommée, sinon celui qui a la recette,
+sinon celui qui a le plus haut niveau dans le métier. Une icône qui regroupe plusieurs commandes suit
+la plus récente. L'infobulle dit ce que fera le clic : « Clic : ouvrir la fenêtre de métier », « Clic :
+ouvrir la <métier> de <reroll> », ou « Clic : voir pourquoi ».
+
+**Les commandes non nommées** (à la guilde, aux amis, à tous) qu'**un de tes persos sait faire**
+allument aussi l'icône du métier. **La couleur du nombre dit d'où vient la commande** :
+
+| Type | Couleur | Mode daltonien du jeu (Okabe-Ito) |
+|---|---|---|
+| Nommée pour toi ou un reroll | bleu (celui de la liste d'amis) | vermillon `#D55E00` |
+| Guilde ou amis | vert (celui de la discussion de guilde) | bleu ciel `#56B4E9` |
+| À tous (réseau, annonces sur Trade comprises) | jaune | jaune `#F0E442` |
+
+- **Une couleur par icône** : celle du type **le plus personnel** présent (nommée > guilde/amis >
+  tous), et le nombre compte **ce type-là seulement**. 1 nommée et 3 publiques en Couture = un « 1 »
+  bleu : le nombre et sa couleur disent la même chose.
+- **Mode daltonien** : COC suit le réglage du jeu (Accessibilité > Mode daltonien, CVar
+  `colorblindMode`), pas une option à lui, et bascule de palette quand le joueur le change.
+- **La couleur n'est jamais seule** (comme Blizzard en mode daltonien, qui double par du texte) :
+  l'infobulle nomme chaque type, « Commandes à ton nom : N », « Pour ta guilde ou tes amis : M »,
+  « Pour tous : K », chacun avec ses lignes (cinq au plus en tout).
+
+Une publique s'éteint comme une nommée (prise par quelqu'un, annulée, expirée, masquée, acheteur en
+sourdine) ; et **dès que tu l'acceptes**, elle n'attend plus.
+
+### Ce qu'on NE fait PAS
+
+- **Toujours pas les Entrantes** (demandes captées dans le chat) : éphémères et bavardes.
+- **Pas une deuxième icône par métier** : une seule icône, la couleur dit le reste (la barre de la
+  minicarte est étroite, et deux icônes Couture côte à côte se liraient mal).
+- **Pas d'option de couleurs propre à COC** : le mode daltonien est celui du jeu.
+- **Pas de publique qu'aucun de tes persos ne sait faire** : c'est le rôle de la vue métier, pas d'un
+  rappel.
+- **Pas de réglage pour couper les publiques** dans ce tour. Si l'icône reste allumée en permanence
+  sur un réseau actif, on l'ajoutera (décision à prendre après usage).
+- **Pas encore l'allure native pour la vue reroll.** Le user l'a demandé le 2026-09-30 (« changer l'ui
+  de la vue reroll par la vue ui native si possible ») : **à étudier dans un chantier à part**. La
+  fenêtre de métier de Blizzard ne lit que le perso connecté (`C_TradeSkillUI`) et ne peut pas afficher
+  les recettes d'un reroll, qui n'existent que dans notre SavedVariable. La piste réaliste : garder
+  nos données, mais construire la vue avec les gabarits et le skin de la fenêtre native (liste de
+  recettes, panneau de détail). Il faudra vérifier que ces gabarits n'appellent pas `C_TradeSkillUI`
+  en interne, et qu'ils ne salissent pas la fenêtre native (taint).
+
+### Cas particuliers
+
+- **« Sait faire » = connaît la recette**, d'après les recettes enregistrées de chaque perso du compte
+  (même royaume, même camp que le perso connecté). Un perso dont les recettes n'ont jamais été lues
+  (métier jamais ouvert) ne compte pas : on ne devine pas.
+- **Ta propre publique** ne compte pas.
+- **Une publique acceptée par quelqu'un d'autre** s'éteint à la réception de l'ACK, comme dans le
+  Carnet — **quand l'ACK arrive**. Relu dans `Orders:Broadcast` le 2026-09-30 : l'ACK part à l'acheteur
+  et, sans canal, aux pairs EN LIGNE que l'accepteur connaît. Un tiers hors de cette liste garde la
+  commande « ouverte », et son icône allumée, jusqu'à l'expiration (6 h). Limite du réseau, antérieure
+  à l'icône ; c'est elle qui décidera du réglage « couper les publiques ».
+- **Nommée pour un reroll qui sait la faire, alors que le perso connecté la sait aussi** : sans
+  l'option rerolls (`/co alts`), seul le reroll nommé peut l'accepter (`Orders:Accept` refuse d'un
+  autre perso) → le clic ouvre SA vue, pas la native. Avec l'option, la native. Défaut de l'agent
+  (2026-09-30), **à confirmer par le user** : la 2e version écrivait la liste dans le chat.
+- **Popup** : jamais d'appel au système de menus de Blizzard (cf. `forever-menu-addon-open-crash`) ;
+  un `StaticPopup` comme `COC_MISSING_ADDON` (déjà vu en jeu), fermé par Échap, avec « Où
+  l'apprendre » quand les sources le savent et un bouton « Ouvrir la fenêtre de métier » si le perso
+  connecté a le métier. Hors combat seulement pour la vue reroll (elle détache la native).
+- **Rerolls de l'autre camp** : exclus, comme dans « Mes artisans ».
+- **Acheteur sous le seuil anti-robots** (niveau connu < 5, `/co lowlevel`) : sa non nommée n'allume
+  rien, comme elle ne sonne pas (`Orders:_ShouldAlert`). Vu en jeu le 2026-10-01 : Gnomi, niveau 2,
+  n'allumait rien avant `/co trust`. Ce n'est pas un défaut ; un testeur qui poste depuis un petit
+  perso doit le savoir.
+- **Commande reçue par le réseau** : une commande d'objet voyage SANS son numéro de recette, avec son
+  métier ; la recette se retrouve par l'objet (catalogue `itemToSpell`). Vu en jeu le 2026-10-02.
+
+### Critères d'acceptation (3e tour)
+
+8. [test] La cible du clic : native si le connecté a la recette ; sinon le reroll choisi selon la
+   règle de départage (nommé > a la recette > plus haut niveau) ; sinon popup. Rerolls d'un autre
+   camp ou d'un autre royaume écartés. → `tests/test_order_indicator.lua`
+9. [test] Une non nommée compte si un perso du compte a la recette, et seulement alors ; la mienne, une
+   acceptée, une expirée, une masquée, un acheteur en sourdine sont écartées ; la couleur et le nombre
+   suivent le type le plus personnel présent ; `colorblindMode` à 1 donne la palette Okabe-Ito, et
+   son changement repeint les icônes affichées. → même fichier
+10. [porte] Les quatre portes ; les chaînes neuves dans les trois overlays.
+11. [humain] Un client, commandes de test DevMacro : (a) une nommée dans un métier qu'un reroll a
+    et pas le connecté → clic = vue reroll de ce reroll, titre « <reroll> — lecture seule » ;
+    (b) une nommée que personne ne sait faire → popup ; (c) une « à tous » qu'un reroll sait faire →
+    nombre jaune ; (d) une « guilde » → vert ; (e) (c) + une nommée dans le même métier → « 1 » bleu ;
+    (f) Mode daltonien coché dans les options du jeu → les couleurs changent sans /reload. Témoin :
+    le nombre blanc de la 2e version, vu le 2026-09-30 à 18:15. Observateur : le user, sur capture.
+12. [humain] Deux comptes : A poste à tous une commande que seul un reroll de B sait faire → l'icône
+    au nombre jaune apparaît chez B ; A l'annule → elle s'éteint.
+
+## Contrat
+
+`CraftingOrderClassic_MinimapIndicator_Orders.lua`, sur `COC.UI` :
+
+- `UI:OrdersWaitingForMe()` → les commandes NOMMÉES qui attendent ma réponse, plus récente d'abord.
+- `UI:OrdersICanDo()` → les non nommées (guilde, amis, tous) qu'un perso du compte sait faire (3e
+  tour). Ces deux listes sont, ensemble, la seule source de vérité des icônes.
+- `CraftingOrderClassic_MinimapIndicator_Who.lua` (3e tour) : `UI:_OrderKnowers(o)` (mes persos qui
+  connaissent la recette), `UI:_OrderClickTarget(o)` (`native` / `reroll` / `popup`),
+  `UI:_OrderKind(o)` (`named` / `group` / `all`), `UI:_OrderKindColor(kind)` (palette normale ou
+  Okabe-Ito selon `colorblindMode`), `UI:ShowNobodyKnows(o, n)`.
+- `UI:RefreshOrderIndicator()` → recalcule (différé de 0,2 s, les rafales réseau arrivent groupées)
+  et pose chaque icône `"order:<métier>"` avec son nombre et sa couleur. `CVAR_UPDATE` de
+  `colorblindMode` le rappelle. À appeler partout où cet état change :
+  réception réseau (`Orders:OnNetwork`), `Orders:Accept`, `Orders:Decline`, masquer ou réafficher une
+  commande (vue métier), `Moderation:Mute` / `Unmute`, `/co notify`. L'entrée en jeu et l'expiration
+  l'appellent d'elles-mêmes.
+
+## Renvois
+
+- `icone-minicarte.md` (l'outil, la méthode mesurée sans taint, les rangs).
+- `Orders.lua` (`_ShouldAlert`, `AlertTargeted`) : l'alerte dont l'icône est le rappel.
+- Blizzard : `MiniMapCraftingOrderFrameMixin`, `Blizzard_Minimap/Mainline/Minimap.lua` ;
+  `LayoutFrame.lua` (tri numérique des `layoutIndex`).
