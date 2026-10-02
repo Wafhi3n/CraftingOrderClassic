@@ -46,6 +46,13 @@ client.
 
 ## Relevés
 
+- 2026-10-02 10:20 — jusqu'a 8e7c062 — Forever, client de Rédemption, en ANGLAIS, Forgefer ; build
+  `main-dev@ce68ef3 2026-10-02 10:16` avec icone-commande-recue, liste-destinataires,
+  profit-arbitrages, release/v1.43.0 (copie déployée du `.toc`) — **GO sur `fix/manquantes-nom-long`**
+  — capture du user, Enchantement 102/150, vue Missing (239) : « Enchant Cloak - Lesser Shadow
+  Resista… » tient sur UNE ligne, tronqué par « … », et « Arcane Salvager » en dessous n'est plus
+  recouvert (le constat du matin le montrait sur deux lignes). **Pas observé** : l'infobulle qui
+  donne le nom entier au survol.
 - 2026-10-02 09:37 — jusqu'a a1560ee — Forever build client 70170, même build addon `main-dev@2709aa5`
   — **GO** — fin de la liste de la v1.42.1 : `/dump CraftingOrderClassic.Api.IS_MAINLINE` → `[1]=true`
   (capture du user) ; le clic droit sur le bouton COC de la minimap ouvre la fenêtre des métiers
