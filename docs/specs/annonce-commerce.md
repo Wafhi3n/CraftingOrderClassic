@@ -12,7 +12,9 @@
 > tenu en jeu le 2026-09-30 00:31**. Reste le palier 5 (relectures, critère 15).
 > **Évolution du 2026-10-03** (demande du user) : la ligne LFW porte le **lien de métier** de l'auteur
 > (palier 6, branches `feat/lfw-lien-metier`) ; critères 16 et 17 tenus en test, **18 tenu en jeu le
-> 2026-10-03 14:33** (Trade (Services) accepte le lien de métier) ; 19 et 20 à voir au banc.
+> 2026-10-03 14:33** (Trade (Services) accepte le lien de métier), **19 et 20 tenus à 14:40** (lien
+> gardé valable après un redémarrage de l'addon ; un lien d'un autre jour pas essayé). Reste le
+> critère 15 (relectures) avant fusion.
 
 ## Le problème
 
@@ -228,13 +230,18 @@ Le lien de métier dans la ligne LFW (2026-10-03) :
     dit « avec le lien frais ». Témoin connu-bon : la ligne d'avant, sans lien. Si la ligne ne paraît
     pas du tout, le canal refuse le lien : le dire, ne rien fusionner. Observateur : le user, deux comptes.
     → **Tenu** le 2026-10-03 14:33 (capture : la ligne et son lien sur « 5. Trade (Services) -
-    English ») ; la trace « lien frais » n'a pas été relevée.
+    English ») ; la trace « avec le lien frais » relue ensuite dans la SavedVariable (14:21:47, 14:32:01).
 19. [humain] Gnomi, **COC désactivé**, clique le lien : la fenêtre de métier de Rédemption s'ouvre, nom
     du métier et recettes affichés. Observateur : le user, compte B.
+    → **Tenu** le 2026-10-03 14:40 (parole du user ; COC de Gnomi désactivé, établi par sa
+    SavedVariable non réécrite).
 20. [humain] Rédemption se déconnecte, se reconnecte, et tape `/co lfw Blacksmithing` **sans ouvrir son
     métier** : la trace dit « avec le lien gardé », et le clic de Gnomi (COC désactivé) ouvre le métier
     avec ses recettes. Un nom de métier vide ou une liste vide = le lien gardé ne vaut rien : on retire
     ce cas (décision du 2026-10-03).
+    → **Tenu** le 2026-10-03 14:40 : « avec le lien gardé » à 14:33:24, après un redémarrage de
+    l'addon (`/reload` ou relog, la trace ne les distingue pas) ; le clic montre les recettes. Un lien
+    gardé d'un autre jour n'a pas été essayé.
 
 ## Contrat
 
