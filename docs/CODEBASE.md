@@ -92,8 +92,8 @@
 | `CraftingOrderClassic_Stats_Filter.lua` | sélecteur « ne montrer que ce qui donne <stat> ». | 103 |
 | `CraftingOrderClassic_Gem.lua` | spécifique à la JOAILLERIE : sous-catégorise les GEMMES TAILLÉES par TAILLE (le mot qui porte la stat). | 226 |
 | `CraftingOrderClassic_Gem_Stats.lua` | correspondance TAILLE DE GEMME → STAT (données, éditées à la main). | 41 |
-| `CraftingOrderClassic_Sources.lua` | « où j'obtiens ce plan, et lesquels me manquent ». | 440 |
-| `CraftingOrderClassic_Sources_Side.lua` | le plan que seul l'AUTRE camp vend. | 58 |
+| `CraftingOrderClassic_Sources.lua` | « où j'obtiens ce plan, et lesquels me manquent ». | 442 |
+| `CraftingOrderClassic_Sources_Side.lua` | le plan que seul l'AUTRE camp vend. | 75 |
 | `CraftingOrderClassic_Trainers.lua` | « le formateur, vu de nos propres yeux ». | 344 |
 | `CraftingOrderClassic_ProfWindow.lua` | fenêtre métier custom 3 colonnes (migration depuis Guild Economy) : Recettes \| Détail+Craft \| Commandes du métier. | 490 |
 | `CraftingOrderClassic_ProfWindow_Layout.lua` | GÉOMÉTRIE de la vue métier (fenêtre 3 colonnes). | 184 |
@@ -1838,7 +1838,7 @@
 > À part de CraftingOrderClassic_Sources.lua pour le seul plafond de 500 lignes : c'est la même
 > table `COC.Sources`, chargée juste après elle par le .toc.
 
-**API** : `S:OtherSideVendor(profKey, spellID)` · `S:OtherSideNote(side)` · `S:OtherSideAtlas(side)` · `S:OtherSideCrest(side, size)` · `S:AuctionPrice(profKey, spellID)`
+**API** : `S:OtherSideVendor(profKey, spellID)` · `S:PlanIsBound(profKey, spellID)` · `S:OtherSideUnreachable(profKey, spellID)` · `S:OtherSideNote(side)` · `S:OtherSideAtlas(side)` · `S:OtherSideCrest(side, size)` · `S:AuctionPrice(profKey, spellID)`
 
 ### `CraftingOrderClassic_Trainers.lua`
 > CraftingOrderClassic_Trainers.lua — « le formateur, vu de nos propres yeux ».

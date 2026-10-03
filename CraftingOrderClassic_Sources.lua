@@ -347,7 +347,9 @@ function S:MissingRecipes(profKey)
     local out = {}
     for _, spellID in ipairs(lib:GetRecipes(profKey) or {}) do
         if not known[spellID] and not (IsSpellKnown and IsSpellKnown(spellID))
-           and not self:IsOtherSideTwin(profKey, spellID) then
+           and not self:IsOtherSideTwin(profKey, spellID)
+           -- Lié ET vendu seulement en face : hors d'atteinte, comme un jumeau (cf. _Sources_Side).
+           and not (self.OtherSideUnreachable and self:OtherSideUnreachable(profKey, spellID)) then
             local itemID = lib.RecipeProduct and lib:RecipeProduct(profKey, spellID) or nil
             out[#out + 1] = {
                 isMissing = true, spellID = spellID, itemID = itemID,

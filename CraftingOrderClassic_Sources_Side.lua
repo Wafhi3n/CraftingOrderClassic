@@ -30,6 +30,23 @@ function S:OtherSideVendor(profKey, spellID)
     return list[1][4]
 end
 
+-- LE PLAN LIÉ QUAND RAMASSÉ ne se revend pas : vendu seulement chez l'autre camp, il est hors d'atteinte
+-- pour ce joueur, et la piste de l'HV neutre serait un mensonge. La règle du user (2026-10-03) ne
+-- marque que la recette NON liée ; la liée sort de la liste, comme un jumeau de camp. Mesuré le même
+-- jour : les 72 plans d'Aisarra Nightmeadow (Hyjal, Alliance) sont tous liés quand ramassés.
+-- La liaison est LUE sur le client (14e retour de GetItemInfo, 1 = liée quand ramassée), comme le
+-- fait déjà UI_Post. Objet pas encore en cache : on ne sait pas, donc FAUX -- un doute ne masque rien.
+function S:PlanIsBound(profKey, spellID)
+    local itemID = self:RecipeItem(profKey, spellID)
+    if not (itemID and COC.Api and COC.Api.GetItemInfo) then return false end
+    return select(14, COC.Api.GetItemInfo(itemID)) == 1
+end
+
+-- Vrai si seul l'autre camp vend ce plan ET qu'il est lié : personne de ce camp ne peut l'obtenir.
+function S:OtherSideUnreachable(profKey, spellID)
+    return self:OtherSideVendor(profKey, spellID) ~= nil and self:PlanIsBound(profKey, spellID)
+end
+
 -- La phrase qui le dit. Le nom du camp vient des globales du jeu : déjà traduit, et c'est celui que le
 -- joueur lit partout ailleurs.
 function S:OtherSideNote(side)
