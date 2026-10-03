@@ -190,8 +190,8 @@ local en2 = {
         "The selected recipe: its reagents and the button to craft it.",
     ["Les commandes reçues pour ce métier — accepte, crafte, livre. Les onglets filtrent la source (tous / guilde / amis / annuaire)."] =
         "Orders received for this profession — accept, craft, deliver. The tabs filter the source (all / guild / friends / directory).",
-    ["Chercher du travail : signale au royaume que tu proposes ce métier. L'engrenage voisin règle ton offre (composants fournis, commission)."] =
-        "Look for work: tell the realm you offer this profession. The gear next to it sets up your offer (provided reagents, fee).",
+    ["Chercher du travail : signale au royaume que tu proposes ce métier. Le bouton « Offre » règle ce que tu proposes (composants fournis, commission)."] =
+        "Look for work: tell the realm you offer this profession. The Offer button sets up what you provide (reagents, fee).",
     ["Vue Blizzard : rebascule sur la fenêtre de métier native de Blizzard."] =
         "Blizzard view: switch back to Blizzard's native profession window.",
     ["Filtre les commandes par source : tous, ta guilde, tes amis, ou ton annuaire d'artisans."] =

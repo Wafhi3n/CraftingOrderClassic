@@ -161,8 +161,8 @@ local de2 = {
         "Das ausgewählte Rezept: seine Reagenzien und die Schaltfläche zum Herstellen.",
     ["Les commandes reçues pour ce métier — accepte, crafte, livre. Les onglets filtrent la source (tous / guilde / amis / annuaire)."] =
         "Für diesen Beruf erhaltene Aufträge – annehmen, herstellen, liefern. Die Reiter filtern die Quelle (alle / Gilde / Freunde / Verzeichnis).",
-    ["Chercher du travail : signale au royaume que tu proposes ce métier. L'engrenage voisin règle ton offre (composants fournis, commission)."] =
-        "Arbeit suchen: Teile dem Realm mit, dass du diesen Beruf anbietest. Das Zahnrad daneben stellt dein Angebot ein (bereitgestellte Reagenzien, Gebühr).",
+    ["Chercher du travail : signale au royaume que tu proposes ce métier. Le bouton « Offre » règle ce que tu proposes (composants fournis, commission)."] =
+        "Arbeit suchen: Teile dem Realm mit, dass du diesen Beruf anbietest. Die Schaltfläche „Angebot“ stellt ein, was du anbietest (bereitgestellte Reagenzien, Gebühr).",
     ["Vue Blizzard : rebascule sur la fenêtre de métier native de Blizzard."] =
         "Blizzard-Ansicht: zurück zum nativen Berufsfenster von Blizzard wechseln.",
     ["Filtre les commandes par source : tous, ta guilde, tes amis, ou ton annuaire d'artisans."] =

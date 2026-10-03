@@ -67,9 +67,11 @@ function PW:_ShowHelp()
     end
     for _, n in ipairs(PW.helpNodes or {}) do add(self:Sec(n.id), texts[n.id], n.dir) end
 
-    add(self.lfwBtn,
-        L["Chercher du travail : signale au royaume que tu proposes ce métier. L'engrenage voisin règle ton offre (composants fournis, commission)."],
-        "DOWN")
+    local lfwHelp = L["Chercher du travail : signale au royaume que tu proposes ce métier. Le bouton « Offre » règle ce que tu proposes (composants fournis, commission)."]
+    add(self.lfwBtn, lfwHelp, "DOWN")
+    -- La bande de pied (colonne) : bulle AU-DESSUS. Garde sur la BANDE : le bouton, enfant jamais
+    -- caché lui-même, rend IsShown() vrai même quand elle l'est.
+    add(self.lfwStrip and self.lfwStrip:IsShown() and self.lfwStripBtn, lfwHelp, "UP")
     add(self.missingBtn, L["Affiche AUSSI les recettes non apprises (en rouge) et où les obtenir."], "DOWN")
     add(self.vanillaBtn, L["Vue Blizzard : rebascule sur la fenêtre de métier native de Blizzard."], "DOWN")
     local relHelp = L["Filtre les commandes par source : tous, ta guilde, tes amis, ou ton annuaire d'artisans."]

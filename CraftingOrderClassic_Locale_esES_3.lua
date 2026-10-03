@@ -13,6 +13,7 @@ local es3 = {
     ["Route"] = "Ruta",               -- languette courte (la vue garde « Ruta de subida »)
     ["Dispo — %s"] = "Disponible — %s",
     ["Offre"] = "Oferta",
+    ["Arrêter"] = "Detener",           -- bouton de la bande LFW allumée (2026-10-03)
     ["Réactifs"] = "Reactivos",
     ["Recettes"] = "Recetas",
     ["Aucun résultat pour cette recherche."] = "Ningun resultado para esa busqueda.",

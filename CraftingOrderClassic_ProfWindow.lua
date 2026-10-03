@@ -111,7 +111,7 @@ function PW:_BuildHeader(f)
     self.lfwBtn = lfw
 
     -- L'entrée LFW vivante est la BANDE de pied de colonne (la greffe ne montre pas cet en-tête) :
-    -- interrupteur, état écrit, engrenage d'offre. Le pourquoi est dans _ProfWindow_LFW.lua.
+    -- bouton d'action, état écrit à part, bouton d'offre. Le pourquoi : _ProfWindow_LFW_Strip.lua.
     if self._BuildLFWStrip then self:_BuildLFWStrip(f) end
 
     -- (Bouton fermer : le natif de MakeWindow porte la logique dock/fermeture via opts.onClose.)

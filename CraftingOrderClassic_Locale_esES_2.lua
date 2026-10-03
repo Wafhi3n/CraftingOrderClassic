@@ -162,8 +162,8 @@ local es2 = {
         "La receta seleccionada: sus componentes y el botón para fabricarla.",
     ["Les commandes reçues pour ce métier — accepte, crafte, livre. Les onglets filtrent la source (tous / guilde / amis / annuaire)."] =
         "Los pedidos recibidos para esta profesión: acepta, fabrica, entrega. Las pestañas filtran la fuente (todos / hermandad / amigos / directorio).",
-    ["Chercher du travail : signale au royaume que tu proposes ce métier. L'engrenage voisin règle ton offre (composants fournis, commission)."] =
-        "Buscar trabajo: anuncia al reino que ofreces esta profesión. El engranaje contiguo configura tu oferta (componentes aportados, comisión).",
+    ["Chercher du travail : signale au royaume que tu proposes ce métier. Le bouton « Offre » règle ce que tu proposes (composants fournis, commission)."] =
+        "Buscar trabajo: anuncia al reino que ofreces esta profesión. El botón «Oferta» configura lo que ofreces (componentes aportados, comisión).",
     ["Vue Blizzard : rebascule sur la fenêtre de métier native de Blizzard."] =
         "Vista Blizzard: vuelve a la ventana de profesión nativa de Blizzard.",
     ["Filtre les commandes par source : tous, ta guilde, tes amis, ou ton annuaire d'artisans."] =

@@ -1,5 +1,5 @@
 -- CraftingOrderClassic_ProfWindow_LFW.lua — config de l'OFFRE « recherche de travail » par métier.
--- Engrenage à droite du bouton « Chercher du travail » (en-tête fenêtre métier) → panneau flyout :
+-- Bouton « Offre » de la bande de pied (cf. _ProfWindow_LFW_Strip.lua) → panneau flyout :
 -- compos de base, restriction « si progression », commission fixe (or/argent/cuivre), et picker
 -- cherchable des composants fournis (univers = UNION des réactifs des recettes CraftLink du métier,
 -- filtré par version client via Skin.ItemExists). Save-on-change → Dir:SetLFWOffer (persiste +
@@ -24,110 +24,6 @@ PW.LFW_LIST_TOP        = LIST_TOP   -- lu par _ProfWindow_LFW_Recipes pour poser
 
 local function maxItems() return (COC.Directory and COC.Directory.OFFER_MAX_ITEMS) or 15 end
 
-local function profLabel(key) return (Skin.ProfLabel and Skin.ProfLabel(key)) or key end
-
--- ------------------------------------------------------------------
--- Bande « Chercher du travail » en PIED de colonne
--- ------------------------------------------------------------------
--- POURQUOI UNE BANDE ET PAS UNE 5e LANGUETTE. Le portage Forever a tue l'entree LFW : le bouton
--- d'en-tete et son engrenage vivaient dans la vue custom, que la colonne greffee n'affiche plus.
--- La reponse evidente etait une languette de plus. Elle a ete mesuree le 2026-09-26 et elle coute
--- cher : ~41 px de CADRE par languette (le texte, lui, ne pese que 1,9 px/caractere), et la rangee
--- pilote la largeur de la colonne, qui elargit la FENETRE NATIVE d'autant. ~35 px de fenetre pour
--- un interrupteur. Ici on paie 20 px de HAUTEUR sur une liste qui en fait 301, et rien ne bouge.
---
--- Deux avantages tombent avec ce choix, et ils ne sont pas cosmetiques :
---   * la bande est visible dans TOUTES les vues -- or c'est un ETAT qu'on oublie d'eteindre, et
---     tout le mecanisme de TTL anti-leurre existe precisement pour ca ;
---   * elle peut ECRIRE son etat. Une languette ne le pouvait pas : changer son libelle change sa
---     largeur (bar:SetText rappelle PanelTemplates_TabResize), donc la rangee, donc la colonne --
---     pour 9 px de marge. La bande ne pilote aucune mise en page : elle dit le metier en toutes
---     lettres.
--- Sa hauteur est reservee INCONDITIONNELLEMENT par _ApplyMode : voir PW.TUNE.lfwStrip.
-function PW:_BuildLFWStrip(f)
-    if self.lfwStrip then return end
-    local s = Skin.MakeFlatRow(f, 100, PW.TUNE.lfwStrip)
-    s:SetPoint("BOTTOMLEFT",  f, "BOTTOMLEFT",   PW.PAD, 4)
-    s:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -PW.PAD, 4)
-    s:SetHeight(PW.TUNE.lfwStrip)
-    s:SetScript("OnClick", function() PW:_ToggleLFW() end)
-    s:SetScript("OnEnter", function(b)
-        local D = COC.Directory
-        local on = D and D.MyLFW and D:MyLFW() == PW.profKey
-        GameTooltip:SetOwner(b, "ANCHOR_TOPLEFT")
-        GameTooltip:SetText(on and L["Tu cherches du travail — clic pour arrêter."]
-            or L["Signale au royaume que tu cherches du travail dans ce métier."], 1, 1, 1, 1, true)
-        GameTooltip:Show()
-    end)
-    s:SetScript("OnLeave", GameTooltip_Hide)
-    s:Hide()
-    self.lfwStrip = s
-    if self._BuildLFWOfferBtn then self:_BuildLFWOfferBtn(s) end
-end
-
--- Etat de la bande : visible sur un metier A MOI en colonne, et elle DIT lequel quand elle est
--- allumee. L'engrenage suit la meme portee -- regler une offre pour un metier qu'on n'a pas ouvert
--- n'aurait pas de sens.
-function PW:_SyncLFWStrip()
-    local s = self.lfwStrip; if not s then return end
-    local D = COC.Directory
-    local show = self.profKey and not self.rerollKey and (self._compact or self.docked)
-                 and D and D.SetLFW and true or false
-    s:SetShown(show)
-    if show then
-        local on = D.MyLFW and D:MyLFW() == self.profKey
-        s:SetSelected(on and true or false)
-        s:SetText(on and ("|cFF4CDB6E" .. string.format(L["Dispo — %s"], profLabel(self.profKey)) .. "|r")
-            or L["Chercher du travail"])
-    end
-    if self._SyncLFWConfig then self:_SyncLFWConfig(show) end
-end
-
--- ------------------------------------------------------------------
--- Bouton « Offre » à droite de la bande (visibilité gérée par PW:_SyncLFWStrip)
--- ------------------------------------------------------------------
--- C'ÉTAIT UN ENGRENAGE (`Interface\WorldMap\Gear_64`, 18 px) ET LE USER NE L'A PAS RECONNU : à
--- l'écran, le 2026-09-26, deux petits carrés sans forme lisible.
---
--- Pourquoi on ne cherche pas plus loin la cause. L'asset EXISTE — `WorldMap/Gear_64.PNG` est dans
--- `Documentation/wow-ui-textures-classic/`. Reste qu'il n'est référencé nulle part dans l'export
--- Forever 1.60.1 (il a pu disparaître sur MAINLINE), ou qu'un dessin conçu en 64 px ne survit pas
--- à une réduction en 16. Départager coûterait un aller-retour en jeu pour un bouton, alors qu'un
--- MOT est lisible à toute taille et ne peut pas manquer. Et ça rejoint la leçon du 2026-09-19,
--- payée sur capture dans cette colonne même : une icône de 16 px posée dans une bande se lit comme
--- un bouton secondaire oublié là, quand un libellé dit ce qu'il fait.
--- Pas de glyphe ⚙ non plus : la police du jeu les rend en tofu.
---
--- ⚠️ MÉTHODE, apprise en se trompant ce jour-là : pour savoir si une texture existe, l'oracle est
--- `Documentation/wow-ui-textures-classic/`, PAS l'export Lua/XML. L'export ne contient aucun asset
--- et donne des faux négatifs — `MoneyFrame\UI-GoldIcon` n'y figure pas davantage, et elle s'affiche
--- très bien dans la vue Profit.
-function PW:_BuildLFWOfferBtn(strip)
-    if self.lfwCfgBtn then return end
-    -- ENFANT de la bande, pas frère. Il était créé sur le cadre de la colonne et seulement ANCRÉ
-    -- sur la bande : deux frères au même niveau, donc un ordre de dessin qui ne se décide pas — le
-    -- user l'a vu « en arrière » le 2026-09-26. Enfant, il passe devant par construction, il se
-    -- montre et se cache avec elle, et le niveau explicite ne laisse plus la question ouverte.
-    local b = Skin.MakeGoldButton(strip, 56, 16, L["Offre"])
-    b:SetPoint("RIGHT", strip, "RIGHT", -2, 0)
-    b:SetFrameLevel((strip:GetFrameLevel() or 0) + 2)
-    -- Et le texte d'état s'arrête AVANT le bouton : « Dispo — Leatherworking » est déjà long, et
-    -- un libellé sans bord droit passerait dessous au lieu d'être tronqué.
-    if strip.text then
-        strip.text:SetPoint("RIGHT", b, "LEFT", -4, 0)
-        strip.text:SetWordWrap(false)
-    end
-    b:SetScript("OnClick", function() PW:ToggleLFWConfig() end)
-    b:SetScript("OnEnter", function(s)
-        GameTooltip:SetOwner(s, "ANCHOR_TOPLEFT")
-        GameTooltip:SetText(L["Configurer l'offre : composants fournis, commission…"], 1, 1, 1, 1, true)
-        GameTooltip:Show()
-    end)
-    b:SetScript("OnLeave", GameTooltip_Hide)
-    b:Hide()
-    self.lfwCfgBtn = b
-end
-
 -- Suit l'état du bouton LFW (même portée : vue pleine d'un métier À MOI). Panneau ouvert : il se
 -- ferme si la portée disparaît, il se REPEINT si on a changé de métier (la config est par métier).
 function PW:_SyncLFWConfig(show)
@@ -139,7 +35,7 @@ function PW:_SyncLFWConfig(show)
     end
 end
 
--- Ouvre/ferme le panneau pour le métier OUVERT (mien). Liseré doré de l'engrenage = panneau ouvert.
+-- Ouvre/ferme le panneau pour le métier OUVERT (mien). « Offre » enfoncé = panneau ouvert.
 function PW:ToggleLFWConfig()
     if not self.profKey or self.rerollKey then return end
     local p = self:_BuildLFWPanel()

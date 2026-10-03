@@ -12,6 +12,7 @@ local de3 = {
     ["Route"] = "Route",              -- languette courte (la vue garde « Levelroute »)
     ["Dispo — %s"] = "Verfuegbar — %s",
     ["Offre"] = "Angebot",
+    ["Arrêter"] = "Beenden",           -- bouton de la bande LFW allumée (2026-10-03)
     ["Réactifs"] = "Reagenzien",
     ["Recettes"] = "Rezepte",
     ["Aucun résultat pour cette recherche."] = "Keine Treffer fuer diese Suche.",

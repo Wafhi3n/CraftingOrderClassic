@@ -13,6 +13,7 @@ local en3 = {
     ["Route"] = "Route",              -- languette courte (la vue garde « Leveling route »)
     ["Dispo — %s"] = "Available — %s",
     ["Offre"] = "Offer",
+    ["Arrêter"] = "Stop",              -- bouton de la bande LFW allumée (2026-10-03)
     ["Réactifs"] = "Reagents",
     ["Recettes"] = "Recipes",
     ["Aucun résultat pour cette recherche."] = "Nothing matches that search.",
