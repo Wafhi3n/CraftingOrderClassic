@@ -175,6 +175,7 @@ local en3 = {
     ["Aucun de tes persos ne sait faire %s."] = "None of your characters can make %s.",
     ["%d commandes attendent dans ce métier."] = "%d orders are waiting in this profession.",
     ["Ouvrir la fenêtre de métier"] = "Open the profession window",
+    ["Vendu seulement côté %s : cherche-le à l'hôtel des ventes neutre."] = "Only sold on the %s side: look for it at a neutral auction house.",
 }
 
 for k, v in pairs(en3) do L[k] = v end

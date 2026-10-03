@@ -124,13 +124,21 @@ function PW:_FillLevelingRight(row, e, anchor)
         row.srcTex = row:CreateTexture(nil, "ARTWORK"); row.srcTex:SetSize(14, 14)
         row.lvlTex = row:CreateTexture(nil, "ARTWORK"); row.lvlTex:SetSize(14, 14)
     end
-    local function put(tex, icon)
-        tex:SetTexture(icon); tex:ClearAllPoints()
+    -- ⚠️ Texture POOLÉE : `SetAtlas` pose ses propres coordonnées, et un `SetTexture` qui suit les
+    -- garde. Sans la remise à plat, une ligne qui a porté un blason recadrerait l'icône suivante.
+    local function put(tex, icon, atlas)
+        if atlas then tex:SetAtlas(icon) else tex:SetTexture(icon); tex:SetTexCoord(0, 1, 0, 1) end
+        tex:ClearAllPoints()
         if anchor then tex:SetPoint("RIGHT", anchor, "LEFT", -4, 0) else tex:SetPoint("RIGHT", row, "RIGHT", -2, 0) end
         tex:Show(); anchor = tex
     end
+    -- Le plan que seul l'autre camp vend : le blason de ce camp à la place de l'icône marchand, comme
+    -- dans la vue Manquantes (cf. Sources:OtherSideVendor).
+    local M = COC.Sources
+    local crest = e.isMissing and e.otherSide and M and M.OtherSideAtlas and M:OtherSideAtlas(e.otherSide)
     local icon = e.isMissing and self:_MissingSourceIcon(e) or nil
-    if icon then put(row.srcTex, icon) else row.srcTex:Hide() end
+    if crest then put(row.srcTex, crest, true)
+    elseif icon then put(row.srcTex, icon) else row.srcTex:Hide() end
     if self._lvlBest and self._lvlBest == e then put(row.lvlTex, ICON.best) else row.lvlTex:Hide() end
     return anchor
 end
@@ -161,6 +169,14 @@ function PW:_PlanTooltip(e)
     local price = M:SourcePrice(self.profKey, e.spellID)
     local ptxt = price and (" — " .. COC.Api.Coin(price)) or ""
     local txt
+    -- Vendu seulement chez l'autre camp : la note dit où aller (l'HV neutre), puis sa cote s'il en a.
+    local side = M.OtherSideVendor and M:OtherSideVendor(self.profKey, e.spellID)
+    if side then
+        GameTooltip:AddLine(M:OtherSideNote(side), 0.6, 0.6, 0.6, true)
+        local ah = M:AuctionPrice(self.profKey, e.spellID)
+        if ah then GameTooltip:AddLine(string.format(L["Plan : coté à l'HV — %s"], COC.Api.Coin(ah)), 0.91, 0.72, 0.29) end
+        return
+    end
     if kind == "trainer" then txt = string.format(L["Plan : au formateur%s"], ptxt)
     elseif kind == "vendor" then txt = string.format(L["Plan : chez un vendeur PNJ%s"], ptxt)
     else

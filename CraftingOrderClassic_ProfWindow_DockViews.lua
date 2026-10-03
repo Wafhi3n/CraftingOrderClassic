@@ -215,7 +215,14 @@ end
 local function missWhere(prof, sid)
     local S = COC.Sources
     local fromGame = S.SourceText and S:SourceText(prof, sid)
-    if fromGame then GameTooltip:AddLine(fromGame, 0.91, 0.72, 0.29, true); return end
+    if fromGame then
+        GameTooltip:AddLine(fromGame, 0.91, 0.72, 0.29, true)
+        -- Le texte du jeu nomme le marchand, pas son camp : le plan que seul l'autre camp vend doit
+        -- quand même dire où l'acheter (sans ça, le retour anticipé avalait la note de SourceOrigin).
+        local side = S.OtherSideVendor and S:OtherSideVendor(prof, sid)
+        if side then GameTooltip:AddLine(S:OtherSideNote(side), 0.6, 0.6, 0.6, true) end
+        return
+    end
     local kind = S:SourceKind(prof, sid)
     local txt = KIND_TEXT[kind] and KIND_TEXT[kind]() or L["Source inconnue"]
     if kind == "trainer" and S:IsInferred(prof, sid) then txt = txt .. " |cFF888888?|r" end
@@ -247,6 +254,10 @@ local function missTooltip(row)
     row.pin = missWhere(prof, sid)
     local price = S.SourcePrice and S:SourcePrice(prof, sid)
     if price then GameTooltip:AddLine(L["Prix"] .. " : " .. COC.Api.Coin(price), 1, 1, 1) end
+    -- Plan vendu seulement chez l'autre camp : SourcePrice se tait (ce marchand n'est pas le sien), la
+    -- cote de l'HV est la seule qui vaille.
+    local ah = row.otherSide and S.AuctionPrice and S:AuctionPrice(prof, sid)
+    if ah then GameTooltip:AddLine(string.format(L["Plan : coté à l'HV — %s"], COC.Api.Coin(ah)), 1, 1, 1) end
     -- L'invite n'apparait que s'il y a vraiment un repere a poser : annoncer un clic qui ne fait
     -- rien est pire que de ne rien annoncer.
     if row.pin then GameTooltip:AddLine(L["Clic : poser un repère sur ce PNJ."], 0.55, 0.75, 0.55) end
@@ -315,7 +326,7 @@ function PW:_FillDockMissing()
     if w > 0 then mp.content:SetWidth(w) end
     for i, e in ipairs(list) do
         local row = missRow(i)
-        row.sid, row.rname, row.rlevel = e.spellID, e.name, e.level
+        row.sid, row.rname, row.rlevel, row.otherSide = e.spellID, e.name, e.level, e.otherSide
         row.rlink, row.pin = nil, nil   -- ligne poolée : rien de la précédente ne survit
         row.prof = self.profKey   -- la ligne emporte le métier qui l'a produite (cf. missTooltip)
         row.ic:SetTexture(ICON[S:SourceKind(self.profKey, e.spellID)] or ICON.unknown)
@@ -324,7 +335,10 @@ function PW:_FillDockMissing()
         local outOfReach = e.level ~= nil and e.level > rank
         row.ic:SetDesaturated(outOfReach)
         row.nm:SetText((outOfReach and "|cFF777777" or "") .. (e.name or "?") .. (outOfReach and "|r" or ""))
-        row.lv:SetText(e.level and tostring(e.level) or "|cFF777777?|r")
+        -- Le plan que seul l'autre camp vend garde sa place (il s'achète à l'HV neutre), mais il porte
+        -- le blason de ce camp devant son niveau : il ne doit pas se lire comme un plan de notre ville.
+        local crest = e.otherSide and (S:OtherSideCrest(e.otherSide) .. " ") or ""
+        row.lv:SetText(crest .. (e.level and tostring(e.level) or "|cFF777777?|r"))
         row:Show()
     end
     for i = #list + 1, #mp.rows do mp.rows[i]:Hide(); mp.rows[i].sid = nil end

@@ -239,7 +239,8 @@ function PW:_IsAcquirable(e)
     if not e.isMissing then return false end
     local M = COC.Sources
     local kind = M and M:SourceKind(self.profKey, e.spellID) or "unknown"
-    if kind == "trainer" or kind == "vendor" then return true end
+    -- Un plan que seul l'autre camp vend ne s'acquiert qu'à l'HV : il tombe dans le test d'en dessous.
+    if kind == "trainer" or (kind == "vendor" and not e.otherSide) then return true end
     local PR = COC.Profit
     if PR and PR:IsAvailable() then
         local recItemID = M and M:RecipeItem(self.profKey, e.spellID)

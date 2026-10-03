@@ -100,7 +100,10 @@ function Route:Candidates(profKey, opts)
             local otherSide = M and M.IsOtherSideTwin and M:IsOtherSideTwin(profKey, sid)
             if not isKnown and opts.plans and not otherSide then
                 local kind = (M and M:IsAvailable()) and M:SourceKind(profKey, sid) or "unknown"
-                if kind == "trainer" or kind == "vendor" then
+                -- Un plan que seul l'AUTRE camp vend ne s'achète pas chez son marchand : comme un plan
+                -- de butin, il n'est candidat que coté à l'HV (cf. Sources:OtherSideVendor).
+                local viaAH = M and M.OtherSideVendor and M:OtherSideVendor(profKey, sid)
+                if (kind == "trainer" or kind == "vendor") and not viaAH then
                     planPrice = M and M:SourcePrice(profKey, sid)
                     -- Prix INCONNU (le cas de tous les plans de formateur : aucune source ne les
                     -- donne). On garde la recette candidate -- « va l'apprendre au formateur » reste

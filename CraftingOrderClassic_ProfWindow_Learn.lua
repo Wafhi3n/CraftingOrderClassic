@@ -67,7 +67,7 @@ function PW:_LearnableNow()
                 local c = PR and PR.CraftCost and PR:CraftCost(self.profKey, m.spellID)
                 out[#out + 1] = {
                     sid = m.spellID, name = m.name, level = lvl, diff = diff,
-                    kind = S:SourceKind(self.profKey, m.spellID),
+                    kind = S:SourceKind(self.profKey, m.spellID), otherSide = m.otherSide,
                     perPoint = c and c.cost and math.floor(c.cost / CHANCE[diff] + 0.5) or nil,
                     partial = c and c.missing or nil,
                 }
@@ -89,7 +89,9 @@ local function learnLine(e)
     local cost = e.perPoint
         and ("  |cFF888888" .. COC.Api.Coin(math.max(1, e.perPoint)) .. (e.partial and " (?)" or "") .. "|r")
         or ""
-    return "|T" .. icon .. ":12:12|t " .. (e.name or "?")
+    -- Plan vendu seulement chez l'autre camp : son blason à la place de l'icône marchand.
+    local mark = e.otherSide and COC.Sources:OtherSideCrest(e.otherSide) or ("|T" .. icon .. ":12:12|t")
+    return mark .. " " .. (e.name or "?")
         .. " |cFF666666(" .. e.level .. ")|r" .. cost
 end
 

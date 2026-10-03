@@ -175,6 +175,7 @@ local es3 = {
     ["Aucun de tes persos ne sait faire %s."] = "Ninguno de tus personajes sabe hacer %s.",
     ["%d commandes attendent dans ce métier."] = "%d pedidos esperan en esta profesión.",
     ["Ouvrir la fenêtre de métier"] = "Abrir la ventana de profesión",
+    ["Vendu seulement côté %s : cherche-le à l'hôtel des ventes neutre."] = "Solo se vende en el bando de la %s: búscalo en una casa de subastas neutral.",
 }
 
 for k, v in pairs(es3) do L[k] = v end

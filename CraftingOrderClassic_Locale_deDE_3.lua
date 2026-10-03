@@ -174,6 +174,7 @@ local de3 = {
     ["Aucun de tes persos ne sait faire %s."] = "Keiner deiner Charaktere kann %s herstellen.",
     ["%d commandes attendent dans ce métier."] = "%d Aufträge warten in diesem Beruf.",
     ["Ouvrir la fenêtre de métier"] = "Berufsfenster öffnen",
+    ["Vendu seulement côté %s : cherche-le à l'hôtel des ventes neutre."] = "Nur auf der Seite der %s verkauft: such es im neutralen Auktionshaus.",
 }
 
 for k, v in pairs(de3) do L[k] = v end

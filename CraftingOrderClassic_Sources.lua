@@ -120,6 +120,9 @@ end
 -- a vu le marchand, sait répondre — et c'est déjà son rôle via COC.Profit, interrogé ici pour
 -- que les appelants n'aient qu'UN endroit à demander.
 function S:SourcePrice(profKey, spellID)
+    -- Le prix d'un marchand du camp d'en face n'est pas un prix pour CE joueur : il ne peut pas lui
+    -- acheter. Inconnu, donc -- sa seule cote est celle de l'HV (cf. AuctionPrice).
+    if self:OtherSideVendor(profKey, spellID) then return nil end
     -- Le prix RELEVÉ chez le marchand d'abord : c'est un fait, il ne dépend d'aucun addon tiers, et
     -- il vaut pour tout le monde. Ce qu'on avait perdu en abandonnant MTSL est revenu par les pages
     -- d'objet de Wowhead (`buyprice`), pour les plans vendus.
@@ -174,6 +177,55 @@ local function myFaction()
     return (f == "Alliance" and "A") or (f == "Horde" and "H") or nil
 end
 
+-- LE PLAN QUE SEUL L'AUTRE CAMP VEND. « Recipe: Crispy Bat Wing » n'a qu'un marchand, Abigail Shiel
+-- (Brill, Horde) : un joueur de l'Alliance ne lui parlera jamais, et la vue Manquantes la lui
+-- proposait comme n'importe quel plan de sa ville (relevé en jeu le 2026-10-03). Mais le plan est un
+-- OBJET : il se revend, à l'hôtel des ventes NEUTRE. On ne le cache donc pas, on le MARQUE (arbitrage
+-- du user, même jour), et les vues qui parlent d'un achat l'envoient à l'HV, pas chez ce marchand.
+--
+-- ⚠️ TOUS les marchands connus doivent porter le camp d'en face. Un seul SANS camp suffit à se taire :
+-- `nil` n'est pas « neutre », c'est « les deux, ou on ne sait pas », et marquer sur un doute enverrait
+-- à l'HV quelqu'un qui pouvait l'acheter en ville. Même prudence que pour les jumeaux, plus bas.
+-- Rend le camp qui vend ("A"|"H"), ou nil. Camp du joueur inconnu : nil, on ne tranche pas.
+function S:OtherSideVendor(profKey, spellID)
+    local me = myFaction()
+    if not (me and profKey and spellID) or self:SourceKind(profKey, spellID) ~= "vendor" then return nil end
+    local lib = CL()
+    local list = lib and lib.RecipeOrigins and lib:RecipeOrigins(profKey, spellID)
+    if not (list and list[1]) then return nil end
+    for _, e in ipairs(list) do
+        if e[4] == nil or e[4] == me then return nil end
+    end
+    return list[1][4]
+end
+
+-- La phrase qui le dit. Le nom du camp vient des globales du jeu : déjà traduit, et c'est celui que le
+-- joueur lit partout ailleurs.
+function S:OtherSideNote(side)
+    local camp = (side == "H" and FACTION_HORDE) or (side == "A" and FACTION_ALLIANCE) or nil
+    if not camp then return nil end
+    return string.format(COC.L["Vendu seulement côté %s : cherche-le à l'hôtel des ventes neutre."], camp)
+end
+
+-- Le blason du camp qui vend : l'atlas que le journal de quêtes de Forever pose sur une quête de
+-- faction (Blizzard_FrameXMLBase/Constants.lua). En atlas pour une texture, en balise pour un texte.
+local CREST = { A = "questlog-questtypeicon-alliance", H = "questlog-questtypeicon-horde" }
+function S:OtherSideAtlas(side) return CREST[side] end
+function S:OtherSideCrest(side, size)
+    if not CREST[side] then return "" end
+    size = size or 12
+    return "|A:" .. CREST[side] .. ":" .. size .. ":" .. size .. "|a"
+end
+
+-- La cote HV de l'OBJET-plan (Auctionator), ou nil : le seul prix qui vaille pour un plan qu'aucun
+-- marchand de notre camp ne vend.
+function S:AuctionPrice(profKey, spellID)
+    local itemID = recipeItemFor(profKey, spellID)
+    local PR = COC.Profit
+    if not (itemID and PR and PR.IsAvailable and PR:IsAvailable()) then return nil end
+    return PR:ItemValue(itemID)
+end
+
 -- ⚠️ REND UNE TABLE, PAS TROIS VALEURS, et c'est délibéré. Un multi-retour invite à écrire
 -- `local a, b, c = X and X:f()` — qui TRONQUE à une seule valeur en Lua. Ce piège maison est tombé
 -- TROIS fois dans la même journée, la dernière sur la ligne qui portait justement le repère : le
@@ -224,7 +276,9 @@ function S:SourceOrigin(profKey, spellID)
         --
         -- La donnée reste en place et reste lisible par `RecipeOrigins` : elle vaut pour un reroll
         -- du camp adverse, que l'addon sait déjà suivre. C'est l'AFFICHAGE qui se tait, pas nous.
-        txt = "|cFF888888" .. COC.L["Aucune source connue de ton camp."] .. "|r"
+        -- Un plan que seuls des MARCHANDS d'en face vendent a une issue, et on la donne : l'HV neutre.
+        local note = self:OtherSideNote(self:OtherSideVendor(profKey, spellID))
+        txt = "|cFF888888" .. (note or COC.L["Aucune source connue de ton camp."]) .. "|r"
         pin = nil   -- aucun repère vers un PNJ à qui on ne peut pas parler
     end
     if not txt then return nil end
@@ -235,7 +289,10 @@ end
 -- fournitures du Plan de route). La lib filtre déjà sur la nature — on ne refait pas le tri ici.
 function S:SourceNpcLine(profKey, spellID)
     local lib = CL(); if not lib or not lib.RecipeVendor then return nil end
-    local npcID, areaID, name = lib:RecipeVendor(profKey, spellID)
+    local npcID, areaID, name, faction = lib:RecipeVendor(profKey, spellID)
+    -- Une ligne d'ACHAT ne nomme pas un marchand du camp d'en face : la lib rend le seul qu'elle a,
+    -- et le Plan de route envoyait un joueur de l'Alliance acheter son plan à Brill.
+    if faction and faction ~= myFaction() then return nil end
     return line(name, areaID), npcID
 end
 
@@ -349,6 +406,8 @@ function S:MissingRecipes(profKey)
                 -- de 0 : la vue les classait en tête et les déclarait à portée (0 <= ton rang),
                 -- c'est-à-dire qu'elle affirmait ce qu'elle ignore. Un repli doit se taire.
                 level = levelOf(lib, profKey, spellID),
+                -- "A"|"H" quand seul l'autre camp vend ce plan : la vue le MARQUE (cf. OtherSideVendor).
+                otherSide = self:OtherSideVendor(profKey, spellID),
                 icon = (itemID and COC.Api.GetItemIcon and COC.Api.GetItemIcon(itemID))
                        or "Interface\\Icons\\INV_Scroll_03",
                 difficulty = "trivial",   -- neutre : une recette non apprise n'a pas de couleur
