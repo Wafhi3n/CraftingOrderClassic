@@ -35,14 +35,17 @@ local frame                                     -- construit au premier usage
 local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true) end
 local function Skin() return COC.UI and COC.UI.Skin end
 
--- Les modèles vivent dans un module de Blizzard chargé à la demande. On charge le seul module des
--- modèles : il ne crée pas la fenêtre de métier du jeu.
-local TEMPLATES = "Blizzard_ProfessionsTemplates"
+-- Les modèles vivent dans des modules de Blizzard chargés à la demande. On charge le module des MÉTIERS
+-- entier, comme le jeu à la 1re ouverture d'un métier : le panneau recette hérite d'une liste
+-- déroulante (`ProfessionsRecipeLevelDropdownTemplate`) définie là, pas dans le module des modèles.
+-- Charger les modèles seuls levait « Couldn't find inherited node » à la création du panneau (vu en
+-- jeu le 2026-10-03). Le module crée la fenêtre du jeu, cachée — ce que fait toute ouverture de métier.
+local MODULE = "Blizzard_Professions"
 local function templatesReady()
     local A = C_AddOns
     if not (A and A.IsAddOnLoaded and A.LoadAddOn) then return false end
-    if not A.IsAddOnLoaded(TEMPLATES) then pcall(A.LoadAddOn, TEMPLATES) end
-    return A.IsAddOnLoaded(TEMPLATES) and true or false
+    if not A.IsAddOnLoaded(MODULE) then pcall(A.LoadAddOn, MODULE) end
+    return A.IsAddOnLoaded(MODULE) and true or false
 end
 
 -- ---------------------------------------------------------------- liste
@@ -258,7 +261,9 @@ local function dressFor(sid)
         for k, v in pairs(pinfo) do info[k] = v end
         info.skillLevel, info.maxSkillLevel, info.skillModifier = rank, max, 0
         frame.RankBar:Show()
-        shown = pcall(frame.RankBar.Update, frame.RankBar, info)
+        local err
+        shown, err = pcall(frame.RankBar.Update, frame.RankBar, info)
+        if not shown and COC.Trace and COC.Trace:IsOn() then COC.Trace:Log("reroll", "barre de rang : " .. tostring(err)) end
     end
     frame.RankBar:SetShown(shown and true or false)
 end
