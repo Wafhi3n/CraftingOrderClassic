@@ -46,6 +46,18 @@ client.
 
 ## Relevés
 
+- 2026-10-03 14:33 — jusqu'a 904e238 — Forever build client 70205, client de Rédemption en ANGLAIS ;
+  build `main-dev@79ab669 2026-10-03 14:14` avec docs/spec-lien-metier, docs/spec-route-cout-net,
+  feat/lfw-lien-metier, feat/lien-metier, feat/liste-destinataires, feat/profit-arbitrages,
+  feat/route-cout-net, feat/vue-reroll-native, fix/clic-recette-connue, fix/connues-perimees,
+  fix/route-formateur, release/v1.43.1 (copie déployée du `.toc`) — **GO partiel sur
+  `feat/lfw-lien-metier` : critère 18 de `annonce-commerce.md`** — capture du user après le clic
+  « Looking for work » : « availability announced in Trade (Services) - English. », puis la ligne
+  `[5. Trade (Services) - English] [Rédemption Wafhien]: LFW Blacksmithing/[Blacksmithing] #CO`, le
+  second « Blacksmithing » dans la couleur d'un lien, puis « looking for work: Blacksmithing — visible
+  across the realm » ; le user : « Tout fonctionne normalement ». **Trade (Services) accepte donc un
+  lien de métier** (jamais mesuré avant). **Pas observé** : la trace « avec le lien frais », le clic
+  de Gnomi sans COC (critère 19), le lien gardé après un relog (critère 20).
 - 2026-10-02 10:20 — jusqu'a 8e7c062 — Forever, client de Rédemption, en ANGLAIS, Forgefer ; build
   `main-dev@ce68ef3 2026-10-02 10:16` avec icone-commande-recue, liste-destinataires,
   profit-arbitrages, release/v1.43.0 (copie déployée du `.toc`) — **GO sur `fix/manquantes-nom-long`**

@@ -11,7 +11,8 @@
 > LFW, `AnnounceSend:PostLFW`, case dans le panneau « Offre ») fait le 2026-09-30, tenu en test ; **13
 > tenu en jeu le 2026-09-30 00:31**. Reste le palier 5 (relectures, critère 15).
 > **Évolution du 2026-10-03** (demande du user) : la ligne LFW porte le **lien de métier** de l'auteur
-> (palier 6, branches `feat/lfw-lien-metier`) ; critères 16 et 17 tenus en test, 18 à 20 à voir au banc.
+> (palier 6, branches `feat/lfw-lien-metier`) ; critères 16 et 17 tenus en test, **18 tenu en jeu le
+> 2026-10-03 14:33** (Trade (Services) accepte le lien de métier) ; 19 et 20 à voir au banc.
 
 ## Le problème
 
@@ -226,6 +227,8 @@ Le lien de métier dans la ligne LFW (2026-10-03) :
     (jamais mesuré sur ce canal : la séance du lien de métier du 2026-10-02 était sur Trade). La trace
     dit « avec le lien frais ». Témoin connu-bon : la ligne d'avant, sans lien. Si la ligne ne paraît
     pas du tout, le canal refuse le lien : le dire, ne rien fusionner. Observateur : le user, deux comptes.
+    → **Tenu** le 2026-10-03 14:33 (capture : la ligne et son lien sur « 5. Trade (Services) -
+    English ») ; la trace « lien frais » n'a pas été relevée.
 19. [humain] Gnomi, **COC désactivé**, clique le lien : la fenêtre de métier de Rédemption s'ouvre, nom
     du métier et recettes affichés. Observateur : le user, compte B.
 20. [humain] Rédemption se déconnecte, se reconnecte, et tape `/co lfw Blacksmithing` **sans ouvrir son
