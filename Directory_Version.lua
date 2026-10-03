@@ -59,6 +59,21 @@ function Dir:_MyVersion()
     return self._myVer
 end
 
+-- Build de DEV ? (copie déployée par deploy.ps1, qui pose `## X-Build` dans le .toc ; une release
+-- CurseForge n'en a jamais). Un tel build TAIT sa version sur le fil SK (cf. _SkillPayload) : le banc,
+-- ce sont DEUX comptes, donc deux joueurs distincts = CONFIRM atteint à lui seul. Vu le 2026-10-03 :
+-- main-dev en 1.43.1 (branche release/v1.43.1, pas encore taguée) annonçait aux autres joueurs une
+-- version absente de CurseForge. Seul l'émetteur peut l'empêcher : la réception des clients déjà
+-- publiés ne se corrige pas après coup. Un build de dev continue d'ÉCOUTER les versions des autres.
+function Dir:_IsDevBuild()
+    if self._devBuild == nil then
+        local meta = (C_AddOns and C_AddOns.GetAddOnMetadata) or GetAddOnMetadata
+        local build = meta and meta("CraftingOrderClassic", "X-Build")
+        self._devBuild = (build ~= nil and build ~= "") and true or false
+    end
+    return self._devBuild
+end
+
 -- SK reçu d'un pair DIRECT → note sa version (verStr = pseudo-chunk `cv=`). N'est appelée QUE depuis
 -- OnSkill (données de 1re main) : un relais (Directory_Relay) ne compte jamais → une version relayée
 -- de 3e main ne peut pas déclencher d'alerte. Corrobore par joueurs distincts avant d'agir.

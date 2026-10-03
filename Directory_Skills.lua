@@ -73,14 +73,17 @@ end
 
 -- Fil SK : "SK|lvl=<n>|key,cur,max;...[;rep=<n>][;cv=<ver>]". rep (crafts livrés) et cv (ma version, cf.
 -- Directory_Version) = pseudo-chunks FINAUX, ignorés par un vieux client (parse par préfixe) → rétro-
--- compatibles ; JAMAIS dans l'en-tête (corromprait leur 1er métier).
+-- compatibles ; JAMAIS dans l'en-tête (corromprait leur 1er métier). Pas de cv= depuis un build de dev
+-- (Dir:_IsDevBuild) : le banc annonçait sa version pas encore publiée à tout le royaume.
 function Dir:_SkillPayload()
     local parts = {}
     for key, sk in pairs(self.mySkills or {}) do parts[#parts + 1] = key .. "," .. sk[1] .. "," .. sk[2] end
     if #parts == 0 then return nil end
     local lvl, rep = (UnitLevel and UnitLevel("player")) or 0, (COC.db and COC.db.delivered) or 0
     local tail = (rep > 0) and (";rep=" .. rep) or ""
-    if self._MyVersion then self:_MyVersion(); if self._myVerStr then tail = tail .. ";cv=" .. self._myVerStr end end
+    if self._MyVersion and not (self._IsDevBuild and self:_IsDevBuild()) then
+        self:_MyVersion(); if self._myVerStr then tail = tail .. ";cv=" .. self._myVerStr end
+    end
     return "SK|lvl=" .. lvl .. "|" .. table.concat(parts, ";") .. tail
 end
 
