@@ -28,8 +28,10 @@ Une **seule fenêtre**, qui ressemble à la fenêtre de métier du jeu, pour le 
   recherche) remplie avec les recettes que ce reroll connaît, rangées par nos catégories
   (« Chest · Cloth », « Shirt »…) ;
 - à droite, **le panneau recette du jeu** : un clic sur une recette l'affiche (icône, nom, réactifs) ;
-- collée à droite, **notre colonne** (Orders / Route / Missing / Profit) en mode reroll, comme sur la
-  fenêtre de métier du jeu. Un clic sur une commande affiche sa recette dans le panneau ;
+- collée à droite, **notre colonne** en mode reroll, comme sur la fenêtre de métier du jeu : la liste
+  des commandes du métier, avec la marque de celles que le reroll sait faire. Les vues Route, Missing
+  et Profit restent cachées en mode reroll, comme avant : elles lisent la fenêtre du perso connecté.
+  Un clic sur une commande affiche sa recette dans le panneau ;
 - **aucun bouton Créer** : on n'est pas sur ce perso.
 
 Elle **remplace l'ancienne vue reroll partout** sur Forever : clic de l'icône de la minicarte et

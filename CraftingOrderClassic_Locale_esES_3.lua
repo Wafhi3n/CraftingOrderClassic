@@ -175,6 +175,12 @@ local es3 = {
     ["Aucun de tes persos ne sait faire %s."] = "Ninguno de tus personajes sabe hacer %s.",
     ["%d commandes attendent dans ce métier."] = "%d pedidos esperan en esta profesión.",
     ["Ouvrir la fenêtre de métier"] = "Abrir la ventana de profesión",
+    -- Vue reroll à l'allure de la fenêtre de métier du jeu (2026-10-03)
+    ["%s — %s (lecture seule)"] = "%s — %s (solo lectura)",
+    ["Ouvre ce métier une fois sur ce perso : l'addon lira ses recettes."] =
+        "Abre esta profesión una vez con ese personaje para que el addon lea sus recetas.",
+    ["Aucune recette ne correspond."] = "Ninguna receta coincide.",
+    ["Choisis une recette à gauche."] = "Elige una receta a la izquierda.",
 }
 
 for k, v in pairs(es3) do L[k] = v end

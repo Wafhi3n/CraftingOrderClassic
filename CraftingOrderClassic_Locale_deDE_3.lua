@@ -174,6 +174,12 @@ local de3 = {
     ["Aucun de tes persos ne sait faire %s."] = "Keiner deiner Charaktere kann %s herstellen.",
     ["%d commandes attendent dans ce métier."] = "%d Aufträge warten in diesem Beruf.",
     ["Ouvrir la fenêtre de métier"] = "Berufsfenster öffnen",
+    -- Vue reroll à l'allure de la fenêtre de métier du jeu (2026-10-03)
+    ["%s — %s (lecture seule)"] = "%s — %s (schreibgeschützt)",
+    ["Ouvre ce métier une fois sur ce perso : l'addon lira ses recettes."] =
+        "Öffne diesen Beruf einmal auf diesem Charakter, damit das Addon seine Rezepte lesen kann.",
+    ["Aucune recette ne correspond."] = "Kein Rezept passt.",
+    ["Choisis une recette à gauche."] = "Wähle links ein Rezept.",
 }
 
 for k, v in pairs(de3) do L[k] = v end

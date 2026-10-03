@@ -175,6 +175,12 @@ local en3 = {
     ["Aucun de tes persos ne sait faire %s."] = "None of your characters can make %s.",
     ["%d commandes attendent dans ce métier."] = "%d orders are waiting in this profession.",
     ["Ouvrir la fenêtre de métier"] = "Open the profession window",
+    -- Vue reroll à l'allure de la fenêtre de métier du jeu (2026-10-03)
+    ["%s — %s (lecture seule)"] = "%s — %s (read-only)",
+    ["Ouvre ce métier une fois sur ce perso : l'addon lira ses recettes."] =
+        "Open this profession once on that character so the addon can read its recipes.",
+    ["Aucune recette ne correspond."] = "No recipe matches.",
+    ["Choisis une recette à gauche."] = "Pick a recipe on the left.",
 }
 
 for k, v in pairs(en3) do L[k] = v end

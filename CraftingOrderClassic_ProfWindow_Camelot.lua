@@ -100,6 +100,9 @@ local function stripChrome(f) hideChrome(f, CHROME, "full") end
 -- dessinee pour un cadre depouille : la rangee d'onglets commence en haut a gauche, la ou le
 -- portrait vient se poser -- il recouvrait l'onglet « All » (releve en jeu le 2026-09-19).
 local function sideChrome(f) hideChrome(f, { "PortraitContainer", "portrait" }, "side") end
+-- Même habillage pour la colonne collée à la vue reroll (_RerollNative.lua) : le portrait est déjà
+-- celui de la fenêtre reroll, à sa gauche. CamelotDetach le rend, comme pour l'accolé.
+PW._CamelotSideChrome = sideChrome
 
 -- ---------------------------------------------------------------- greffe
 

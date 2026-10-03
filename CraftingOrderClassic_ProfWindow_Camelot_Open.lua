@@ -91,16 +91,26 @@ local function installOpeners()
     function PW:_OpenCompact(profKey) return self:CamelotOpenNative(profKey) end
 
     -- La vue REROLL, elle, reste la nôtre : le client ne sait rien des métiers d'un perso hors
-    -- ligne. Elle demande l'inverse de la greffe — une vraie fenêtre flottante, avec son chrome.
+    -- ligne. Depuis la spec vue-reroll-native (2026-10-03), c'est une fenêtre à l'allure de celle du
+    -- jeu (_RerollNative.lua) ; l'ancienne vue flottante ne sert plus que de repli, si les modèles
+    -- de Blizzard ne se chargent pas.
     local baseReroll = PW.OpenForReroll
     function PW:OpenForReroll(prof, rerollKey, name)
         if not (prof and rerollKey and baseReroll) then return end
+        -- En combat, la colonne greffée est PROTÉGÉE : ni la détacher ni la recoller ailleurs. Toutes
+        -- les entrées passent ici (icône de la minicarte, « Mes artisans ») : une seule garde.
+        if InCombatLockdown and InCombatLockdown() then
+            print("|cFF33DD88Crafting Order|r " .. COC.L["Hors combat seulement."])
+            return
+        end
         local native = _G.ProfessionsFrame
         if native and native:IsShown() then
             if _G.HideUIPanel then pcall(_G.HideUIPanel, native) else pcall(native.Hide, native) end
         end
         self:CamelotDetach(native)          -- rend parent, ancres ET chrome
         Api.CloseProfession()               -- sinon `_DoRefresh` voit une session ouverte et la préfère au reroll
+        local RNF = COC.RerollNativeFrame
+        if RNF and RNF:Open(prof, rerollKey, name) then return end
         baseReroll(self, prof, rerollKey, name)
         -- Sur l'Era le socle ferme la native et attend l'événement CLOSE pour rouvrir en reroll.
         -- Ici les événements TRADE_SKILL_*/CRAFT_* n'existent pas (aucun ne s'enregistre, cf.
