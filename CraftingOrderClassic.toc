@@ -117,6 +117,7 @@ CraftingOrderClassic_Stats_Filter.lua
 CraftingOrderClassic_Gem.lua
 CraftingOrderClassic_Gem_Stats.lua
 CraftingOrderClassic_Sources.lua
+CraftingOrderClassic_Sources_Side.lua
 CraftingOrderClassic_Trainers.lua
 CraftingOrderClassic_ProfWindow.lua
 CraftingOrderClassic_ProfWindow_Layout.lua

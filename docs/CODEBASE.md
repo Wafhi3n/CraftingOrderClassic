@@ -4,7 +4,7 @@
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
-158 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
+159 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
 
 ## Modules (ordre de chargement)
 
@@ -92,7 +92,8 @@
 | `CraftingOrderClassic_Stats_Filter.lua` | sélecteur « ne montrer que ce qui donne <stat> ». | 103 |
 | `CraftingOrderClassic_Gem.lua` | spécifique à la JOAILLERIE : sous-catégorise les GEMMES TAILLÉES par TAILLE (le mot qui porte la stat). | 226 |
 | `CraftingOrderClassic_Gem_Stats.lua` | correspondance TAILLE DE GEMME → STAT (données, éditées à la main). | 41 |
-| `CraftingOrderClassic_Sources.lua` | « où j'obtiens ce plan, et lesquels me manquent ». | 488 |
+| `CraftingOrderClassic_Sources.lua` | « où j'obtiens ce plan, et lesquels me manquent ». | 440 |
+| `CraftingOrderClassic_Sources_Side.lua` | le plan que seul l'AUTRE camp vend. | 58 |
 | `CraftingOrderClassic_Trainers.lua` | « le formateur, vu de nos propres yeux ». | 344 |
 | `CraftingOrderClassic_ProfWindow.lua` | fenêtre métier custom 3 colonnes (migration depuis Guild Economy) : Recettes \| Détail+Craft \| Commandes du métier. | 490 |
 | `CraftingOrderClassic_ProfWindow_Layout.lua` | GÉOMÉTRIE de la vue métier (fenêtre 3 colonnes). | 184 |
@@ -1823,7 +1824,21 @@
 > Contrat identique à l'ancien pont (mêmes noms, mêmes retours) : les appelants n'ont eu qu'à
 > changer de table. « unknown » reste la réponse honnête quand on ne sait pas.
 
-**API** : `S:IsAvailable()` · `S:RecipeItem(profKey, spellID)` · `S:SourceKind(profKey, spellID)` · `S:IsInferred(profKey, spellID)` · `S:MinSkill(profKey, spellID)` · `S:SourcePrice(profKey, spellID)` · `S:SourceText(profKey, spellID)` · `S:OtherSideVendor(profKey, spellID)` · `S:OtherSideNote(side)` · `S:OtherSideAtlas(side)` · `S:OtherSideCrest(side, size)` · `S:AuctionPrice(profKey, spellID)` · `S:SourceOrigin(profKey, spellID)` · `S:SourceNpcLine(profKey, spellID)` · `S:IsOtherSideTwin(profKey, spellID)` · `S:MissingRecipes(profKey)` · `S:SkillDetail(profKey, spellID)`
+**API** : `S:IsAvailable()` · `S:RecipeItem(profKey, spellID)` · `S:SourceKind(profKey, spellID)` · `S:IsInferred(profKey, spellID)` · `S:MinSkill(profKey, spellID)` · `S:SourcePrice(profKey, spellID)` · `S:SourceText(profKey, spellID)` · `S:SourceOrigin(profKey, spellID)` · `S:SourceNpcLine(profKey, spellID)` · `S:IsOtherSideTwin(profKey, spellID)` · `S:MissingRecipes(profKey)` · `S:SkillDetail(profKey, spellID)`
+
+### `CraftingOrderClassic_Sources_Side.lua`
+> CraftingOrderClassic_Sources_Side.lua — le plan que seul l'AUTRE camp vend.
+> 
+> « Recipe: Crispy Bat Wing » n'a qu'un marchand, Abigail Shiel (Brill, Horde) : un joueur de
+> l'Alliance ne lui parlera jamais, et la vue Manquantes la lui proposait comme n'importe quel plan de
+> sa ville (relevé en jeu le 2026-10-03). Mais le plan est un OBJET : il se revend, à l'hôtel des
+> ventes NEUTRE. On ne le cache donc pas, on le MARQUE (arbitrage du user, même jour), et les vues
+> qui parlent d'un achat l'envoient à l'HV, pas chez ce marchand.
+> 
+> À part de CraftingOrderClassic_Sources.lua pour le seul plafond de 500 lignes : c'est la même
+> table `COC.Sources`, chargée juste après elle par le .toc.
+
+**API** : `S:OtherSideVendor(profKey, spellID)` · `S:OtherSideNote(side)` · `S:OtherSideAtlas(side)` · `S:OtherSideCrest(side, size)` · `S:AuctionPrice(profKey, spellID)`
 
 ### `CraftingOrderClassic_Trainers.lua`
 > CraftingOrderClassic_Trainers.lua — « le formateur, vu de nos propres yeux ».
