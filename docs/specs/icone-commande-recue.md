@@ -1,6 +1,8 @@
 # Icônes « une commande t'attend » dans la barre de la minicarte
 
-> État : **2e version vue en jeu à deux comptes** (relevé 2026-09-30 18:25, critères 5 et 6, sauf le
+> État : **publiée en v1.43.0** (2026-10-02) ; règle du clic changée le jour même par le user (le
+> perso connecté qui connaît la recette prend la main, cf. Cas particuliers du 3e tour), pas vue en jeu.
+> Avant : **2e version vue en jeu à deux comptes** (relevé 2026-09-30 18:25, critères 5 et 6, sauf le
 > clic d'un métier que le perso n'a pas) ; **3e tour vu en jeu** (section « 3e tour » ci-dessous : le
 > clic selon qui sait faire, les commandes non nommées qu'un de tes persos sait faire, la couleur du
 > nombre) : critère 11 sur un client (relevé 2026-09-30 19:06), 11 (d) le vert et 12 à deux comptes
@@ -198,10 +200,11 @@ sourdine) ; et **dès que tu l'acceptes**, elle n'attend plus.
   et, sans canal, aux pairs EN LIGNE que l'accepteur connaît. Un tiers hors de cette liste garde la
   commande « ouverte », et son icône allumée, jusqu'à l'expiration (6 h). Limite du réseau, antérieure
   à l'icône ; c'est elle qui décidera du réglage « couper les publiques ».
-- **Nommée pour un reroll qui sait la faire, alors que le perso connecté la sait aussi** : sans
-  l'option rerolls (`/co alts`), seul le reroll nommé peut l'accepter (`Orders:Accept` refuse d'un
-  autre perso) → le clic ouvre SA vue, pas la native. Avec l'option, la native. Défaut de l'agent
-  (2026-09-30), **à confirmer par le user** : la 2e version écrivait la liste dans le chat.
+- **Nommée pour un reroll qui sait la faire, alors que le perso connecté la sait aussi** : le clic
+  ouvre la **native** du perso connecté. Décision du user le 2026-10-02 (« si on connaît la recette,
+  il faut prendre la main sur le reroll »), qui remplace le défaut de l'agent publié en v1.43.0 (la
+  vue du reroll, sauf avec `/co alts`). Conséquence assumée : sans `/co alts`, `Orders:Accept` refuse
+  toujours d'accepter depuis un autre perso que le nommé, et le dit dans le chat.
 - **Popup** : jamais d'appel au système de menus de Blizzard (cf. `forever-menu-addon-open-crash`) ;
   un `StaticPopup` comme `COC_MISSING_ADDON` (déjà vu en jeu), fermé par Échap, avec « Où
   l'apprendre » quand les sources le savent et un bouton « Ouvrir la fenêtre de métier » si le perso

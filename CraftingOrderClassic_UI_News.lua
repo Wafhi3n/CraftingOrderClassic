@@ -36,6 +36,14 @@ local BODY_W = 780
 local function versionsTop()
     return {
         {
+            v = "v1.44.0", title = L["Ta ligne LFW porte le lien de ton métier"],
+            lines = {
+                L["Quand tu cherches du travail, la ligne que l'addon poste sur Trade (Services) porte maintenant le lien de ton métier, juste après son nom. N'importe qui clique dessus et voit tes recettes, même sans l'addon. L'addon prend le lien chaque fois que tu ouvres ta fenêtre de métier et le garde : un /co lfw tapé fenêtre fermée part avec le dernier lien connu. Un métier jamais ouvert depuis la mise à jour part avec son nom seul, comme avant."],
+                L["Une commande nommée pour un de tes rerolls ouvrait la vue de ce reroll, même quand le perso sur lequel tu joues connaît aussi la recette. Maintenant, si tu sais la faire, c'est ta fenêtre de métier qui s'ouvre. La vue du reroll ne s'ouvre plus que si lui seul connaît la recette."],
+                L["Chercher du travail ne provoque plus d'erreur Lua en combat de boss : pendant la rencontre, le jeu cache si tu es absent, et l'addon butait dessus. Il saute simplement ce rafraîchissement et reprend après le combat."],
+            },
+        },
+        {
             v = "v1.43.0", title = L["Une icône quand une commande t'attend"],
             lines = {
                 L["Quand une commande t'attend, l'icône de son métier s'affiche à côté de la minicarte, près de la lettre du courrier, avec le nombre de commandes. Survole-la pour voir qui demande quoi, clique pour ouvrir la bonne fenêtre. Elle s'éteint quand tu as tout accepté ou refusé."],
@@ -424,20 +432,12 @@ local function versionsOlder()
                 L["La vue métier est refaite, avec une colonne Commandes en liste : une ligne par commande (demandeur, objet voulu, prix), et le clic ouvre la carte complète (composants fournis, coût des réactifs, Accepter / Refuser / Chuchoter) avec une croix pour revenir à la liste. Et les sous-catégories de récolte (Peaux, Écailles, Herbes, Poissons) sont enfin traduites hors client français."],
             },
         },
-        {
-            v = "v1.16.0", title = L["Recettes triées, et où est l'or"],
-            lines = {
-                L["Fini le fourre-tout « Consommable » : les recettes sont regroupées par type (potions de soin, de mana, élixirs, flacons, transmutations…) et triées du plus haut niveau au plus bas. Une potion qui rend vie ET mana apparaît sous les deux. Le même classement s'applique partout — Commande, Mes artisans, et les métiers de récolte (minerais, herbes, cuirs, poissons)."],
-                L["Si tu as Lazy Gold, chaque recette affiche sa rentabilité (pièces, étoiles au-delà de mille pièces d'or ; rien pour une perte). La pièce d'or au-dessus de la liste trie par profit, le bouton « 123 » bascule en valeurs exactes. L'onglet Commande a les deux boutons, plus la valeur HV et le coût des réactifs sur chaque commande entrante."],
-                L["Dans l'annuaire, les métiers passent en icônes : un artisan avec un plan vraiment rentable a un contour doré, le survol nomme le plan, le clic ouvre la Commande déjà ciblée. « Mes artisans » gagne « Tous les plans du royaume » : tous tes persos (même faction) fusionnés et triés par profit — d'un coup d'œil, quel reroll fait des sous. Et si tu as MissingTradeSkillsList, un bouton montre tes recettes non apprises en rouge, avec leur source au clic."],
-            },
-        },
     }
 end
 
 local function versionsOldest()
     return {
-        -- v1.15.1 (retirée à la v1.43.0), v1.15.0 (retirée à la v1.42.1), v1.14.0 (retirée à la v1.42.0), v1.13.0 (retirée à la v1.41.1), v1.12.0 / v1.11.0 / v1.10.2 (retirées à la v1.41.0 : la Saison de la Découverte, le canal du royaume et
+        -- v1.16.0 (retirée à la v1.44.0), v1.15.1 (retirée à la v1.43.0), v1.15.0 (retirée à la v1.42.1), v1.14.0 (retirée à la v1.42.0), v1.13.0 (retirée à la v1.41.1), v1.12.0 / v1.11.0 / v1.10.2 (retirées à la v1.41.0 : la Saison de la Découverte, le canal du royaume et
         -- le bouton « Créer » sécurisé n'existent pas sur Forever), v1.10.1 / v1.9.0 / v1.8.0 / v1.7.0 / v1.7.1 /
         -- v1.6.0 / v1.5.0 / v1.4.0 retirées de l'onglet (l'historique
         -- complet vit dans CHANGELOG.md). Cet onglet ne garde qu'une fenêtre glissante de versions :

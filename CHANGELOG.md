@@ -1,5 +1,26 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.44.0 - Your LFW line links your profession
+
+When you look for work, the line the addon posts on Trade (Services) now carries your profession
+link right after its name, like `LFW Blacksmithing/[Blacksmithing] #CO`. Anyone can click it and
+browse your recipes, whether they run the addon or not. Before, "Blacksmithing" was plain text.
+
+The game only hands out that link while your profession window is open, so the addon picks it up
+every time you open it and keeps it. Type `/co lfw` with the window closed and the line still goes
+out with the last link it saw for that character and profession. A profession you haven't opened
+since updating goes out with its name only, as before. Players still on an older version of the
+addon read the name the same way they always did.
+
+Two fixes:
+
+- In v1.43.0, an order named for one of your alts opened that alt's read-only view, even when the
+  character you're playing knew the recipe too. Now your own profession window opens whenever you
+  can make it. The alt's view only opens when the alt is the only one who knows the recipe.
+- Looking for work no longer throws a Lua error during boss fights. During the encounter the game
+  hides whether you're away, and the addon tripped over that. It now skips that refresh and picks up
+  again after the fight.
+
 ## v1.43.0 - An icon when an order is waiting for you
 
 When someone sent you an order, you got a line in chat and maybe a banner, and that was it. Miss

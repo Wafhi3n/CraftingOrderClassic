@@ -46,6 +46,17 @@ client.
 
 ## Relevés
 
+- 2026-10-03 16:43 (réception de la capture) — jusqu'a 6d33ccf — Forever build client 70205, un
+  compte, Deadmines, en combat contre Edwin VanCleef ; build `main-dev@4aeb800 2026-10-03 16:42`
+  avec fix/lfw-afk-secret (copie déployée du `.toc` ; `/co version` pas montré sur la capture) —
+  **GO sur `fix/lfw-afk-secret`** — capture du user, deux `/run` tapés pendant le boss :
+  `print(issecretvalue(UnitIsAFK("player")))` → `true` (témoin : le verrou du boss est actif, l'état
+  AFK est secret), puis `CraftingOrderClassic.Directory:LFWRiposte() print("riposte OK")` →
+  `riposte OK`, sans erreur. L'ancien code levait sur ce même chemin (`not` sur la secrète, ligne
+  305) et la commande se serait arrêtée avant le `print` : c'est donc le correctif qui a tourné. LFW
+  actif : établi par l'erreur du ticker dans la même session (même persistance `COC.db.lfw`).
+  **Pas observé** : un tick du ticker (toutes les 8 min) tombé pendant le boss ; BugGrabber après le
+  combat pas relu.
 - 2026-10-03 14:40 — jusqu'a 904e238 — même séance et même build que le relevé de 14:33 — **GO sur
   `feat/lfw-lien-metier` : critères 19 et 20 de `annonce-commerce.md`** — parole du user : « la
   fenêtre blacksmith […] avec le /co lfw fonctionnait au clic avec ses recettes ». Lu par l'agent dans
@@ -72,6 +83,15 @@ client.
   lien de métier** (jamais mesuré avant). **Pas observé** : la trace « avec le lien frais », le clic
   de Gnomi sans COC (critère 19), le lien gardé après un relog (critère 20). (Les trois sont relevés
   à 14:40, ci-dessus.)
+- 2026-10-02 10:36 — jusqu'a 191a238 — Forever, client de Rédemption, en ANGLAIS, Forgefer ; build
+  `main-dev@6936b40 2026-10-02 10:26` avec feat/liste-destinataires, feat/profit-arbitrages,
+  fix/clic-recette-connue (copie déployée du `.toc`) — **GO sur `fix/clic-recette-connue`** — deux
+  commandes de test DevMacro nommées pour le reroll Anatarion, `/co alts` coupé : (a) Secourisme,
+  recette 1244431 que Rédemption connaît aussi → le clic ouvre la fenêtre de métier de Rédemption ;
+  (b) Couture, qu'Anatarion seul connaît → le clic ouvre la vue d'Anatarion (témoin). Vu par le user
+  (« ça fonctionne comme décrit », capture des deux icônes) et relu par l'agent dans `DevMacroDB.log`
+  (10:35:37 : `T-a clic=native`, `T-b clic=reroll Anatarion`). **Pas observé** : le refus
+  d'acceptation depuis Rédemption d'une commande nommée pour Anatarion (règle inchangée).
 - 2026-10-02 10:20 — jusqu'a 8e7c062 — Forever, client de Rédemption, en ANGLAIS, Forgefer ; build
   `main-dev@ce68ef3 2026-10-02 10:16` avec icone-commande-recue, liste-destinataires,
   profit-arbitrages, release/v1.43.0 (copie déployée du `.toc`) — **GO sur `fix/manquantes-nom-long`**
