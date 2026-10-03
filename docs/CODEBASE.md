@@ -121,8 +121,8 @@
 | `CraftingOrderClassic_ProfWindow_LFW_Recipes.lua` | le SÉLECTEUR DE RECETTES de l'offre LFW. | 140 |
 | `CraftingOrderClassic_ProfWindow_LFW_Announce.lua` | la case « Annoncer en Commerce » de l'offre LFW. | 28 |
 | `CraftingOrderClassic_ProfWindow_Reroll.lua` | vue métier LECTURE SEULE d'un REROLL. | 118 |
-| `Directory.lua` | Crafting Order - Classic — Directory : l'annuaire des GENS (présence + qui peut crafter quoi). | 499 |
-| `Directory_Presence.lua` | présence : la vérité JEU (amis/guilde) et sa fusion avec la vérité ADDON. | 102 |
+| `Directory.lua` | Crafting Order - Classic — Directory : l'annuaire des GENS (présence + qui peut crafter quoi). | 480 |
+| `Directory_Presence.lua` | présence : la vérité JEU (amis/guilde) et sa fusion avec la vérité ADDON. | 148 |
 | `Directory_Recipes.lua` | COUTURE de lecture du registre « qui sait crafter quoi » d'un artisan. | 129 |
 | `Directory_Confed.lua` | source « confédération » (GreenWall) de l'annuaire, DISPLAY-ONLY. | 63 |
 | `Directory_Club.lua` | source « cercle » (communautés WoW) de l'annuaire, DISPLAY-ONLY. | 382 |
@@ -2247,7 +2247,8 @@
 > ressemblait à une panne réseau. Dir:PresenceOf les fusionne en 3 états pour l'UI.
 > 
 > Satellite de Directory.lua (anti-monolithe) : y vivent le sweep des relations en ligne
-> (DiscoverFriendsAndGuild) et la requête d'affichage. Chargé APRÈS Directory.lua (.toc).
+> (DiscoverFriendsAndGuild), la requête d'affichage, et le filtre des erreurs « No player named »,
+> seule présence qu'on ait d'un simple croisé. Chargé APRÈS Directory.lua (.toc).
 
 **API** : `Dir:ForEachBNetWoWFriend(fn)` · `Dir:DiscoverFriendsAndGuild()` · `Dir:PresenceOf(name)`
 

@@ -337,27 +337,8 @@ function Dir:RediscoverKnown(includeRecent)
     end
 end
 
--- Supprime le message système « No player named "X" is currently online. » quand X est un nom qu'on
--- vient de ping (découverte whisper) → pas de spam rouge en sondant des artisans hors-ligne.
-function Dir:_InstallWhisperErrorFilter()
-    if self._errFilter then return end
-    local raw = ERR_CHAT_PLAYER_NOT_FOUND_S or "No player named \"%s\" is currently online."
-    local pat = "^" .. raw:gsub("[%-%.%+%[%]%(%)%$%^%%%?%*]", "%%%0"):gsub("%%%%s", "(.-)") .. "$"
-    self._errFilter = COC.Api.AddChatFilter("CHAT_MSG_SYSTEM", function(_, _, msg)
-        if COC.Api.IsSecret(msg) then return false end   -- instance : texte secret, ni match ni comparaison
-        local who = type(msg) == "string" and msg:match(pat)
-        if who then
-            who = shortName(who)
-            local pinged = Dir._lastPing and Dir._lastPing[who] and (now() - Dir._lastPing[who]) < 15
-            if pinged or (CraftLink and CraftLink.WhisperedRecently and CraftLink:WhisperedRecently(who, 15)) then
-                -- NOTRE whisper (sondage ou fanout sans canal) : on avale l'erreur, et il est hors ligne.
-                if Dir:MarkOffline(who) and COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end
-                return true
-            end
-        end
-        return false
-    end)
-end
+-- Le filtre des erreurs « No player named 'X' » (Dir:_InstallWhisperErrorFilter) vit dans
+-- Directory_Presence.lua : c'est un signal de PRÉSENCE, et le serveur le rend ~110 s après l'envoi.
 
 -- ------------------------------------------------------------------
 -- Requêtes (lisent le CACHE, jamais le réseau)
