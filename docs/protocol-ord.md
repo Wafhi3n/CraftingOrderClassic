@@ -205,7 +205,11 @@ expiré** (`ORDER_TTL`), et la portée est respectée. `RebroadcastMine` est jit
 >   une arrivée du canal arrive **secrète**, et le transport la lisait sans garde : erreur Lua relevée par
 >   BugGrabber le 2026-09-25 (canal plein, Wailing Caverns) ; que la salle y mène aussi est déduit du
 >   code, pas observé. La REV 17 coupe cette balise sans canal et écarte toute valeur secrète du chat
->   avant de la lire (`CraftLink_Sender.lua`).
+>   avant de la lire (`CraftLink_Sender.lua`) ;
+> - **resync sur HI** (2026-10-03) : un « global » coûtant un whisper par pair, un HI reçu ne relance
+>   plus `RebroadcastMine` à tous mais `PushMineTo(auteur)` : le même lot (mes commandes ouvertes ou
+>   acceptées, rerolls et titre compris), vers lui seul, 60 s par cible. Le canal plein garde la
+>   rediffusion regroupée. Fil inchangé : un vieux client reçoit un NEW comme avant.
 
 > ### Confinement ROYAUME de TOUT le trafic addon (TRANSPORT_REV 10, 2026-07-11)
 >

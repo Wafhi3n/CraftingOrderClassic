@@ -153,6 +153,26 @@ function Orders:Broadcast(action, o, opts)
     end
 end
 
+-- HI reçu SANS canal (Orders:OnHello) : le même lot que RebroadcastMine (MES commandes ouvertes ou
+-- acceptées, rerolls compris, titre compris), mais vers celui qui vient de dire bonjour, lui seul.
+-- Throttlé par cible (60 s, comme Dir:_AnnounceToThrottled) : un pair qui me spamme de HI ne me fait
+-- pas renvoyer tout mon carnet à chaque message. Aucun verbe neuf : un vieux client reçoit un NEW.
+local PUSH_MINE_THROTTLE = 60
+
+function Orders:PushMineTo(who)
+    if not (who and CraftLink and COC.db) or myChar(who) then return end
+    self._lastMinePush = self._lastMinePush or {}
+    local t = (GetTime and GetTime()) or 0
+    if (self._lastMinePush[who] or 0) + PUSH_MINE_THROTTLE > t then return end
+    self._lastMinePush[who] = t
+    for _, o in pairs(COC.db.orders or {}) do
+        if myChar(o.buyer) and (o.status == "open" or o.status == "accepted") then
+            CraftLink:Send(self:_NewPayload(o), "whisper", who)
+            if self.PushTitleTo then self:PushTitleTo(who, o) end   -- Orders_Narrative : TTL si titrée
+        end
+    end
+end
+
 -- ------------------------------------------------------------------
 -- Réception (protocole) — met à jour le cache
 -- ------------------------------------------------------------------

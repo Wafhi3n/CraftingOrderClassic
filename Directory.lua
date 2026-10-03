@@ -292,14 +292,7 @@ function Dir:OnBeacon(who)
     self:DiscoverPlayer(who)
 end
 
--- Re-publication throttlée (3 s) — appelée quand mes recettes changent (plan appris) ou skill gagné,
--- pour que les autres reçoivent mes RK/SK à jour sans spammer le réseau.
-function Dir:AnnounceThrottled()
-    if not C_Timer then return self:Announce() end
-    if self._annTimer then return end
-    self._annTimer = true
-    C_Timer.After(3, function() self._annTimer = nil; Dir:Announce() end)
-end
+-- Re-publication coalescée (Dir:AnnounceThrottled) → Directory_Skills.lua, à côté de _AnnounceToThrottled.
 
 -- ------------------------------------------------------------------
 -- Niveaux de compétence (SK) + réputation → déplacés dans Directory_Skills.lua (couche « profil »,

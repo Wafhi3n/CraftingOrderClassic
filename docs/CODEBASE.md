@@ -121,14 +121,14 @@
 | `CraftingOrderClassic_ProfWindow_LFW_Recipes.lua` | le SÉLECTEUR DE RECETTES de l'offre LFW. | 140 |
 | `CraftingOrderClassic_ProfWindow_LFW_Announce.lua` | la case « Annoncer en Commerce » de l'offre LFW. | 28 |
 | `CraftingOrderClassic_ProfWindow_Reroll.lua` | vue métier LECTURE SEULE d'un REROLL. | 118 |
-| `Directory.lua` | Crafting Order - Classic — Directory : l'annuaire des GENS (présence + qui peut crafter quoi). | 499 |
+| `Directory.lua` | Crafting Order - Classic — Directory : l'annuaire des GENS (présence + qui peut crafter quoi). | 492 |
 | `Directory_Presence.lua` | présence : la vérité JEU (amis/guilde) et sa fusion avec la vérité ADDON. | 102 |
 | `Directory_Recipes.lua` | COUTURE de lecture du registre « qui sait crafter quoi » d'un artisan. | 129 |
 | `Directory_Confed.lua` | source « confédération » (GreenWall) de l'annuaire, DISPLAY-ONLY. | 63 |
 | `Directory_Club.lua` | source « cercle » (communautés WoW) de l'annuaire, DISPLAY-ONLY. | 382 |
 | `Directory_Community.lua` | le réseau SANS canal : la communauté remplace CraftLinkNet (Forever). | 270 |
 | `Directory_Note.lua` | la note de membre de la communauté : lue dans l'annuaire, préparée pour le joueur. | 105 |
-| `Directory_Skills.lua` | niveaux de compétence + réputation (couche « profil » de l'annuaire). | 157 |
+| `Directory_Skills.lua` | niveaux de compétence + réputation (couche « profil » de l'annuaire). | 173 |
 | `Directory_Room.lua` | la salle de découverte : CraftLinkNet rejoint pour SE PRÉSENTER, pas pour transporter. | 88 |
 | `Directory_Version.lua` | détection « nouvelle version disponible » (100 % P2P, aucun serveur). | 147 |
 | `Directory_Cooldowns.lua` | cooldowns de recettes (couche « profil » de l'annuaire). | 82 |
@@ -146,8 +146,8 @@
 | `Orders_Announce.lua` | le FORMAT d'une annonce en clair sur Commerce (spec docs/specs/annonce-commerce.md). | 193 |
 | `Orders_AnnounceSend.lua` | l'ENVOI d'une annonce sur Trade (Services) (spec annonce-commerce, palier 2). | 212 |
 | `Orders_AnnounceRecv.lua` | la LECTURE d'une annonce de Commerce (spec annonce-commerce, palier 3). | 107 |
-| `Orders.lua` | Crafting Order - Classic — Orders : carnet d'ordres GLOBAL (modèle + cycle + protocole). | 493 |
-| `Orders_Net.lua` | couche « fil réseau » du carnet d'ordres (protocole ORD\|). | 371 |
+| `Orders.lua` | Crafting Order - Classic — Orders : carnet d'ordres GLOBAL (modèle + cycle + protocole). | 495 |
+| `Orders_Net.lua` | couche « fil réseau » du carnet d'ordres (protocole ORD\|). | 391 |
 | `Orders_Narrative.lua` | TITRE et DESCRIPTION libres d'une commande : « donne un nom et une histoire à ce que tu demandes ». | 254 |
 | `CraftingOrderClassic_QuestSheet.lua` | FICHE DE QUÊTE réutilisable : affiche (ou fait écrire) une commande sous la forme d'une vraie quête du jeu. | 363 |
 | `CraftingOrderClassic_JournalQuests.lua` | lecture EN SEULE LECTURE du journal de quêtes du JEU, pour que le journal COC affiche les vraies quêtes à côté des commandes. | 103 |
@@ -2233,7 +2233,7 @@
 > répond ; depuis le 2026-09-28 le canal est coupé et « global » part en whisper vers ces pairs
 > (Directory_Community). Recettes → Dir.roster (persistant). Discipline : réseau → roster → UI.
 
-**API** : `Dir:OnPresence(kind, who)` · `Dir:ScanRelations()` · `Dir:ClassifySource(name)` · `Dir:ReclassifyAll()` · `Dir:PruneRoster(maxAgeDays, maxRecent)` · `Dir:OnRK(sender, message)` · `Dir:OnHello(sender, message, distribution)` · `Dir:OnPing(sender, _, distribution)` · `Dir:OnPong(sender)` · `Dir:Announce()` · `Dir:AnnounceTo(target)` · `Dir:DiscoverPlayer(name)` · `Dir:OnBeacon(who)` · `Dir:AnnounceThrottled()` · `Dir:Refresh()` · `Dir:RediscoverKnown(includeRecent)` · `Dir:CountOnline()` · `Dir:CountKnownCrafters()` · `Dir:WhoCanCraft(prof, spellID)` · `Dir:Start()`
+**API** : `Dir:OnPresence(kind, who)` · `Dir:ScanRelations()` · `Dir:ClassifySource(name)` · `Dir:ReclassifyAll()` · `Dir:PruneRoster(maxAgeDays, maxRecent)` · `Dir:OnRK(sender, message)` · `Dir:OnHello(sender, message, distribution)` · `Dir:OnPing(sender, _, distribution)` · `Dir:OnPong(sender)` · `Dir:Announce()` · `Dir:AnnounceTo(target)` · `Dir:DiscoverPlayer(name)` · `Dir:OnBeacon(who)` · `Dir:Refresh()` · `Dir:RediscoverKnown(includeRecent)` · `Dir:CountOnline()` · `Dir:CountKnownCrafters()` · `Dir:WhoCanCraft(prof, spellID)` · `Dir:Start()`
 
 ### `Directory_Presence.lua`
 > Directory_Presence.lua — présence : la vérité JEU (amis/guilde) et sa fusion avec la vérité ADDON.
@@ -2339,7 +2339,7 @@
 > et reçoit ceux des autres → Dir.roster[name].skill/.level/.rep. Les méthodes restent sur la table
 > COC.Directory (créée par Directory.lua, chargé AVANT) → self:_Touch etc. résolus sur la table partagée.
 
-**API** : `Dir:CaptureSkills()` · `Dir:AnnounceSkills()` · `Dir:OnSkill(sender, message)`
+**API** : `Dir:CaptureSkills()` · `Dir:AnnounceSkills()` · `Dir:OnSkill(sender, message)` · `Dir:AnnounceThrottled()`
 
 ### `Directory_Room.lua`
 > Directory_Room.lua — la salle de découverte : CraftLinkNet rejoint pour SE PRÉSENTER, pas pour transporter.
@@ -2616,7 +2616,7 @@
 >   NEW / CANCEL / ACK / DLV / DONE / NACK / SUGG, sérialisés/parsés par Orders_Codec.lua.
 >   Grammaire filaire complète + règles d'autorité (anti-spoof sender==buyer) : docs\protocol-ord.md.
 
-**API** : `Orders:ProfForItem(itemID)` · `Orders:VisibleTo(o, who)` · `Orders:Post(itemID, qty, price, opts)` · `Orders:PostEntry(entry, qty, price, opts)` · `Orders:OrderName(o)` · `Orders:Cancel(id)` · `Orders:Accept(id)` · `Orders:Deliver(id)` · `Orders:Confirm(id, auto)` · `Orders:TryAutoComplete(itemID, source, from)` · `Orders:AlertDelivered(o)` · `Orders:Decline(o)` · `Orders:ProfRowAction(o)` · `Orders:AlertTargeted(o, tries)` · `Orders:RebroadcastMine()` · `Orders:OnHello()` · `Orders:All()` · `Orders:PruneExpired()` · `Orders:OnArtisanOnline(who)` · `Orders:PrintList()` · `Orders:PostFromInput(rest)` · `Orders:Ping()` · `Orders:OnPing(sender)` · `Orders:Start()`
+**API** : `Orders:ProfForItem(itemID)` · `Orders:VisibleTo(o, who)` · `Orders:Post(itemID, qty, price, opts)` · `Orders:PostEntry(entry, qty, price, opts)` · `Orders:OrderName(o)` · `Orders:Cancel(id)` · `Orders:Accept(id)` · `Orders:Deliver(id)` · `Orders:Confirm(id, auto)` · `Orders:TryAutoComplete(itemID, source, from)` · `Orders:AlertDelivered(o)` · `Orders:Decline(o)` · `Orders:ProfRowAction(o)` · `Orders:AlertTargeted(o, tries)` · `Orders:RebroadcastMine()` · `Orders:OnHello(sender)` · `Orders:All()` · `Orders:PruneExpired()` · `Orders:OnArtisanOnline(who)` · `Orders:PrintList()` · `Orders:PostFromInput(rest)` · `Orders:Ping()` · `Orders:OnPing(sender)` · `Orders:Start()`
 
 ### `Orders_Net.lua`
 > Orders_Net.lua — couche « fil réseau » du carnet d'ordres (protocole ORD|).
@@ -2626,7 +2626,7 @@
 > la table COC.Orders (créée par Orders.lua, chargé AVANT) → appelées via self: depuis les deux fichiers.
 > Le cycle local (Post/Accept/Deliver/Cancel/Decline), l'alerting et les helpers restent dans Orders.lua.
 
-**API** : `Orders:Broadcast(action, o, opts)` · `Orders:OnNetwork(sender, message, distribution)`
+**API** : `Orders:Broadcast(action, o, opts)` · `Orders:PushMineTo(who)` · `Orders:OnNetwork(sender, message, distribution)`
 
 ### `Orders_Narrative.lua`
 > Orders_Narrative.lua — TITRE et DESCRIPTION libres d'une commande : « donne un nom et une histoire

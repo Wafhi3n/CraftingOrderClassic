@@ -330,11 +330,13 @@ function Orders:RebroadcastMine()
     end
 end
 
--- Resync sur HI : je ré-annonce MES commandes ouvertes/acceptées. COALESCÉ (une salve de HI au
--- login en masse ne doit pas rediffuser tout mon carnet en global N fois) : un seul rebroadcast par
--- fenêtre ~3-6 s, jitté (anti-burst). Les pushes DIRIGÉS restent plafonnés ailleurs (OnArtisanOnline).
-function Orders:OnHello()
+-- Resync sur HI : je ré-annonce MES commandes ouvertes/acceptées. Canal plein : en global, COALESCÉ (une
+-- salve de HI au login ne doit pas rediffuser tout mon carnet N fois), un rebroadcast par ~3-6 s, jitté.
+-- Sans canal, « global » = un whisper par pair : chaque HI renvoyait mon carnet à TOUS (vu toutes les
+-- 20-50 s le 2026-10-03). Seul celui qui dit bonjour le reçoit (PushMineTo, Orders_Net).
+function Orders:OnHello(sender)
     if not (CraftLink and C_Timer) then return end
+    if not (CraftLink.NetworkMode and CraftLink:NetworkMode() == "channel") then return self:PushMineTo(sender) end
     if self._rebTimer then return end
     self._rebTimer = true
     C_Timer.After(3 + math.random() * 3, function() Orders._rebTimer = nil; Orders:RebroadcastMine() end)
@@ -482,7 +484,7 @@ function Orders:Start()
     COC.db.orders = COC.db.orders or {}
     self:PruneExpired()                                  -- entretien au démarrage
     CraftLink:RegisterHandler("ORD", function(s, m, d) Orders:OnNetwork(s, m, d) end)
-    CraftLink:RegisterHandler("HI",  function() Orders:OnHello() end)
+    CraftLink:RegisterHandler("HI",  function(s) Orders:OnHello(s) end)
     CraftLink:RegisterHandler("PING", function(s) Orders:OnPing(s) end)
     -- PONG : plus d'affichage chat (c'était du debug). Dir:OnPong gère la présence en coulisse.
     -- Ré-émission périodique de MES commandes ouvertes/acceptées : un porteur qui rejoint le canal
