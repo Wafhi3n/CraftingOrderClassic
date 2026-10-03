@@ -8,6 +8,14 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "Neues",
+    -- v1.44.1
+    ["Fini le spam « No player named »"] = "Schluss mit dem „No player named“-Spam",
+    ["Quand un joueur de l'addon se déconnectait, ton chat pouvait se remplir de « No player named 'X' is currently playing. » deux minutes plus tard, encore et encore : l'addon continuait de lui envoyer tes commandes et ta fiche. Le jeu signale un message envoyé à un absent avec environ deux minutes de retard, et l'addon ne l'attendait que 15 secondes. Il attend maintenant cinq minutes : l'erreur reste cachée et l'addon cesse d'écrire à celui qui est parti."] =
+        "Wenn sich ein anderer Addon-Nutzer abmeldete, konnte sich dein Chat zwei Minuten später mit „No player named 'X' is currently playing.“ füllen, immer wieder: Das Addon schickte ihm weiter deine Aufträge und dein Profil. Das Spiel meldet eine Nachricht an jemanden, der offline ist, erst etwa zwei Minuten später, und das Addon wartete nur 15 Sekunden darauf. Jetzt wartet es fünf Minuten: Der Fehler bleibt verborgen, und das Addon schreibt dem Abgemeldeten nicht mehr.",
+    ["L'addon envoie aussi beaucoup moins : quand un joueur te dit bonjour, tes commandes ne partent plus qu'à lui, et plus à tous tes contacts. En montant un métier, ta fiche part au plus une fois par minute au lieu de partir à chaque point."] =
+        "Das Addon sendet außerdem viel weniger: Wenn dich ein Spieler grüßt, gehen deine Aufträge nur noch an ihn statt an alle deine Kontakte. Beim Leveln eines Berufs geht dein Profil höchstens einmal pro Minute raus statt nach jedem Punkt.",
+    ["Seul effet de bord : si tu chuchotes toi-même un joueur déconnecté que l'addon a contacté dans ces cinq minutes, l'erreur de ton chuchotement est cachée aussi."] =
+        "Einziger Nebeneffekt: Wenn du selbst einen abgemeldeten Spieler anflüsterst, den das Addon in diesen fünf Minuten kontaktiert hat, bleibt auch der Fehler zu deinem Flüstern verborgen.",
     -- v1.44.0
     ["Ta ligne LFW porte le lien de ton métier"] = "Deine LFW-Zeile verlinkt deinen Beruf",
     ["Quand tu cherches du travail, la ligne que l'addon poste sur Trade (Services) porte maintenant le lien de ton métier, juste après son nom. N'importe qui clique dessus et voit tes recettes, même sans l'addon. L'addon prend le lien chaque fois que tu ouvres ta fenêtre de métier et le garde : un /co lfw tapé fenêtre fermée part avec le dernier lien connu. Un métier jamais ouvert depuis la mise à jour part avec son nom seul, comme avant."] =
@@ -213,10 +221,7 @@ local news = {
     ["Correctif : erreur au login en « Chercher du travail »"] = "Behoben: Fehler beim Anmelden bei „Arbeit suchen\"",
     ["Si tu avais activé « Chercher du travail », te connecter ou faire /reload pouvait déclencher une erreur rouge : l'addon annonçait ta disponibilité avant que le jeu n'autorise un addon à parler sur le canal. L'annonce attend maintenant ton prochain clic ou ta prochaine touche — plus d'erreur, et les autres te voient toujours dispo."] =
         "Wenn „Arbeit suchen\" aktiviert war, konnte das Anmelden oder /reload einen roten Fehler auslösen: Das Addon meldete deine Verfügbarkeit, bevor das Spiel einem Addon erlaubt, im Kanal zu sprechen. Die Meldung wartet jetzt auf deinen nächsten Klick oder Tastendruck — kein Fehler mehr, und andere sehen weiterhin, dass du verfügbar bist.",
-    -- v1.17.0
-    ["L'interface passe au style natif de WoW"] = "Das Fenster passt jetzt zum Spiel",
-    ["La fenêtre n'a plus son habillage doré maison : elle emprunte le cadre du jeu (barre de titre, portrait rond, onglets, boutons). Elle se fond dans l'interface au lieu de ressembler à un addon posé par-dessus, et rien n'a bougé de ce que tu connais."] = "Das Fenster hat seine eigene goldene Optik gegen den Rahmen des Spiels getauscht (Titelleiste, rundes Porträt, Reiter oben, Schaltflächen). Es wirkt jetzt wie ein Teil der Oberfläche statt wie ein aufgesetztes Addon, und nichts hat sich verschoben, was du neu lernen müsstest.",
-    ["La vue métier est refaite, avec une colonne Commandes en liste : une ligne par commande (demandeur, objet voulu, prix), et le clic ouvre la carte complète (composants fournis, coût des réactifs, Accepter / Refuser / Chuchoter) avec une croix pour revenir à la liste. Et les sous-catégories de récolte (Peaux, Écailles, Herbes, Poissons) sont enfin traduites hors client français."] = "Das Berufsfenster wurde neu gebaut, mit der Auftragsspalte als Liste: eine Zeile pro Auftrag (Besteller, gewünschter Gegenstand, Preis), und ein Klick öffnet die vollständige Karte (bereitgestellte Komponenten, Reagenzienkosten, Annehmen / Ablehnen / Flüstern) mit einer Schließen-Schaltfläche zurück zur Liste. Und die Sammelberuf-Unterkategorien (Felle, Schuppen, Kräuter, Fische) sind außerhalb eines französischen Clients endlich übersetzt.",
+    -- (clés v1.17.0 retirées à la v1.44.1 : version sortie de la fenêtre glissante de l'onglet)
     -- (clés v1.8.0/v1.7.0/v1.7.1/v1.6.0/v1.5.0/v1.4.0 retirées : ces versions ne sont plus listées dans l'onglet Nouveautés)
     -- (clés v1.13.0 retirées à la v1.41.1 : version sortie de la fenêtre glissante de l'onglet)
     -- (clés v1.12.1 retirées : version sortie de la fenêtre glissante de l'onglet Nouveautés)
