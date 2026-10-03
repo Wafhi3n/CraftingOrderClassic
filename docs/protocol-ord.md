@@ -195,8 +195,10 @@ expiré** (`ORDER_TTL`), et la portée est respectée. `RebroadcastMine` est jit
 >   commande » : un pair atteint par **relais mesh** ne reçoit pas mon CANCEL — d'où le renvoi du CANCEL
 >   sur ACK/DLV d'une commande annulée (table d'autorité ci-dessus) ;
 > - la **présence** vient du code `TargetOffline` de `SendAddonMessage`, du message « aucun joueur
->   nommé » pour un joueur whispé < 15 s, et d'un **sondage** quand le jeu (amis, guilde, club) le dit
->   parti — jamais d'un effacement sur la seule foi du jeu ;
+>   nommé » pour un joueur que l'addon a chuchoté dans les 5 min (le serveur le rend **~110 s après
+>   l'envoi**, mesuré le 2026-10-03 ; la fenêtre de 15 s d'avant le laissait passer, d'où un pair
+>   parti resté « en ligne » et des renvois en boucle), et d'un **sondage** quand le jeu (amis,
+>   guilde, club) le dit parti — jamais d'un effacement sur la seule foi du jeu ;
 > - la **découverte** d'inconnus passe par la communauté (`Directory_Community.lua`). Spec :
 >   `docs/specs/communaute-sans-canal.md`. Les sections qui suivent décrivent le mode canal ;
 > - la **salle de découverte** (TRANSPORT_REV 16, `Directory_Room.lua`) rejoint `CraftLinkNet` pour y

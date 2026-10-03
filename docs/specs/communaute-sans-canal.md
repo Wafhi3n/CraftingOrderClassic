@@ -160,6 +160,18 @@ Ce que le canal portait et qui se tait sans lui :
     quand le client reste ouvert. Le lien part désormais **15 s après l'entrée en jeu**, sans attendre
     d'événement (roster du club lisible 4 s après l'entrée en jeu au banc). Chaque décision laisse sa
     raison dans `/co trace` (« lien de la communauté proposé / non proposé : … »).
+- **2026-10-03, mesuré en jeu (DevMacro n°5 et n°6)** : le « aucun retour » du relevé 12 était un
+  retour **en retard**. Le serveur rend « No player named 'X' is currently playing. » pour un whisper
+  d'addon vers un absent (ou un nom inexistant) **108 à 112 s après l'envoi**, en paquet, dans l'ordre
+  d'envoi, sans changement de zone. Le filtre le reçoit bien (aucune valeur secrète). La fenêtre de 15 s
+  ne reconnaissait donc plus notre whisper : l'erreur s'affichait, et le pair parti restait « en ligne »,
+  avec annonces et renvois de commande en boucle (spam vu par le user à Ironforge et Stormwind). Fenêtre
+  portée à **5 min**. Le pair qui m'a parlé dans la dernière minute n'est pas éteint (revenu après l'envoi
+  refusé). Prix **accepté par le user le 2026-10-03** (« oui »), avec la consigne de **mieux
+  l'encadrer plus tard** : un whisper À LA MAIN vers un absent que l'addon a écrit dans ces 5 min perd
+  son erreur. Pistes, non tranchées : retenir les noms que le JOUEUR vient de chuchoter (crochet sur
+  l'envoi du chat, à mesurer pour le taint) et ne jamais avaler leur erreur ; ou compter les envois de
+  l'addon par nom et n'avaler que ce nombre d'erreurs. Le filtre passe dans `Directory_Presence.lua`.
 
 ## Critères d'acceptation
 
@@ -177,7 +189,11 @@ Ce que le canal portait et qui se tait sans lui :
 8. [test] Le lien s'affiche à la connexion initiale si aucun cercle et que le camp a une communauté
    officielle ; pas au `/reload`, pas pour la Horde, pas après `/co circle nolink`, pas si un cercle
    existe.
-9. [test] Un « Aucun joueur nommé X » pour un pair whispé il y a moins de 15 s est avalé et éteint X.
+9. [test] Un « Aucun joueur nommé X » pour un pair que l'addon a chuchoté il y a moins de 5 min est
+   avalé et éteint X (sauf s'il m'a parlé dans la dernière minute) ; au-delà, ou pour un nom que
+   l'addon n'a pas écrit, il reste affiché. → `tests/test_community.lua`.
+   En jeu [humain] : un pair qui se déconnecte ne fait plus pleuvoir « No player named », et
+   `/co trace` ne montre plus d'envoi vers lui au-delà de ~2 min.
 10. [porte] Les quatre portes passent ; toute chaîne neuve est dans les trois overlays.
 11. [agent] Revue `api-gotcha-reviewer` (transport, clubs, valeurs secrètes) et
     `craftlink-protocol-reviewer` (fanout, doublons, présence) sans bloquant. → faites le 2026-09-28,
