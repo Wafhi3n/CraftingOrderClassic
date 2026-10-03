@@ -261,6 +261,17 @@ function Dir:SetLFW(profKey)
     if COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end
 end
 
+-- Suis-je absent, pour l'anti-leurre ? En combat de BOSS (verrou `Chat`), `UnitIsAFK("player")` rend une
+-- valeur SECRÈTE, et la tester dans un `if` lève (vu le 2026-10-03, ticker LFW). Une secrète vaut « on ne
+-- sait pas » : on n'émet pas, comme pour un absent — le même verrou bloque de toute façon l'envoi d'addon
+-- sur un canal. Le test de secret vient AVANT toute utilisation de la valeur.
+local function awayOrUnknown()
+    if not UnitIsAFK then return false end
+    local afk = UnitIsAFK("player")
+    if COC.Api.IsSecret(afk) then return true end
+    return afk == true
+end
+
 -- Ré-émission périodique : (1) maintient mon LFW FRAIS chez les autres (sinon le TTL l'expire), (2) atteint
 -- les joueurs qui rejoignent le canal APRÈS mon annonce. STOPPÉE si je suis FULL AFK (UnitIsAFK) → je cesse
 -- d'émettre et je sors du radar au bout du TTL, au lieu de leurrer les gens avec un « dispo » d'un absent.
@@ -273,7 +284,7 @@ function Dir:_StartLFWTicker()
             if Dir._lfwTicker then Dir._lfwTicker:Cancel(); Dir._lfwTicker = nil end
             return
         end
-        if UnitIsAFK and UnitIsAFK("player") then return end   -- full AFK → on cesse d'émettre (anti-leurre)
+        if awayOrUnknown() then return end   -- full AFK, ou boss → on cesse d'émettre (anti-leurre)
         Dir:_BroadcastLFW()
     end)
 end
@@ -302,7 +313,7 @@ local RIPOSTE_THROTTLE = 45    -- s entre deux ripostes, quel que soit le nombre
 local RIPOSTE_JITTER   = 3     -- s : étalement aléatoire, pour ne pas parler tous en choeur
 
 local function stillBroadcastable()
-    return (COC.db and COC.db.lfw and COC.db.lfw.prof) and not (UnitIsAFK and UnitIsAFK("player"))
+    return (COC.db and COC.db.lfw and COC.db.lfw.prof) and not awayOrUnknown()
 end
 
 function Dir:LFWRiposte()
