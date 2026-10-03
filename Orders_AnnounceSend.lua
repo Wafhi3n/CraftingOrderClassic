@@ -1,7 +1,7 @@
 -- Orders_AnnounceSend.lua — l'ENVOI d'une annonce sur Trade (Services) (spec annonce-commerce, palier 2).
 --
 -- Le format vit dans Orders_Announce.lua ; ici, ce qui touche au jeu : trouver le canal, résoudre les
--- liens d'objet, poser les garde-fous, écrire la ligne. Décisions du user (2026-09-29) : le canal est
+-- liens d'objet, garder mon lien de métier, poser les garde-fous, écrire la ligne. Décisions du user (2026-09-29) : le canal est
 -- Trade (Services), celui des services d'artisans ; une annonce part d'un CLIC (le jeu l'exige, et un
 -- espace public ne se remplit pas tout seul) ; « Rappeler » au plus une fois par quart d'heure et par
 -- commande. Mesuré le même soir (constat C15) : l'addon écrit sur ce canal depuis une action du joueur,
@@ -131,18 +131,82 @@ function S:Post(o, isRemind)
     return true
 end
 
+-- ------------------------------------------------------------------
+-- Mon lien de métier, pour la ligne LFW (user, 2026-10-03) : un joueur sans l'addon le clique et voit
+-- mes recettes. Le jeu ne le donne que fenêtre de MON métier ouverte (`GetTradeSkillListLink`, réf.
+-- wow-forever-api `metiers-et-objets`) : on le garde à chaque ouverture, par personnage (GUID, les
+-- SavedVariables sont au compte) et par métier, pour /co lfw tapé fenêtre fermée. N'entre qu'un lien
+-- à MOI (GUID) dont le libellé se résout en métier : jamais celui d'une vue liée ou de la guilde.
+-- ⚠️ À ÉPROUVER au banc : un lien gardé d'une session précédente s'ouvre-t-il encore chez l'autre ?
+-- Un lien fabriqué pour un métier jamais partagé s'ouvre vide (relevé du 2026-09-27).
+-- ------------------------------------------------------------------
+local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true) end
+local function myGUID() return UnitGUID and UnitGUID("player") end
+
+local function profOfLabel(label)
+    local c = CL()
+    if not (c and c.ResolveProfession and label and label ~= "") then return nil end
+    local key = c:ResolveProfession(label)
+    return (c.professions and c.professions[key]) and key or nil
+end
+
+-- Relit le lien du métier ouvert et le garde. Rend la clé du métier gardé, ou nil. Même garde que le
+-- bouton « lien » de Blizzard (`CanTradeSkillListLink`, Blizzard_ProfessionsCrafting.lua) : jamais un
+-- lien que le jeu lui-même ne proposerait pas.
+function S.CaptureTradeLink()
+    local ts, c = C_TradeSkillUI, CL()
+    if not (ts and ts.GetTradeSkillListLink and COC.db) then return nil end
+    if ts.CanTradeSkillListLink then
+        local ok, can = pcall(ts.CanTradeSkillListLink)
+        if not (ok and can) then return nil end
+    end
+    if c and c.IsOwnProfessionOpen and not c:IsOwnProfessionOpen() then return nil end
+    local ok, link = pcall(ts.GetTradeSkillListLink)
+    if not (ok and type(link) == "string") or COC.Api.IsSecret(link) then return nil end
+    local t, guid = COC.Announce.ParseTradeLink(link), myGUID()
+    if not (t and guid and t.owner == guid) then return nil end
+    local key = profOfLabel(t.label)
+    if not key then return nil end
+    COC.db.tradeLinks = COC.db.tradeLinks or {}
+    COC.db.tradeLinks[guid] = COC.db.tradeLinks[guid] or {}
+    COC.db.tradeLinks[guid][key] = link
+    return key
+end
+
+-- Mon lien pour ce métier et sa provenance (« frais » : fenêtre ouverte ; « gardé » : d'une ouverture
+-- précédente), ou nil. La provenance va dans la trace : c'est ce que le banc doit départager.
+function S.TradeLink(profKey)
+    local fresh = S.CaptureTradeLink() == profKey
+    local guid = myGUID()
+    local mine = guid and COC.db and COC.db.tradeLinks and COC.db.tradeLinks[guid]
+    local link = mine and mine[profKey]
+    if not link then return nil end
+    return link, fresh and "frais" or "gardé"
+end
+
+if CreateFrame and COC.Api and COC.Api.RegisterEventsSafe then
+    local f = CreateFrame("Frame")
+    COC.Api.RegisterEventsSafe(f, { "TRADE_SKILL_SHOW", "TRADE_SKILL_LIST_UPDATE" })
+    f:SetScript("OnEvent", function() S.CaptureTradeLink() end)
+end
+
 -- La dispo d'un artisan (palier 4) : « LFW <métier> #CO », quand il l'ACTIVE et seulement si la case
 -- « Annoncer en Commerce » est cochée (même réglage que le formulaire de commande). À appeler depuis
 -- son clic (bouton, bande « Chercher du travail », /co lfw) — jamais depuis le renouvellement
 -- automatique de la dispo (ticker, riposte) : le jeu exige un geste, et Commerce n'est pas à nous.
+-- Le lien se lit dans le même geste, sans délai, avant l'écriture.
 function S:PostLFW(profKey)
     if not (profKey and COC.db and COC.db.announceTrade) then return false end
     local why = channelWhyNot()
     if why then p(why); return false end
-    local line = COC.Announce.BuildLFW({ profKey })
+    local link, from = S.TradeLink(profKey)
+    local line = COC.Announce.BuildLFW({ profKey }, link and { [profKey] = link })
     local name = line and write(line)
     if not name then return false end
-    if COC.Trace then COC.Trace:Log("send", "dispo " .. profKey .. " annoncée sur " .. tostring(name)) end
+    if COC.Trace then
+        local how = (line:find("|Htrade:", 1, true) and (" avec le lien " .. from)) or " sans lien"
+        COC.Trace:Log("send", "dispo " .. profKey .. " annoncée sur " .. tostring(name) .. how)
+    end
     p(string.format(L["dispo annoncée sur %s."], name))
     return true
 end

@@ -46,6 +46,32 @@ client.
 
 ## Relevés
 
+- 2026-10-03 14:40 — jusqu'a 904e238 — même séance et même build que le relevé de 14:33 — **GO sur
+  `feat/lfw-lien-metier` : critères 19 et 20 de `annonce-commerce.md`** — parole du user : « la
+  fenêtre blacksmith […] avec le /co lfw fonctionnait au clic avec ses recettes ». Lu par l'agent dans
+  la SavedVariable de Rédemption (écrite à 14:34:53) : `14:21:47` et `14:32:01` « dispo Blacksmithing
+  annoncée sur Trade (Services) - English avec le lien frais » ; redémarrage de l'addon entre
+  `14:33:05` et `14:33:15` (canal quitté, réseau prêt à 14:33:18, bonjours de connexion) ; puis
+  `14:33:24` « … avec le lien **gardé** » ; `tradeLinks` garde
+  `|Htrade:Player-4620-0099DCCF:3100:164|h[Blacksmithing]|h` (3100 = Forge Compagnon, à 96/150).
+  Gnomi avait COC désactivé : sa SavedVariable de COC n'a pas été réécrite depuis 11:08 quand
+  COCProbe a écrit la sienne à 14:34, et aucun chuchotement de Gnomi dans la trace de Rédemption.
+  **Pas établi** : un `/reload` et un relog ne se distinguent pas dans la trace ; un lien gardé d'un
+  autre jour n'a pas été essayé. Le lien gardé reste (décision du 2026-10-03 : il ne partait que s'il
+  s'ouvrait vide).
+- 2026-10-03 14:33 — jusqu'a 904e238 — Forever build client 70205, client de Rédemption en ANGLAIS ;
+  build `main-dev@79ab669 2026-10-03 14:14` avec docs/spec-lien-metier, docs/spec-route-cout-net,
+  feat/lfw-lien-metier, feat/lien-metier, feat/liste-destinataires, feat/profit-arbitrages,
+  feat/route-cout-net, feat/vue-reroll-native, fix/clic-recette-connue, fix/connues-perimees,
+  fix/route-formateur, release/v1.43.1 (copie déployée du `.toc`) — **GO partiel sur
+  `feat/lfw-lien-metier` : critère 18 de `annonce-commerce.md`** — capture du user après le clic
+  « Looking for work » : « availability announced in Trade (Services) - English. », puis la ligne
+  `[5. Trade (Services) - English] [Rédemption Wafhien]: LFW Blacksmithing/[Blacksmithing] #CO`, le
+  second « Blacksmithing » dans la couleur d'un lien, puis « looking for work: Blacksmithing — visible
+  across the realm » ; le user : « Tout fonctionne normalement ». **Trade (Services) accepte donc un
+  lien de métier** (jamais mesuré avant). **Pas observé** : la trace « avec le lien frais », le clic
+  de Gnomi sans COC (critère 19), le lien gardé après un relog (critère 20). (Les trois sont relevés
+  à 14:40, ci-dessus.)
 - 2026-10-02 10:20 — jusqu'a 8e7c062 — Forever, client de Rédemption, en ANGLAIS, Forgefer ; build
   `main-dev@ce68ef3 2026-10-02 10:16` avec icone-commande-recue, liste-destinataires,
   profit-arbitrages, release/v1.43.0 (copie déployée du `.toc`) — **GO sur `fix/manquantes-nom-long`**

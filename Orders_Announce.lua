@@ -6,10 +6,13 @@
 --
 --   WTB [objet] x1 PROVIDE [mat]x2 [mat]x1 2g50s #CO27      une commande publique (id = <auteur>-27)
 --   LFW Enchanting/Tailoring #CO                           un artisan disponible
+--   LFW Blacksmithing/[Forge] #CO                          le même, avec son lien de métier
 --
 -- Ce fichier ne fait QUE le format : fabriquer une ligne, relire une ligne. Aucun appel au jeu (les
 -- liens d'objet sont résolus par l'appelant), donc tout se teste sans WoW (tests/test_announce.lua).
--- Contrat PUBLIC : des clients déployés liront ces lignes. On ajoute en fin de ligne, on ne réordonne pas.
+-- Contrat PUBLIC : des clients déployés liront ces lignes. Toute évolution reste lisible par l'ancien
+-- lecteur : on ajoute en fin de ligne, on ne réordonne pas ; le lien de métier de la ligne LFW entre
+-- après son nom parce que l'ancien lecteur le prend pour un métier inconnu et le saute (2026-10-03).
 
 local COC = CraftingOrderClassic
 local A = {}
@@ -86,11 +89,31 @@ function A.BuildWTB(o, targetLink, mats, copper)
     return head .. provideTokens(mats, A.MAX - #head - #tail) .. tail
 end
 
--- « LFW Enchanting/Tailoring #CO » : les noms anglais des métiers (clés de CraftLink).
-function A.BuildLFW(profs)
+-- « LFW Enchanting/Tailoring #CO » : les noms anglais des métiers (clés de CraftLink). `links` =
+-- { [métier] = lien de métier de l'auteur }, facultatif : un joueur sans l'addon clique le lien et voit
+-- les recettes (user, 2026-10-03). Le lien suit son nom comme un métier de plus, après un « / » : un
+-- client ≤ v1.43.0 n'y reconnaît aucun métier, le saute, et lit toujours le nom. Un lien qui porte un
+-- « / » casserait ce découpage : il n'entre pas. Trop long avec les liens : la ligne part sans eux.
+function A.BuildLFW(profs, links)
     if type(profs) ~= "table" or #profs == 0 then return nil end
-    local line = "LFW " .. table.concat(profs, "/") .. " #CO"
+    local parts = {}
+    for _, prof in ipairs(profs) do
+        parts[#parts + 1] = prof
+        local link = type(links) == "table" and links[prof]
+        if type(link) == "string" and link ~= "" and not link:find("/", 1, true) then parts[#parts + 1] = link end
+    end
+    local line = "LFW " .. table.concat(parts, "/") .. " #CO"
+    if #line > A.MAX and links then return A.BuildLFW(profs) end
     return (#line <= A.MAX) and line or nil
+end
+
+-- Un lien de métier de Forever (relevé du 2026-09-27) : |Htrade:<GUID du propriétaire>:<sort de rang>:
+-- <ligne de métier>|h[Libellé]|h, libellé dans la langue de son client. -> { owner, spell, line, label } ou nil.
+function A.ParseTradeLink(link)
+    if type(link) ~= "string" then return nil end
+    local owner, spell, line, label = link:match("|Htrade:([^:|]+):(%d+):(%d+)[^|]*|h%[([^%]]*)%]|h")
+    if not owner then return nil end
+    return { owner = owner, spell = tonumber(spell), line = tonumber(line), label = label }
 end
 
 -- ------------------------------------------------------------------
@@ -139,12 +162,15 @@ local function parseWTB(rest, author, n)
     return t
 end
 
+-- Un lien se lit par son libellé (« [Forge] » -> « Forge ») : le même métier, nommé puis lié, ne
+-- compte qu'une fois.
 local function parseLFW(rest, author, resolveProf)
-    local profs = {}
+    rest = rest:gsub("|H[^|]*|h%[([^%]]*)%]|h", "%1")
+    local profs, seen = {}, {}
     for name in rest:gmatch("[^/]+") do
         name = name:match("^%s*(.-)%s*$")
         local key = (resolveProf and resolveProf(name)) or (not resolveProf and name) or nil
-        if key and key ~= "" then profs[#profs + 1] = key end
+        if key and key ~= "" and not seen[key] then seen[key] = true; profs[#profs + 1] = key end
     end
     if #profs == 0 then return nil end
     return { kind = "LFW", author = author, profs = profs }

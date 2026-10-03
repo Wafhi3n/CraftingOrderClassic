@@ -10,6 +10,11 @@
 > bonjour, commande complète à la place de l'aperçu, une seule alerte). Palier 4 (l'envoi de la ligne
 > LFW, `AnnounceSend:PostLFW`, case dans le panneau « Offre ») fait le 2026-09-30, tenu en test ; **13
 > tenu en jeu le 2026-09-30 00:31**. Reste le palier 5 (relectures, critère 15).
+> **Évolution du 2026-10-03** (demande du user) : la ligne LFW porte le **lien de métier** de l'auteur
+> (palier 6, branches `feat/lfw-lien-metier`) ; critères 16 et 17 tenus en test, **18 tenu en jeu le
+> 2026-10-03 14:33** (Trade (Services) accepte le lien de métier), **19 et 20 tenus à 14:40** (lien
+> gardé valable après un redémarrage de l'addon ; un lien d'un autre jour pas essayé) ; critère 15
+> relu le 2026-10-03 (`api-gotcha-reviewer`, `craftlink-protocol-reviewer` : rien de bloquant).
 
 ## Le problème
 
@@ -49,9 +54,12 @@ découverte pour les porteurs. Les données, elles, ne quittent pas le chuchotem
 
 ```
 LFW Enchanting/Tailoring #CO
+LFW Blacksmithing/[Forge] #CO          (depuis le 2026-10-03 : le nom, puis le lien de métier)
 ```
 
 - Un joueur sans l'addon lit « je cherche du travail en Enchantement et Couture » et chuchote l'auteur.
+  Quand l'addon connaît le lien de métier de l'auteur, il le pose après le nom : un clic ouvre ses
+  recettes, sans l'addon (demande du user, 2026-10-03 : « Blacksmithing » n'était pas cliquable).
 - Un porteur de l'addon lui dit bonjour (chuchotement) ; en réponse, l'addon de l'auteur renvoie
   déjà son profil et sa dispo (`Dir:OnHello` → `LFWRiposte`). La suite se fait au chuchotement : ses
   métiers et niveaux, et les commandes qui le concernent (relais `Orders:OnArtisanOnline`).
@@ -96,6 +104,12 @@ des commandes nommées), mais un joueur hors communauté voit et est vu dès qu'
 - **La même commande vue deux fois** (ligne + chuchotement) : une seule entrée, l'id fait foi ; la
   commande complète remplace l'aperçu tiré de la ligne.
 - **Combat, instance** : le texte du chat peut être masqué par le jeu ; rien n'est lu, rien ne casse.
+- **Le lien de métier de la ligne LFW** : le jeu ne le donne que fenêtre de MON métier ouverte
+  (`GetTradeSkillListLink`). Fenêtre de ce métier ouverte : le lien frais. Fermée (`/co lfw` tapé
+  ailleurs) : le dernier lien gardé pour ce personnage et ce métier. Métier jamais ouvert depuis la
+  mise à jour : le nom seul, comme avant. La vue liée d'un autre ou de la guilde ne donne jamais son
+  lien (garde `IsOwnProfessionOpen` + GUID du lien = le mien). Ligne trop longue avec le lien : elle
+  part sans lui.
 
 ## Décisions
 
@@ -148,6 +162,24 @@ des commandes nommées), mais un joueur hors communauté voit et est vu dès qu'
   chaque lien pour un objet demandé : s'il a le métier d'un matériau fourni, il voit une fausse
   entrante pour ce matériau (et peut la « garder pour un ami capable »), jusqu'à sa mise à jour.
   Écartés : les noms en texte (pas cliquables, dans la langue de l'auteur) et la ligne sans `PROVIDE`.
+- 2026-10-03, **user** : la ligne LFW porte un **lien de métier**, pour ceux qui n'ont pas l'addon.
+  Forme choisie : **le nom, puis le lien** (`LFW Blacksmithing/[Forge] #CO`), pour qu'un client
+  ≤ v1.43.0 lise toujours le métier et dise bonjour (il découpe sur `/` et saute le lien, où il ne
+  reconnaît aucun métier ; tenu en test par un lecteur v1.43.0 figé). Écartée : le lien seul
+  (`LFW [Forge] #CO`), plus propre, mais qu'un client v1.43.0 ignore sans dire bonjour ; le lecteur
+  d'aujourd'hui le lit déjà (par le libellé), ce qui laisse la porte ouverte plus tard.
+- 2026-10-03, **user** : fenêtre de métier fermée, l'addon poste le **lien gardé** de la dernière
+  ouverture. Risque connu, à trancher au banc (critère 19) : un lien fabriqué pour un métier jamais
+  partagé s'ouvre vide (réf. `metiers-et-objets`, 2026-09-27) ; si un lien gardé d'une session
+  précédente fait pareil, on retire ce cas et on revient au nom seul fenêtre fermée.
+- 2026-10-03, agent (relectures du critère 15, rien de bloquant) — limites connues, laissées :
+  - si le CLIENT refuse l'envoi (`pcall` en échec), la dispo ne repart pas sans le lien ; le serveur,
+    lui, l'accepte (critère 18), et un refus du serveur ne se voit pas dans `pcall` ;
+  - un lien gardé n'expire pas : un rang appris sans rouvrir le métier laisse l'ancien sort de rang
+    dans le lien (un métier désappris, lui, ne s'annonce plus : `/co lfw` exige le métier) ;
+  - le lecteur prend le libellé de N'IMPORTE QUEL lien de la ligne LFW (`[Tailoring]` d'un lien
+    d'objet compterait) : sans effet, les métiers lus ne servent qu'à la trace et au bonjour ;
+  - un lien de métier rend public le GUID du personnage, comme tout lien de métier posté à la main.
 
 ## Critères d'acceptation
 
@@ -192,6 +224,33 @@ Fonctionnalité :
 15. [agent] Aucun envoi sur Commerce hors d'un clic (`api-gotcha-reviewer`), et relecture du
     protocole (`craftlink-protocol-reviewer`) avant fusion.
 
+Le lien de métier dans la ligne LFW (2026-10-03) :
+
+16. [test] La ligne porte le nom puis le lien ; un lecteur v1.43.0 figé y lit toujours le métier ; le
+    lecteur d'aujourd'hui n'en compte qu'un ; trop longue ou lien à « / » : le nom seul
+    (`test_announce.lua`).
+17. [test] Lien frais fenêtre ouverte, lien gardé fenêtre fermée, nom seul pour un métier jamais
+    ouvert ; jamais le lien d'une vue liée, d'un autre GUID, ni celui du main sur son reroll ; l'écho
+    de ma ligne avec lien reste muet (`test_announce_send.lua`, `_recv`, `_lfw_echo`).
+18. [humain] Rédemption, fenêtre de Forge ouverte, active sa dispo case cochée : la ligne
+    `LFW Blacksmithing/[Blacksmithing] #CO` apparaît sur **Trade (Services)** avec le lien cliquable
+    (jamais mesuré sur ce canal : la séance du lien de métier du 2026-10-02 était sur Trade). La trace
+    dit « avec le lien frais ». Témoin connu-bon : la ligne d'avant, sans lien. Si la ligne ne paraît
+    pas du tout, le canal refuse le lien : le dire, ne rien fusionner. Observateur : le user, deux comptes.
+    → **Tenu** le 2026-10-03 14:33 (capture : la ligne et son lien sur « 5. Trade (Services) -
+    English ») ; la trace « avec le lien frais » relue ensuite dans la SavedVariable (14:21:47, 14:32:01).
+19. [humain] Gnomi, **COC désactivé**, clique le lien : la fenêtre de métier de Rédemption s'ouvre, nom
+    du métier et recettes affichés. Observateur : le user, compte B.
+    → **Tenu** le 2026-10-03 14:40 (parole du user ; COC de Gnomi désactivé, établi par sa
+    SavedVariable non réécrite).
+20. [humain] Rédemption se déconnecte, se reconnecte, et tape `/co lfw Blacksmithing` **sans ouvrir son
+    métier** : la trace dit « avec le lien gardé », et le clic de Gnomi (COC désactivé) ouvre le métier
+    avec ses recettes. Un nom de métier vide ou une liste vide = le lien gardé ne vaut rien : on retire
+    ce cas (décision du 2026-10-03).
+    → **Tenu** le 2026-10-03 14:40 : « avec le lien gardé » à 14:33:24, après un redémarrage de
+    l'addon (`/reload` ou relog, la trace ne les distingue pas) ; le clic montre les recettes. Un lien
+    gardé d'un autre jour n'a pas été essayé.
+
 ## Contrat
 
 La ligne est un **format public** : une fois publiée, des clients déployés la liront. Toute évolution
@@ -204,12 +263,16 @@ mat      := lien d'objet [("x" | ":" | "×") qté]           (qté inconnue : le
 prix     := [N "g"] [N "s"] [N "c"]                       lecteur : aussi « po » « pa » « pc »
 n        := entier ; id de la commande = <nom réseau de l'auteur> "-" n
 
-dispo    := "LFW " métier {"/" métier} " #CO"
+dispo    := "LFW " métier ["/" lienm] {"/" métier ["/" lienm]} " #CO"
 métier   := nom anglais du métier (Enchanting, Tailoring…)  lecteur : aussi FR/DE/ES (ResolveProfession)
+lienm    := lien de métier de l'auteur, sans « / »           (|Htrade:<GUID>:<sort de rang>:<ligne>|h[Libellé]|h)
+            lecteur : lu par son libellé ; le même métier ne compte qu'une fois
 ```
 
 - Écrit toujours dans cet ordre ; le lecteur tolère les espaces multiples et la casse des mots-clés.
 - `#CO` sans `n` : balise de découverte seule, sans commande (la ligne « LFW »).
+- Le lien de métier entre au milieu de la ligne LFW, après son nom : l'ancien lecteur le prend pour un
+  métier inconnu et le saute (2026-10-03). C'est ce qui le rend lisible, pas sa place.
 - Maximum 255 octets, liens compris.
 
 ## Plan (2026-09-29) — volatile, meurt quand c'est fait
@@ -235,6 +298,11 @@ de découverte (`feat/salle-decouverte`) seulement pour le bonjour ; le reste es
    la dispo n'en porte qu'un. Même délai d'une minute que les commandes, un seul compteur.
 5. **Relectures** avant fusion : `api-gotcha-reviewer`, `craftlink-protocol-reviewer` (critère 15),
    puis `spec-updater` sur le diff.
+6. **Le lien de métier dans la ligne LFW** (2026-10-03, branches `feat/lfw-lien-metier`, COC +
+   outillage) : `A.BuildLFW(profs, links)` et `A.ParseTradeLink` (format, pur) ;
+   `S.CaptureTradeLink` à chaque `TRADE_SKILL_SHOW` / `LIST_UPDATE`, gardé dans
+   `db.tradeLinks[GUID][métier]`, et `S.TradeLink` au clic (envoi). Critères 16 et 17 tenus en test ;
+   banc : 18, 19, 20, dans cet ordre.
 
 ## Renvois
 

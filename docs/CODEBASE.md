@@ -1,6 +1,6 @@
 # CraftingOrderClassic — carte du code
 
-> **GÉNÉRÉ** le 2026-10-02 (v1.43.0) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
+> **GÉNÉRÉ** le 2026-10-03 (v1.43.0) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
@@ -143,8 +143,8 @@
 | `Directory_MyArtisans.lua` | agrégation des métiers du COMPTE (onglet « Mes artisans »). | 168 |
 | `Directory_LootScan.lua` | découverte PASSIVE des artisans NON-porteurs de l'addon qui craftent à proximité, par CHAT_MSG_TRADESKILLS « X creates Y. | 161 |
 | `Orders_Codec.lua` | codec du protocole filaire ORD\| (sérialisation ⇄ parsing, SOURCE DE VÉRITÉ). | 158 |
-| `Orders_Announce.lua` | le FORMAT d'une annonce en clair sur Commerce (spec docs/specs/annonce-commerce.md). | 167 |
-| `Orders_AnnounceSend.lua` | l'ENVOI d'une annonce sur Trade (Services) (spec annonce-commerce, palier 2). | 148 |
+| `Orders_Announce.lua` | le FORMAT d'une annonce en clair sur Commerce (spec docs/specs/annonce-commerce.md). | 193 |
+| `Orders_AnnounceSend.lua` | l'ENVOI d'une annonce sur Trade (Services) (spec annonce-commerce, palier 2). | 212 |
 | `Orders_AnnounceRecv.lua` | la LECTURE d'une annonce de Commerce (spec annonce-commerce, palier 3). | 107 |
 | `Orders.lua` | Crafting Order - Classic — Orders : carnet d'ordres GLOBAL (modèle + cycle + protocole). | 493 |
 | `Orders_Net.lua` | couche « fil réseau » du carnet d'ordres (protocole ORD\|). | 371 |
@@ -2570,24 +2570,27 @@
 > 
 >   WTB [objet] x1 PROVIDE [mat]x2 [mat]x1 2g50s #CO27      une commande publique (id = <auteur>-27)
 >   LFW Enchanting/Tailoring #CO                           un artisan disponible
+>   LFW Blacksmithing/[Forge] #CO                          le même, avec son lien de métier
 > 
 > Ce fichier ne fait QUE le format : fabriquer une ligne, relire une ligne. Aucun appel au jeu (les
 > liens d'objet sont résolus par l'appelant), donc tout se teste sans WoW (tests/test_announce.lua).
-> Contrat PUBLIC : des clients déployés liront ces lignes. On ajoute en fin de ligne, on ne réordonne pas.
+> Contrat PUBLIC : des clients déployés liront ces lignes. Toute évolution reste lisible par l'ancien
+> lecteur : on ajoute en fin de ligne, on ne réordonne pas ; le lien de métier de la ligne LFW entre
+> après son nom parce que l'ancien lecteur le prend pour un métier inconnu et le saute (2026-10-03).
 
-**API** : `A.PriceTokens(copper)` · `A.ParsePrice(text)` · `A.BuildWTB(o, targetLink, mats, copper)` · `A.BuildLFW(profs)` · `A.Parse(msg, author, resolveProf)`
+**API** : `A.PriceTokens(copper)` · `A.ParsePrice(text)` · `A.BuildWTB(o, targetLink, mats, copper)` · `A.BuildLFW(profs, links)` · `A.ParseTradeLink(link)` · `A.Parse(msg, author, resolveProf)`
 
 ### `Orders_AnnounceSend.lua`
 > Orders_AnnounceSend.lua — l'ENVOI d'une annonce sur Trade (Services) (spec annonce-commerce, palier 2).
 > 
 > Le format vit dans Orders_Announce.lua ; ici, ce qui touche au jeu : trouver le canal, résoudre les
-> liens d'objet, poser les garde-fous, écrire la ligne. Décisions du user (2026-09-29) : le canal est
+> liens d'objet, garder mon lien de métier, poser les garde-fous, écrire la ligne. Décisions du user (2026-09-29) : le canal est
 > Trade (Services), celui des services d'artisans ; une annonce part d'un CLIC (le jeu l'exige, et un
 > espace public ne se remplit pas tout seul) ; « Rappeler » au plus une fois par quart d'heure et par
 > commande. Mesuré le même soir (constat C15) : l'addon écrit sur ce canal depuis une action du joueur,
 > et le canal relie toutes les capitales.
 
-**API** : `S.ChannelIndex()` · `S:WhyNot(o, isRemind)` · `S:CanRemind(o)` · `S:LineFor(o)` · `S:Post(o, isRemind)` · `S:PostLFW(profKey)`
+**API** : `S.ChannelIndex()` · `S:WhyNot(o, isRemind)` · `S:CanRemind(o)` · `S:LineFor(o)` · `S:Post(o, isRemind)` · `S.CaptureTradeLink()` · `S.TradeLink(profKey)` · `S:PostLFW(profKey)`
 
 ### `Orders_AnnounceRecv.lua`
 > Orders_AnnounceRecv.lua — la LECTURE d'une annonce de Commerce (spec annonce-commerce, palier 3).
