@@ -36,6 +36,14 @@ local BODY_W = 780
 local function versionsTop()
     return {
         {
+            v = "v1.44.1", title = L["Fini le spam « No player named »"],
+            lines = {
+                L["Quand un joueur de l'addon se déconnectait, ton chat pouvait se remplir de « No player named 'X' is currently playing. » deux minutes plus tard, encore et encore : l'addon continuait de lui envoyer tes commandes et ta fiche. Le jeu signale un message envoyé à un absent avec environ deux minutes de retard, et l'addon ne l'attendait que 15 secondes. Il attend maintenant cinq minutes : l'erreur reste cachée et l'addon cesse d'écrire à celui qui est parti."],
+                L["L'addon envoie aussi beaucoup moins : quand un joueur te dit bonjour, tes commandes ne partent plus qu'à lui, et plus à tous tes contacts. En montant un métier, ta fiche part au plus une fois par minute au lieu de partir à chaque point."],
+                L["Seul effet de bord : si tu chuchotes toi-même un joueur déconnecté que l'addon a contacté dans ces cinq minutes, l'erreur de ton chuchotement est cachée aussi."],
+            },
+        },
+        {
             v = "v1.44.0", title = L["Ta ligne LFW porte le lien de ton métier"],
             lines = {
                 L["Quand tu cherches du travail, la ligne que l'addon poste sur Trade (Services) porte maintenant le lien de ton métier, juste après son nom. N'importe qui clique dessus et voit tes recettes, même sans l'addon. L'addon prend le lien chaque fois que tu ouvres ta fenêtre de métier et le garde : un /co lfw tapé fenêtre fermée part avec le dernier lien connu. Un métier jamais ouvert depuis la mise à jour part avec son nom seul, comme avant."],
@@ -425,19 +433,12 @@ local function versionsOlder()
                 L["Si tu avais activé « Chercher du travail », te connecter ou faire /reload pouvait déclencher une erreur rouge : l'addon annonçait ta disponibilité avant que le jeu n'autorise un addon à parler sur le canal. L'annonce attend maintenant ton prochain clic ou ta prochaine touche — plus d'erreur, et les autres te voient toujours dispo."],
             },
         },
-        {
-            v = "v1.17.0", title = L["L'interface passe au style natif de WoW"],
-            lines = {
-                L["La fenêtre n'a plus son habillage doré maison : elle emprunte le cadre du jeu (barre de titre, portrait rond, onglets, boutons). Elle se fond dans l'interface au lieu de ressembler à un addon posé par-dessus, et rien n'a bougé de ce que tu connais."],
-                L["La vue métier est refaite, avec une colonne Commandes en liste : une ligne par commande (demandeur, objet voulu, prix), et le clic ouvre la carte complète (composants fournis, coût des réactifs, Accepter / Refuser / Chuchoter) avec une croix pour revenir à la liste. Et les sous-catégories de récolte (Peaux, Écailles, Herbes, Poissons) sont enfin traduites hors client français."],
-            },
-        },
     }
 end
 
 local function versionsOldest()
     return {
-        -- v1.16.0 (retirée à la v1.44.0), v1.15.1 (retirée à la v1.43.0), v1.15.0 (retirée à la v1.42.1), v1.14.0 (retirée à la v1.42.0), v1.13.0 (retirée à la v1.41.1), v1.12.0 / v1.11.0 / v1.10.2 (retirées à la v1.41.0 : la Saison de la Découverte, le canal du royaume et
+        -- v1.17.0 (retirée à la v1.44.1), v1.16.0 (retirée à la v1.44.0), v1.15.1 (retirée à la v1.43.0), v1.15.0 (retirée à la v1.42.1), v1.14.0 (retirée à la v1.42.0), v1.13.0 (retirée à la v1.41.1), v1.12.0 / v1.11.0 / v1.10.2 (retirées à la v1.41.0 : la Saison de la Découverte, le canal du royaume et
         -- le bouton « Créer » sécurisé n'existent pas sur Forever), v1.10.1 / v1.9.0 / v1.8.0 / v1.7.0 / v1.7.1 /
         -- v1.6.0 / v1.5.0 / v1.4.0 retirées de l'onglet (l'historique
         -- complet vit dans CHANGELOG.md). Cet onglet ne garde qu'une fenêtre glissante de versions :

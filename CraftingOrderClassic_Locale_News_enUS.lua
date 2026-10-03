@@ -11,6 +11,14 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "What's New",
+    -- v1.44.1
+    ["Fini le spam « No player named »"] = "No more \"No player named\" spam",
+    ["Quand un joueur de l'addon se déconnectait, ton chat pouvait se remplir de « No player named 'X' is currently playing. » deux minutes plus tard, encore et encore : l'addon continuait de lui envoyer tes commandes et ta fiche. Le jeu signale un message envoyé à un absent avec environ deux minutes de retard, et l'addon ne l'attendait que 15 secondes. Il attend maintenant cinq minutes : l'erreur reste cachée et l'addon cesse d'écrire à celui qui est parti."] =
+        "When another addon user logged off, your chat could fill up with \"No player named 'X' is currently playing.\" a couple of minutes later, over and over: the addon kept sending them your orders and your profile. The game reports a message sent to someone offline about two minutes late, and the addon only waited 15 seconds for it. It now waits five minutes, so the error stays hidden and the addon stops writing to whoever left.",
+    ["L'addon envoie aussi beaucoup moins : quand un joueur te dit bonjour, tes commandes ne partent plus qu'à lui, et plus à tous tes contacts. En montant un métier, ta fiche part au plus une fois par minute au lieu de partir à chaque point."] =
+        "The addon also sends a lot less. When a player says hello, your orders now go to them only, not to all your contacts. While you level a profession, your profile goes out at most once a minute instead of after every point.",
+    ["Seul effet de bord : si tu chuchotes toi-même un joueur déconnecté que l'addon a contacté dans ces cinq minutes, l'erreur de ton chuchotement est cachée aussi."] =
+        "One side effect: if you whisper a player who has logged off, and the addon contacted them in those five minutes, the error for your whisper is hidden too.",
     -- v1.44.0
     ["Ta ligne LFW porte le lien de ton métier"] = "Your LFW line links your profession",
     ["Quand tu cherches du travail, la ligne que l'addon poste sur Trade (Services) porte maintenant le lien de ton métier, juste après son nom. N'importe qui clique dessus et voit tes recettes, même sans l'addon. L'addon prend le lien chaque fois que tu ouvres ta fenêtre de métier et le garde : un /co lfw tapé fenêtre fermée part avec le dernier lien connu. Un métier jamais ouvert depuis la mise à jour part avec son nom seul, comme avant."] =
@@ -216,10 +224,7 @@ local news = {
     ["Correctif : erreur au login en « Chercher du travail »"] = "Fixed a login error while looking for work",
     ["Si tu avais activé « Chercher du travail », te connecter ou faire /reload pouvait déclencher une erreur rouge : l'addon annonçait ta disponibilité avant que le jeu n'autorise un addon à parler sur le canal. L'annonce attend maintenant ton prochain clic ou ta prochaine touche — plus d'erreur, et les autres te voient toujours dispo."] =
         "If you had \"Look for work\" on, connecting or reloading could throw a red error: the addon announced your availability before the game lets an addon talk on the channel. The announcement now waits for your next click or keypress — no more error, and others still see you're available.",
-    -- v1.17.0
-    ["L'interface passe au style natif de WoW"] = "The window matches the game now",
-    ["La fenêtre n'a plus son habillage doré maison : elle emprunte le cadre du jeu (barre de titre, portrait rond, onglets, boutons). Elle se fond dans l'interface au lieu de ressembler à un addon posé par-dessus, et rien n'a bougé de ce que tu connais."] = "The window dropped its custom gold skin for the game's own frame (title bar, round portrait, tabs across the top, buttons). It reads as part of the interface instead of something bolted on top, and nothing moved that you'd have to relearn.",
-    ["La vue métier est refaite, avec une colonne Commandes en liste : une ligne par commande (demandeur, objet voulu, prix), et le clic ouvre la carte complète (composants fournis, coût des réactifs, Accepter / Refuser / Chuchoter) avec une croix pour revenir à la liste. Et les sous-catégories de récolte (Peaux, Écailles, Herbes, Poissons) sont enfin traduites hors client français."] = "The profession window was rebuilt, with the orders column as a list: one line per order (requester, the item they want, price), and clicking opens the full card (supplied components, reagent cost, Accept / Decline / Whisper) with a close button back to the list. And the gathering sub-headings (Hides, Scales, Herbs, Fish) are finally translated outside a French client.",
+    -- (clés v1.17.0 retirées à la v1.44.1 : version sortie de la fenêtre glissante de l'onglet)
     -- (clés v1.8.0/v1.7.0/v1.7.1/v1.6.0/v1.5.0/v1.4.0 retirées : ces versions ne sont plus listées dans l'onglet Nouveautés)
     -- (clés v1.13.0 retirées à la v1.41.1 : version sortie de la fenêtre glissante de l'onglet)
     -- (clés v1.12.1 retirées : version sortie de la fenêtre glissante de l'onglet Nouveautés)

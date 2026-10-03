@@ -1,5 +1,22 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.44.1 - No more "No player named" spam
+
+When another addon user logged off, your chat could fill up with `No player named 'Someone' is
+currently playing.` a couple of minutes later, and it kept coming back. The addon was still sending
+that player your orders and your profile. The game reports a message sent to someone offline about
+two minutes late, and the addon only waited 15 seconds for that report, so it missed it, let the
+error through and went on treating the player as online. It now waits five minutes. The error stays
+out of your chat, and the addon stops writing to whoever left.
+
+One side effect: if you whisper a player who has logged off, and the addon wrote to them in the last
+five minutes, the game's error for your whisper is hidden too.
+
+The addon also sends a lot less. When another player said hello, it used to send your whole list of
+orders to everyone you were connected to, not just to them. Now only the player who said hello gets
+it. And while you level a profession, your skill update goes out at most once a minute instead of
+after every point.
+
 ## v1.44.0 - Your LFW line links your profession
 
 When you look for work, the line the addon posts on Trade (Services) now carries your profession
