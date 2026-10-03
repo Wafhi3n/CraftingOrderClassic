@@ -167,8 +167,11 @@ Ce que le canal portait et qui se tait sans lui :
   ne reconnaissait donc plus notre whisper : l'erreur s'affichait, et le pair parti restait « en ligne »,
   avec annonces et renvois de commande en boucle (spam vu par le user à Ironforge et Stormwind). Fenêtre
   portée à **5 min**. Le pair qui m'a parlé dans la dernière minute n'est pas éteint (revenu après l'envoi
-  refusé). Prix, choix de l'agent **à confirmer par le user** : un whisper À LA MAIN vers un absent que
-  l'addon a écrit dans ces 5 min perd son erreur. Le filtre passe dans `Directory_Presence.lua`.
+  refusé). Prix **accepté par le user le 2026-10-03** (« oui »), avec la consigne de **mieux
+  l'encadrer plus tard** : un whisper À LA MAIN vers un absent que l'addon a écrit dans ces 5 min perd
+  son erreur. Pistes, non tranchées : retenir les noms que le JOUEUR vient de chuchoter (crochet sur
+  l'envoi du chat, à mesurer pour le taint) et ne jamais avaler leur erreur ; ou compter les envois de
+  l'addon par nom et n'avaler que ce nombre d'erreurs. Le filtre passe dans `Directory_Presence.lua`.
 
 ## Critères d'acceptation
 
