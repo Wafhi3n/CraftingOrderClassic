@@ -46,6 +46,17 @@ client.
 
 ## Relevés
 
+- 2026-10-03 16:43 (réception de la capture) — jusqu'a 6d33ccf — Forever build client 70205, un
+  compte, Deadmines, en combat contre Edwin VanCleef ; build `main-dev@4aeb800 2026-10-03 16:42`
+  avec fix/lfw-afk-secret (copie déployée du `.toc` ; `/co version` pas montré sur la capture) —
+  **GO sur `fix/lfw-afk-secret`** — capture du user, deux `/run` tapés pendant le boss :
+  `print(issecretvalue(UnitIsAFK("player")))` → `true` (témoin : le verrou du boss est actif, l'état
+  AFK est secret), puis `CraftingOrderClassic.Directory:LFWRiposte() print("riposte OK")` →
+  `riposte OK`, sans erreur. L'ancien code levait sur ce même chemin (`not` sur la secrète, ligne
+  305) et la commande se serait arrêtée avant le `print` : c'est donc le correctif qui a tourné. LFW
+  actif : établi par l'erreur du ticker dans la même session (même persistance `COC.db.lfw`).
+  **Pas observé** : un tick du ticker (toutes les 8 min) tombé pendant le boss ; BugGrabber après le
+  combat pas relu.
 - 2026-10-03 14:40 — jusqu'a 904e238 — même séance et même build que le relevé de 14:33 — **GO sur
   `feat/lfw-lien-metier` : critères 19 et 20 de `annonce-commerce.md`** — parole du user : « la
   fenêtre blacksmith […] avec le /co lfw fonctionnait au clic avec ses recettes ». Lu par l'agent dans
