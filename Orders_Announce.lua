@@ -10,7 +10,9 @@
 --
 -- Ce fichier ne fait QUE le format : fabriquer une ligne, relire une ligne. Aucun appel au jeu (les
 -- liens d'objet sont résolus par l'appelant), donc tout se teste sans WoW (tests/test_announce.lua).
--- Contrat PUBLIC : des clients déployés liront ces lignes. On ajoute en fin de ligne, on ne réordonne pas.
+-- Contrat PUBLIC : des clients déployés liront ces lignes. Toute évolution reste lisible par l'ancien
+-- lecteur : on ajoute en fin de ligne, on ne réordonne pas ; le lien de métier de la ligne LFW entre
+-- après son nom parce que l'ancien lecteur le prend pour un métier inconnu et le saute (2026-10-03).
 
 local COC = CraftingOrderClassic
 local A = {}

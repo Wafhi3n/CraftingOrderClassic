@@ -150,10 +150,16 @@ local function profOfLabel(label)
     return (c.professions and c.professions[key]) and key or nil
 end
 
--- Relit le lien du métier ouvert et le garde. Rend la clé du métier gardé, ou nil.
+-- Relit le lien du métier ouvert et le garde. Rend la clé du métier gardé, ou nil. Même garde que le
+-- bouton « lien » de Blizzard (`CanTradeSkillListLink`, Blizzard_ProfessionsCrafting.lua) : jamais un
+-- lien que le jeu lui-même ne proposerait pas.
 function S.CaptureTradeLink()
     local ts, c = C_TradeSkillUI, CL()
     if not (ts and ts.GetTradeSkillListLink and COC.db) then return nil end
+    if ts.CanTradeSkillListLink then
+        local ok, can = pcall(ts.CanTradeSkillListLink)
+        if not (ok and can) then return nil end
+    end
     if c and c.IsOwnProfessionOpen and not c:IsOwnProfessionOpen() then return nil end
     local ok, link = pcall(ts.GetTradeSkillListLink)
     if not (ok and type(link) == "string") or COC.Api.IsSecret(link) then return nil end
