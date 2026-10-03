@@ -53,7 +53,8 @@ addon also writes one line in Trade (Services), in a capital:
 
 Players without the addon can whisper you, and addon users you've never met get the full order within
 seconds. It's only ever sent when you click. The same box, in the "Look for work" offer, lets people
-know you're available.
+know you're available. That line carries your profession link, `LFW Blacksmithing/[Blacksmithing] #CO`,
+so anyone can click it and browse your recipes, whether they run the addon or not.
 
 Gather orders work in units or stacks and always show the real total, so you read *3 stacks (60)*
 instead of *3 st*. A cancellation follows the same whispers as the order, and open orders expire on
