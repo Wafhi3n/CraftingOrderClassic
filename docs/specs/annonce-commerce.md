@@ -13,8 +13,8 @@
 > **Évolution du 2026-10-03** (demande du user) : la ligne LFW porte le **lien de métier** de l'auteur
 > (palier 6, branches `feat/lfw-lien-metier`) ; critères 16 et 17 tenus en test, **18 tenu en jeu le
 > 2026-10-03 14:33** (Trade (Services) accepte le lien de métier), **19 et 20 tenus à 14:40** (lien
-> gardé valable après un redémarrage de l'addon ; un lien d'un autre jour pas essayé). Reste le
-> critère 15 (relectures) avant fusion.
+> gardé valable après un redémarrage de l'addon ; un lien d'un autre jour pas essayé) ; critère 15
+> relu le 2026-10-03 (`api-gotcha-reviewer`, `craftlink-protocol-reviewer` : rien de bloquant).
 
 ## Le problème
 
@@ -172,6 +172,14 @@ des commandes nommées), mais un joueur hors communauté voit et est vu dès qu'
   ouverture. Risque connu, à trancher au banc (critère 19) : un lien fabriqué pour un métier jamais
   partagé s'ouvre vide (réf. `metiers-et-objets`, 2026-09-27) ; si un lien gardé d'une session
   précédente fait pareil, on retire ce cas et on revient au nom seul fenêtre fermée.
+- 2026-10-03, agent (relectures du critère 15, rien de bloquant) — limites connues, laissées :
+  - si le CLIENT refuse l'envoi (`pcall` en échec), la dispo ne repart pas sans le lien ; le serveur,
+    lui, l'accepte (critère 18), et un refus du serveur ne se voit pas dans `pcall` ;
+  - un lien gardé n'expire pas : un rang appris sans rouvrir le métier laisse l'ancien sort de rang
+    dans le lien (un métier désappris, lui, ne s'annonce plus : `/co lfw` exige le métier) ;
+  - le lecteur prend le libellé de N'IMPORTE QUEL lien de la ligne LFW (`[Tailoring]` d'un lien
+    d'objet compterait) : sans effet, les métiers lus ne servent qu'à la trace et au bonjour ;
+  - un lien de métier rend public le GUID du personnage, comme tout lien de métier posté à la main.
 
 ## Critères d'acceptation
 
