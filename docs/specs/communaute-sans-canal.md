@@ -81,6 +81,12 @@ Ce que le canal portait et qui se tait sans lui :
   à 0,15 s par message. Plafond : **40 pairs par message**. Au-delà, la communauté a dépassé ce que
   ce transport sait porter et il faudra le revoir (file à priorités, ou sous-ensemble tournant).
   Le dépassement se trace.
+- **Un événement local ne part pas à tous** (2026-10-03, demande du user : « si ça spamme les
+  joueurs, c'est très négatif »). Relevé dans `/co trace` : chaque HI reçu renvoyait tout mon carnet
+  à tous mes pairs (toutes les 20 à 50 s), chaque point de métier toute ma fiche (toutes les 3 à 10 s).
+  Sans canal, un HI ne pousse donc mes commandes qu'à son auteur (`Orders:PushMineTo`, 60 s par
+  cible), et l'annonce de fiche se regroupe sur 60 s (3 s en canal plein, inchangé). Un arrivant reçoit
+  ma fiche tout de suite par l'annonce dirigée. Pas touché : la riposte LFW (déjà 45 s, garde AFK).
 - **Doublons.** `Orders:Broadcast` whispe déjà les artisans concernés, puis envoie « à tous », puis
   en texte : trois chemins vers le même joueur. Un même message pour la même cible dans une fenêtre
   de 2 s ne part qu'une fois.

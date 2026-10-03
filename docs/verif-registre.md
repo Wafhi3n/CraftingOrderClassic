@@ -46,6 +46,22 @@ client.
 
 ## Relevés
 
+- 2026-10-03 23:38 — jusqu'a 03a9fbc — Forever build client 70205, un compte (Sheadra), réseau sans
+  canal, 4 pairs en ligne (Osrik Stonefist, Ellowyn Snowveil, Crux Pal, Lirolia Clouddancer) ; build
+  `main-dev@896f711 2026-10-03 23:34` avec fix/rafales-sans-canal et fix/erreur-chuchotement-retard
+  (copie déployée du `.toc` ; `/co version` pas montré) — **GO partiel sur `fix/rafales-sans-canal`**
+  — `/co trace` des sessions ouvertes à 23:36:43 et 23:38:15, relu dans la SavedVariable : chaque HI
+  reçu ne fait partir `ORD|NEW` (mes 2 commandes) que vers son auteur (Osrik à 23:38:17, puis
+  Ellowyn, Crux, Lirolia à 23:38:24-32, Osrik exclu de cette 2e vague), et aucune rediffusion de
+  tout le carnet à tous. Aucune fiche complète (SK + RI) envoyée à tous : seules les réponses
+  dirigées aux HI. Témoin : la session ouverte à 23:34:09, rechargée PENDANT la copie du
+  déploiement, montre encore l'ancien comportement (deux fiches complètes à tous à 7 s d'écart,
+  carnet à tous 4 s après le HI de Crux) ; et Osrik, en v1.44.0, envoie sa fiche à chaque point de
+  Minage (toutes les 11 à 26 s). **Pas observé** : le regroupement de 60 s sur un vrai point de
+  métier (aucun gain de compétence de Sheadra dans ces sessions) ; un doublon dirigé sans
+  conséquence (Lirolia reçoit `-16` à 23:38:29 et 23:38:31, push au retour en ligne puis push du HI,
+  2 s d'écart). Le correctif de `fix/erreur-chuchotement-retard` n'a pas été mis à l'épreuve (aucun
+  pair parti pendant ces sessions).
 - 2026-10-03 16:43 (réception de la capture) — jusqu'a 6d33ccf — Forever build client 70205, un
   compte, Deadmines, en combat contre Edwin VanCleef ; build `main-dev@4aeb800 2026-10-03 16:42`
   avec fix/lfw-afk-secret (copie déployée du `.toc` ; `/co version` pas montré sur la capture) —

@@ -155,3 +155,19 @@ function Dir:_AnnounceToThrottled(target)
     self._lastAnnTo[target] = t
     self:AnnounceTo(target)
 end
+
+-- Re-publication COALESCÉE : appelée quand mes recettes changent (plan appris), qu'un cooldown bouge ou
+-- qu'un point de métier tombe. Canal plein : 3 s, un message sert tout le monde. Sans canal, une annonce
+-- = SK + RI par métier + CD, à CHAQUE pair : en montant un métier (un point par craft), c'était toute ma
+-- fiche à tous toutes les 3 à 10 s (vu le 2026-10-03). 60 s suffisent : un arrivant, lui, reçoit ma
+-- fiche fraîche tout de suite (_AnnounceToThrottled sur son HI).
+local ANNOUNCE_COALESCE = { channel = 3, whisper = 60 }
+
+function Dir:AnnounceThrottled()
+    if not C_Timer then return self:Announce() end
+    if self._annTimer then return end
+    self._annTimer = true
+    local channel = CraftLink and CraftLink.NetworkMode and CraftLink:NetworkMode() == "channel"
+    C_Timer.After(channel and ANNOUNCE_COALESCE.channel or ANNOUNCE_COALESCE.whisper,
+        function() self._annTimer = nil; Dir:Announce() end)
+end
