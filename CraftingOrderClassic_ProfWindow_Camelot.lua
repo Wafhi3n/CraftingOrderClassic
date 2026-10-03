@@ -103,6 +103,7 @@ local function sideChrome(f) hideChrome(f, { "PortraitContainer", "portrait" }, 
 -- Même habillage pour la colonne collée à la vue reroll (_RerollNative.lua) : le portrait est déjà
 -- celui de la fenêtre reroll, à sa gauche. CamelotDetach le rend, comme pour l'accolé.
 PW._CamelotSideChrome = sideChrome
+PW._CamelotStripChrome = stripChrome   -- encastrée dans la vue reroll, comme dans la fenêtre du jeu
 
 -- ---------------------------------------------------------------- greffe
 

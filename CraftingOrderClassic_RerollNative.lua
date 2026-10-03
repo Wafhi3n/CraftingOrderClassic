@@ -22,8 +22,14 @@ if not (Api and Api.IS_MAINLINE and PW and RN) then return end
 local RNF = {}
 COC.RerollNativeFrame = RNF
 
-local LIST_W, FORM_W, FORM_H = 310, 395, 553    -- le panneau a la taille de celui d'InspectRecipeFrame
-local TOP, PAD = 62, 4                          -- sous la barre de titre du PortraitFrameTemplate
+-- Mesures de la page de métier de FOREVER, lues dans la source (Camelot/Blizzard_ProfessionsCrafting.lua
+-- et Blizzard_ProfessionsFrame.xml) : cadre 594 de haut, liste 304 à (5, -72), panneau recette 360 de
+-- large (SchematicFormCraftingTemplate, 484 de haut, bordure « common-insideframe »), barre de rang à
+-- (110, -40). Copiées, pas devinées : c'est ce qui fait que la vue « ressemble » (retour du user du
+-- 2026-10-03 sur la 1re version, plus large, sans bordure ni barre de rang, colonne à part).
+local FRAME_H, LIST_X, LIST_TOP, LIST_W = 594, 5, 72, 304
+local FORM_W, FORM_H, GAP = 360, 484, 2
+local BASE_W = LIST_X + LIST_W + GAP + FORM_W + LIST_X
 local frame                                     -- construit au premier usage
 
 local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true) end
@@ -80,15 +86,19 @@ local function factory(make, node)
     end
 end
 
--- Arbre des données (RN.Tree) → fournisseur d'arbre de la liste du jeu.
+-- Arbre des données (RN.Tree) → fournisseur d'arbre de la liste du jeu. Rend le sort de la première
+-- recette de la liste : la fenêtre du jeu s'ouvre sur une recette choisie, pas sur un panneau vide.
 local function provide()
     local entries = RN.Entries(frame.key, frame.prof)
     local shown = RN.Filter(entries, frame.search)
-    local dp = CreateTreeDataProvider()
+    local dp, first = CreateTreeDataProvider(), nil
     local function add(parent, nodes)
         for _, n in ipairs(nodes) do
             if n.categoryInfo then add(parent:Insert({ categoryInfo = n.categoryInfo }), n.children)
-            else parent:Insert({ recipeInfo = n.recipeInfo }) end
+            else
+                first = first or n.recipeInfo.recipeID
+                parent:Insert({ recipeInfo = n.recipeInfo })
+            end
         end
     end
     add(dp, RN.Tree(frame.prof, shown))
@@ -100,6 +110,7 @@ local function provide()
         empty:SetText(L["Aucune recette ne correspond."])
     end
     empty:SetShown(#shown == 0)
+    return first
 end
 
 -- ---------------------------------------------------------------- panneau
@@ -160,7 +171,7 @@ end
 
 local function buildList()
     local list = CreateFrame("Frame", nil, frame, "ProfessionsRecipeListTemplate")
-    list:SetPoint("TOPLEFT", PAD, -TOP); list:SetPoint("BOTTOMLEFT", PAD, PAD); list:SetWidth(LIST_W)
+    list:SetPoint("TOPLEFT", LIST_X, -LIST_TOP); list:SetPoint("BOTTOMLEFT", LIST_X, LIST_X); list:SetWidth(LIST_W)
     list.FilterDropdown:Hide()                       -- ses filtres ne valent que pour le perso connecté
     list.ScrollBox:GetView():SetElementFactory(factory)
     list.SearchBox:HookScript("OnTextChanged", function(box)
@@ -172,11 +183,17 @@ local function buildList()
     frame.List = list
 end
 
+-- Le panneau de la PAGE DE MÉTIER (SchematicFormCraftingTemplate : bordure comprise), pas le panneau nu
+-- d'InspectRecipeFrame. Le fond dessiné du métier n'est pas dans le modèle : la page de Blizzard le
+-- pose elle-même (`Background`) ; on fait pareil, derrière, à toute la taille du panneau.
 local function buildForm()
-    local form = CreateFrame("Frame", nil, frame, "ProfessionsRecipeSchematicFormTemplate")
+    local form = CreateFrame("Frame", nil, frame, "SchematicFormCraftingTemplate")
     form.isInspection = true                         -- lu par Init seulement : posé avant le premier
     form:SetSize(FORM_W, FORM_H)
-    form:SetPoint("TOPLEFT", frame.List, "TOPRIGHT", PAD, 0)
+    form:SetPoint("TOPLEFT", frame.List, "TOPRIGHT", GAP, 0)
+    form.Background = form:CreateTexture(nil, "BACKGROUND")
+    form.Background:SetAllPoints()
+    if form.OutputIcon and form.OutputIcon.Icon then form.OutputIcon.Icon:SetSize(53, 53) end   -- comme Forever
     form:Hide()
     frame.Form = form
     local hint = frame:CreateFontString(nil, "OVERLAY", "GameFontDisable")
@@ -185,9 +202,19 @@ local function buildForm()
     frame.Hint = hint
 end
 
+-- La barre de rang du jeu, avec le rang du REROLL. `ownerManagesEvents` : sans lui, elle s'abonne aux
+-- changements de compétence et se repeint avec le métier du perso connecté.
+local function buildRankBar()
+    local bar = CreateFrame("Frame", nil, frame, "ProfessionsRankBarTemplate")
+    bar.ownerManagesEvents = true
+    bar:SetPoint("TOPLEFT", 110, -40)
+    bar:Hide()
+    frame.RankBar = bar
+end
+
 local function build()
     frame = CreateFrame("Frame", "CraftingOrderRerollFrame", UIParent, "PortraitFrameTemplate")
-    frame:SetSize(PAD + LIST_W + PAD + FORM_W + PAD, TOP + FORM_H + PAD + 11)
+    frame:SetSize(BASE_W, FRAME_H)
     frame:SetPoint("CENTER", -150, 0)
     frame:SetToplevel(true)
     frame:SetClampedToScreen(true)
@@ -199,41 +226,69 @@ local function build()
     tinsert(UISpecialFrames, "CraftingOrderRerollFrame")   -- Échap la ferme, comme une fenêtre du jeu
     buildList()
     buildForm()
+    buildRankBar()
     buildFallback()
 end
 
--- Portrait : l'icône du métier telle que le jeu la donne pour une de ses recettes, sinon la nôtre.
-local function portrait(sid)
+-- Rang du reroll, gardé par l'addon (db.mySkillsByChar) : { rang, max }, ou nil s'il ne l'a jamais lu.
+local function rerollRank()
+    local mc = COC.db and COC.db.mySkillsByChar and COC.db.mySkillsByChar[frame.key]
+    local sk = mc and mc[frame.prof]
+    return sk and sk[1], sk and sk[2]
+end
+
+-- Le décor du métier, tel que le jeu le donne pour une de ses recettes : portrait, fond dessiné du
+-- panneau, barre de rang. Le jeu décrit le métier (nom, identifiant, style) ; le RANG, lui, est celui
+-- du reroll — le jeu donnerait celui du perso connecté.
+local function dressFor(sid)
     local T = C_TradeSkillUI
     local pinfo = sid and T and T.GetProfessionInfoByRecipeID and T.GetProfessionInfoByRecipeID(sid)
     local tex = pinfo and pinfo.professionID and T.GetTradeSkillTexture and T.GetTradeSkillTexture(pinfo.professionID)
     local S = Skin()
     tex = tex or (S and S.ProfIcon and S.ProfIcon(frame.prof))
     if tex and frame.SetPortraitToAsset then frame:SetPortraitToAsset(tex) end
+    local P = _G.Professions
+    local atlas = pinfo and P and P.GetProfessionBackgroundAtlas and P.GetProfessionBackgroundAtlas(pinfo)
+    if atlas then frame.Form.Background:SetAtlas(atlas, TextureKitConstants.IgnoreAtlasSize) end
+    frame.Form.Background:SetShown(atlas ~= nil)
+    local rank, max = rerollRank()
+    local shown = false
+    if pinfo and rank and max then
+        local info = {}
+        for k, v in pairs(pinfo) do info[k] = v end
+        info.skillLevel, info.maxSkillLevel, info.skillModifier = rank, max, 0
+        frame.RankBar:Show()
+        shown = pcall(frame.RankBar.Update, frame.RankBar, info)
+    end
+    frame.RankBar:SetShown(shown and true or false)
 end
 
 -- ---------------------------------------------------------------- la colonne
 
--- Notre colonne, collée à droite comme sur la fenêtre de métier du jeu, en mode reroll : elle lit les
--- recettes du reroll (PW.CanFulfill → RerollKnows) et le métier ouvert ici, pas celui du perso connecté.
+-- Notre colonne, ENCASTRÉE dans le cadre comme dans la fenêtre de métier du jeu (dépouillée de son
+-- titre et de sa croix, le cadre élargi d'autant, mêmes retraits que la greffe : PW.TUNE). En mode
+-- reroll : elle lit les recettes du reroll (PW.CanFulfill → RerollKnows) et le métier ouvert ici.
 function RNF:_DockColumn()
     PW:Build()
-    local col = PW.frame
+    local col, T = PW.frame, PW.TUNE or {}
+    local gap = T.graftGap or 6
     PW.docked = true
     PW._compact = nil
     PW:_ApplyMode(true)
     if PW.vanillaBtn then PW.vanillaBtn:Hide() end
     -- Largeur : celle de la greffe (cf. sizeColumn de _ProfWindow_Camelot), sans en vider rerollKey.
-    col:SetWidth(math.max(col:GetWidth() or 310, (PW._ViewTabsWidth and PW:_ViewTabsWidth()) or 0))
+    local colW = math.max(col:GetWidth() or 310, (PW._ViewTabsWidth and PW:_ViewTabsWidth()) or 0)
+    col:SetWidth(colW)
     if PW._SyncOrdWidth then PW:_SyncOrdWidth() end
     if PW._PlaceOrdTabs then PW:_PlaceOrdTabs(true) end
-    if PW._CamelotSideChrome then PW._CamelotSideChrome(col) end
+    if PW._CamelotStripChrome then PW._CamelotStripChrome(col) end
+    frame:SetWidth(BASE_W + colW + gap * 2)
     col:SetMovable(false)
     col:RegisterForDrag()
     col:SetParent(frame)
     col:ClearAllPoints()
-    col:SetPoint("TOPLEFT", frame, "TOPRIGHT", 2, 0)
-    col:SetPoint("BOTTOMLEFT", frame, "BOTTOMRIGHT", 2, 0)
+    col:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -gap, -(T.graftTopInset or 26))
+    col:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -gap, LIST_X)
     if col.SetToplevel then col:SetToplevel(false) end
     col:SetFrameStrata(frame:GetFrameStrata())
     col:SetFrameLevel(frame:GetFrameLevel() + 10)
@@ -281,14 +336,14 @@ function RNF:Open(prof, key, short)
     local S = Skin()
     frame:SetTitle(string.format(L["%s — %s (lecture seule)"], frame.short,
         (S and S.ProfLabel and S.ProfLabel(prof)) or prof))
-    local first = RN.Entries(key, prof)[1]
-    portrait(first and first.spellID)
-    provide()
-    clearRecipe()
+    local any = RN.Entries(key, prof)[1]
+    dressFor(any and any.spellID)
+    local first = provide()
     PW.rerollKey, PW.rerollName, PW.standaloneKey = key, frame.short, prof
     frame:Show()
     frame:Raise()
     self:_DockColumn()
+    if first then self:ShowRecipe(first) else clearRecipe() end
     return true
 end
 
