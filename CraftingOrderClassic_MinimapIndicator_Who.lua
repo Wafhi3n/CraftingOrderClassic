@@ -54,7 +54,8 @@ end
 
 -- Où va le clic pour `o` : { kind = "native" } si le perso connecté connaît la recette ; sinon
 -- { kind = "reroll", key, short } — celui à qui la commande est nommée, sinon le plus haut niveau ;
--- sinon { kind = "popup" }. Décisions du user, 2026-09-30.
+-- sinon { kind = "popup" }. Décisions du user, 2026-09-30 ; le 2026-10-02, il a tranché que le perso
+-- connecté qui connaît la recette prend la main, même sur une commande nommée pour un reroll qui la sait.
 function UI:_OrderClickTarget(o)
     if not o then return { kind = "popup" } end
     -- Le destinataire nommé, ramené au prénom (clé locale des persos) : « Rédemption Wafhien » → « Rédemption ».
@@ -67,10 +68,7 @@ function UI:_OrderClickTarget(o)
             if not best or (kNamed and not bNamed) or (kNamed == bNamed and k.rank > best.rank) then best = k end
         end
     end
-    -- Nommée pour un reroll qui sait la faire : sans l'option rerolls (/co alts), LUI SEUL peut l'accepter
-    -- (Orders:Accept refuse depuis un autre perso). La native du perso connecté serait une fausse piste.
-    local onlyHim = best and best.short == named and not (COC.db and COC.db.altsEnabled)
-    if meKnows and not onlyHim then return { kind = "native" } end
+    if meKnows then return { kind = "native" } end
     if best then return { kind = "reroll", key = best.key, short = best.short } end
     return { kind = "popup" }
 end
