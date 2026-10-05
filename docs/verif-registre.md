@@ -46,6 +46,17 @@ client.
 
 ## Relevés
 
+- 2026-10-05 21:11 — jusqu'a b4fcac0 — Forever build client 70205, deux comptes (Gnomi #1, Rédemption
+  #4), build `main-dev@cbd9c25 2026-10-05 21:08` avec feat/ri-paliers (copie déployée du `.toc` ;
+  `/co version` pas montré) — **GO partiel sur `feat/ri-paliers`** — relevé dans DevMacroDB.log et
+  la SavedVariable de COC des deux comptes : Gnomi envoie un FAUX registre de Forge entier (506
+  recettes, 10 messages, 198 octets au plus) → Rédemption en stocke 506 sur 506, par palier
+  (0=10, 1=52, 2=91, 3=107, 4=246) ; dans l'autre sens, Cuisine entière (133 recettes, 4 messages)
+  → Gnomi en stocke 133 sur 133 (1=35, 2=31, 3=35, 4=32). Puis la vraie fiche de Gnomi (`/dm 3`) :
+  Rédemption ne garde que ses 5 vraies recettes de Forge, à l'ancienne forme, paliers oubliés.
+  **Pas vu** : un vrai artisan au-delà de 255 octets (aucun sur la bêta), le relais d'un gros
+  registre, l'annonce des seuls paliers changés, un morceau perdu, une v1.44.1 qui reçoit des
+  paliers. Rédemption n'a pas encore remis sa vraie fiche chez Gnomi (faux registre de Cuisine).
 - 2026-10-05 19:57 — jusqu'a 0548533 — Forever, compte #4 (Rédemption), build
   `main-dev@0e3eaed 2026-10-05 19:44` avec fix/cd-non-appris (copie déployée du `.toc` ; `/co version`
   pas montré) — **GO partiel sur `fix/cd-non-appris`** — SavedVariable écrite à 19:57 par ce build,

@@ -18,7 +18,8 @@ local RELAY_MAX_ORIGINS     = 5             -- partenaires max relayés par ripo
 local RELAY_THROTTLE        = 120           -- s entre deux relais du même origin vers la même cible
 local RELAY_MAX_AGE         = 30 * 86400    -- au-delà : fiche trop vieille, rejetée
 local RELAY_KEEP            = 7 * 86400     -- rétention d'un r.relayed sans rafraîchissement
-local RATE_WINDOW, RATE_MAX = 300, 60       -- réception : 60 msgs RLY max / 5 min / émetteur
+local RATE_WINDOW, RATE_MAX = 300, 150      -- réception : 150 msgs RLY max / 5 min / émetteur (60 avant
+                                            -- le registre par palier : un artisan relayé tient en ~20 messages)
 
 -- ------------------------------------------------------------------
 -- Émission (riposte de découverte)
@@ -64,8 +65,14 @@ function Dir:_SendRelay(target, name, r)
     end
     send(Codec.BuildSK(r))
     for prof, hex in pairs(r.recipes or {}) do send(Codec.BuildRK(prof, hex, r.recipeDV)) end
-    -- Registre par identifiants (Camelot) : même rediffusion, autre forme.
-    for prof, pay in pairs(r.recipeIDs or {}) do send(Codec.BuildRI(prof, pay)) end
+    -- Registre par identifiants (Camelot) : redécoupé par palier sous 255 octets ENVELOPPE COMPRISE —
+    -- un message plus long arrive coupé, en silence (mesuré le 2026-10-05). Les paliers sont relus
+    -- dans NOS données : le récepteur n'a besoin que d'un découpage cohérent au sein du lot.
+    local cap = 250 - #("RLY|" .. name .. "|" .. age .. "|")
+    for prof, pay in pairs(r.recipeIDs or {}) do
+        local msgs = CraftLink.BuildRIMessages and CraftLink:BuildRIMessages(prof, CraftLink:DecodeKnownIDs(pay), cap)
+        for _, m in ipairs(msgs or { Codec.BuildRI(prof, pay) }) do send(m) end
+    end
     for prof, cds in pairs(r.cooldowns or {}) do send(Codec.BuildCD(prof, cds, ts)) end
 end
 
@@ -112,7 +119,7 @@ function Dir:OnRelay(sender, message, distribution)
     end
     if f.verb == "SK" then self:_StoreRelayedSK(rel, f.inner)
     elseif f.verb == "RK" then self:_StoreRelayedRK(rel, f.inner)
-    elseif f.verb == "RI" then self:_StoreRelayedRI(rel, f.inner)
+    elseif f.verb == "RI" then self:_StoreRelayedRI(rel, f.inner, sender .. ">" .. f.origin)
     else self:_StoreRelayedCD(rel, f.inner) end
     if COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end
 end
@@ -135,14 +142,14 @@ function Dir:_StoreRelayedRK(rel, inner)
 end
 
 -- Pendant identifiants de _StoreRelayedRK. ParseRI revalide la forme du message : un relayeur
--- véreux ne peut pas injecter plus de junk qu'un émetteur direct.
-function Dir:_StoreRelayedRI(rel, inner)
+-- véreux ne peut pas injecter plus de junk qu'un émetteur direct. Par palier comme en direct
+-- (Dir:_ApplyRI) ; `key` (relayeur > origine) sépare l'assemblage des morceaux de chaque source.
+function Dir:_StoreRelayedRI(rel, inner, key)
     local c = CraftLink
     if not (c and c.ParseRI) then return end
-    local prof, payload = c:ParseRI(inner)
+    local prof, payload, tier, k, n, mask = c:ParseRI(inner)
     if not prof then return end
-    rel.recipeIDs = rel.recipeIDs or {}
-    rel.recipeIDs[prof] = payload
+    self:_ApplyRI(rel, "relais\0" .. tostring(key), prof, payload, tier, k, n, mask)
 end
 
 -- ParseCD (lib) revalide tout (métier catalogué à CD, spellID, bornes) : un relayeur véreux ne

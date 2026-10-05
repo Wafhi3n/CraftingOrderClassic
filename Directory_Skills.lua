@@ -169,5 +169,5 @@ function Dir:AnnounceThrottled()
     self._annTimer = true
     local channel = CraftLink and CraftLink.NetworkMode and CraftLink:NetworkMode() == "channel"
     C_Timer.After(channel and ANNOUNCE_COALESCE.channel or ANNOUNCE_COALESCE.whisper,
-        function() self._annTimer = nil; Dir:Announce() end)
+        function() self._annTimer = nil; Dir:Announce(true) end)   -- seuls les paliers RI changés
 end
