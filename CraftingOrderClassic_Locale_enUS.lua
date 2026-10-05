@@ -180,7 +180,7 @@ local en = {
     -- Statuts d'ordre
     ["En attente"] = "Pending", ["Acceptée"] = "Accepted", ["Livrée"] = "Delivered", ["Annulée"] = "Cancelled", ["Refusée"] = "Declined",
     -- Commande (Post)
-    ["JE FOURNIS"] = "I PROVIDE", ["Réactifs"] = "Reagents",
+    ["JE FOURNIS"] = "I PROVIDE",   -- « Réactifs » : dans _enUS_3
     ["(cocher = je fournis)"] = "(check = I provide)", ["Commission"] = "Commission", ["Qté"] = "Qty",
     ["Destinataire :"] = "Recipient:", ["Diffuser à tous"] = "Broadcast to all", ["Poster"] = "Post",
     ["La commande sera visible par tout le monde (cible « Tous »)."] = "The order will be broadcast to everyone (target: \"All\").",

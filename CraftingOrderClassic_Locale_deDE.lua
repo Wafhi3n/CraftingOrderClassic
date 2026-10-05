@@ -169,7 +169,7 @@ local de = {
     ["Minage"] = "Bergbau", ["Dépeçage"] = "Kürschnerei", ["Couture"] = "Schneiderei",
     ["Joaillerie"] = "Juwelenschleifen", ["Calligraphie"] = "Inschriftenkunde", ["Élémentaire"] = "Elementar",
     ["En attente"] = "Ausstehend", ["Acceptée"] = "Angenommen", ["Livrée"] = "Geliefert", ["Annulée"] = "Abgebrochen", ["Refusée"] = "Abgelehnt",
-    ["JE FOURNIS"] = "ICH STELLE", ["Réactifs"] = "Materialien",
+    ["JE FOURNIS"] = "ICH STELLE",   -- « Réactifs » : dans _deDE_3 (« Reagenzien », le mot du jeu)
     ["(cocher = je fournis)"] = "(anhaken = ich stelle bereit)", ["Commission"] = "Provision", ["Qté"] = "Anz.",
     ["Destinataire :"] = "Empfänger:", ["Diffuser à tous"] = "An alle senden", ["Poster"] = "Erstellen",
     ["La commande sera visible par tout le monde (cible « Tous »)."] = "Der Auftrag wird an alle gesendet (Ziel: \"Alle\").",

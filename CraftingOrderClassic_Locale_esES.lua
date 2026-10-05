@@ -170,7 +170,7 @@ local es = {
     ["Minage"] = "Minería", ["Dépeçage"] = "Desuello", ["Couture"] = "Sastrería",
     ["Joaillerie"] = "Joyería", ["Calligraphie"] = "Inscripción", ["Élémentaire"] = "Elemental",
     ["En attente"] = "Pendiente", ["Acceptée"] = "Aceptado", ["Livrée"] = "Entregado", ["Annulée"] = "Cancelado", ["Refusée"] = "Rechazado",
-    ["JE FOURNIS"] = "YO APORTO", ["Réactifs"] = "Reactivos",
+    ["JE FOURNIS"] = "YO APORTO",   -- « Réactifs » : dans _esES_3
     ["(cocher = je fournis)"] = "(marcar = yo aporto)", ["Commission"] = "Comisión", ["Qté"] = "Cant.",
     ["Destinataire :"] = "Destinatario:", ["Diffuser à tous"] = "Difundir a todos", ["Poster"] = "Publicar",
     ["La commande sera visible par tout le monde (cible « Tous »)."] = "El pedido se difundirá a todos (destino: \"Todos\").",
