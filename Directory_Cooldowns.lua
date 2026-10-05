@@ -14,9 +14,23 @@ local CraftLink = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
 
 local CD_KEEP = 14 * 86400   -- rétention d'un readyAt DÉPASSÉ : 14 j (readyAt passé = « prête », utile)
 
+-- Un CD annoncé est-il VRAISEMBLABLE ? Non quand la recette s'apprend à un rang que l'émetteur n'a
+-- pas atteint (`skill` = sa table SK { [prof] = { rang, max } }, directe ou relayée). Les copies de
+-- CraftLink d'avant COOLDOWNS_REV 7 relevaient « prête » des recettes non apprises : relevé le
+-- 2026-10-05, des inconnus diffusaient l'Étoffe lunaire (apprise à 250) sur la bêta plafonnée au
+-- niveau 30. Elles restent en circulation : on les écarte à la réception. Sans rang annoncé ou sans
+-- niveau d'apprentissage connu, pas d'avis : on garde.
+function Dir:CooldownPlausible(skill, prof, sid)
+    local sk = type(skill) == "table" and skill[prof]
+    local rank = type(sk) == "table" and tonumber(sk[1]) or nil
+    local need = CraftLink and CraftLink.RecipeLearnedAt and CraftLink:RecipeLearnedAt(prof, sid)
+    return not (rank and need and need > rank)
+end
+
 -- CD reçu (cooldowns d'un autre) → cache roster persistant. MERGE par métier (un état arrive
 -- éventuellement en plusieurs chunks) ; chaque annonce couvrant TOUTES les recettes suivies de
 -- l'émetteur, les entrées se réécrivent d'elles-mêmes — PruneCooldowns balaie le reliquat.
+-- Un CD invraisemblable (cf. CooldownPlausible) n'entre pas, et efface celui qu'on gardait.
 function Dir:OnCD(sender, message)
     if not (sender and CraftLink and CraftLink.ParseCD) then return end
     local prof, list = CraftLink:ParseCD(message)
@@ -26,7 +40,10 @@ function Dir:OnCD(sender, message)
     local ts = time()
     r.cooldowns = r.cooldowns or {}
     local cds = r.cooldowns[prof]; if not cds then cds = {}; r.cooldowns[prof] = cds end
-    for _, e in ipairs(list) do cds[e.sid] = ts + e.remain end
+    for _, e in ipairs(list) do
+        cds[e.sid] = self:CooldownPlausible(r.skill, prof, e.sid) and (ts + e.remain) or nil
+    end
+    if not next(cds) then r.cooldowns[prof] = nil end   -- vide : CooldownLines retombe sur le relais
     r.cdStamp = r.cdStamp or {}; r.cdStamp[prof] = ts
     self:_ApplySource(sender, r)
     r.lastSeen = ts
@@ -46,11 +63,16 @@ function Dir:AnnounceCooldowns(scope, target)
     end
 end
 
-local function pruneCdTable(byProf, cutoff)
+-- `skill` (optionnel) : la table SK qui juge la vraisemblance des entrées (cf. CooldownPlausible).
+-- cdSeen n'en passe pas : il vient d'un craft VU, la preuve que la recette est connue.
+local function pruneCdTable(byProf, cutoff, skill)
     if type(byProf) ~= "table" then return nil end
     for prof, set in pairs(byProf) do
         for sid, readyAt in pairs(set) do
-            if type(readyAt) ~= "number" or readyAt < cutoff then set[sid] = nil end
+            if type(readyAt) ~= "number" or readyAt < cutoff
+               or (skill and not Dir:CooldownPlausible(skill, prof, sid)) then
+                set[sid] = nil
+            end
         end
         if not next(set) then byProf[prof] = nil end
     end
@@ -59,13 +81,14 @@ local function pruneCdTable(byProf, cutoff)
 end
 
 -- Entretien (appelé par PruneRoster au démarrage) : purge les readyAt dépassés depuis > 14 j
--- dans les trois magasins (direct, estimé cdSeen, relayé), et les cdStamp orphelins.
+-- dans les trois magasins (direct, estimé cdSeen, relayé), les CD invraisemblables reçus avant la
+-- garde d'OnCD, et les cdStamp orphelins.
 function Dir:PruneCooldowns()
     local cutoff = time() - CD_KEEP
     for _, r in pairs(self.roster or {}) do
-        r.cooldowns = pruneCdTable(r.cooldowns, cutoff)
+        r.cooldowns = pruneCdTable(r.cooldowns, cutoff, r.skill)
         r.cdSeen    = pruneCdTable(r.cdSeen, cutoff)
-        if r.relayed then r.relayed.cooldowns = pruneCdTable(r.relayed.cooldowns, cutoff) end
+        if r.relayed then r.relayed.cooldowns = pruneCdTable(r.relayed.cooldowns, cutoff, r.relayed.skill) end
         if r.cdStamp then
             for prof in pairs(r.cdStamp) do
                 if not (r.cooldowns and r.cooldowns[prof]) then r.cdStamp[prof] = nil end

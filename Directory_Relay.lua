@@ -146,16 +146,21 @@ function Dir:_StoreRelayedRI(rel, inner)
 end
 
 -- ParseCD (lib) revalide tout (métier catalogué à CD, spellID, bornes) : un relayeur véreux ne
--- peut pas injecter plus de junk qu'un émetteur direct.
+-- peut pas injecter plus de junk qu'un émetteur direct. Même garde de vraisemblance qu'OnCD, jugée
+-- sur le SK du même lot (relayé avant le CD, cf. _SendRelay).
 function Dir:_StoreRelayedCD(rel, inner)
     if not (CraftLink and CraftLink.ParseCD) then return end
     local prof, list = CraftLink:ParseCD(inner)
     if not prof then return end
     local ts = time()
     local set = {}
-    for _, e in ipairs(list) do set[e.sid] = ts + e.remain end
+    for _, e in ipairs(list) do
+        if not self.CooldownPlausible or self:CooldownPlausible(rel.skill, prof, e.sid) then
+            set[e.sid] = ts + e.remain
+        end
+    end
     rel.cooldowns = rel.cooldowns or {}
-    rel.cooldowns[prof] = set
+    rel.cooldowns[prof] = next(set) and set or nil
 end
 
 -- ------------------------------------------------------------------

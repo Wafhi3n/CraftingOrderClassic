@@ -1,6 +1,6 @@
 # CraftingOrderClassic — carte du code
 
-> **GÉNÉRÉ** le 2026-10-03 (v1.44.1) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
+> **GÉNÉRÉ** le 2026-10-05 (v1.44.1) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
@@ -13,7 +13,7 @@
 | `CraftingOrderClassic.lua` | Crafting Order - Classic — réseau GLOBAL et SOCIAL de commandes de craft. | 499 |
 | `CraftingOrderClassic_Compat.lua` | couche d'adaptation d'API entre les SAVEURS de client. | 346 |
 | `CraftingOrderClassic_Trace.lua` | trace réseau PERSISTÉE, lisible hors-jeu. | 79 |
-| `CraftingOrderClassic_Migrations.lua` | versionnage du schéma SavedVariables. | 40 |
+| `CraftingOrderClassic_Migrations.lua` | versionnage du schéma SavedVariables. | 60 |
 | `CraftingOrderClassic_Locale.lua` | socle de localisation du CHROME de l'UI. | 12 |
 | `CraftingOrderClassic_Locale_enUS.lua` | overlay ANGLAIS (enUS/enGB). | 279 |
 | `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 498 |
@@ -131,9 +131,9 @@
 | `Directory_Skills.lua` | niveaux de compétence + réputation (couche « profil » de l'annuaire). | 173 |
 | `Directory_Room.lua` | la salle de découverte : CraftLinkNet rejoint pour SE PRÉSENTER, pas pour transporter. | 88 |
 | `Directory_Version.lua` | détection « nouvelle version disponible » (100 % P2P, aucun serveur). | 147 |
-| `Directory_Cooldowns.lua` | cooldowns de recettes (couche « profil » de l'annuaire). | 82 |
+| `Directory_Cooldowns.lua` | cooldowns de recettes (couche « profil » de l'annuaire). | 105 |
 | `Directory_RelayCodec.lua` | codec du fil RLY : relais de la fiche d'un artisan HORS LIGNE par un de ses partenaires. | 70 |
-| `Directory_Relay.lua` | « contacts de confiance » : les données d'un joueur DÉCONNECTÉ restent servies par ses partenaires (r.isPartner). | 184 |
+| `Directory_Relay.lua` | « contacts de confiance » : les données d'un joueur DÉCONNECTÉ restent servies par ses partenaires (r.isPartner). | 189 |
 | `Directory_AltCodec.lua` | codec du fil ALT (liste des persos d'un même joueur) + vérification par réciprocité. | 119 |
 | `Directory_Alts.lua` | regroupement des rerolls : identité « joueur » multi-persos (verbe ALT). | 316 |
 | `Directory_LFW.lua` | statut « recherche de travail » (Looking For Work) + OFFRE par métier. | 367 |
@@ -741,7 +741,8 @@
 > Une échelle ORDONNÉE de migrations, bornée par `db.schemaVer`, garantit qu'un palier ne tourne
 > NI deux fois NI jamais. Remplace l'ancienne migration ad hoc « knownRecipes v2 » (ex-inline dans
 > CraftingOrderClassic.lua). Les défauts PARESSEUX (COC.db.orders = … or {}, etc.) restent posés à
-> leur point d'usage — ce module ne gère QUE les transformations de format entre versions.
+> leur point d'usage — ce module ne gère QUE les transformations de format entre versions, et les
+> purges UNIQUES d'une donnée qu'une version a écrite fausse (palier 2).
 > 
 > PUR : aucune dépendance à l'API WoW ni à LibStub → testable hors client (tests headless Elune).
 
@@ -2382,7 +2383,7 @@
 > relogs, l'UI recalcule le restant à l'affichage). Les méthodes restent sur COC.Directory
 > (créée par Directory.lua, chargé AVANT) → self:_Touch etc. résolus sur la table partagée.
 
-**API** : `Dir:OnCD(sender, message)` · `Dir:AnnounceCooldowns(scope, target)` · `Dir:PruneCooldowns()` · `Dir:StartCooldowns()`
+**API** : `Dir:CooldownPlausible(skill, prof, sid)` · `Dir:OnCD(sender, message)` · `Dir:AnnounceCooldowns(scope, target)` · `Dir:PruneCooldowns()` · `Dir:StartCooldowns()`
 
 ### `Directory_RelayCodec.lua`
 > Directory_RelayCodec.lua — codec du fil RLY : relais de la fiche d'un artisan HORS LIGNE par
