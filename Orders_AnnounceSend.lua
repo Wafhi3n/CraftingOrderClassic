@@ -102,9 +102,15 @@ function S:WhyNot(o, isRemind)
     return channelWhyNot()
 end
 
--- Le clic « droit » du Carnet propose-t-il d'annoncer (ou de rappeler) cette commande ?
+-- Le clic droit du Carnet s'applique-t-il à cette commande (à moi, ouverte, publique) ? Vrai aussi
+-- pendant le quart d'heure : le clic dit alors dans combien la rappeler, au lieu de se taire (2026-10-05).
+function S:Announceable(o)
+    return (o and o.buyer == me() and o.status == "open" and isPublic(o)) and true or false
+end
+
+-- Peut-elle partir MAINTENANT côté rappel (jamais annoncée, ou il y a plus d'un quart d'heure) ?
 function S:CanRemind(o)
-    if not (o and o.buyer == me() and o.status == "open" and isPublic(o)) then return false end
+    if not self:Announceable(o) then return false end
     return not o.announcedAt or (now() - o.announcedAt) >= S.REMIND
 end
 

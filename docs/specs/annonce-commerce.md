@@ -130,6 +130,10 @@ des commandes nommées), mais un joueur hors communauté voit et est vu dès qu'
   choix du joueur est retenu**.
 - 2026-09-29, **user** : un bouton **« Rappeler »** ré-annonce une commande encore ouverte, **au plus
   une fois par 15 minutes** et par commande. Jamais de rappel automatique.
+- 2026-10-05, **user** (reco du 2026-09-30, gardée au backlog de la v1.41.0) : pendant ces 15 minutes,
+  le clic droit du Carnet reste **actif** et dit dans combien la commande pourra être rappelée (le
+  message existait, mais le clic était coupé : il ne s'affichait jamais) ; l'infobulle le dit avant
+  le clic, comme le délai d'une minute et l'absence de canal hors capitale.
 - 2026-09-29, agent (non contesté à la validation) : jetons fixes en anglais (`WTB`, `PROVIDE`, `LFW`,
   prix en `g`/`s`/`c`), quel que soit le client — le jargon commun de Commerce. Le lecteur accepte
   aussi `po`/`pa`/`pc`, `:N` et `×N` (le scanner lit déjà « 2g50s » en 2 po 50 pa).

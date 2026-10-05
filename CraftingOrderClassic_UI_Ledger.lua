@@ -192,9 +192,10 @@ function UI:_FillOrderRow(row, it)
     row.status:SetText("|c" .. scol .. slabel .. "|r")
     local label, fn = orderActionFor(o)
     -- Clic DROIT : annoncer (ou rappeler) la commande sur Trade (Services) — un clic, une ligne, au plus
-    -- une fois par quart d'heure (Orders_AnnounceSend, spec annonce-commerce).
+    -- une fois par quart d'heure (Orders_AnnounceSend, spec annonce-commerce). Actif même pendant ce
+    -- quart d'heure : le clic et l'infobulle disent pourquoi elle ne part pas encore.
     local AS = COC.AnnounceSend
-    local ann = AS and AS:CanRemind(o) and (o.announcedAt and L["Clic droit : rappeler en Commerce"]
+    local ann = AS and AS:Announceable(o) and (o.announcedAt and L["Clic droit : rappeler en Commerce"]
         or L["Clic droit : annoncer en Commerce"])
     if row.RegisterForClicks then row:RegisterForClicks("LeftButtonUp", "RightButtonUp") end
     row:SetScript("OnClick", (label or ann) and function(_, btn)
@@ -205,7 +206,11 @@ function UI:_FillOrderRow(row, it)
     row:SetScript("OnEnter", (label or ann) and function(rr)
         GameTooltip:SetOwner(rr, "ANCHOR_RIGHT")
         if label then GameTooltip:AddLine(L["Clic : "] .. label, 1, 1, 1) end
-        if ann then GameTooltip:AddLine(ann, 1, 1, 1) end
+        if ann then
+            GameTooltip:AddLine(ann, 1, 1, 1)
+            local why = AS:WhyNot(o, o.announcedAt ~= nil)   -- quart d'heure, minute, hors capitale
+            if why then GameTooltip:AddLine(why, 0.6, 0.6, 0.6, true) end
+        end
         GameTooltip:Show()
     end or nil)
 end
