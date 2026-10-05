@@ -1,6 +1,6 @@
 # CraftingOrderClassic — carte du code
 
-> **GÉNÉRÉ** le 2026-10-03 (v1.44.1) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
+> **GÉNÉRÉ** le 2026-10-05 (v1.44.1) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
@@ -61,7 +61,7 @@
 | `CraftingOrderClassic_UI_Artisans_Needs.lua` | la « BOURSE d'artisan » de l'onglet Artisans : pour un artisan du roster (partenaire, guildie, ami…), la LISTE DE COURSES des fournitures qu'il lui faut pour monter ses métiers — mats agrégés de SA route de progression (COC.Route, calculée 100 % en LOCAL depuis son rang SK diffusé + ses recettes décodées du bitfield RK ; prix Lazy Gold locaux, valables serveur entier). | 361 |
 | `CraftingOrderClassic_UI_Artisans_Muted.lua` | panel « En sourdine » de l'onglet Artisans. | 85 |
 | `CraftingOrderClassic_UI_Artisans_Channels.lua` | la section « Canaux surveillés » de l'onglet Artisans (spec docs/specs/canaux-surveilles.md, palier 3). | 153 |
-| `CraftingOrderClassic_UI_Setup.lua` | le panneau de PREMIÈRE CONNEXION : où chercher les artisans ? (spec docs/specs/canaux-surveilles.md, palier 5). | 181 |
+| `CraftingOrderClassic_UI_Setup.lua` | le panneau de PREMIÈRE CONNEXION : où chercher les artisans ? (spec docs/specs/canaux-surveilles.md, palier 5). | 185 |
 | `CraftingOrderClassic_UI_MyArtisans_Layout.lua` | GÉOMÉTRIE de l'onglet « Mes artisans ». | 57 |
 | `CraftingOrderClassic_UI_MyArtisans.lua` | onglet « Mes artisans » : vue agrégée des métiers du COMPTE (tous mes rerolls du royaume), en mode « connu ». | 475 |
 | `CraftingOrderClassic_UI_MyArtisans_Profit.lua` | onglet « Mes artisans » : couche Auctionator. | 135 |
@@ -137,7 +137,7 @@
 | `Directory_AltCodec.lua` | codec du fil ALT (liste des persos d'un même joueur) + vérification par réciprocité. | 119 |
 | `Directory_Alts.lua` | regroupement des rerolls : identité « joueur » multi-persos (verbe ALT). | 316 |
 | `Directory_LFW.lua` | statut « recherche de travail » (Looking For Work) + OFFRE par métier. | 367 |
-| `CraftingOrderClassic_Channels.lua` | RECONNAÎTRE un canal du jeu (spec docs/specs/canaux-surveilles.md). | 261 |
+| `CraftingOrderClassic_Channels.lua` | RECONNAÎTRE un canal du jeu (spec docs/specs/canaux-surveilles.md). | 306 |
 | `CraftingOrderClassic_Notify.lua` | la SORTIE d'une alerte : ligne de chat, bandeau, son. | 39 |
 | `CraftingOrderClassic_LFWChat.lua` | détection « recherche de travail » dans le CHAT VISIBLE. | 91 |
 | `Directory_MyArtisans.lua` | agrégation des métiers du COMPTE (onglet « Mes artisans »). | 168 |
@@ -2470,17 +2470,17 @@
 >   LocalDefense, un canal perso…        -> nil
 > 
 > Deux choses ici, et rien d'autre : le nom -> la clé (KeyOf), et la case de chaque clé (IsWatched,
-> SetWatched). Aucun appel au jeu : tout se teste sans WoW (tests/test_channels.lua,
-> tests/test_channel_watch.lua). Les clés sont PERSISTÉES (COC.db.watch) : on en ajoute, on n'en
-> renomme pas.
+> SetWatched). Un seul appel au jeu, gardé et à part : GameKeyOf relit quels canaux sont PERSO.
+> Tout le reste se teste sans WoW (tests/test_channels.lua, tests/test_channel_watch.lua). Les clés
+> sont PERSISTÉES (COC.db.watch) : on en ajoute, on n'en renomme pas.
 > 
 > Mesuré sur Forever, client anglais (COCProbe, 2026-09-29) : « Trade (Services) - English » et
 > « Trade (Local) - Ironforge ». Le nom français, allemand ou espagnol de Trade (Local) n'est PAS
 > mesuré : il se reconnaît à sa forme (un canal de Commerce, avec une parenthèse qui n'est pas
-> « Services »). Un canal PERSO qui s'appellerait « Trade » n'est pas distingué ici : c'est à
-> l'appelant de savoir, par le jeu, qu'un canal est perso.
+> « Services »). Un canal PERSO qui s'appellerait « TradeXYZ » ou « GeneralChat » passait pour celui
+> du jeu : les lecteurs passent donc par GameKeyOf, qui l'écarte (2026-10-05).
 
-**API** : `Ch.BaseName(name)` · `Ch.KeyOf(name)` · `Ch.IsWatched(key)` · `Ch.SetWatched(key, on)` · `Ch.BuildRows(joined, clubs, inGuild)` · `Ch.SetupState(db, inCombat, inInstance)` · `Ch.MarkSetupSeen(db, version)` · `Ch:Cmd(arg)`
+**API** : `Ch.BaseName(name)` · `Ch.SetCustom(names)` · `Ch.KeyOf(name)` · `Ch.GameKeyOf(name)` · `Ch.IsWatched(key)` · `Ch.SetWatched(key, on)` · `Ch.BuildRows(joined, clubs, inGuild)` · `Ch.SetupState(db, inCombat, inInstance)` · `Ch.MarkSetupSeen(db, version)` · `Ch:Cmd(arg)`
 
 ### `CraftingOrderClassic_Notify.lua`
 > CraftingOrderClassic_Notify.lua — la SORTIE d'une alerte : ligne de chat, bandeau, son.

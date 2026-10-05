@@ -31,7 +31,7 @@ local function joinedChannels()
     for i = 1, 20 do
         local _, name = GetChannelName(i)
         if type(name) == "string" and not COC.Api.IsSecret(name) then
-            local key = Ch.KeyOf(name)
+            local key = Ch.GameKeyOf(name)   -- un canal perso « TradeXYZ » n'est pas Commerce
             if key then out[key] = Ch.BaseName(name) end
         end
     end

@@ -317,7 +317,7 @@ function Inbound:Start()
         -- plus haut, lui, dit QUOI garder.
         local Ch = COC.Channels
         if event == "CHAT_MSG_CHANNEL" then
-            local key = Ch.KeyOf(channelName)
+            local key = Ch.GameKeyOf(channelName)   -- un canal perso « TradeXYZ » n'est pas Commerce
             if key and Ch.IsWatched(key) then
                 -- Une annonce d'un autre addon (#CO) d'abord : elle ne doit pas devenir aussi une demande humaine.
                 local R = COC.AnnounceRecv

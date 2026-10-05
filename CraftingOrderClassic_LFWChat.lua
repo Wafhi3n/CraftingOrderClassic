@@ -66,7 +66,7 @@ function LC:Start()
         -- canaux-surveilles). `/co lfwchat`, lui, coupe la lecture des lignes LFW partout.
         local Ch = COC.Channels
         if ev == "CHAT_MSG_CHANNEL" then
-            local key = Ch.KeyOf(chanName)
+            local key = Ch.GameKeyOf(chanName)   -- un canal perso « TradeXYZ » n'est pas Commerce
             if not (key and Ch.IsWatched(key)) then return end
         elseif not Ch.IsWatched("sayyell") then return end
         LC:_OnChat(text, author)

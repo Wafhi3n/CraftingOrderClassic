@@ -12,15 +12,15 @@
 --   LocalDefense, un canal perso…        -> nil
 --
 -- Deux choses ici, et rien d'autre : le nom -> la clé (KeyOf), et la case de chaque clé (IsWatched,
--- SetWatched). Aucun appel au jeu : tout se teste sans WoW (tests/test_channels.lua,
--- tests/test_channel_watch.lua). Les clés sont PERSISTÉES (COC.db.watch) : on en ajoute, on n'en
--- renomme pas.
+-- SetWatched). Un seul appel au jeu, gardé et à part : GameKeyOf relit quels canaux sont PERSO.
+-- Tout le reste se teste sans WoW (tests/test_channels.lua, tests/test_channel_watch.lua). Les clés
+-- sont PERSISTÉES (COC.db.watch) : on en ajoute, on n'en renomme pas.
 --
 -- Mesuré sur Forever, client anglais (COCProbe, 2026-09-29) : « Trade (Services) - English » et
 -- « Trade (Local) - Ironforge ». Le nom français, allemand ou espagnol de Trade (Local) n'est PAS
 -- mesuré : il se reconnaît à sa forme (un canal de Commerce, avec une parenthèse qui n'est pas
--- « Services »). Un canal PERSO qui s'appellerait « Trade » n'est pas distingué ici : c'est à
--- l'appelant de savoir, par le jeu, qu'un canal est perso.
+-- « Services »). Un canal PERSO qui s'appellerait « TradeXYZ » ou « GeneralChat » passait pour celui
+-- du jeu : les lecteurs passent donc par GameKeyOf, qui l'écarte (2026-10-05).
 
 local COC = CraftingOrderClassic
 local Ch = {}
@@ -53,11 +53,24 @@ function Ch.BaseName(name)
     return (base:gsub("%s+$", ""))
 end
 
--- La clé d'un canal du jeu, ou nil s'il n'en est pas un que l'addon exploite.
+-- Les canaux PERSO où se trouve le joueur, par nom nu en minuscules (relecture api-gotcha du
+-- 2026-09-30). Rempli par SetCustom ; vide, KeyOf ne juge que sur le nom, comme avant.
+local custom = {}
+
+function Ch.SetCustom(names)
+    custom = {}
+    for _, n in ipairs(names or {}) do
+        local b = Ch.BaseName(n)
+        if b and b ~= "" then custom[b:lower()] = true end
+    end
+end
+
+-- La clé d'un canal du jeu, ou nil s'il n'en est pas un que l'addon exploite (ou s'il est perso).
 function Ch.KeyOf(name)
     local base = Ch.BaseName(name)
     if not base or base == "" then return nil end
     local low = base:lower()
+    if custom[low] then return nil end
     if SHORT[low] then return SHORT[low] end
     if has(low, TRADE) then
         if has(low, SERVICE) then return "trade_services" end
@@ -66,6 +79,38 @@ function Ch.KeyOf(name)
     end
     if has(low, GENERAL) then return "general" end
     return nil
+end
+
+-- Le nom d'un canal PERSO de la fenêtre Chat Channels, ou nil. La catégorie le dit (mesurée le
+-- 2026-09-30 : CHANNEL_CATEGORY_WORLD / _CUSTOM ; la 7e valeur, comme chez Blizzard_Channels).
+-- Une valeur secrète ne se compare pas : écartée avant.
+local function customName(i)
+    local name, header, _, _, _, _, category = GetChannelDisplayInfo(i)
+    local Api = COC.Api
+    if Api and Api.IsSecret and (Api.IsSecret(name) or Api.IsSecret(category)) then return nil end
+    if header or category ~= "CHANNEL_CATEGORY_CUSTOM" or type(name) ~= "string" then return nil end
+    return name
+end
+
+local customAt
+Ch.CUSTOM_TTL = 10   -- s : rejoindre un canal perso se voit au plus 10 s plus tard
+
+-- KeyOf pour un nom LU DANS LE JEU (CHAT_MSG_CHANNEL, GetChannelName) : relit d'abord, au plus toutes
+-- les CUSTOM_TTL s, quels canaux sont perso. Sans l'API (tests, client qui l'aurait perdue) : KeyOf seul.
+function Ch.GameKeyOf(name)
+    local now = type(GetTime) == "function" and GetTime() or nil
+    if now and (not customAt or now - customAt >= Ch.CUSTOM_TTL)
+       and type(GetNumDisplayChannels) == "function" and type(GetChannelDisplayInfo) == "function" then
+        customAt = now
+        local ok, n = pcall(GetNumDisplayChannels)
+        local names = {}
+        for i = 1, (ok and type(n) == "number") and n or 0 do
+            local okI, nm = pcall(customName, i)
+            if okI and nm then names[#names + 1] = nm end
+        end
+        Ch.SetCustom(names)
+    end
+    return Ch.KeyOf(name)
 end
 
 -- ------------------------------------------------------------------
