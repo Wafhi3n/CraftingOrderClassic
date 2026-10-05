@@ -343,7 +343,7 @@ function PW:_FillOrdRow(row, it)
     row.item:SetText(nm:match("^item:") and L["Chargement…"] or nm); row.item:SetTextColor(rr, gg, bb)
     row.item:Show()
     row.tipItemID, row.tipSpellID = o.itemID, o.spellID
-    local price = o.price and ("|cFFFFDD00" .. o.price .. "|r") or ("|cFF888888" .. L["Don / gratuit"] .. "|r")
+    local price = o.price and ("|cFFFFDD00" .. (Skin.PriceShow(o.price) or o.price) .. "|r") or ("|cFF888888" .. L["Don / gratuit"] .. "|r")
     row.money:SetText("|cFFCCCCCC" .. Skin.QtyText(o) .. "|r  " .. price)
     row.age:SetText("|cFF777777" .. self:_Age(o.ts) .. "|r")
     row:Show()

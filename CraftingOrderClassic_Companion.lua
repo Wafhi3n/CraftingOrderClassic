@@ -29,10 +29,12 @@ function Comp.PriceToCopper(price)
 end
 
 -- Prix (texte) → chaîne avec ICÔNES de pièces natives (or/argent/cuivre inline). Repli sur le texte
--- doré si le prix n'est pas convertible en cuivre (ex. « Don / gratuit »).
+-- doré si le prix n'est pas QUE des montants (« Don / gratuit », « 5g + pourboire ») : même règle
+-- que Skin.PriceShow, le Carnet et l'échange disent la même chose. PriceToCopper, tolérant, reste
+-- au contre-remboursement, qui a besoin d'un nombre.
 function Comp.PriceLabel(o)
     if not (o and o.price) then return "" end
-    local copper = Comp.PriceToCopper(o.price)
+    local copper = Skin.PriceAmount(o.price)
     if copper and COC.Api.Coin then return COC.Api.Coin(copper) end
     return "|c" .. Skin.hex.price .. tostring(o.price) .. "|r"
 end

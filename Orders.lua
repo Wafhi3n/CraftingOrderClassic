@@ -289,7 +289,7 @@ function Orders:AlertTargeted(o, tries)
     end
     local Skin = COC.UI and COC.UI.Skin
     local qty = (Skin and Skin.QtySuffix(o)) or ""
-    local pr  = o.price and (" — |cFFFFDD00" .. o.price .. "|r") or ""
+    local pr  = o.price and (" — |cFFFFDD00" .. (Skin and Skin.PriceShow and Skin.PriceShow(o.price) or o.price) .. "|r") or ""
     local msg
     local rcpt = o.recipient
     if rcpt and rcpt ~= me() and COC.IsMyChar and COC:IsMyChar(rcpt) then
@@ -447,7 +447,7 @@ function Orders:PostFromInput(rest)
     local o = self:Post(itemID, qty, price ~= "" and price or nil)
     if o then
         pmsg(string.format(L["commande postée |cFFFFFFFF%s|r : %s x%d %s[%s]"],
-            o.id, itemName(itemID), qty, o.price and (o.price .. " ") or "", o.profession or "?"))
+            o.id, itemName(itemID), qty, o.price and (COC.UI.Skin.PriceShow(o.price) .. " ") or "", o.profession or "?"))
     end
 end
 

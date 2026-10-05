@@ -1,6 +1,6 @@
 # CraftingOrderClassic — carte du code
 
-> **GÉNÉRÉ** le 2026-10-03 (v1.44.1) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
+> **GÉNÉRÉ** le 2026-10-05 (v1.44.1) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
@@ -32,7 +32,7 @@
 | `CraftingOrderClassic_UI_Skin_Native.lua` | kit de chrome Blizzard NATIF (le « framework » UI de COC). | 485 |
 | `CraftingOrderClassic_UI_Skin_ScrollList.lua` | la LISTE DÉFILANTE moderne du kit, palier 1 de la revue d'interface (docs/revue-ui-mainline.md). | 207 |
 | `CraftingOrderClassic_UI_Skin_SideTabs.lua` | la rangée d'ONGLETS LATÉRAUX de la fenêtre principale (palier 3 de la revue d'interface, décision D1 : « les onglets sur la droite, comme la vue métier »). | 77 |
-| `CraftingOrderClassic_UI_Skin_Inputs.lua` | les CHAMPS DE SAISIE du formulaire de commande (palier 4 de la revue d'interface) : le montant et la quantité, avec les briques du formulaire des Commandes d'artisanat de Forever (Blizzard_ProfessionsCustomerOrdersForm.xml, notre maquette) au lieu de nos InputBoxTemplate nus. | 83 |
+| `CraftingOrderClassic_UI_Skin_Inputs.lua` | les CHAMPS DE SAISIE du formulaire de commande (palier 4 de la revue d'interface) : le montant et la quantité, avec les briques du formulaire des Commandes d'artisanat de Forever (Blizzard_ProfessionsCustomerOrdersForm.xml, notre maquette) au lieu de nos InputBoxTemplate nus. | 122 |
 | `CraftingOrderClassic_UI_Skin_Table.lua` | l'EN-TÊTE DE TABLEAU triable (palier 5 de la revue d'interface : le Carnet façon « Mes commandes » des Commandes d'artisanat de Forever). | 65 |
 | `CraftingOrderClassic_UI_Skin_Dropdown.lua` | menu deroulant (selecteur) du kit natif. | 93 |
 | `CraftingOrderClassic_UI_Skin_Sections.lua` | kit de chrome natif, volet SECTIONS : comment on découpe l'intérieur d'une fenêtre en blocs et en zones. | 266 |
@@ -156,7 +156,7 @@
 | `CraftingOrderClassic_Handoff.lua` | « garder une commande pour un ami capable ». | 285 |
 | `CraftingOrderClassic_Moderation.lua` | modération / anti-spam. | 372 |
 | `CraftingOrderClassic_LootAlert.lua` | alerte quand TU loots un objet-PLAN (recette/formule/ schéma/patron) catalogué par CraftLink, MAIS seulement s'il te CONCERNE : soit tu as le métier (candidat à l'apprendre), soit un AMI/PARTENAIRE de ton annuaire ne le connaît pas encore (candidat à un don — cf. | 165 |
-| `CraftingOrderClassic_Companion.lua` | socle des GREFFONS : panneaux compagnons accrochés aux fenêtres natives (échange, courrier) pour livrer une commande sans quitter le geste en cours. | 233 |
+| `CraftingOrderClassic_Companion.lua` | socle des GREFFONS : panneaux compagnons accrochés aux fenêtres natives (échange, courrier) pour livrer une commande sans quitter le geste en cours. | 235 |
 | `CraftingOrderClassic_Companion_Mail.lua` | greffon COURRIER (scène B de la maquette) : panneau accroché à droite du compositeur d'envoi. | 329 |
 | `CraftingOrderClassic_Companion_Trade.lua` | greffon ÉCHANGE (scène A de la maquette) : panneau accroché SOUS la fenêtre d'échange native quand une commande nous lie au partenaire (dans les DEUX sens : je crafte pour lui = « vendeur », ou il crafte pour moi = « acheteur »). | 121 |
 | `CraftingOrderClassic_Enchant_Trade.lua` | « ses composants désignent quel enchant ? »  Ce fichier portait un PANNEAU flottant accroché à droite de la fenêtre d'échange : la liste de mes enchants applicables à la pièce posée, classée par pertinence. | 139 |
@@ -558,10 +558,27 @@
 > Le prix tel que le protocole d'ordres le transporte : « 12po 5pa 3pc », dénominations nulles
 > omises, nil pour zéro. Écrit une fois ici : Commande et Récolte le recopiaient chacune deux fois.
 
+**`Skin.PriceAmount(text)`**
+
+> Le cuivre d'un prix fait SEULEMENT de montants (« 12po 5pa », « 5g5s », « 5 G 3 S ») ; nil dès qu'il
+> porte autre chose (« 5g + pourboire », « à voir », un prix déjà rendu en pièces), et pour zéro.
+
 **`Skin.PriceCopper(text)`**
 
 > L'inverse : un prix transporté (« 12po 5pa 3pc ») redevient un nombre de cuivre, pour TRIER le
 > Carnet par prix. Illisible ou absent → 0.
+
+**`Skin.PriceShow(text)`**
+
+> Le prix transporté, pour l'ÉCRAN. Le fil parle français (« 12po 5pa ») quelle que soit la langue
+> du client : un prix fait seulement de montants devient les pièces du jeu, un texte libre reste tel
+> quel (rien de ce que l'acheteur a écrit ne se perd). Le fil ne change pas. ⚠️ Pour SetText, format
+> ou print seulement, jamais dans un champ de commande : les |T partiraient sur le réseau.
+
+**`Skin.PriceWords(text)`**
+
+> Le même prix pour un TEXTE envoyé à quelqu'un (le corps d'un courrier n'affiche pas de pièces) :
+> le jargon de Commerce (« 12g5s »), compris quelle que soit la langue ; un texte libre reste tel quel.
 
 **`Skin.MakeMoneyInput(parent, w)`**
 
@@ -917,7 +934,7 @@
 > (Blizzard_MoneyFrame, Blizzard_SharedXML), et la sonde du labo les a vus présents (26/26).
 > Leurs mixins ne touchent aucun objet global (risque 3 de la revue, lu avant d'hériter).
 
-**API** : `Skin.PriceText(copper)` · `Skin.PriceCopper(text)` · `Skin.MakeMoneyInput(parent, w)` · `Skin.MakeQtySpinner(parent, max)`
+**API** : `Skin.PriceText(copper)` · `Skin.PriceAmount(text)` · `Skin.PriceCopper(text)` · `Skin.PriceShow(text)` · `Skin.PriceWords(text)` · `Skin.MakeMoneyInput(parent, w)` · `Skin.MakeQtySpinner(parent, max)`
 
 ### `CraftingOrderClassic_UI_Skin_Table.lua`
 > CraftingOrderClassic_UI_Skin_Table.lua — l'EN-TÊTE DE TABLEAU triable (palier 5 de la revue

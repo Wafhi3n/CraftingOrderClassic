@@ -199,7 +199,7 @@ function Handoff:AlertCapable(o, tries)
     end
     local Skin = COC.UI and COC.UI.Skin
     local qty = (Skin and Skin.QtySuffix(o)) or ""
-    local pr  = o.price and (" — |cFFFFDD00" .. o.price .. "|r") or ""
+    local pr  = o.price and (" — |cFFFFDD00" .. (Skin and Skin.PriceShow and Skin.PriceShow(o.price) or o.price) .. "|r") or ""
     local msg = string.format(L["|cFF66CCFFtu sais le faire|r — demandé par |cFFFFFFFF%s|r : %s%s%s"],
         o.buyer or "?", nm, qty, pr)
     if COC.Notify then COC.Notify.Emit({ chat = (Skin and ("|T" .. Skin.tex.workorder .. ":0|t ") or "") .. msg, toast = msg,

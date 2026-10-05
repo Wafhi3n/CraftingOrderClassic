@@ -198,7 +198,7 @@ function Inbound:Alert(e)
     local src = (e.source == "guild") and L["guilde"] or (e.source == "general") and L["général"] or L["commerce"]
     local Skin = COC.UI and COC.UI.Skin
     local qty = (Skin and Skin.QtySuffix(e)) or ""
-    local pr  = e.price and (" — |cFFFFDD00" .. e.price .. "|r") or ""
+    local pr  = e.price and (" — |cFFFFDD00" .. (Skin and Skin.PriceShow and Skin.PriceShow(e.price) or e.price) .. "|r") or ""
     local msg = string.format(L["|cFFFF8800entrante|r |cFFFFFFFF%s|r (%s) : %s%s%s"], e.buyer, src, nm, qty, pr)
     e.alerted = true   -- lu par TakeOver : la commande complète ne sonnera pas une seconde fois
     if COC.Notify then COC.Notify.Emit({ chat = (Skin and ("|T" .. Skin.tex.workorder .. ":0|t ") or "") .. msg, toast = msg, sound = true,

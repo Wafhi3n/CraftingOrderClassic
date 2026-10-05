@@ -227,7 +227,7 @@ function Orders:ShowAsQuest(id)
         title     = o.title,
         text      = o.text,
         objective = self:OrderName(o) .. ((Skin and Skin.QtySuffix) and Skin.QtySuffix(o) or ""),
-        reward    = o.price,
+        reward    = (Skin and Skin.PriceShow) and Skin.PriceShow(o.price) or o.price,   -- affichage seul
         giver     = o.buyer,
     })
 end

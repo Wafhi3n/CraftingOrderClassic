@@ -207,7 +207,7 @@ local function entryData(key)
         title = (o and o.title) or found.title,
         text  = (o and o.text) or (found.notes and table.concat(found.notes, "\n")) or nil,
         objectives = objs,
-        reward = o and o.price or nil,
+        reward = o and (Skin and Skin.PriceShow and Skin.PriceShow(o.price) or o.price) or nil,   -- affichage seul
         giver  = (o and o.buyer) or found.sub,
     }
 end

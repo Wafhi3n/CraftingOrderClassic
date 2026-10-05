@@ -21,12 +21,51 @@ function Skin.PriceText(copper)
     return table.concat(parts, " ")
 end
 
+-- Les unités qu'un prix transporté peut porter : po/pa/pc (la forme de PriceText et de la capture du
+-- chat) et g/s/c (tapées dans « /co post », le jargon de Commerce).
+local UNIT = { po = 10000, pa = 100, pc = 1, g = 10000, s = 100, c = 1 }
+
+-- Le cuivre d'un prix fait SEULEMENT de montants (« 12po 5pa », « 5g5s », « 5 G 3 S ») ; nil dès qu'il
+-- porte autre chose (« 5g + pourboire », « à voir », un prix déjà rendu en pièces), et pour zéro.
+function Skin.PriceAmount(text)
+    if type(text) ~= "string" then return nil end
+    local rest, total = text:lower():match("^%s*(.-)%s*$"), 0
+    if rest == "" then return nil end
+    while rest ~= "" do
+        local n, unit, tail = rest:match("^(%d+)%s*(%a+)%s*(.*)$")
+        if not (n and UNIT[unit]) then return nil end
+        total, rest = total + tonumber(n) * UNIT[unit], tail
+    end
+    return total > 0 and total or nil
+end
+
 -- L'inverse : un prix transporté (« 12po 5pa 3pc ») redevient un nombre de cuivre, pour TRIER le
 -- Carnet par prix. Illisible ou absent → 0.
 function Skin.PriceCopper(text)
+    local amount = Skin.PriceAmount(text)
+    if amount then return amount end
     if type(text) ~= "string" then return 0 end
     local function n(unit) return tonumber(text:match("(%d+)%s*" .. unit)) or 0 end
     return n("po") * 10000 + n("pa") * 100 + n("pc")
+end
+
+-- Le prix transporté, pour l'ÉCRAN. Le fil parle français (« 12po 5pa ») quelle que soit la langue
+-- du client : un prix fait seulement de montants devient les pièces du jeu, un texte libre reste tel
+-- quel (rien de ce que l'acheteur a écrit ne se perd). Le fil ne change pas. ⚠️ Pour SetText, format
+-- ou print seulement, jamais dans un champ de commande : les |T partiraient sur le réseau.
+function Skin.PriceShow(text)
+    if text == nil or text == "" then return nil end
+    local copper, Api = Skin.PriceAmount(text), COC.Api
+    if copper and Api and Api.Coin then return Api.Coin(copper) end
+    return tostring(text)
+end
+
+-- Le même prix pour un TEXTE envoyé à quelqu'un (le corps d'un courrier n'affiche pas de pièces) :
+-- le jargon de Commerce (« 12g5s »), compris quelle que soit la langue ; un texte libre reste tel quel.
+function Skin.PriceWords(text)
+    local copper, A = Skin.PriceAmount(text), COC.Announce
+    if copper and A and A.PriceTokens then return A.PriceTokens(copper) end
+    return text
 end
 
 -- Repli du montant si le gabarit manquait : la rangée maison, sous le même contrat.

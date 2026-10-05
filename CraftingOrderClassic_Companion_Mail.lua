@@ -168,7 +168,7 @@ local function fill()
         _G.SendMailSubjectEditBox:SetText(string.format(L["Commande : %s"], nm .. " " .. Skin.QtyText(o)))
     end
     if _G.MailEditBox and _G.MailEditBox.SetText then
-        _G.MailEditBox:SetText(o.price and string.format(L["Voici ta commande. Prix convenu : %s."], o.price)
+        _G.MailEditBox:SetText(o.price and string.format(L["Voici ta commande. Prix convenu : %s."], Skin.PriceWords(o.price))
             or L["Voici ta commande."])
     end
     local copper = Comp.PriceToCopper(o.price)
