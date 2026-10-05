@@ -245,12 +245,15 @@ end
 -- Émission
 -- ------------------------------------------------------------------
 -- SK PUIS RK (ordre voulu : le receveur établit la vérité terrain des métiers avant les recettes → garde anti-fuite OnRK).
-function Dir:Announce()
+-- `onlyChanged` (annonce coalescée d'après un changement, cf. AnnounceThrottled) : seuls les paliers RI
+-- qui ont changé repartent ; les autres sont déjà chez tous, et un arrivant reçoit tout par AnnounceTo.
+function Dir:Announce(onlyChanged)
     if not (CraftLink and CraftLink:IsNetworkReady()) then return end
     self:AnnounceSkills()
     for _, prof in ipairs(CraftLink:MyProfessions()) do
-        local msg = self:RecipeMessage(prof)   -- RI sur Camelot, RK ailleurs
-        if msg then CraftLink:Send(msg, "global") end
+        for _, msg in ipairs(self:RecipeMessages(prof, onlyChanged, true) or {}) do   -- RI par palier sur Camelot, RK ailleurs
+            CraftLink:Send(msg, "global")
+        end
     end
     if self.AnnounceCooldowns then self:AnnounceCooldowns("global") end
     if self.AnnounceAlts then self:AnnounceAlts("global") end   -- opt-in : no-op sans /co alts on
@@ -263,8 +266,9 @@ function Dir:AnnounceTo(target)
     local sk = self:_SkillPayload()
     if sk then CraftLink:Send(sk, "whisper", target) end     -- SK d'abord (vérité terrain avant les RK)
     for _, prof in ipairs(CraftLink:MyProfessions()) do
-        local msg = self:RecipeMessage(prof)   -- RI sur Camelot, RK ailleurs
-        if msg then CraftLink:Send(msg, "whisper", target) end
+        for _, msg in ipairs(self:RecipeMessages(prof) or {}) do   -- tous les paliers
+            CraftLink:Send(msg, "whisper", target)
+        end
     end
     if self.AnnounceCooldowns then self:AnnounceCooldowns("whisper", target) end
     if self.AnnounceAlts then self:AnnounceAlts("whisper", target) end   -- opt-in : no-op sinon

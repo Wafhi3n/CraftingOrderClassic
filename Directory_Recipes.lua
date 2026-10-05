@@ -89,15 +89,97 @@ end
 -- Le FIL : quelle forme j'émets, et comment je reçois l'autre
 -- ------------------------------------------------------------------
 
--- Le message de registre à diffuser pour ce métier, ou nil si je n'ai rien à dire.
+-- Les messages de registre à diffuser pour ce métier : une LISTE, ou nil si je n'ai rien à dire.
 -- Sur Camelot on émet des IDENTIFIANTS (RI) : il n'y a pas de catalogue partagé à faire concorder,
 -- et le contenu du jeu bouge encore. Ailleurs, le bitfield (RK) reste plus compact et le catalogue
 -- est stable. Les deux jeux étant séparés, un client ne rencontre jamais l'autre forme en pratique.
-function Dir:RecipeMessage(prof)
+--
+-- RI part PAR PALIER du jeu, en morceaux si un palier dépasse (CraftLink REGISTRY_IDS_REV 2) : un
+-- message d'addon de plus de 255 octets arrive COUPÉ, en silence (mesuré le 2026-10-05).
+-- `onlyChanged` : seulement les paliers qui ont changé depuis la dernière annonce à tous ; `record` :
+-- cette annonce part à TOUS les pairs, elle devient la référence (une réponse à un seul joueur, non).
+function Dir:RecipeMessages(prof, onlyChanged, record)
     local c = CL()
     if not (c and prof) then return nil end
-    if COC.Api and COC.Api.IS_MAINLINE and c.BuildRI then return c:BuildRI(prof) end
-    return c.BuildRK and c:BuildRK(prof) or nil
+    local mainline = COC.Api and COC.Api.IS_MAINLINE
+    if mainline and c.BuildRITiers then return self:_TierMessages(c, prof, onlyChanged, record) end
+    local one = (mainline and c.BuildRI and c:BuildRI(prof)) or (not mainline and c.BuildRK and c:BuildRK(prof))
+    return one and { one } or nil
+end
+
+function Dir:_TierMessages(c, prof, onlyChanged, record)
+    local tiers = c:BuildRITiers(prof)
+    if not tiers then return nil end
+    self._riSent = self._riSent or {}
+    local sent, now, out = self._riSent[prof] or {}, {}, {}
+    for _, e in ipairs(tiers) do
+        local key = table.concat(e.msgs, "\n")   -- le masque y est : un palier vidé change tous les autres
+        now[e.tier] = key
+        if not onlyChanged or sent[e.tier] ~= key then
+            for _, m in ipairs(e.msgs) do out[#out + 1] = m end
+        end
+    end
+    if record then self._riSent[prof] = now end
+    return (#out > 0) and out or nil
+end
+
+-- ------------------------------------------------------------------
+-- Réception par palier (RI, REGISTRY_IDS_REV 2)
+-- ------------------------------------------------------------------
+-- Un palier reçu REMPLACE ce palier, et lui seul ; `recipeIDs[prof]` est ensuite recollé (union des
+-- paliers), et c'est lui que lisent tous les consommateurs (RecipeTester, relais, Social…). Un palier
+-- en morceaux n'est remplacé qu'une fois TOUS ses morceaux arrivés : sinon l'ancien reste.
+local PART_TTL = 120   -- s : un palier dont il manque un morceau après ce délai repart de zéro
+
+local function now() return (GetTime and GetTime()) or 0 end
+
+-- Range le morceau k/n ; rend le payload du palier entier quand le dernier arrive, sinon nil.
+-- `key` : la source (émetteur, ou relayeur et origine), pour ne jamais mêler deux registres.
+function Dir:_CollectRIPart(key, prof, tier, k, n, payload)
+    self._riParts = self._riParts or {}
+    local t, id = now(), key .. "\0" .. prof .. "\0" .. tier
+    local p = self._riParts[id]
+    if not p or p.n ~= n or t - p.at > PART_TTL then
+        for old, q in pairs(self._riParts) do
+            if t - q.at > PART_TTL then self._riParts[old] = nil end
+        end
+        p = { n = n, at = t, got = {}, count = 0 }
+        self._riParts[id] = p
+    end
+    if not p.got[k] then p.count = p.count + 1 end
+    p.got[k] = payload
+    if p.count < n then return nil end
+    self._riParts[id] = nil
+    local c = CL()
+    return c and c.UnionKnownIDs and c:UnionKnownIDs(p.got) or nil
+end
+
+-- Applique un message RI déjà lu à `store` (une fiche du roster, ou son lot relayé). Rend true si
+-- le registre a changé. Forme d'avant REV 2 (palier nil) : un registre ENTIER, qui remplace tout.
+function Dir:_ApplyRI(store, key, prof, payload, tier, k, n, mask)
+    store.recipeIDs = store.recipeIDs or {}
+    if not tier then
+        store.recipeIDs[prof] = payload
+        if store.recipeTiers then store.recipeTiers[prof] = nil end
+        return true
+    end
+    if n then
+        payload = self:_CollectRIPart(key, prof, tier, k, n, payload)
+        if not payload then return false end
+    end
+    local c = CL()
+    if not (c and c.UnionKnownIDs) then return false end
+    store.recipeTiers = store.recipeTiers or {}
+    local tiers = store.recipeTiers[prof] or {}
+    store.recipeTiers[prof] = tiers
+    tiers[tier] = payload
+    if mask and mask ~= "" then
+        for t in pairs(tiers) do
+            if not mask:find(tostring(t), 1, true) then tiers[t] = nil end
+        end
+    end
+    store.recipeIDs[prof] = c:UnionKnownIDs(tiers)
+    return true
 end
 
 -- RI reçu (recettes d'un autre, forme identifiants) → cache roster persistant.
@@ -108,12 +190,11 @@ end
 function Dir:OnRI(sender, message)
     local c = CL()
     if not (sender and c and c.ParseRI) then return end
-    local prof, payload = c:ParseRI(message)
+    local prof, payload, tier, k, n, mask = c:ParseRI(message)
     if not prof then return end
     local r = self.roster[sender]; if not r then r = {}; self.roster[sender] = r end
     if r.skill and next(r.skill) and not r.skill[prof] then return end  -- anti fuite d'alts
-    r.recipeIDs = r.recipeIDs or {}
-    r.recipeIDs[prof] = payload
+    self:_ApplyRI(r, sender, prof, payload, tier, k, n, mask)
     self:_ApplySource(sender, r)          -- guilde/ami si reconnu, sinon « recent »
     r.lastSeen = time()
     self.online[sender] = true            -- présence passive : un message prouve la présence
