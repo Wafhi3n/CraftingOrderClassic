@@ -1,5 +1,21 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.44.2 - Correct cooldowns, and long recipe lists arrive whole
+
+The addon told other players that crafters had transmutes or Mooncloth ready when they didn't even
+know those recipes. The profession window also lists the recipes you haven't learned, and the addon
+read their cooldowns as yours. It now only tracks recipes you know, and on load it clears the wrong
+cooldowns it had already saved, for all your characters. Cooldowns sent by players who haven't
+updated yet are dropped when their profession level is too low to know the recipe.
+
+The game silently cuts any addon message longer than 255 characters. Past about a hundred recipes in
+one profession, the list of what a crafter can make reached everyone else cut short, sometimes ending
+with a recipe they don't know. It now goes out in several messages, one per skill tier (Apprentice,
+Journeyman, Expert, Artisan), and arrives whole. A short list still goes out as a single message.
+
+For a player who hasn't updated yet, nothing changes while your list fits in one message. Past that,
+they'll only see part of it until they update.
+
 ## v1.44.1 - No more "No player named" spam
 
 When another addon user logged off, your chat could fill up with `No player named 'Someone' is
