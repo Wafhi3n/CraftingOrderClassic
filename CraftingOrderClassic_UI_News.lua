@@ -31,8 +31,22 @@ local BODY_W = 780
 -- Bloc de tête ACTUEL, créé pour v1.36.1 : versionsNewest faisait 56 lignes, l'entrée l'aurait porté
 -- à 62. Même manœuvre : un bloc DEVANT, concaténé en premier par versions(). À la prochaine release,
 -- ajouter ici, en tête.
--- Bloc de tête ACTUEL, créé pour v1.41.0 : versionsHead faisait 58 lignes. À la prochaine release,
+-- Bloc créé pour v1.41.0 : versionsHead faisait 58 lignes.
+-- Bloc de tête ACTUEL, créé pour v1.44.2 : versionsTop faisait 58 lignes. À la prochaine release,
 -- ajouter ici, en tête.
+local function versionsFront()
+    return {
+        {
+            v = "v1.44.2", title = L["Des cooldowns justes, et les longues listes de recettes arrivent entières"],
+            lines = {
+                L["L'addon annonçait des transmutations ou l'Étoffe lunaire « prêtes » chez des artisans qui ne connaissaient même pas ces recettes. La fenêtre de métier liste aussi les recettes que tu n'as pas apprises, et l'addon prenait leur cooldown pour le tien. Il ne suit plus que les recettes que tu connais, et efface au chargement les faux cooldowns déjà notés, pour tous tes persos. Ceux qu'envoie un joueur pas encore à jour sont écartés quand son niveau de métier est trop bas pour connaître la recette."],
+                L["Le jeu coupe sans prévenir tout message d'addon de plus de 255 caractères. Au-delà d'une centaine de recettes dans un métier, la liste de ce qu'un artisan sait faire arrivait tronquée chez les autres, parfois avec à la fin une recette qu'il ne connaît pas. Elle part maintenant en plusieurs messages, un par palier du métier (Apprenti, Compagnon, Expert, Artisan), et arrive entière. Une liste courte part toujours en un seul message."],
+                L["Chez un joueur qui n'a pas encore la mise à jour, rien ne change tant que ta liste tient en un message. Au-delà, il n'en verra qu'une partie jusqu'à sa mise à jour."],
+            },
+        },
+    }
+end
+
 local function versionsTop()
     return {
         {
@@ -419,26 +433,12 @@ local function versionsOlder()
                 L["Le LFW marche même sans l'addon : tape « LFW enchantement » en Commerce ou Général et tu apparais comme dispo, avec la même icône de plaque qu'un joueur qui a Crafting Order. Plus une correction : une recette déjà apprise ne s'affichait plus en double avec MissingTradeSkillsList."],
             },
         },
-        {
-            v = "v1.18.0", title = L["Chercher du travail : dis ce que tu offres, et trie par progression"],
-            lines = {
-                L["« Chercher du travail » ne se contente plus de te signaler dispo. Clique l'engrenage à côté du bouton et dis ce que tu proposes : tu fournis les composants de base, tu fournis tel réactif précis, une commission fixe par craft, ou seulement les plans qui te font gagner un point de compétence. Ça s'affiche sur ta ligne [Dispo] et dans l'infobulle au-dessus de ta tête, avec une pièce s'il y a une commission et un sac si tu fournis des compos."],
-                L["L'icône « dispo » au-dessus de la plaque d'un artisan marche maintenant sur Era et Saison de la Découverte, plus seulement sur le client TBC. Active les plaques des amis (nameplateShowFriends) et l'icône du métier flotte au-dessus de qui cherche du travail à côté de toi."],
-                L["Les recettes se trient par ce qui te fait encore progresser : un troisième bouton outil remonte en tête les plans qui donnent un point, d'orange à gris. Les commandes ont le même « ce qui me fait monter d'abord », avec un liseré de difficulté sur le côté de chaque ligne. Plus quelques corrections au passage."],
-            },
-        },
-        {
-            v = "v1.17.1", title = L["Correctif : erreur au login en « Chercher du travail »"],
-            lines = {
-                L["Si tu avais activé « Chercher du travail », te connecter ou faire /reload pouvait déclencher une erreur rouge : l'addon annonçait ta disponibilité avant que le jeu n'autorise un addon à parler sur le canal. L'annonce attend maintenant ton prochain clic ou ta prochaine touche — plus d'erreur, et les autres te voient toujours dispo."],
-            },
-        },
     }
 end
 
 local function versionsOldest()
     return {
-        -- v1.17.0 (retirée à la v1.44.1), v1.16.0 (retirée à la v1.44.0), v1.15.1 (retirée à la v1.43.0), v1.15.0 (retirée à la v1.42.1), v1.14.0 (retirée à la v1.42.0), v1.13.0 (retirée à la v1.41.1), v1.12.0 / v1.11.0 / v1.10.2 (retirées à la v1.41.0 : la Saison de la Découverte, le canal du royaume et
+        -- v1.18.0 / v1.17.1 (retirées à la v1.44.2), v1.17.0 (retirée à la v1.44.1),v1.16.0 (retirée à la v1.44.0), v1.15.1 (retirée à la v1.43.0), v1.15.0 (retirée à la v1.42.1), v1.14.0 (retirée à la v1.42.0), v1.13.0 (retirée à la v1.41.1), v1.12.0 / v1.11.0 / v1.10.2 (retirées à la v1.41.0 : la Saison de la Découverte, le canal du royaume et
         -- le bouton « Créer » sécurisé n'existent pas sur Forever), v1.10.1 / v1.9.0 / v1.8.0 / v1.7.0 / v1.7.1 /
         -- v1.6.0 / v1.5.0 / v1.4.0 retirées de l'onglet (l'historique
         -- complet vit dans CHANGELOG.md). Cet onglet ne garde qu'une fenêtre glissante de versions :
@@ -449,7 +449,8 @@ local function versionsOldest()
 end
 
 local function versions()
-    local out = versionsTop()
+    local out = versionsFront()
+    for _, e in ipairs(versionsTop()) do out[#out + 1] = e end
     for _, e in ipairs(versionsHead()) do out[#out + 1] = e end
     for _, e in ipairs(versionsNewest()) do out[#out + 1] = e end
     for _, e in ipairs(versionsCurrent()) do out[#out + 1] = e end
