@@ -46,6 +46,18 @@ client.
 
 ## Relevés
 
+- 2026-10-05 19:57 — jusqu'a 0548533 — Forever, compte #4 (Rédemption), build
+  `main-dev@0e3eaed 2026-10-05 19:44` avec fix/cd-non-appris (copie déployée du `.toc` ; `/co version`
+  pas montré) — **GO partiel sur `fix/cd-non-appris`** — SavedVariable écrite à 19:57 par ce build,
+  relue au terminal : `schemaVer` = 2, la migration 2 est passée ; Anatarion (Couture 56) n'a plus
+  aucun CD de Couture, l'Étoffe lunaire (18560, apprise à 250) relevée à tort est retirée sans qu'il
+  ait rouvert sa fenêtre ; dans l'annuaire, un seul bloc de cooldowns reste, celui d'Avseneth
+  Everglade (Étoffe lunaire, aucun rang de Couture connu : la garde ne tranche pas, c'est attendu ;
+  l'essai à blanc sur la même SV avant le correctif en retirait 98 chez 21 joueurs). Le user, en jeu :
+  « ça a l'air d'être bon », sans détail. **Pas vu** : un CD qui sort ou qui entre depuis le
+  déploiement (aucune ligne `CD|` dans la trace après 19:44), donc ni le filtre d'émission ni la
+  garde à la réception sur un message réel ; « Mes artisans » à l'écran ; le compte #1 (pas relancé,
+  SV du 2026-10-04).
 - 2026-10-03 23:38 — jusqu'a 03a9fbc — Forever build client 70205, un compte (Sheadra), réseau sans
   canal, 4 pairs en ligne (Osrik Stonefist, Ellowyn Snowveil, Crux Pal, Lirolia Clouddancer) ; build
   `main-dev@896f711 2026-10-03 23:34` avec fix/rafales-sans-canal et fix/erreur-chuchotement-retard
