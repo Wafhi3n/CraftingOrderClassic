@@ -159,10 +159,14 @@ function UI:ShowSetup()
     S.Render()
 end
 
+-- Une ouverture AUTOMATIQUE par session au plus (relecture api-gotcha du 2026-09-30) : masqué sans
+-- passer par `close` (pas « vu »), il revenait à chaque fin de combat et chaque écran de chargement.
+-- Il reviendra à la prochaine connexion tant qu'il n'est pas validé ; /co watch setup, lui, l'ouvre toujours.
 local function tryOpen()
+    if S.autoShown then return end
     local inCombat = InCombatLockdown and InCombatLockdown()
     local inInstance = IsInInstance and IsInInstance()
-    if COC.Channels.SetupState(COC.db, inCombat, inInstance) == "show" then UI:ShowSetup() end
+    if COC.Channels.SetupState(COC.db, inCombat, inInstance) == "show" then S.autoShown = true; UI:ShowSetup() end
 end
 
 local boot = CreateFrame("Frame")
