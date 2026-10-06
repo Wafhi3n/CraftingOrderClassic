@@ -107,38 +107,55 @@ function Dir:RecipeMessages(prof, onlyChanged, record)
     return one and { one } or nil
 end
 
+local function now() return (GetTime and GetTime()) or 0 end
+
+-- ⚠️ La référence « déjà envoyé » est posée à l'ENFILAGE, pas à la livraison : rien ne dit qu'un pair a
+-- reçu (débit refusé après 5 essais, verrou d'instance, plafond du fanout). Sans borne, il garderait un
+-- palier périmé jusqu'à sa reconnexion — chaque annonce d'avant les paliers renvoyait tout et réparait.
+-- D'où : une référence plus vieille que RI_REFRESH ne vaut plus, l'annonce repart ENTIÈRE. Son heure
+-- est celle de la dernière annonce entière : des annonces partielles en série ne la repoussent pas.
+-- (Revue protocole de la v1.44.2, 2026-10-05.)
+local RI_REFRESH = 900   -- s
+
 function Dir:_TierMessages(c, prof, onlyChanged, record)
     local tiers = c:BuildRITiers(prof)
     if not tiers then return nil end
     self._riSent = self._riSent or {}
-    local sent, now, out = self._riSent[prof] or {}, {}, {}
+    local t, ref = now(), self._riSent[prof]
+    if ref and (type(ref.keys) ~= "table" or t - (ref.at or 0) > RI_REFRESH) then ref = nil end
+    local partial = onlyChanged and ref ~= nil
+    local keys, out = {}, {}
     for _, e in ipairs(tiers) do
         local key = table.concat(e.msgs, "\n")   -- le masque y est : un palier vidé change tous les autres
-        now[e.tier] = key
-        if not onlyChanged or sent[e.tier] ~= key then
+        keys[e.tier] = key
+        if not partial or ref.keys[e.tier] ~= key then
             for _, m in ipairs(e.msgs) do out[#out + 1] = m end
         end
     end
-    if record then self._riSent[prof] = now end
+    if record then self._riSent[prof] = { keys = keys, at = partial and ref.at or t } end
     return (#out > 0) and out or nil
 end
 
 -- ------------------------------------------------------------------
 -- Réception par palier (RI, REGISTRY_IDS_REV 2)
 -- ------------------------------------------------------------------
--- Un palier reçu REMPLACE ce palier, et lui seul ; `recipeIDs[prof]` est ensuite recollé (union des
--- paliers), et c'est lui que lisent tous les consommateurs (RecipeTester, relais, Social…). Un palier
--- en morceaux n'est remplacé qu'une fois TOUS ses morceaux arrivés : sinon l'ancien reste.
+-- Un palier reçu REMPLACE ce palier, et lui seul. Un palier en morceaux n'est remplacé qu'une fois TOUS
+-- ses morceaux arrivés : sinon l'ancien reste. `recipeIDs[prof]`, que lisent tous les consommateurs
+-- (RecipeTester, relais, Social…), n'est recollé (union des paliers) que quand TOUS les paliers du
+-- masque de l'émetteur sont là : avec un palier manquant, l'union répondrait « il ne la connaît pas »
+-- sur ses recettes, au lieu de « je ne sais pas ». D'ici là, le registre d'avant reste.
 local PART_TTL = 120   -- s : un palier dont il manque un morceau après ce délai repart de zéro
-
-local function now() return (GetTime and GetTime()) or 0 end
 
 -- Range le morceau k/n ; rend le payload du palier entier quand le dernier arrive, sinon nil.
 -- `key` : la source (émetteur, ou relayeur et origine), pour ne jamais mêler deux registres.
+-- Un AUTRE contenu pour un morceau déjà reçu = une nouvelle rafale : on repart d'elle, sans mêler
+-- deux découpages (un palier qui a changé ne se coupe plus aux mêmes endroits). Le même morceau
+-- reçu deux fois (annonce à tous, puis réponse à son bonjour) ne relance rien.
 function Dir:_CollectRIPart(key, prof, tier, k, n, payload)
     self._riParts = self._riParts or {}
     local t, id = now(), key .. "\0" .. prof .. "\0" .. tier
     local p = self._riParts[id]
+    if p and p.got[k] and p.got[k] ~= payload then p = nil end
     if not p or p.n ~= n or t - p.at > PART_TTL then
         for old, q in pairs(self._riParts) do
             if t - q.at > PART_TTL then self._riParts[old] = nil end
@@ -151,7 +168,26 @@ function Dir:_CollectRIPart(key, prof, tier, k, n, payload)
     if p.count < n then return nil end
     self._riParts[id] = nil
     local c = CL()
-    return c and c.UnionKnownIDs and c:UnionKnownIDs(p.got) or nil
+    if not (c and c.UnionKnownIDs and self:_PartsInOrder(c, p.got, n)) then return nil end
+    return c:UnionKnownIDs(p.got)
+end
+
+-- Les morceaux d'un palier sont des tranches CONTIGUËS de sa liste triée : chaque morceau commence
+-- au-delà du dernier identifiant du précédent. Un chevauchement trahit deux rafales mêlées (un morceau
+-- perdu dans chacune) : on jette tout, le registre d'avant reste. Un trou, lui, ne se voit pas sans
+-- marqueur de rafale dans le fil : c'est le reste du risque, réparé par l'annonce entière (RI_REFRESH).
+function Dir:_PartsInOrder(c, got, n)
+    local prevMax = 0
+    for k = 1, n do
+        local lo, hi
+        for sid in pairs(c:DecodeKnownIDs(got[k])) do
+            if not lo or sid < lo then lo = sid end
+            if not hi or sid > hi then hi = sid end
+        end
+        if not lo or lo <= prevMax then return false end
+        prevMax = hi
+    end
+    return true
 end
 
 -- Applique un message RI déjà lu à `store` (une fiche du roster, ou son lot relayé). Rend true si
@@ -161,6 +197,7 @@ function Dir:_ApplyRI(store, key, prof, payload, tier, k, n, mask)
     if not tier then
         store.recipeIDs[prof] = payload
         if store.recipeTiers then store.recipeTiers[prof] = nil end
+        if store.recipeTiersMask then store.recipeTiersMask[prof] = nil end
         return true
     end
     if n then
@@ -177,6 +214,12 @@ function Dir:_ApplyRI(store, key, prof, payload, tier, k, n, mask)
         for t in pairs(tiers) do
             if not mask:find(tostring(t), 1, true) then tiers[t] = nil end
         end
+        store.recipeTiersMask = store.recipeTiersMask or {}
+        store.recipeTiersMask[prof] = mask
+    end
+    local want = store.recipeTiersMask and store.recipeTiersMask[prof]
+    for d in (want or ""):gmatch("%d") do
+        if not tiers[tonumber(d)] then return false end   -- un palier annoncé manque : l'ancien registre reste
     end
     store.recipeIDs[prof] = c:UnionKnownIDs(tiers)
     return true

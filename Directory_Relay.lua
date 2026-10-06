@@ -68,10 +68,17 @@ function Dir:_SendRelay(target, name, r)
     -- Registre par identifiants (Camelot) : redécoupé par palier sous 255 octets ENVELOPPE COMPRISE —
     -- un message plus long arrive coupé, en silence (mesuré le 2026-10-05). Les paliers sont relus
     -- dans NOS données : le récepteur n'a besoin que d'un découpage cohérent au sein du lot.
+    -- Rien plutôt qu'un message trop long : il arriverait coupé, fini par un identifiant faux.
     local cap = 250 - #("RLY|" .. name .. "|" .. age .. "|")
     for prof, pay in pairs(r.recipeIDs or {}) do
-        local msgs = CraftLink.BuildRIMessages and CraftLink:BuildRIMessages(prof, CraftLink:DecodeKnownIDs(pay), cap)
-        for _, m in ipairs(msgs or { Codec.BuildRI(prof, pay) }) do send(m) end
+        local msgs
+        if CraftLink.BuildRIMessages then
+            msgs = CraftLink:BuildRIMessages(prof, CraftLink:DecodeKnownIDs(pay), cap)
+        else
+            local one = Codec.BuildRI(prof, pay)   -- lib d'avant REGISTRY_IDS_REV 2 : un message, s'il tient
+            msgs = (one and #one <= cap) and { one } or nil
+        end
+        for _, m in ipairs(msgs or {}) do send(m) end
     end
     for prof, cds in pairs(r.cooldowns or {}) do send(Codec.BuildCD(prof, cds, ts)) end
 end
@@ -119,7 +126,7 @@ function Dir:OnRelay(sender, message, distribution)
     end
     if f.verb == "SK" then self:_StoreRelayedSK(rel, f.inner)
     elseif f.verb == "RK" then self:_StoreRelayedRK(rel, f.inner)
-    elseif f.verb == "RI" then self:_StoreRelayedRI(rel, f.inner, sender .. ">" .. f.origin)
+    elseif f.verb == "RI" then self:_StoreRelayedRI(rel, f.inner, sender .. ">" .. f.origin, #message >= 255)
     else self:_StoreRelayedCD(rel, f.inner) end
     if COC.UI and COC.UI.RefreshSoon then COC.UI:RefreshSoon() end
 end
@@ -144,10 +151,12 @@ end
 -- Pendant identifiants de _StoreRelayedRK. ParseRI revalide la forme du message : un relayeur
 -- véreux ne peut pas injecter plus de junk qu'un émetteur direct. Par palier comme en direct
 -- (Dir:_ApplyRI) ; `key` (relayeur > origine) sépare l'assemblage des morceaux de chaque source.
-function Dir:_StoreRelayedRI(rel, inner, key)
+-- `cut` : le message ENTIER (enveloppe comprise) a la taille d'un message coupé par le serveur ; la
+-- partie RI seule est plus courte, ParseRI ne peut pas le voir d'elle-même.
+function Dir:_StoreRelayedRI(rel, inner, key, cut)
     local c = CraftLink
     if not (c and c.ParseRI) then return end
-    local prof, payload, tier, k, n, mask = c:ParseRI(inner)
+    local prof, payload, tier, k, n, mask = c:ParseRI(inner, cut)
     if not prof then return end
     self:_ApplyRI(rel, "relais\0" .. tostring(key), prof, payload, tier, k, n, mask)
 end
