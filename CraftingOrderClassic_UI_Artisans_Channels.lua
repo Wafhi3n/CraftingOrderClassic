@@ -39,15 +39,19 @@ local function joinedChannels()
 end
 
 -- Les communautés du joueur. En instance la liste est une valeur SECRÈTE, illisible : on garde la
--- dernière lue plutôt que de vider la section (« illisible » ne veut pas dire « aucune »).
+-- dernière lue plutôt que de vider la section (« illisible » ne veut pas dire « aucune »). Une seule
+-- entrée secrète rend toute la lecture illisible : sauter l'entrée écraserait la dernière liste par une
+-- liste tronquée.
 local lastClubs = {}
 local function myClubs()
-    local D, out = COC.Directory, {}
+    local D, out, secret = COC.Directory, {}, false
     if not (D and D.EachClub) then return lastClubs end
+    local IsSecret = COC.Api.IsSecret
     local _, readable = D:EachClub(function(info)
+        if IsSecret(info.clubId) or IsSecret(info.name) then secret = true; return end
         out[#out + 1] = { id = tostring(info.clubId), name = tostring(info.name) }
     end)
-    if readable == false then return lastClubs end
+    if secret or readable == false then return lastClubs end
     lastClubs = out
     return out
 end

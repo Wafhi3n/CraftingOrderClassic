@@ -43,15 +43,17 @@ end
 -- (en ligne chez moi : ses données, sa commande, sa dispo me parviennent déjà). Relecture protocole, 2026-09-30.
 local HELLO_JITTER = 5   -- s
 
+-- Rend ce qui s'est passé, pour la trace : elle disait « bonjour » même quand on se taisait.
 local function hello(author)
     local D = COC.Directory
-    if not (D and D.DiscoverPlayer) then return end
-    if D.online and D.online[author] then return end
+    if not (D and D.DiscoverPlayer) then return "pas d'annuaire, pas de bonjour" end
+    if D.online and D.online[author] then return "déjà en contact avec " .. author .. ", pas de bonjour" end
     if C_Timer and C_Timer.After then
         C_Timer.After(math.random() * HELLO_JITTER, function() D:DiscoverPlayer(author) end)
     else
         D:DiscoverPlayer(author)
     end
+    return "bonjour à " .. author
 end
 
 -- L'aperçu d'une commande annoncée, si le scanner l'aurait gardé (métier surveillé). Rend true s'il
@@ -87,8 +89,8 @@ function R:OnLine(msg, player)
         trace("annonce de " .. author .. " ignorée (muté)"); return true
     end
     if t.kind == "LFW" then
-        trace("LFW de " .. author .. " (" .. table.concat(t.profs, "/") .. ") : bonjour")
-        hello(author); return true
+        trace("LFW de " .. author .. " (" .. table.concat(t.profs, "/") .. ") : " .. hello(author))
+        return true
     end
     if COC.db and COC.db.orders and COC.db.orders[t.id] then   -- déjà reçue en entier (chuchotement)
         trace("annonce " .. t.id .. " : commande déjà reçue, rien à faire"); return true
@@ -98,8 +100,7 @@ function R:OnLine(msg, player)
     local Inbound = COC.Inbound
     if preview(t, msg) or (t.spellID and Inbound and Inbound:_WantProf("Enchanting"))
        or (COC.db and COC.db.inboundScope == "all") then
-        trace("annonce " .. t.id .. " : bonjour à " .. author)
-        hello(author)
+        trace("annonce " .. t.id .. " : " .. hello(author))
     else
         trace("annonce " .. t.id .. " : métier non surveillé (/co scan), ignorée")
     end
