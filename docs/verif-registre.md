@@ -46,6 +46,20 @@ client.
 
 ## Relevés
 
+- 2026-10-07 23:53 — jusqu'a ce5b42c — Forever build client 70245, trois comptes : Gnoma Short (3e,
+  `#5`, 4618, pas en LFW), Toao Rosa (4e, `#6`, 4620), Gnomi Short (2e, `#1`, 4620, le faux relais),
+  Rédemption Wafhien (1er, `#4`) restée connectée ; build `main-dev@f4ec367 2026-10-07 23:47` (lu par
+  l'appli du banc, fiche `CraftingOrderClassic--feat-relais-confiance-2`, cinq gestes cochés OK) —
+  **GO sur le critère 9** (`feat/relais-confiance`) : avec le relevé de 23:43 (critère 8), les deux
+  critères humains de la spec sont vus. Relu dans les traces : 23:52:44 Toao reçoit le LFW forgé « via
+  Gnomi Short » ([Dispo]) ; clic sur Chuchoter → 23:53:08 Toao « VRF|Cooking|Gnomi Short » à Gnoma ;
+  23:53:09 Gnoma répond « VRF|no|Cooking » (sans se noter de menteur : elle n'avait rien confié à
+  Gnomi, D-R12) ; 23:53:10 Toao « VRF : Gnoma Short dément, relais Gnomi Short écarté », le LFW
+  disparaît (remarque du user). 2e envoi forgé à 23:53:30 : rien chez Toao, Gnoma ne redevient pas
+  [Dispo] ; la sonde de nettoyage lit `true`. Vu au passage : Rédemption, membre de la même salle,
+  reçoit aussi les envois forgés et garde Gnoma [Dispo] « via Gnomi » jusqu'à expiration (25 min) ou
+  son propre clic : l'écartement est local à qui a vérifié (attendu, D-R5). Pas d'erreur Lua.
+
 - 2026-10-07 23:43 — jusqu'a 9baf899 — Forever build client 70245, quatre comptes : Gnoma Short (3e,
   `#5`, 4618, la source, Cuisine apprise pour l'occasion), Rédemption Wafhien (1er, `#4`, 4620, le
   relais), Toao Rosa (4e, `#6`, 4620), Gnomi Short (2e, `#1`, 4620, le faux relais) ; build
