@@ -46,6 +46,30 @@ client.
 
 ## Relevés
 
+- 2026-10-07 13:30 — jusqu'a 55339ea — Forever build client 70245, 4e compte de test (`#6`, créé à
+  l'instant), Sfdfs Sdfdsfd (Alliance, Classic Beta PvE 2), première connexion, Elwynn ; build
+  `main-dev@7707888 2026-10-07 13:04` (aucun déploiement depuis le relevé de 13:07 ; `/co version`
+  pas relevé) — **GO** sur le cas « perso neuf » du /1 — relevé relu dans la trace de la SV de COC.
+  13:28:52 → 13:29:02 : onze « attente d'un canal par défaut sur le slot 1 », puis salle rejointe en
+  idx=1 (aucun canal du jeu au bout de 10 s) ; 13:29:16 « canal déplacé du /1 au /2 : le /1 rendu à
+  General - Elwynn Forest », par le chien de garde, 14 s plus tard. C'est le cas qui manquait au relevé
+  de 13:07. Dans la même trace : la salle répond (Gnomi Short, royaume 4620, et deux inconnus).
+
+- 2026-10-07 13:07 — jusqu'a 55339ea — Forever build client 70245, 3e compte (`#5`), Gnoma Short
+  (royaume 4618), Ironforge, groupée avec Gnomi Short ; build `main-dev@7707888 2026-10-07 13:04`
+  (lu dans le `.toc` de la copie déployée, `fix/bonjour-et-slot1` dans les branches ; `/co version`
+  pas relevé en jeu) — **GO partiel** — relevé relu dans la trace de la SV de COC.
+  **Le /1 rendu (lib `_FixSlot1`)** : CraftLinkNet remis en /1 à la main
+  (`SwapChatChannelsByChannelIndex(1,2)` en `/run`), puis 13:05:59 « canal déplacé du /1 au /2 : le
+  /1 rendu à General - Ironforge », venu du chien de garde (minuterie, sans geste du joueur) ; au
+  `/reload` de 13:06:07, salle rejointe en idx=2 : l'ordre corrigé tient.
+  **Noms complets** : de 13:04 à 13:07, aucun chuchotement vers un prénom seul ni « Unknown » (tous
+  les HI en « Prénom Nom », un nom cyrillique compris).
+  ⚠️ **NON observé** : le clic droit sur Gnomi (un joueur déjà connu n'est pas relancé : un succès ne
+  laisse aucune ligne ; la section « Crafting Order » du menu, qui cherche le joueur dans l'annuaire,
+  n'a pas été regardée) ; la reprise du groupe 3 s plus tard (aucun groupe formé pendant la séance) ;
+  la ligne « bonjour écarté » ; la première connexion d'un perso neuf (rejoindre en /1 puis rendre).
+
 - 2026-10-07 10:02 — jusqu'a ac7c0ce — Forever build client 70245, un compte (#4, perso non noté),
   capitale, AFK ; build `main-dev@159d2e6 2026-10-07 09:54` (lu par la sonde dans le `.toc` déployé,
   `fix/route-cache-memoire` dans les branches) — **GO sur la mémoire du suivi** — mesuré par

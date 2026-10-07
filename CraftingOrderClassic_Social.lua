@@ -323,7 +323,31 @@ local function discover(unit)
     -- Whisper addon-message ne traverse pas la faction adverse → on ne ping que les alliés potentiels.
     if UnitCanCooperate and not UnitCanCooperate("player", unit) then return end
     local name = COC.Api.UnitNameSafe(unit)
-    if name then COC.Directory:DiscoverPlayer(name) end
+    if not name then return end
+    local full = COC.Api.IsFullPlayerName
+    if full and not full(name) then return false end   -- nom pas encore chargé par le jeu : à repasser
+    COC.Directory:DiscoverPlayer(name)
+end
+
+-- Groupe : au GROUP_ROSTER_UPDATE, le jeu n'a pas toujours le nom complet d'un membre (« Unknown », ou
+-- le prénom sans nom de famille : relevé du 2026-10-07). On repasse sur le groupe 3 s plus tard, au plus
+-- deux fois ; un nouveau changement de groupe remplace la reprise en cours.
+local GROUP_RETRY, GROUP_PASSES = 3, 3
+function Social:_DiscoverGroup(token, pass)
+    if not token then
+        self._groupToken = (self._groupToken or 0) + 1
+        token, pass = self._groupToken, 1
+    elseif token ~= self._groupToken then
+        return
+    end
+    local prefix = IsInRaid and IsInRaid() and "raid" or "party"
+    local incomplete = false
+    for i = 1, (GetNumGroupMembers and GetNumGroupMembers() or 0) do
+        if discover(prefix .. i) == false then incomplete = true end
+    end
+    if incomplete and pass < GROUP_PASSES and C_Timer and C_Timer.After then
+        C_Timer.After(GROUP_RETRY, function() Social:_DiscoverGroup(token, pass + 1) end)
+    end
 end
 
 function Social:_WireDiscovery()
@@ -334,10 +358,7 @@ function Social:_WireDiscovery()
     f:SetScript("OnEvent", function(_, event)
         if event == "UPDATE_MOUSEOVER_UNIT" then discover("mouseover")
         elseif event == "PLAYER_TARGET_CHANGED" then discover("target")
-        else
-            local prefix = IsInRaid and IsInRaid() and "raid" or "party"
-            for i = 1, (GetNumGroupMembers and GetNumGroupMembers() or 0) do discover(prefix .. i) end
-        end
+        else Social:_DiscoverGroup() end
     end)
 end
 

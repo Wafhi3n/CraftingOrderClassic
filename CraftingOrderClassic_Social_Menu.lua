@@ -35,11 +35,23 @@ local function targetName(contextData)
     if contextData.bnetIDAccount then return bnetCharacterName(contextData) end
     -- Le test de SECRET passe avant la comparaison : comparer une secrète lève la même erreur
     -- que l'indexer, et `contextData` vient du jeu comme le reste (cf. Api.UnitNameSafe).
+    -- Sur Forever, le menu range le PRÉNOM dans `name` et le nom de famille dans `surname`
+    -- (UnitPopupShared.lua, UnitNameUnmodified) : le prénom seul ne trouve personne dans le roster, et un
+    -- bonjour à ce nom se perd (relevé du 2026-10-07 : « whisper→Gnomi » à chaque clic droit).
     local n = contextData.name
-    if n and not COC.Api.IsSecret(n) and n ~= "" then return n end
+    if n and not COC.Api.IsSecret(n) and n ~= "" then
+        local s = contextData.surname
+        if s and not COC.Api.IsSecret(s) and s ~= "" then
+            local sep = Constants and Constants.CharacterNameSeparatorConsts
+                and Constants.CharacterNameSeparatorConsts.CHARACTERNAME_SURNAME_SEPARATOR or " "
+            return n .. sep .. s
+        end
+        return n
+    end
     if contextData.unit then return COC.Api.UnitNameSafe(contextData.unit) end
     return nil
 end
+Social._MenuTargetName = targetName   -- pour les tests
 
 -- Callback Menu.ModifyMenu : append de la section (owner, rootDescription, contextData).
 local function addEntries(_, rootDescription, contextData)
