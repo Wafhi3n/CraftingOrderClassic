@@ -403,7 +403,7 @@ end
 function UI:_ArtRowButtons(row, a, nonAddon, partnerOn)
     local D = COC.Directory
     row.whisper:SetScript("OnClick", function()
-        if D0 and D0.TrustVerify then D0:TrustVerify(a.name) end   -- un LFW relayé : vérifié auprès de lui
+        if D and D.TrustVerify then D:TrustVerify(a.name) end   -- un LFW relayé : vérifié auprès de lui
         if ChatFrame_SendTell then ChatFrame_SendTell(a.name) end
     end)
     -- Présence 3 ÉTATS : « en ligne sans addon » (game) reste joignable par /w — le bouton suit la
