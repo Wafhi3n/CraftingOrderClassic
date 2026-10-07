@@ -1,5 +1,16 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.46.0 - More crafters found, even the ones you've never run into
+
+Some addon users stayed invisible to you, even playing right next to you. You only found them by
+running into them, targeting them or grouping with them. Now, when one of them logs in, an addon user
+who knows you both makes the introductions, and your two addons say hello behind the scenes. They
+show up in your Artisans tab with their professions, and their orders and their looking-for-work line
+reach you like any known crafter's. Nothing to set up.
+
+It stays quiet: one introduction per login, a short hello each way, and no more than once every six
+hours for the same player. The more players update, the more people you'll see.
+
 ## v1.45.0 - /1 is yours again, and the addon learns about hidden realms
 
 On a brand new character, the addon's hidden channel could join before the game's General channel

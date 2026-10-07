@@ -37,6 +37,13 @@ local BODY_W = 780
 local function versionsFront()
     return {
         {
+            v = "v1.46.0", title = L["Plus d'artisans trouvés, même ceux que tu n'as jamais croisés"],
+            lines = {
+                L["Certains joueurs de l'addon restaient invisibles pour toi, même en jouant à côté : tu ne les trouvais qu'en les croisant, en les ciblant ou en groupe. Maintenant, quand l'un d'eux se connecte, un joueur de l'addon qui vous connaît tous les deux fait les présentations, et vos deux addons se disent bonjour en coulisse. Il apparaît dans ton onglet Artisans avec ses métiers, et ses commandes et sa recherche de travail t'arrivent comme pour n'importe quel artisan connu. Rien à régler."],
+                L["Ça reste discret : une présentation par connexion, un bonjour court de chaque côté, et pas plus d'une fois toutes les six heures pour le même joueur. Plus il y a de joueurs à jour, plus tu verras de monde."],
+            },
+        },
+        {
             v = "v1.45.0", title = L["Le /1 te revient, et l'addon découvre les royaumes cachés"],
             lines = {
                 L["Sur un perso tout neuf, le canal caché de l'addon pouvait passer avant le canal Général du jeu et prendre le /1, que le jeu lui gardait ensuite : taper /1 écrivait dans un canal caché. L'addon rend maintenant le /1 au premier canal du jeu dès qu'il y en a un, sur les nouveaux persos comme sur ceux déjà touchés."],
@@ -419,22 +426,12 @@ local function versionsRecent()
 end
 
 local function versionsOlder()
-    return {
-        {
-            v = "v1.20.0", title = L["Enchante en un clic, trié par emplacement, et depuis l'échange"],
-            lines = {
-                L["Le bouton « Créer » de l'Enchantement avait un vieux bug intermittent : parfois rien ne se passait, et resélectionner la recette finissait par le faire marcher. Cause trouvée : sélectionner une recette n'arme pas le bouton natif de Blizzard, notre clic sécurisé tombait donc sur un bouton désactivé. Corrigé — ça devrait marcher du premier coup, à chaque fois."],
-                L["Les recettes d'enchantement ne s'entassent plus dans un fourre-tout « Autres/Divers » : elles se rangent par emplacement (Poignets, Torse, Main gauche…) puis par stat de base (Force, Esprit, Déviation), le nom raccourci à la stat seule puisque l'emplacement est déjà dans l'en-tête."],
-                L["Sélectionner un enchant d'équipement affiche un bouton « Enchanter équipé » à côté de Créer : un clic l'applique directement sur la pièce que tu portes, sans avoir à cibler."],
-                L["Et quand quelqu'un te tend un objet à enchanter en échange, le poser dans la case « ne sera pas échangé » ouvre un petit panneau listant tes enchants pour cet emplacement, prêts à lancer sans fouiller ta fenêtre de métier (qui doit rester ouverte : le jeu ne renseigne tes recettes connues que pendant qu'elle l'est)."],
-            },
-        },
-    }
+    return {}   -- vide depuis la v1.46.0 (v1.20.0 sortie de la fenêtre glissante) ; gardé pour versions()
 end
 
 local function versionsOldest()
     return {
-        -- v1.19.1 / v1.19.0 (retirées à la v1.45.0), v1.18.0 / v1.17.1 (retirées à la v1.44.2), v1.17.0 (retirée à la v1.44.1),v1.16.0 (retirée à la v1.44.0), v1.15.1 (retirée à la v1.43.0), v1.15.0 (retirée à la v1.42.1), v1.14.0 (retirée à la v1.42.0), v1.13.0 (retirée à la v1.41.1), v1.12.0 / v1.11.0 / v1.10.2 (retirées à la v1.41.0 : la Saison de la Découverte, le canal du royaume et
+        -- v1.20.0 (retirée à la v1.46.0), v1.19.1 / v1.19.0 (retirées à la v1.45.0), v1.18.0 / v1.17.1 (retirées à la v1.44.2), v1.17.0 (retirée à la v1.44.1),v1.16.0 (retirée à la v1.44.0), v1.15.1 (retirée à la v1.43.0), v1.15.0 (retirée à la v1.42.1), v1.14.0 (retirée à la v1.42.0), v1.13.0 (retirée à la v1.41.1), v1.12.0 / v1.11.0 / v1.10.2 (retirées à la v1.41.0 : la Saison de la Découverte, le canal du royaume et
         -- le bouton « Créer » sécurisé n'existent pas sur Forever), v1.10.1 / v1.9.0 / v1.8.0 / v1.7.0 / v1.7.1 /
         -- v1.6.0 / v1.5.0 / v1.4.0 retirées de l'onglet (l'historique
         -- complet vit dans CHANGELOG.md). Cet onglet ne garde qu'une fenêtre glissante de versions :

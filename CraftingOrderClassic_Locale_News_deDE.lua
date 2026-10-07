@@ -8,6 +8,12 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "Neues",
+    -- v1.46.0
+    ["Plus d'artisans trouvés, même ceux que tu n'as jamais croisés"] = "Mehr Handwerker gefunden, auch solche, denen du nie begegnet bist",
+    ["Certains joueurs de l'addon restaient invisibles pour toi, même en jouant à côté : tu ne les trouvais qu'en les croisant, en les ciblant ou en groupe. Maintenant, quand l'un d'eux se connecte, un joueur de l'addon qui vous connaît tous les deux fait les présentations, et vos deux addons se disent bonjour en coulisse. Il apparaît dans ton onglet Artisans avec ses métiers, et ses commandes et sa recherche de travail t'arrivent comme pour n'importe quel artisan connu. Rien à régler."] =
+        "Manche Addon-Nutzer blieben für dich unsichtbar, selbst wenn sie direkt neben dir spielten: Du fandest sie nur, wenn du ihnen begegnet bist, sie ins Ziel genommen oder mit ihnen gruppiert hast. Jetzt stellt beim Einloggen eines von ihnen ein Addon-Nutzer, der euch beide kennt, euch einander vor, und eure Addons grüßen sich im Hintergrund. Er erscheint in deinem Handwerker-Reiter mit seinen Berufen, und seine Aufträge und seine Arbeitssuche erreichen dich wie bei jedem bekannten Handwerker. Nichts einzustellen.",
+    ["Ça reste discret : une présentation par connexion, un bonjour court de chaque côté, et pas plus d'une fois toutes les six heures pour le même joueur. Plus il y a de joueurs à jour, plus tu verras de monde."] =
+        "Das bleibt unauffällig: eine Vorstellung pro Login, ein kurzer Gruß in jede Richtung und höchstens einmal alle sechs Stunden für denselben Spieler. Je mehr Spieler aktualisieren, desto mehr Leute siehst du.",
     -- v1.45.0
     ["Le /1 te revient, et l'addon découvre les royaumes cachés"] = "/1 gehört wieder dir, und das Addon lernt die versteckten Realms kennen",
     ["Sur un perso tout neuf, le canal caché de l'addon pouvait passer avant le canal Général du jeu et prendre le /1, que le jeu lui gardait ensuite : taper /1 écrivait dans un canal caché. L'addon rend maintenant le /1 au premier canal du jeu dès qu'il y en a un, sur les nouveaux persos comme sur ceux déjà touchés."] =
@@ -207,16 +213,7 @@ local news = {
         "Zwei Korrekturen: Wraths Verzauberungen für Handgelenke und Stäbe tauchten im Tauschfenster nie auf (das Spiel schreibt sie „Bracers\" und „Staff\", wo andere Erweiterungen „Bracer\" sagen), und eine Stab-Verzauberung bietet sich jetzt nur noch auf einem echten Stab an. Außerdem fasst das Fenster im Kampf seine Knöpfe nicht mehr an, was das Spiel ohnehin blockiert.",
     ["Plus discret : les lignes de chat « X sait faire cette commande captée » sont désactivées par défaut — la commande est poussée aux amis capables dans tous les cas, le message n'était que du bruit. |cFFFFFFFF/co verbose|r les remet."] =
         "Leiser: Die Chatzeilen „X kann diesen aufgefangenen Auftrag herstellen\" sind jetzt standardmäßig aus. Der Auftrag wird ohnehin an fähige Freunde weitergereicht, die Meldung war nur Rauschen. |cFFFFFFFF/co verbose|r holt sie zurück.",
-    -- v1.20.0
-    ["Enchante en un clic, trié par emplacement, et depuis l'échange"] = "Verzaubern per Klick, sortiert nach Platz, direkt beim Tauschen",
-    ["Le bouton « Créer » de l'Enchantement avait un vieux bug intermittent : parfois rien ne se passait, et resélectionner la recette finissait par le faire marcher. Cause trouvée : sélectionner une recette n'arme pas le bouton natif de Blizzard, notre clic sécurisé tombait donc sur un bouton désactivé. Corrigé — ça devrait marcher du premier coup, à chaque fois."] =
-        "Der „Erstellen\"-Knopf beim Verzauberkunst hatte einen alten, unregelmäßigen Fehler: manchmal passierte einfach nichts, und das Rezept mehrmals neu auszuwählen brachte es irgendwann zum Laufen. Ursache gefunden: Ein Rezept auszuwählen aktiviert nicht den nativen Knopf von Blizzard, unser gesicherter Klick landete also auf einem deaktivierten Knopf. Behoben — sollte jetzt jedes Mal sofort funktionieren.",
-    ["Les recettes d'enchantement ne s'entassent plus dans un fourre-tout « Autres/Divers » : elles se rangent par emplacement (Poignets, Torse, Main gauche…) puis par stat de base (Force, Esprit, Déviation), le nom raccourci à la stat seule puisque l'emplacement est déjà dans l'en-tête."] =
-        "Verzauberungs-Rezepte landen nicht mehr alle im Sammelbecken „Sonstiges\": Sie sind jetzt nach Ausrüstungsplatz sortiert (Handgelenk, Brust, Waffenhand…), dann nach Basiswert (Stärke, Willenskraft, Abwehr), mit gekürztem Namen, da der Platz schon in der Überschrift steht.",
-    ["Sélectionner un enchant d'équipement affiche un bouton « Enchanter équipé » à côté de Créer : un clic l'applique directement sur la pièce que tu portes, sans avoir à cibler."] =
-        "Wählst du eine Verzauberung für einen Ausrüstungsplatz aus, erscheint neben „Erstellen\" ein Knopf „Ausgerüstetes verzaubern\": Ein Klick wendet sie direkt auf das getragene Teil an, ohne manuelles Zielen.",
-    ["Et quand quelqu'un te tend un objet à enchanter en échange, le poser dans la case « ne sera pas échangé » ouvre un petit panneau listant tes enchants pour cet emplacement, prêts à lancer sans fouiller ta fenêtre de métier (qui doit rester ouverte : le jeu ne renseigne tes recettes connues que pendant qu'elle l'est)."] =
-        "Und wenn dir jemand beim Tauschen etwas zum Verzaubern gibt: Es in das Feld „wird nicht getauscht\" zu legen, öffnet ein kleines Fenster mit allen deinen Verzauberungen für diesen Platz, einsatzbereit, ohne im Berufsfenster zu suchen (das aber geöffnet bleiben muss: Das Spiel gibt deine bekannten Rezepte nur preis, solange es offen ist).",
+    -- (clés v1.20.0 retirées à la v1.46.0 : version sortie de la fenêtre glissante de l'onglet)
     -- (clés v1.19.1 et v1.19.0 retirées à la v1.45.0 : versions sorties de la fenêtre glissante de l'onglet)
     -- (clés v1.18.0 et v1.17.1 retirées à la v1.44.2 : versions sorties de la fenêtre glissante de l'onglet)
     -- (clés v1.17.0 retirées à la v1.44.1 : version sortie de la fenêtre glissante de l'onglet)

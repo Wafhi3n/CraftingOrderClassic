@@ -11,6 +11,12 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "What's New",
+    -- v1.46.0
+    ["Plus d'artisans trouvés, même ceux que tu n'as jamais croisés"] = "More crafters found, even the ones you've never run into",
+    ["Certains joueurs de l'addon restaient invisibles pour toi, même en jouant à côté : tu ne les trouvais qu'en les croisant, en les ciblant ou en groupe. Maintenant, quand l'un d'eux se connecte, un joueur de l'addon qui vous connaît tous les deux fait les présentations, et vos deux addons se disent bonjour en coulisse. Il apparaît dans ton onglet Artisans avec ses métiers, et ses commandes et sa recherche de travail t'arrivent comme pour n'importe quel artisan connu. Rien à régler."] =
+        "Some addon users stayed invisible to you, even playing right next to you: you only found them by running into them, targeting them or grouping. Now, when one of them logs in, an addon user who knows you both makes the introductions, and your two addons say hello behind the scenes. They show up in your Artisans tab with their professions, and their orders and their looking-for-work line reach you like any known crafter's. Nothing to set up.",
+    ["Ça reste discret : une présentation par connexion, un bonjour court de chaque côté, et pas plus d'une fois toutes les six heures pour le même joueur. Plus il y a de joueurs à jour, plus tu verras de monde."] =
+        "It stays quiet: one introduction per login, a short hello each way, and no more than once every six hours for the same player. The more players update, the more people you'll see.",
     -- v1.45.0
     ["Le /1 te revient, et l'addon découvre les royaumes cachés"] = "/1 is yours again, and the addon learns about hidden realms",
     ["Sur un perso tout neuf, le canal caché de l'addon pouvait passer avant le canal Général du jeu et prendre le /1, que le jeu lui gardait ensuite : taper /1 écrivait dans un canal caché. L'addon rend maintenant le /1 au premier canal du jeu dès qu'il y en a un, sur les nouveaux persos comme sur ceux déjà touchés."] =
@@ -210,16 +216,7 @@ local news = {
         "Two fixes: Wrath's wrist and staff enchants never showed up in the trade panel (the game spells them \"Bracers\" and \"Staff\" where other expansions say \"Bracer\"), and a staff enchant only offers itself on an actual staff now. The panel also stops touching its buttons while you're in combat, which the game blocks outright.",
     ["Plus discret : les lignes de chat « X sait faire cette commande captée » sont désactivées par défaut — la commande est poussée aux amis capables dans tous les cas, le message n'était que du bruit. |cFFFFFFFF/co verbose|r les remet."] =
         "Quieter now: \"X can craft that captured order\" chat lines are off by default. The order still gets pushed to capable friends either way, so the message was noise. |cFFFFFFFF/co verbose|r brings it back.",
-    -- v1.20.0
-    ["Enchante en un clic, trié par emplacement, et depuis l'échange"] = "One-click enchants, sorted by slot, right from the trade window",
-    ["Le bouton « Créer » de l'Enchantement avait un vieux bug intermittent : parfois rien ne se passait, et resélectionner la recette finissait par le faire marcher. Cause trouvée : sélectionner une recette n'arme pas le bouton natif de Blizzard, notre clic sécurisé tombait donc sur un bouton désactivé. Corrigé — ça devrait marcher du premier coup, à chaque fois."] =
-        "The enchanting Create button had a long-standing intermittent bug: sometimes it just wouldn't fire, and re-selecting the recipe a few times eventually got it working. Root cause found: selecting a recipe doesn't actually arm Blizzard's native create button, so our secure click was landing on a disabled button. Fixed. Should just work now, every time.",
-    ["Les recettes d'enchantement ne s'entassent plus dans un fourre-tout « Autres/Divers » : elles se rangent par emplacement (Poignets, Torse, Main gauche…) puis par stat de base (Force, Esprit, Déviation), le nom raccourci à la stat seule puisque l'emplacement est déjà dans l'en-tête."] =
-        "Enchant recipes no longer pile up in a single Other/Misc bucket: they're grouped by slot (Wrist, Chest, Off-Hand...) then by base stat (Strength, Spirit, Deflection), with the name trimmed to just the stat since the slot's already in the header.",
-    ["Sélectionner un enchant d'équipement affiche un bouton « Enchanter équipé » à côté de Créer : un clic l'applique directement sur la pièce que tu portes, sans avoir à cibler."] =
-        "Selecting an equip-slot enchant now shows an \"Enchant equipped\" button next to Create: one click casts it on the item you're wearing in that slot, no manual targeting.",
-    ["Et quand quelqu'un te tend un objet à enchanter en échange, le poser dans la case « ne sera pas échangé » ouvre un petit panneau listant tes enchants pour cet emplacement, prêts à lancer sans fouiller ta fenêtre de métier (qui doit rester ouverte : le jeu ne renseigne tes recettes connues que pendant qu'elle l'est)."] =
-        "And when someone hands you gear to enchant over trade, dropping it in the \"will not be traded\" slot now pops a small panel listing every enchant you know for that slot, ready to cast without hunting through your profession window (which still needs to be open: the game only reports your known recipes while it's up).",
+    -- (clés v1.20.0 retirées à la v1.46.0 : version sortie de la fenêtre glissante de l'onglet)
     -- (clés v1.19.1 et v1.19.0 retirées à la v1.45.0 : versions sorties de la fenêtre glissante de l'onglet)
     -- (clés v1.18.0 et v1.17.1 retirées à la v1.44.2 : versions sorties de la fenêtre glissante de l'onglet)
     -- (clés v1.17.0 retirées à la v1.44.1 : version sortie de la fenêtre glissante de l'onglet)
