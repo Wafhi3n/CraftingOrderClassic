@@ -202,9 +202,11 @@ end
 -- Sinon l'échange serait à SENS UNIQUE (symptôme : « Croisé » en ligne sans métiers). Canal → à LUI seul.
 function Dir:OnHello(sender, message, distribution)
     if not CraftLink then return end
-    self:_Touch(sender)
+    local r = self:_Touch(sender)
     local body = message and message:match("^HI|(.+)$")               -- métiers embarqués dans le hello ?
     if body and body:find("^SK") then self:OnSkill(sender, body) end
+    local rm = body and body:match("^rm=(%d+)$")                      -- sans métier : le royaume seul
+    if rm and r then r.realm = tonumber(rm) end
     if distribution == "WHISPER" then
         self:_AnnounceToThrottled(sender)
         self:DiscoverPlayer(sender)
