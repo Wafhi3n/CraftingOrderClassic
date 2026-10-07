@@ -250,16 +250,29 @@ end
 -- qui ment. Avant, je l'ignorais en silence et il l'attendait pour rien (2026-10-07, idée du user : la
 -- source tranche quand quelqu'un agit). Si l'id me désigne comme acheteur (« Prénom Nom-<n> », cf.
 -- Orders.lua, création de l'id), je lui renvoie un CANCEL, à lui seul : un client d'avant le comprend
--- déjà (même geste que pour ma commande annulée, plus bas). Une fois par (commande, artisan) / 10 min.
-local UNKNOWN_REPLY_EVERY = 600   -- s
+-- déjà (même geste que pour ma commande annulée, plus bas). Une fois par (commande, artisan) / 10 min,
+-- au plus 5 réponses par minute en tout, jamais à un joueur en sourdine : sinon des ACK forgés sur
+-- « <moi>-1 », « -2 »… feraient de moi un réflecteur qui remplit ma file d'envoi (revue 2026-10-07).
+local UNKNOWN_REPLY_EVERY, UNKNOWN_MAX_PER_MIN = 600, 5
+
+local function unknownReplyAllowed(self, key, t)
+    local seen = self._unknownReplied or {}
+    self._unknownReplied = seen
+    for k, at in pairs(seen) do if t - at >= UNKNOWN_REPLY_EVERY then seen[k] = nil end end   -- purge
+    if seen[key] then return false end
+    local n = 0
+    for _, at in pairs(seen) do if t - at < 60 then n = n + 1 end end
+    if n >= UNKNOWN_MAX_PER_MIN then return false end
+    seen[key] = t
+    return true
+end
+
 function Orders:_OnUnknownCycle(action, f, sender)
     if not (action == "ACK" or action == "DLV") or not (f and f.id and sender and CraftLink) then return end
     if f.id:match("^(.+)%-%d+$") ~= me() then return end          -- la commande d'un autre : pas à moi
-    self._unknownReplied = self._unknownReplied or {}
-    local key, t = f.id .. ">" .. sender, (GetTime and GetTime()) or 0
-    local last = self._unknownReplied[key]
-    if last and t - last < UNKNOWN_REPLY_EVERY then return end
-    self._unknownReplied[key] = t
+    local Mod = COC.Moderation
+    if Mod and Mod.IsMuted and Mod:IsMuted(sender) then return end
+    if not unknownReplyAllowed(self, f.id .. ">" .. sender, (GetTime and GetTime()) or 0) then return end
     CraftLink:Send(Codec.Encode("CANCEL", { id = f.id }), "whisper", sender)
     if COC.Trace then
         COC.Trace:Log("recv", string.format("%s sur une commande inconnue (%s) : annulation renvoyée à %s", action, f.id, sender))
@@ -286,7 +299,9 @@ function Orders:_OnCycle(action, message, sender)
     end
     if action == "CANCEL" then
         -- Seul l'AUTEUR peut annuler — ou un perso de son set VÉRIFIÉ (extension pure : jamais un tiers).
-        if samePlayer(sender, o.buyer) then o.status = "cancelled" end
+        -- Jamais une commande TERMINÉE : l'acheteur qui a purgé la sienne (7 j après la fin) renvoie un
+        -- CANCEL à un DLV rejoué (_OnUnknownCycle), et l'artisan perdait sa commande faite (revue 2026-10-07).
+        if samePlayer(sender, o.buyer) and o.status ~= "done" then o.status = "cancelled" end
     elseif action == "ACK" then
         -- Un ACK ne s'applique qu'à un ordre OUVERT : ferme le vol d'attribution (re-ACK d'un ordre
         -- déjà accepté/livré/annulé/terminé pour s'en attribuer le crédit). Idempotent : la 2e copie

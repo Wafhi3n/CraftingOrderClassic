@@ -285,7 +285,11 @@ function Dir:DiscoverPlayer(name)
     if name == shortName(COC.Api.PlayerName()) then return end
     local full = COC.Api.IsFullPlayerName                    -- prénom seul, « Unknown » : bonjour perdu
     if full and not full(name) then
-        if COC.Trace then COC.Trace:Log("net", "bonjour écarté : nom incomplet « " .. name .. " »") end
+        self._incompleteSeen = self._incompleteSeen or {}
+        if COC.Trace and not self._incompleteSeen[name] then          -- une ligne par nom et par session
+            COC.Trace:Log("net", "bonjour écarté : nom incomplet « " .. name .. " »")
+        end
+        self._incompleteSeen[name] = true
         return
     end
     self._lastPing = self._lastPing or {}

@@ -1,5 +1,31 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.45.0 - /1 is yours again, and the addon learns about hidden realms
+
+On a brand new character, the addon's hidden channel could join before the game's General channel
+and take /1. The game then kept that number for the character, so typing /1 wrote into a hidden
+channel. The addon now hands /1 back to the game's first channel as soon as there is one, on new
+characters and on the ones already affected.
+
+On Forever, a whisper only reaches the full "First Surname". Right after you grouped with someone, or
+when you right-clicked a player, the addon sometimes said hello to the first name alone, or to
+"Unknown". The hello got lost, and a `No player named` error could follow two minutes later. It now
+waits for the full name, and the right-click menu reads the surname too.
+
+If you accepted or delivered an order its buyer no longer has (it expired, was deleted, or was never
+theirs), their addon now tells yours, and the order shows as cancelled instead of sitting there for
+nothing. Only the buyer needs this version. A finished order is never cancelled that way.
+
+With the on-screen tracker shown, the addon recomputed the recipes of every tracked profession every
+two minutes, and its memory kept climbing. It now only does it when you leave the auction house or a
+vendor, where prices change, and otherwise every 15 minutes.
+
+Forever still has realms, they're just hidden. The game puts each account on one without telling you.
+The addon's discovery channel only reaches players on your realm, and so does the Trade channel, which
+means your announcements and your LFW line too. Your realm now goes out with the addon's hello, and
+players who haven't updated read it without trouble. Nothing changes on screen yet: it's the first
+step toward introducing players across realms.
+
 ## v1.44.2 - Correct cooldowns, and long recipe lists arrive whole
 
 The addon told other players that crafters had transmutes or Mooncloth ready when they didn't even

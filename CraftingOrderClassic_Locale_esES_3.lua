@@ -45,7 +45,8 @@ local es3 = {
     ["salle de découverte rouverte : l'addon rejoint |cFFFFFFFF%s|r pour se présenter."] =
         "sala de descubrimiento reactivada: el addon entra en |cFFFFFFFF%s|r para presentarse.",
     ["salle de découverte : en attente du canal (quelques secondes après la connexion)"] =
-        "sala de descubrimiento: esperando el canal (unos segundos tras conectarse)",    ["salle de découverte : coupée — |cFFFFFFFF/co channel room on|r pour la rouvrir"] =
+        "sala de descubrimiento: esperando el canal (unos segundos tras conectarse)",
+    ["salle de découverte : coupée — |cFFFFFFFF/co channel room on|r pour la rouvrir"] =
         "sala de descubrimiento: desactivada — |cFFFFFFFF/co channel room on|r para reactivarla",
     ["salle de découverte : |cFFFFFFFF%s|r — on s'y présente, les données restent en whisper"] =
         "sala de descubrimiento: |cFFFFFFFF%s|r — sirve para presentarse, los datos siguen yendo por susurro",
