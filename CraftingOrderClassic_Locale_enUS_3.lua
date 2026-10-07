@@ -46,6 +46,8 @@ local en3 = {
         "discovery room back on: the addon joins |cFFFFFFFF%s|r to introduce itself.",
     ["salle de découverte : en attente du canal (quelques secondes après la connexion)"] =
         "discovery room: waiting for the channel (a few seconds after login)",
+    ["salle de découverte : en attente d'un canal du jeu sur le /1 (elle ne le prend jamais)"] =
+        "discovery room: waiting for a game channel to hold /1 (it never takes /1 itself)",
     ["salle de découverte : coupée — |cFFFFFFFF/co channel room on|r pour la rouvrir"] =
         "discovery room: off — |cFFFFFFFF/co channel room on|r to turn it back on",
     ["salle de découverte : |cFFFFFFFF%s|r — on s'y présente, les données restent en whisper"] =

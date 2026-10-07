@@ -45,6 +45,8 @@ local de3 = {
         "Entdeckungsraum wieder an: das Addon betritt |cFFFFFFFF%s|r, um sich vorzustellen.",
     ["salle de découverte : en attente du canal (quelques secondes après la connexion)"] =
         "Entdeckungsraum: warte auf den Kanal (einige Sekunden nach dem Einloggen)",
+    ["salle de découverte : en attente d'un canal du jeu sur le /1 (elle ne le prend jamais)"] =
+        "Entdeckungsraum: wartet, bis ein Spielkanal /1 belegt (er nimmt /1 nie selbst)",
     ["salle de découverte : coupée — |cFFFFFFFF/co channel room on|r pour la rouvrir"] =
         "Entdeckungsraum: aus — |cFFFFFFFF/co channel room on|r, um ihn wieder einzuschalten",
     ["salle de découverte : |cFFFFFFFF%s|r — on s'y présente, les données restent en whisper"] =

@@ -82,6 +82,9 @@ function Dir:RoomStatusLine()
     if CraftLink and CraftLink.RoomJoined and CraftLink:RoomJoined() then
         return string.format(L["salle de découverte : |cFFFFFFFF%s|r — on s'y présente, les données restent en whisper"], label())
     end
+    if CraftLink and CraftLink.RoomWaitingSlot1 and CraftLink:RoomWaitingSlot1() then   -- personnage neuf
+        return L["salle de découverte : en attente d'un canal du jeu sur le /1 (elle ne le prend jamais)"]
+    end
     return nil
 end
 

@@ -322,6 +322,18 @@ function A.PlayerName()
     return (_G.UnitName and _G.UnitName("player")) or "?"
 end
 
+-- Un nom qu'on peut chuchoter ? Sur Forever, « moi » porte un nom de famille : un nom SANS est
+-- incomplet, et un chuchotement à ce nom se perd puis revient en « No player named » deux minutes
+-- plus tard. Relevé le 2026-10-07 : « whisper→Gnomi » (membre de groupe dont le jeu n'avait pas encore
+-- le nom de famille), « →Unknown » (UNKNOWNOBJECT, « Inconnu » en français), fiches d'avant les noms
+-- de famille. Sans nom de famille chez moi (autre client), seul UNKNOWNOBJECT est écarté.
+function A.IsFullPlayerName(name)
+    if A.IsSecret(name) or type(name) ~= "string" or name == "" then return false end
+    if name == (_G.UNKNOWNOBJECT or "Unknown") then return false end
+    if not A.PlayerName():find(" ", 1, true) then return true end
+    return name:find(" ", 1, true) ~= nil
+end
+
 -- Deux désignations du MÊME prénom ? Le courrier nomme son expéditeur à sa façon (prénom seul, ou
 -- « Prénom Nom », avec ou sans royaume), le réseau dit « Prénom Nom » : on compare le PRÉNOM, sans
 -- casse. Un prénom n'est pas unique sur Forever : ne s'en servir que pour RESTREINDRE un choix déjà

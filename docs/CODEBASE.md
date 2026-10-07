@@ -11,19 +11,19 @@
 | Fichier | Rôle | Lignes |
 |---|---|---|
 | `CraftingOrderClassic.lua` | Crafting Order - Classic — réseau GLOBAL et SOCIAL de commandes de craft. | 499 |
-| `CraftingOrderClassic_Compat.lua` | couche d'adaptation d'API entre les SAVEURS de client. | 346 |
+| `CraftingOrderClassic_Compat.lua` | couche d'adaptation d'API entre les SAVEURS de client. | 358 |
 | `CraftingOrderClassic_Trace.lua` | trace réseau PERSISTÉE, lisible hors-jeu. | 79 |
 | `CraftingOrderClassic_Migrations.lua` | versionnage du schéma SavedVariables. | 60 |
 | `CraftingOrderClassic_Locale.lua` | socle de localisation du CHROME de l'UI. | 12 |
 | `CraftingOrderClassic_Locale_enUS.lua` | overlay ANGLAIS (enUS/enGB). | 279 |
 | `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 498 |
-| `CraftingOrderClassic_Locale_enUS_3.lua` | overlay enUS, 3/3. | 180 |
+| `CraftingOrderClassic_Locale_enUS_3.lua` | overlay enUS, 3/3. | 182 |
 | `CraftingOrderClassic_Locale_deDE.lua` | overlay ALLEMAND (deDE). | 280 |
 | `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 479 |
-| `CraftingOrderClassic_Locale_deDE_3.lua` | overlay deDE, 3/3. | 179 |
+| `CraftingOrderClassic_Locale_deDE_3.lua` | overlay deDE, 3/3. | 181 |
 | `CraftingOrderClassic_Locale_esES.lua` | overlay ESPAGNOL (esES/esMX). | 281 |
 | `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 480 |
-| `CraftingOrderClassic_Locale_esES_3.lua` | overlay esES, 3/3. | 180 |
+| `CraftingOrderClassic_Locale_esES_3.lua` | overlay esES, 3/3. | 182 |
 | `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 438 |
 | `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 435 |
 | `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 435 |
@@ -68,7 +68,7 @@
 | `CraftingOrderClassic_UI_MyArtisans_Reroll.lua` | accès à la vue REROLL (métiers d'un AUTRE perso du compte) depuis l'onglet « Mes artisans ». | 86 |
 | `CraftingOrderClassic_UI_Help.lua` | onglet Aide : page unique défilante qui explique les autres onglets (Carnet/Commande/Récolte/Artisans), la Vue Métier et le réseau. | 208 |
 | `CraftingOrderClassic_UI_News.lua` | onglet « Nouveautés » : notes de version (changelog) affichées EN JEU, version par version, la plus récente en tête. | 496 |
-| `CraftingOrderClassic_Social.lua` | couche sociale passive (socle). | 402 |
+| `CraftingOrderClassic_Social.lua` | couche sociale passive (socle). | 423 |
 | `CraftingOrderClassic_Social_Menu.lua` | entrées « Crafting Order » du menu contextuel joueur. | 104 |
 | `CraftingOrderClassic_Social_Roster.lua` | affichage des métiers sur les fenêtres NATIVES. | 130 |
 | `CraftingOrderClassic_Minimap.lua` | bouton minimap (toggle du carnet). | 185 |
@@ -121,7 +121,7 @@
 | `CraftingOrderClassic_ProfWindow_LFW_Recipes.lua` | le SÉLECTEUR DE RECETTES de l'offre LFW. | 140 |
 | `CraftingOrderClassic_ProfWindow_LFW_Announce.lua` | la case « Annoncer en Commerce » de l'offre LFW. | 28 |
 | `CraftingOrderClassic_ProfWindow_Reroll.lua` | vue métier LECTURE SEULE d'un REROLL. | 118 |
-| `Directory.lua` | Crafting Order - Classic — Directory : l'annuaire des GENS (présence + qui peut crafter quoi). | 477 |
+| `Directory.lua` | Crafting Order - Classic — Directory : l'annuaire des GENS (présence + qui peut crafter quoi). | 482 |
 | `Directory_Presence.lua` | présence : la vérité JEU (amis/guilde) et sa fusion avec la vérité ADDON. | 148 |
 | `Directory_Recipes.lua` | COUTURE de lecture du registre « qui sait crafter quoi » d'un artisan. | 210 |
 | `Directory_Confed.lua` | source « confédération » (GreenWall) de l'annuaire, DISPLAY-ONLY. | 63 |
@@ -129,7 +129,7 @@
 | `Directory_Community.lua` | le réseau SANS canal : la communauté remplace CraftLinkNet (Forever). | 270 |
 | `Directory_Note.lua` | la note de membre de la communauté : lue dans l'annuaire, préparée pour le joueur. | 105 |
 | `Directory_Skills.lua` | niveaux de compétence + réputation (couche « profil » de l'annuaire). | 173 |
-| `Directory_Room.lua` | la salle de découverte : CraftLinkNet rejoint pour SE PRÉSENTER, pas pour transporter. | 88 |
+| `Directory_Room.lua` | la salle de découverte : CraftLinkNet rejoint pour SE PRÉSENTER, pas pour transporter. | 91 |
 | `Directory_Version.lua` | détection « nouvelle version disponible » (100 % P2P, aucun serveur). | 147 |
 | `Directory_Cooldowns.lua` | cooldowns de recettes (couche « profil » de l'annuaire). | 105 |
 | `Directory_RelayCodec.lua` | codec du fil RLY : relais de la fiche d'un artisan HORS LIGNE par un de ses partenaires. | 70 |
@@ -718,7 +718,7 @@
 > NB : la lib CraftLink charge AVANT COC et ne peut donc pas s'appuyer là-dessus — elle résout
 > ses propres appels chez elle.
 
-**API** : `A.GetSpellName(spellID)` · `A.GetBNetFriend(index)` · `A.Coin(copper, fontHeight)` · `A.GetNumQuestLogEntries()` · `A.GetQuestLogTitle(index)` · `A.GetQuestSelection()` · `A.RestoreQuestSelection(token)` · `A.SelectQuestLogEntry(index)` · `A.RegisterEventSafe(frame, event)` · `A.HookScriptSafe(frame, script, handler)` · `A.RegisterEventsSafe(frame, events)` · `A.TitleFontString(frame)` · `A.PortraitTexture(frame)` · `A.ChatMessagingBlocked()` · `A.AddChatFilter(event, fn)` · `A.IsSecret(v)` · `A.UnitNameSafe(unit, getter)` · `A.PlayerName()` · `A.SameFirstName(a, b)` · `A.CloseProfession()`
+**API** : `A.GetSpellName(spellID)` · `A.GetBNetFriend(index)` · `A.Coin(copper, fontHeight)` · `A.GetNumQuestLogEntries()` · `A.GetQuestLogTitle(index)` · `A.GetQuestSelection()` · `A.RestoreQuestSelection(token)` · `A.SelectQuestLogEntry(index)` · `A.RegisterEventSafe(frame, event)` · `A.HookScriptSafe(frame, script, handler)` · `A.RegisterEventsSafe(frame, events)` · `A.TitleFontString(frame)` · `A.PortraitTexture(frame)` · `A.ChatMessagingBlocked()` · `A.AddChatFilter(event, fn)` · `A.IsSecret(v)` · `A.UnitNameSafe(unit, getter)` · `A.PlayerName()` · `A.IsFullPlayerName(name)` · `A.SameFirstName(a, b)` · `A.CloseProfession()`
 
 ### `CraftingOrderClassic_Trace.lua`
 > CraftingOrderClassic_Trace.lua — trace réseau PERSISTÉE, lisible hors-jeu.

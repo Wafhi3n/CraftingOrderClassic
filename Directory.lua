@@ -281,6 +281,11 @@ function Dir:DiscoverPlayer(name)
     name = shortName(name)
     if not (CraftLink and name and name ~= "") then return end
     if name == shortName(COC.Api.PlayerName()) then return end
+    local full = COC.Api.IsFullPlayerName                    -- prénom seul, « Unknown » : bonjour perdu
+    if full and not full(name) then
+        if COC.Trace then COC.Trace:Log("net", "bonjour écarté : nom incomplet « " .. name .. " »") end
+        return
+    end
     self._lastPing = self._lastPing or {}
     local t = now()
     if (self._lastPing[name] or 0) + 60 > t then return end   -- 1 hello / 60 s / joueur
