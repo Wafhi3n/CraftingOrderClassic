@@ -294,23 +294,15 @@ end
 -- paie ça une fois puis marche rang par rang jusqu'au plafond : c'est un chemin FROID (on ouvre une
 -- fenêtre). Le suivi à l'écran, lui, se recalcule à chaque BAG_UPDATE — d'où ce cache, même patron
 -- que PR:BestPlanFor (clé + TTL). Clé : métier + inclusion des plans + version de données + nombre
--- de recettes connues (apprendre un plan doit rebattre les candidates).
--- Ce qui reste hors de la clé, ce sont les PRIX, et ils ne bougent qu'à deux endroits : chez le
--- formateur (Trainers appelle InvalidateCandidates) et à l'hôtel des ventes (scan d'Auctionator),
--- d'où la purge à sa fermeture. Le TTL n'est plus qu'un filet. À 120 s, il rebâtissait chaque métier
--- suivi toutes les 2 min sans que rien n'ait changé, même AFK : ≥ 364 Ko de déchets par passe, la
--- mémoire de COC qui « ne fait que monter » (mesuré par /cocprobe mem le 2026-10-07).
+-- de recettes connues (apprendre un plan doit rebattre les candidates). Restent les PRIX : purgés chez le
+-- formateur (Trainers) et à la fermeture de l'HV. TTL = filet ; à 120 s, il rebâtissait tout, même AFK.
 local CANDS, CANDS_TTL = {}, 900
 
 function Route:InvalidateCandidates(profKey)
     if profKey then CANDS[profKey] = nil else CANDS = {} end
 end
-
-if CreateFrame then
-    local ah = CreateFrame("Frame")
-    ah:RegisterEvent("AUCTION_HOUSE_CLOSED")
-    ah:SetScript("OnEvent", function() Route:InvalidateCandidates() end)
-end
+local ahWatch = CreateFrame and CreateFrame("Frame")
+if ahWatch then ahWatch:RegisterEvent("AUCTION_HOUSE_CLOSED"); ahWatch:SetScript("OnEvent", function() CANDS = {} end) end
 
 local function candsKey(profKey, opts)
     local lib = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
