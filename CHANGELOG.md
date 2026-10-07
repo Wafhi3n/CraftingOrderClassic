@@ -11,6 +11,8 @@ reach you like any known crafter's. Nothing to set up.
 It stays quiet: one introduction per login, a short hello each way, and no more than once every six
 hours for the same player. The more players update, the more people you'll see.
 
+In the Artisans tab, a crafter's main professions now show before Cooking, Fishing and First Aid.
+
 ## v1.45.0 - /1 is yours again, and the addon learns about hidden realms
 
 On a brand new character, the addon's hidden channel could join before the game's General channel

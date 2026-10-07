@@ -14,6 +14,8 @@ local news = {
         "Manche Addon-Nutzer blieben für dich unsichtbar, selbst wenn sie direkt neben dir spielten: Du fandest sie nur, wenn du ihnen begegnet bist, sie ins Ziel genommen oder mit ihnen gruppiert hast. Jetzt stellt beim Einloggen eines von ihnen ein Addon-Nutzer, der euch beide kennt, euch einander vor, und eure Addons grüßen sich im Hintergrund. Er erscheint in deinem Handwerker-Reiter mit seinen Berufen, und seine Aufträge und seine Arbeitssuche erreichen dich wie bei jedem bekannten Handwerker. Nichts einzustellen.",
     ["Ça reste discret : une présentation par connexion, un bonjour court de chaque côté, et pas plus d'une fois toutes les six heures pour le même joueur. Plus il y a de joueurs à jour, plus tu verras de monde."] =
         "Das bleibt unauffällig: eine Vorstellung pro Login, ein kurzer Gruß in jede Richtung und höchstens einmal alle sechs Stunden für denselben Spieler. Je mehr Spieler aktualisieren, desto mehr Leute siehst du.",
+    ["Dans l'onglet Artisans, les métiers principaux d'un artisan s'affichent maintenant avant la Cuisine, la Pêche et le Secourisme."] =
+        "Im Handwerker-Reiter erscheinen die Hauptberufe eines Handwerkers jetzt vor Kochkunst, Angeln und Erster Hilfe.",
     -- v1.45.0
     ["Le /1 te revient, et l'addon découvre les royaumes cachés"] = "/1 gehört wieder dir, und das Addon lernt die versteckten Realms kennen",
     ["Sur un perso tout neuf, le canal caché de l'addon pouvait passer avant le canal Général du jeu et prendre le /1, que le jeu lui gardait ensuite : taper /1 écrivait dans un canal caché. L'addon rend maintenant le /1 au premier canal du jeu dès qu'il y en a un, sur les nouveaux persos comme sur ceux déjà touchés."] =

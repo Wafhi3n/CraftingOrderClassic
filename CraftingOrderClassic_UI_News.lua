@@ -41,6 +41,7 @@ local function versionsFront()
             lines = {
                 L["Certains joueurs de l'addon restaient invisibles pour toi, même en jouant à côté : tu ne les trouvais qu'en les croisant, en les ciblant ou en groupe. Maintenant, quand l'un d'eux se connecte, un joueur de l'addon qui vous connaît tous les deux fait les présentations, et vos deux addons se disent bonjour en coulisse. Il apparaît dans ton onglet Artisans avec ses métiers, et ses commandes et sa recherche de travail t'arrivent comme pour n'importe quel artisan connu. Rien à régler."],
                 L["Ça reste discret : une présentation par connexion, un bonjour court de chaque côté, et pas plus d'une fois toutes les six heures pour le même joueur. Plus il y a de joueurs à jour, plus tu verras de monde."],
+                L["Dans l'onglet Artisans, les métiers principaux d'un artisan s'affichent maintenant avant la Cuisine, la Pêche et le Secourisme."],
             },
         },
         {
