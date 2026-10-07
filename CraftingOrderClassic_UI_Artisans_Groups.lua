@@ -78,7 +78,7 @@ function UI:_GroupProfs(g)
         end
     end
     for _, it in pairs(by) do out[#out + 1] = it end
-    table.sort(out, function(a, b) return Skin.ProfLabel(a.key) < Skin.ProfLabel(b.key) end)
+    table.sort(out, Skin.ProfLess)   -- principaux d'abord, puis secondaires
     return out
 end
 

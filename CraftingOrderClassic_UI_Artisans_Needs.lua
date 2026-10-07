@@ -76,7 +76,7 @@ function UI:_NeedsProfs(r)
             if next(set) then out[#out + 1] = { key = key, rank = sv[1] or 0, max = sv[2] or 0, set = set } end
         end
     end
-    table.sort(out, function(a, b) return Skin.ProfLabel(a.key) < Skin.ProfLabel(b.key) end)
+    table.sort(out, Skin.ProfLess)   -- principaux d'abord, puis secondaires
     return out
 end
 
