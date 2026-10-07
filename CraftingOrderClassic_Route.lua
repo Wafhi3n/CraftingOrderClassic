@@ -294,12 +294,16 @@ end
 -- paie ça une fois puis marche rang par rang jusqu'au plafond : c'est un chemin FROID (on ouvre une
 -- fenêtre). Le suivi à l'écran, lui, se recalcule à chaque BAG_UPDATE — d'où ce cache, même patron
 -- que PR:BestPlanFor (clé + TTL). Clé : métier + inclusion des plans + version de données + nombre
--- de recettes connues (apprendre un plan doit rebattre les candidates).
-local CANDS, CANDS_TTL = {}, 120
+-- de recettes connues (apprendre un plan doit rebattre les candidates). Restent les PRIX : purgés chez le
+-- formateur, en quittant l'HV ou un marchand (Auctionator y apprend). TTL = filet (à 120 s : tout, même AFK).
+local CANDS, CANDS_TTL = {}, 900
 
 function Route:InvalidateCandidates(profKey)
     if profKey then CANDS[profKey] = nil else CANDS = {} end
 end
+local priceWatch = CreateFrame and CreateFrame("Frame")
+if priceWatch then priceWatch:RegisterEvent("AUCTION_HOUSE_CLOSED"); priceWatch:RegisterEvent("MERCHANT_CLOSED") end
+if priceWatch then priceWatch:SetScript("OnEvent", function() CANDS = {} end) end
 
 local function candsKey(profKey, opts)
     local lib = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
