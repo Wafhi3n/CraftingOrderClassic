@@ -46,6 +46,23 @@ client.
 
 ## Relevés
 
+- 2026-10-07 23:43 — jusqu'a 9baf899 — Forever build client 70245, quatre comptes : Gnoma Short (3e,
+  `#5`, 4618, la source, Cuisine apprise pour l'occasion), Rédemption Wafhien (1er, `#4`, 4620, le
+  relais), Toao Rosa (4e, `#6`, 4620), Gnomi Short (2e, `#1`, 4620, le faux relais) ; build
+  `main-dev@31fe6c7 2026-10-07 23:34` (lu par l'appli du banc, fiche
+  `CraftingOrderClassic--feat-relais-confiance` ; il porte 9baf899, déployé par une autre session
+  après le `33f5e3f` de la fiche) — **GO sur le critère 8, KO sur le critère 9** (`feat/relais-confiance`).
+  Relu dans les traces des quatre SV. Critère 8 : pré-vol OK (Gnoma voit Rédemption relais, 4620,
+  en ligne) ; après l'oubli mutuel, 23:39:33 Gnoma « LFW|on|Cooking confié à Rédemption Wafhien »,
+  Rédemption « posté dans la salle » à la même seconde, Toao « reçu via Rédemption Wafhien » à
+  23:39:34 ; la ligne de Gnoma réapparaît chez Toao, [Dispo], « via » dans l'infobulle (remarque du
+  user : « j'ai bien le relayed ») ; l'arrêt suit le même chemin (23:40:15 → 23:40:16), [Dispo]
+  disparaît. Critère 9 : l'enveloppe forgée par Gnomi arrive chez Toao (et chez Rédemption) à
+  23:41:38, « via Gnomi Short » ; **le clic sur Chuchoter n'ouvre que le chuchotement**, Gnoma reste
+  [Dispo], aucune trace `VRF` chez Toao ni chez Gnoma ; le nettoyage lit `false` (Gnomi jamais
+  écartée). Cause : `D0` n'est local qu'à `_FillArtRow`, le bouton (`_ArtRowButtons`) lisait un
+  global vide. Corrigé par `ce5b42c` (test qui clique, échoue sur l'ancien code), à revoir au banc.
+
 - 2026-10-07 19:01 — jusqu'a e96fe97 — Forever build client 70245, Rédemption Wafhien (1er compte) ;
   build `main-dev@845a9e1 2026-10-07 18:53`, `## Version: 1.46.0` (lu par l'appli du banc, fiche
   `CraftingOrderClassic--release-v1.46.0`, trois gestes cochés OK) — **GO** sur `fix/version-banc` et

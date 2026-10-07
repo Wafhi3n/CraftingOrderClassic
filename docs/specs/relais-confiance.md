@@ -135,7 +135,12 @@ Rien ne parle de royaume dans l'interface (règle du user, 2026-10-07).
   - **limites acceptées** : une commande forgée peut prendre l'id de la vraie (ids `Nom-<n>`
     devinables) ; elle tombe au premier geste (l'acheteur renvoie une annulation, D-R5). Le « via »
     n'est montré que pour un LFW : une ligne de commande n'a pas d'infobulle d'origine, la trace le
-    dit (écart à D-R8, à confirmer par le user).
+    dit (écart à D-R8, à confirmer par le user). La vérification ne part que du bouton Chuchoter de
+    l'onglet Artisans, pas de « commander à A » ni de son offre (écart à D-R5, idem). Un faussaire
+    crée jusqu'à 30 fausses fiches d'annuaire par 10 min (plafond du membre ; le métier est validé,
+    rien ne plafonne les fiches purement relayées, oubliées après 7 jours). Le numéro d'enveloppe
+    (heure réelle) prend ~9 octets de plus : une grosse commande passe un peu plus tôt en « trop
+    long » et garde ses autres chemins.
 
 ## Critères d'acceptation
 
