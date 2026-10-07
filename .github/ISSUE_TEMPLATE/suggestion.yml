@@ -8,7 +8,7 @@ body:
       value: |
         Thanks for the idea! Write in any language you like.
 
-        **From the game:** type `/co bug` (or click the report button in the addon window), pick **Idea**, copy the link (Ctrl+C) and open it in your browser.
+        **From the game, in versions after 1.46.0:** type `/co bug` (or click the report button in the addon window), pick **Idea**, copy the link (Ctrl+C) and open it in your browser.
   - type: textarea
     id: idea
     attributes:
