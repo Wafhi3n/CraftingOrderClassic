@@ -17,6 +17,8 @@ local news = {
         "Some addon users stayed invisible to you, even playing right next to you: you only found them by running into them, targeting them or grouping. Now, when one of them logs in, an addon user who knows you both makes the introductions, and your two addons say hello behind the scenes. They show up in your Artisans tab with their professions, and their orders and their looking-for-work line reach you like any known crafter's. Nothing to set up.",
     ["Ça reste discret : une présentation par connexion, un bonjour court de chaque côté, et pas plus d'une fois toutes les six heures pour le même joueur. Plus il y a de joueurs à jour, plus tu verras de monde."] =
         "It stays quiet: one introduction per login, a short hello each way, and no more than once every six hours for the same player. The more players update, the more people you'll see.",
+    ["Dans l'onglet Artisans, les métiers principaux d'un artisan s'affichent maintenant avant la Cuisine, la Pêche et le Secourisme."] =
+        "In the Artisans tab, a crafter's main professions now show before Cooking, Fishing and First Aid.",
     -- v1.45.0
     ["Le /1 te revient, et l'addon découvre les royaumes cachés"] = "/1 is yours again, and the addon learns about hidden realms",
     ["Sur un perso tout neuf, le canal caché de l'addon pouvait passer avant le canal Général du jeu et prendre le /1, que le jeu lui gardait ensuite : taper /1 écrivait dans un canal caché. L'addon rend maintenant le /1 au premier canal du jeu dès qu'il y en a un, sur les nouveaux persos comme sur ceux déjà touchés."] =

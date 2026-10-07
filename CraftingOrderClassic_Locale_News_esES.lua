@@ -14,6 +14,8 @@ local news = {
         "Algunos jugadores del addon seguían siendo invisibles para ti, incluso jugando a tu lado: solo los encontrabas al cruzártelos, al seleccionarlos o en grupo. Ahora, cuando uno de ellos se conecta, un jugador del addon que os conoce a los dos hace las presentaciones, y vuestros addons se saludan entre bastidores. Aparece en tu pestaña Artesanos con sus profesiones, y sus pedidos y su búsqueda de trabajo te llegan como los de cualquier artesano conocido. Nada que configurar.",
     ["Ça reste discret : une présentation par connexion, un bonjour court de chaque côté, et pas plus d'une fois toutes les six heures pour le même joueur. Plus il y a de joueurs à jour, plus tu verras de monde."] =
         "Sigue siendo discreto: una presentación por conexión, un saludo corto en cada sentido y no más de una vez cada seis horas para el mismo jugador. Cuantos más jugadores actualicen, a más gente verás.",
+    ["Dans l'onglet Artisans, les métiers principaux d'un artisan s'affichent maintenant avant la Cuisine, la Pêche et le Secourisme."] =
+        "En la pestaña Artesanos, las profesiones principales de un artesano aparecen ahora antes de Cocina, Pesca y Primeros auxilios.",
     -- v1.45.0
     ["Le /1 te revient, et l'addon découvre les royaumes cachés"] = "El /1 vuelve a ser tuyo, y el addon descubre los reinos ocultos",
     ["Sur un perso tout neuf, le canal caché de l'addon pouvait passer avant le canal Général du jeu et prendre le /1, que le jeu lui gardait ensuite : taper /1 écrivait dans un canal caché. L'addon rend maintenant le /1 au premier canal du jeu dès qu'il y en a un, sur les nouveaux persos comme sur ceux déjà touchés."] =

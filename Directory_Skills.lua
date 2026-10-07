@@ -83,14 +83,17 @@ end
 -- (ma version, cf. Directory_Version) = pseudo-chunks FINAUX ; rm = PREMIER morceau : le jeu coupe un
 -- message à 255 octets sans prévenir, une fin coupée ferait d'un rm=4618 un rm=46. Tous trois sont ignorés
 -- par un vieux client (il ne garde que les morceaux clé,cur,max, rep= et cv= : vérifié de v1.30 à v1.44.2).
--- Jamais rien entre « lvl= » et le « | » qui suit (corromprait le niveau chez eux).
+-- Jamais rien entre « lvl= » et le « | » qui suit (corromprait le niveau chez eux). Pas de cv= depuis un
+-- build de dev (Dir:_IsDevBuild) : le banc annonçait sa version pas encore publiée à tout le royaume.
 function Dir:_SkillPayload()
     local parts = {}
     for key, sk in pairs(self.mySkills or {}) do parts[#parts + 1] = key .. "," .. sk[1] .. "," .. sk[2] end
     if #parts == 0 then return nil end
     local lvl, rep = (UnitLevel and UnitLevel("player")) or 0, (COC.db and COC.db.delivered) or 0
     local tail = (rep > 0) and (";rep=" .. rep) or ""
-    if self._MyVersion then self:_MyVersion(); if self._myVerStr then tail = tail .. ";cv=" .. self._myVerStr end end
+    if self._MyVersion and not (self._IsDevBuild and self:_IsDevBuild()) then
+        self:_MyVersion(); if self._myVerStr then tail = tail .. ";cv=" .. self._myVerStr end
+    end
     local rm = self:_MyRealmID()
     return "SK|lvl=" .. lvl .. "|" .. (rm and ("rm=" .. rm .. ";") or "") .. table.concat(parts, ";") .. tail
 end
