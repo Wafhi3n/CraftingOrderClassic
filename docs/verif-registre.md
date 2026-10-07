@@ -46,6 +46,47 @@ client.
 
 ## Relevés
 
+- 2026-10-07 16:21 — jusqu'a df1d18f — Forever build client 70245, Toao Rosa (4e compte, 4620) et
+  Gnoma Short (3e compte, 4618) ; build `main-dev@f0c30b7 2026-10-07 16:18` (lu par l'appli du banc,
+  geste « toao-se-presente » coché OK à 16:21) — **GO** sur le verrou par personnage — relevé relu dans
+  la trace de la SV du 4e compte. Toao se reconnecte à 16:20:38 ; 16:20:43 « présentation demandée à
+  Gnoma Short (royaume 4618) » et `INT|Toao Rosa|4620` en whisper à Gnoma : le défaut de 16:15 (verrou
+  commun au compte) est levé. ⚠️ **NON observé** : le côté de Gnoma (pas de `/reload` après 16:16, sa
+  trace n'est pas sur le disque), donc pas vu qu'elle ne reposte pas une présentation faite à 16:15.
+
+- 2026-10-07 16:16 — jusqu'a f2b8a9c — Forever build client 70245, quatre comptes : Toao Rosa (perso
+  NEUF du 4e compte, royaume 4620, l'arrivant), Gnomi Short (2e, 4620, élue attendue), Rédemption
+  Wafhien (1er, 4620), Gnoma Short (3e, 4618) ; build `main-dev@8e33709 2026-10-07 16:06` (lu dans le
+  `.toc` de la copie déployée, et par l'appli du banc, fiche `CraftingOrderClassic--feat-pont-royaumes`,
+  trois gestes cochés OK) — **GO partiel** sur le palier 3 (spec `pont-royaumes.md`, critère 14) —
+  relevé relu dans les traces des quatre SV. Toao entre à 16:15:07 ; 16:15:14 Gnomi lit son bonjour de
+  salle `HI|rm=4620`, 16:15:15 « présentation de Toao Rosa demandée à Gnoma Short (royaume 4618) :
+  passeur élu » ; Rédemption n'a aucune ligne de ce genre (pas élue) ; 16:15:16 Gnoma reçoit la demande
+  de Gnomi, 16:15:18 « présentation de Toao Rosa (royaume 4620) postée dans la salle », une seule fois.
+  Au passage, Gnomi s'est présentée elle-même à son `/reload` de 16:14 (Gnoma l'a postée à 16:14:26) :
+  palier 2 revu. **Défaut trouvé** : Toao ne s'est PAS présentée elle-même alors que Gnoma lui a répondu
+  avec `rm=4618` (16:15:13) — le verrou de 6 h était rangé par royaume dans la SavedVariable, commune
+  au compte, et Sfdfs (même compte) s'était présentée en 4618 à 15:44. Corrigé après la séance (verrou
+  par personnage), PAS revu en jeu. ⚠️ **NON observé** : un membre de 4618 qui salue Toao (Gnoma est
+  seule en 4618 sur nos comptes), la règle des 6 h de l'élu en jeu.
+
+- 2026-10-07 15:44 — jusqu'a ebe242b — Forever build client 70245, trois comptes : Gnoma Short (3e,
+  royaume 4618, l'arrivante), Rédemption Wafhien (1er, 4620, la connaît), Sfdfs Sdfdsfd (4e, 4620, ne
+  la connaissait pas : absente de son annuaire avant le test, vérifié dans sa SV) ; build
+  `main-dev@3abe28f 2026-10-07 15:27` (lu dans le `.toc` de la copie déployée, `feat/pont-royaumes`
+  dans les branches ; `/co version` pas relevé) — **GO partiel** sur le palier 2 du pont (spec
+  `pont-royaumes.md`, critères 11 et 12) — relevé relu dans les traces et les annuaires des trois SV.
+  Gnoma recharge à ~15:41 : 15:42:00 « présentation demandée à Rédemption Wafhien (royaume 4620) »,
+  `INT|Gnoma Short|4618` en whisper ; 15:42:04 Rédemption `[send] room : INT|Gnoma Short|4618`
+  « postée dans la salle » (délai aléatoire de 3 s) ; 15:42:05 Sfdfs la reçoit sur la salle, 15:42:07
+  « bonjour léger → Gnoma Short (présenté par Rédemption Wafhien) », `HL|rm=4620` ; 15:42:08 Gnoma
+  répond un seul `HL|rm=4618` ; 15:42:09 Sfdfs le reçoit et ne répond pas. Annuaires : Sfdfs a
+  `Gnoma Short` (realm 4618, lastSeen 15:42), Gnoma a `Sfdfs Sdfdsfd` (realm 4620). Première
+  découverte d'un inconnu d'un autre royaume sans croisement en jeu. D9 vu : au passage en ligne,
+  chacune a poussé à l'autre la commande `Gnomi Short-56` qu'elle tenait (un `ORD|NEW` chacune).
+  ⚠️ **NON observé** : Gnoma dans l'onglet Artisans de Sfdfs (pas regardé), un second passeur qui se
+  tait, le plafond par émetteur, la règle des 6 h en jeu, la coupure par `/co channel room off`.
+
 - 2026-10-07 15:00 — jusqu'a 79803de — Forever build client 70245, Gnoma Short (3e compte, royaume
   4618, acheteuse) et Gnomi Short (2e compte, royaume 4620, forgeronne), Ironforge ; build
   `main-dev@0f4f0db 2026-10-07 14:53`, `## Version: 1.45.0` (lu dans le `.toc` de la copie déployée ;

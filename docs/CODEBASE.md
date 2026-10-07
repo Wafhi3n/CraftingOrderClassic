@@ -4,7 +4,7 @@
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
-158 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
+159 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
 
 ## Modules (ordre de chargement)
 
@@ -121,19 +121,20 @@
 | `CraftingOrderClassic_ProfWindow_LFW_Recipes.lua` | le SÉLECTEUR DE RECETTES de l'offre LFW. | 140 |
 | `CraftingOrderClassic_ProfWindow_LFW_Announce.lua` | la case « Annoncer en Commerce » de l'offre LFW. | 28 |
 | `CraftingOrderClassic_ProfWindow_Reroll.lua` | vue métier LECTURE SEULE d'un REROLL. | 118 |
-| `Directory.lua` | Crafting Order - Classic — Directory : l'annuaire des GENS (présence + qui peut crafter quoi). | 488 |
+| `Directory.lua` | Crafting Order - Classic — Directory : l'annuaire des GENS (présence + qui peut crafter quoi). | 492 |
 | `Directory_Presence.lua` | présence : la vérité JEU (amis/guilde) et sa fusion avec la vérité ADDON. | 148 |
 | `Directory_Recipes.lua` | COUTURE de lecture du registre « qui sait crafter quoi » d'un artisan. | 210 |
 | `Directory_Confed.lua` | source « confédération » (GreenWall) de l'annuaire, DISPLAY-ONLY. | 63 |
 | `Directory_Club.lua` | source « cercle » (communautés WoW) de l'annuaire, DISPLAY-ONLY. | 382 |
 | `Directory_Community.lua` | le réseau SANS canal : la communauté remplace CraftLinkNet (Forever). | 270 |
 | `Directory_Note.lua` | la note de membre de la communauté : lue dans l'annuaire, préparée pour le joueur. | 105 |
-| `Directory_Skills.lua` | niveaux de compétence + réputation (couche « profil » de l'annuaire). | 191 |
+| `Directory_Skills.lua` | niveaux de compétence + réputation (couche « profil » de l'annuaire). | 199 |
 | `Directory_Room.lua` | la salle de découverte : CraftLinkNet rejoint pour SE PRÉSENTER, pas pour transporter. | 88 |
 | `Directory_Version.lua` | détection « nouvelle version disponible » (100 % P2P, aucun serveur). | 147 |
 | `Directory_Cooldowns.lua` | cooldowns de recettes (couche « profil » de l'annuaire). | 105 |
 | `Directory_RelayCodec.lua` | codec du fil RLY : relais de la fiche d'un artisan HORS LIGNE par un de ses partenaires. | 70 |
 | `Directory_Relay.lua` | « contacts de confiance » : les données d'un joueur DÉCONNECTÉ restent servies par ses partenaires (r.isPartner). | 196 |
+| `Directory_Bridge.lua` | pont entre royaumes, paliers 2 et 3 (spec docs/specs/pont-royaumes.md). | 290 |
 | `Directory_AltCodec.lua` | codec du fil ALT (liste des persos d'un même joueur) + vérification par réciprocité. | 119 |
 | `Directory_Alts.lua` | regroupement des rerolls : identité « joueur » multi-persos (verbe ALT). | 316 |
 | `Directory_LFW.lua` | statut « recherche de travail » (Looking For Work) + OFFRE par métier. | 367 |
@@ -2407,6 +2408,33 @@
 > Codec pur dans Directory_RelayCodec.lua ; méthodes sur COC.Directory (chargé avant, .toc).
 
 **API** : `Dir:RelayPartnersTo(target)` · `Dir:OnRelay(sender, message, distribution)` · `Dir:PruneRelays()` · `Dir:StartRelay()`
+
+### `Directory_Bridge.lua`
+> Directory_Bridge.lua — pont entre royaumes, paliers 2 et 3 (spec docs/specs/pont-royaumes.md).
+> 
+> Sous le méga-serveur de Forever, un canal s'arrête au royaume (mesuré le 2026-10-07) : chaque royaume
+> a sa copie de la salle CraftLinkNet, et du Commerce du jeu. Le chuchotement, lui, traverse. Un porteur
+> qui arrive se présente donc lui-même aux AUTRES royaumes :
+>   1. à sa connexion, la première réponse directe d'un porteur d'un autre royaume (son `rm=` vient avec
+>      sa fiche, palier 1) reçoit « présente-moi » : INT en whisper ;
+>   2. ce passeur poste la présentation dans SA salle : INT sur la salle ;
+>   3. chaque membre de cette salle qui ne connaît pas l'arrivant lui dit un bonjour LÉGER (HL : sa fiche
+>      de métiers, rien d'autre), qui reçoit au plus un bonjour léger en retour.
+> Ensuite, tout passe par les chemins existants (chuchotement aux pairs connus, D9 : mes commandes
+> ouvertes qui le concernent partent au premier contact, comme pour tout pair qui passe en ligne).
+> 
+> Fil :  INT|<Prénom Nom>|<royaume>                  whisper (demande) ou salle (présentation postée)
+>        HL|SK|lvl=…|rm=…;…   ou   HL|rm=<royaume>       bonjour léger, whisper
+> Palier 3 : l'arrivant qui ne connaît personne ailleurs est présenté par le passeur ÉLU de sa salle
+> (le plus petit nom des porteurs à jour présents). La salle d'en face n'accepte une demande pour un
+> AUTRE que de la part d'un pair qu'elle connaît en direct et dont le royaume est celui du présenté ;
+> sinon, seulement de l'arrivant lui-même (palier 2). Budget (D7) :
+> 10 présentations par émetteur / 10 min ; une même personne pas représentée plus d'une fois / 6 h,
+> gardé en SavedVariables à l'heure réelle (une minuterie de session repartirait à chaque connexion).
+> Coupé avec la salle (D8 : /co channel room off). Jamais un second saut : une présentation reçue ne
+> déclenche jamais de demande.
+
+**API** : `Dir:BridgeOnRealm(sender, realm)` · `Dir:OnIntro(sender, message, distribution)` · `Dir:OnLightHello(sender, message)` · `Dir:BridgeOnRoomHello(sender, realm)` · `Dir:StartBridge()`
 
 ### `Directory_AltCodec.lua`
 > Directory_AltCodec.lua — codec du fil ALT (liste des persos d'un même joueur) + vérification

@@ -124,6 +124,14 @@ function Dir:_ParseSKBody(message)
     return skills, lvl and tonumber(lvl) or nil, rep, ver, realm
 end
 
+-- Le royaume d'un pair, lu dans SA fiche (jamais d'un relais) ; le pont s'en sert (Directory_Bridge).
+function Dir:_NoteRealm(name, realm)
+    local r = name and self.roster and self.roster[name]
+    if not (r and realm) then return end
+    r.realm = realm
+    if self.BridgeOnRealm then self:BridgeOnRealm(name, realm) end
+end
+
 -- SK reçu (niveaux d'un autre) → cache roster. Le royaume n'est gardé que d'une fiche DIRECTE (ici),
 -- jamais d'une fiche relayée : il ne fait foi que pour celui qui l'annonce.
 function Dir:OnSkill(sender, message)
@@ -134,7 +142,7 @@ function Dir:OnSkill(sender, message)
     local r = self:_Touch(sender)
     if lvl then r.level = lvl end
     if rep then r.rep = rep end
-    if realm then r.realm = realm end
+    if realm then self:_NoteRealm(sender, realm) end
     -- SK = énumération COMPLÈTE des métiers RÉELS du perso courant de l'émetteur (GetNumSkillLines,
     -- jamais bleedée par les alts contrairement au RK). On reconstruit à neuf (un métier abandonné
     -- disparaît) puis on s'en sert comme vérité terrain pour purger les RK périmés.
