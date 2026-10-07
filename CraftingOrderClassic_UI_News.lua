@@ -37,6 +37,14 @@ local BODY_W = 780
 local function versionsFront()
     return {
         {
+            v = "v1.47.0", title = L["Ta recherche de travail et tes commandes publiques vont plus loin"],
+            lines = {
+                L["Certains joueurs de l'addon ne voyaient toujours ni ta recherche de travail ni tes commandes pour tous : le canal de l'addon n'atteint pas tout le monde, et les présentations de la v1.46.0 n'aident que ceux déjà connectés quand tu arrives. Maintenant, là où ton canal n'arrive pas, l'addon demande à un joueur de l'addon que tu connais (un ami ou un membre de ta guilde d'abord) de les répéter à tous ceux que son propre canal atteint. Ils les voient comme les autres, avec « via <nom> » dans l'infobulle d'une recherche de travail."],
+                L["Une ligne répétée par un autre pourrait être inventée, alors l'addon vérifie. Quand tu cliques sur Chuchoter pour un artisan dont la recherche de travail t'est arrivée ainsi, il demande d'abord en coulisse à cet artisan si c'est vrai. S'il dit non, la ligne disparaît et celui qui l'a répétée est ignoré pendant un jour. Une commande répétée se vérifie comme avant, à la première acceptation : si l'acheteur ne l'a pas, elle passe annulée."],
+                L["Ça reste léger : un seul joueur par canal, ta recherche de travail répétée au plus toutes les 15 minutes, une commande au plus toutes les deux heures, et rien quand tu es en instance. Ça ne marche qu'entre joueurs qui ont cette version."],
+            },
+        },
+        {
             v = "v1.46.0", title = L["Plus d'artisans trouvés, même ceux que tu n'as jamais croisés"],
             lines = {
                 L["Certains joueurs de l'addon restaient invisibles pour toi, même en jouant à côté : tu ne les trouvais qu'en les croisant, en les ciblant ou en groupe. Maintenant, quand l'un d'eux se connecte, un joueur de l'addon qui vous connaît tous les deux fait les présentations, et vos deux addons se disent bonjour en coulisse. Il apparaît dans ton onglet Artisans avec ses métiers, et ses commandes et sa recherche de travail t'arrivent comme pour n'importe quel artisan connu. Rien à régler."],
@@ -413,16 +421,6 @@ local function versionsRecent()
                 L["Cette même aide gagne un plan de route : clique le bouton carte et il déroule toute ta montée rang par rang, en choisissant à chaque étape la recette la moins chère (apprise ou achetable, plans compris) et en additionnant le coût total. Les recettes à cooldown ou avec un réactif sans prix connu sont exclues exprès, elles fausseraient le total. Demande Lazy Gold ; MTSL ajoute les prix de plans formateur et vendeur au calcul."],
             },
         },
-        {
-            v = "v1.21.0", title = L["L'enchant par emplacement, et un panneau d'échange qui ne cache plus rien"],
-            lines = {
-                L["Choisir un enchant demandait de fouiller des centaines de plans aux noms presque identiques. L'onglet Commande a maintenant une vue silhouette : clique l'emplacement à enchanter, tu obtiens ses stats, puis ses variantes de la plus forte à la plus faible. La bascule est dans la bande de filtres ; la liste reste pour tout ce qui n'a pas d'emplacement (huiles, baguettes, produits de désenchantement)."],
-                L["Le panneau d'enchant de l'échange n'affichait que 8 lignes, et le « +N autre(s) » du bas n'était pas cliquable : au-delà de la 8ᵉ place, un enchant était tout bonnement inatteignable — c'est ainsi qu'un enchanteur à qui on avait passé les réactifs ne se voyait jamais proposer la bonne recette, noyée sous les variantes de haut rang. La liste défile à la molette, et elle est classée par ce qu'on te demande : d'abord les enchants dont ton partenaire vient de poser les réactifs, puis ce que tes sacs permettent, puis le reste."],
-                L["Tant que la case « ne sera pas échangé » est vide, le panneau ne disparaît plus : il montre la même silhouette, avec le modèle de ton partenaire, et cliquer un emplacement lui chuchote d'y poser cette pièce. La plupart des gens qui te tendent un objet ignorent que cette case existe."],
-                L["Deux correctifs : les enchants de poignets et de bâton de Wrath n'apparaissaient jamais dans le panneau d'échange (le jeu les écrit « Bracers » et « Staff » là où les autres extensions disent « Bracer »), et un enchant de bâton ne se propose plus que sur un vrai bâton. Le panneau ne touche plus non plus à ses boutons pendant un combat, ce que le jeu interdit."],
-                L["Plus discret : les lignes de chat « X sait faire cette commande captée » sont désactivées par défaut — la commande est poussée aux amis capables dans tous les cas, le message n'était que du bruit. |cFFFFFFFF/co verbose|r les remet."],
-            },
-        },
     }
 end
 
@@ -432,7 +430,7 @@ end
 
 local function versionsOldest()
     return {
-        -- v1.20.0 (retirée à la v1.46.0), v1.19.1 / v1.19.0 (retirées à la v1.45.0), v1.18.0 / v1.17.1 (retirées à la v1.44.2), v1.17.0 (retirée à la v1.44.1),v1.16.0 (retirée à la v1.44.0), v1.15.1 (retirée à la v1.43.0), v1.15.0 (retirée à la v1.42.1), v1.14.0 (retirée à la v1.42.0), v1.13.0 (retirée à la v1.41.1), v1.12.0 / v1.11.0 / v1.10.2 (retirées à la v1.41.0 : la Saison de la Découverte, le canal du royaume et
+        -- v1.21.0 (retirée à la v1.47.0), v1.20.0 (retirée à la v1.46.0), v1.19.1 / v1.19.0 (retirées à la v1.45.0), v1.18.0 / v1.17.1 (retirées à la v1.44.2), v1.17.0 (retirée à la v1.44.1),v1.16.0 (retirée à la v1.44.0), v1.15.1 (retirée à la v1.43.0), v1.15.0 (retirée à la v1.42.1), v1.14.0 (retirée à la v1.42.0), v1.13.0 (retirée à la v1.41.1), v1.12.0 / v1.11.0 / v1.10.2 (retirées à la v1.41.0 : la Saison de la Découverte, le canal du royaume et
         -- le bouton « Créer » sécurisé n'existent pas sur Forever), v1.10.1 / v1.9.0 / v1.8.0 / v1.7.0 / v1.7.1 /
         -- v1.6.0 / v1.5.0 / v1.4.0 retirées de l'onglet (l'historique
         -- complet vit dans CHANGELOG.md). Cet onglet ne garde qu'une fenêtre glissante de versions :

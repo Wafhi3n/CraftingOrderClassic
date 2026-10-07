@@ -1,5 +1,23 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.47.0 - Your looking-for-work line and public orders reach further
+
+Some addon users still never saw your looking-for-work line or your orders for everyone: the addon's
+channel doesn't reach every player, and the introductions from v1.46.0 only help the ones already
+online when you log in. Now, where your channel doesn't reach, the addon asks an addon user you know
+(a friend or guildmate first) to repeat them to everyone their own channel reaches. Those players
+see them like any other, with "via <name>" in the tooltip of a looking-for-work line.
+
+A line repeated by someone else could be made up, so the addon checks it. When you click Whisper on
+a crafter whose looking-for-work line reached you that way, it first asks that crafter, behind the
+scenes, whether it's true. If they say no, the line disappears and whoever repeated it is ignored
+for a day. A repeated order is checked as before, when someone first accepts it: if the buyer
+doesn't have it, it shows as cancelled.
+
+It stays light: one player per channel, your looking-for-work line repeated at most every 15
+minutes, an order at most every two hours, and nothing while you're in an instance. It only works
+between players who have this version.
+
 ## v1.46.0 - More crafters found, even the ones you've never run into
 
 Some addon users stayed invisible to you, even playing right next to you. You only found them by
