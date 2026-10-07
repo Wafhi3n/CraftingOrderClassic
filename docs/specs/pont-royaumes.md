@@ -106,7 +106,11 @@ royaume (`GetRealmID()`).
 - **D6 (user, 2026-10-07)** : **un seul passeur par arrivée et par royaume étranger**, en visée.
   **L'arrivant se présente lui-même** quand il connaît déjà un porteur en ligne dans l'autre
   royaume : il chuchote « présente-moi » à un seul d'entre eux par royaume. C'est le cas le plus
-  simple, et le seul que le banc peut voir de bout en bout (critère 12). Pour un arrivant qui ne
+  simple, et le seul que le banc peut voir de bout en bout (critère 12). **Déclencheur** : à la
+  connexion, l'arrivant ne sait pas encore qui est en ligne ailleurs ; il l'apprend par les réponses
+  à ses bonjours de connexion. La **première réponse directe** qui porte un `rm=` différent du sien,
+  dans les 2 minutes qui suivent son arrivée dans la salle, déclenche la demande vers ce pair-là, une
+  seule par royaume étranger et par session (et pas avant 6 heures, D7). Pour un arrivant qui ne
   connaît personne ailleurs, un membre de sa salle le fait : A agit seulement s'il est élu dans sa
   salle, le **plus petit nom** parmi les membres en ligne de son royaume qui portent la nouvelle
   version. Un double passage reste possible si deux membres n'ont pas la même vue ; le
@@ -115,10 +119,16 @@ royaume (`GetRealmID()`).
 - **D7 (user, 2026-10-07) — le budget** : pour une arrivée, au plus 1 présentation chuchotée et
   1 présentation postée par royaume étranger, puis au plus 2 messages par paire (D, C). C envoie au
   plus un message par membre de R2 qui ne le connaissait pas, étalés par la file d'envoi. Aucun
-  autre message ne part à cause du pont. Contre les abus : **au plus 10 présentations acceptées par
+  autre message ne part à cause du pont. ⚠️ **Question ouverte (2026-10-07, au user)** : le premier
+  message d'un pair qui n'était pas « en ligne » chez moi lui pousse aujourd'hui mes commandes
+  ouvertes qui le concernent (`Orders:OnArtisanOnline`, via `Dir:_Touch`). Un bonjour léger le
+  déclencherait chez C comme chez chaque D : ces envois sortent du budget ci-dessus. Contre les abus : **au plus 10 présentations acceptées par
   émetteur par tranche de 10 minutes**, le reste est ignoré. Et **une même personne n'est pas
   représentée plus d'une fois toutes les 6 heures** : un joueur qui se connecte cinq fois dans la
-  journée ne coûte pas cinq présentations.
+  journée ne coûte pas cinq présentations. Cette date-là est **gardée dans les SavedVariables**
+  (heure réelle, `time()`), chez l'arrivant (par royaume visé) comme chez le passeur (par personne
+  postée) : une minuterie de session (`GetTime()`) repartirait de zéro à chaque connexion, et le test
+  headless passerait quand même.
 - **D8 (user, 2026-10-07)** : **pas de réglage à part.** Le pont suit la salle de découverte :
   `/co channel room off` le coupe aussi. Raison : moins de réglages, et sans salle le pont n'a ni
   arrivées à voir ni salle où poster.
@@ -150,8 +160,9 @@ royaume (`GetRealmID()`).
 10. [test] Budget D7 : une arrivée simulée dans une salle de 30 membres étrangers produit au plus
     1 + 1 + 2 × 30 messages, tous types confondus, et C en émet au plus 30.
 10bis. [test] D7 : une même personne n'est pas représentée moins de 6 heures après sa dernière
-    présentation, quel que soit le nombre de ses connexions ; au-delà de 10 présentations d'un même
-    émetteur en 10 minutes, les suivantes sont ignorées.
+    présentation, quel que soit le nombre de ses connexions (le test recharge l'addon entre deux
+    connexions, SavedVariables gardées, horloge `time()` avancée) ; au-delà de 10 présentations d'un
+    même émetteur en 10 minutes, les suivantes sont ignorées.
 10ter. [test] D8 : salle coupée (`/co channel room off`), aucune présentation ne part et aucune
     présentation reçue n'est postée.
 11. [humain] Gnoma (4618) en ligne, et connue de Gnomi (4620). Gnomi se connecte. **Observé** : la
@@ -165,8 +176,10 @@ royaume (`GetRealmID()`).
     qu'elle n'est pas dans son annuaire) ; Gnoma se connecte et **se présente elle-même** (D6) à
     Rédemption, qui poste la présentation dans la salle 4620. **Observé attendu** chez Sfdfs : la ligne
     « bonjour léger → Gnoma Short », puis Gnoma dans son onglet Artisans avec ses métiers. Témoin :
-    avant le pont, Sfdfs ne la voit jamais (elle n'est ni dans sa salle ni dans son Commerce).
-    Observateur : le user, au banc, traces des trois comptes relues dans les SavedVariables.
+    le même scénario sur le build d'avant le pont, **à mesurer avant de coder** (le relais `RLY` ou la
+    propagation des commandes pourraient déjà lui faire connaître Gnoma). Au 2026-10-07 13:30, Gnoma
+    est absente de l'annuaire de Sfdfs. Observateur : le user, au banc, traces des trois comptes
+    relues dans les SavedVariables.
 
 ## Contrat
 
