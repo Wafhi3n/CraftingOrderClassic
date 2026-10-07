@@ -46,6 +46,22 @@ client.
 
 ## Relevés
 
+- 2026-10-07 16:16 — jusqu'a f2b8a9c — Forever build client 70245, quatre comptes : Toao Rosa (perso
+  NEUF du 4e compte, royaume 4620, l'arrivant), Gnomi Short (2e, 4620, élue attendue), Rédemption
+  Wafhien (1er, 4620), Gnoma Short (3e, 4618) ; build `main-dev@8e33709 2026-10-07 16:06` (lu dans le
+  `.toc` de la copie déployée, et par l'appli du banc, fiche `CraftingOrderClassic--feat-pont-royaumes`,
+  trois gestes cochés OK) — **GO partiel** sur le palier 3 (spec `pont-royaumes.md`, critère 14) —
+  relevé relu dans les traces des quatre SV. Toao entre à 16:15:07 ; 16:15:14 Gnomi lit son bonjour de
+  salle `HI|rm=4620`, 16:15:15 « présentation de Toao Rosa demandée à Gnoma Short (royaume 4618) :
+  passeur élu » ; Rédemption n'a aucune ligne de ce genre (pas élue) ; 16:15:16 Gnoma reçoit la demande
+  de Gnomi, 16:15:18 « présentation de Toao Rosa (royaume 4620) postée dans la salle », une seule fois.
+  Au passage, Gnomi s'est présentée elle-même à son `/reload` de 16:14 (Gnoma l'a postée à 16:14:26) :
+  palier 2 revu. **Défaut trouvé** : Toao ne s'est PAS présentée elle-même alors que Gnoma lui a répondu
+  avec `rm=4618` (16:15:13) — le verrou de 6 h était rangé par royaume dans la SavedVariable, commune
+  au compte, et Sfdfs (même compte) s'était présentée en 4618 à 15:44. Corrigé après la séance (verrou
+  par personnage), PAS revu en jeu. ⚠️ **NON observé** : un membre de 4618 qui salue Toao (Gnoma est
+  seule en 4618 sur nos comptes), la règle des 6 h de l'élu en jeu.
+
 - 2026-10-07 15:44 — jusqu'a ebe242b — Forever build client 70245, trois comptes : Gnoma Short (3e,
   royaume 4618, l'arrivante), Rédemption Wafhien (1er, 4620, la connaît), Sfdfs Sdfdsfd (4e, 4620, ne
   la connaissait pas : absente de son annuaire avant le test, vérifié dans sa SV) ; build

@@ -99,6 +99,10 @@ end
 -- confirmation après 30 s, un second (au plus). Le verrou de 6 h ne se pose qu'à la CONFIRMATION (un
 -- bonjour léger venu de ce royaume) : à l'envoi, un verrou de 10 min seulement. Sinon un passeur qui
 -- ment sur son royaume, ou qui part, faisait perdre ma présentation pour 6 h (revue du 2026-10-07).
+-- Le verrou est PAR PERSONNAGE : la SavedVariable est commune au compte, et c'est chaque perso qui doit
+-- être présenté (vu au banc le 2026-10-07 : Sfdfs présentée à 15:44, Toao, même compte, bloqué à 16:15).
+local function selfKey(realm) return me() .. "@" .. realm end
+
 function Dir:BridgeOnRealm(sender, realm)
     local mine = myRealm()
     if not (enabled() and mine and validRealm(realm) and realm ~= mine and sender) then return end
@@ -107,11 +111,11 @@ function Dir:BridgeOnRealm(sender, realm)
     if not db then return end
     local a = s.asked[realm]
     if a and (a.confirmed or a.tries >= 2 or a.by == sender or now() - a.at < RETRY_AFTER) then return end
-    if not a and recent(db.selfIntro, realm) then s.asked[realm] = { confirmed = true }; return end
+    if not a and recent(db.selfIntro, selfKey(realm)) then s.asked[realm] = { confirmed = true }; return end
     local name = me()
     if not fullName(name) then return end
     s.asked[realm] = { at = now(), by = sender, tries = (a and a.tries or 0) + 1 }
-    db.selfIntro[realm] = clock() - (REPEAT_EVERY - SHORT_LOCK)   -- « récent » pendant 10 min seulement
+    db.selfIntro[selfKey(realm)] = clock() - (REPEAT_EVERY - SHORT_LOCK)   -- « récent » 10 min seulement
     CraftLink:Send(("INT|%s|%d"):format(name, mine), "whisper", sender)
     trace(("présentation demandée à %s (royaume %d)"):format(sender, realm))
 end
@@ -122,7 +126,7 @@ local function confirm(realm)
     if not a or a.confirmed then return end
     a.confirmed = true
     local db = store()
-    if db then db.selfIntro[realm] = clock() end                -- maintenant, 6 h
+    if db then db.selfIntro[selfKey(realm)] = clock() end       -- maintenant, 6 h
 end
 
 -- 2. Le passeur. « Présente-moi » reçu, de l'arrivant lui-même (palier 2) ou du passeur élu de sa salle

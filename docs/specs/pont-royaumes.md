@@ -172,6 +172,9 @@ royaume (`GetRealmID()`).
     une victime à chaque repost ;
   - une présentation n'est lue que par whisper (demande) ou sur la salle, jamais par groupe ou
     guilde, et un numéro de royaume démesuré est ignoré.
+  - le verrou de l'arrivant est rangé **par personnage** (`<nom>@<royaume>`) : la SavedVariable est
+    commune au compte, et un perso présenté bloquait les autres persos du compte (vu au banc le
+    2026-10-07, corrigé le même jour).
   Accepté : un bonjour léger d'un inconnu entre dans l'annuaire et reçoit une réponse (comme un HI
   chuchoté), et un bonjour léger forgé avec le bon royaume peut confirmer trop tôt une présentation.
 - **D8 (user, 2026-10-07)** : **pas de réglage à part.** Le pont suit la salle de découverte :
