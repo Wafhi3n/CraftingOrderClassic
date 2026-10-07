@@ -46,6 +46,14 @@ client.
 
 ## Relevés
 
+- 2026-10-07 16:21 — jusqu'a df1d18f — Forever build client 70245, Toao Rosa (4e compte, 4620) et
+  Gnoma Short (3e compte, 4618) ; build `main-dev@f0c30b7 2026-10-07 16:18` (lu par l'appli du banc,
+  geste « toao-se-presente » coché OK à 16:21) — **GO** sur le verrou par personnage — relevé relu dans
+  la trace de la SV du 4e compte. Toao se reconnecte à 16:20:38 ; 16:20:43 « présentation demandée à
+  Gnoma Short (royaume 4618) » et `INT|Toao Rosa|4620` en whisper à Gnoma : le défaut de 16:15 (verrou
+  commun au compte) est levé. ⚠️ **NON observé** : le côté de Gnoma (pas de `/reload` après 16:16, sa
+  trace n'est pas sur le disque), donc pas vu qu'elle ne reposte pas une présentation faite à 16:15.
+
 - 2026-10-07 16:16 — jusqu'a f2b8a9c — Forever build client 70245, quatre comptes : Toao Rosa (perso
   NEUF du 4e compte, royaume 4620, l'arrivant), Gnomi Short (2e, 4620, élue attendue), Rédemption
   Wafhien (1er, 4620), Gnoma Short (3e, 4618) ; build `main-dev@8e33709 2026-10-07 16:06` (lu dans le
