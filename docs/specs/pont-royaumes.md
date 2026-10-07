@@ -45,7 +45,12 @@ royaume (`GetRealmID()`).
 ## Ce qu'on NE fait PAS
 
 - **Relayer des données.** Le pont présente des gens, il ne transporte ni commandes (`ORD|`), ni
-  LFW, ni fiches de métiers. Elles passent ensuite en direct, comme aujourd'hui.
+  LFW, ni fiches de métiers. Elles passent ensuite en direct, comme aujourd'hui. **Piste du user
+  pour plus tard (2026-10-07)** : des **nœuds de confiance** qui répéteraient les commandes dans la
+  salle `CraftLinkNet` de chaque royaume, pour qu'une commande publique atteigne aussi les inconnus
+  des autres royaumes. Hors de cette spec : il faudra décider qui est de confiance et comment, ce
+  qu'on fait d'une commande répétée par un nœud qui ment, et combien de messages ça coûte. Une spec
+  à part le jour où on s'y met.
 - **Relayer les annonces Commerce `#CO`** d'un royaume à l'autre. Une ligne de texte est l'affaire
   du joueur qui l'écrit.
 - **Plusieurs sauts.** Une présentation reçue ne déclenche jamais une autre présentation.
@@ -119,16 +124,19 @@ royaume (`GetRealmID()`).
 - **D7 (user, 2026-10-07) — le budget** : pour une arrivée, au plus 1 présentation chuchotée et
   1 présentation postée par royaume étranger, puis au plus 2 messages par paire (D, C). C envoie au
   plus un message par membre de R2 qui ne le connaissait pas, étalés par la file d'envoi. Aucun
-  autre message ne part à cause du pont. ⚠️ **Question ouverte (2026-10-07, au user)** : le premier
-  message d'un pair qui n'était pas « en ligne » chez moi lui pousse aujourd'hui mes commandes
-  ouvertes qui le concernent (`Orders:OnArtisanOnline`, via `Dir:_Touch`). Un bonjour léger le
-  déclencherait chez C comme chez chaque D : ces envois sortent du budget ci-dessus. Contre les abus : **au plus 10 présentations acceptées par
+  autre message ne part à cause du pont, **sauf** la pousse des commandes (D9). Contre les abus : **au plus 10 présentations acceptées par
   émetteur par tranche de 10 minutes**, le reste est ignoré. Et **une même personne n'est pas
   représentée plus d'une fois toutes les 6 heures** : un joueur qui se connecte cinq fois dans la
   journée ne coûte pas cinq présentations. Cette date-là est **gardée dans les SavedVariables**
   (heure réelle, `time()`), chez l'arrivant (par royaume visé) comme chez le passeur (par personne
   postée) : une minuterie de session (`GetTime()`) repartirait de zéro à chaque connexion, et le test
   headless passerait quand même.
+- **D9 (user, 2026-10-07)** : le bonjour léger **garde** la pousse des commandes. Le premier message
+  d'un pair qui n'était pas « en ligne » chez moi lui envoie mes commandes ouvertes qui le concernent
+  (`Orders:OnArtisanOnline`, via `Dir:_Touch`, au plus une fois par minute et par pair). Après une
+  présentation, ça joue chez C comme chez chaque D. On le garde : faire connaître ses commandes aux
+  autres royaumes, c'est l'intérêt du pont, et peu de joueurs ont des commandes ouvertes. Le budget
+  D7 le compte à part (critère 10).
 - **D8 (user, 2026-10-07)** : **pas de réglage à part.** Le pont suit la salle de découverte :
   `/co channel room off` le coupe aussi. Raison : moins de réglages, et sans salle le pont n'a ni
   arrivées à voir ni salle où poster.
@@ -140,7 +148,8 @@ royaume (`GetRealmID()`).
 2. [test] Un bonjour sans métiers porte `HI|rm=<id>` ; un client d'avant l'accepte comme un `HI` nu.
 3. [test] La plus grande fiche de métiers possible (deux métiers principaux aux noms les plus
    longs, Cuisine, Secourisme, Pêche, Poisons, `rep=`, `cv=`, `rm=`) tient sous 255 octets, bonjour
-   et enveloppe de relais `RLY` compris.
+   et enveloppe de relais `RLY` compris. → `tests/test_pont_royaume_bonjour.lua` (critères 1 à 3 ;
+   pire bonjour mesuré : 157 octets).
 4. [test] Une arrivée dans la salle (bonjour reçu par le canal, royaume connu) déclenche une
    présentation vers un seul pair en ligne par royaume étranger, du même camp ; aucune vers le
    royaume de l'arrivant. Un arrivant qui connaît déjà un porteur en ligne d'un autre royaume se
@@ -158,7 +167,8 @@ royaume (`GetRealmID()`).
 9. [test] Une présentation d'un nom incomplet (prénom seul, « Unknown ») est ignorée ; au-delà du
    plafond par émetteur, les présentations sont ignorées et tracées une fois.
 10. [test] Budget D7 : une arrivée simulée dans une salle de 30 membres étrangers produit au plus
-    1 + 1 + 2 × 30 messages, tous types confondus, et C en émet au plus 30.
+    1 + 1 + 2 × 30 messages du pont (présentations et bonjours légers), et C en émet au plus 30. La
+    pousse des commandes (D9) se compte à part : sans commande ouverte, elle n'envoie rien.
 10bis. [test] D7 : une même personne n'est pas représentée moins de 6 heures après sa dernière
     présentation, quel que soit le nombre de ses connexions (le test recharge l'addon entre deux
     connexions, SavedVariables gardées, horloge `time()` avancée) ; au-delà de 10 présentations d'un
@@ -187,7 +197,10 @@ Tout ce qui suit atteint des clients déjà installés : figé une fois publié.
 
 - **Royaume dans la fiche de métiers** : `SK|lvl=<n>|rm=<id>;<métier>,<cur>,<max>;…[;rep=<n>][;cv=<v>]`.
   `rm=` est le **premier** morceau. Un client d'avant l'ignore (son parseur ne garde que les
-  morceaux `clé,cur,max`, `rep=` et `cv=`). Même place dans un `SK` relayé par `RLY`.
+  morceaux `clé,cur,max`, `rep=` et `cv=` : vérifié de la v1.30 à la v1.44.2). Un `SK` relayé par
+  `RLY` n'en porte **pas** (décidé au codage du palier 1, 2026-10-07) : le royaume ne vaut que pour
+  celui qui l'annonce, et le relais ne sert qu'aux partenaires hors ligne, dont le pont n'a pas
+  besoin. Un royaume reçu n'est gardé que d'une fiche directe.
 - **Bonjour sans métiers** : `HI|rm=<id>` (aujourd'hui `HI` nu).
 - **Présentation** : `INT|<Prénom Nom>|<id>`, dans un whisper de A vers B (« poste-la ») ou sur la
   salle, postée par B (« un nouveau d'un autre royaume »). Le même verbe, distingué par la portée.

@@ -71,9 +71,19 @@ function Dir:CaptureSkills()
     if COC.db then COC.db.mySkills = self.mySkills; mirrorMySkills(self.mySkills) end
 end
 
--- Fil SK : "SK|lvl=<n>|key,cur,max;...[;rep=<n>][;cv=<ver>]". rep (crafts livrés) et cv (ma version, cf.
--- Directory_Version) = pseudo-chunks FINAUX, ignorés par un vieux client (parse par préfixe) → rétro-
--- compatibles ; JAMAIS dans l'en-tête (corromprait leur 1er métier).
+-- Mon royaume sous le méga-serveur (GetRealmID = la partie serveur de mon GUID, mesuré le 2026-10-07) :
+-- un canal s'arrête au royaume, le pont entre royaumes en a besoin (spec pont-royaumes). nil sans l'API.
+function Dir:_MyRealmID()
+    local ok, id = pcall(function() return GetRealmID and GetRealmID() end)
+    id = ok and tonumber(id) or nil
+    return (id and id > 0) and id or nil
+end
+
+-- Fil SK : "SK|lvl=<n>|[rm=<royaume>;]key,cur,max;...[;rep=<n>][;cv=<ver>]". rep (crafts livrés) et cv
+-- (ma version, cf. Directory_Version) = pseudo-chunks FINAUX ; rm = PREMIER morceau : le jeu coupe un
+-- message à 255 octets sans prévenir, une fin coupée ferait d'un rm=4618 un rm=46. Tous trois sont ignorés
+-- par un vieux client (il ne garde que les morceaux clé,cur,max, rep= et cv= : vérifié de v1.30 à v1.44.2).
+-- Jamais rien entre « lvl= » et le « | » qui suit (corromprait le niveau chez eux).
 function Dir:_SkillPayload()
     local parts = {}
     for key, sk in pairs(self.mySkills or {}) do parts[#parts + 1] = key .. "," .. sk[1] .. "," .. sk[2] end
@@ -81,7 +91,8 @@ function Dir:_SkillPayload()
     local lvl, rep = (UnitLevel and UnitLevel("player")) or 0, (COC.db and COC.db.delivered) or 0
     local tail = (rep > 0) and (";rep=" .. rep) or ""
     if self._MyVersion then self:_MyVersion(); if self._myVerStr then tail = tail .. ";cv=" .. self._myVerStr end end
-    return "SK|lvl=" .. lvl .. "|" .. table.concat(parts, ";") .. tail
+    local rm = self:_MyRealmID()
+    return "SK|lvl=" .. lvl .. "|" .. (rm and ("rm=" .. rm .. ";") or "") .. table.concat(parts, ";") .. tail
 end
 
 function Dir:AnnounceSkills()
@@ -90,36 +101,40 @@ function Dir:AnnounceSkills()
     if sk then CraftLink:Send(sk, "global") end
 end
 
--- Parse le message SK → (skills, level, rep, ver) ou nil. PUR (aucun effet sur le roster) : réutilisé
--- par OnSkill (données directes) ET Directory_Relay (fiche relayée). Formats : "SK|lvl=N|..."
--- (avec niveau) ou ancien "SK|...". rep + cv (version) = pseudo-chunks finaux (cf. _SkillPayload).
+-- Parse le message SK → (skills, level, rep, ver, realm) ou nil. PUR (aucun effet sur le roster) :
+-- réutilisé par OnSkill (données directes) ET Directory_Relay (fiche relayée). Formats : "SK|lvl=N|..."
+-- (avec niveau) ou ancien "SK|...". rm (royaume), rep, cv (version) : pseudo-chunks (cf. _SkillPayload).
 function Dir:_ParseSKBody(message)
     local lvl, body = (message or ""):match("^SK|lvl=(%d+)|(.+)$")
     if not body then body = (message or ""):match("^SK|(.+)$") end
     if not body then return nil end
-    local skills, rep, ver = {}, nil, nil
+    local skills, rep, ver, realm = {}, nil, nil, nil
     for chunk in body:gmatch("[^;]+") do
         local rp = chunk:match("^rep=(%d+)$")
         local cv = (not rp) and chunk:match("^cv=(.+)$") or nil
+        local rm = chunk:match("^rm=(%d+)$")
         if rp then rep = tonumber(rp)
         elseif cv then ver = cv
+        elseif rm then realm = tonumber(rm)
         else
             local key, cur, max = chunk:match("^([^,]+),(%d+),(%d+)$")
             if key then skills[key] = { tonumber(cur), tonumber(max) } end
         end
     end
-    return skills, lvl and tonumber(lvl) or nil, rep, ver
+    return skills, lvl and tonumber(lvl) or nil, rep, ver, realm
 end
 
--- SK reçu (niveaux d'un autre) → cache roster.
+-- SK reçu (niveaux d'un autre) → cache roster. Le royaume n'est gardé que d'une fiche DIRECTE (ici),
+-- jamais d'une fiche relayée : il ne fait foi que pour celui qui l'annonce.
 function Dir:OnSkill(sender, message)
     if not sender then return end
-    local skills, lvl, rep, ver = self:_ParseSKBody(message)
+    local skills, lvl, rep, ver, realm = self:_ParseSKBody(message)
     if not skills then return end
     if ver and self.NotePeerVersion then self:NotePeerVersion(sender, ver) end   -- version = 1re main (jamais relais)
     local r = self:_Touch(sender)
     if lvl then r.level = lvl end
     if rep then r.rep = rep end
+    if realm then r.realm = realm end
     -- SK = énumération COMPLÈTE des métiers RÉELS du perso courant de l'émetteur (GetNumSkillLines,
     -- jamais bleedée par les alts contrairement au RK). On reconstruit à neuf (un métier abandonné
     -- disparaît) puis on s'en sert comme vérité terrain pour purger les RK périmés.
@@ -138,10 +153,13 @@ end
 
 -- « Bonjour » DIRIGÉ, niveaux de métier COLLÉS ("HI|SK|…" si j'ai des métiers, sinon "HI" nu) : l'autre
 -- apprend mes métiers DÈS le hello, sans round-trip AnnounceTo séparé → moins de transactions, et plus
--- de « Croisé en ligne, 0 métier ». Un client v≤1.15 ignore le corps du HI → rétro-compatible.
+-- de « Croisé en ligne, 0 métier ». Un client v≤1.15 ignore le corps du HI → rétro-compatible. Sans
+-- métier, le royaume seul : "HI|rm=<id>" (un client d'avant n'y cherche que "SK", il l'ignore).
 function Dir:_HelloPayload()
     local sk = self:_SkillPayload()
-    return sk and ("HI|" .. sk) or "HI"
+    if sk then return "HI|" .. sk end
+    local rm = self:_MyRealmID()
+    return rm and ("HI|rm=" .. rm) or "HI"
 end
 
 -- Réponse d'annuaire throttlée PAR CIBLE (60 s, comme DiscoverPlayer) : un pair qui me spamme de HI/PING ne
