@@ -206,7 +206,7 @@ function Dir:OnHello(sender, message, distribution)
     local body = message and message:match("^HI|(.+)$")               -- métiers embarqués dans le hello ?
     if body and body:find("^SK") then self:OnSkill(sender, body) end
     local rm = body and body:match("^rm=(%d+)$")                      -- sans métier : le royaume seul
-    if rm and r then r.realm = tonumber(rm) end
+    if rm and r and self._NoteRealm then self:_NoteRealm(sender, tonumber(rm)) end
     if distribution == "WHISPER" then
         self:_AnnounceToThrottled(sender)
         self:DiscoverPlayer(sender)
@@ -396,6 +396,7 @@ function Dir:Start()
     CraftLink:RegisterHandler("PONG", function(s)       Dir:OnPong(s) end)
     if self.StartCooldowns then self:StartCooldowns() end   -- verbe CD (Directory_Cooldowns.lua)
     if self.StartRelay then self:StartRelay() end           -- verbe RLY (Directory_Relay.lua)
+    if self.StartBridge then self:StartBridge() end         -- verbes INT + HL (Directory_Bridge.lua)
     if self.StartAlts then self:StartAlts() end             -- verbe ALT (Directory_Alts.lua)
     if self.StartLFW then self:StartLFW() end               -- verbe LFW (Directory_LFW.lua)
     if self.StartVersion then self:StartVersion() end       -- détection maj (Directory_Version.lua)

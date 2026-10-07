@@ -1,7 +1,9 @@
 # Pont entre royaumes : présenter un arrivant aux autres salles
 
-> État : **approuvée** (décisions D2 et D4 à D8 prises par le user le 2026-10-07) · Rédigée le
-> 2026-10-07 · Idée du user (le pont par whisper), le 2026-10-07 · Rien de codé
+> État : **approuvée** (décisions D2 et D4 à D9 prises par le user le 2026-10-07) · Rédigée le
+> 2026-10-07 · Idée du user (le pont par whisper), le 2026-10-07 · Palier 1 **publié en v1.45.0** ·
+> Palier 2 codé (`Directory_Bridge.lua`, `tests/test_pont_royaume_presentation.lua`), pas vu en jeu ·
+> Palier 3 pas commencé
 > Cible : WoW: Forever / Camelot (16001) · Addon : Crafting Order - Classic (+ lib CraftLink, peu)
 >
 > Origine : mesures du 2026-10-07 avec trois comptes. Sous le méga-serveur de Forever, les royaumes
@@ -114,8 +116,11 @@ royaume (`GetRealmID()`).
   simple, et le seul que le banc peut voir de bout en bout (critère 12). **Déclencheur** : à la
   connexion, l'arrivant ne sait pas encore qui est en ligne ailleurs ; il l'apprend par les réponses
   à ses bonjours de connexion. La **première réponse directe** qui porte un `rm=` différent du sien,
-  dans les 2 minutes qui suivent son arrivée dans la salle, déclenche la demande vers ce pair-là, une
-  seule par royaume étranger et par session (et pas avant 6 heures, D7). Pour un arrivant qui ne
+  dans les 2 minutes qui suivent le **chargement de l'addon** (connexion ou `/reload` ; corrigé au
+  codage : les réponses aux bonjours de connexion arrivent souvent AVANT la salle, qui attend jusqu'à
+  10 s que le /1 soit pris), déclenche la demande vers ce pair-là, une seule par royaume étranger et
+  par session (et pas avant 6 heures, D7). Ce pair porte forcément la nouvelle version : seule elle
+  envoie `rm=`. Pour un arrivant qui ne
   connaît personne ailleurs, un membre de sa salle le fait : A agit seulement s'il est élu dans sa
   salle, le **plus petit nom** parmi les membres en ligne de son royaume qui portent la nouvelle
   version. Un double passage reste possible si deux membres n'ont pas la même vue ; le
@@ -137,6 +142,14 @@ royaume (`GetRealmID()`).
   présentation, ça joue chez C comme chez chaque D. On le garde : faire connaître ses commandes aux
   autres royaumes, c'est l'intérêt du pont, et peu de joueurs ont des commandes ouvertes. Le budget
   D7 le compte à part (critère 10).
+- **D10 (codage du palier 2, 2026-10-07)** : tant que le passeur élu (palier 3) n'existe pas, une
+  demande « présente-moi » n'est acceptée **que de l'arrivant lui-même** (l'émetteur du whisper EST le
+  nom présenté). Un tiers ne peut donc pas faire poster le nom de quelqu'un d'autre. Le palier 3
+  ouvrira la demande au passeur élu, avec ses propres gardes.
+- **D11 (codage du palier 2, 2026-10-07)** : un membre D qui reçoit un bonjour léger dans ses propres
+  2 minutes de chargement peut, lui aussi, se présenter dans le royaume de C. C'est une
+  auto-présentation légitime (D connaît maintenant quelqu'un là-bas), bornée par les mêmes règles :
+  une par royaume et par session, une par 6 h.
 - **D8 (user, 2026-10-07)** : **pas de réglage à part.** Le pont suit la salle de découverte :
   `/co channel room off` le coupe aussi. Raison : moins de réglages, et sans salle le pont n'a ni
   arrivées à voir ni salle où poster.
@@ -167,25 +180,28 @@ royaume (`GetRealmID()`).
 9. [test] Une présentation d'un nom incomplet (prénom seul, « Unknown ») est ignorée ; au-delà du
    plafond par émetteur, les présentations sont ignorées et tracées une fois.
 10. [test] Budget D7 : une arrivée simulée dans une salle de 30 membres étrangers produit au plus
-    1 + 1 + 2 × 30 messages du pont (présentations et bonjours légers), et C en émet au plus 30. La
-    pousse des commandes (D9) se compte à part : sans commande ouverte, elle n'envoie rien.
+    1 + 1 + 2 × 30 messages du pont (présentations et bonjours légers), et C en émet 1 demande et au
+    plus 30 bonjours légers. La pousse des commandes (D9) se compte à part : sans commande ouverte,
+    elle n'envoie rien. → critères 4 (part « lui-même ») à 10ter : `tests/test_pont_royaume_presentation.lua`.
 10bis. [test] D7 : une même personne n'est pas représentée moins de 6 heures après sa dernière
     présentation, quel que soit le nombre de ses connexions (le test recharge l'addon entre deux
     connexions, SavedVariables gardées, horloge `time()` avancée) ; au-delà de 10 présentations d'un
     même émetteur en 10 minutes, les suivantes sont ignorées.
 10ter. [test] D8 : salle coupée (`/co channel room off`), aucune présentation ne part et aucune
     présentation reçue n'est postée.
-11. [humain] Gnoma (4618) en ligne, et connue de Gnomi (4620). Gnomi se connecte. **Observé** : la
-    trace de Gnomi dit « présentation de Gnomi Short → Gnoma Short », celle de Gnoma dit
-    « présentation postée dans la salle » et `[send] room : INT|Gnomi Short|4620`. Témoin : sans le
-    pont (build d'avant), aucune de ces lignes. Observateur : le user, au banc, traces relues dans
-    les SavedVariables.
+11. [humain] Rédemption (4620) en ligne, qui connaît Gnoma (4618). Gnoma se connecte. **Observé** :
+    la trace de Gnoma dit « présentation demandée à Rédemption Wafhien (royaume 4620) », celle de
+    Rédemption dit « présentation de Gnoma Short (royaume 4618) postée dans la salle » avec
+    `[send] room : INT|Gnoma Short|4618`. Témoin : sans le pont (v1.45.0), aucune de ces lignes.
+    Observateur : le user, au banc, traces relues dans les SavedVariables.
 12. [humain] Un membre de la salle étrangère découvre l'arrivant. Le banc a de quoi le voir depuis
     le 2026-10-07 : le 4e compte (Sfdfs Sdfdsfd) est tombé en 4620, comme Rédemption et Gnomi ; seule
     Gnoma est en 4618. Scénario : Rédemption et Sfdfs en ligne, Sfdfs n'a jamais croisé Gnoma (vérifier
     qu'elle n'est pas dans son annuaire) ; Gnoma se connecte et **se présente elle-même** (D6) à
     Rédemption, qui poste la présentation dans la salle 4620. **Observé attendu** chez Sfdfs : la ligne
-    « bonjour léger → Gnoma Short », puis Gnoma dans son onglet Artisans avec ses métiers. Témoin :
+    « bonjour léger → Gnoma Short (présenté par Rédemption Wafhien) », puis Gnoma dans son onglet
+    Artisans, avec son royaume dans sa fiche (et ses métiers si elle en a) ; chez Gnoma, « bonjour
+    léger de Sfdfs Sdfdsfd : un bonjour léger en retour ». Témoin :
     le même scénario sur le build d'avant le pont, **à mesurer avant de coder** (le relais `RLY` ou la
     propagation des commandes pourraient déjà lui faire connaître Gnoma). Au 2026-10-07 13:30, Gnoma
     est absente de l'annuaire de Sfdfs. Observateur : le user, au banc, traces des trois comptes
