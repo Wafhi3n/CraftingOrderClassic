@@ -213,6 +213,9 @@ function Dir:OnHello(sender, message, distribution)
         if self.RelayPartnersTo then self:RelayPartnersTo(sender) end   -- fiches de mes partenaires hors ligne
     else   -- salle de découverte : une annonce COMPLÈTE par présent, à chaque arrivée, noierait le réseau
         self:_AnnounceToThrottled(sender)
+        if distribution == "CHANNEL" and self.BridgeOnRoomHello then   -- passeur élu (Directory_Bridge)
+            self:BridgeOnRoomHello(sender, tonumber(body and body:match("rm=(%d+)")))
+        end
     end
     -- Il vient d'arriver : il ne sait rien de mon LFW, et `Dir.lfw` est RUNTIME chez lui comme
     -- chez moi. Je me ré-annonce (throttlé, jitté, et JAMAIS en AFK — cf. Directory_LFW).

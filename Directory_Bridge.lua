@@ -1,4 +1,4 @@
--- Directory_Bridge.lua — pont entre royaumes, palier 2 (spec docs/specs/pont-royaumes.md).
+-- Directory_Bridge.lua — pont entre royaumes, paliers 2 et 3 (spec docs/specs/pont-royaumes.md).
 --
 -- Sous le méga-serveur de Forever, un canal s'arrête au royaume (mesuré le 2026-10-07) : chaque royaume
 -- a sa copie de la salle CraftLinkNet, et du Commerce du jeu. Le chuchotement, lui, traverse. Un porteur
@@ -13,8 +13,10 @@
 --
 -- Fil :  INT|<Prénom Nom>|<royaume>                  whisper (demande) ou salle (présentation postée)
 --        HL|SK|lvl=…|rm=…;…   ou   HL|rm=<royaume>       bonjour léger, whisper
--- Palier 2 : une demande n'est acceptée que de l'arrivant LUI-MÊME (l'émetteur EST le présenté) ; le
--- passeur élu pour un arrivant qui ne connaît personne ailleurs viendra au palier 3. Budget (D7) :
+-- Palier 3 : l'arrivant qui ne connaît personne ailleurs est présenté par le passeur ÉLU de sa salle
+-- (le plus petit nom des porteurs à jour présents). La salle d'en face n'accepte une demande pour un
+-- AUTRE que de la part d'un pair qu'elle connaît en direct et dont le royaume est celui du présenté ;
+-- sinon, seulement de l'arrivant lui-même (palier 2). Budget (D7) :
 -- 10 présentations par émetteur / 10 min ; une même personne pas représentée plus d'une fois / 6 h,
 -- gardé en SavedVariables à l'heure réelle (une minuterie de session repartirait à chaque connexion).
 -- Coupé avec la salle (D8 : /co channel room off). Jamais un second saut : une présentation reçue ne
@@ -60,7 +62,7 @@ local function store()
     if not COC.db then return nil end
     COC.db.bridge = COC.db.bridge or {}
     local b = COC.db.bridge
-    b.selfIntro, b.posted = b.selfIntro or {}, b.posted or {}
+    b.selfIntro, b.posted, b.vouched = b.selfIntro or {}, b.posted or {}, b.vouched or {}
     return b
 end
 
@@ -123,12 +125,17 @@ local function confirm(realm)
     if db then db.selfIntro[realm] = clock() end                -- maintenant, 6 h
 end
 
--- 2. Le passeur. « Présente-moi » reçu (palier 2 : de l'arrivant lui-même, d'un autre royaume). Je le
--- poste dans ma salle après un court délai, sauf s'il y a été vu entre-temps ou depuis moins de 10 min,
--- ou si je l'ai posté moi-même depuis moins de 6 h.
+-- 2. Le passeur. « Présente-moi » reçu, de l'arrivant lui-même (palier 2) ou du passeur élu de sa salle
+-- (palier 3) : un pair que je connais en direct, et dont le royaume est celui du présenté. Je le poste
+-- dans ma salle après un court délai, sauf s'il y a été vu entre-temps ou depuis moins de 10 min, ou si
+-- je l'ai posté moi-même depuis moins de 6 h.
 function Dir:_BridgeRequest(sender, name, realm)
     local mine = myRealm()
-    if sender ~= name or not mine or realm == mine then return end
+    if not mine or realm == mine then return end
+    if sender ~= name then
+        local r = self.roster and self.roster[sender]
+        if not (r and r.lastSeen and r.realm == realm) then return end
+    end
     if not (CraftLink.RoomJoined and CraftLink:RoomJoined()) then return end
     local db = store()
     if not db or recent(db.posted, name) then return end
@@ -221,6 +228,55 @@ function Dir:OnLightHello(sender, message)
     if sent and now() - sent < HL_FOR then return end
     self:_SendLightHello(sender)
     trace(("bonjour léger de %s : un bonjour léger en retour"):format(sender))
+end
+
+-- 4. Le passeur élu (palier 3). Un porteur à jour arrive dans MA salle : s'il ne connaît personne
+-- ailleurs, personne ne le présente. Le plus petit nom de la salle le fait pour lui. Les candidats :
+-- moi, et les porteurs de mon royaume que je vois en ligne (leur royaume connu = ils sont à jour). Deux
+-- membres qui ne voient pas les mêmes présents peuvent se croire élus tous les deux, et l'arrivant a pu
+-- se présenter lui-même : la salle d'en face absorbe le doublon (déjà vue, 10 min).
+local PRESENT_MAX_REALMS = 5
+
+local function iAmElected(arrivant, mine)
+    local best = me()
+    for n, r in pairs(Dir.roster or {}) do
+        if n ~= arrivant and r.realm == mine and Dir.online[n] and n < best then best = n end
+    end
+    return best == me()
+end
+
+-- Un passeur en ligne par royaume étranger : un ami ou un membre de ma guilde d'abord, sinon le plus
+-- récemment vu.
+local function passeursByRealm(mine)
+    local best = {}
+    for n, r in pairs(Dir.roster or {}) do
+        local x = r.realm
+        if validRealm(x) and x ~= mine and Dir.online[n] and r.lastSeen then
+            local score = ((r.isFriend or r.isGuild) and 1e12 or 0) + r.lastSeen
+            if not best[x] or score > best[x].score then best[x] = { name = n, score = score } end
+        end
+    end
+    return best
+end
+
+-- Bonjour d'arrivée lu dans ma salle (royaume = le mien). Une fois par arrivant et par 6 h ; jamais
+-- pour moi-même ; au plus 5 royaumes étrangers.
+function Dir:BridgeOnRoomHello(sender, realm)
+    local mine = myRealm()
+    if not (enabled() and mine and realm == mine and sender) or sender == me() or not fullName(sender) then return end
+    local db = store()
+    if not db or recent(db.vouched, sender) then return end
+    after(math.random() * POST_JITTER, function()
+        if not iAmElected(sender, mine) or recent(db.vouched, sender) then return end
+        local n = 0
+        for x, p in pairs(passeursByRealm(mine)) do
+            if n >= PRESENT_MAX_REALMS then break end
+            n = n + 1
+            CraftLink:Send(("INT|%s|%d"):format(sender, mine), "whisper", p.name)
+            trace(("présentation de %s demandée à %s (royaume %d) : passeur élu"):format(sender, p.name, x))
+        end
+        if n > 0 then db.vouched[sender] = clock() end
+    end)
 end
 
 function Dir:StartBridge()

@@ -2,8 +2,8 @@
 
 > État : **approuvée** (décisions D2 et D4 à D9 prises par le user le 2026-10-07) · Rédigée le
 > 2026-10-07 · Idée du user (le pont par whisper), le 2026-10-07 · Palier 1 **publié en v1.45.0** ·
-> Palier 2 codé (`Directory_Bridge.lua`, `tests/test_pont_royaume_presentation.lua`), pas vu en jeu ·
-> Palier 3 pas commencé
+> Palier 2 codé, **vu en jeu le 2026-10-07** (registre, GO partiel), relu par l'agent protocole (D12) ·
+> Palier 3 codé (`Directory_Bridge.lua`, `tests/test_pont_royaume_passeur.lua`), pas vu en jeu
 > Cible : WoW: Forever / Camelot (16001) · Addon : Crafting Order - Classic (+ lib CraftLink, peu)
 >
 > Origine : mesures du 2026-10-07 avec trois comptes. Sous le méga-serveur de Forever, les royaumes
@@ -144,8 +144,18 @@ royaume (`GetRealmID()`).
   D7 le compte à part (critère 10).
 - **D10 (codage du palier 2, 2026-10-07)** : tant que le passeur élu (palier 3) n'existe pas, une
   demande « présente-moi » n'est acceptée **que de l'arrivant lui-même** (l'émetteur du whisper EST le
-  nom présenté). Un tiers ne peut donc pas faire poster le nom de quelqu'un d'autre. Le palier 3
-  ouvrira la demande au passeur élu, avec ses propres gardes.
+  nom présenté). Un tiers ne peut donc pas faire poster le nom de quelqu'un d'autre. **Palier 3
+  (codé le 2026-10-07)** : une demande pour un AUTRE est acceptée d'un pair que le passeur connaît en
+  direct (`lastSeen`) et dont le royaume (lu dans SA fiche) est celui du présenté. Un menteur de ce
+  royaume peut encore faire présenter un nom inventé : borné par le plafond de 10 par émetteur, et par
+  la garde « un bonjour par nom et par 10 min » de la salle d'en face (D12).
+- **D13 (codage du palier 3, 2026-10-07)** : l'élection. Candidats : moi, et les porteurs de mon
+  royaume que je vois en ligne (royaume connu dans leur fiche = ils sont à jour), sauf l'arrivant ; le
+  plus petit nom (comparaison d'octets, la même chez tous) est élu. Déclencheur : le bonjour de SALLE
+  d'un arrivant qui porte mon royaume (un arrivant d'avant, sans `rm=`, ne répondrait pas aux bonjours
+  légers : pas présenté). L'élu le présente à un passeur en ligne par royaume étranger, un ami ou un
+  membre de sa guilde d'abord, sinon le plus récemment vu ; au plus 5 royaumes. Une fois par arrivant
+  et par 6 h (SavedVariables, posé seulement si une demande est partie).
 - **D11 (codage du palier 2, 2026-10-07)** : un membre D qui reçoit un bonjour léger dans ses propres
   2 minutes de chargement peut, lui aussi, se présenter dans le royaume de C. C'est une
   auto-présentation légitime (D connaît maintenant quelqu'un là-bas), bornée par les mêmes règles :
@@ -220,6 +230,18 @@ royaume (`GetRealmID()`).
     propagation des commandes pourraient déjà lui faire connaître Gnoma). Au 2026-10-07 13:30, Gnoma
     est absente de l'annuaire de Sfdfs. Observateur : le user, au banc, traces des trois comptes
     relues dans les SavedVariables.
+13. [test] Palier 3 : un arrivant à jour dans ma salle est présenté par l'élu seul, à un passeur par
+    royaume étranger (l'ami d'abord), une fois par 6 h même après un `/reload` ; un non-élu, un arrivant
+    sans royaume, un bonjour chuchoté ou un autre royaume ne déclenchent rien ; au plus 5 royaumes ; la
+    salle d'en face n'accepte la demande pour un autre que d'un pair connu du même royaume.
+    → `tests/test_pont_royaume_passeur.lua`.
+14. [humain] Palier 3 au banc : un perso NEUF sur le 4e compte (royaume 4620, ne connaît personne en
+    4618), Gnomi et Rédemption en ligne (4620 ; « Gnomi Short » est le plus petit nom, donc l'élue),
+    Gnoma en ligne (4618, connue de Gnomi). Le perso neuf se connecte. **Observé attendu** : chez Gnomi,
+    « présentation de <perso neuf> demandée à Gnoma Short (royaume 4618) : passeur élu » ; chez
+    Rédemption, aucune ligne de ce genre ; chez Gnoma, « présentation de <perso neuf> (royaume 4620)
+    postée dans la salle ». Pas observable avec nos comptes : un membre de 4618 qui salue l'arrivant
+    (le 3e compte est le seul en 4618). Observateur : le user, au banc, traces des quatre comptes.
 
 ## Contrat
 

@@ -121,7 +121,7 @@
 | `CraftingOrderClassic_ProfWindow_LFW_Recipes.lua` | le SÉLECTEUR DE RECETTES de l'offre LFW. | 140 |
 | `CraftingOrderClassic_ProfWindow_LFW_Announce.lua` | la case « Annoncer en Commerce » de l'offre LFW. | 28 |
 | `CraftingOrderClassic_ProfWindow_Reroll.lua` | vue métier LECTURE SEULE d'un REROLL. | 118 |
-| `Directory.lua` | Crafting Order - Classic — Directory : l'annuaire des GENS (présence + qui peut crafter quoi). | 489 |
+| `Directory.lua` | Crafting Order - Classic — Directory : l'annuaire des GENS (présence + qui peut crafter quoi). | 492 |
 | `Directory_Presence.lua` | présence : la vérité JEU (amis/guilde) et sa fusion avec la vérité ADDON. | 148 |
 | `Directory_Recipes.lua` | COUTURE de lecture du registre « qui sait crafter quoi » d'un artisan. | 210 |
 | `Directory_Confed.lua` | source « confédération » (GreenWall) de l'annuaire, DISPLAY-ONLY. | 63 |
@@ -134,7 +134,7 @@
 | `Directory_Cooldowns.lua` | cooldowns de recettes (couche « profil » de l'annuaire). | 105 |
 | `Directory_RelayCodec.lua` | codec du fil RLY : relais de la fiche d'un artisan HORS LIGNE par un de ses partenaires. | 70 |
 | `Directory_Relay.lua` | « contacts de confiance » : les données d'un joueur DÉCONNECTÉ restent servies par ses partenaires (r.isPartner). | 196 |
-| `Directory_Bridge.lua` | pont entre royaumes, palier 2 (spec docs/specs/pont-royaumes.md). | 230 |
+| `Directory_Bridge.lua` | pont entre royaumes, paliers 2 et 3 (spec docs/specs/pont-royaumes.md). | 286 |
 | `Directory_AltCodec.lua` | codec du fil ALT (liste des persos d'un même joueur) + vérification par réciprocité. | 119 |
 | `Directory_Alts.lua` | regroupement des rerolls : identité « joueur » multi-persos (verbe ALT). | 316 |
 | `Directory_LFW.lua` | statut « recherche de travail » (Looking For Work) + OFFRE par métier. | 367 |
@@ -2410,7 +2410,7 @@
 **API** : `Dir:RelayPartnersTo(target)` · `Dir:OnRelay(sender, message, distribution)` · `Dir:PruneRelays()` · `Dir:StartRelay()`
 
 ### `Directory_Bridge.lua`
-> Directory_Bridge.lua — pont entre royaumes, palier 2 (spec docs/specs/pont-royaumes.md).
+> Directory_Bridge.lua — pont entre royaumes, paliers 2 et 3 (spec docs/specs/pont-royaumes.md).
 > 
 > Sous le méga-serveur de Forever, un canal s'arrête au royaume (mesuré le 2026-10-07) : chaque royaume
 > a sa copie de la salle CraftLinkNet, et du Commerce du jeu. Le chuchotement, lui, traverse. Un porteur
@@ -2425,14 +2425,16 @@
 > 
 > Fil :  INT|<Prénom Nom>|<royaume>                  whisper (demande) ou salle (présentation postée)
 >        HL|SK|lvl=…|rm=…;…   ou   HL|rm=<royaume>       bonjour léger, whisper
-> Palier 2 : une demande n'est acceptée que de l'arrivant LUI-MÊME (l'émetteur EST le présenté) ; le
-> passeur élu pour un arrivant qui ne connaît personne ailleurs viendra au palier 3. Budget (D7) :
+> Palier 3 : l'arrivant qui ne connaît personne ailleurs est présenté par le passeur ÉLU de sa salle
+> (le plus petit nom des porteurs à jour présents). La salle d'en face n'accepte une demande pour un
+> AUTRE que de la part d'un pair qu'elle connaît en direct et dont le royaume est celui du présenté ;
+> sinon, seulement de l'arrivant lui-même (palier 2). Budget (D7) :
 > 10 présentations par émetteur / 10 min ; une même personne pas représentée plus d'une fois / 6 h,
 > gardé en SavedVariables à l'heure réelle (une minuterie de session repartirait à chaque connexion).
 > Coupé avec la salle (D8 : /co channel room off). Jamais un second saut : une présentation reçue ne
 > déclenche jamais de demande.
 
-**API** : `Dir:BridgeOnRealm(sender, realm)` · `Dir:OnIntro(sender, message, distribution)` · `Dir:OnLightHello(sender, message)` · `Dir:StartBridge()`
+**API** : `Dir:BridgeOnRealm(sender, realm)` · `Dir:OnIntro(sender, message, distribution)` · `Dir:OnLightHello(sender, message)` · `Dir:BridgeOnRoomHello(sender, realm)` · `Dir:StartBridge()`
 
 ### `Directory_AltCodec.lua`
 > Directory_AltCodec.lua — codec du fil ALT (liste des persos d'un même joueur) + vérification
