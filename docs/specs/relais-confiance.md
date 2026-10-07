@@ -1,6 +1,7 @@
 # Relais de confiance : faire passer le LFW et les commandes publiques d'une salle à l'autre
 
-> État : **approuvée** (décisions D-R2 à D-R10 prises par le user le 2026-10-07) · Rédigée le 2026-10-07 · Idée du user, le 2026-10-07 (« définir des nœuds de
+> État : **approuvée** (décisions D-R2 à D-R10 prises par le user le 2026-10-07), codée, critères 8
+> et 9 vus au banc le 2026-10-07 ; part en v1.47.0 · Rédigée le 2026-10-07 · Idée du user, le 2026-10-07 (« définir des nœuds de
 > confiance qui répètent les commandes dans le canal CraftLink des différents royaumes », et la
 > vérification au clic) · Rien de codé
 > Cible : WoW: Forever / Camelot (16001) · Addon : Crafting Order - Classic

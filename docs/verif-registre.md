@@ -46,6 +46,14 @@ client.
 
 ## Relevés
 
+- 2026-10-08 00:06 — jusqu'a 68545b1 — Forever build client 70245, Rédemption Wafhien (1er compte,
+  `#4`) ; build `main-dev@779eb27 2026-10-08 00:02`, `## Version: 1.47.0` (lu dans le `.toc` déployé et
+  par l'appli du banc, fiche `CraftingOrderClassic--release-v1.47.0`, trois gestes cochés OK) — **GO**
+  sur le candidat v1.47.0 (`release/v1.47.0`, qui porte la fusion `1305fe9` du relais de confiance et
+  des formulaires de tickets) : `/co version` affiche 1.47.0 et la ligne Build ; onglet Nouveautés,
+  la v1.47.0 en tête, lisible, sans clé brute ni le mot « royaume », puis la v1.46.0 ; aucune erreur
+  (BugGrabber du compte : rien depuis la session 405, la séance est la 426).
+
 - 2026-10-07 23:53 — jusqu'a ce5b42c — Forever build client 70245, trois comptes : Gnoma Short (3e,
   `#5`, 4618, pas en LFW), Toao Rosa (4e, `#6`, 4620), Gnomi Short (2e, `#1`, 4620, le faux relais),
   Rédemption Wafhien (1er, `#4`) restée connectée ; build `main-dev@f4ec367 2026-10-07 23:47` (lu par
