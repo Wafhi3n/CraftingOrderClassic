@@ -46,6 +46,19 @@ client.
 
 ## Relevés
 
+- 2026-10-07 14:12 — jusqu'a 8562a3a — Forever build client 70245, 2e compte (`#1`), Gnomi Short
+  (royaume 4620), connexion à 14:11 ; build `main-dev@67296b9 2026-10-07 13:51` (lu dans le `.toc`
+  de la copie déployée, `feat/pont-royaumes` dans les branches ; `/co version` pas relevé) — **GO
+  partiel** sur le palier 1 du pont (spec `pont-royaumes.md`) — relevé relu dans la trace de la SV.
+  `GetRealmID` répond depuis le code de l'addon dès la connexion : chaque bonjour part en
+  `HI|SK|lvl=3|rm=4620;Blacksmithing,1,75`. `HI|rm=4620` reçu de Sfdfs Sdfdsfd (4e compte, sans
+  métier), en whisper puis sur la salle, et noté dans sa fiche (`realm = 4620` dans la SV).
+  **Compatibilité réelle** : trois porteurs de versions d'avant ont répondu normalement au nouveau
+  bonjour dans la même seconde (Goldar Ksionc et Adelbert Immerspross par leur fiche complète ;
+  Lorber Drillmaven, client v1.44.2 d'après son `cv=` de 13:29, par un HI).
+  ⚠️ **NON observé** : un pair d'un AUTRE royaume (Gnoma, 4618, pas connectée) ; la réception d'une
+  fiche `SK` portant `rm=` (Sfdfs n'a pas de métier).
+
 - 2026-10-07 13:30 — jusqu'a 55339ea — Forever build client 70245, 4e compte de test (`#6`, créé à
   l'instant), Sfdfs Sdfdsfd (Alliance, Classic Beta PvE 2), première connexion, Elwynn ; build
   `main-dev@7707888 2026-10-07 13:04` (aucun déploiement depuis le relevé de 13:07 ; `/co version`
