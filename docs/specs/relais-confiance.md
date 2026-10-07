@@ -1,8 +1,8 @@
 # Relais de confiance : faire passer le LFW et les commandes publiques d'une salle à l'autre
 
-> État : **brouillon** · Rédigé le 2026-10-07 · Idée du user, le 2026-10-07 (« définir des nœuds de
+> État : **approuvée** (décisions D-R2 à D-R10 prises par le user le 2026-10-07) · Rédigée le 2026-10-07 · Idée du user, le 2026-10-07 (« définir des nœuds de
 > confiance qui répètent les commandes dans le canal CraftLink des différents royaumes », et la
-> vérification au clic) · Les décisions marquées « proposée » attendent le user
+> vérification au clic) · Rien de codé
 > Cible : WoW: Forever / Camelot (16001) · Addon : Crafting Order - Classic
 >
 > Suite du pont entre royaumes (`pont-royaumes.md`, publié en v1.46.0). Faits mesurés : skill public
@@ -38,7 +38,8 @@ Rien ne parle de royaume dans l'interface (règle du user, 2026-10-07).
 
 - **Relayer les fiches** (métiers, recettes) : le pont s'en charge (présentation, bonjour léger).
 - **Relayer les commandes nommées, de guilde ou d'amis** : seules les commandes « Tous » ont un public
-  dans une salle étrangère.
+  dans une salle étrangère. Une commande de guilde passe déjà par le canal de guilde, une commande pour
+  des amis par chuchotement direct (qui traverse les royaumes) : rien à relayer (confirmé par le user).
 - **Relayer l'offre détaillée du LFW** (`LFO`, `LFR`) : la ligne LFW suffit pour qu'on contacte A ;
   l'offre arrive en direct au premier contact.
 - **Un second saut** : un message reçu d'un relais n'est jamais relayé de nouveau.
@@ -67,43 +68,89 @@ Rien ne parle de royaume dans l'interface (règle du user, 2026-10-07).
 
 - **D-R1 (user, 2026-10-07)** : des relais répètent, dans la salle de leur royaume, ce qu'un porteur
   d'un autre royaume publie ; la source tranche au premier geste (vérification au clic).
-- **D-R2 (proposée)** : ce qui passe : le LFW (on / off) et les commandes publiques « Tous ». Rien
+- **D-R2 (user, 2026-10-07)** : ce qui passe : le LFW (on / off) et les commandes publiques « Tous ». Rien
   d'autre (voir « Ce qu'on NE fait PAS »).
-- **D-R3 (proposée)** : **A choisit ses relais**, un par royaume étranger : un ami ou un membre de sa
-  guilde d'abord, sinon le porteur à jour le plus récemment vu, en ligne. Option plus stricte :
-  seulement des amis ou des membres de guilde (moins de portée, plus de confiance).
-- **D-R4 (proposée)** : **une enveloppe** `RLY2|<A>|<n>|<message>` (verbe à nommer) : A la chuchote au
+- **D-R3 (user, 2026-10-07)** : **A choisit ses relais**, un par royaume étranger : un ami ou un membre de sa
+  guilde d'abord, sinon le porteur à jour le plus récemment vu, en ligne. (L'option stricte, amis et
+  guilde seulement, n'est pas retenue.)
+- **D-R4 (user, 2026-10-07)** : **une enveloppe** `RLY2|<A>|<n>|<message>` (verbe à nommer) : A la chuchote au
   relais, le relais la poste telle quelle dans sa salle. À la réception sur la salle : le message
   intérieur est traité comme venant de A **par un tiers** (une commande est créée, jamais modifiée,
   comme un relais par chuchotement aujourd'hui ; un LFW entre dans une entrée « relayée par B »,
   jamais dans l'entrée directe de A). Nécessaire aussi pour les commandes : une commande postée dans
   la salle par un autre que l'acheteur y est aujourd'hui rejetée comme usurpation
   (`Orders_Net.lua`, `_OnNew`).
-- **D-R5 (proposée)** : **la vérification au clic**. Quand D agit sur une entrée relayée (chuchoter,
+- **D-R5 (user, 2026-10-07)** : **la vérification au clic**. Quand D agit sur une entrée relayée (chuchoter,
   commander à A, ouvrir son offre), COC chuchote d'abord à A « tu es bien en LFW ? » ; A répond oui ou
   non. Sur un non : l'entrée disparaît chez D, D écarte B comme relais (24 h), et A note que B a menti
   (il ne le choisit plus). Pour une commande, rien de neuf : l'acceptation part à l'acheteur, qui
   renvoie une annulation s'il ne la connaît pas (v1.45.0).
-- **D-R6 (proposée)** : **le rythme**. Une commande : relayée une fois à sa publication (et à la
+- **D-R6 (user, 2026-10-07)** : **le rythme**. Une commande : relayée une fois à sa publication (et à la
   republication de A toutes les 2 h). Un LFW : relayé à l'activation, puis toutes les 15 min tant
   qu'il est actif (l'entrée relayée expire après 25 min sans rafraîchissement). Si un relais n'a rien
   posté (aucun membre de sa salle ne l'a vu), A en choisit un autre au rafraîchissement suivant.
-- **D-R7 (proposée)** : **plafonds**. Chez le relais : au plus 6 enveloppes par source et par 10 min,
+- **D-R7 (user, 2026-10-07)** : **plafonds**. Chez le relais : au plus 6 enveloppes par source et par 10 min,
   30 en tout. Chez un membre de la salle : au plus 10 entrées relayées par relais et par 10 min.
-- **D-R8 (proposée)** : **ce que voit le joueur**. Une entrée relayée s'affiche comme les autres (plaque
+- **D-R8 (user, 2026-10-07)** : **ce que voit le joueur**. Une entrée relayée s'affiche comme les autres (plaque
   LFW, liste des commandes), avec dans son infobulle « via <relais> », sans le mot royaume.
-- **D-R9 (proposée)** : **savoir relayer**. Un porteur à jour l'annonce dans sa fiche de métiers par
+- **D-R9 (user, 2026-10-07)** : **savoir relayer**. Un porteur à jour l'annonce dans sa fiche de métiers par
   un petit morceau (par exemple `rl=1`, placé avant les métiers comme `rm=`), ignoré par les clients
   d'avant. Pas la version (`cv=`) : les builds du banc la taisent depuis la v1.46.0.
-- **D-R10 (proposée)** : pas de réglage à part ; suit la salle de découverte (`/co channel room off`).
+- **D-R10 (user, 2026-10-07)** : pas de réglage à part ; suit la salle de découverte (`/co channel room off`).
 
 ## Critères d'acceptation
 
-À écrire une fois les décisions prises.
+1. [test] La fiche de métiers d'un client à jour porte `rl=1` juste après `rm=` ; un client d'avant la
+   lit sans erreur, avec les mêmes métiers. Un bonjour sans métier reste `HI|rm=<id>` (inchangé).
+2. [test] A passe en LFW : une enveloppe part vers un seul relais par royaume étranger connu qui sait
+   relayer, un ami ou un membre de guilde d'abord ; aucune vers son propre royaume, aucune vers un
+   client d'avant ; au plus 5 royaumes. Rien en instance, rien salle coupée.
+3. [test] Rythme : le LFW est relayé à l'activation puis au plus toutes les 15 min ; `LFW off` part tout
+   de suite s'il avait été relayé ; une commande « Tous » à sa publication, puis au plus toutes les 2 h ;
+   jamais une commande nommée, de guilde ou d'amis.
+4. [test] Le relais poste l'enveloppe dans sa salle telle quelle, une fois, et répond à A ; il refuse
+   une enveloppe dont la source n'est pas l'émetteur, un message intérieur hors liste (LFW on/off,
+   commande dont l'acheteur est la source), une enveloppe de plus de 255 octets, et au-delà de 6 par
+   source ou 30 en tout par 10 min.
+5. [test] Dans la salle : une commande relayée est créée (jamais modifiée) et marquée « via B » ; un LFW
+   relayé entre dans une entrée « via B » qui expire en 25 min, sans jamais remplacer une entrée
+   directe ; un LFW direct remplace l'entrée relayée ; `LFW off` relayé n'efface qu'une entrée relayée.
+   Au-delà de 10 entrées par relais par 10 min, le reste est ignoré. Rien n'est relayé de nouveau.
+6. [test] Un relais qui n'a pas répondu n'est plus choisi au rafraîchissement suivant (30 min).
+7. [test] Vérification : agir sur un LFW relayé (bouton Chuchoter) envoie `VRF` à A, une fois par
+   entrée ; A répond oui si son LFW est actif sur ce métier, non sinon ; sur un non, l'entrée disparaît,
+   B est ignoré comme relais pendant 24 h chez D, et A ne choisit plus B.
+8. [humain] Au banc, trois comptes : Gnoma (4618) passe en LFW ; Rédemption (4620) est son relais ;
+   Toao (4620) entre dans la salle APRÈS la présentation de Gnoma et ne la connaît pas. **Observé** :
+   Toao voit Gnoma en LFW (plaque ou onglet Artisans, « via Rédemption Wafhien » dans l'infobulle) ;
+   traces : `RL|Gnoma Short|…` chuchoté par Gnoma, posté par Rédemption, reçu par Toao. Témoin : la
+   v1.46.0, où Toao ne voit pas le LFW de Gnoma.
+9. [humain] Gnoma coupe son LFW sans le dire au relais (le relais ment en le gardant affiché : simulé en
+   faisant poster par Rédemption un `RL|Gnoma Short|…|LFW|on|…` en `/run`). Toao clique sur Chuchoter :
+   l'entrée disparaît, la trace de Toao dit « VRF : Gnoma Short dément, relais Rédemption Wafhien
+   écarté ».
 
 ## Contrat
 
-À écrire une fois les décisions prises (l'enveloppe, la vérification, le morceau `rl=`).
+Tout ce qui suit atteint des clients installés : figé une fois publié.
+
+- **Savoir relayer** : morceau `rl=1` dans la fiche de métiers, juste après `rm=<id>;` :
+  `SK|lvl=<n>|rm=<id>;rl=1;<métier>,<cur>,<max>;…`. Ignoré par un client d'avant (pas de virgule).
+  Absent d'un `HI` sans métier (le lecteur v1.46.0 de `HI|rm=` est strict) : un porteur sans métier
+  n'est pas choisi comme relais.
+- **Enveloppe** : `RL|<A>|<n>|<message>`, où `<A>` est le nom complet de la source, `<n>` un numéro
+  propre à A (dédoublonnage), `<message>` = `LFW|on|<métier>`, `LFW|off` ou `ORD|NEW|…` (acheteur = A).
+  Chuchotée par A au relais, puis postée telle quelle par le relais dans sa salle.
+- **Accusé** : `RLA|<n>`, chuchoté par le relais à A après avoir posté.
+- **Vérification** : `VRF|<métier>|<relais>` de D à A ; réponse `VRF|ok|<métier>` ou `VRF|no|<métier>`.
+
+## Plan (2026-10-07, à jeter une fois livré)
+
+Un seul palier, branche `feat/relais-confiance` (COC + outillage) : module `Directory_TrustRelay.lua`
+(source, relais, salle, vérification), `rl=1` dans `Directory_Skills.lua`, branchements dans
+`Directory_LFW.lua` (`_BroadcastLFW`), `Orders_Net.lua` (`Broadcast` NEW « Tous »), `UI_Artisans.lua`
+(bouton Chuchoter) et les infobulles (« via »). Test `tests/test_relais_confiance.lua`. Banc : critères 8
+et 9 par l'appli du banc.
 
 ## Renvois
 
