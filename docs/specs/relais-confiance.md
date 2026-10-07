@@ -141,6 +141,9 @@ Rien ne parle de royaume dans l'interface (règle du user, 2026-10-07).
     rien ne plafonne les fiches purement relayées, oubliées après 7 jours). Le numéro d'enveloppe
     (heure réelle) prend ~9 octets de plus : une grosse commande passe un peu plus tôt en « trop
     long » et garde ses autres chemins.
+- **D-R13 (user, 2026-10-07, après le banc)** : les deux écarts sont acceptés pour ce palier, publié
+  tel que vu au banc. Le « via » sur une commande relayée et les autres déclencheurs de la
+  vérification (commander à A, ouvrir son offre) viennent dans un palier suivant.
 
 ## Critères d'acceptation
 
