@@ -90,7 +90,8 @@ Rien ne parle de royaume dans l'interface (règle du user, 2026-10-07).
   qu'il est actif (l'entrée relayée expire après 25 min sans rafraîchissement). Si un relais n'a rien
   posté (aucun membre de sa salle ne l'a vu), A en choisit un autre au rafraîchissement suivant.
 - **D-R7 (user, 2026-10-07)** : **plafonds**. Chez le relais : au plus 6 enveloppes par source et par 10 min,
-  30 en tout. Chez un membre de la salle : au plus 10 entrées relayées par relais et par 10 min.
+  30 en tout. Chez un membre de la salle : au plus ~~10~~ 30 entrées relayées par relais et par 10 min
+  (D-R12 : à 10, le membre tronquait en silence ce que le relais avait posté).
 - **D-R8 (user, 2026-10-07)** : **ce que voit le joueur**. Une entrée relayée s'affiche comme les autres (plaque
   LFW, liste des commandes), avec dans son infobulle « via <relais> », sans le mot royaume.
 - **D-R9 (user, 2026-10-07)** : **savoir relayer**. Un porteur à jour l'annonce dans sa fiche de métiers par
@@ -114,6 +115,27 @@ Rien ne parle de royaume dans l'interface (règle du user, 2026-10-07).
     envoyé ce LFW il y a moins de 35 min (une copie pas encore effacée), il répond « périmé » :
     l'entrée disparaît chez D, personne n'est blâmé. Il ne blâme le relais que s'il ne lui a jamais
     rien confié de tel.
+- **D-R12 (revue protocole après le code, 2026-10-07)** :
+  - **le numéro d'enveloppe part de l'heure réelle** de A : il repartait de 0 à chaque `/reload`, et un
+    relais resté en ligne jetait alors la nouvelle enveloppe comme déjà vue, sans accusé ; A le
+    croyait muet. Une enveloppe vue est oubliée après 1 h ;
+  - **« Tous » exigé chez le relais ET chez le membre**, et le métier d'un LFW doit être une clé de la
+    lib : une commande nommée relayée alertait sa cible au nom d'un A que personne n'avait vérifié ;
+  - **une source de mon royaume n'est jamais relayée** chez moi : elle poste elle-même dans ma salle,
+    une enveloppe à son nom ne peut venir que d'un faussaire. (Un pair d'un autre royaume que je
+    connais reste relayable : son LFW ne part que dans sa salle.) ;
+  - **seules MES commandes sont confiées**, pas celles d'un reroll : l'enveloppe porte mon nom, le
+    relais la jetterait (acheteur ≠ source) ;
+  - **A ne blâme un relais que s'il lui a confié quelque chose** dans les 24 h, et pour 24 h : la
+    question vient d'un tiers que rien n'authentifie, sinon n'importe qui ferait écarter un relais
+    sain. « Périmé » se juge métier par métier : un LFW changé depuis moins de 35 min n'est pas un
+    mensonge ;
+  - **le relais voit lui-même le LFW** qu'on lui confie (A le lui a chuchoté : c'est une annonce
+    directe), sinon il était le seul de sa salle à ne pas le voir ;
+  - **limites acceptées** : une commande forgée peut prendre l'id de la vraie (ids `Nom-<n>`
+    devinables) ; elle tombe au premier geste (l'acheteur renvoie une annulation, D-R5). Le « via »
+    n'est montré que pour un LFW : une ligne de commande n'a pas d'infobulle d'origine, la trace le
+    dit (écart à D-R8, à confirmer par le user).
 
 ## Critères d'acceptation
 
@@ -127,17 +149,22 @@ Rien ne parle de royaume dans l'interface (règle du user, 2026-10-07).
    jamais une commande nommée, de guilde ou d'amis.
 4. [test] A n'envoie pas une enveloppe de plus de 255 octets. Le relais poste l'enveloppe dans sa
    salle telle quelle, une fois, et répond à A ; il refuse une enveloppe dont la source n'est pas
-   l'émetteur, un message intérieur hors liste (LFW on/off, commande dont l'acheteur est la source), et
-   au-delà de 6 par source ou 30 en tout par 10 min.
-5. [test] Dans la salle : une commande relayée est créée (jamais modifiée) et marquée « via B » ; un LFW
+   l'émetteur, un message intérieur hors liste (LFW on/off d'un métier de la lib, commande « Tous »
+   dont l'acheteur est la source), et au-delà de 6 par source ou 30 en tout par 10 min. Il voit
+   lui-même le LFW confié. Après un `/reload` de A, l'enveloppe suivante porte un numéro neuf, et le
+   relais resté en ligne la poste. La commande d'un reroll de A n'est pas confiée.
+5. [test] Dans la salle : une commande relayée est créée (jamais modifiée) et tracée « via B » ; un LFW
    relayé entre dans une entrée « via B » qui expire en 25 min, sans jamais remplacer une entrée
    directe ; un LFW direct remplace l'entrée relayée ; `LFW off` relayé n'efface qu'une entrée relayée.
-   Au-delà de 10 entrées par relais par 10 min, le reste est ignoré. Rien n'est relayé de nouveau.
+   Au-delà de 30 entrées par relais par 10 min, le reste est ignoré. Une commande nommée relayée et
+   une enveloppe au nom d'une source de mon royaume sont ignorées. Rien n'est relayé de nouveau.
 6. [test] Un relais qui n'a pas répondu n'est plus choisi au rafraîchissement suivant (30 min).
 7. [test] Vérification : agir sur un LFW relayé (bouton Chuchoter) envoie `VRF` à A, une fois par
    entrée ; A répond oui si son LFW est actif sur ce métier, non sinon ; sur un non, l'entrée disparaît,
-   B est ignoré comme relais pendant 24 h chez D, et A ne choisit plus B. Si A avait bien confié ce LFW
-   à B il y a moins de 35 min, il répond « périmé » : l'entrée disparaît, personne n'est blâmé.
+   B est ignoré comme relais pendant 24 h chez D, et A ne choisit plus B pendant 24 h s'il lui avait
+   confié quelque chose (sinon, pas de blâme côté A). Si A avait bien confié ce LFW à B il y a moins de
+   35 min, même s'il a changé de métier depuis, il répond « périmé » : l'entrée disparaît, personne
+   n'est blâmé.
 8. [humain] Au banc, trois comptes : Gnoma (4618) passe en LFW ; Rédemption (4620) est son relais ;
    Toao (4620) ne la connaît pas. **Observé** : Toao voit Gnoma en LFW (onglet Artisans, « via
    Rédemption Wafhien ») ; traces : `RL|Gnoma Short|…` chuchoté par Gnoma, posté par Rédemption, reçu
@@ -159,7 +186,8 @@ Tout ce qui suit atteint des clients installés : figé une fois publié.
   Absent d'un `HI` sans métier (le lecteur v1.46.0 de `HI|rm=` est strict) : un porteur sans métier
   n'est pas choisi comme relais.
 - **Enveloppe** : `RL|<A>|<n>|<message>`, où `<A>` est le nom complet de la source, `<n>` un numéro
-  propre à A (dédoublonnage), `<message>` = `LFW|on|<métier>`, `LFW|off` ou `ORD|NEW|…` (acheteur = A).
+  propre à A (dédoublonnage ; croissant, parti de l'heure réelle de A pour survivre à un `/reload`),
+  `<message>` = `LFW|on|<métier>` (clé de la lib), `LFW|off` ou `ORD|NEW|…` (acheteur = A, « Tous »).
   Chuchotée par A au relais, puis postée telle quelle par le relais dans sa salle.
 - **Accusé** : `RLA|<n>`, chuchoté par le relais à A après avoir posté.
 - **Vérification** : `VRF|<métier>|<relais>` de D à A ; réponse `VRF|ok|<métier>`, `VRF|no|<métier>|old`

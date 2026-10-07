@@ -135,7 +135,7 @@
 | `Directory_RelayCodec.lua` | codec du fil RLY : relais de la fiche d'un artisan HORS LIGNE par un de ses partenaires. | 70 |
 | `Directory_Relay.lua` | « contacts de confiance » : les données d'un joueur DÉCONNECTÉ restent servies par ses partenaires (r.isPartner). | 196 |
 | `Directory_Bridge.lua` | pont entre royaumes, paliers 2 et 3 (spec docs/specs/pont-royaumes.md). | 325 |
-| `Directory_TrustRelay.lua` | relais de confiance (spec docs/specs/relais-confiance.md). | 299 |
+| `Directory_TrustRelay.lua` | relais de confiance (spec docs/specs/relais-confiance.md). | 345 |
 | `Directory_AltCodec.lua` | codec du fil ALT (liste des persos d'un même joueur) + vérification par réciprocité. | 119 |
 | `Directory_Alts.lua` | regroupement des rerolls : identité « joueur » multi-persos (verbe ALT). | 316 |
 | `Directory_LFW.lua` | statut « recherche de travail » (Looking For Work) + OFFRE par métier. | 368 |
