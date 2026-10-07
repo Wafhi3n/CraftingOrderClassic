@@ -46,6 +46,15 @@ client.
 
 ## Relevés
 
+- 2026-10-07 13:30 — jusqu'a 55339ea — Forever build client 70245, 4e compte de test (`#6`, créé à
+  l'instant), Sfdfs Sdfdsfd (Alliance, Classic Beta PvE 2), première connexion, Elwynn ; build
+  `main-dev@7707888 2026-10-07 13:04` (aucun déploiement depuis le relevé de 13:07 ; `/co version`
+  pas relevé) — **GO** sur le cas « perso neuf » du /1 — relevé relu dans la trace de la SV de COC.
+  13:28:52 → 13:29:02 : onze « attente d'un canal par défaut sur le slot 1 », puis salle rejointe en
+  idx=1 (aucun canal du jeu au bout de 10 s) ; 13:29:16 « canal déplacé du /1 au /2 : le /1 rendu à
+  General - Elwynn Forest », par le chien de garde, 14 s plus tard. C'est le cas qui manquait au relevé
+  de 13:07. Dans la même trace : la salle répond (Gnomi Short, royaume 4620, et deux inconnus).
+
 - 2026-10-07 13:07 — jusqu'a 55339ea — Forever build client 70245, 3e compte (`#5`), Gnoma Short
   (royaume 4618), Ironforge, groupée avec Gnomi Short ; build `main-dev@7707888 2026-10-07 13:04`
   (lu dans le `.toc` de la copie déployée, `fix/bonjour-et-slot1` dans les branches ; `/co version`
