@@ -97,6 +97,23 @@ Rien ne parle de royaume dans l'interface (règle du user, 2026-10-07).
   un petit morceau (par exemple `rl=1`, placé avant les métiers comme `rm=`), ignoré par les clients
   d'avant. Pas la version (`cv=`) : les builds du banc la taisent depuis la v1.46.0.
 - **D-R10 (user, 2026-10-07)** : pas de réglage à part ; suit la salle de découverte (`/co channel room off`).
+- **D-R11 (relecture avant le code, 2026-10-07)** :
+  - **la taille se mesure chez A** : le jeu coupe un chuchotement à 255 octets sans prévenir, le relais
+    ne recevrait qu'un morceau (une liste de réactifs coupée donnerait un faux objet). A mesure
+    l'enveloppe entière et ne l'envoie pas au-delà de 255 octets (prix en texte libre, réactifs fournis
+    sans plafond : une grosse commande n'est pas relayée, elle garde ses autres chemins) ;
+  - **une commande n'est relayée qu'une fois par 2 h**, retenu dans les SavedVariables : la
+    republication de A part aussi à chaque bonjour reçu, pas seulement toutes les 2 h ;
+  - **une commande relayée est traitée comme reçue d'un tiers** (l'émetteur réel est le relais) :
+    créée, jamais modifiée, jamais comptée contre A par l'anti-spam. Jamais réenveloppée ni reposée ;
+    la poussée existante des commandes connues à un pair qui passe en ligne reste ce qu'elle est. Sans
+    titre : seul l'acheteur peut en donner un, et le titre n'est pas relayé ;
+  - **un inconnu en LFW relayé** entre dans l'annuaire comme une fiche relayée (`RLY`) : sans présence,
+    sans « vu le », marquée « via <relais> », oubliée après 7 jours sans contact direct ;
+  - **périmé n'est pas mensonge** : A se souvient de ce qu'il a confié à chaque relais. S'il lui a bien
+    envoyé ce LFW il y a moins de 35 min (une copie pas encore effacée), il répond « périmé » :
+    l'entrée disparaît chez D, personne n'est blâmé. Il ne blâme le relais que s'il ne lui a jamais
+    rien confié de tel.
 
 ## Critères d'acceptation
 
@@ -108,10 +125,10 @@ Rien ne parle de royaume dans l'interface (règle du user, 2026-10-07).
 3. [test] Rythme : le LFW est relayé à l'activation puis au plus toutes les 15 min ; `LFW off` part tout
    de suite s'il avait été relayé ; une commande « Tous » à sa publication, puis au plus toutes les 2 h ;
    jamais une commande nommée, de guilde ou d'amis.
-4. [test] Le relais poste l'enveloppe dans sa salle telle quelle, une fois, et répond à A ; il refuse
-   une enveloppe dont la source n'est pas l'émetteur, un message intérieur hors liste (LFW on/off,
-   commande dont l'acheteur est la source), une enveloppe de plus de 255 octets, et au-delà de 6 par
-   source ou 30 en tout par 10 min.
+4. [test] A n'envoie pas une enveloppe de plus de 255 octets. Le relais poste l'enveloppe dans sa
+   salle telle quelle, une fois, et répond à A ; il refuse une enveloppe dont la source n'est pas
+   l'émetteur, un message intérieur hors liste (LFW on/off, commande dont l'acheteur est la source), et
+   au-delà de 6 par source ou 30 en tout par 10 min.
 5. [test] Dans la salle : une commande relayée est créée (jamais modifiée) et marquée « via B » ; un LFW
    relayé entre dans une entrée « via B » qui expire en 25 min, sans jamais remplacer une entrée
    directe ; un LFW direct remplace l'entrée relayée ; `LFW off` relayé n'efface qu'une entrée relayée.
@@ -119,16 +136,19 @@ Rien ne parle de royaume dans l'interface (règle du user, 2026-10-07).
 6. [test] Un relais qui n'a pas répondu n'est plus choisi au rafraîchissement suivant (30 min).
 7. [test] Vérification : agir sur un LFW relayé (bouton Chuchoter) envoie `VRF` à A, une fois par
    entrée ; A répond oui si son LFW est actif sur ce métier, non sinon ; sur un non, l'entrée disparaît,
-   B est ignoré comme relais pendant 24 h chez D, et A ne choisit plus B.
+   B est ignoré comme relais pendant 24 h chez D, et A ne choisit plus B. Si A avait bien confié ce LFW
+   à B il y a moins de 35 min, il répond « périmé » : l'entrée disparaît, personne n'est blâmé.
 8. [humain] Au banc, trois comptes : Gnoma (4618) passe en LFW ; Rédemption (4620) est son relais ;
-   Toao (4620) entre dans la salle APRÈS la présentation de Gnoma et ne la connaît pas. **Observé** :
-   Toao voit Gnoma en LFW (plaque ou onglet Artisans, « via Rédemption Wafhien » dans l'infobulle) ;
-   traces : `RL|Gnoma Short|…` chuchoté par Gnoma, posté par Rédemption, reçu par Toao. Témoin : la
-   v1.46.0, où Toao ne voit pas le LFW de Gnoma.
-9. [humain] Gnoma coupe son LFW sans le dire au relais (le relais ment en le gardant affiché : simulé en
-   faisant poster par Rédemption un `RL|Gnoma Short|…|LFW|on|…` en `/run`). Toao clique sur Chuchoter :
-   l'entrée disparaît, la trace de Toao dit « VRF : Gnoma Short dément, relais Rédemption Wafhien
-   écarté ».
+   Toao (4620) ne la connaît pas. **Observé** : Toao voit Gnoma en LFW (onglet Artisans, « via
+   Rédemption Wafhien ») ; traces : `RL|Gnoma Short|…` chuchoté par Gnoma, posté par Rédemption, reçu
+   par Toao. Témoin : la v1.46.0, où Toao ne voit pas le LFW de Gnoma. ⚠️ Les SavedVariables sont par
+   compte et le 4e compte connaît Gnoma depuis 15:42 : il faut d'abord que Gnoma et Toao s'oublient
+   (après le `/reload` et 30 s, des deux côtés :
+   `/run local D=CraftingOrderClassic.Directory n="<l'autre>" D.roster[n]=nil D.online[n]=nil`, astuce
+   du 2026-09-30), sinon le LFW arrive en direct et le test ne prouve rien.
+9. [humain] Un faux relais : Gnoma n'est PAS en LFW, et Gnomi (4620, à qui Gnoma n'a rien confié) poste
+   en `/run` un `RL|Gnoma Short|…|LFW|on|…` dans sa salle. Toao clique sur Chuchoter : l'entrée
+   disparaît, la trace de Toao dit « VRF : Gnoma Short dément, relais Gnomi Short écarté ».
 
 ## Contrat
 
@@ -142,7 +162,8 @@ Tout ce qui suit atteint des clients installés : figé une fois publié.
   propre à A (dédoublonnage), `<message>` = `LFW|on|<métier>`, `LFW|off` ou `ORD|NEW|…` (acheteur = A).
   Chuchotée par A au relais, puis postée telle quelle par le relais dans sa salle.
 - **Accusé** : `RLA|<n>`, chuchoté par le relais à A après avoir posté.
-- **Vérification** : `VRF|<métier>|<relais>` de D à A ; réponse `VRF|ok|<métier>` ou `VRF|no|<métier>`.
+- **Vérification** : `VRF|<métier>|<relais>` de D à A ; réponse `VRF|ok|<métier>`, `VRF|no|<métier>|old`
+  (copie périmée, personne n'est blâmé) ou `VRF|no|<métier>` (le relais a menti).
 
 ## Plan (2026-10-07, à jeter une fois livré)
 

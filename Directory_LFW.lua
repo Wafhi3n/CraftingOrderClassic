@@ -187,6 +187,7 @@ function Dir:_BroadcastLFW()
     else
         c:QueueText("LFW|off")
     end
+    if self.TrustRelayLFW then self:TrustRelayLFW(db and db.prof or nil) end   -- relais de confiance
 end
 
 -- Ma clé de métier LFW (ou nil).

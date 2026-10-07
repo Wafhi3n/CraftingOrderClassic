@@ -95,7 +95,8 @@ function Dir:_SkillPayload()
         self:_MyVersion(); if self._myVerStr then tail = tail .. ";cv=" .. self._myVerStr end
     end
     local rm = self:_MyRealmID()
-    return "SK|lvl=" .. lvl .. "|" .. (rm and ("rm=" .. rm .. ";") or "") .. table.concat(parts, ";") .. tail
+    local rl = (rm and self.OnTrustEnvelope) and "rl=1;" or ""   -- je sais relayer (Directory_TrustRelay)
+    return "SK|lvl=" .. lvl .. "|" .. (rm and ("rm=" .. rm .. ";") or "") .. rl .. table.concat(parts, ";") .. tail
 end
 
 function Dir:AnnounceSkills()
@@ -111,7 +112,7 @@ function Dir:_ParseSKBody(message)
     local lvl, body = (message or ""):match("^SK|lvl=(%d+)|(.+)$")
     if not body then body = (message or ""):match("^SK|(.+)$") end
     if not body then return nil end
-    local skills, rep, ver, realm = {}, nil, nil, nil
+    local skills, rep, ver, realm, relay = {}, nil, nil, nil, nil
     for chunk in body:gmatch("[^;]+") do
         local rp = chunk:match("^rep=(%d+)$")
         local cv = (not rp) and chunk:match("^cv=(.+)$") or nil
@@ -119,12 +120,13 @@ function Dir:_ParseSKBody(message)
         if rp then rep = tonumber(rp)
         elseif cv then ver = cv
         elseif rm then realm = tonumber(rm)
+        elseif chunk == "rl=1" then relay = true
         else
             local key, cur, max = chunk:match("^([^,]+),(%d+),(%d+)$")
             if key then skills[key] = { tonumber(cur), tonumber(max) } end
         end
     end
-    return skills, lvl and tonumber(lvl) or nil, rep, ver, realm
+    return skills, lvl and tonumber(lvl) or nil, rep, ver, realm, relay
 end
 
 -- Le royaume d'un pair, lu dans SA fiche (jamais d'un relais) ; le pont s'en sert (Directory_Bridge).
@@ -139,12 +141,13 @@ end
 -- jamais d'une fiche relayée : il ne fait foi que pour celui qui l'annonce.
 function Dir:OnSkill(sender, message)
     if not sender then return end
-    local skills, lvl, rep, ver, realm = self:_ParseSKBody(message)
+    local skills, lvl, rep, ver, realm, relay = self:_ParseSKBody(message)
     if not skills then return end
     if ver and self.NotePeerVersion then self:NotePeerVersion(sender, ver) end   -- version = 1re main (jamais relais)
     local r = self:_Touch(sender)
     if lvl then r.level = lvl end
     if rep then r.rep = rep end
+    r.relay = relay or nil                                -- sait relayer (rl=1) : relais de confiance possible
     if realm then self:_NoteRealm(sender, realm) end
     -- SK = énumération COMPLÈTE des métiers RÉELS du perso courant de l'émetteur (GetNumSkillLines,
     -- jamais bleedée par les alts contrairement au RK). On reconstruit à neuf (un métier abandonné

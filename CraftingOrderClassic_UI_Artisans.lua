@@ -358,6 +358,10 @@ function UI:_FillArtRow(row, a)
             for _, ln in ipairs((D0.LFWOfferLines and D0:LFWOfferLines(a.name)) or {}) do
                 GameTooltip:AddLine(ln, 0.72, 0.90, 0.78, true)
             end
+            if lfwE.via then   -- relayé (Directory_TrustRelay) : provenance et fraîcheur
+                GameTooltip:AddLine(string.format(L["via %s · il y a %s"], lfwE.via,
+                    Skin.FormatDuration(math.max(0, time() - (lfwE.ts or time())))), 0.55, 0.55, 0.55)
+            end
             GameTooltip:Show()
         end)
         row:SetScript("OnLeave", GameTooltip_Hide)
@@ -398,7 +402,10 @@ end
 -- FUSIONNÉE de refléter g.anyPartner (un reroll non-vitrine peut porter le drapeau).
 function UI:_ArtRowButtons(row, a, nonAddon, partnerOn)
     local D = COC.Directory
-    row.whisper:SetScript("OnClick", function() if ChatFrame_SendTell then ChatFrame_SendTell(a.name) end end)
+    row.whisper:SetScript("OnClick", function()
+        if D0 and D0.TrustVerify then D0:TrustVerify(a.name) end   -- un LFW relayé : vérifié auprès de lui
+        if ChatFrame_SendTell then ChatFrame_SendTell(a.name) end
+    end)
     -- Présence 3 ÉTATS : « en ligne sans addon » (game) reste joignable par /w — le bouton suit la
     -- pastille jaune. Caché seulement pour une entrée « ajoutée » réellement hors ligne.
     local pres = (D and D.PresenceOf and D:PresenceOf(a.name)) or (a.online and "online" or "offline")

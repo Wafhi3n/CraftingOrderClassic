@@ -120,6 +120,8 @@ function Orders:Broadcast(action, o, opts)
     local payload = Codec.Encode(action, o)   -- NEW/CANCEL/ACK/DLV/DONE (nil sinon)
     if not payload then return end
     CraftLink:Send(payload, "global")
+    local D = COC.Directory   -- relais de confiance : une de mes commandes « Tous » (filtrée là-bas)
+    if action == "NEW" and D and D.TrustRelayOrder then D:TrustRelayOrder(o, payload) end
     if action == "NEW" or action == "TTL" then
         if o.recipient == "Guilde" then CraftLink:Send(payload, "guild") end
         -- Fanout whisper vers les artisans connus EN LIGNE concernés (contourne le canal caché HS).
