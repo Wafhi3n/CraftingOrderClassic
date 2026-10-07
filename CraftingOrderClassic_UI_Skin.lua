@@ -51,6 +51,17 @@ Skin.profFR = {
 }
 function Skin.ProfLabel(p) return p and L[Skin.profFR[p] or p] or "—" end
 
+-- Ordre d'affichage des métiers d'un artisan : les principaux d'abord, puis les secondaires (Cuisine,
+-- Secourisme, Pêche : COC.SECONDARY_PROF), chacun par libellé. Demande du user le 2026-10-07 : la Cuisine
+-- passait devant la Couture parce que « Cuisine » < « Couture » (ou « Cooking » < « Tailoring »).
+-- Sert de comparateur à table.sort sur des listes { key = <métier> }.
+function Skin.ProfLess(a, b)
+    local sec = CraftingOrderClassic.SECONDARY_PROF or {}
+    local sa, sb = sec[a.key] and 1 or 0, sec[b.key] and 1 or 0
+    if sa ~= sb then return sa < sb end
+    return Skin.ProfLabel(a.key) < Skin.ProfLabel(b.key)
+end
+
 -- Spell IDs d'apprenti pour récupérer l'icône de métier via GetSpellTexture (cache client stable).
 Skin.profSpellID = {
     Alchemy        = 2259,  Blacksmithing  = 2018,  Enchanting    = 7411,

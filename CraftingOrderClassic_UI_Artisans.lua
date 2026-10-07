@@ -18,7 +18,7 @@ local function trim(s) return s and s:gsub("^%s+", ""):gsub("%s+$", "") or "" en
 local knowsProf = Skin.KnowsProfOrSeen
 
 -- Métiers connus d'un artisan, en liste { key, sv } : niveau (SK) si connu, sinon recette seule (RK).
--- Union des deux sources, triée par libellé localisé — même ordre visuel que l'ancien texte concaténé.
+-- Union des deux sources : métiers principaux d'abord, puis secondaires, chacun par libellé (Skin.ProfLess).
 local function profsList(r)
     local SEC = COC.HIDDEN_PROF or {}      -- seuls les Poisons sautent (Cuisine/Secours/Pêche s'affichent)
     local seen, parts = {}, {}
@@ -46,7 +46,7 @@ local function profsList(r)
             if not (SEC[key] or seen[key]) then seen[key] = true; parts[#parts + 1] = { key = key, relay = true } end
         end
     end
-    table.sort(parts, function(a, b) return Skin.ProfLabel(a.key) < Skin.ProfLabel(b.key) end)
+    table.sort(parts, Skin.ProfLess)   -- principaux d'abord, puis secondaires
     return parts
 end
 UI._ProfsList = profsList   -- partagé avec la couche de fusion (UI_Artisans_Groups.lua)
