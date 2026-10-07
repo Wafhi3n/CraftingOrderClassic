@@ -175,6 +175,16 @@ local en3 = {
     ["Aucun de tes persos ne sait faire %s."] = "None of your characters can make %s.",
     ["%d commandes attendent dans ce métier."] = "%d orders are waiting in this profession.",
     ["Ouvrir la fenêtre de métier"] = "Open the profession window",
+
+    -- Signaler un bug ou une idée (CraftingOrderClassic_Report.lua, 2026-10-07)
+    ["Signaler un bug ou proposer une idée"] = "Report a bug or suggest an idea",
+    ["Bug"] = "Bug",
+    ["Idée"] = "Idea",
+    ["Sans compte GitHub"] = "No GitHub account",
+    ["Copie ce lien (Ctrl+C) et ouvre-le dans ton navigateur : le formulaire arrive avec la version déjà remplie."] = "Copy this link (Ctrl+C) and open it in your browser: the form comes up with the version already filled in.",
+    ["Pas de compte GitHub ? Copie ce lien (Ctrl+C) et laisse un commentaire sur la page CurseForge."] = "No GitHub account? Copy this link (Ctrl+C) and leave a comment on the CurseForge page.",
+    ["Un bug, ou une idée pour l'addon ? Choisis ci-dessous : l'addon te donne le lien du formulaire, déjà rempli."] = "A bug, or an idea for the addon? Pick below: the addon gives you the link to the form, already filled in.",
+    ["signaler un bug ou proposer une idée (lien vers un ticket GitHub)"] = "report a bug or suggest an idea (link to a GitHub issue)",
 }
 
 for k, v in pairs(en3) do L[k] = v end

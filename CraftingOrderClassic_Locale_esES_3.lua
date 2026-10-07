@@ -175,6 +175,16 @@ local es3 = {
     ["Aucun de tes persos ne sait faire %s."] = "Ninguno de tus personajes sabe hacer %s.",
     ["%d commandes attendent dans ce métier."] = "%d pedidos esperan en esta profesión.",
     ["Ouvrir la fenêtre de métier"] = "Abrir la ventana de profesión",
+
+    -- Signaler un bug ou une idée (CraftingOrderClassic_Report.lua, 2026-10-07)
+    ["Signaler un bug ou proposer une idée"] = "Informar de un error o proponer una idea",
+    ["Bug"] = "Error",
+    ["Idée"] = "Idea",
+    ["Sans compte GitHub"] = "Sin cuenta de GitHub",
+    ["Copie ce lien (Ctrl+C) et ouvre-le dans ton navigateur : le formulaire arrive avec la version déjà remplie."] = "Copia este enlace (Ctrl+C) y ábrelo en tu navegador: el formulario aparece con la versión ya rellenada.",
+    ["Pas de compte GitHub ? Copie ce lien (Ctrl+C) et laisse un commentaire sur la page CurseForge."] = "¿Sin cuenta de GitHub? Copia este enlace (Ctrl+C) y deja un comentario en la página de CurseForge.",
+    ["Un bug, ou une idée pour l'addon ? Choisis ci-dessous : l'addon te donne le lien du formulaire, déjà rempli."] = "¿Un error o una idea para el addon? Elige abajo: el addon te da el enlace al formulario, ya rellenado.",
+    ["signaler un bug ou proposer une idée (lien vers un ticket GitHub)"] = "informar de un error o proponer una idea (enlace a una incidencia de GitHub)",
 }
 
 for k, v in pairs(es3) do L[k] = v end
