@@ -246,6 +246,26 @@ function Orders:_OnNew(message, distribution, sender)
     end
 end
 
+-- Un artisan accepte ou livre une commande que je n'ai PAS : expirée, effacée, ou inventée par un relais
+-- qui ment. Avant, je l'ignorais en silence et il l'attendait pour rien (2026-10-07, idée du user : la
+-- source tranche quand quelqu'un agit). Si l'id me désigne comme acheteur (« Prénom Nom-<n> », cf.
+-- Orders.lua, création de l'id), je lui renvoie un CANCEL, à lui seul : un client d'avant le comprend
+-- déjà (même geste que pour ma commande annulée, plus bas). Une fois par (commande, artisan) / 10 min.
+local UNKNOWN_REPLY_EVERY = 600   -- s
+function Orders:_OnUnknownCycle(action, f, sender)
+    if not (action == "ACK" or action == "DLV") or not (f and f.id and sender and CraftLink) then return end
+    if f.id:match("^(.+)%-%d+$") ~= me() then return end          -- la commande d'un autre : pas à moi
+    self._unknownReplied = self._unknownReplied or {}
+    local key, t = f.id .. ">" .. sender, (GetTime and GetTime()) or 0
+    local last = self._unknownReplied[key]
+    if last and t - last < UNKNOWN_REPLY_EVERY then return end
+    self._unknownReplied[key] = t
+    CraftLink:Send(Codec.Encode("CANCEL", { id = f.id }), "whisper", sender)
+    if COC.Trace then
+        COC.Trace:Log("recv", string.format("%s sur une commande inconnue (%s) : annulation renvoyée à %s", action, f.id, sender))
+    end
+end
+
 -- Transitions de cycle (CANCEL/ACK/DLV/DONE/NACK). Voir _CycleTargets pour le sens des messages.
 -- `sender` = émetteur RÉEL (nom court, posé par le transport, non falsifiable) → on l'utilise pour
 -- AUTORISER la transition, au lieu de faire confiance aveuglément au champ du payload (anti-griefing :
@@ -254,7 +274,7 @@ function Orders:_OnCycle(action, message, sender)
     if action == "NACK" then return self:_OnNack(message, sender) end
     local f = Codec.Decode(message)
     local o = f and f.id and COC.db.orders[f.id]
-    if not o then return end
+    if not o then return self:_OnUnknownCycle(action, f, sender) end
     -- Ma commande ANNULÉE reçoit un ACK/DLV : cet artisan ne l'a pas su. Sans canal, mon annulation ne
     -- touche que les pairs qui m'ont répondu ; celui qui la tient d'un relais de proche en proche
     -- (OnArtisanOnline) la croit ouverte, l'accepte, la fabrique — et n'est jamais détrompé (revue
