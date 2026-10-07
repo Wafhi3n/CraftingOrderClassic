@@ -8,6 +8,12 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "Novedades",
+    -- v1.46.0
+    ["Plus d'artisans trouvés, même ceux que tu n'as jamais croisés"] = "Más artesanos encontrados, incluso los que nunca te has cruzado",
+    ["Certains joueurs de l'addon restaient invisibles pour toi, même en jouant à côté : tu ne les trouvais qu'en les croisant, en les ciblant ou en groupe. Maintenant, quand l'un d'eux se connecte, un joueur de l'addon qui vous connaît tous les deux fait les présentations, et vos deux addons se disent bonjour en coulisse. Il apparaît dans ton onglet Artisans avec ses métiers, et ses commandes et sa recherche de travail t'arrivent comme pour n'importe quel artisan connu. Rien à régler."] =
+        "Algunos jugadores del addon seguían siendo invisibles para ti, incluso jugando a tu lado: solo los encontrabas al cruzártelos, al seleccionarlos o en grupo. Ahora, cuando uno de ellos se conecta, un jugador del addon que os conoce a los dos hace las presentaciones, y vuestros addons se saludan entre bastidores. Aparece en tu pestaña Artesanos con sus profesiones, y sus pedidos y su búsqueda de trabajo te llegan como los de cualquier artesano conocido. Nada que configurar.",
+    ["Ça reste discret : une présentation par connexion, un bonjour court de chaque côté, et pas plus d'une fois toutes les six heures pour le même joueur. Plus il y a de joueurs à jour, plus tu verras de monde."] =
+        "Sigue siendo discreto: una presentación por conexión, un saludo corto en cada sentido y no más de una vez cada seis horas para el mismo jugador. Cuantos más jugadores actualicen, a más gente verás.",
     -- v1.45.0
     ["Le /1 te revient, et l'addon découvre les royaumes cachés"] = "El /1 vuelve a ser tuyo, y el addon descubre los reinos ocultos",
     ["Sur un perso tout neuf, le canal caché de l'addon pouvait passer avant le canal Général du jeu et prendre le /1, que le jeu lui gardait ensuite : taper /1 écrivait dans un canal caché. L'addon rend maintenant le /1 au premier canal du jeu dès qu'il y en a un, sur les nouveaux persos comme sur ceux déjà touchés."] =
@@ -207,16 +213,7 @@ local news = {
         "Dos correcciones: los encantamientos de muñecas y de bastón de Wrath no aparecían nunca en el panel de intercambio (el juego los escribe «Bracers» y «Staff» donde las demás expansiones dicen «Bracer»), y un encantamiento de bastón solo se ofrece ya sobre un bastón de verdad. Además, el panel ya no toca sus botones mientras estás en combate, algo que el juego bloquea de todos modos.",
     ["Plus discret : les lignes de chat « X sait faire cette commande captée » sont désactivées par défaut — la commande est poussée aux amis capables dans tous les cas, le message n'était que du bruit. |cFFFFFFFF/co verbose|r les remet."] =
         "Más discreto: las líneas de chat «X sabe hacer ese pedido captado» están desactivadas por defecto. El pedido se envía igualmente a los amigos capaces, así que el mensaje solo era ruido. |cFFFFFFFF/co verbose|r las devuelve.",
-    -- v1.20.0
-    ["Enchante en un clic, trié par emplacement, et depuis l'échange"] = "Encanta con un clic, ordenado por ranura, y desde el intercambio",
-    ["Le bouton « Créer » de l'Enchantement avait un vieux bug intermittent : parfois rien ne se passait, et resélectionner la recette finissait par le faire marcher. Cause trouvée : sélectionner une recette n'arme pas le bouton natif de Blizzard, notre clic sécurisé tombait donc sur un bouton désactivé. Corrigé — ça devrait marcher du premier coup, à chaque fois."] =
-        "El botón «Crear» de Encantamiento tenía un viejo fallo intermitente: a veces no pasaba nada, y volver a seleccionar la receta varias veces acababa haciéndolo funcionar. Causa encontrada: seleccionar una receta no activa el botón nativo de Blizzard, así que nuestro clic seguro caía en un botón desactivado. Corregido: ahora debería funcionar a la primera, siempre.",
-    ["Les recettes d'enchantement ne s'entassent plus dans un fourre-tout « Autres/Divers » : elles se rangent par emplacement (Poignets, Torse, Main gauche…) puis par stat de base (Force, Esprit, Déviation), le nom raccourci à la stat seule puisque l'emplacement est déjà dans l'en-tête."] =
-        "Las recetas de encantamiento ya no se amontonan en un cajón «Otros/Varios»: se ordenan por ranura (muñecas, torso, mano izquierda…) y luego por estadística base (fuerza, espíritu, desviación), con el nombre recortado a solo la estadística ya que la ranura está en el encabezado.",
-    ["Sélectionner un enchant d'équipement affiche un bouton « Enchanter équipé » à côté de Créer : un clic l'applique directement sur la pièce que tu portes, sans avoir à cibler."] =
-        "Al seleccionar un encantamiento de equipo aparece un botón «Encantar equipado» junto a Crear: un clic lo aplica directamente sobre la pieza que llevas puesta, sin tener que apuntar.",
-    ["Et quand quelqu'un te tend un objet à enchanter en échange, le poser dans la case « ne sera pas échangé » ouvre un petit panneau listant tes enchants pour cet emplacement, prêts à lancer sans fouiller ta fenêtre de métier (qui doit rester ouverte : le jeu ne renseigne tes recettes connues que pendant qu'elle l'est)."] =
-        "Y cuando alguien te da un objeto para encantar en un intercambio, ponerlo en la casilla «no se intercambiará» abre un pequeño panel con tus encantamientos para esa ranura, listos para lanzar sin rebuscar en tu ventana de profesión (que debe seguir abierta: el juego solo informa de tus recetas conocidas mientras lo está).",
+    -- (clés v1.20.0 retirées à la v1.46.0 : version sortie de la fenêtre glissante de l'onglet)
     -- (clés v1.19.1 et v1.19.0 retirées à la v1.45.0 : versions sorties de la fenêtre glissante de l'onglet)
     -- (clés v1.18.0 et v1.17.1 retirées à la v1.44.2 : versions sorties de la fenêtre glissante de l'onglet)
     -- (clés v1.17.0 retirées à la v1.44.1 : version sortie de la fenêtre glissante de l'onglet)

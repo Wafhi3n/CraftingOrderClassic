@@ -177,6 +177,19 @@ royaume (`GetRealmID()`).
     2026-10-07, corrigé le même jour).
   Accepté : un bonjour léger d'un inconnu entre dans l'annuaire et reçoit une réponse (comme un HI
   chuchoté), et un bonjour léger forgé avec le bon royaume peut confirmer trop tôt une présentation.
+- **D14 (relecture avant la v1.46.0, 2026-10-07)** :
+  - l'élu est choisi parmi les porteurs à jour **vus dans la salle** (leur bonjour de salle, leur
+    entrée, une présentation qu'ils y ont postée ; retirés à leur sortie), pas parmi tous ceux « en
+    ligne » : un ami ou un membre de guilde de mon royaume hors de la salle gagnait l'élection sans
+    voir l'arrivée, et personne ne présentait l'arrivant. Le risque inverse (deux élus) est absorbé ;
+  - le verrou de l'élu est de **10 min** à l'envoi (il ne voit pas la suite) ; c'est le passeur qui ne
+    reposte pas avant 6 h ;
+  - « présente quelqu'un d'autre » : **3 demandes par émetteur et par 10 min** (contre 10 pour le
+    reste). Risque accepté : un menteur de ce royaume peut encore faire saluer 3 noms inventés ou une
+    victime par 10 min, par toute la salle d'en face, une fois par nom et par 10 min ;
+  - **rien en instance** (`IsInInstance`) : ni envoi ni verrou, le jeu y refuse les messages
+    d'addon. Pas `C_ChatInfo.InChatMessagingLockdown`, mesuré « verrouillé » en monde ouvert alors
+    que les envois passent (2026-09-18) ; un bonjour léger différé revérifie aussi la salle.
 - **D8 (user, 2026-10-07)** : **pas de réglage à part.** Le pont suit la salle de découverte :
   `/co channel room off` le coupe aussi. Raison : moins de réglages, et sans salle le pont n'a ni
   arrivées à voir ni salle où poster.
