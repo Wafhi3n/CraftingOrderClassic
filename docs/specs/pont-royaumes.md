@@ -150,6 +150,20 @@ royaume (`GetRealmID()`).
   2 minutes de chargement peut, lui aussi, se présenter dans le royaume de C. C'est une
   auto-présentation légitime (D connaît maintenant quelqu'un là-bas), bornée par les mêmes règles :
   une par royaume et par session, une par 6 h.
+- **D12 (relecture protocole du palier 2, 2026-10-07)** :
+  - le verrou de 6 h de l'arrivant ne se pose qu'à la **confirmation** (un bonjour léger reçu de ce
+    royaume) ; à l'envoi de la demande, 10 min seulement. Sans confirmation après 30 s, un second
+    passeur du même royaume est essayé, jamais un troisième. Sinon un pair qui ment sur son royaume,
+    ou un passeur qui part, faisait perdre la présentation pour 6 h ;
+  - un membre ne dit bonjour qu'une fois par nom et par 10 min, quel que soit le nombre de
+    présentations postées, et jamais à un nom présenté comme de son propre royaume ; au plus 20
+    bonjours légers spontanés par minute, tous noms confondus (les réponses ne comptent pas : elles
+    sont bornées à une par pair et par 10 min). Sinon un menteur faisait chuchoter toute la salle vers
+    une victime à chaque repost ;
+  - une présentation n'est lue que par whisper (demande) ou sur la salle, jamais par groupe ou
+    guilde, et un numéro de royaume démesuré est ignoré.
+  Accepté : un bonjour léger d'un inconnu entre dans l'annuaire et reçoit une réponse (comme un HI
+  chuchoté), et un bonjour léger forgé avec le bon royaume peut confirmer trop tôt une présentation.
 - **D8 (user, 2026-10-07)** : **pas de réglage à part.** Le pont suit la salle de découverte :
   `/co channel room off` le coupe aussi. Raison : moins de réglages, et sans salle le pont n'a ni
   arrivées à voir ni salle où poster.

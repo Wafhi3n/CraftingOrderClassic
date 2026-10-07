@@ -32,6 +32,9 @@ local CAP, CAP_WINDOW = 10, 600      -- présentations acceptées par émetteur,
 local HL_FOR          = 600          -- s : après mon bonjour léger, le sien est une réponse
 local POST_JITTER     = 3            -- s : délai aléatoire avant de poster (un second passeur se tait)
 local HELLO_JITTER    = 5            -- s : étale les bonjours légers des membres de la salle
+local HL_PER_MIN      = 20           -- bonjours légers spontanés par minute, tous noms confondus
+local SHORT_LOCK      = 600          -- s, heure réelle : verrou d'une demande pas encore confirmée
+local RETRY_AFTER     = 30           -- s : sans confirmation, un 2e passeur du même royaume est essayé
 
 local function now() return (GetTime and GetTime()) or 0 end
 local function clock() return (time and time()) or 0 end
@@ -46,9 +49,12 @@ local loadedAt = now()
 
 local function state()
     local s = Dir._bridge
-    if not s then s = { asked = {}, seen = {}, cap = {}, capTraced = {}, hl = {} }; Dir._bridge = s end
+    if not s then s = { asked = {}, seen = {}, cap = {}, capTraced = {}, hl = {}, burst = {} }; Dir._bridge = s end
     return s
 end
+
+-- Un numéro de royaume plausible (le fil est lisible par tous : un nombre démesuré ne passe pas).
+local function validRealm(r) return type(r) == "number" and r > 0 and r < 2147483647 end
 
 local function store()
     if not COC.db then return nil end
@@ -87,21 +93,34 @@ local function underCap(sender)
 end
 
 -- 1. L'arrivant. Un porteur d'un AUTRE royaume vient de me parler en direct : dans les 2 minutes qui
--- suivent mon chargement, je lui demande de me présenter dans sa salle. Un seul par royaume et par
--- session, et pas plus d'une fois toutes les 6 heures par royaume, reconnexions comprises.
+-- suivent mon chargement, je lui demande de me présenter dans sa salle. Un passeur par royaume ; sans
+-- confirmation après 30 s, un second (au plus). Le verrou de 6 h ne se pose qu'à la CONFIRMATION (un
+-- bonjour léger venu de ce royaume) : à l'envoi, un verrou de 10 min seulement. Sinon un passeur qui
+-- ment sur son royaume, ou qui part, faisait perdre ma présentation pour 6 h (revue du 2026-10-07).
 function Dir:BridgeOnRealm(sender, realm)
     local mine = myRealm()
-    if not (enabled() and mine and realm and realm ~= mine and sender) then return end
+    if not (enabled() and mine and validRealm(realm) and realm ~= mine and sender) then return end
     if now() - loadedAt > ASK_WINDOW then return end
     local s, db = state(), store()
-    if s.asked[realm] or not db then return end
-    s.asked[realm] = true
-    if recent(db.selfIntro, realm) then return end
+    if not db then return end
+    local a = s.asked[realm]
+    if a and (a.confirmed or a.tries >= 2 or a.by == sender or now() - a.at < RETRY_AFTER) then return end
+    if not a and recent(db.selfIntro, realm) then s.asked[realm] = { confirmed = true }; return end
     local name = me()
     if not fullName(name) then return end
-    db.selfIntro[realm] = clock()
+    s.asked[realm] = { at = now(), by = sender, tries = (a and a.tries or 0) + 1 }
+    db.selfIntro[realm] = clock() - (REPEAT_EVERY - SHORT_LOCK)   -- « récent » pendant 10 min seulement
     CraftLink:Send(("INT|%s|%d"):format(name, mine), "whisper", sender)
     trace(("présentation demandée à %s (royaume %d)"):format(sender, realm))
+end
+
+-- Un bonjour léger venu d'un royaume où j'ai demandé à être présenté : la présentation a eu lieu.
+local function confirm(realm)
+    local a = validRealm(realm) and state().asked[realm]
+    if not a or a.confirmed then return end
+    a.confirmed = true
+    local db = store()
+    if db then db.selfIntro[realm] = clock() end                -- maintenant, 6 h
 end
 
 -- 2. Le passeur. « Présente-moi » reçu (palier 2 : de l'arrivant lui-même, d'un autre royaume). Je le
@@ -126,13 +145,33 @@ function Dir:_BridgeRequest(sender, name, realm)
     end)
 end
 
+-- Au plus HL_PER_MIN bonjours légers spontanés par minute, tous noms confondus.
+local function burstAllowed()
+    local s, t = state(), now()
+    local kept = {}
+    for _, at in ipairs(s.burst) do if t - at < 60 then kept[#kept + 1] = at end end
+    s.burst = kept
+    if #kept >= HL_PER_MIN then return false end
+    kept[#kept + 1] = t
+    return true
+end
+
 -- 3. Les membres de la salle. Une présentation postée : je la note (pour ne pas la reposter) et, si je
 -- ne connais pas l'arrivant, je lui dis un bonjour léger, après un délai aléatoire (toute la salle ne
--- part pas dans la même seconde).
-function Dir:_BridgeSeen(sender, name)
-    state().seen[name] = now()
+-- part pas dans la même seconde). Une seule fois par nom et par 10 min, quel que soit le nombre de
+-- présentations : sinon un menteur qui reposte la même « victime » faisait chuchoter toute la salle
+-- vers elle à chaque fois (revue du 2026-10-07). Une salle ne présente que des étrangers.
+function Dir:_BridgeSeen(sender, name, realm)
+    local s, t = state(), now()
+    local seenAt = s.seen[name]
+    s.seen[name] = t
+    if seenAt and t - seenAt < SEEN_FOR then return end
+    if realm == myRealm() then return end
+    local hl = s.hl[name]
+    if hl and t - hl < HL_FOR then return end
     local r = self.roster and self.roster[name]
     if r and r.lastSeen then return end
+    if not burstAllowed() then return end
     after(math.random() * HELLO_JITTER, function()
         local rr = Dir.roster and Dir.roster[name]
         if rr and rr.lastSeen then return end            -- il m'a parlé entre-temps
@@ -144,10 +183,11 @@ end
 function Dir:OnIntro(sender, message, distribution)
     local name, realm = (message or ""):match("^INT|([^|]+)|(%d+)$")
     realm = tonumber(realm)
-    if not (name and realm and sender and enabled()) or name == me() or not fullName(name) then return end
+    if not (name and validRealm(realm) and sender and enabled()) or name == me() or not fullName(name) then return end
+    if distribution ~= "WHISPER" and distribution ~= "CHANNEL" then return end   -- ni groupe, ni guilde
     if not underCap(sender) then return end
     if distribution == "WHISPER" then return self:_BridgeRequest(sender, name, realm) end
-    self:_BridgeSeen(sender, name)                       -- posté dans ma salle : jamais un second saut
+    self:_BridgeSeen(sender, name, realm)                -- posté dans ma salle : jamais un second saut
 end
 
 -- Le bonjour léger : ma fiche de métiers seule (le royaume dedans), ou mon royaume seul sans métier.
@@ -168,8 +208,9 @@ end
 -- l'annonce complète, ni les fiches de mes partenaires, ni une découverte.
 function Dir:OnLightHello(sender, message)
     if not (sender and enabled()) or sender == me() then return end
-    local r = self:_Touch(sender)
     local body = message and message:match("^HL|(.+)$")
+    confirm(tonumber(body and body:match("rm=(%d+)")))         -- avant OnSkill : pas d'essai de 2e passeur
+    local r = self:_Touch(sender)
     if body and body:find("^SK") then
         self:OnSkill(sender, body)
     else
