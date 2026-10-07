@@ -37,6 +37,16 @@ local BODY_W = 780
 local function versionsFront()
     return {
         {
+            v = "v1.45.0", title = L["Le /1 te revient, et l'addon découvre les royaumes cachés"],
+            lines = {
+                L["Sur un perso tout neuf, le canal caché de l'addon pouvait passer avant le canal Général du jeu et prendre le /1, que le jeu lui gardait ensuite : taper /1 écrivait dans un canal caché. L'addon rend maintenant le /1 au premier canal du jeu dès qu'il y en a un, sur les nouveaux persos comme sur ceux déjà touchés."],
+                L["Sur Forever, un chuchotement n'arrive qu'au nom complet « Prénom Nom ». Juste après un groupe, ou sur un clic droit, l'addon disait parfois bonjour au seul prénom, ou à « Unknown » : le bonjour se perdait, et une erreur « No player named » pouvait suivre deux minutes plus tard. Il attend maintenant le nom complet, et le menu du clic droit lit aussi le nom de famille."],
+                L["Si tu as accepté ou livré une commande que son acheteur n'a plus (expirée, effacée, ou qui n'a jamais été la sienne), son addon prévient maintenant le tien, et la commande passe annulée au lieu de rester en attente pour rien. Il suffit que l'acheteur ait cette version."],
+                L["Avec le suivi affiché à l'écran, l'addon recalculait toutes les deux minutes les recettes de chaque métier suivi, et sa mémoire grimpait sans arrêt. Il ne le refait plus qu'en quittant l'hôtel des ventes ou un marchand, là où les prix changent, et sinon toutes les 15 minutes."],
+                L["Forever a toujours des royaumes, cachés : le jeu range chaque compte sur l'un d'eux sans le dire. Le canal de découverte de l'addon n'atteint que les joueurs de ton royaume, et le canal Commerce aussi, donc tes annonces et ta ligne LFW. Ton royaume part maintenant avec le bonjour de l'addon. Rien ne change encore à l'écran : c'est la première étape pour présenter les joueurs d'un royaume à l'autre."],
+            },
+        },
+        {
             v = "v1.44.2", title = L["Des cooldowns justes, et les longues listes de recettes arrivent entières"],
             lines = {
                 L["L'addon annonçait des transmutations ou l'Étoffe lunaire « prêtes » chez des artisans qui ne connaissaient même pas ces recettes. La fenêtre de métier liste aussi les recettes que tu n'as pas apprises, et l'addon prenait leur cooldown pour le tien. Il ne suit plus que les recettes que tu connais, et efface au chargement les faux cooldowns déjà notés, pour tous tes persos. Ceux qu'envoie un joueur pas encore à jour sont écartés quand son niveau de métier est trop bas pour connaître la recette."],
@@ -419,26 +429,12 @@ local function versionsOlder()
                 L["Et quand quelqu'un te tend un objet à enchanter en échange, le poser dans la case « ne sera pas échangé » ouvre un petit panneau listant tes enchants pour cet emplacement, prêts à lancer sans fouiller ta fenêtre de métier (qui doit rester ouverte : le jeu ne renseigne tes recettes connues que pendant qu'elle l'est)."],
             },
         },
-        {
-            v = "v1.19.1", title = L["Correctif : l'icône « dispo » remarche sur la nouvelle UI des plaques"],
-            lines = {
-                L["Sur le client TBC (et bientôt Era/Saison de la Découverte à la 1.15.9), l'icône « recherche de travail » au-dessus de la plaque d'un artisan cessait de s'afficher quand son statut changeait : la nouvelle interface de plaques a renommé un champ interne que l'addon lisait. Corrigé. Elle reste invisible en instance (donjon, raid) : le jeu verrouille les plaques amies aux addons là-bas, rien à faire de notre côté."],
-            },
-        },
-        {
-            v = "v1.19.0", title = L["Propose des recettes précises, diffuse tes réactifs, et le LFW marche même sans l'addon"],
-            lines = {
-                L["« Chercher du travail » propose maintenant des recettes précises, pas seulement des réactifs : coche des plans dans la liste et qui te consulte voit « propose : Bouclier de fer, Gilet de mailles de cuivre » à côté de ce que tu fournis déjà."],
-                L["Un bouton « Diffuser » envoie la liste de réactifs d'une recette ou d'une commande dans un canal au choix (guilde, dire, groupe/raid, un canal numéroté), avec le lien de chaque objet — une liste de courses en un clic, depuis la vue métier, la carte de commande ou le panneau de publication."],
-                L["Le LFW marche même sans l'addon : tape « LFW enchantement » en Commerce ou Général et tu apparais comme dispo, avec la même icône de plaque qu'un joueur qui a Crafting Order. Plus une correction : une recette déjà apprise ne s'affichait plus en double avec MissingTradeSkillsList."],
-            },
-        },
     }
 end
 
 local function versionsOldest()
     return {
-        -- v1.18.0 / v1.17.1 (retirées à la v1.44.2), v1.17.0 (retirée à la v1.44.1),v1.16.0 (retirée à la v1.44.0), v1.15.1 (retirée à la v1.43.0), v1.15.0 (retirée à la v1.42.1), v1.14.0 (retirée à la v1.42.0), v1.13.0 (retirée à la v1.41.1), v1.12.0 / v1.11.0 / v1.10.2 (retirées à la v1.41.0 : la Saison de la Découverte, le canal du royaume et
+        -- v1.19.1 / v1.19.0 (retirées à la v1.45.0), v1.18.0 / v1.17.1 (retirées à la v1.44.2), v1.17.0 (retirée à la v1.44.1),v1.16.0 (retirée à la v1.44.0), v1.15.1 (retirée à la v1.43.0), v1.15.0 (retirée à la v1.42.1), v1.14.0 (retirée à la v1.42.0), v1.13.0 (retirée à la v1.41.1), v1.12.0 / v1.11.0 / v1.10.2 (retirées à la v1.41.0 : la Saison de la Découverte, le canal du royaume et
         -- le bouton « Créer » sécurisé n'existent pas sur Forever), v1.10.1 / v1.9.0 / v1.8.0 / v1.7.0 / v1.7.1 /
         -- v1.6.0 / v1.5.0 / v1.4.0 retirées de l'onglet (l'historique
         -- complet vit dans CHANGELOG.md). Cet onglet ne garde qu'une fenêtre glissante de versions :
