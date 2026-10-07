@@ -46,6 +46,17 @@ client.
 
 ## Relevés
 
+- 2026-10-07 14:24 — jusqu'a 8562a3a — Forever build client 70245, Gnomi Short (2e compte, royaume
+  4620) et Gnoma Short (3e compte, royaume 4618) connectées ensemble, Ironforge ; build
+  `main-dev@67296b9 2026-10-07 13:51` (inchangé depuis le relevé de 14:12) — **GO** sur le palier 1
+  du pont, entre deux royaumes — relevé relu dans les traces et l'annuaire des deux SV.
+  14:22:44 Gnomi → Gnoma `HI|SK|lvl=3|rm=4620;Blacksmithing,1,75` ; 14:22:45 Gnoma → Gnomi
+  `HI|rm=4618` (elle n'a pas de métier). Annuaire : Gnomi note `realm = 4618` pour Gnoma, Gnoma note
+  `realm = 4620` pour Gnomi (fiche avec métier, chemin `SK`) ; Gnomi a aussi `realm = 4620` pour
+  Rédemption Wafhien. Les deux formes du contrat (avec et sans métier) sont donc vues dans les deux
+  sens. Quatre bonjours de Gnomi vers Gnoma en 70 s : un par `/reload` (14:22:40, 14:23:08,
+  14:23:39, 14:23:48), le délai de 60 s par joueur repart à chaque chargement, comme avant.
+
 - 2026-10-07 14:12 — jusqu'a 8562a3a — Forever build client 70245, 2e compte (`#1`), Gnomi Short
   (royaume 4620), connexion à 14:11 ; build `main-dev@67296b9 2026-10-07 13:51` (lu dans le `.toc`
   de la copie déployée, `feat/pont-royaumes` dans les branches ; `/co version` pas relevé) — **GO
