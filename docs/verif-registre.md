@@ -46,6 +46,21 @@ client.
 
 ## Relevés
 
+- 2026-10-07 18:44 — jusqu'a ed10579 — Forever build client 70245, quatre comptes : Toao Rosa (4e,
+  4620, l'arrivante), Gnomi Short (2e, 4620), Rédemption Wafhien (1er, 4620), Gnoma Short (3e, 4618) ;
+  build `main-dev@0f7dd3f 2026-10-07 18:40`, `## Version: 1.46.0` (lu dans le `.toc` déployé et par
+  l'appli du banc, fiche `CraftingOrderClassic--release-v1.46.0`, deux gestes cochés OK) — **GO** sur
+  le candidat v1.46.0 (relecture D14 comprise) — relevé relu dans les traces et les verrous des quatre
+  SV. Toao entre à 18:44:13 ; 18:44:17 Rédemption « présentation de Toao Rosa demandée à Gnoma Short
+  (royaume 4618) : passeur élu » ; Gnoma la reçoit et ne la reposte pas (déjà postée à 16:15, 6 h) ;
+  18:44:49 Toao se présente aussi elle-même à Gnoma. **Pourquoi Rédemption et pas Gnomi** (la fiche
+  annonçait Gnomi) : Gnomi gardait un verrou « Toao présentée » posé à 16:15 par le build d'avant la
+  relecture (6 h à l'envoi, lu dans la SV du 2e compte) ; Rédemption, entrée dans la salle APRÈS Gnomi
+  (18:43:13 contre 18:42:50), ne l'y avait pas vue et s'est crue élue — le cas « deux élus » accepté
+  (D14), ici sans doublon puisque Gnomi s'est tue. Gnomi, elle, a bien vu Rédemption entrer (`[pres]
+  join` à 18:43:17, bonjour de salle à 18:43:24). Pas d'erreur Lua. Au passage : Rédemption s'est
+  présentée à Lina Licht (4618), un joueur extérieur déjà en v1.45.0.
+
 - 2026-10-07 16:21 — jusqu'a df1d18f — Forever build client 70245, Toao Rosa (4e compte, 4620) et
   Gnoma Short (3e compte, 4618) ; build `main-dev@f0c30b7 2026-10-07 16:18` (lu par l'appli du banc,
   geste « toao-se-presente » coché OK à 16:21) — **GO** sur le verrou par personnage — relevé relu dans
