@@ -46,6 +46,15 @@ client.
 
 ## Relevés
 
+- 2026-10-07 08:48 — jusqu'a 762579e — Forever, deux comptes (Gnomi #1, Rédemption #4), build
+  `main-dev@8b3354e 2026-10-06 20:27` avec fix/trace-et-clubs (copie déployée du `.toc` ; `/co version`
+  pas montré) — **GO partiel sur `fix/trace-et-clubs`** — Gnomi annonce une commande d'enchantement sur
+  Trade (Services) (`#CO56`, trace #1 08:48:14 « annonce Gnomi Short-56 sur Trade (Services) ») ;
+  Rédemption, déjà en contact, écrit dans sa trace (SavedVariable #4, relue après /reload) « annonce
+  Gnomi Short-56 : déjà en contact avec Gnomi Short, pas de bonjour », et la commande complète arrive
+  par chuchotement à la même seconde (`ORD|NEW|Gnomi Short-56`). **Pas vu** : le cas « bonjour à X »
+  (auteur pas encore en contact), la trace d'une ligne LFW, la liste des communautés en instance
+  (`myClubs` avec une valeur secrète).
 - 2026-10-05 21:11 — jusqu'a b4fcac0 — Forever build client 70205, deux comptes (Gnomi #1, Rédemption
   #4), build `main-dev@cbd9c25 2026-10-05 21:08` avec feat/ri-paliers (copie déployée du `.toc` ;
   `/co version` pas montré) — **GO partiel sur `feat/ri-paliers`** — relevé dans DevMacroDB.log et
