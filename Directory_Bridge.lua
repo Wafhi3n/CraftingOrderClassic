@@ -37,6 +37,7 @@ local HELLO_JITTER    = 5            -- s : étale les bonjours légers des memb
 local HL_PER_MIN      = 20           -- bonjours légers spontanés par minute, tous noms confondus
 local SHORT_LOCK      = 600          -- s, heure réelle : verrou d'une demande pas encore confirmée
 local RETRY_AFTER     = 30           -- s : sans confirmation, un 2e passeur du même royaume est essayé
+local CAP_OTHER       = 3            -- demandes « présente quelqu'un d'autre » acceptées par émetteur / CAP_WINDOW
 
 local function now() return (GetTime and GetTime()) or 0 end
 local function clock() return (time and time()) or 0 end
@@ -49,9 +50,21 @@ end
 
 local loadedAt = now()
 
+-- En instance, le jeu refuse les messages d'addon (verrouillage d'instance, CraftLink_Fanout : refusé
+-- « sans reprise utile ») : on n'envoie rien et on ne pose aucun verrou, sinon une personne resterait
+-- « présentée » sans l'avoir été. Pas C_ChatInfo.InChatMessagingLockdown : mesuré le 2026-09-18, il dit
+-- « verrouillé » en monde ouvert alors que les envois passent (COC.Api.ChatMessagingBlocked).
+local function canSend()
+    local ok, inInstance = pcall(function() return IsInInstance and IsInInstance() end)
+    return not (ok and inInstance)
+end
+
 local function state()
     local s = Dir._bridge
-    if not s then s = { asked = {}, seen = {}, cap = {}, capTraced = {}, hl = {}, burst = {} }; Dir._bridge = s end
+    if not s then
+        s = { asked = {}, seen = {}, cap = {}, capOther = {}, capTraced = {}, hl = {}, burst = {}, room = {} }
+        Dir._bridge = s
+    end
     return s
 end
 
@@ -79,13 +92,16 @@ end
 
 local function myRealm() return Dir._MyRealmID and Dir:_MyRealmID() end
 
--- Au plus CAP présentations acceptées d'un même émetteur par fenêtre ; une trace au premier refus.
-local function underCap(sender)
+-- Au plus `limit` présentations acceptées d'un même émetteur par fenêtre, comptées dans `bucket` (CAP
+-- en tout ; CAP_OTHER pour « présente quelqu'un d'autre », la voie qu'un menteur peut détourner) ; une
+-- trace au premier refus.
+local function underCap(sender, bucket, limit)
     local s, t = state(), now()
+    bucket, limit = bucket or "cap", limit or CAP
     local kept = {}
-    for _, at in ipairs(s.cap[sender] or {}) do if t - at < CAP_WINDOW then kept[#kept + 1] = at end end
-    s.cap[sender] = kept
-    if #kept >= CAP then
+    for _, at in ipairs(s[bucket][sender] or {}) do if t - at < CAP_WINDOW then kept[#kept + 1] = at end end
+    s[bucket][sender] = kept
+    if #kept >= limit then
         if not s.capTraced[sender] then trace("présentations de " .. sender .. " : plafond atteint, ignorées") end
         s.capTraced[sender] = true
         return false
@@ -104,16 +120,14 @@ end
 local function selfKey(realm) return me() .. "@" .. realm end
 
 function Dir:BridgeOnRealm(sender, realm)
-    local mine = myRealm()
+    local mine, name = myRealm(), me()
     if not (enabled() and mine and validRealm(realm) and realm ~= mine and sender) then return end
-    if now() - loadedAt > ASK_WINDOW then return end
+    if not fullName(name) or now() - loadedAt > ASK_WINDOW or not canSend() then return end
     local s, db = state(), store()
     if not db then return end
     local a = s.asked[realm]
     if a and (a.confirmed or a.tries >= 2 or a.by == sender or now() - a.at < RETRY_AFTER) then return end
     if not a and recent(db.selfIntro, selfKey(realm)) then s.asked[realm] = { confirmed = true }; return end
-    local name = me()
-    if not fullName(name) then return end
     s.asked[realm] = { at = now(), by = sender, tries = (a and a.tries or 0) + 1 }
     db.selfIntro[selfKey(realm)] = clock() - (REPEAT_EVERY - SHORT_LOCK)   -- « récent » 10 min seulement
     CraftLink:Send(("INT|%s|%d"):format(name, mine), "whisper", sender)
@@ -149,7 +163,7 @@ function Dir:_BridgeRequest(sender, name, realm)
             trace(("présentation de %s déjà vue dans la salle : pas reposée"):format(name))
             return
         end
-        if not CraftLink:RoomJoined() then return end
+        if not (CraftLink:RoomJoined() and canSend()) then return end
         db.posted[name], state().seen[name] = clock(), now()
         CraftLink:Send(("INT|%s|%d"):format(name, realm), "room")
         trace(("présentation de %s (royaume %d) postée dans la salle"):format(name, realm))
@@ -186,6 +200,7 @@ function Dir:_BridgeSeen(sender, name, realm)
     after(math.random() * HELLO_JITTER, function()
         local rr = Dir.roster and Dir.roster[name]
         if rr and rr.lastSeen then return end            -- il m'a parlé entre-temps
+        if not (enabled() and canSend()) then return end -- salle coupée, ou entré en instance, entre-temps
         Dir:_SendLightHello(name)
         trace(("bonjour léger → %s (présenté par %s)"):format(name, sender))
     end)
@@ -197,7 +212,11 @@ function Dir:OnIntro(sender, message, distribution)
     if not (name and validRealm(realm) and sender and enabled()) or name == me() or not fullName(name) then return end
     if distribution ~= "WHISPER" and distribution ~= "CHANNEL" then return end   -- ni groupe, ni guilde
     if not underCap(sender) then return end
-    if distribution == "WHISPER" then return self:_BridgeRequest(sender, name, realm) end
+    if distribution == "WHISPER" then
+        if sender ~= name and not underCap(sender, "capOther", CAP_OTHER) then return end
+        return self:_BridgeRequest(sender, name, realm)
+    end
+    state().room[sender] = now()                         -- il poste dans ma salle : il y est
     self:_BridgeSeen(sender, name, realm)                -- posté dans ma salle : jamais un second saut
 end
 
@@ -236,17 +255,25 @@ end
 
 -- 4. Le passeur élu (palier 3). Un porteur à jour arrive dans MA salle : s'il ne connaît personne
 -- ailleurs, personne ne le présente. Le plus petit nom de la salle le fait pour lui. Les candidats :
--- moi, et les porteurs de mon royaume que je vois en ligne (leur royaume connu = ils sont à jour). Deux
--- membres qui ne voient pas les mêmes présents peuvent se croire élus tous les deux, et l'arrivant a pu
--- se présenter lui-même : la salle d'en face absorbe le doublon (déjà vue, 10 min).
+-- moi, et les porteurs à jour de mon royaume que j'ai VUS DANS LA SALLE (leur bonjour, leur entrée, ou
+-- une présentation qu'ils y ont postée), encore en ligne. Pas « en ligne » tout court : un ami ou un
+-- membre de guilde de mon royaume hors de la salle aurait gagné l'élection sans jamais voir l'arrivée,
+-- et personne ne l'aurait présenté (revue du 2026-10-07). Le risque inverse, deux élus, est sans
+-- conséquence : la salle d'en face absorbe le doublon (déjà vue, 10 min ; postée, 6 h).
 local PRESENT_MAX_REALMS = 5
 
 local function iAmElected(arrivant, mine)
-    local best = me()
+    local best, room = me(), state().room
     for n, r in pairs(Dir.roster or {}) do
-        if n ~= arrivant and r.realm == mine and Dir.online[n] and n < best then best = n end
+        if n ~= arrivant and room[n] and r.realm == mine and Dir.online[n] and n < best then best = n end
     end
     return best == me()
+end
+
+-- Présence dans la salle (Dir:OnPresence) : une entrée en fait un candidat, une sortie l'en retire.
+function Dir:BridgeRoomPresence(kind, who)
+    if not who then return end
+    state().room[who] = (kind == "join") and now() or nil
 end
 
 -- Un passeur en ligne par royaume étranger : un ami ou un membre de ma guilde d'abord, sinon le plus
@@ -263,15 +290,19 @@ local function passeursByRealm(mine)
     return best
 end
 
--- Bonjour d'arrivée lu dans ma salle (royaume = le mien). Une fois par arrivant et par 6 h ; jamais
--- pour moi-même ; au plus 5 royaumes étrangers.
+-- Bonjour d'arrivée lu dans ma salle (royaume = le mien) : il y est, et peut-être faut-il le présenter.
+-- Jamais pour moi-même ; au plus 5 royaumes étrangers. Verrou de 10 min à l'envoi seulement : l'élu ne
+-- voit pas la suite (le bonjour léger va à l'arrivant), et un passeur parti ne doit pas coûter 6 h à
+-- l'arrivant ; c'est le passeur qui ne reposte pas avant 6 h (revue du 2026-10-07).
 function Dir:BridgeOnRoomHello(sender, realm)
     local mine = myRealm()
-    if not (enabled() and mine and realm == mine and sender) or sender == me() or not fullName(sender) then return end
+    if not (enabled() and mine and sender) or sender == me() or not fullName(sender) then return end
+    if realm then state().room[sender] = now() end       -- à jour, et dans ma salle
+    if realm ~= mine then return end
     local db = store()
     if not db or recent(db.vouched, sender) then return end
     after(math.random() * POST_JITTER, function()
-        if not iAmElected(sender, mine) or recent(db.vouched, sender) then return end
+        if not canSend() or not iAmElected(sender, mine) or recent(db.vouched, sender) then return end
         local n = 0
         for x, p in pairs(passeursByRealm(mine)) do
             if n >= PRESENT_MAX_REALMS then break end
@@ -279,7 +310,7 @@ function Dir:BridgeOnRoomHello(sender, realm)
             CraftLink:Send(("INT|%s|%d"):format(sender, mine), "whisper", p.name)
             trace(("présentation de %s demandée à %s (royaume %d) : passeur élu"):format(sender, p.name, x))
         end
-        if n > 0 then db.vouched[sender] = clock() end
+        if n > 0 then db.vouched[sender] = clock() - (REPEAT_EVERY - SHORT_LOCK) end
     end)
 end
 

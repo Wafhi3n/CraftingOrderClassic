@@ -29,6 +29,7 @@ end
 
 function Dir:OnPresence(kind, who)
     if not who then return end
+    if self.BridgeRoomPresence then self:BridgeRoomPresence(kind, who) end   -- qui est dans la salle (pont)
     -- Canal CUSTOM dédié (CraftLinkNet, plein ou salle) : tout joiner EST un porteur, donc on réagit à
     -- tous les JOIN/LEAVE, connus ou pas — ça accélère sa découverte sans risque de spam.
     if kind == "join" then
