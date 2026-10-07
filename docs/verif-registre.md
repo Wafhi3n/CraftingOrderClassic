@@ -46,6 +46,21 @@ client.
 
 ## Relevés
 
+- 2026-10-07 10:02 — jusqu'a ac7c0ce — Forever build client 70245, un compte (#4, perso non noté),
+  capitale, AFK ; build `main-dev@159d2e6 2026-10-07 09:54` (lu par la sonde dans le `.toc` déployé,
+  `fix/route-cache-memoire` dans les branches) — **GO sur la mémoire du suivi** — mesuré par
+  `/cocprobe mem` (COCProbe `feat/sonde-memoire`), 300 s, relevé relu dans la SV de COCProbe.
+  **Avant** (09:29-09:34, `main-dev@8b3354e`, même compte) : `Route.Candidates` 8 passes, au moins
+  2,9 Mo, environ 40 fois la fonction suivante, via `Tracker.Refresh` → `Route.NextStep` ×4 métiers ;
+  COC +1106 Ko nets. **Après** : `Route.Candidates` **0 appel** dans la fenêtre (le cache tient) ;
+  COC +221 Ko nets ; ce qui reste du suivi : `Tracker.Refresh` 14 repeints, 544 Ko inclusifs.
+  Ramasse-miettes reparti dans les deux fenêtres : chiffres nets, bornes basses ; le classement vaut.
+  Aucune table ne grossit au-delà de quelques dizaines d'entrées : pas de fuite.
+  ⚠️ **NON observé** : la purge à la fermeture de l'hôtel des ventes (pas de passage à l'HV), le
+  rafraîchissement après 15 min, et que le suivi conseille toujours la même recette qu'avant.
+  Reste visible, à juger : `Directory.CapSeen` 164 Ko (49 appels) sur 95 `CHAT_MSG_TRADESKILLS`,
+  détection des crafteurs activée (`feat/lien-metier`, au banc).
+
 - 2026-10-05 21:11 — jusqu'a b4fcac0 — Forever build client 70205, deux comptes (Gnomi #1, Rédemption
   #4), build `main-dev@cbd9c25 2026-10-05 21:08` avec feat/ri-paliers (copie déployée du `.toc` ;
   `/co version` pas montré) — **GO partiel sur `feat/ri-paliers`** — relevé dans DevMacroDB.log et
