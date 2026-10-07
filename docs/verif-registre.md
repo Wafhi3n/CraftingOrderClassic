@@ -46,6 +46,17 @@ client.
 
 ## Relevés
 
+- 2026-10-07 19:01 — jusqu'a e96fe97 — Forever build client 70245, Rédemption Wafhien (1er compte) ;
+  build `main-dev@845a9e1 2026-10-07 18:53`, `## Version: 1.46.0` (lu par l'appli du banc, fiche
+  `CraftingOrderClassic--release-v1.46.0`, trois gestes cochés OK) — **GO** sur `fix/version-banc` et
+  `fix/artisans-metiers-principaux`, dans la release. Sonde `_SkillPayload()` affichée dans le chat
+  (capture du user) : `SK|lvl=21|rm=4620;Cooking,31,75;Blacksmithing,109,150;Fishing,22,75;First
+  Aid,49,75;Enchanting,162,225;rep=13` — **aucun `cv=`** : le banc ne dit plus sa version aux autres
+  joueurs. (Le chat montre `lvl=21m=4620` : il avale `|r`, code de fin de couleur ; la chaîne est
+  entière, les royaumes reçus par ce chemin sont notés dans les annuaires depuis 14:22.) `/co version`
+  affiche 1.46.0 et la ligne Build. Onglet Artisans : métiers principaux avant Cuisine, Pêche et
+  Secourisme sur les lignes de la capture d'avant (remarque du user : « c'est tout good »).
+
 - 2026-10-07 18:44 — jusqu'a ed10579 — Forever build client 70245, quatre comptes : Toao Rosa (4e,
   4620, l'arrivante), Gnomi Short (2e, 4620), Rédemption Wafhien (1er, 4620), Gnoma Short (3e, 4618) ;
   build `main-dev@0f7dd3f 2026-10-07 18:40`, `## Version: 1.46.0` (lu dans le `.toc` déployé et par
