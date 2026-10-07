@@ -104,7 +104,10 @@ royaume (`GetRealmID()`).
   des centaines de messages en quelques secondes. Les recettes viennent plus tard, à la demande
   (sélectionner un artisan en ligne le relance déjà) ou avec la prochaine annonce de C.
 - **D6 (proposée, 2026-10-07)** : **un seul passeur par arrivée et par royaume étranger**, en
-  visée. A agit seulement s'il est élu dans sa salle (par exemple le plus petit nom parmi les
+  visée. **L'arrivant se présente lui-même** quand il connaît déjà un porteur en ligne dans l'autre
+  royaume : il chuchote « présente-moi » à un seul d'entre eux par royaume. C'est le cas le plus
+  simple, et le seul que le banc peut voir de bout en bout (critère 12). Pour un arrivant qui ne
+  connaît personne ailleurs, un membre de sa salle le fait : A agit seulement s'il est élu dans sa salle (par exemple le plus petit nom parmi les
   membres en ligne de son royaume qui portent la nouvelle version). Un double passage reste
   possible si deux membres n'ont pas la même vue ; le dédoublonnage côté R2 l'absorbe. Variante :
   un tirage au hasard (chacun agit avec une probabilité qui vise deux passeurs en moyenne), plus
@@ -124,11 +127,14 @@ royaume (`GetRealmID()`).
    et enveloppe de relais `RLY` compris.
 4. [test] Une arrivée dans la salle (bonjour reçu par le canal, royaume connu) déclenche une
    présentation vers un seul pair en ligne par royaume étranger, du même camp ; aucune vers le
-   royaume de l'arrivant.
+   royaume de l'arrivant. Un arrivant qui connaît déjà un porteur en ligne d'un autre royaume se
+   présente lui-même à un seul d'entre eux par royaume. Les membres de sa salle ne savent pas qu'il
+   l'a fait : s'ils le présentent aussi, la salle étrangère n'en poste qu'une (critère 6).
 5. [test] Une présentation reçue (chuchotée ou postée) ne déclenche jamais une autre présentation
    chuchotée. Un bonjour reçu en whisper non plus.
 6. [test] Une présentation chuchotée est postée dans la salle seulement si la salle est rejointe,
-   et pas si la même présentation y a été vue dans les 10 dernières minutes.
+   après un court délai aléatoire, et pas si la même présentation y a été vue entre-temps ou dans
+   les 10 dernières minutes : deux passeurs pour le même arrivant donnent un seul message posté.
 7. [test] Une présentation postée fait partir un bonjour léger vers C chez un membre qui ne connaît
    pas C, après un délai aléatoire ; rien chez un membre qui le connaît déjà.
 8. [test] Un bonjour léger reçu reçoit au plus un bonjour léger en retour, jamais l'annonce
@@ -137,15 +143,19 @@ royaume (`GetRealmID()`).
    plafond par émetteur, les présentations sont ignorées et tracées une fois.
 10. [test] Budget D7 : une arrivée simulée dans une salle de 30 membres étrangers produit au plus
     1 + 1 + 2 × 30 messages, tous types confondus, et C en émet au plus 30.
-11. [humain] Rédemption (4620) dans sa salle, Gnoma (4618) en ligne et connue de Rédemption. Gnomi
-    (4620) se connecte. **Observé** : la trace de Rédemption dit « présentation de Gnomi Short →
-    Gnoma Short », celle de Gnoma dit « présentation postée dans la salle » et `[send] room :
-    INT|Gnomi Short|4620`. Témoin : sans le pont (build d'avant), aucune de ces lignes. Observateur :
-    le user, au banc, traces relues dans les SavedVariables.
-12. [humain] **Pas observable avec nos comptes seuls** : un membre de la salle étrangère qui
-    découvre l'arrivant. Il faut deux clients à jour dans le même royaume étranger, donc un 4e
-    compte (de l'autre royaume PvE) ou un testeur du Discord. Observé attendu : chez ce membre, la
-    ligne « bonjour léger → Gnomi Short » puis Gnomi dans son onglet Artisans avec ses métiers.
+11. [humain] Gnoma (4618) en ligne, et connue de Gnomi (4620). Gnomi se connecte. **Observé** : la
+    trace de Gnomi dit « présentation de Gnomi Short → Gnoma Short », celle de Gnoma dit
+    « présentation postée dans la salle » et `[send] room : INT|Gnomi Short|4620`. Témoin : sans le
+    pont (build d'avant), aucune de ces lignes. Observateur : le user, au banc, traces relues dans
+    les SavedVariables.
+12. [humain] Un membre de la salle étrangère découvre l'arrivant. Le banc a de quoi le voir depuis
+    le 2026-10-07 : le 4e compte (Sfdfs Sdfdsfd) est tombé en 4620, comme Rédemption et Gnomi ; seule
+    Gnoma est en 4618. Scénario : Rédemption et Sfdfs en ligne, Sfdfs n'a jamais croisé Gnoma (vérifier
+    qu'elle n'est pas dans son annuaire) ; Gnoma se connecte et **se présente elle-même** (D6) à
+    Rédemption, qui poste la présentation dans la salle 4620. **Observé attendu** chez Sfdfs : la ligne
+    « bonjour léger → Gnoma Short », puis Gnoma dans son onglet Artisans avec ses métiers. Témoin :
+    avant le pont, Sfdfs ne la voit jamais (elle n'est ni dans sa salle ni dans son Commerce).
+    Observateur : le user, au banc, traces des trois comptes relues dans les SavedVariables.
 
 ## Contrat
 
