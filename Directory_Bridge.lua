@@ -314,6 +314,10 @@ function Dir:BridgeOnRoomHello(sender, realm)
     end)
 end
 
+-- Aides partagées avec les relais de confiance (Directory_TrustRelay.lua) : une seule définition.
+Dir._BridgeCanSend = canSend
+Dir._ValidRealm    = validRealm
+
 function Dir:StartBridge()
     if not (CraftLink and CraftLink.RegisterHandler) then return end
     CraftLink:RegisterHandler("INT", function(s, m, d) Dir:OnIntro(s, m, d) end)

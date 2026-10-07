@@ -276,6 +276,10 @@ local function OnUnitTooltip(tooltip)
         for _, ln in ipairs((D.LFWOfferLines and D:LFWOfferLines(name)) or {}) do
             tooltip:AddLine("   " .. ln, 0.72, 0.90, 0.78)
         end
+        if lfwE.via then   -- relayé (Directory_TrustRelay) : provenance et fraîcheur
+            local dur = (sk and sk.FormatDuration) and sk.FormatDuration(math.max(0, time() - (lfwE.ts or time()))) or "?"
+            tooltip:AddLine("   |cFF808080" .. string.format(COC.L["via %s · il y a %s"], lfwE.via, dur) .. "|r")
+        end
     end
     -- Cooldowns de recettes : 3 lignes max — vert = prête, orange = en cours de recharge.
     local rr = COC.Directory and COC.Directory.roster and COC.Directory.roster[name]

@@ -163,6 +163,7 @@ Directory_Cooldowns.lua
 Directory_RelayCodec.lua
 Directory_Relay.lua
 Directory_Bridge.lua
+Directory_TrustRelay.lua
 Directory_AltCodec.lua
 Directory_Alts.lua
 Directory_LFW.lua

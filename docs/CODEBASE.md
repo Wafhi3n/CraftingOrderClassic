@@ -4,7 +4,7 @@
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
-159 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
+160 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
 
 ## Modules (ordre de chargement)
 
@@ -55,7 +55,7 @@
 | `CraftingOrderClassic_UI_Gather_Categories.lua` | onglet « Récolte », panneau gauche : repliage des en-têtes et remplissage des lignes (en-tête de section/sous-catégorie, ou ressource). | 79 |
 | `CraftingOrderClassic_UI_Artisans_Layout.lua` | GÉOMÉTRIE de l'onglet « Artisans » (annuaire social). | 45 |
 | `CraftingOrderClassic_UI_Artisans_Text.lua` | onglet « Artisans » : ce qu'une ligne de l'annuaire DIT. | 75 |
-| `CraftingOrderClassic_UI_Artisans.lua` | onglet « Artisans » : annuaire social. | 467 |
+| `CraftingOrderClassic_UI_Artisans.lua` | onglet « Artisans » : annuaire social. | 474 |
 | `CraftingOrderClassic_UI_Artisans_Groups.lua` | fusion « une ligne par JOUEUR » (rerolls). | 200 |
 | `CraftingOrderClassic_UI_Artisans_Icons.lua` | onglet « Artisans » : tout ce qui est ICÔNE de métier. | 189 |
 | `CraftingOrderClassic_UI_Artisans_Needs.lua` | la « BOURSE d'artisan » de l'onglet Artisans : pour un artisan du roster (partenaire, guildie, ami…), la LISTE DE COURSES des fournitures qu'il lui faut pour monter ses métiers — mats agrégés de SA route de progression (COC.Route, calculée 100 % en LOCAL depuis son rang SK diffusé + ses recettes décodées du bitfield RK ; prix Lazy Gold locaux, valables serveur entier). | 361 |
@@ -68,7 +68,7 @@
 | `CraftingOrderClassic_UI_MyArtisans_Reroll.lua` | accès à la vue REROLL (métiers d'un AUTRE perso du compte) depuis l'onglet « Mes artisans ». | 86 |
 | `CraftingOrderClassic_UI_Help.lua` | onglet Aide : page unique défilante qui explique les autres onglets (Carnet/Commande/Récolte/Artisans), la Vue Métier et le réseau. | 208 |
 | `CraftingOrderClassic_UI_News.lua` | onglet « Nouveautés » : notes de version (changelog) affichées EN JEU, version par version, la plus récente en tête. | 490 |
-| `CraftingOrderClassic_Social.lua` | couche sociale passive (socle). | 423 |
+| `CraftingOrderClassic_Social.lua` | couche sociale passive (socle). | 427 |
 | `CraftingOrderClassic_Social_Menu.lua` | entrées « Crafting Order » du menu contextuel joueur. | 116 |
 | `CraftingOrderClassic_Social_Roster.lua` | affichage des métiers sur les fenêtres NATIVES. | 130 |
 | `CraftingOrderClassic_Minimap.lua` | bouton minimap (toggle du carnet). | 185 |
@@ -121,23 +121,24 @@
 | `CraftingOrderClassic_ProfWindow_LFW_Recipes.lua` | le SÉLECTEUR DE RECETTES de l'offre LFW. | 140 |
 | `CraftingOrderClassic_ProfWindow_LFW_Announce.lua` | la case « Annoncer en Commerce » de l'offre LFW. | 28 |
 | `CraftingOrderClassic_ProfWindow_Reroll.lua` | vue métier LECTURE SEULE d'un REROLL. | 118 |
-| `Directory.lua` | Crafting Order - Classic — Directory : l'annuaire des GENS (présence + qui peut crafter quoi). | 493 |
+| `Directory.lua` | Crafting Order - Classic — Directory : l'annuaire des GENS (présence + qui peut crafter quoi). | 494 |
 | `Directory_Presence.lua` | présence : la vérité JEU (amis/guilde) et sa fusion avec la vérité ADDON. | 148 |
 | `Directory_Recipes.lua` | COUTURE de lecture du registre « qui sait crafter quoi » d'un artisan. | 210 |
 | `Directory_Confed.lua` | source « confédération » (GreenWall) de l'annuaire, DISPLAY-ONLY. | 63 |
 | `Directory_Club.lua` | source « cercle » (communautés WoW) de l'annuaire, DISPLAY-ONLY. | 382 |
 | `Directory_Community.lua` | le réseau SANS canal : la communauté remplace CraftLinkNet (Forever). | 270 |
 | `Directory_Note.lua` | la note de membre de la communauté : lue dans l'annuaire, préparée pour le joueur. | 105 |
-| `Directory_Skills.lua` | niveaux de compétence + réputation (couche « profil » de l'annuaire). | 202 |
+| `Directory_Skills.lua` | niveaux de compétence + réputation (couche « profil » de l'annuaire). | 205 |
 | `Directory_Room.lua` | la salle de découverte : CraftLinkNet rejoint pour SE PRÉSENTER, pas pour transporter. | 88 |
 | `Directory_Version.lua` | détection « nouvelle version disponible » (100 % P2P, aucun serveur). | 162 |
 | `Directory_Cooldowns.lua` | cooldowns de recettes (couche « profil » de l'annuaire). | 105 |
 | `Directory_RelayCodec.lua` | codec du fil RLY : relais de la fiche d'un artisan HORS LIGNE par un de ses partenaires. | 70 |
 | `Directory_Relay.lua` | « contacts de confiance » : les données d'un joueur DÉCONNECTÉ restent servies par ses partenaires (r.isPartner). | 196 |
-| `Directory_Bridge.lua` | pont entre royaumes, paliers 2 et 3 (spec docs/specs/pont-royaumes.md). | 321 |
+| `Directory_Bridge.lua` | pont entre royaumes, paliers 2 et 3 (spec docs/specs/pont-royaumes.md). | 325 |
+| `Directory_TrustRelay.lua` | relais de confiance (spec docs/specs/relais-confiance.md). | 345 |
 | `Directory_AltCodec.lua` | codec du fil ALT (liste des persos d'un même joueur) + vérification par réciprocité. | 119 |
 | `Directory_Alts.lua` | regroupement des rerolls : identité « joueur » multi-persos (verbe ALT). | 316 |
-| `Directory_LFW.lua` | statut « recherche de travail » (Looking For Work) + OFFRE par métier. | 367 |
+| `Directory_LFW.lua` | statut « recherche de travail » (Looking For Work) + OFFRE par métier. | 368 |
 | `CraftingOrderClassic_Channels.lua` | RECONNAÎTRE un canal du jeu (spec docs/specs/canaux-surveilles.md). | 261 |
 | `CraftingOrderClassic_Notify.lua` | la SORTIE d'une alerte : ligne de chat, bandeau, son. | 39 |
 | `CraftingOrderClassic_LFWChat.lua` | détection « recherche de travail » dans le CHAT VISIBLE. | 91 |
@@ -148,7 +149,7 @@
 | `Orders_AnnounceSend.lua` | l'ENVOI d'une annonce sur Trade (Services) (spec annonce-commerce, palier 2). | 212 |
 | `Orders_AnnounceRecv.lua` | la LECTURE d'une annonce de Commerce (spec annonce-commerce, palier 3). | 107 |
 | `Orders.lua` | Crafting Order - Classic — Orders : carnet d'ordres GLOBAL (modèle + cycle + protocole). | 495 |
-| `Orders_Net.lua` | couche « fil réseau » du carnet d'ordres (protocole ORD\|). | 426 |
+| `Orders_Net.lua` | couche « fil réseau » du carnet d'ordres (protocole ORD\|). | 428 |
 | `Orders_Narrative.lua` | TITRE et DESCRIPTION libres d'une commande : « donne un nom et une histoire à ce que tu demandes ». | 254 |
 | `CraftingOrderClassic_QuestSheet.lua` | FICHE DE QUÊTE réutilisable : affiche (ou fait écrire) une commande sous la forme d'une vraie quête du jeu. | 363 |
 | `CraftingOrderClassic_JournalQuests.lua` | lecture EN SEULE LECTURE du journal de quêtes du JEU, pour que le journal COC affiche les vraies quêtes à côté des commandes. | 103 |
@@ -2442,6 +2443,25 @@
 > déclenche jamais de demande.
 
 **API** : `Dir:BridgeOnRealm(sender, realm)` · `Dir:OnIntro(sender, message, distribution)` · `Dir:OnLightHello(sender, message)` · `Dir:BridgeRoomPresence(kind, who)` · `Dir:BridgeOnRoomHello(sender, realm)` · `Dir:StartBridge()`
+
+### `Directory_TrustRelay.lua`
+> Directory_TrustRelay.lua — relais de confiance (spec docs/specs/relais-confiance.md).
+> 
+> Une salle CraftLinkNet s'arrête au royaume (mesuré le 2026-10-07). Le pont (Directory_Bridge)
+> présente un arrivant aux autres salles, mais un joueur entré là-bas APRÈS la présentation ne le
+> connaît pas, et « à tous » plafonne à 40 chuchotements. Ici, la SOURCE A confie son LFW et ses
+> commandes « Tous » à un RELAIS par royaume étranger, qui les poste dans SA salle : tous ses présents
+> les voient d'un coup. La source tranche au premier geste (idée du user) : un LFW relayé est vérifié
+> auprès de A quand on clique dessus, et un relais qui a menti est écarté.
+> 
+> Fil :  RL|<A>|<n>|<message>        A → relais (whisper), puis relais → sa salle, tel quel
+>        RLA|<n>                     relais → A : posté
+>        VRF|<métier>|<relais>       D → A : « tu es bien en LFW ? »
+>        VRF|ok|<métier>   VRF|no|<métier>|old   VRF|no|<métier>
+> <message> ∈ { LFW|on|<métier>, LFW|off, ORD|NEW|… (acheteur = A) }. Jamais un second saut. Rien en
+> instance (le jeu refuse), rien salle coupée (D-R10). Le royaume n'apparaît nulle part à l'écran.
+
+**API** : `Dir:TrustRelayLFW(prof)` · `Dir:TrustRelayOrder(o, payload)` · `Dir:OnTrustEnvelope(sender, message, distribution)` · `Dir:OnTrustAck(sender)` · `Dir:TrustVerify(A)` · `Dir:OnTrustVerify(sender, message)` · `Dir:StartTrustRelay()`
 
 ### `Directory_AltCodec.lua`
 > Directory_AltCodec.lua — codec du fil ALT (liste des persos d'un même joueur) + vérification
