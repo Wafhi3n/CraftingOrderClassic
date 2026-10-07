@@ -1,7 +1,7 @@
 # Pont entre royaumes : présenter un arrivant aux autres salles
 
-> État : **brouillon** · Rédigé le 2026-10-07 · Idée du user (le pont par whisper), le 2026-10-07 ·
-> Les décisions marquées « proposée » attendent le user
+> État : **approuvée** (décisions D2 et D4 à D8 prises par le user le 2026-10-07) · Rédigée le
+> 2026-10-07 · Idée du user (le pont par whisper), le 2026-10-07 · Rien de codé
 > Cible : WoW: Forever / Camelot (16001) · Addon : Crafting Order - Classic (+ lib CraftLink, peu)
 >
 > Origine : mesures du 2026-10-07 avec trois comptes. Sous le méga-serveur de Forever, les royaumes
@@ -86,36 +86,42 @@ royaume (`GetRealmID()`).
 
 - **D1 (user, 2026-10-07)** : relier les salles par whisper, en faisant répéter une information
   dans la salle d'un autre royaume. Idée du user.
-- **D2 (proposée, 2026-10-07)** : ce qui traverse est une **présentation** (un nom, un royaume),
+- **D2 (user, 2026-10-07)** : ce qui traverse est une **présentation** (un nom, un royaume),
   pas les données. Raison : les données passent déjà en whisper entre pairs connus, quel que soit
   leur royaume ; le seul trou est l'inconnu. Et une présentation forgée ne peut rien écrire de faux.
 - **D3 (mesure, 2026-10-07)** : le royaume d'un joueur = `GetRealmID()` (la partie serveur de son
   GUID), envoyé par lui-même dans son bonjour. Le nom d'un joueur ne porte pas son royaume sur
   Forever, et `CHAT_MSG_ADDON` ne donne pas de GUID.
-- **D4 (proposée, 2026-10-07)** : le pont vit dans **COC** (l'annuaire, `Directory_*.lua`), à côté
+- **D4 (user, 2026-10-07)** : le pont vit dans **COC** (l'annuaire, `Directory_*.lua`), à côté
   du relais `RLY`. Raison : le bonjour, l'annuaire (qui est connu, en ligne, de quel royaume) et
   le côté produit de la salle y sont déjà. CraftLink transporte et rejoint la salle ; elle n'a
   rien à apprendre. Autre choix possible : mettre le pont dans CraftLink pour qu'un futur addon
   l'ait aussi ; COC est aujourd'hui le seul à embarquer la lib.
-- **D5 (proposée, 2026-10-07)** : après une présentation, D et C échangent un **bonjour léger**
+- **D5 (user, 2026-10-07)** : après une présentation, D et C échangent un **bonjour léger**
   (un message chacun, la fiche de métiers seule), pas le bonjour complet d'aujourd'hui. Raison :
   un bonjour complet fait répondre C par toute sa fiche (métiers, recettes, cooldowns) et les
   fiches de ses partenaires, soit 10 à 35 whispers par membre de R2. Avec 30 membres, C enverrait
   des centaines de messages en quelques secondes. Les recettes viennent plus tard, à la demande
   (sélectionner un artisan en ligne le relance déjà) ou avec la prochaine annonce de C.
-- **D6 (proposée, 2026-10-07)** : **un seul passeur par arrivée et par royaume étranger**, en
-  visée. **L'arrivant se présente lui-même** quand il connaît déjà un porteur en ligne dans l'autre
+- **D6 (user, 2026-10-07)** : **un seul passeur par arrivée et par royaume étranger**, en visée.
+  **L'arrivant se présente lui-même** quand il connaît déjà un porteur en ligne dans l'autre
   royaume : il chuchote « présente-moi » à un seul d'entre eux par royaume. C'est le cas le plus
   simple, et le seul que le banc peut voir de bout en bout (critère 12). Pour un arrivant qui ne
-  connaît personne ailleurs, un membre de sa salle le fait : A agit seulement s'il est élu dans sa salle (par exemple le plus petit nom parmi les
-  membres en ligne de son royaume qui portent la nouvelle version). Un double passage reste
-  possible si deux membres n'ont pas la même vue ; le dédoublonnage côté R2 l'absorbe. Variante :
-  un tirage au hasard (chacun agit avec une probabilité qui vise deux passeurs en moyenne), plus
-  tolérant aux vues différentes.
-- **D7 (proposée, 2026-10-07) — le budget** : pour une arrivée, au plus 1 présentation chuchotée
-  et 1 présentation postée par royaume étranger, puis au plus 2 messages par paire (D, C). C
-  envoie au plus un message par membre de R2 qui ne le connaissait pas, étalés par la file
-  d'envoi. Aucun autre message ne part à cause du pont.
+  connaît personne ailleurs, un membre de sa salle le fait : A agit seulement s'il est élu dans sa
+  salle, le **plus petit nom** parmi les membres en ligne de son royaume qui portent la nouvelle
+  version. Un double passage reste possible si deux membres n'ont pas la même vue ; le
+  dédoublonnage côté R2 l'absorbe. Écartés : l'arrivant seul (un tout nouveau joueur ne serait
+  jamais présenté) et le tirage au sort entre tous (plus de messages).
+- **D7 (user, 2026-10-07) — le budget** : pour une arrivée, au plus 1 présentation chuchotée et
+  1 présentation postée par royaume étranger, puis au plus 2 messages par paire (D, C). C envoie au
+  plus un message par membre de R2 qui ne le connaissait pas, étalés par la file d'envoi. Aucun
+  autre message ne part à cause du pont. Contre les abus : **au plus 10 présentations acceptées par
+  émetteur par tranche de 10 minutes**, le reste est ignoré. Et **une même personne n'est pas
+  représentée plus d'une fois toutes les 6 heures** : un joueur qui se connecte cinq fois dans la
+  journée ne coûte pas cinq présentations.
+- **D8 (user, 2026-10-07)** : **pas de réglage à part.** Le pont suit la salle de découverte :
+  `/co channel room off` le coupe aussi. Raison : moins de réglages, et sans salle le pont n'a ni
+  arrivées à voir ni salle où poster.
 
 ## Critères d'acceptation
 
@@ -143,6 +149,11 @@ royaume (`GetRealmID()`).
    plafond par émetteur, les présentations sont ignorées et tracées une fois.
 10. [test] Budget D7 : une arrivée simulée dans une salle de 30 membres étrangers produit au plus
     1 + 1 + 2 × 30 messages, tous types confondus, et C en émet au plus 30.
+10bis. [test] D7 : une même personne n'est pas représentée moins de 6 heures après sa dernière
+    présentation, quel que soit le nombre de ses connexions ; au-delà de 10 présentations d'un même
+    émetteur en 10 minutes, les suivantes sont ignorées.
+10ter. [test] D8 : salle coupée (`/co channel room off`), aucune présentation ne part et aucune
+    présentation reçue n'est postée.
 11. [humain] Gnoma (4618) en ligne, et connue de Gnomi (4620). Gnomi se connecte. **Observé** : la
     trace de Gnomi dit « présentation de Gnomi Short → Gnoma Short », celle de Gnoma dit
     « présentation postée dans la salle » et `[send] room : INT|Gnomi Short|4620`. Témoin : sans le
@@ -183,3 +194,18 @@ Tout ce qui suit atteint des clients déjà installés : figé une fois publié.
 - `Directory_Room.lua` : la salle de découverte côté produit.
 - Mémoire du user sur le bruit réseau : envoyer dirigé, regrouper, jamais « à tous » sur un
   événement local.
+
+## Plan (2026-10-07, à jeter une fois livré)
+
+Trois paliers, chacun tient en une séance et se teste seul. Branche `feat/pont-royaumes` dans COC
+et l'outillage (les tests), même nom ; CraftLink n'est touchée que si un palier en a besoin.
+
+1. **Le royaume dans le bonjour.** `rm=<id>` en tête de la fiche de métiers, `HI|rm=<id>` sans
+   métiers, lu et gardé dans l'annuaire (le royaume de chaque pair). Rien d'autre ne change :
+   publiable seul, et chaque client à jour se met à annoncer son royaume avant que le pont existe.
+   Critères 1 à 3.
+2. **L'arrivant se présente lui-même, et la salle étrangère le découvre.** Verbe `INT` (chuchoté
+   puis posté, dédoublonné), bonjour léger, plafonds D7, coupure D8. Critères 5 à 9, 10bis, 10ter,
+   la part « lui-même » du 4 ; au banc, 11 et 12.
+3. **Le passeur élu** pour l'arrivant qui ne connaît personne ailleurs (plus petit nom de la salle).
+   Critères 4 (complet) et 10.
