@@ -46,6 +46,20 @@ client.
 
 ## Relevés
 
+- 2026-10-07 15:00 — jusqu'a 79803de — Forever build client 70245, Gnoma Short (3e compte, royaume
+  4618, acheteuse) et Gnomi Short (2e compte, royaume 4620, forgeronne), Ironforge ; build
+  `main-dev@0f4f0db 2026-10-07 14:53`, `## Version: 1.45.0` (lu dans le `.toc` de la copie déployée ;
+  `/co version` pas relevé) — **GO** sur la commande inconnue (candidat v1.45.0, avec la revue
+  `fix/revue-1.45`) — relevé relu dans les traces et les commandes des deux SV.
+  Gnoma poste `Gnoma Short-2` (14:59:45, reçue par Gnomi), l'efface chez elle seule par `/run`, puis
+  Gnomi l'accepte : 15:00:06 chez Gnoma « ACK sur une commande inconnue (Gnoma Short-2) : annulation
+  renvoyée à Gnomi Short » et `ORD|CANCEL|Gnoma Short-2` en whisper à Gnomi seule ; 15:00:06 Gnomi le
+  reçoit, sa commande passe `cancelled` (`acceptedBy = Gnomi Short`). Trois inconnus qui ont reçu le
+  même ACK par le « à tous » n'ont rien renvoyé. Avant, au premier essai (14:56), le bouton « Annuler »
+  de Gnoma : CANCEL reçu par Gnomi, commande masquée, l'annulation ordinaire marche d'un royaume à
+  l'autre. ⚠️ **NON observé** : le plafond de 5 réponses par minute, la sourdine, la garde du `/1`
+  sous le verrou du chat (combat de boss), et les couleurs de canaux après l'échange.
+
 - 2026-10-07 14:24 — jusqu'a 8562a3a — Forever build client 70245, Gnomi Short (2e compte, royaume
   4620) et Gnoma Short (3e compte, royaume 4618) connectées ensemble, Ironforge ; build
   `main-dev@67296b9 2026-10-07 13:51` (inchangé depuis le relevé de 14:12) — **GO** sur le palier 1
