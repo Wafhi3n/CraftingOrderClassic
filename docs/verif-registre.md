@@ -46,6 +46,23 @@ client.
 
 ## Relevés
 
+- 2026-10-07 15:44 — jusqu'a ebe242b — Forever build client 70245, trois comptes : Gnoma Short (3e,
+  royaume 4618, l'arrivante), Rédemption Wafhien (1er, 4620, la connaît), Sfdfs Sdfdsfd (4e, 4620, ne
+  la connaissait pas : absente de son annuaire avant le test, vérifié dans sa SV) ; build
+  `main-dev@3abe28f 2026-10-07 15:27` (lu dans le `.toc` de la copie déployée, `feat/pont-royaumes`
+  dans les branches ; `/co version` pas relevé) — **GO partiel** sur le palier 2 du pont (spec
+  `pont-royaumes.md`, critères 11 et 12) — relevé relu dans les traces et les annuaires des trois SV.
+  Gnoma recharge à ~15:41 : 15:42:00 « présentation demandée à Rédemption Wafhien (royaume 4620) »,
+  `INT|Gnoma Short|4618` en whisper ; 15:42:04 Rédemption `[send] room : INT|Gnoma Short|4618`
+  « postée dans la salle » (délai aléatoire de 3 s) ; 15:42:05 Sfdfs la reçoit sur la salle, 15:42:07
+  « bonjour léger → Gnoma Short (présenté par Rédemption Wafhien) », `HL|rm=4620` ; 15:42:08 Gnoma
+  répond un seul `HL|rm=4618` ; 15:42:09 Sfdfs le reçoit et ne répond pas. Annuaires : Sfdfs a
+  `Gnoma Short` (realm 4618, lastSeen 15:42), Gnoma a `Sfdfs Sdfdsfd` (realm 4620). Première
+  découverte d'un inconnu d'un autre royaume sans croisement en jeu. D9 vu : au passage en ligne,
+  chacune a poussé à l'autre la commande `Gnomi Short-56` qu'elle tenait (un `ORD|NEW` chacune).
+  ⚠️ **NON observé** : Gnoma dans l'onglet Artisans de Sfdfs (pas regardé), un second passeur qui se
+  tait, le plafond par émetteur, la règle des 6 h en jeu, la coupure par `/co channel room off`.
+
 - 2026-10-07 15:00 — jusqu'a 79803de — Forever build client 70245, Gnoma Short (3e compte, royaume
   4618, acheteuse) et Gnomi Short (2e compte, royaume 4620, forgeronne), Ironforge ; build
   `main-dev@0f4f0db 2026-10-07 14:53`, `## Version: 1.45.0` (lu dans le `.toc` de la copie déployée ;
