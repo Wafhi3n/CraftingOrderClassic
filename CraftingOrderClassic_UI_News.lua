@@ -37,6 +37,13 @@ local BODY_W = 780
 local function versionsFront()
     return {
         {
+            v = "v1.48.0", title = L["Signale un bug ou propose une idée depuis le jeu"],
+            lines = {
+                L["Un bug, une idée ? Clique sur le petit scarabée bleu à côté du « i », en haut de la fenêtre (ou sur le bouton en haut de l'onglet Aide, ou tape /co bug). Choisis Bug ou Idée : l'addon te donne un lien déjà sélectionné. Fais Ctrl+C, colle-le dans ton navigateur, et le formulaire GitHub s'ouvre avec la version de l'addon et du jeu déjà remplie. Rien sur ton personnage n'y figure."],
+                L["Pas de compte GitHub ? Le troisième choix donne la page CurseForge de l'addon, pour y laisser un commentaire."],
+            },
+        },
+        {
             v = "v1.47.0", title = L["Ta recherche de travail et tes commandes publiques vont plus loin"],
             lines = {
                 L["Certains joueurs de l'addon ne voyaient toujours ni ta recherche de travail ni tes commandes pour tous : le canal de l'addon n'atteint pas tout le monde, et les présentations de la v1.46.0 n'aident que ceux déjà connectés quand tu arrives. Maintenant, là où ton canal n'arrive pas, l'addon demande à un joueur de l'addon que tu connais (un ami ou un membre de ta guilde d'abord) de les répéter à tous ceux que son propre canal atteint. Ils les voient comme les autres, avec « via <nom> » dans l'infobulle d'une recherche de travail."],
@@ -410,17 +417,6 @@ local function versionsRecent()
                 L["Le plan de route « quoi monter ensuite » pouvait suggérer une recette différente du badge de coût de la liste, les deux lisant des données légèrement différentes. Le plan utilise maintenant la difficulté réelle de la fenêtre métier à ton rang actuel plutôt qu'une projection, et se rafraîchit au même rythme que le badge. La commande |cFFFFFFFF/co lvldump|r affiche le détail en cas de nouveau désaccord."],
             },
         },
-        {
-            v = "v1.22.0", title = L["L'aide contextuelle, des dépendances qu'on ne peut plus rater, et une touche Échap qui obéit"],
-            lines = {
-                L["Un nouveau bouton « i » ouvre l'aide contextuelle du jeu, le même système que Blizzard utilise pour ses propres fenêtres : le fond s'assombrit et une bulle pointe directement sur ce dont il est question. Chaque onglet (Vue Métier, Commande, Récolte, Artisans, Mes artisans, Carnet) a sa propre visite guidée, donc le bouton explique ce qui est réellement affiché plutôt qu'une infobulle générique."],
-                L["Lazy Gold et MTSL restent optionnels, mais rien ne signalait qu'ils manquaient. Les boutons qui en dépendent restent visibles et colorés même sans l'addon installé, et cliquer dessus sans l'avoir ouvre désormais une explication de ce qu'il fait et où le trouver, plutôt que de ne rien faire du tout."],
-                L["L'alerte « peut faire cette commande » se déclenchait même quand tu ne connaissais pas la recette, souvent des gemmes ou enchants dont tu avais les réactifs sans le plan. Elle vérifie maintenant tes recettes connues avant de te notifier sur tes propres commandes. Un ami en ligne sans l'addon ne s'affiche plus « Hors ligne » par erreur."],
-                L["Échap laissait souvent les fenêtres de métier ouvertes, et trois rapports différents pointaient la même cause : cacher ou désactiver la souris d'une fenêtre protégée en plein combat déclenche une erreur du jeu. Les fenêtres passent maintenant par un petit relais dédié, donc Échap les ferme proprement, en combat ou non."],
-                L["L'aide « quoi monter ensuite » affiche maintenant le coût par point de compétence, une pastille de prix Auctioneer, et une icône vers le PNJ qui vend une recette que tu ne connais pas encore, en plus d'un tri affiné."],
-                L["Cette même aide gagne un plan de route : clique le bouton carte et il déroule toute ta montée rang par rang, en choisissant à chaque étape la recette la moins chère (apprise ou achetable, plans compris) et en additionnant le coût total. Les recettes à cooldown ou avec un réactif sans prix connu sont exclues exprès, elles fausseraient le total. Demande Lazy Gold ; MTSL ajoute les prix de plans formateur et vendeur au calcul."],
-            },
-        },
     }
 end
 
@@ -430,7 +426,7 @@ end
 
 local function versionsOldest()
     return {
-        -- v1.21.0 (retirée à la v1.47.0), v1.20.0 (retirée à la v1.46.0), v1.19.1 / v1.19.0 (retirées à la v1.45.0), v1.18.0 / v1.17.1 (retirées à la v1.44.2), v1.17.0 (retirée à la v1.44.1),v1.16.0 (retirée à la v1.44.0), v1.15.1 (retirée à la v1.43.0), v1.15.0 (retirée à la v1.42.1), v1.14.0 (retirée à la v1.42.0), v1.13.0 (retirée à la v1.41.1), v1.12.0 / v1.11.0 / v1.10.2 (retirées à la v1.41.0 : la Saison de la Découverte, le canal du royaume et
+        -- v1.22.0 (retirée à la v1.48.0), v1.21.0 (retirée à la v1.47.0),v1.20.0 (retirée à la v1.46.0), v1.19.1 / v1.19.0 (retirées à la v1.45.0), v1.18.0 / v1.17.1 (retirées à la v1.44.2), v1.17.0 (retirée à la v1.44.1),v1.16.0 (retirée à la v1.44.0), v1.15.1 (retirée à la v1.43.0), v1.15.0 (retirée à la v1.42.1), v1.14.0 (retirée à la v1.42.0), v1.13.0 (retirée à la v1.41.1), v1.12.0 / v1.11.0 / v1.10.2 (retirées à la v1.41.0 : la Saison de la Découverte, le canal du royaume et
         -- le bouton « Créer » sécurisé n'existent pas sur Forever), v1.10.1 / v1.9.0 / v1.8.0 / v1.7.0 / v1.7.1 /
         -- v1.6.0 / v1.5.0 / v1.4.0 retirées de l'onglet (l'historique
         -- complet vit dans CHANGELOG.md). Cet onglet ne garde qu'une fenêtre glissante de versions :
