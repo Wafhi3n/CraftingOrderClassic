@@ -68,7 +68,7 @@
 | `CraftingOrderClassic_UI_MyArtisans_Reroll.lua` | accès à la vue REROLL (métiers d'un AUTRE perso du compte) depuis l'onglet « Mes artisans ». | 86 |
 | `CraftingOrderClassic_UI_Help.lua` | onglet Aide : page unique défilante qui explique les autres onglets (Carnet/Commande/Récolte/Artisans), la Vue Métier et le réseau. | 213 |
 | `CraftingOrderClassic_UI_News.lua` | onglet « Nouveautés » : notes de version (changelog) affichées EN JEU, version par version, la plus récente en tête. | 490 |
-| `CraftingOrderClassic_Report.lua` | « Signaler » : un bug ou une idée, en ticket sur le dépôt GitHub. | 152 |
+| `CraftingOrderClassic_Report.lua` | « Signaler » : un bug ou une idée, en ticket sur le dépôt GitHub. | 155 |
 | `CraftingOrderClassic_Social.lua` | couche sociale passive (socle). | 423 |
 | `CraftingOrderClassic_Social_Menu.lua` | entrées « Crafting Order » du menu contextuel joueur. | 116 |
 | `CraftingOrderClassic_Social_Roster.lua` | affichage des métiers sur les fenêtres NATIVES. | 130 |

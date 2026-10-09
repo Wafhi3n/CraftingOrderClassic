@@ -75,9 +75,12 @@ local function buildBox(f)
     return box
 end
 
+-- Strate DIALOG, au-dessus de HIGH (celle des autres fenêtres de COC) : à strate égale, un clic sur la
+-- fenêtre principale la remontait par-dessus celle-ci (SetToplevel), vu par le user le 2026-10-09.
 function Report:Build()
     local f = Skin.MakeWindow("CraftingOrderClassicReport", 470, 200, {
         title = L["Signaler un bug ou proposer une idée"], portrait = "Interface\\Icons\\INV_Letter_15",
+        strata = "DIALOG",
     })
     f.hint = f:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
     f.hint:SetPoint("TOPLEFT", f.Inset, "TOPLEFT", 12, -12)
@@ -127,8 +130,8 @@ function Report:AttachTitleButton(f, anchor)
     b:SetFrameStrata(anchor:GetFrameStrata()); b:SetFrameLevel(anchor:GetFrameLevel())
     b:SetNormalTexture(BUG_ICON); b:SetHighlightTexture(BUG_ICON, "ADD")
     b:SetScript("OnClick", function() Report:Open() end)
-    b:SetScript("OnEnter", function(self)
-        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+    b:SetScript("OnEnter", function(btn)
+        GameTooltip:SetOwner(btn, "ANCHOR_RIGHT")
         GameTooltip:SetText(L["Signaler un bug ou proposer une idée"], 1, 1, 1)
         GameTooltip:Show()
     end)
