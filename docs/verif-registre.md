@@ -46,6 +46,13 @@ client.
 
 ## Relevés
 
+- 2026-10-09 13:15 — jusqu'a 857ec0d — Forever build client 70291 ; build `main-dev@178f862 2026-10-09
+  13:12`, `## Version: 1.48.0` (lu dans le `.toc` déployé et par l'appli du banc, fiche
+  `CraftingOrderClassic--release-v1.48.0`, trois gestes cochés OK, sur la parole du user) — **GO** sur
+  le candidat v1.48.0 (`release/v1.48.0` : version, CHANGELOG, onglet Nouveautés ; le bouton
+  « Signaler » vu au banc à 12:19) : `/co version` affiche 1.48.0 et la ligne Build ; onglet
+  Nouveautés, la v1.48.0 en tête, lisible, sans clé brute, puis la v1.47.0 ; aucune erreur.
+
 - 2026-10-08 00:06 — jusqu'a 68545b1 — Forever build client 70245, Rédemption Wafhien (1er compte,
   `#4`) ; build `main-dev@779eb27 2026-10-08 00:02`, `## Version: 1.47.0` (lu dans le `.toc` déployé et
   par l'appli du banc, fiche `CraftingOrderClassic--release-v1.47.0`, trois gestes cochés OK) — **GO**
