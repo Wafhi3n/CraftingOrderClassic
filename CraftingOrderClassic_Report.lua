@@ -114,6 +114,28 @@ function Report:Show(kind)
     if kind then f.box:SetFocus(); f.box:HighlightText() else f.box:ClearFocus() end
 end
 
+-- L'icône « bug » de la barre de titre, juste à droite du « i » : visible depuis TOUS les onglets
+-- (le user l'a cherchée sur le Carnet, 2026-10-09). Même strate et même niveau que le « i », que
+-- Skin.MakeHelpButton pose au-dessus de la bordure du cadre ; sans eux, la bordure la couvrirait.
+-- Le « i » est un bouton de 64 px dont le disque visible fait ~28 px, au centre : d'où CENTER + 16.
+-- Texture : celle du rapport de bug de Blizzard (Blizzard_PTRFeedback), 64 x 64 avec sa marge.
+local BUG_ICON = "Interface\\HelpFrame\\HelpIcon-Bug"
+function Report:AttachTitleButton(f, anchor)
+    local b = CreateFrame("Button", nil, f)
+    b:SetSize(30, 30)
+    b:SetPoint("LEFT", anchor, "CENTER", 16, 0)
+    b:SetFrameStrata(anchor:GetFrameStrata()); b:SetFrameLevel(anchor:GetFrameLevel())
+    b:SetNormalTexture(BUG_ICON); b:SetHighlightTexture(BUG_ICON, "ADD")
+    b:SetScript("OnClick", function() Report:Open() end)
+    b:SetScript("OnEnter", function(self)
+        GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+        GameTooltip:SetText(L["Signaler un bug ou proposer une idée"], 1, 1, 1)
+        GameTooltip:Show()
+    end)
+    b:SetScript("OnLeave", GameTooltip_Hide)
+    return b
+end
+
 -- /co bug, /co idée et leur ligne dans /co help se greffent ICI sur COC:Slash et COC:Help :
 -- CraftingOrderClassic.lua est au plafond de 500 lignes. Le /co relit COC.Slash à chaque frappe
 -- (`function(msg) COC:Slash(msg) end`), la greffe y est donc vue.
