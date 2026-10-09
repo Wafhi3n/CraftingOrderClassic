@@ -205,4 +205,9 @@ function UI:BuildHelpTab(f)
     local y = -2
     for _, sec in ipairs(content()) do y = paintSection(body, sec, y) end
     body:SetHeight(math.max(-y, 10))
+
+    -- Signaler un bug ou une idée (CraftingOrderClassic_Report.lua), dans la bande au-dessus de la page.
+    local report = Skin.MakeGoldButton(panel, 230, 22, L["Signaler un bug ou proposer une idée"])
+    report:SetPoint("TOPRIGHT", panel, "TOPRIGHT", -12, -42)
+    report:SetScript("OnClick", function() if COC.Report then COC.Report:Open() end end)
 end

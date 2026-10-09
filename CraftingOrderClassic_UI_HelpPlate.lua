@@ -157,6 +157,8 @@ function UI:_BuildHelp(f)
         point   = { "TOPLEFT", f, "TOPLEFT", 39, 20 },
         tooltip = L["Aide : survole les zones surlignées pour comprendre chaque fonction."],
     })
+    -- À sa droite, l'icône « signaler un bug ou une idée » (CraftingOrderClassic_Report.lua).
+    if COC.Report then COC.Report:AttachTitleButton(f, self.helpBtn) end
 end
 
 -- Tutoriel one-shot : la 1re fois qu'on arrive sur un onglet AIDÉ (aujourd'hui Commande — et la minimap

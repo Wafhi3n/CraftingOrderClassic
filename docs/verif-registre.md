@@ -84,6 +84,20 @@ client.
   [Dispo], aucune trace `VRF` chez Toao ni chez Gnoma ; le nettoyage lit `false` (Gnomi jamais
   écartée). Cause : `D0` n'est local qu'à `_FillArtRow`, le bouton (`_ArtRowButtons`) lisait un
   global vide. Corrigé par `ce5b42c` (test qui clique, échoue sur l'ancien code), à revoir au banc.
+- 2026-10-09 12:19 — jusqu'a dbda765 — Forever build client 70291 (lu par `deploy.ps1`) ; comptes de
+  la fiche : Rédemption (`#4`, client anglais) et Gnomi Short (`#1`, client FR) ; build
+  `main-dev@a64cf0f 2026-10-09 11:59`, et `main-dev@1246ca1 2026-10-09 11:49` pour l'icône de la barre
+  de titre (lus par l'appli du banc, fiche `CraftingOrderClassic--feat-bouton-ticket`, neuf gestes
+  cochés OK, sans remarque, sur la parole du user) — **GO** sur `feat/bouton-ticket` (spec
+  `docs/specs/signaler.md` de l'outillage, critères 7 à 9) : icône bug dans la barre de titre à droite
+  du « i », entière, sur le Carnet et d'autres onglets, infobulle et clic (capture du user) ; la
+  fenêtre Signaler reste devant la fenêtre principale (elle passait derrière en `@8df13bc`, capture du
+  user, corrigé par `568dafe`) ; bouton de l'onglet Aide (capture) ; zone du lien montrée par son
+  début, « Link copied » en vert après Ctrl+C ; Bug et Idea ouvrent les formulaires du dépôt avec la
+  zone Version remplie, No GitHub account la page CurseForge ; `/co bug`, `/co idée` et la ligne de
+  `/co help` ; Échap ferme la fenêtre en combat, aucune action bloquée signalée. Pas de capture du
+  formulaire GitHub : le contenu exact de la zone Version est celui qu'attendait la fiche, coché OK.
+  Pas de vrai bouton Copier : `CopyToClipboard` porte `HasRestrictions` (pas mesuré sur Forever).
 
 - 2026-10-07 19:01 — jusqu'a e96fe97 — Forever build client 70245, Rédemption Wafhien (1er compte) ;
   build `main-dev@845a9e1 2026-10-07 18:53`, `## Version: 1.46.0` (lu par l'appli du banc, fiche
