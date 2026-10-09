@@ -8,7 +8,7 @@ body:
       value: |
         Thanks for taking the time! Write in any language you like.
 
-        **Fastest way, in versions after 1.46.0:** in game, type `/co bug` (or click the report button in the addon window), pick **Bug**, copy the link (Ctrl+C) and open it in your browser. The Version box below comes back filled in. On an older version, just fill in the form.
+        **Fastest way, in versions after 1.47.0:** in game, type `/co bug` (or click the report button in the addon window), pick **Bug**, copy the link (Ctrl+C) and open it in your browser. The Version box below comes back filled in. On an older version, just fill in the form.
   - type: textarea
     id: what
     attributes:
