@@ -180,6 +180,7 @@ local de3 = {
     ["Bug"] = "Fehler",
     ["Idée"] = "Idee",
     ["Sans compte GitHub"] = "Kein GitHub-Konto",
+    ["Lien copié : colle-le (Ctrl+V) dans ton navigateur."] = "Link kopiert: Füge ihn (Strg+V) in deinen Browser ein.",
     ["Copie ce lien (Ctrl+C) et ouvre-le dans ton navigateur : le formulaire arrive avec la version déjà remplie."] = "Kopiere diesen Link (Strg+C) und öffne ihn in deinem Browser: Das Formular erscheint mit bereits ausgefüllter Version.",
     ["Pas de compte GitHub ? Copie ce lien (Ctrl+C) et laisse un commentaire sur la page CurseForge."] = "Kein GitHub-Konto? Kopiere diesen Link (Strg+C) und hinterlasse einen Kommentar auf der CurseForge-Seite.",
     ["Un bug, ou une idée pour l'addon ? Choisis ci-dessous : l'addon te donne le lien du formulaire, déjà rempli."] = "Ein Fehler oder eine Idee für das Addon? Wähle unten: Das Addon gibt dir den Link zum bereits ausgefüllten Formular.",
