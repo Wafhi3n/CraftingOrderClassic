@@ -63,6 +63,7 @@ function UI:_BuildPostArtisanSection(panel)
     self.postSource = "guild"; self.postTarget = "all"
     self.postSrcDD = self:_BuildRecipientBand(self:PostSec("scope"), "COCPostSrcDD", P.PAD, function(v)
         UI.postSource = v; UI.postTarget = Skin.TargetAfterListChange(UI.postTarget, v)
+        UI.postDiscord = false   -- changer de liste n'emporte pas « + Discord » (spec annonce-discord)
         UI:RefreshPostArtisans(); UI:RefreshPostPlans()
     end)
     self:_RefreshPostSrcTabs()
@@ -221,6 +222,8 @@ function UI:_UpdateArtisanLabel()
         -- Le rappel dit aussi la ligne sur Commerce : c'est la dernière chose lue avant « Poster ».
         local txt = "|c" .. col .. L[self:_PostTargetLabel()] .. "|r"
         if trade then txt = txt .. "|cFFAAAAAA + |r|cFFFFFFFF" .. L["Commerce"] .. "|r" end
+        local AD = COC.AnnounceDiscord
+        if AD and AD.Wanted(t, self.postDiscord) then txt = txt .. "|cFFAAAAAA + |r|cFFFFFFFF" .. L["Discord"] .. "|r" end
         self.postArtisanName:SetText(txt)
     end
     self:_SyncHeaderSkill()   -- la cible a pu changer → la jauge du header suit (niveau de l'artisan visé)

@@ -199,6 +199,9 @@ local es3 = {
     ["ou un artisan"] = "o un artesano",
     ["ou un récolteur"] = "o un recolector",
     ["Annoncer en Commerce (en capitale)"] = "Anunciar en Comercio (solo en capitales)",
+    -- Ligne de destinataire du salon Discord de la guilde (2026-10-10)
+    ["Toute la guilde + Discord"] = "Toda la hermandad + Discord",
+    ["Discord"] = "Discord",
 }
 
 for k, v in pairs(es3) do L[k] = v end

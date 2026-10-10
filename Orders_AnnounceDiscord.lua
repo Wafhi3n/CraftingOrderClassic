@@ -63,6 +63,18 @@ function D.RowState(group, target, wanted, linked)
     return shown, shown and D.Wanted(target, wanted)
 end
 
+-- Le chef peut relier, délier ou changer de flux fenêtre ouverte : la ligne « Toute la guilde +
+-- Discord » se redessine sur ces événements (libres d'accès, mesurés le 2026-10-10 au basculement de la
+-- case). Hors fenêtre, rien : la ligne se relit de toute façon à l'ouverture.
+if CreateFrame and COC.Api and COC.Api.RegisterEventsSafe then
+    local f = CreateFrame("Frame")
+    COC.Api.RegisterEventsSafe(f, { "DISCORD_GUILD_SETTINGS_UPDATE", "DISCORD_LINK_UPDATE" })
+    f:SetScript("OnEvent", function()
+        local UI = COC.UI
+        if UI and UI.frame and UI.frame:IsShown() and UI.RefreshPostArtisans then UI:RefreshPostArtisans() end
+    end)
+end
+
 -- À appeler depuis le clic « Poster » (UI:DoPostOrder), après que la commande est partie : le jeu
 -- exige un geste du joueur. Rend true si la ligne est partie. Une ligne perdue ne casse jamais la
 -- commande : refus du jeu, flux mêlé ou guilde pas reliée = rien, sans message (le joueur n'a rien
