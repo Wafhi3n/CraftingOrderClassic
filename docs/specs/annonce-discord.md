@@ -96,8 +96,8 @@ nom du personnage. Le jeu la recopie dans le salon Discord.
   pour Rédemption comme pour Gnomi). Forme : `@Prénom Nom`, juste avant `#CO<n>`.
 - 2026-10-10, mesuré : un salon par guilde, choisi par le chef ; un addon ne peut ni le lire ni le
   changer (fonctions de `C_Discord` protégées, même depuis une commande tapée).
-- 2026-10-10, agent (à confirmer par le user) : les **commandes de récolte** (onglet Récolte) n'ont pas
-  de ligne Discord, comme elles n'ont pas d'annonce sur Commerce. Le joueur est prévenu à chaque ligne
+- 2026-10-10, agent, **confirmé par le user** le même jour : les **commandes de récolte** (onglet
+  Récolte) n'ont pas de ligne Discord, comme elles n'ont pas d'annonce sur Commerce. Le joueur est prévenu à chaque ligne
   envoyée (« commande annoncée sur le Discord de la guilde. »), comme sur Commerce.
 
 ## Mesures (faites le 2026-10-10, Rédemption chef de guilde, sonde COCProbe)
