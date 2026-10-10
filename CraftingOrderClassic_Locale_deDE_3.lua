@@ -67,6 +67,12 @@ local de3 = {
     ["Clic droit : rappeler en Commerce"] = "Rechtsklick: im Handelskanal wiederholen",
     -- Annonce de la dispo LFW (2026-09-30)
     ["dispo annoncée sur %s."] = "Verfügbarkeit in %s angekündigt.",
+    -- Ligne d'une commande de guilde dans le fil Discord de la guilde (2026-10-10)
+    ["commande annoncée sur le Discord de la guilde."] = "Auftrag im Discord der Gilde angekündigt.",
+    ["commande postée sans sa ligne Discord : une par minute au plus (encore %d s)."] =
+        "Auftrag ohne Discord-Zeile erstellt: höchstens eine pro Minute (noch %d s).",
+    ["commande postée sans sa ligne Discord : un objet n'est pas encore connu du jeu."] =
+        "Auftrag ohne Discord-Zeile erstellt: ein Gegenstand ist dem Spiel noch nicht bekannt.",
     ["Quand tu actives ta dispo, poste aussi une ligne sur Trade (Services) : les joueurs avec ou sans l'addon voient que tu cherches du travail. Une ligne par activation, jamais au renouvellement automatique ; dans une capitale. Même réglage que la case du formulaire de commande."] =
         "Wenn du die Arbeitssuche einschaltest, wird zusätzlich eine Zeile in Handel (Dienstleistungen) gepostet: Spieler mit oder ohne das Addon sehen, dass du Arbeit suchst. Eine Zeile pro Einschalten, nie bei der automatischen Erneuerung; nur in einer Hauptstadt. Dieselbe Einstellung wie das Kästchen im Auftragsformular.",
     -- Aide sans communauté officielle (2026-09-30)

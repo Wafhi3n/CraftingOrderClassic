@@ -7,6 +7,7 @@
 --   WTB [objet] x1 PROVIDE [mat]x2 [mat]x1 2g50s #CO27      une commande publique (id = <auteur>-27)
 --   LFW Enchanting/Tailoring #CO                           un artisan disponible
 --   LFW Blacksmithing/[Forge] #CO                          le même, avec son lien de métier
+--   WTB [objet] x1 2g50s @Prénom Nom #CO27                  une commande de guilde, fil Discord (annonce-discord)
 --
 -- Ce fichier ne fait QUE le format : fabriquer une ligne, relire une ligne. Aucun appel au jeu (les
 -- liens d'objet sont résolus par l'appelant), donc tout se teste sans WoW (tests/test_announce.lua).
@@ -75,18 +76,33 @@ local function provideTokens(mats, room)
     return out
 end
 
--- La ligne « WTB » d'une commande. `targetLink` = lien de l'objet (ou de l'enchantement) commandé ;
--- `mats` = { { link =, qty = }, … } déjà résolus ; `copper` = commission. nil si la commande est privée,
--- sans numéro, ou si même sans matériaux la ligne ne tient pas.
-function A.BuildWTB(o, targetLink, mats, copper)
-    if not (isPublic(o) and type(targetLink) == "string") then return nil end
+-- Le corps commun des lignes « WTB ». `who` (facultatif) = le nom de l'auteur, posé en « @Prénom Nom »
+-- juste AVANT l'étiquette : Parse ancre `#CO<n>` en fin de ligne, et un nom n'est ni un lien ni un prix.
+local function buildWTB(o, targetLink, mats, copper, who)
+    if type(targetLink) ~= "string" then return nil end
     local n = type(o.id) == "string" and o.id:match("%-(%d+)$")
     if not n then return nil end
     local head = "WTB " .. targetLink .. " x" .. (tonumber(o.qty) or 1)
     local price = A.PriceTokens(copper)
-    local tail = (price and (" " .. price) or "") .. " #CO" .. n
+    local tail = (price and (" " .. price) or "") .. (who and (" @" .. who) or "") .. " #CO" .. n
     if #head + #tail > A.MAX then return nil end
     return head .. provideTokens(mats, A.MAX - #head - #tail) .. tail
+end
+
+-- La ligne « WTB » d'une commande. `targetLink` = lien de l'objet (ou de l'enchantement) commandé ;
+-- `mats` = { { link =, qty = }, … } déjà résolus ; `copper` = commission. nil si la commande est privée,
+-- sans numéro, ou si même sans matériaux la ligne ne tient pas.
+function A.BuildWTB(o, targetLink, mats, copper)
+    if not isPublic(o) then return nil end
+    return buildWTB(o, targetLink, mats, copper)
+end
+
+-- La ligne du fil Discord de la guilde (spec docs/specs/annonce-discord.md) : la même, pour une commande
+-- en portée « Guilde », avec le nom du personnage (`who`) — Discord affiche le COMPTE Discord de
+-- l'auteur, jamais son personnage. nil hors portée « Guilde », sans nom, ou si elle ne tient pas.
+function A.BuildDiscordWTB(o, targetLink, mats, copper, who)
+    if not (o and o.recipient == "Guilde" and type(who) == "string" and who ~= "") then return nil end
+    return buildWTB(o, targetLink, mats, copper, who)
 end
 
 -- « LFW Enchanting/Tailoring #CO » : les noms anglais des métiers (clés de CraftLink). `links` =

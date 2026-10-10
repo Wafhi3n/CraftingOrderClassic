@@ -108,13 +108,27 @@ function S:CanRemind(o)
     return not o.announcedAt or (now() - o.announcedAt) >= S.REMIND
 end
 
--- La ligne de la commande, ou nil (objet pas encore en cache, commande privée…).
-function S:LineFor(o)
+-- Ce qu'une ligne WTB dit de la commande : lien de la cible, matériaux fournis, commission en cuivre.
+-- nil si la cible n'est pas encore en cache.
+local function wtbParts(o)
     local target = (o.itemID and itemLink(o.itemID)) or (o.spellID and spellLink(o.spellID))
     if not target then return nil end
     local Skin = COC.UI and COC.UI.Skin
-    local copper = Skin and Skin.PriceCopper and Skin.PriceCopper(o.price) or nil
-    return COC.Announce.BuildWTB(o, target, providedMats(o), copper)
+    return target, providedMats(o), Skin and Skin.PriceCopper and Skin.PriceCopper(o.price) or nil
+end
+
+-- La ligne de la commande, ou nil (objet pas encore en cache, commande privée…).
+function S:LineFor(o)
+    local target, mats, copper = wtbParts(o)
+    if not target then return nil end
+    return COC.Announce.BuildWTB(o, target, mats, copper)
+end
+
+-- La ligne du fil Discord de la guilde (Orders_AnnounceDiscord), signée `who`, ou nil.
+function S:DiscordLineFor(o, who)
+    local target, mats, copper = wtbParts(o)
+    if not target then return nil end
+    return COC.Announce.BuildDiscordWTB(o, target, mats, copper, who)
 end
 
 -- Écrit la ligne sur Trade (Services). À appeler depuis un CLIC du joueur. Rend true si elle est partie.
