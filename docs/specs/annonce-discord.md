@@ -10,6 +10,11 @@
 > test ; **6 à 9 tenus au banc le 2026-10-10 16:23** (GO, registre de vérification, `main-dev@b4df661`) ;
 > 10 relu à la main (seul `IsDiscordStreamSeparate` de C_GuildInfo,
 > `C_Club.SendMessage` atteignable du seul `DoPostOrder`).
+> **Évolution du 2026-10-10 après le banc** (D2 revue par le user) : plus d'envoi automatique, une
+> ligne de destinataire « Toute la guilde + Discord ». Ici : l'envoi exige ce choix (`D.Wanted`), ce
+> qui laisse la fonction en sommeil sur l'écran de `main`, qui n'a pas la ligne ; la ligne elle-même
+> arrive avec la branche `feat/ligne-guilde-discord` (bâtie sur `feat/liste-destinataires`). Le GO de
+> 16:23 vaut pour `f904fe2` (envoi automatique) et pour le chef de guilde comme seul posteur.
 
 ## Le problème
 
@@ -24,10 +29,16 @@ guildien sur Discord ne sait pas qu'un membre cherche un artisan.
 
 ## Ce qu'on veut
 
-Quand un joueur poste une commande **publique en portée « Guilde »**, et que sa guilde est reliée à
-Discord **en flux séparé**, COC écrit **en plus**, dans le même clic, la ligne `WTB` de cette
-commande dans le **fil « Discord »** de la guilde. C'est la ligne de Commerce, à laquelle s'ajoute le
-nom du personnage. Le jeu la recopie dans le salon Discord.
+Quand la guilde est reliée à Discord **en flux séparé**, la liste des destinataires du formulaire de
+commande offre, sous « Toute la guilde », une ligne **« Toute la guilde + Discord »**. Un joueur qui la
+choisit poste une commande **publique en portée « Guilde »** comme avec « Toute la guilde », et COC
+écrit **en plus**, dans le même clic, la ligne `WTB` de cette commande dans le **fil « Discord »** de
+la guilde. C'est la ligne de Commerce, à laquelle s'ajoute le nom du personnage. Le jeu la recopie
+dans le salon Discord.
+
+- « Toute la guilde » seule ne poste rien sur Discord.
+- Guilde pas reliée, ou en flux mêlé : la ligne « Toute la guilde + Discord » n'est **pas affichée**.
+  COC ne peut pas savoir si un bot tourne derrière le salon : c'est le lien de la guilde qui décide.
 
 - Le flux séparé, c'est la case « Separate Discord chat from Guild chat » du chef de guilde. La
   guilde a alors un fil « Discord » à elle, distinct du chat de guilde.
@@ -82,8 +93,12 @@ nom du personnage. Le jeu la recopie dans le salon Discord.
 
 - 2026-10-10, **user** (D1) : seules les **commandes (WTB)** vont sur Discord. Ni la dispo LFW ni le
   suivi d'une commande.
-- 2026-10-10, **user** (D2) : l'envoi est **automatique pour toute commande publique en portée
-  « Guilde »**, dans le clic « Poster ». Pas de case à cocher.
+- 2026-10-10, **user** (D2, **revue** le même jour après le banc) : l'envoi se **choisit**, par une
+  ligne de destinataire « Toute la guilde + Discord » sous « Toute la guilde », affichée seulement si
+  la guilde est reliée (« si le bot n'est pas installé, on cache »). D'abord : automatique pour toute
+  commande « Guilde », sans case — remplacé. Sur le réseau, la commande reste « Guilde » (contrat
+  inchangé : un client déjà publié lirait une valeur inconnue comme un nom de joueur) ; le choix est
+  un drapeau local du formulaire, et la ligne n'existe que dans l'onglet Commande (pas Récolte).
 - 2026-10-10, **user** (D3, revue le même jour après M2) : COC n'écrit **qu'en flux séparé**, dans le
   fil « Discord » de la guilde. En flux mêlé, rien. Remplace « suivre le réglage » (chat de guilde en
   flux mêlé), abandonné parce qu'un addon ne peut pas y savoir que la guilde est reliée.
@@ -119,9 +134,10 @@ nom du personnage. Le jeu la recopie dans le salon Discord.
    le même id, objet, quantité, matériaux et prix. → `tests/test_announce.lua`
 2. [test] La ligne de **Commerce** ne change pas : les tests actuels d'`annonce-commerce` passent tels
    quels. → `tests/test_announce.lua`, `tests/test_announce_send.lua`
-3. [test] Une commande en portée « Tous », « Amis » ou à une personne n'écrit aucune ligne Discord.
-   Un `TTL`, une rediffusion ou un rejeu non plus. Seul le clic « Poster » d'une commande « Guilde »
-   en écrit une.
+3. [test] Une commande en portée « Tous », « Amis » ou à une personne n'écrit aucune ligne Discord,
+   ni « Toute la guilde » seule. Un `TTL`, une rediffusion ou un rejeu non plus. Seul le clic
+   « Poster » avec « Toute la guilde + Discord » choisie en écrit une ; sur le réseau, la commande
+   reste « Guilde ».
 4. [test] Garde D4 : sans flux séparé, ou sans fil `Discord` dans la guilde, aucune ligne. Rien n'est
    jamais écrit dans le chat de guilde ordinaire.
 5. [test] Une 2ᵉ commande de guilde moins d'une minute après la 1ʳᵉ part sans ligne, avec un message
@@ -139,6 +155,13 @@ nom du personnage. Le jeu la recopie dans le salon Discord.
    ni dans le chat de guilde ni sur Discord. Témoin : la même commande en flux séparé écrit sa ligne.
 10. [agent] Pas d'appel à une fonction protégée de `C_Discord`, pas d'envoi hors du clic.
     → `api-gotcha-reviewer`
+11. [human] La ligne « Toute la guilde + Discord » : affichée sous « Toute la guilde » quand la guilde
+    est reliée en flux séparé ; cachée en flux mêlé (case décochée pendant que la fenêtre est ouverte
+    comprise) ; absente de la liste « Amis » et de l'onglet Récolte. Choisie puis cachée : le
+    destinataire retombe sur « Toute la guilde ». Témoin : la ligne « Toute la guilde », toujours là.
+12. [human] **Gnomi (grade Initiate, pas officier)** choisit « Toute la guilde + Discord » et poste :
+    sa ligne arrive sur Discord. Pas encore vu : seul le chef de guilde a posté le 2026-10-10 ; qu'un
+    simple membre voie le fil `Discord` dans `GetStreams` et puisse y écrire n'est pas mesuré.
 
 ## Contrat
 

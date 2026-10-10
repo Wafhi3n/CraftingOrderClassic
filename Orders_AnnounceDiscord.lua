@@ -5,9 +5,11 @@
 -- commande de COC part en messages d'addon, que Discord ne voit jamais. Mesuré le même jour (M1, M2) :
 -- un addon écrit dans le fil « Discord » de la guilde depuis un geste du joueur, et ce fil n'existe
 -- qu'en flux SÉPARÉ ; en flux mêlé, rien ne dit à un addon que la guilde est reliée (les fonctions de
--- C_Discord qui le diraient sont protégées). Décisions du user : automatique pour une commande publique
--- en portée « Guilde », au clic « Poster » seulement ; flux séparé seulement ; une ligne par minute ;
--- le nom du personnage dans la ligne (Discord affiche le compte Discord, jamais le personnage).
+-- C_Discord qui le diraient sont protégées). Décisions du user : sur CHOIX du joueur, la ligne de
+-- destinataire « Toute la guilde + Discord » (D2 revue le 2026-10-10 : plus d'envoi automatique), au
+-- clic « Poster » seulement ; flux séparé seulement ; une ligne par minute ; le nom du personnage dans
+-- la ligne (Discord affiche le compte Discord, jamais le personnage). Sur le réseau, rien ne change :
+-- la commande reste « Guilde » ; le choix Discord est un drapeau LOCAL du formulaire (UI.postDiscord).
 -- Rien n'est jamais écrit dans le chat de guilde ordinaire, et COC ne relit pas cette ligne : un
 -- guildien qui a COC reçoit déjà la commande par le réseau.
 
@@ -48,6 +50,17 @@ function D.DiscordStream()
         if type(s) == "table" and isDiscord(s, want) then return clubId, s.streamId end
     end
     return nil
+end
+
+-- Le joueur a-t-il choisi « Toute la guilde + Discord » ? `target` = UI.postTarget, `wanted` =
+-- UI.postDiscord (posé par cette ligne seule). Un autre destinataire choisi ensuite l'annule de fait.
+function D.Wanted(target, wanted) return wanted == true and target == "guild" end
+
+-- La ligne de destinataire : (affichée, choisie). Seulement pour la liste « Guilde », et seulement si
+-- la guilde est reliée en flux séparé (`linked` = D.DiscordStream() ~= nil) : ailleurs, rien à offrir.
+function D.RowState(group, target, wanted, linked)
+    local shown = group == "guild" and linked == true
+    return shown, shown and D.Wanted(target, wanted)
 end
 
 -- À appeler depuis le clic « Poster » (UI:DoPostOrder), après que la commande est partie : le jeu
