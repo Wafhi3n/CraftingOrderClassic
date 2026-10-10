@@ -126,7 +126,8 @@ dans le salon Discord.
   et les clients v1.49.0 continuent d'envoyer l'ancienne forme. Le jeton se place entre le prix et le
   nom, pour que `#CO<n>` reste en fin de ligne (lecteur publié et bot déployé la relisent sans
   changement). Préfixe `i` (objet) ou `e` (sort, pour un enchantement), **jamais** `s`, `g`, `c` ni
-  `p` : « x1 s13421 » se lirait comme un prix de 1s, chez COC comme chez le bot.
+  `p` : `Announce.Parse` lirait « x1 s13421 » comme un prix de 1s (le bot, lui, ôte la quantité avant
+  de chercher le prix : vérifié par ses tests le 2026-10-10).
 
 ## Mesures (faites le 2026-10-10, Rédemption chef de guilde, sonde COCProbe)
 
