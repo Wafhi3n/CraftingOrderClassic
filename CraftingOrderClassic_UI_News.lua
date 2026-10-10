@@ -37,6 +37,14 @@ local BODY_W = 780
 local function versionsFront()
     return {
         {
+            v = "v1.49.0", title = L["Une commande de guilde peut aller sur le Discord de ta guilde"],
+            lines = {
+                L["Si le chef de ta guilde a relié le chat de guilde à un salon Discord, le formulaire de commande propose une ligne « Toute la guilde + Discord » sous « Toute la guilde ». Choisis-la : ta commande part à ta guilde comme d'habitude, et sa ligne arrive aussi dans le salon Discord de la guilde, pour ceux qui le lisent sur leur téléphone. Discord n'affiche que ton nom Discord, alors la ligne porte celui de ton personnage (« @Ton Nom »)."],
+                L["La ligne n'apparaît que si le chef a coché, en reliant Discord, la case qui sépare le chat Discord du chat de guilde (clic droit sur la guilde dans la fenêtre Guilde et communautés, puis les réglages de guilde, puis les réglages Discord). Une ligne par minute au plus, et « Toute la guilde » seule ne poste jamais sur Discord."],
+                L["Choisir à qui envoyer ta commande se fait maintenant dans une seule liste : « Tous (avec l'addon) » en haut avec sa case « Annoncer en Commerce », puis toute la guilde ou tous les amis selon la liste affichée, puis les artisans. La case Commerce ne vaut que pour « Tous (avec l'addon) » et se grise ailleurs."],
+            },
+        },
+        {
             v = "v1.48.0", title = L["Signale un bug ou propose une idée depuis le jeu"],
             lines = {
                 L["Un bug, une idée ? Clique sur le petit scarabée bleu à côté du « i », en haut de la fenêtre (ou sur le bouton en haut de l'onglet Aide, ou tape /co bug). Choisis Bug ou Idée : l'addon te donne un lien déjà sélectionné. Fais Ctrl+C, colle-le dans ton navigateur, et le formulaire GitHub s'ouvre avec la version de l'addon et du jeu déjà remplie. Rien sur ton personnage n'y figure."],
@@ -408,13 +416,6 @@ local function versionsRecent()
                 L["Coche « inclure les plans à acheter » et les recettes derrière un coût rejoignent la liste : les plans-objets comme fourniture à apporter, les plans de formateur comme simple note. Le même bloc de fournitures s'affiche maintenant sous le plan de route « quoi monter ensuite », avec le PNJ où aller (nom, zone, coordonnées) et une épingle TomTom cliquable si tu l'as installé."],
                 L["Une recette sans réactif au prix connu (la poussière d'enchantement, par exemple) ne fait plus sauter tout un tronçon du plan de route : elle sert maintenant de repli marqué « ? » quand rien de mieux n'est disponible. Une table de désenchantement maison alimente aussi l'infobulle des poussières, essences et éclats affichés dans ces listes."],
                 L["Deux corrections : un compte à plusieurs personnages se voyait parfois lister lui-même comme « joignable via » son autre perso dans son propre onglet Artisans, corrigé. Et le plan de route pouvait s'arrêter avant le vrai plafond de compétence après une formation chez le maître, à cause d'une assignation Lua qui perdait silencieusement sa seconde valeur."],
-            },
-        },
-        {
-            v = "v1.22.1", title = L["Les alertes de commande vérifient enfin le métier, et un plan de route qui suit son propre badge"],
-            lines = {
-                L["Une commande à portée large (guilde, amis, tous) déclenchait un toast même chez un joueur sans le métier, du moment qu'elle arrivait par le relais de connexion (chuchotement) plutôt que par le canal : le filtre par métier ne couvrait que le canal. Il s'applique maintenant quel que soit le chemin réseau. Le toast gagne aussi un troisième texte : une commande à portée large n'affiche plus « pour TOI », ce qui donnait l'impression fausse d'une demande personnelle."],
-                L["Le plan de route « quoi monter ensuite » pouvait suggérer une recette différente du badge de coût de la liste, les deux lisant des données légèrement différentes. Le plan utilise maintenant la difficulté réelle de la fenêtre métier à ton rang actuel plutôt qu'une projection, et se rafraîchit au même rythme que le badge. La commande |cFFFFFFFF/co lvldump|r affiche le détail en cas de nouveau désaccord."],
             },
         },
     }

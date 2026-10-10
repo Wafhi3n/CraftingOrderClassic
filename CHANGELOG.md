@@ -1,5 +1,22 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.49.0 - A guild order can go to your guild's Discord
+
+If your guild master linked guild chat to a Discord channel, the order form now has a "Whole guild +
+Discord" line under "Whole guild". Pick it and your order goes to your guild as usual, and its line
+also lands in the guild's Discord channel, for guildmates who read Discord on their phone. It looks
+like `WTB [Linen Bandage] x1 2g50s @Your Name #CO27`: Discord only shows your Discord name, so the
+line carries your character's.
+
+The line only shows up when the guild master ticked "Separate Discord chat from Guild chat" while
+linking Discord (right-click your guild in Guild & Communities, then Guild Settings, then Discord
+Settings). That's the one setup where the addon can tell the guild is linked. It posts one line per
+minute at most, and "Whole guild" alone never posts to Discord.
+
+Choosing who gets your order is simpler too: it's one list now. "Everyone with the addon" sits at the
+top with its "Announce in Trade" box, then the whole guild or all friends depending on the list you
+show, then crafters. The Trade box only applies to "Everyone with the addon" and greys out otherwise.
+
 ## v1.48.0 - Report a bug or suggest an idea from the game
 
 Found a bug, or have an idea? Click the little blue bug next to the "i" at the top of the window (or
