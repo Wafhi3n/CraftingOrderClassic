@@ -175,50 +175,26 @@ function UI:_BuildGatherQtyRow()
 end
 
 function UI:_BuildGatherArtisanSection(panel)
-    -- Portée dans SA zone (« scope », bande grise de la SPEC) : le MÊME dropdown natif que l'onglet
-    -- Commande (demande user, capture 2026-07-12 — les 4 boutons rouges dépareillaient) ; bouton-icône
-    -- « Diffuser à tous » (bulle sociale + tooltip) à droite. Choisir une portée cible AUSSI toute la liste.
-    local scope = self:GatherSec("scope")
-    local srcDefs = {
-        { value = "guild",  text = L["Guilde"] },
-        { value = "friend", text = L["Amis"] },
-        { value = "added",  text = L["Ajoutés"] },
-        { value = "recent", text = L["Annuaire"] },
-    }
-    local srcDD = Skin.MakeDropdown("COCGatherSrcDD", scope, 96, srcDefs, {
-        onSelect = function(v)
-            UI.gatherSrc = v; UI.gatherTarget = v   -- cibler TOUTE cette liste
-            UI:_RefreshGatherArtisans()
-        end,
-    })
-    srcDD:SetPointVisual("TOPLEFT", scope, "TOPLEFT", G.PAD, -4)
-    self.gatherSrcDD = srcDD
-    self.gatherSrc = "guild"; self.gatherTarget = "all"; self:_RefreshGatherSrcTabs()
-
-    local diffBtn = Skin.MakeIconButton(scope, 22, Skin.tex.broadcast)
-    diffBtn.icon:SetTexCoord(0, 1, 0, 1)   -- icône sociale sans bordure cuite → pas de rognage 8 %
-    diffBtn:SetPoint("RIGHT", -G.PAD - 4, 0)
-    self.gatherDiffBtn = diffBtn   -- _RefreshAllRow("gather") synchronise son liseré doré (cible = Tous)
-    diffBtn:SetScript("OnClick", function()
-        UI.gatherTarget = "all"; UI:_RefreshGatherArtisans()
+    -- LE DESTINATAIRE, comme dans Commande (piste 2 de la maquette, 2026-09-30) : la bande « Envoyer
+    -- à » + le menu de la liste affichée, puis « Tous », toute la guilde / tous les amis, un récolteur.
+    -- Pas de case Commerce ici : l'annonce sur Trade (Services) ne vit que dans le formulaire de commande.
+    self.gatherSrc = "guild"; self.gatherTarget = "all"
+    self.gatherSrcDD = self:_BuildRecipientBand(self:GatherSec("scope"), "COCGatherSrcDD", G.PAD, function(v)
+        UI.gatherSrc = v; UI.gatherTarget = Skin.TargetAfterListChange(UI.gatherTarget, v)
+        UI:_RefreshGatherArtisans()
     end)
-    diffBtn:SetScript("OnEnter", function(b)
-        GameTooltip:SetOwner(b, "ANCHOR_BOTTOMLEFT")
-        GameTooltip:SetText(L["Diffuser à tous"], 1, 1, 1)
-        GameTooltip:AddLine(L["La commande sera visible par tout le monde (cible « Tous »)."], nil, nil, nil, true)
-        GameTooltip:Show()
-    end)
-    diffBtn:SetScript("OnLeave", GameTooltip_Hide)
+    self:_RefreshGatherSrcTabs()
 
-    -- Liste des récolteurs (ligne « toute la liste » épinglée + scroll) : largeur LUE sur la zone.
+    -- Lignes épinglées + liste des récolteurs : largeur LUE sur la zone.
     local az = self:GatherSec("gatherers")
     local aw = az:GetWidth(); if aw <= 1 then aw = G.WIDE_W end
     self.gatherArtW = aw
-    -- Jusqu'au-dessus du statut (posé à 6 du bas, cf. _BuildGatherActionBar), comme dans Commande :
+    -- Jusqu'au-dessus du statut (posé à 6 du bas, cf. _BuildGatherActionBar) :
     -- 4 lignes laissaient un grand vide sous une liste qui défilait (relevé en jeu le 2026-09-27).
     self:_BuildAllRowAndScroll(az, "gather", -G.PAD, G.PAD, aw, {
-        fill   = function(row, a) UI:_FillGatherArtRow(row, a) end,
-        bottom = 22,
+        fill    = function(row, a) UI:_FillGatherArtRow(row, a) end,
+        bottom  = 22,
+        caption = L["ou un récolteur"],
     })
 
     self:_BuildGatherActionBar(panel)

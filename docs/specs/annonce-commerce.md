@@ -181,6 +181,12 @@ des commandes nommées), mais un joueur hors communauté voit et est vu dès qu'
     d'objet compterait) : sans effet, les métiers lus ne servent qu'à la trace et au bonjour ;
   - un lien de métier rend public le GUID du personnage, comme tout lien de métier posté à la main.
 
+- 2026-09-30, **user** (maquette « destinataire », piste 2) : la case du formulaire vit **dans la
+  ligne « Tous »** de la liste des destinataires, plus en bas de la fenêtre. Elle est grisée pour
+  tout autre destinataire et hors d'une capitale (libellé « (en capitale) »), sans effacer le choix
+  retenu ; « Poster » n'annonce que pour « Tous ». Le rappel du bas dit « Tous + Commerce ». La case
+  de l'offre « Chercher du travail » ne change pas.
+
 ## Critères d'acceptation
 
 Mesures préalables (sonde `/cocprobe annonce [services|local]`, avant tout code) — **tenues le

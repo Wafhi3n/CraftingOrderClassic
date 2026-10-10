@@ -19,7 +19,7 @@ local en3 = {
     ["Rien à afficher pour ce métier."] = "Nothing to show for this profession.",
     ["Recettes proposées (%d/%d)"] = "Offered recipes (%d/%d)",
     -- Réseau sans canal + communauté officielle (2026-09-28)
-    ["réseau par whisper"] = "whisper network",
+    ["par whisper"] = "by whisper",   -- suit « réseau » (barre du bas, /co status)
     ["canal : aucun — le réseau passe en whisper (cercles, amis, guilde)"] =
         "channel: none — the network runs on whispers (circles, friends, guild)",
     ["communauté officielle marquée comme cercle d'artisans : %s"] =
@@ -186,6 +186,13 @@ local en3 = {
     ["Pas de compte GitHub ? Copie ce lien (Ctrl+C) et laisse un commentaire sur la page CurseForge."] = "No GitHub account? Copy this link (Ctrl+C) and leave a comment on the CurseForge page.",
     ["Un bug, ou une idée pour l'addon ? Choisis ci-dessous : l'addon te donne le lien du formulaire, déjà rempli."] = "A bug, or an idea for the addon? Pick below: the addon gives you the link to the form, already filled in.",
     ["signaler un bug ou proposer une idée (lien vers un ticket GitHub)"] = "report a bug or suggest an idea (link to a GitHub issue)",
+    -- Le destinataire en une liste, Commande et Récolte (2026-09-30)
+    ["Envoyer à"] = "Send to",
+    ["Liste"] = "List",
+    ["Tous (avec l'addon)"] = "Everyone with the addon",
+    ["ou un artisan"] = "or one crafter",
+    ["ou un récolteur"] = "or one gatherer",
+    ["Annoncer en Commerce (en capitale)"] = "Announce in Trade (capital only)",
 }
 
 for k, v in pairs(en3) do L[k] = v end

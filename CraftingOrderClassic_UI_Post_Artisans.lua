@@ -1,5 +1,6 @@
--- CraftingOrderClassic_UI_Post_Artisans.lua — onglet « Commande », section droite basse :
--- boutons source, liste des artisans, ciblage (@Nom), libellé destinataire, bouton Poster.
+-- CraftingOrderClassic_UI_Post_Artisans.lua — onglet « Commande », section droite basse : bande
+-- « Envoyer à » + menu de la liste, lignes de destinataire (Tous / groupe / artisan), case Commerce,
+-- rappel du destinataire, boutons Poster.
 -- Extrait de _UI_Post.lua (2026-07-02, anti-monolithe) : partage le même namespace UI.
 
 local COC  = CraftingOrderClassic
@@ -55,69 +56,38 @@ function UI:_TargetArtisanFilter(prof)
 end
 
 function UI:_BuildPostArtisanSection(panel)
-    -- PORTÉE : quatre boutons rouges côte à côte AVANT → un DROPDOWN natif (demande user 2026-07-12).
-    -- Même raisonnement que le Carnet : ce sont 4 valeurs EXCLUSIVES (où je cherche l'artisan), pas
-    -- 4 actions. La rangée libérée rend sa largeur au bouton « Diffuser à tous », qui RESTE un bouton :
-    -- lui n'est pas une portée mais une CIBLE (postTarget = "all") — deux verbes différents, deux widgets.
-    -- Comportement inchangé : choisir une portée cible AUSSI toute cette liste (postTarget = source).
-    local srcDefs = {
-        { value = "guild",  text = L["Guilde"] },
-        { value = "friend", text = L["Amis"] },
-        { value = "added",  text = L["Ajoutés"] },
-        { value = "recent", text = L["Annuaire"] },
-    }
-    -- Portée + « Diffuser à tous » : leur PROPRE zone (« scope »), juste au-dessus de la liste qu'elles
-    -- pilotent — la rangée de commandes d'une liste, comme les filtres au-dessus du browse de l'HdV.
-    local scope = self:PostSec("scope")
-    local srcDD = Skin.MakeDropdown("COCPostSrcDD", scope, 96, srcDefs, {
-        onSelect = function(v)
-            UI.postSource = v; UI.postTarget = v   -- cibler TOUTE cette liste
-            UI:RefreshPostArtisans(); UI:RefreshPostPlans()
-        end,
-    })
-    srcDD:SetPointVisual("TOPLEFT", scope, "TOPLEFT", P.PAD, -4)
-    self.postSrcDD = srcDD
-    self.postSource = "guild"; self.postTarget = "all"; self:_RefreshPostSrcTabs()
-
-    -- « Diffuser à tous » = BOUTON-ICÔNE (la bulle bleue du volet Social, pointée par le user) + un
-    -- vrai tooltip d'explication — le libellé long vivait mal dans la bande. Le liseré doré
-    -- (SetSelected) reflète « cible = Tous » (synchro dans RefreshPostArtisans). L'icône sociale n'a
-    -- pas de bordure cuite dedans → on annule le rognage 8 % du kit (pensé pour les icônes d'objets).
-    local diffBtn = Skin.MakeIconButton(scope, 22, Skin.tex.broadcast)
-    diffBtn.icon:SetTexCoord(0, 1, 0, 1)
-    diffBtn:SetPoint("RIGHT", -P.PAD - 4, 0)
-    self.postDiffBtn = diffBtn
-    -- Sélectionne la cible « Tous » (diffusion globale) ; on poste ensuite via « Poster » (iso Récolte).
-    diffBtn:SetScript("OnClick", function()
-        UI.postTarget = "all"; UI:RefreshPostArtisans(); UI:RefreshPostPlans()
+    -- LE DESTINATAIRE (piste 2 de la maquette, choisie par le user le 2026-09-30) : la bande
+    -- « Envoyer à » + le menu de la liste affichée (UI:_BuildRecipientBand), puis la liste où chaque
+    -- destinataire est une ligne (UI:_BuildAllRowAndScroll) : « Tous », toute la guilde / tous les
+    -- amis, un artisan. Changer de liste ne change pas le destinataire (Skin.TargetAfterListChange).
+    self.postSource = "guild"; self.postTarget = "all"
+    self.postSrcDD = self:_BuildRecipientBand(self:PostSec("scope"), "COCPostSrcDD", P.PAD, function(v)
+        UI.postSource = v; UI.postTarget = Skin.TargetAfterListChange(UI.postTarget, v)
+        UI:RefreshPostArtisans(); UI:RefreshPostPlans()
     end)
-    diffBtn:SetScript("OnEnter", function(b)
-        GameTooltip:SetOwner(b, "ANCHOR_BOTTOMLEFT")
-        GameTooltip:SetText(L["Diffuser à tous"], 1, 1, 1)
-        GameTooltip:AddLine(L["La commande sera visible par tout le monde (cible « Tous »)."],
-            nil, nil, nil, true)
-        GameTooltip:Show()
-    end)
-    diffBtn:SetScript("OnLeave", GameTooltip_Hide)
+    self:_RefreshPostSrcTabs()
 
-    -- Ligne « Toute la guilde » épinglée + liste, DANS la zone artisans, à la largeur LUE sur la zone
-    -- (la SPEC pilote le pad). La liste descend jusqu'au-dessus du statut, posé à 6 du bas.
+    -- Lignes épinglées + liste, DANS la zone artisans, à la largeur LUE sur la zone (la SPEC pilote
+    -- le pad). La liste descend jusqu'en bas : le statut vit désormais dans le détail du plan.
     local az = self:PostSec("artisans")
     local aw = az:GetWidth(); if aw <= 1 then aw = P.WIDE_W end
     self.postArtW = aw
     self:_BuildAllRowAndScroll(az, "post", -P.PAD, P.PAD, aw, {
-        fill   = function(row, it) UI:_FillPostArtGroupRow(row, it.g, it.prof) end,
-        bottom = 22,
+        fill    = function(row, it) UI:_FillPostArtGroupRow(row, it.g, it.prof) end,
+        bottom  = 4,
+        caption = L["ou un artisan"],
     })
+    self:_BuildAnnounceCheck(self.postPinned.all)
 
-    self:_BuildPostActionBar(panel, self:PostSec("artisans"))
+    self:_BuildPostActionBar(panel)
 end
 
 -- BARRE D'ACTIONS (croquis + maquette GIMP user : « Destinataire » et « Poster » = UN objet, la
 -- barre à boutons native du bas de fenêtre). Conteneur parenté au PANNEAU (il se masque avec
 -- l'onglet) mais ANCRÉ sur la bande native `f.ActionBar` (MakeWindow, opts.buttonBar). Contenu
 -- aligné à droite : [Destinataire : X] [Poster] — la gauche de la bande reste à la ligne réseau.
-function UI:_BuildPostActionBar(panel, sec)
+-- Le destinataire n'y est plus qu'un RAPPEL, lu avant « Poster » : il se choisit dans la liste.
+function UI:_BuildPostActionBar(panel)
     local bar = CreateFrame("Frame", nil, panel)
     bar:SetAllPoints(self.frame.ActionBar)
     local posterBtn = Skin.MakeGoldButton(bar, 82, 20, L["Poster"]); posterBtn:SetPoint("RIGHT", -8, 0)
@@ -136,26 +106,22 @@ function UI:_BuildPostActionBar(panel, sec)
     local artLbl = bar:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     artLbl:SetPoint("RIGHT", self.postArtisanName, "LEFT", -6, 0)
     artLbl:SetText("|cFFE8B84B" .. L["Destinataire :"] .. "|r"); Skin.ApplyShadow(artLbl)
-    self:_BuildAnnounceCheck(bar, artLbl)
     self:_UpdateArtisanLabel()
-
-    -- Statut/aide (« Choisis un métier puis un plan. ») : en bas de la SECTION artisans, plus dans la
-    -- barre — c'est un message de l'onglet, pas une action de la fenêtre.
-    self.postSelLbl = sec:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
-    self.postSelLbl:SetPoint("BOTTOMLEFT", P.PAD, 6); self.postSelLbl:SetWidth((self.postArtW or P.WIDE_W) - 20)
-    self.postSelLbl:SetJustifyH("LEFT")
-    self.postSelLbl:SetText("|cFF888888" .. L["Choisis un métier puis un plan."] .. "|r")
 end
 
--- Case « Annoncer en Commerce » (spec annonce-commerce) : décochée au départ, le dernier choix est
--- retenu (COC.db.announceTrade) — décision du user, 2026-09-29. Posée à gauche de « Destinataire ».
-function UI:_BuildAnnounceCheck(bar, rightOf)
-    local chk = Skin.MakeCheckButton(bar, L["Annoncer en Commerce"])
-    chk:SetPoint("RIGHT", rightOf, "LEFT", -(chk.text:GetStringWidth() + 16), 0)
-    chk:SetChecked(COC.db and COC.db.announceTrade == true)
-    chk:SetScript("OnClick", function(b) if COC.db then COC.db.announceTrade = b:GetChecked() and true or nil end end)
+-- Case « Annoncer en Commerce » (spec annonce-commerce) : DANS la ligne « Tous » (piste 2 de la
+-- maquette, 2026-09-30) — elle ne sert qu'à une commande à tous, elle le montre par sa place. Elle
+-- vivait en bas, loin de la bulle, et restait cochable pour une commande privée que « Poster »
+-- refusait ensuite d'annoncer. Décochée au départ, le dernier choix est retenu (COC.db.announceTrade,
+-- décision du user, 2026-09-29) ; grisée ailleurs que « Tous » et hors d'une capitale (_SyncAnnounceCheck).
+function UI:_BuildAnnounceCheck(row)
+    local chk = Skin.MakeCheckButton(row, L["Annoncer en Commerce"], 18)
+    chk:SetScript("OnClick", function(b)
+        if COC.db then COC.db.announceTrade = b:GetChecked() and true or nil end
+        UI:_UpdateArtisanLabel()   -- le rappel du bas dit « + Commerce »
+    end)
     -- Le même réglage se coche aussi dans l'offre de dispo (PW:_BuildLFWChecks) : relu à chaque affichage.
-    chk:SetScript("OnShow", function(b) b:SetChecked(COC.db and COC.db.announceTrade == true) end)
+    chk:SetScript("OnShow", function() UI:_UpdateArtisanLabel() end)
     chk:SetScript("OnEnter", function(b)
         GameTooltip:SetOwner(b, "ANCHOR_TOP")
         GameTooltip:SetText(L["Annoncer en Commerce"], 1, 1, 1)
@@ -164,6 +130,27 @@ function UI:_BuildAnnounceCheck(bar, rightOf)
     end)
     chk:SetScript("OnLeave", GameTooltip_Hide)
     self.postAnnChk = chk
+    -- Entrer dans une capitale, ou en sortir, change la case sans autre geste du joueur : la liste des
+    -- canaux du client bouge (CHANNEL_UI_UPDATE, celui qu'écoute la fenêtre des canaux de Blizzard).
+    -- Relu seulement quand le formulaire est à l'écran ; sinon l'OnShow de la case s'en charge.
+    local watch = CreateFrame("Frame", nil, row)
+    pcall(watch.RegisterEvent, watch, "CHANNEL_UI_UPDATE")
+    watch:SetScript("OnEvent", function() if chk:IsVisible() then UI:_UpdateArtisanLabel() end end)
+end
+
+-- La case suit le destinataire et la ville (Skin.AnnounceState). Hors d'une capitale, son libellé
+-- le dit. Ancrée depuis le bord droit de la ligne à la largeur de son texte (le libellé est À DROITE
+-- de la case, et il change). Rend true si la commande partira aussi sur Commerce.
+function UI:_SyncAnnounceCheck()
+    local chk = self.postAnnChk; if not chk then return false end
+    local S = COC.AnnounceSend
+    local inTown = (S and S.ChannelIndex and S.ChannelIndex()) ~= nil
+    local on, checked = Skin.AnnounceState(COC.db and COC.db.announceTrade, self.postTarget, inTown)
+    chk.text:SetText(inTown and L["Annoncer en Commerce"] or L["Annoncer en Commerce (en capitale)"])
+    chk:ClearAllPoints(); chk:SetPoint("RIGHT", chk:GetParent(), "RIGHT", -(chk.text:GetStringWidth() + 8), 0)
+    chk:SetEnabled(on); chk:SetChecked(checked)
+    if on then chk.text:SetTextColor(1, 1, 1) else chk.text:SetTextColor(Skin.unpack(Skin.color.textMuted)) end
+    return checked
 end
 
 -- Reflète la portée courante dans le dropdown (libellé + coche). Nom conservé : plusieurs appelants.
@@ -198,7 +185,6 @@ function UI:RefreshPostArtisans()
     end
     self.postArtList:SetData(items, true)
     self:_RefreshAllRow("post"); self:_UpdateArtisanLabel()
-    if self.postDiffBtn then self.postDiffBtn:SetSelected((self.postTarget or "all") == "all") end
 end
 
 -- Amène la ligne ciblée dans la fenêtre de la liste : triée en ligne d'abord puis par nom, elle peut
@@ -227,11 +213,15 @@ function UI:_PostTargetLabel()
 end
 
 function UI:_UpdateArtisanLabel()
+    local trade = self:_SyncAnnounceCheck()   -- la case suit le destinataire
     if self.postArtisanName then
         local t = self.postTarget or "all"
         local col = (t == "all") and "FFAAAAAA" or "FFFFFFFF"
         -- Affichage localisé ; la VALEUR canonique (FR) sert au réseau (cf. _PostTargetLabel / DoPostOrder).
-        self.postArtisanName:SetText("|c" .. col .. L[self:_PostTargetLabel()] .. "|r")
+        -- Le rappel dit aussi la ligne sur Commerce : c'est la dernière chose lue avant « Poster ».
+        local txt = "|c" .. col .. L[self:_PostTargetLabel()] .. "|r"
+        if trade then txt = txt .. "|cFFAAAAAA + |r|cFFFFFFFF" .. L["Commerce"] .. "|r" end
+        self.postArtisanName:SetText(txt)
     end
     self:_SyncHeaderSkill()   -- la cible a pu changer → la jauge du header suit (niveau de l'artisan visé)
 end

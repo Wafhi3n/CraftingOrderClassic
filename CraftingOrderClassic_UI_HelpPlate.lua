@@ -24,8 +24,8 @@ local function postTexts()
         ItemSelected = L["L'objet choisi. La pastille « Je fournis » indique que tu apportes tous les composants toi-même."],
         reagentsList = L["Coche les réactifs que TU fournis toi-même (le reste reste à la charge de l'artisan)."],
         price        = L["La commission que tu proposes à l'artisan pour ce craft."],
-        scope        = L["La portée : diffuser à tous, ou restreindre (guilde / amis)."],
-        artisans     = L["Le destinataire : toute la source sélectionnée, ou un artisan précis."],
+        scope        = L["Envoyer à : le destinataire se choisit dans la liste dessous. Le menu « Liste » change seulement les joueurs affichés."],
+        artisans     = L["Le destinataire : tous les joueurs qui ont l'addon, toute la guilde (ou tous les amis), ou un artisan précis. « Annoncer en Commerce » ajoute une ligne lisible sur Trade (Services) : seulement pour une commande à tous, dans une capitale."],
     }
 end
 
@@ -38,8 +38,8 @@ local function gatherTexts()
         ItemSelected = L["La ressource choisie."],
         qtyRow       = L["À l'unité ou par pile, et la quantité voulue."],
         price        = L["Le prix que tu proposes au récolteur."],
-        scope        = L["La portée : diffuser à tous, ou restreindre (guilde / amis)."],
-        gatherers    = L["Le destinataire : toute la source, ou un récolteur précis."],
+        scope        = L["Envoyer à : le destinataire se choisit dans la liste dessous. Le menu « Liste » change seulement les joueurs affichés."],
+        gatherers    = L["Le destinataire : tous les joueurs qui ont l'addon, toute la guilde (ou tous les amis), ou un récolteur précis."],
     }
 end
 
