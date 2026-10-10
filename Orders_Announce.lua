@@ -8,6 +8,7 @@
 --   LFW Enchanting/Tailoring #CO                           un artisan disponible
 --   LFW Blacksmithing/[Forge] #CO                          le même, avec son lien de métier
 --   WTB [objet] x1 2g50s i1251 @Prénom Nom #CO27            une commande de guilde, fil Discord (annonce-discord)
+--   CANCEL [objet] @Prénom Nom #CO27                        son annulation, même fil (annonce-discord, D8)
 --
 -- Ce fichier ne fait QUE le format : fabriquer une ligne, relire une ligne. Aucun appel au jeu (les
 -- liens d'objet sont résolus par l'appelant), donc tout se teste sans WoW (tests/test_announce.lua).
@@ -124,6 +125,19 @@ end
 function A.BuildDiscordWTB(o, targetLink, mats, copper, who, ref)
     if not (o and o.recipient == "Guilde" and type(who) == "string" and who ~= "") then return nil end
     return buildWTB(o, targetLink, mats, copper, who, ref)
+end
+
+-- « CANCEL [objet] @Prénom Nom #CO27 » : l'annulation d'une commande dont la ligne est partie dans le
+-- fil Discord (D8) ; le bot barre sa carte. Même `@nom` et même numéro que la ligne WTB : c'est la clé.
+-- Le lien n'est là que pour les humains qui lisent le fil : sans lui (pas en cache), la ligne part
+-- quand même. `Announce.Parse` ne la lit pas (verbe inconnu) : rien ne change pour les clients publiés.
+function A.BuildDiscordCancel(o, targetLink, who)
+    local n = o and type(o.id) == "string" and o.id:match("%-(%d+)$")
+    if not (n and type(who) == "string" and who ~= "") then return nil end
+    local line = "CANCEL" .. (type(targetLink) == "string" and (" " .. targetLink) or "") .. " @" .. who .. " #CO" .. n
+    if #line <= A.MAX then return line end
+    line = "CANCEL @" .. who .. " #CO" .. n
+    return #line <= A.MAX and line or nil
 end
 
 -- « LFW Enchanting/Tailoring #CO » : les noms anglais des métiers (clés de CraftLink). `links` =

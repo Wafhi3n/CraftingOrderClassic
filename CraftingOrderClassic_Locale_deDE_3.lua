@@ -69,6 +69,7 @@ local de3 = {
     ["dispo annoncée sur %s."] = "Verfügbarkeit in %s angekündigt.",
     -- Ligne d'une commande de guilde dans le fil Discord de la guilde (2026-10-10)
     ["commande annoncée sur le Discord de la guilde."] = "Auftrag im Discord der Gilde angekündigt.",
+    ["annulation signalée sur le Discord de la guilde."] = "Stornierung an den Discord der Gilde gemeldet.",
     ["commande postée sans sa ligne Discord : une par minute au plus (encore %d s)."] =
         "Auftrag ohne Discord-Zeile erstellt: höchstens eine pro Minute (noch %d s).",
     ["commande postée sans sa ligne Discord : un objet n'est pas encore connu du jeu."] =
