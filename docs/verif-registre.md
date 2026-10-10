@@ -46,6 +46,18 @@ client.
 
 ## Relevés
 
+- 2026-10-10 16:46 — jusqu'a aa8ca87 — Forever build client 70338 ; build `main-dev@daf4133 2026-10-10
+  16:36` (fiche `CraftingOrderClassic--feat-ligne-guilde-discord`, sept gestes cochés OK dans l'appli du
+  banc, sur la parole du user ; le geste de Gnomi refait à 16:46 après une première coche sans
+  commande) — **GO** sur `feat/ligne-guilde-discord` (spec `annonce-discord`, D2 revue, critères 11 et
+  12) : guilde reliée en flux séparé, la ligne « Whole guild + Discord » s'affiche sous « Whole guild »
+  sur l'onglet Commande ; « Whole guild » seule ne poste rien sur Discord ; « + Discord » poste chez
+  Rédemption (chef ; `#CO` vu par le bot CraftingOrderBot à 16:42:55) ET chez **Gnomi, simple membre**
+  (trace COC `16:46:33 [send] discord : ligne de Gnomi Short-57 envoyée dans le fil Discord`, puis
+  `ORD|NEW` en guilde ; le bot reçoit `WTB [Enchant 2H Weapon - Minor Impact] x1 @Gnomi Short #CO57`) ;
+  case du flux séparé décochée fenêtre ouverte : la ligne disparaît et la sélection retombe sur « Whole
+  guild » ; pas de ligne « + Discord » dans la liste « Friends » ni dans Récolte. Porte aussi le passage
+  au choix de `feat/annonce-discord` (`ae5582f`). Pas vu : le message au joueur relu mot à mot.
 - 2026-10-10 16:23 — jusqu'a f904fe2 — Forever build client 70338 ; build `main-dev@b4df661 2026-10-10
   15:06` (fiche `CraftingOrderClassic--feat-annonce-discord`, quatre gestes cochés OK dans l'appli du
   banc, sur la parole du user) — **GO** sur `feat/annonce-discord` (spec `annonce-discord`, critères 6
