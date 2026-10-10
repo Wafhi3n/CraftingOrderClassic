@@ -1,8 +1,7 @@
 # Annoncer une commande de guilde sur le salon Discord de la guilde
 
-> État : **brouillon** du 2026-10-10 · Demande du user, mise en forme par l'agent · Décisions D1 à D3
-> prises par le user le 2026-10-10 ; D4 à D6 **proposées, à trancher** ; mesures M1 et M2 à faire
-> avant tout code. Rien d'implémenté. Contrat vérifié le 2026-10-10 : `Announce.Parse` de `main`
+> État : **validée** le 2026-10-10 par le user (D1 à D6) · Demande du user, mise en forme par
+> l'agent · Mesures M1 et M2 à faire au banc avant tout code. Rien d'implémenté. Contrat vérifié le 2026-10-10 : `Announce.Parse` de `main`
 > (`15bda9d`) relit une ligne avec `@Prénom Nom` avant `#CO27` comme la ligne de Commerce (même id,
 > objet, quantité, matériaux, prix).
 
@@ -53,10 +52,10 @@ de Commerce, à laquelle s'ajoute le nom du personnage.
 ## Cas particuliers
 
 - **Guilde non reliée à Discord** : en flux mêlé, la ligne n'apporterait rien et encombrerait le
-  chat de guilde du jeu. Ce que COC fait alors est la décision D4, à trancher.
+  chat de guilde du jeu : COC n'écrit rien (D4).
 - **Plusieurs commandes de guilde coup sur coup** : le serveur limite le chat, et chaque ligne s'affiche
-  chez tous les guildiens. Le délai entre deux lignes est la décision D5, à trancher. Au-delà de ce
-  délai, la commande part quand même, sans sa ligne, et le joueur en est prévenu.
+  chez tous les guildiens. Une ligne par minute au plus (D5) : au-delà, la commande part quand même,
+  sans sa ligne, et le joueur en est prévenu.
 - **Objet pas encore connu du jeu** (lien non résolu) : pas de ligne, la commande part, message au
   joueur, comme sur Commerce.
 - **Ligne trop longue** : le nom du personnage entre dans les 255 octets. Les matériaux fournis
@@ -82,17 +81,17 @@ de Commerce, à laquelle s'ajoute le nom du personnage.
   « Guilde »**, dans le clic « Poster ». Pas de case à cocher.
 - 2026-10-10, **user** (D3) : COC **suit le réglage de la guilde**. En flux mêlé, il écrit dans le chat
   de guilde ; en flux séparé, dans le fil Discord si M1 montre que c'est possible, et sinon rien.
-- **Proposé, à trancher** (D4) : n'écrire **que si la guilde est reliée à Discord**. Pour le savoir,
-  COC regarde la liste des fils de la guilde (`C_Club.GetGuildClubId`, `C_Club.GetStreams`, toutes
-  deux libres) : un fil de type `Discord` doit y être, si la mesure M2 le confirme en flux mêlé.
-  Sans M2, l'indice de secours est d'avoir vu passer, pendant la session, une ligne de guilde
-  marquée « venue de Discord » (argument 18, `fromDiscord`). Recommandation de l'agent : D4 avec
-  M2, pour ne jamais rien écrire dans une guilde qui n'est pas reliée.
-- **Proposé, à trancher** (D5) : **une ligne Discord par minute au plus**, compteur à part de celui de
-  Commerce. Au-delà, la commande part sans ligne et le joueur lit pourquoi.
-- **Proposé, à trancher** (D6) : la ligne **nomme le personnage**, parce que Discord affiche le
-  **compte Discord** de l'auteur et jamais son personnage (mesuré : « Wafhien » pour Rédemption
-  comme pour Gnomi). Forme proposée : `@Prénom Nom`, juste avant `#CO<n>`.
+- 2026-10-10, **user** (D4, sur proposition de l'agent) : n'écrire **que si la guilde est reliée à
+  Discord**, jamais dans une guilde qui ne l'est pas. Pour le savoir, COC regarde la liste des fils
+  de la guilde (`C_Club.GetGuildClubId`, `C_Club.GetStreams`, toutes deux libres) : un fil de type
+  `Discord` doit y être, si la mesure M2 le confirme en flux mêlé. Sans M2, l'indice de secours est
+  d'avoir vu passer, pendant la session, une ligne de guilde marquée « venue de Discord »
+  (argument 18, `fromDiscord`).
+- 2026-10-10, **user** (D5, sur proposition de l'agent) : **une ligne Discord par minute au plus**,
+  compteur à part de celui de Commerce. Au-delà, la commande part sans ligne et le joueur lit pourquoi.
+- 2026-10-10, **user** (D6, sur proposition de l'agent) : la ligne **nomme le personnage**, parce que
+  Discord affiche le **compte Discord** de l'auteur et jamais son personnage (mesuré : « Wafhien »
+  pour Rédemption comme pour Gnomi). Forme : `@Prénom Nom`, juste avant `#CO<n>`.
 - 2026-10-10, mesuré : un salon par guilde, choisi par le chef ; un addon ne peut ni le lire ni le
   changer (fonctions de `C_Discord` protégées, même depuis une commande tapée).
 
@@ -120,9 +119,9 @@ de Commerce, à laquelle s'ajoute le nom du personnage.
 4. [test] Une ligne `WTB … #CO<n>` lue dans le chat de guilde passe par le lecteur d'annonces :
    commande déjà reçue = rien ; commande inconnue = aperçu et bonjour. Elle ne passe **jamais** par le
    scanner des demandes humaines. → `tests/test_announce_recv.lua`
-5. [test] Selon D4 tranché : guilde non reliée = aucune ligne écrite.
-6. [test] Selon D5 tranché : une 2ᵉ commande de guilde dans le délai part sans ligne, avec un message
-   au joueur.
+5. [test] Guilde non reliée (aucun fil `Discord`, aucune ligne Discord vue) = aucune ligne écrite (D4).
+6. [test] Une 2ᵉ commande de guilde moins d'une minute après la 1ʳᵉ part sans ligne, avec un message
+   au joueur (D5).
 7. [human] Flux mêlé : Rédemption poste une commande de guilde. Sur Discord apparaît, sous
    « Wafhien » avec le badge manette, `WTB [objet] x1 … @Rédemption Wafhien #CO<n>`.
    Témoin connu bon : la ligne `WTB [Linen Bandage] x1 2g50s #CO0` écrite le 2026-10-10 par la sonde.
@@ -151,7 +150,8 @@ de Commerce, à laquelle s'ajoute le nom du personnage.
 
 ## Plan (2026-10-10) — volatile, meurt quand c'est fait
 
-1. Mesures M1 et M2 sur COCProbe, au banc (le user, Rédemption chef de guilde). Puis trancher D4 à D6.
+1. Mesures M1 et M2 sur COCProbe (`/cocprobe discord fils`, `/cocprobe discord ecrire`), au banc
+   (le user, Rédemption chef de guilde). Fiche `mesure--discord-m1-m2`.
 2. Format : la ligne de guilde dans `Orders_Announce.lua` et ses tests (critères 1, 2).
    ⚠️ `BuildWTB` et `AnnounceSend:WhyNot` refusent aujourd'hui `recipient == "Guilde"` (leur garde
    `isPublic`) : la ligne de guilde a son propre chemin, la règle de Commerce ne change pas.
