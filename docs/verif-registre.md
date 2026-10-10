@@ -46,6 +46,16 @@ client.
 
 ## Relevés
 
+- 2026-10-10 16:23 — jusqu'a f904fe2 — Forever build client 70338 ; build `main-dev@b4df661 2026-10-10
+  15:06` (fiche `CraftingOrderClassic--feat-annonce-discord`, quatre gestes cochés OK dans l'appli du
+  banc, sur la parole du user) — **GO** sur `feat/annonce-discord` (spec `annonce-discord`, critères 6
+  à 9) : guilde Ost Ardent reliée au salon Discord en flux séparé, une commande « Guilde » postée au
+  clic Poster écrit sa ligne dans le fil Discord (`[Guild Discord] WTB [Wildvine Potion] x1
+  @Rédemption Wafhien #CO18`, vue en jeu par capture du user à 15:50 ; `#CO19` à `#CO22` reçues telles
+  quelles sur Discord, notées par le bot CraftingOrderBot) ; une 2ᵉ commande dans la minute part sans
+  ligne, message au joueur ; Gnomi reçoit la commande une seule fois ; en flux mêlé, rien sur Discord.
+  Pas vu : le message « commande annoncée sur le Discord de la guilde. » relu mot à mot, un objet pas
+  encore en cache, un envoi refusé par le jeu.
 - 2026-10-09 13:15 — jusqu'a 857ec0d — Forever build client 70291 ; build `main-dev@178f862 2026-10-09
   13:12`, `## Version: 1.48.0` (lu dans le `.toc` déployé et par l'appli du banc, fiche
   `CraftingOrderClassic--release-v1.48.0`, trois gestes cochés OK, sur la parole du user) — **GO** sur

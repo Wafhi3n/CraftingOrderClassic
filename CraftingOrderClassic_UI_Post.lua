@@ -385,6 +385,12 @@ function UI:DoPostOrder(narr)
     if o and toAll and COC.db and COC.db.announceTrade and COC.AnnounceSend then COC.AnnounceSend:Post(o) end
     self.postMoney:Clear()
     self.postQty:SetValue(1); self.postEntry = nil; self.postProvide = {}
+    -- Destinataire « Toute la guilde + Discord » : la ligne dans le fil Discord de la guilde, dans le même
+    -- clic (Orders_AnnounceDiscord). Protégée : une ligne perdue ne doit pas bloquer le formulaire.
+    local AD = COC.AnnounceDiscord
+    if o and AD and AD.Wanted(self.postTarget, self.postDiscord) then
+        pcall(function() return COC.AnnounceDiscord:Post(o) end)
+    end
     self.postSelLbl:SetText("|cFF33DD33" .. L["Commande postée !"] .. "|r")
     self:ShowTab("orders")
 end
