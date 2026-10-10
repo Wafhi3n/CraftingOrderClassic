@@ -18,7 +18,7 @@ local de3 = {
     ["Rien à afficher pour ce métier."] = "Fuer diesen Beruf gibt es nichts anzuzeigen.",
     ["Recettes proposées (%d/%d)"] = "Angebotene Rezepte (%d/%d)",
     -- Réseau sans canal + communauté officielle (2026-09-28)
-    ["réseau par whisper"] = "Netzwerk über Flüstern",
+    ["par whisper"] = "über Flüstern",   -- suit « réseau » (barre du bas, /co status)
     ["canal : aucun — le réseau passe en whisper (cercles, amis, guilde)"] =
         "Kanal: keiner — das Netzwerk läuft über Flüstern (Kreise, Freunde, Gilde)",
     ["communauté officielle marquée comme cercle d'artisans : %s"] =
@@ -185,6 +185,13 @@ local de3 = {
     ["Pas de compte GitHub ? Copie ce lien (Ctrl+C) et laisse un commentaire sur la page CurseForge."] = "Kein GitHub-Konto? Kopiere diesen Link (Strg+C) und hinterlasse einen Kommentar auf der CurseForge-Seite.",
     ["Un bug, ou une idée pour l'addon ? Choisis ci-dessous : l'addon te donne le lien du formulaire, déjà rempli."] = "Ein Fehler oder eine Idee für das Addon? Wähle unten: Das Addon gibt dir den Link zum bereits ausgefüllten Formular.",
     ["signaler un bug ou proposer une idée (lien vers un ticket GitHub)"] = "Fehler melden oder Idee vorschlagen (Link zu einem GitHub-Issue)",
+    -- Le destinataire en une liste, Commande et Récolte (2026-09-30)
+    ["Envoyer à"] = "Senden an",
+    ["Liste"] = "Liste",
+    ["Tous (avec l'addon)"] = "Alle mit dem Addon",
+    ["ou un artisan"] = "oder ein Handwerker",
+    ["ou un récolteur"] = "oder ein Sammler",
+    ["Annoncer en Commerce (en capitale)"] = "Im Handelskanal ankündigen (nur in Hauptstädten)",
 }
 
 for k, v in pairs(de3) do L[k] = v end

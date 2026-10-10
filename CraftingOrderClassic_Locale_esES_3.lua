@@ -19,7 +19,7 @@ local es3 = {
     ["Rien à afficher pour ce métier."] = "Nada que mostrar para esta profesion.",
     ["Recettes proposées (%d/%d)"] = "Recetas ofrecidas (%d/%d)",
     -- Réseau sans canal + communauté officielle (2026-09-28)
-    ["réseau par whisper"] = "red por susurros",
+    ["par whisper"] = "por susurros",   -- suit « réseau » (barre du bas, /co status)
     ["canal : aucun — le réseau passe en whisper (cercles, amis, guilde)"] =
         "canal: ninguno — la red funciona por susurros (círculos, amigos, hermandad)",
     ["communauté officielle marquée comme cercle d'artisans : %s"] =
@@ -186,6 +186,13 @@ local es3 = {
     ["Pas de compte GitHub ? Copie ce lien (Ctrl+C) et laisse un commentaire sur la page CurseForge."] = "¿Sin cuenta de GitHub? Copia este enlace (Ctrl+C) y deja un comentario en la página de CurseForge.",
     ["Un bug, ou une idée pour l'addon ? Choisis ci-dessous : l'addon te donne le lien du formulaire, déjà rempli."] = "¿Un error o una idea para el addon? Elige abajo: el addon te da el enlace al formulario, ya rellenado.",
     ["signaler un bug ou proposer une idée (lien vers un ticket GitHub)"] = "informar de un error o proponer una idea (enlace a una incidencia de GitHub)",
+    -- Le destinataire en une liste, Commande et Récolte (2026-09-30)
+    ["Envoyer à"] = "Enviar a",
+    ["Liste"] = "Lista",
+    ["Tous (avec l'addon)"] = "Todos con el addon",
+    ["ou un artisan"] = "o un artesano",
+    ["ou un récolteur"] = "o un recolector",
+    ["Annoncer en Commerce (en capitale)"] = "Anunciar en Comercio (solo en capitales)",
 }
 
 for k, v in pairs(es3) do L[k] = v end

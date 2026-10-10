@@ -62,9 +62,15 @@ local PRICE_H = 66
 -- → RIGHT ; colonne droite (empilée) → LEFT.
 local SPEC = {
     x1 = 0, x2 = 848, vBottom = 18,
-    -- inset (palier 6) : la liste = l'encart sombre de la liste de recettes, le détail = l'encart sur
-    -- la pierre de la page, comme la fenêtre des métiers (Skin.WrapInset).
-    { id = "left", w = 333, top = -63, bottom = 20, inset = "list",
+    -- inset (palier 6) : les encarts de la fenêtre des métiers (Skin.WrapInset). Les DEUX colonnes sur
+    -- le fond sombre de la liste de recettes depuis le 2026-09-30 (capture du user) : la colonne de
+    -- droite était un encart « page », sans fond propre — sa bordure se dessinait sur la même pierre que
+    -- la fenêtre autour, des bords qui n'encadraient rien. Artisans et Mes artisans faisaient déjà ainsi.
+    -- MARGE de 6 dans chaque encart, bandes grises comprises (choix du user, 2026-09-30, capture des
+    -- « problèmes d'empattement ») : la recherche et les en-têtes touchaient le bord gauche, la bande
+    -- « Envoyer à » débordait la liste dessous. La colonne de gauche grandit de 12 pour que ses slots
+    -- de filtres gardent leurs largeurs (333 utiles) ; la droite, flex, rend ces 12.
+    { id = "left", w = 345, top = -63, bottom = 20, inset = "list", padL = 6, padR = 6,
       { id = "filters", h = 34, bg = true, dir = "cols", help = "filters", helpDir = "RIGHT",
         { id = "srch" },
         { id = "qualityDropDown", w = 96,  sep = false },
@@ -80,7 +86,7 @@ local SPEC = {
       { dir = "cols", sep = false,
         { id = "plans", help = "plans", helpDir = "RIGHT" },
         { id = "plansGutter", w = 22, sep = false} }},
-    { top = -63, bottom = 20, inset = "page",
+    { top = -63, bottom = 20, inset = "list", padL = 6, padR = 6,
       -- Sous-zones de detail (SPEC user) : en-tête du plan / liste des réactifs — la jointure fine
       -- entre les deux est posée par le générateur (le filet dessiné à la main dans _BuildPostDetail
       -- a été retiré). `reagentsList` et non « Reagents » : le slot de filtre « reagents » existe déjà,
@@ -104,9 +110,11 @@ local SPEC = {
 
       -- major sur price (choix user) : la jointure detail|prix passe en barre LOURDE — l'hypothèse
       -- 3-blocs d'origine ne mettait du lourd qu'à scope (③|④) ; à juger sur capture.
-      { id = "price",  h = PRICE_H, major = true , padL = 10, help = "price", helpDir = "LEFT" },
-      { id = "scope",  h = 36, major = true , bg = true , padL = 10 , padT = 4, help = "scope", helpDir = "LEFT"},
-      { id = "artisans" , padL = 10, help = "artisans", helpDir = "LEFT" } },
+      -- padL 5 : les libellés (« Commission », « Envoyer à ») sur la même verticale que les icônes des
+      -- lignes de destinataire, qui partent du bord de la bande (artisans sans padL).
+      { id = "price",  h = PRICE_H, major = true , padL = 5, help = "price", helpDir = "LEFT" },
+      { id = "scope",  h = 36, major = true , bg = true , padL = 5 , padT = 4, help = "scope", helpDir = "LEFT"},
+      { id = "artisans" , help = "artisans", helpDir = "LEFT" } },
 }
 
 -- Métriques DÉRIVÉES de la SPEC (une seule source de vérité : éditer la SPEC suffit, plus de largeurs

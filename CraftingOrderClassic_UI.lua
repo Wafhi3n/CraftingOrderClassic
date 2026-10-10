@@ -135,44 +135,81 @@ function UI:ShowTab(id)
 end
 
 -- ------------------------------------------------------------------
--- Ligne « toute la liste » (Commande/Récolte) : bouton épinglé EN TÊTE de la liste d'artisans qui
--- cible explicitement TOUTE la source courante (toute la guilde / tous les amis). Le routage existe
--- déjà côté réseau (recipient "Guilde"/"Amis" ; cf. Orders:_ScopeMatch/VisibleTo) : ici on rend ce
--- choix VISIBLE et re-sélectionnable (sinon il n'existait qu'en effet de bord du clic sur l'onglet
--- source). Sélection seule → on poste ensuite via « Poster ». Partagé par _UI_Post + _UI_Gather.
+-- LE DESTINATAIRE (Commande/Récolte) — piste 2 de la maquette « destinataire », choisie par le user le
+-- 2026-09-30. Avant, un seul choix vivait à cinq endroits : un menu de portée qui ressemblait à un
+-- destinataire, la bulle « Diffuser à tous » au bout de la bande, une ligne « toute la guilde » qui
+-- portait la MÊME bulle, la case Commerce et le rappel en bas. Maintenant chaque destinataire est une
+-- LIGNE de la liste, avec la même surbrillance : « Tous (avec l'addon) », le groupe entier (guilde /
+-- amis), puis un joueur. Le routage est inchangé (recipient "Tous"/"Guilde"/"Amis"/Nom, cf.
+-- Orders:VisibleTo). Sélection seule → on poste via « Poster ». Partagé par _UI_Post + _UI_Gather.
 -- ALL_RX/RW = place par défaut (Récolte) ; ALL_ARH = hauteur d'une ligne d'artisan, SEULE source.
-local ALL_RX, ALL_RW, ALL_ARH = 316, 502, 26
-local ALL_SRC_LABEL = {
-    guild  = "Toute la guilde",  friend = "Tous les amis",
-    added  = "Tous les ajoutés", recent = "Tous les croisés",
-}
+local ALL_RX, ALL_RW, ALL_ARH, PIN_GAP = 316, 502, 26, 6
+-- LIST_BAR : la place de la barre de défilement au bord droit de la liste (MinimalScrollBar 8 + écart
+-- 4, Skin.MakeScrollList). Les lignes épinglées, la légende et le menu de la bande s'arrêtent là, sur
+-- la même verticale que les lignes de la liste ; la liste elle-même, barre comprise, prend toute la
+-- largeur de la bande (capture du user : le menu dépassait les lignes de 15 px, 2026-09-30).
+local LIST_BAR = 12
+local GROUP_LABEL = { guild = "Toute la guilde", friend = "Tous les amis" }
 
--- kind = "post" | "gather" ; top = Y de la ligne épinglée. Construit la ligne + la liste des artisans
--- juste en dessous, et renseigne self.<kind>AllRow / <kind>ArtList.
+-- Icône du groupe : le tabard de guilde, ou l'atlas de l'onglet Amis du volet social (vérifié en jeu
+-- le 2026-09-28, skill coc-native-ui). Plus la bulle de « Tous » : une image pour deux destinataires.
+local FRIEND_ATLAS = "friends-icon-tab-friends"
+local function paintGroupIcon(ic, grp)
+    if grp == "friend" and C_Texture and C_Texture.GetAtlasInfo and C_Texture.GetAtlasInfo(FRIEND_ATLAS) then
+        ic:SetAtlas(FRIEND_ATLAS); return
+    end
+    if grp == "friend" then ic:SetTexture(Skin.tex.online); ic:SetTexCoord(0, 1, 0, 1)
+    else ic:SetTexture(Skin.tex.guild); ic:SetTexCoord(0.08, 0.92, 0.08, 0.92) end   -- rogne la bordure cuite
+end
+
+-- Une ligne épinglée : icône 14 px, libellé doré, surbrillance de MakeFlatRow.
+local function pinnedRow(panel, w)
+    local row = Skin.MakeFlatRow(panel, w - LIST_BAR, ALL_ARH)
+    row.icon = row:CreateTexture(nil, "OVERLAY"); row.icon:SetSize(14, 14); row.icon:SetPoint("LEFT", 5, 0)
+    row.label = row.text   -- alias historique ; ré-ancré après l'icône
+    row.label:ClearAllPoints(); row.label:SetPoint("LEFT", 24, 0)
+    row.label:SetWidth(w - 60); row.label:SetTextColor(Skin.unpack(Skin.color.gold))
+    return row
+end
+
+-- kind = "post" | "gather" ; top = Y de la 1re ligne épinglée. Construit « Tous », la ligne de
+-- groupe, la légende « ou un artisan » et la liste des personnes dessous ; renseigne
+-- self.<kind>Pinned = { all, group, caption } et self.<kind>ArtList.
 -- `panel` peut être un PANNEAU (Récolte : coordonnées absolues, x/w = ALL_RX/ALL_RW par défaut) ou une
 -- SECTION (Commande, blocs natifs : on passe alors x = marge du bloc et w = largeur utile du bloc).
 -- opts.fill(ligne, donnée) remplit une ligne d'artisan ; opts.bottom = marge au bas du panneau, où la
--- liste s'arrête (au-dessus du statut de l'onglet).
+-- liste s'arrête ; opts.caption = clé de la légende.
 function UI:_BuildAllRowAndScroll(panel, kind, top, x, w, opts)
     x, w = x or ALL_RX, w or ALL_RW
-    local row = Skin.MakeFlatRow(panel, w - 22, ALL_ARH)
-    row:SetPoint("TOPLEFT", x, top)
-    local ic = row:CreateTexture(nil, "OVERLAY"); ic:SetSize(14, 14); ic:SetPoint("LEFT", 5, 0); ic:SetTexture(Skin.tex.broadcast)
-    row.label = row.text   -- alias historique (_RefreshAllRow) ; ré-ancré après l'icône
-    row.label:ClearAllPoints(); row.label:SetPoint("LEFT", 24, 0)
-    row.label:SetWidth(w - 60); row.label:SetTextColor(Skin.unpack(Skin.color.gold))
-    row:SetScript("OnClick", function()
-        if kind == "post" then UI.postTarget = UI.postSource; UI:RefreshPostArtisans(); UI:RefreshPostPlans()
-        else UI.gatherTarget = UI.gatherSrc; UI:_RefreshGatherArtisans() end
-    end)
-    self[kind .. "AllRow"] = row
+    local function pick(t)   -- t = nil : la liste affichée entière (guilde / amis)
+        return function()
+            if kind == "post" then UI.postTarget = t or UI.postSource; UI:RefreshPostArtisans(); UI:RefreshPostPlans()
+            else UI.gatherTarget = t or UI.gatherSrc; UI:_RefreshGatherArtisans() end
+        end
+    end
+    -- PIN_GAP de pierre sous la bande « Envoyer à » (la maquette en laissait 6) : « Tous », choisie par
+    -- défaut, collait sa surbrillance au filet de la bande, et les deux aplats clairs se confondaient —
+    -- la bande ne se lisait plus comme un en-tête (capture du user, 2026-09-30).
+    local all = pinnedRow(panel, w)
+    all:SetPoint("TOPLEFT", x, top - PIN_GAP); all.icon:SetTexture(Skin.tex.broadcast)
+    all.label:SetText(L["Tous (avec l'addon)"]); all:SetScript("OnClick", pick("all"))
+    local grp = pinnedRow(panel, w)
+    grp:SetPoint("TOPLEFT", all, "BOTTOMLEFT", 0, -2); grp:SetScript("OnClick", pick(nil))
+    -- Légende « ou un artisan » + filet : sépare les destinataires collectifs des personnes.
+    local cap = CreateFrame("Frame", nil, panel); cap:SetSize(w - LIST_BAR, 16)
+    local cfs = cap:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+    cfs:SetPoint("LEFT", 6, 0); cfs:SetText(opts.caption or "")
+    local rule = cap:CreateTexture(nil, "ARTWORK"); rule:SetHeight(1); rule:SetColorTexture(1, 1, 1, 0.12)
+    rule:SetPoint("LEFT", cfs, "RIGHT", 6, 0); rule:SetPoint("RIGHT", cap, "RIGHT", -4, 0)
+    self[kind .. "Pinned"] = { all = all, group = grp, caption = cap }
 
-    -- Liste défilante du kit (palier 2). w − 10 = largeur de la ligne épinglée + la barre de 8 px.
+    -- Liste défilante du kit (palier 2), toute la largeur : ses lignes s'arrêtent à LIST_BAR du bord,
+    -- sous les lignes épinglées, et sa barre loge dans ce reste.
     -- Elle descend jusqu'à `opts.bottom` : figée à 4 lignes, elle défilait au-dessus d'un grand vide.
     local host = CreateFrame("Frame", nil, panel)
-    host:SetPoint("TOPLEFT", x, top - ALL_ARH - 2)
+    host:SetPoint("TOPLEFT", cap, "BOTTOMLEFT", 0, -2)
     host:SetPoint("BOTTOMLEFT", panel, "BOTTOMLEFT", x, opts.bottom or 22)
-    host:SetWidth(w - 10)
+    host:SetWidth(w)
     self[kind .. "ArtList"] = Skin.MakeScrollList(host, {
         extent = ALL_ARH,
         build  = Skin.ArtisanRowArt,
@@ -180,14 +217,40 @@ function UI:_BuildAllRowAndScroll(panel, kind, top, x, w, opts)
     })
 end
 
--- Rafraîchit le libellé + l'état sélectionné de la ligne « toute la liste » selon la source courante.
+-- Rafraîchit les lignes épinglées selon la liste affichée et le destinataire courant. La ligne de
+-- groupe n'existe que pour une liste routable ; sans elle, la légende remonte sous « Tous ».
 function UI:_RefreshAllRow(kind)
-    local row = self[kind .. "AllRow"]; if not row then return end
+    local p = self[kind .. "Pinned"]; if not p then return end
     local src = (kind == "post") and (self.postSource or "guild") or (self.gatherSrc or "guild")
-    local tgt = (kind == "post") and self.postTarget or self.gatherTarget
-    row.label:SetText(L[ALL_SRC_LABEL[src] or "Tous les croisés"])
-    row.selTex:SetShown(tgt == src)
-    local diff = self[kind .. "DiffBtn"]; if diff then diff:SetSelected(tgt == "all") end
+    local tgt = ((kind == "post") and self.postTarget or self.gatherTarget) or "all"
+    local grp = Skin.RoutableGroup(src)
+    p.all.selTex:SetShown(tgt == "all")
+    p.group:SetShown(grp ~= nil)
+    if grp then
+        p.group.label:SetText(L[GROUP_LABEL[grp]]); paintGroupIcon(p.group.icon, grp)
+        p.group.selTex:SetShown(tgt == grp)
+    end
+    p.caption:ClearAllPoints(); p.caption:SetPoint("TOPLEFT", grp and p.group or p.all, "BOTTOMLEFT", 0, -4)
+end
+
+-- La bande au-dessus de la liste (zone « scope » des SPEC) : « Envoyer à » à gauche ; à droite le menu
+-- de la LISTE affichée, précédé de son mot — sans lui, « Guilde » se lisait comme le destinataire.
+-- `onSelect(valeur)` applique Skin.TargetAfterListChange. Rend le menu.
+function UI:_BuildRecipientBand(scope, ddName, pad, onSelect)
+    local defs = {
+        { value = "guild",  text = L["Guilde"] },
+        { value = "friend", text = L["Amis"] },
+        { value = "added",  text = L["Ajoutés"] },
+        { value = "recent", text = L["Annuaire"] },
+    }
+    local send = scope:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+    send:SetPoint("LEFT", pad, 0); send:SetText(L["Envoyer à"]); Skin.ApplyShadow(send)
+    local dd = Skin.MakeDropdown(ddName, scope, 96, defs, { onSelect = onSelect })
+    dd:SetPointVisual("RIGHT", scope, "RIGHT", -pad - LIST_BAR, 0)   -- au bout des lignes du dessous
+    local lbl = scope:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+    lbl:SetPoint("RIGHT", dd, "LEFT", -6, 0); lbl:SetText(L["Liste"])
+    lbl:SetTextColor(Skin.unpack(Skin.color.textMuted)); Skin.ApplyShadow(lbl)
+    return dd
 end
 
 -- ------------------------------------------------------------------

@@ -21,15 +21,17 @@ local PRICE_H = 54   -- hauteur de la zone « prix proposé » (centrage vertica
 -- _UI_HelpPlate.lua). Tag STRUCTUREL only ; directions : colonne gauche → RIGHT, colonne droite → LEFT.
 local SPEC = {
     x1 = 0, x2 = 848, vBottom = 18,
-    -- inset (palier 6) : les deux encarts de la fenêtre des métiers, comme l'onglet Commande.
-    { id = "left", w = 333, top = -63, bottom = 20, inset = "list",
+    -- inset (palier 6) : les deux encarts de la fenêtre des métiers, comme l'onglet Commande — les deux
+    -- sur le fond sombre de la liste depuis le 2026-09-30, avec la même marge de 6 dans chaque encart
+    -- (colonne de gauche à 345 : 333 utiles, cf. _UI_Post_Layout.lua).
+    { id = "left", w = 345, top = -63, bottom = 20, inset = "list", padL = 6, padR = 6,
       { id = "filters", h = 34, bg = true, dir = "cols", help = "filters", helpDir = "RIGHT",
         { id = "srch" } },
       { id = "verPills", h = 22, sep = false, help = "verPills", helpDir = "RIGHT" },
       { dir = "cols", sep = false,
         { id = "resources", help = "resources", helpDir = "RIGHT" },
         { id = "resGutter", w = 22, sep = false } } },
-    { top = -63, bottom = 20, inset = "page",
+    { top = -63, bottom = 20, inset = "list", padL = 6, padR = 6,
       { id = "detail", h = 160, padL = 5, padR = 5,
         { id = "ItemSelected", h = 46, dir = "cols", help = "ItemSelected", helpDir = "LEFT",
           { id = "resIcon",  w = 50 },
@@ -38,9 +40,9 @@ local SPEC = {
           { id = "qtyHdr" },
           { id = "qtyCtl", w = 180, sep = false } },   -- 180 (150 avant le palier 4) : le compteur et ses [-] [+]
         { id = "info", sep = false } },
-      { id = "price", h = PRICE_H, major = true, padL = 10, help = "price", helpDir = "LEFT" },
-      { id = "scope", h = 36, major = true, bg = true, padL = 10, padT = 4, help = "scope", helpDir = "LEFT" },
-      { id = "gatherers", padL = 10, help = "gatherers", helpDir = "LEFT" } },
+      { id = "price", h = PRICE_H, major = true, padL = 5, help = "price", helpDir = "LEFT" },
+      { id = "scope", h = 36, major = true, bg = true, padL = 5, padT = 4, help = "scope", helpDir = "LEFT" },
+      { id = "gatherers", help = "gatherers", helpDir = "LEFT" } },
 }
 
 -- Métriques dérivées (mêmes rôles que UI.POST) : PAD marge intérieure · LEFT_W largeur du flyout ·

@@ -206,10 +206,10 @@ local en2 = {
         "The chosen item. The \"I provide\" pill means you bring all the reagents yourself.",
     ["La commission que tu proposes à l'artisan pour ce craft."] =
         "The commission you offer the crafter for this craft.",
-    ["La portée : diffuser à tous, ou restreindre (guilde / amis)."] =
-        "The reach: broadcast to everyone, or restrict (guild / friends).",
-    ["Le destinataire : toute la source sélectionnée, ou un artisan précis."] =
-        "The recipient: the whole selected source, or a specific crafter.",
+    ["Envoyer à : le destinataire se choisit dans la liste dessous. Le menu « Liste » change seulement les joueurs affichés."] =
+        "Send to: pick the recipient in the list below. The List menu only changes which players are shown.",
+    ["Le destinataire : tous les joueurs qui ont l'addon, toute la guilde (ou tous les amis), ou un artisan précis. « Annoncer en Commerce » ajoute une ligne lisible sur Trade (Services) : seulement pour une commande à tous, dans une capitale."] =
+        "The recipient: everyone with the addon, the whole guild (or all friends), or one crafter. \"Announce in Trade\" adds a line anyone can read in Trade (Services): only for an order to everyone, in a capital city.",
     ["Poster : envoie la commande au(x) destinataire(s) choisi(s)."] =
         "Post: send the order to the chosen recipient(s).",
 
@@ -222,8 +222,8 @@ local en2 = {
     ["La ressource choisie."] = "The chosen resource.",
     ["À l'unité ou par pile, et la quantité voulue."] = "Per unit or per stack, and the wanted quantity.",
     ["Le prix que tu proposes au récolteur."] = "The price you offer the gatherer.",
-    ["Le destinataire : toute la source, ou un récolteur précis."] =
-        "The recipient: the whole source, or a specific gatherer.",
+    ["Le destinataire : tous les joueurs qui ont l'addon, toute la guilde (ou tous les amis), ou un récolteur précis."] =
+        "The recipient: everyone with the addon, the whole guild (or all friends), or one gatherer.",
 
     -- Aide contextuelle « bouton i » — onglet Artisans (cf. _UI_HelpPlate.lua)
     ["Filtre l'annuaire par source : guilde, amis, ajoutés manuellement, croisés. Dessous, les canaux que l'addon surveille : coche ceux où il doit chercher des artisans. « Configurer » rouvre le panneau de première connexion."] =

@@ -628,6 +628,44 @@ client.
   mention de la communauté. Trace, 08:11:20 : « lien de la communauté non proposé : aucune
   communauté officielle pour ce camp ». Le repère s'arrête à `7e8057e` : l'Aide (`97ab48b`) vient
   après `352c1b7` (relecture du protocole, côté réception), qui n'est PAS vu.
+- 2026-09-30 18:25 — jusqu'a 595290c — Forever, 2 comptes, client en ANGLAIS, en ville ; build
+  `main-dev@5ead49b 2026-09-30 18:06` avec icone-commande-recue, liste-destinataires,
+  profit-arbitrages (copie déployée du `.toc`) — **GO sur le reste du destinataire en une liste** —
+  capture du user : liste « Friends », ligne « All friends » avec l'icône Amis, case « Announce in
+  Trade » grisée à droite de « Everyone with the addon » ; le user confirme que la case suit la règle
+  (grisée pour la guilde, un artisan, hors capitale, rendue en ville) et « tout est ok » pour le reste
+  de la liste du relevé de 09:17. Commande à tous annoncée depuis la case, traces relues par l'agent :
+  Rédemption `annonce Rédemption Wafhien-13 sur Trade (Services) - English` et `ORD|NEW` à Gnomi
+  (18:21:08) ; Gnomi reçoit la ligne (`[inbound] annonce Rédemption Wafhien-13`) et la commande la
+  même seconde. **Pas vu en détail** (couvert par le « tout est ok » global, sans capture) :
+  « Pick a recipe first. », la colonne sombre de l'onglet Commande, le retour de la case à l'entrée
+  en ville.
+
+- 2026-09-30 09:29 — jusqu'a 09fce32 — Forever, client en ANGLAIS, un seul compte regardé ; build
+  déployé `main-dev@3cbaee8 2026-09-30 09:25` (relu dans la copie déployée du `.toc` ; mêmes branches
+  en test que le relevé de 09:17) — **GO sur les marges des encarts** (« tout en retrait », choix du
+  user), jugé sur une capture de Récolte (Mining) : recherche, bande de filtres et en-têtes à distance
+  du bord gauche, bande « Send to » de la largeur des lignes dessous, « Price offered » et « Send to »
+  sur la verticale des icônes, menu « Guild » au bout des lignes. « Ça a l'air tout bon » (user).
+  Onglet Commande non montré sur capture. Le « Non vu » du relevé de 09:17 tient toujours.
+
+- 2026-09-30 09:17 — jusqu'a 9f7e73f — Forever, client en ANGLAIS, un seul compte regardé ; build
+  déployé `main-dev@9acd6cb 2026-09-30 09:15` (relu dans la copie déployée du `.toc` ; branches en
+  test : feat/icone-commande-recue, feat/liste-destinataires, feat/profit-arbitrages) — **GO partiel
+  sur la MISE EN PAGE du destinataire en une liste** (maquette du 2026-09-30, piste 2), jugé sur trois
+  captures du user, aucune commande postée :
+  - `main-dev@428882e`, Commande (Cooking), liste « Directory » : bande « Send to » + « List »,
+    « Everyone with the addon » choisie par défaut avec la case à droite, pas de ligne de groupe
+    (liste non routable), légende « or one crafter », invite « Pick a profession then a recipe. »
+    dans le détail sans « I PROVIDE », barre du bas « network by whisper » ;
+  - build suivant (déployé par le user, avec `f9944cc`), Commande (Alchemy), liste « Guild », case
+    cochée : « Whole guild » au tabard, rappel « Recipient: All + Trade », écart sous la bande ; le user
+    y relève des bords d'encart sur la même pierre que la fenêtre → `9f7e73f` ;
+  - `9acd6cb`, Récolte (Mining) : colonne de droite sur le fond sombre de la liste (« beaucoup mieux »,
+    user), mêmes lignes, légende « or one gatherer », « Gatherer: All ».
+  **Non vu** : la case grisée pour « Whole guild » ou un artisan, hors capitale, et son retour tout
+  seul en entrant en ville (CHANNEL_UI_UPDATE) ; « Pick a recipe first. » sous le nom ; l'icône Amis ;
+  la colonne sombre de l'onglet Commande ; une commande postée et annoncée depuis la nouvelle case.
 
 - 2026-09-30 00:31 — jusqu'a c126c37 — Forever, deux clients, client en ANGLAIS, en ville ; build
   déployé `main-dev@ed6a410 2026-09-30 00:26` (relu dans la copie déployée du `.toc`), les deux comptes

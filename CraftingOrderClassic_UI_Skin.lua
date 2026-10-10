@@ -188,6 +188,32 @@ function Skin.PostSourceFor(r, current)
     return current
 end
 
+-- LE DESTINATAIRE des listes de Commande et Récolte (piste 2 de la maquette « destinataire », choisie
+-- par le user le 2026-09-30) : chaque destinataire est une LIGNE de la liste — « Tous », le groupe
+-- entier, un joueur — et le menu au-dessus ne fait plus que choisir la liste affichée. Seules Guilde
+-- et Amis sont routables (Orders:VisibleTo) : « Ajoutés » / « Annuaire » ne s'évaluent pas chez le
+-- récepteur, et leur ligne « tous les… » partait à « Tous » sans le dire. D'où pas de ligne de groupe.
+local ROUTABLE = { guild = true, friend = true }
+function Skin.RoutableGroup(src)
+    return ROUTABLE[src] and src or nil
+end
+
+-- Le destinataire après un changement de liste. « Tous » et un joueur restent : changer la liste
+-- affichée ne change pas à qui on écrit. Un GROUPE suit la liste s'il est routable, sinon « Tous ».
+function Skin.TargetAfterListChange(target, src)
+    target = target or "all"
+    if target == "all" or target:sub(1, 1) == "@" then return target end
+    return Skin.RoutableGroup(src) or "all"
+end
+
+-- La case « Annoncer en Commerce » : utilisable seulement pour une commande à « Tous », dans une
+-- capitale (spec annonce-commerce, Cas particuliers). Rend (utilisable, cochée). Le choix retenu du
+-- joueur (`pref`) n'est jamais effacé : grisée, la case paraît vide, et il revient avec elle.
+function Skin.AnnounceState(pref, target, inTown)
+    local on = ((target or "all") == "all" and inTown) and true or false
+    return on, (on and pref == true) or false
+end
+
 -- Trois champs de saisie or/argent/cuivre alignés (icônes de monnaie) → (goldEB, silverEB, copperEB).
 -- Partagé par la commission (Commande) et le prix par pile (Récolte) — jadis _MakeGSC / _MakeGSCGather.
 function Skin.MakeMoneyRow(parent, x, y)
@@ -271,6 +297,7 @@ Skin.tex = {
     away    = "Interface\\FriendsFrame\\StatusIcon-Away",
     dnd     = "Interface\\FriendsFrame\\StatusIcon-DnD",
     broadcast = "Interface\\FriendsFrame\\BroadcastIcon",
+    guild     = "Interface\\Icons\\INV_Shirt_GuildTabard_01",   -- ligne « Toute la guilde » (64×64, bordure cuite)
     workorder = "Interface\\GossipFrame\\WorkOrderGossipIcon",
     scroll    = "Interface\\Icons\\INV_Scroll_03",           -- parchemin 64×64 : portrait par défaut de la fenêtre
                                                              -- (workorder = gossip ~16 px : flou + refusé par SetPortraitToTexture)

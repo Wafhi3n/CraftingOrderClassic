@@ -55,7 +55,9 @@ end
 -- Libellé coloré de l'état du réseau, pour /co status, la barre d'état et /co ping.
 function COC:NetworkLabel()
     local mode = CraftLink and CraftLink.NetworkMode and CraftLink:NetworkMode()
-    if mode == "whisper" then return "|cFF33DD33" .. L["réseau par whisper"] .. "|r" end
+    -- « par whisper » et non « réseau par whisper » : les deux appelants écrivent déjà « réseau »
+    -- devant (« réseau réseau par whisper » dans la barre du bas, relevé sur capture le 2026-09-30).
+    if mode == "whisper" then return "|cFF33DD33" .. L["par whisper"] .. "|r" end
     if mode == "channel" then return "|cFF33DD33" .. L["canal rejoint"] .. "|r" end
     return "|cFFFFCC00" .. L["connexion…"] .. "|r"
 end
