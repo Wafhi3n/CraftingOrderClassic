@@ -198,6 +198,9 @@ local de3 = {
     ["ou un artisan"] = "oder ein Handwerker",
     ["ou un récolteur"] = "oder ein Sammler",
     ["Annoncer en Commerce (en capitale)"] = "Im Handelskanal ankündigen (nur in Hauptstädten)",
+    -- Ligne de destinataire du salon Discord de la guilde (2026-10-10)
+    ["Toute la guilde + Discord"] = "Ganze Gilde + Discord",
+    ["Discord"] = "Discord",
 }
 
 for k, v in pairs(de3) do L[k] = v end

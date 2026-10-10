@@ -199,6 +199,9 @@ local en3 = {
     ["ou un artisan"] = "or one crafter",
     ["ou un récolteur"] = "or one gatherer",
     ["Annoncer en Commerce (en capitale)"] = "Announce in Trade (capital only)",
+    -- Ligne de destinataire du salon Discord de la guilde (2026-10-10)
+    ["Toute la guilde + Discord"] = "Whole guild + Discord",
+    ["Discord"] = "Discord",   -- rappel du destinataire : « Whole guild + Discord »
 }
 
 for k, v in pairs(en3) do L[k] = v end

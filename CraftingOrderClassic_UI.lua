@@ -172,6 +172,27 @@ local function pinnedRow(panel, w)
     return row
 end
 
+-- « Toute la guilde + Discord » (spec annonce-discord, D2 revue le 2026-10-10) : onglet Commande seul,
+-- sous la ligne de groupe. Même destinataire « Guilde » sur le réseau ; le choix Discord est un drapeau
+-- LOCAL (UI.postDiscord), que toute autre ligne baisse. Icône : l'atlas Discord du chat de Blizzard
+-- (ChatFrameUtil, `UI-ChatIcon-Discord`), vérifié avant usage, sinon le tabard.
+local DISCORD_ATLAS = "UI-ChatIcon-Discord"
+local function discordRow(panel, w, below)
+    local row = pinnedRow(panel, w)
+    row:SetPoint("TOPLEFT", below, "BOTTOMLEFT", 0, -2)
+    if C_Texture and C_Texture.GetAtlasInfo and C_Texture.GetAtlasInfo(DISCORD_ATLAS) then
+        row.icon:SetAtlas(DISCORD_ATLAS)
+    else
+        row.icon:SetTexture(Skin.tex.guild); row.icon:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+    end
+    row.label:SetText(L["Toute la guilde + Discord"])
+    row:SetScript("OnClick", function()
+        UI.postTarget, UI.postDiscord = "guild", true
+        UI:RefreshPostArtisans(); UI:RefreshPostPlans()
+    end)
+    return row
+end
+
 -- kind = "post" | "gather" ; top = Y de la 1re ligne épinglée. Construit « Tous », la ligne de
 -- groupe, la légende « ou un artisan » et la liste des personnes dessous ; renseigne
 -- self.<kind>Pinned = { all, group, caption } et self.<kind>ArtList.
@@ -183,7 +204,9 @@ function UI:_BuildAllRowAndScroll(panel, kind, top, x, w, opts)
     x, w = x or ALL_RX, w or ALL_RW
     local function pick(t)   -- t = nil : la liste affichée entière (guilde / amis)
         return function()
-            if kind == "post" then UI.postTarget = t or UI.postSource; UI:RefreshPostArtisans(); UI:RefreshPostPlans()
+            if kind == "post" then
+                UI.postTarget, UI.postDiscord = t or UI.postSource, false
+                UI:RefreshPostArtisans(); UI:RefreshPostPlans()
             else UI.gatherTarget = t or UI.gatherSrc; UI:_RefreshGatherArtisans() end
         end
     end
@@ -195,13 +218,14 @@ function UI:_BuildAllRowAndScroll(panel, kind, top, x, w, opts)
     all.label:SetText(L["Tous (avec l'addon)"]); all:SetScript("OnClick", pick("all"))
     local grp = pinnedRow(panel, w)
     grp:SetPoint("TOPLEFT", all, "BOTTOMLEFT", 0, -2); grp:SetScript("OnClick", pick(nil))
+    local disc = (kind == "post") and discordRow(panel, w, grp) or nil
     -- Légende « ou un artisan » + filet : sépare les destinataires collectifs des personnes.
     local cap = CreateFrame("Frame", nil, panel); cap:SetSize(w - LIST_BAR, 16)
     local cfs = cap:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
     cfs:SetPoint("LEFT", 6, 0); cfs:SetText(opts.caption or "")
     local rule = cap:CreateTexture(nil, "ARTWORK"); rule:SetHeight(1); rule:SetColorTexture(1, 1, 1, 0.12)
     rule:SetPoint("LEFT", cfs, "RIGHT", 6, 0); rule:SetPoint("RIGHT", cap, "RIGHT", -4, 0)
-    self[kind .. "Pinned"] = { all = all, group = grp, caption = cap }
+    self[kind .. "Pinned"] = { all = all, group = grp, discord = disc, caption = cap }
 
     -- Liste défilante du kit (palier 2), toute la largeur : ses lignes s'arrêtent à LIST_BAR du bord,
     -- sous les lignes épinglées, et sa barre loge dans ce reste.
@@ -217,6 +241,17 @@ function UI:_BuildAllRowAndScroll(panel, kind, top, x, w, opts)
     })
 end
 
+-- La ligne « Toute la guilde + Discord » : (affichée, choisie). Relue à chaque rafraîchissement — le
+-- chef peut délier ou décocher fenêtre ouverte. Cachée alors qu'elle était choisie : le destinataire
+-- retombe sur « Toute la guilde » (même postTarget, drapeau baissé).
+function UI:_DiscordRowState(grp, tgt)
+    local AD = COC.AnnounceDiscord
+    if not AD then return false, false end
+    local shown, chosen = AD.RowState(grp, tgt, self.postDiscord, AD.DiscordStream() ~= nil)
+    if not shown and self.postDiscord then self.postDiscord = false end
+    return shown, chosen
+end
+
 -- Rafraîchit les lignes épinglées selon la liste affichée et le destinataire courant. La ligne de
 -- groupe n'existe que pour une liste routable ; sans elle, la légende remonte sous « Tous ».
 function UI:_RefreshAllRow(kind)
@@ -224,13 +259,17 @@ function UI:_RefreshAllRow(kind)
     local src = (kind == "post") and (self.postSource or "guild") or (self.gatherSrc or "guild")
     local tgt = ((kind == "post") and self.postTarget or self.gatherTarget) or "all"
     local grp = Skin.RoutableGroup(src)
+    local dShown, dChosen = false, false
+    if p.discord then dShown, dChosen = self:_DiscordRowState(grp, tgt) end
     p.all.selTex:SetShown(tgt == "all")
     p.group:SetShown(grp ~= nil)
     if grp then
         p.group.label:SetText(L[GROUP_LABEL[grp]]); paintGroupIcon(p.group.icon, grp)
-        p.group.selTex:SetShown(tgt == grp)
+        p.group.selTex:SetShown(tgt == grp and not dChosen)
     end
-    p.caption:ClearAllPoints(); p.caption:SetPoint("TOPLEFT", grp and p.group or p.all, "BOTTOMLEFT", 0, -4)
+    if p.discord then p.discord:SetShown(dShown); p.discord.selTex:SetShown(dChosen) end
+    local last = (dShown and p.discord) or (grp and p.group) or p.all
+    p.caption:ClearAllPoints(); p.caption:SetPoint("TOPLEFT", last, "BOTTOMLEFT", 0, -4)
 end
 
 -- La bande au-dessus de la liste (zone « scope » des SPEC) : « Envoyer à » à gauche ; à droite le menu
