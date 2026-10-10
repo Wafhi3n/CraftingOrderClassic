@@ -46,6 +46,14 @@ client.
 
 ## Relevés
 
+- 2026-10-10 18:03 — jusqu'a 26c9f25 — Forever build client 70338 ; build `main-dev@2dda253 2026-10-10
+  17:59`, `## Version: 1.49.0` (lu dans le `.toc` déployé et par l'appli du banc, fiche
+  `CraftingOrderClassic--release-v1.49.0`, version cochée OK, onglet Nouveautés confirmé vu par le user
+  à la question de 18:04, sur sa parole) — **GO** sur le candidat v1.49.0 (`release/v1.49.0` : version,
+  CHANGELOG, onglet Nouveautés ; le code, liste des destinataires et ligne « Whole guild + Discord »,
+  vu au banc à 16:23 et 16:46) : `/co version` affiche 1.49.0 et la ligne Build ; onglet Nouveautés, la
+  v1.49.0 en tête, lisible, puis la v1.48.0.
+
 - 2026-10-10 16:48 — jusqu'a 15bda9d — Forever build client 70338 ; build `main-dev@daf4133 2026-10-10
   16:36` (fiche `mesure--greffe-metier-70291`, deux gestes cochés OK dans l'appli du banc, sur la parole
   du user) — **GO** sur la greffe de COC dans la fenêtre de métier Camelot après les retouches du build
