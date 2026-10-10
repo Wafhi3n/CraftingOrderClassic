@@ -178,8 +178,15 @@ dans le salon Discord.
 1. ~~Mesures M1 et M2~~ : faites (fiche `mesure--discord-m1-m2`, archivée).
 2. ~~Format~~ : fait (critères 1, 2).
 3. ~~Envoi au clic « Poster », garde D4, délai D5~~ : fait (critères 3 à 5).
-4. ~~Banc à deux comptes (critères 6 à 9)~~ : GO le 2026-10-10 16:23. Reste : la fusion dans `main`
-   (COC) et `master` (outillage, tests) le même jour.
+4. ~~Banc à deux comptes (critères 6 à 9)~~ : GO le 2026-10-10 16:23 (envoi automatique, `f904fe2`).
+5. (2026-10-10) La ligne « Toute la guilde + Discord » : `feat/ligne-guilde-discord` (COC + outillage),
+   bâtie sur `feat/liste-destinataires`. Banc : fiche `CraftingOrderClassic--feat-ligne-guilde-discord`
+   (critères 11, 12 ; le GO de 16:23 ne couvre pas le passage au choix, `ae5582f`).
+6. Avant CHAQUE fusion dans `main` : `scripts\gen_docs.ps1` sur la branche, commité en `docs:`.
+   `docs/CODEBASE.md` de `feat/ligne-guilde-discord` est la carte du 30/09 reprise de
+   `feat/liste-destinataires` (conflit résolu « theirs ») : sans régénération, la fusion ferait
+   reculer la carte de `main`. Puis la fusion dans `main` (COC) et `master` (outillage) le même jour,
+   sur l'accord du user.
 
 ## Renvois
 
