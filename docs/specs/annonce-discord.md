@@ -7,7 +7,8 @@
 > 2026-10-10, branches `feat/annonce-discord` (COC : `Orders_Announce.lua` `BuildDiscordWTB`,
 > `Orders_AnnounceSend.lua` `DiscordLineFor`, `Orders_AnnounceDiscord.lua`, appel dans `UI:DoPostOrder` ;
 > outillage : `tests/test_announce.lua`, `tests/test_announce_discord.lua`). Critères 1 à 5 tenus en
-> test ; 6 à 9 à voir au banc ; 10 relu à la main (seul `IsDiscordStreamSeparate` de C_GuildInfo,
+> test ; **6 à 9 tenus au banc le 2026-10-10 16:23** (GO, registre de vérification, `main-dev@b4df661`) ;
+> 10 relu à la main (seul `IsDiscordStreamSeparate` de C_GuildInfo,
 > `C_Club.SendMessage` atteignable du seul `DoPostOrder`).
 
 ## Le problème
@@ -154,8 +155,8 @@ nom du personnage. Le jeu la recopie dans le salon Discord.
 1. ~~Mesures M1 et M2~~ : faites (fiche `mesure--discord-m1-m2`, archivée).
 2. ~~Format~~ : fait (critères 1, 2).
 3. ~~Envoi au clic « Poster », garde D4, délai D5~~ : fait (critères 3 à 5).
-4. Banc à deux comptes (critères 6 à 9) : `deploy.ps1 -Banc feat/annonce-discord`, fiche
-   `CraftingOrderClassic--feat-annonce-discord`. Redémarrer les clients (fichier neuf au `.toc`).
+4. ~~Banc à deux comptes (critères 6 à 9)~~ : GO le 2026-10-10 16:23. Reste : la fusion dans `main`
+   (COC) et `master` (outillage, tests) le même jour.
 
 ## Renvois
 
