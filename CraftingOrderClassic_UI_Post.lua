@@ -380,6 +380,9 @@ function UI:DoPostOrder(narr)
     if COC.Beacon then COC:Beacon() end   -- balise TEXTE de découverte (clic = hardware event)
     -- Annonce sur Trade (Services), case cochée : DANS le clic, le jeu l'exige (Orders_AnnounceSend).
     if o and COC.db and COC.db.announceTrade and COC.AnnounceSend then COC.AnnounceSend:Post(o) end
+    -- Commande « Guilde », guilde reliée en flux séparé : sa ligne dans le fil Discord de la guilde, dans le
+    -- même clic (Orders_AnnounceDiscord). Protégée : une ligne perdue ne doit pas bloquer le formulaire.
+    if o and COC.AnnounceDiscord then pcall(COC.AnnounceDiscord.Post, COC.AnnounceDiscord, o) end
     self.postMoney:Clear()
     self.postQty:SetValue(1); self.postEntry = nil; self.postProvide = {}
     self.postSelLbl:SetText("|cFF33DD33" .. L["Commande postée !"] .. "|r")

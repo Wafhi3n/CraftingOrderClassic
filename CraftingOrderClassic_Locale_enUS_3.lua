@@ -68,6 +68,12 @@ local en3 = {
     ["Clic droit : rappeler en Commerce"] = "Right-click: repeat in Trade",
     -- Annonce de la dispo LFW (2026-09-30)
     ["dispo annoncée sur %s."] = "availability announced in %s.",
+    -- Ligne d'une commande de guilde dans le fil Discord de la guilde (2026-10-10)
+    ["commande annoncée sur le Discord de la guilde."] = "order announced on the guild's Discord.",
+    ["commande postée sans sa ligne Discord : une par minute au plus (encore %d s)."] =
+        "order posted without its Discord line: one per minute at most (%d s left).",
+    ["commande postée sans sa ligne Discord : un objet n'est pas encore connu du jeu."] =
+        "order posted without its Discord line: an item isn't loaded by the game yet.",
     ["Quand tu actives ta dispo, poste aussi une ligne sur Trade (Services) : les joueurs avec ou sans l'addon voient que tu cherches du travail. Une ligne par activation, jamais au renouvellement automatique ; dans une capitale. Même réglage que la case du formulaire de commande."] =
         "When you turn on looking for work, also posts one line in Trade (Services): players with or without the addon see that you are looking for work. One line each time you turn it on, never on the automatic refresh; in a capital city. Same setting as the box on the order form.",
     -- Aide sans communauté officielle (2026-09-30)

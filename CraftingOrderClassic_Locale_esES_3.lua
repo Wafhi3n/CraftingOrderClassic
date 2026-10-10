@@ -68,6 +68,12 @@ local es3 = {
     ["Clic droit : rappeler en Commerce"] = "Clic derecho: repetir en Comercio",
     -- Annonce de la dispo LFW (2026-09-30)
     ["dispo annoncée sur %s."] = "disponibilidad anunciada en %s.",
+    -- Ligne d'une commande de guilde dans le fil Discord de la guilde (2026-10-10)
+    ["commande annoncée sur le Discord de la guilde."] = "pedido anunciado en el Discord de la hermandad.",
+    ["commande postée sans sa ligne Discord : une par minute au plus (encore %d s)."] =
+        "pedido publicado sin su línea de Discord: una por minuto como máximo (faltan %d s).",
+    ["commande postée sans sa ligne Discord : un objet n'est pas encore connu du jeu."] =
+        "pedido publicado sin su línea de Discord: el juego aún no conoce un objeto.",
     ["Quand tu actives ta dispo, poste aussi une ligne sur Trade (Services) : les joueurs avec ou sans l'addon voient que tu cherches du travail. Une ligne par activation, jamais au renouvellement automatique ; dans une capitale. Même réglage que la case du formulaire de commande."] =
         "Al activar tu búsqueda de trabajo, publica también una línea en Comercio (Servicios): los jugadores con o sin el addon ven que buscas trabajo. Una línea por activación, nunca en la renovación automática; solo en una capital. El mismo ajuste que la casilla del formulario de pedido.",
     -- Aide sans communauté officielle (2026-09-30)

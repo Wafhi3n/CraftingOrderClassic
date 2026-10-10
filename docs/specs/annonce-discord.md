@@ -3,7 +3,12 @@
 > État : **validée** le 2026-10-10 par le user (D1 à D6) · Demande du user, mise en forme par
 > l'agent · Mesures M1 et M2 faites au banc le 2026-10-10 à 14:51-14:53 ; D3 revue le même jour sur
 > leur résultat (flux séparé seulement). Contrat vérifié : `Announce.Parse` de `main` (`15bda9d`)
-> relit une ligne avec `@Prénom Nom` avant `#CO27` comme la ligne de Commerce. Rien d'implémenté.
+> relit une ligne avec `@Prénom Nom` avant `#CO27` comme la ligne de Commerce. **Implémenté** le
+> 2026-10-10, branches `feat/annonce-discord` (COC : `Orders_Announce.lua` `BuildDiscordWTB`,
+> `Orders_AnnounceSend.lua` `DiscordLineFor`, `Orders_AnnounceDiscord.lua`, appel dans `UI:DoPostOrder` ;
+> outillage : `tests/test_announce.lua`, `tests/test_announce_discord.lua`). Critères 1 à 5 tenus en
+> test ; 6 à 9 à voir au banc ; 10 relu à la main (seul `IsDiscordStreamSeparate` de C_GuildInfo,
+> `C_Club.SendMessage` atteignable du seul `DoPostOrder`).
 
 ## Le problème
 
@@ -91,6 +96,9 @@ nom du personnage. Le jeu la recopie dans le salon Discord.
   pour Rédemption comme pour Gnomi). Forme : `@Prénom Nom`, juste avant `#CO<n>`.
 - 2026-10-10, mesuré : un salon par guilde, choisi par le chef ; un addon ne peut ni le lire ni le
   changer (fonctions de `C_Discord` protégées, même depuis une commande tapée).
+- 2026-10-10, agent (à confirmer par le user) : les **commandes de récolte** (onglet Récolte) n'ont pas
+  de ligne Discord, comme elles n'ont pas d'annonce sur Commerce. Le joueur est prévenu à chaque ligne
+  envoyée (« commande annoncée sur le Discord de la guilde. »), comme sur Commerce.
 
 ## Mesures (faites le 2026-10-10, Rédemption chef de guilde, sonde COCProbe)
 
@@ -144,12 +152,10 @@ nom du personnage. Le jeu la recopie dans le salon Discord.
 ## Plan (2026-10-10) — volatile, meurt quand c'est fait
 
 1. ~~Mesures M1 et M2~~ : faites (fiche `mesure--discord-m1-m2`, archivée).
-2. Format : la ligne Discord dans `Orders_Announce.lua` et ses tests (critères 1, 2).
-   ⚠️ `BuildWTB` et `AnnounceSend:WhyNot` refusent aujourd'hui `recipient == "Guilde"` (leur garde
-   `isPublic`) : la ligne Discord a son propre chemin, la règle de Commerce ne change pas.
-3. Envoi au clic « Poster », garde D4, délai D5, écriture dans le fil `Discord` par
-   `C_Club.SendMessage` (le fil que la garde vient de trouver) (critères 3 à 5).
-4. Banc à deux comptes (critères 6 à 9), revue (critère 10).
+2. ~~Format~~ : fait (critères 1, 2).
+3. ~~Envoi au clic « Poster », garde D4, délai D5~~ : fait (critères 3 à 5).
+4. Banc à deux comptes (critères 6 à 9) : `deploy.ps1 -Banc feat/annonce-discord`, fiche
+   `CraftingOrderClassic--feat-annonce-discord`. Redémarrer les clients (fichier neuf au `.toc`).
 
 ## Renvois
 
