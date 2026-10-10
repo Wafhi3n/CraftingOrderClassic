@@ -46,6 +46,14 @@ client.
 
 ## Relevés
 
+- 2026-10-10 16:48 — jusqu'a 15bda9d — Forever build client 70338 ; build `main-dev@daf4133 2026-10-10
+  16:36` (fiche `mesure--greffe-metier-70291`, deux gestes cochés OK dans l'appli du banc, sur la parole
+  du user) — **GO** sur la greffe de COC dans la fenêtre de métier Camelot après les retouches du build
+  70291 (fenêtre qui ne se ferme plus sur `TRADE_SKILL_CLOSE` page d'ensemble affichée, case « Suivre la
+  recette » passée en bas à droite) : la colonne de COC se greffe à côté de la recette comme avant, rien
+  ne recouvre la case, la greffe part et revient avec la fenêtre. Mesure, pas une branche : le repère
+  est le `main` contenu dans le build.
+
 - 2026-10-10 16:46 — jusqu'a aa8ca87 — Forever build client 70338 ; build `main-dev@daf4133 2026-10-10
   16:36` (fiche `CraftingOrderClassic--feat-ligne-guilde-discord`, sept gestes cochés OK dans l'appli du
   banc, sur la parole du user ; le geste de Gnomi refait à 16:46 après une première coche sans
