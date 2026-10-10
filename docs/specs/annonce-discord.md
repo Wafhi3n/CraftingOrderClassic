@@ -18,7 +18,8 @@
 > Publié en **v1.49.0** (2026-10-10). **Évolution D7 du 2026-10-10 soir** (demande du user) : le jeton
 > d'ids, branche `feat/ids-discord` (COC + outillage), critères 13 et 14 ; au banc le 2026-10-10 20:40.
 > **D8** (annulation, carte barrée) : branche `feat/annulation-discord` (bâtie sur `feat/ids-discord`),
-> critères 15 à 17.
+> critères 15 à 17. **D5 revue** (la ligne attend son tour) : branche `feat/discord-file` (bâtie sur
+> `feat/annulation-discord`), critères 5 et 18.
 
 ## Le problème
 
@@ -111,6 +112,13 @@ dans le salon Discord.
   `Discord` dans `C_Club.GetStreams(C_Club.GetGuildClubId())` (fonctions libres), relus à chaque clic.
 - 2026-10-10, **user** (D5, sur proposition de l'agent) : **une ligne Discord par minute au plus**,
   compteur à part de celui de Commerce. Au-delà, la commande part sans ligne et le joueur lit pourquoi.
+  **Revue par le user le 2026-10-10 soir** (« mauvaise idée », capture de « order posted without its
+  Discord line ») : la ligne **attend son tour** au lieu d'être perdue, et part d'elle-même. Toujours
+  une par minute, dans l'ordre d'arrivée. `C_Club.SendMessage` exige un geste du joueur : pas de
+  minuteur, la ligne part au **premier clic dans le monde ou à la première touche** une fois la minute
+  écoulée (motif de `CraftLink_TextQueue`), jamais en combat. Gardes (agent) : seulement pour la
+  guilde et le personnage du clic « Poster » ; une commande annulée avant que sa ligne parte sort de la
+  file sans rien écrire. La file vit sur les commandes (SavedVariables) : un /reload la garde.
 - 2026-10-10, **user** (D6, sur proposition de l'agent) : la ligne **nomme le personnage**, parce que
   Discord affiche le **compte Discord** de l'auteur et jamais son personnage (mesuré : « Wafhien »
   pour Rédemption comme pour Gnomi). Forme : `@Prénom Nom`, juste avant `#CO<n>`.
@@ -164,8 +172,10 @@ dans le salon Discord.
    reste « Guilde ».
 4. [test] Garde D4 : sans flux séparé, ou sans fil `Discord` dans la guilde, aucune ligne. Rien n'est
    jamais écrit dans le chat de guilde ordinaire.
-5. [test] Une 2ᵉ commande de guilde moins d'une minute après la 1ʳᵉ part sans ligne, avec un message
-   au joueur (D5).
+5. [test] (D5 revue) Une 2ᵉ commande de guilde moins d'une minute après la 1ʳᵉ : sa ligne attend, le
+   joueur lit l'attente réelle ; elle part au 1er input (`D:Drain`) une fois la minute écoulée, jamais
+   en combat ; plusieurs : dans l'ordre, une par minute ; relue après un /reload. Rien ne part pour une
+   commande annulée entre-temps, un autre personnage, une autre guilde ou une guilde déliée.
 6. [human] Flux séparé : Rédemption poste une commande de guilde. Sur Discord apparaît, sous
    « Wafhien » avec le badge manette, `WTB [objet] x1 … @Rédemption Wafhien #CO<n>` (forme
    d'avant D7 ; depuis, le jeton d'ids précède `@`, critère 14).
@@ -179,7 +189,8 @@ dans le salon Discord.
 9. [human] Flux mêlé (case décochée), puis guilde déliée : la même commande de guilde n'écrit rien,
    ni dans le chat de guilde ni sur Discord. Témoin : la même commande en flux séparé écrit sa ligne.
 10. [agent] Pas d'appel à une fonction protégée de `C_Discord`, pas d'envoi hors d'un geste (le clic
-    « Poster » ; depuis D8, aussi `Orders:Cancel`, appelé par le clic « Annuler » et `/co cancel`).
+    « Poster » ; depuis D8, aussi `Orders:Cancel`, appelé par le clic « Annuler » et `/co cancel` ;
+    depuis D5 revue, la file, vidée par un clic dans le monde ou une touche du joueur).
     → `api-gotcha-reviewer`
 11. [human] La ligne « Toute la guilde + Discord » : affichée sous « Toute la guilde » quand la guilde
     est reliée en flux séparé ; cachée en flux mêlé (case décochée pendant que la fenêtre est ouverte
@@ -209,6 +220,11 @@ dans le salon Discord.
     dans #commandes, la carte de cette commande est **barrée**, « annulée », sans aperçu. Témoin : une
     autre commande, pas annulée, reste intacte. Observateur : le user, en jeu et sur Discord.
 17. [human] (D8) Même chose par `/co cancel <id>` tapée. Même observation que 16.
+18. [human] (D5 revue) Sous `/console taintLog 1` : poster deux commandes « Toute la guilde +
+    Discord » à 10 s d'écart. La 2ᵉ dit « ligne Discord en attente : … dans ~50 s » ; sa ligne arrive
+    en `[Guild Discord]` peu après la minute, au premier déplacement ou clic ; `Logs\taint.log` ne cite
+    pas COC. Seule preuve possible : la voir arriver (un envoi bloqué n'est pas une erreur Lua).
+    Témoin connu bon : la 1ʳᵉ ligne, partie du clic « Poster ». Observateur : le user, en jeu.
 
 ## Contrat
 

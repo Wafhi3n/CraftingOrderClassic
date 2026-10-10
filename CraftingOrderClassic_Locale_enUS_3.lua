@@ -71,8 +71,8 @@ local en3 = {
     -- Ligne d'une commande de guilde dans le fil Discord de la guilde (2026-10-10)
     ["commande annoncée sur le Discord de la guilde."] = "order announced on the guild's Discord.",
     ["annulation signalée sur le Discord de la guilde."] = "cancellation sent to the guild's Discord.",
-    ["commande postée sans sa ligne Discord : une par minute au plus (encore %d s)."] =
-        "order posted without its Discord line: one per minute at most (%d s left).",
+    ["ligne Discord en attente : elle partira dans %d s environ (une par minute)."] =
+        "Discord line queued: it will go out in about %d s (one per minute).",
     ["commande postée sans sa ligne Discord : un objet n'est pas encore connu du jeu."] =
         "order posted without its Discord line: an item isn't loaded by the game yet.",
     ["Quand tu actives ta dispo, poste aussi une ligne sur Trade (Services) : les joueurs avec ou sans l'addon voient que tu cherches du travail. Une ligne par activation, jamais au renouvellement automatique ; dans une capitale. Même réglage que la case du formulaire de commande."] =

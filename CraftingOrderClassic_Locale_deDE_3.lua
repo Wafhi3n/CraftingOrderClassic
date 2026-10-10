@@ -70,8 +70,8 @@ local de3 = {
     -- Ligne d'une commande de guilde dans le fil Discord de la guilde (2026-10-10)
     ["commande annoncée sur le Discord de la guilde."] = "Auftrag im Discord der Gilde angekündigt.",
     ["annulation signalée sur le Discord de la guilde."] = "Stornierung an den Discord der Gilde gemeldet.",
-    ["commande postée sans sa ligne Discord : une par minute au plus (encore %d s)."] =
-        "Auftrag ohne Discord-Zeile erstellt: höchstens eine pro Minute (noch %d s).",
+    ["ligne Discord en attente : elle partira dans %d s environ (une par minute)."] =
+        "Discord-Zeile wartet: sie geht in etwa %d s raus (eine pro Minute).",
     ["commande postée sans sa ligne Discord : un objet n'est pas encore connu du jeu."] =
         "Auftrag ohne Discord-Zeile erstellt: ein Gegenstand ist dem Spiel noch nicht bekannt.",
     ["Quand tu actives ta dispo, poste aussi une ligne sur Trade (Services) : les joueurs avec ou sans l'addon voient que tu cherches du travail. Une ligne par activation, jamais au renouvellement automatique ; dans une capitale. Même réglage que la case du formulaire de commande."] =

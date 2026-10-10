@@ -75,22 +75,12 @@ if CreateFrame and COC.Api and COC.Api.RegisterEventsSafe then
     end)
 end
 
--- À appeler depuis le clic « Poster » (UI:DoPostOrder), après que la commande est partie : le jeu
--- exige un geste du joueur. Rend true si la ligne est partie. Une ligne perdue ne casse jamais la
--- commande : refus du jeu, flux mêlé ou guilde pas reliée = rien, sans message (le joueur n'a rien
--- demandé de particulier) ; seuls le délai et l'objet pas encore connu lui sont dits.
-function D:Post(o)
-    if not (o and o.recipient == "Guilde" and o.status == "open") then return false end
-    local me = COC.Api and COC.Api.PlayerName and COC.Api.PlayerName()
-    if not (me and o.buyer == me) then return false end
-    local clubId, streamId = D.DiscordStream()
-    if not clubId then trace("pas de fil Discord (flux mêlé ou guilde pas reliée), rien pour " .. tostring(o.id)); return false end
-    local left = D.COOLDOWN - (now() - ((COC.db and COC.db.discordLast) or 0))
-    if left > 0 then
-        p(string.format(L["commande postée sans sa ligne Discord : une par minute au plus (encore %d s)."], left))
-        trace("délai, " .. tostring(o.id) .. " sans ligne"); return false
-    end
-    local line = COC.AnnounceSend and COC.AnnounceSend:DiscordLineFor(o, me)
+local function myName() return COC.Api and COC.Api.PlayerName and COC.Api.PlayerName() end
+local function sinceLast() return now() - ((COC.db and COC.db.discordLast) or 0) end
+
+-- Écrit la ligne WTB de `o` dans le fil (clubId, streamId) et la note. Rend true si elle est partie.
+local function sendLine(o, who, clubId, streamId)
+    local line = COC.AnnounceSend and COC.AnnounceSend:DiscordLineFor(o, who)
     if not line then
         p(L["commande postée sans sa ligne Discord : un objet n'est pas encore connu du jeu."])
         trace("ligne impossible pour " .. tostring(o.id)); return false
@@ -102,6 +92,98 @@ function D:Post(o)
     trace("ligne de " .. tostring(o.id) .. " envoyée dans le fil Discord")
     p(L["commande annoncée sur le Discord de la guilde."])
     return true
+end
+
+-- ------------------------------------------------------------------
+-- La file (D5 revue par le user le 2026-10-10 : une ligne arrivée dans la minute ATTEND au lieu d'être
+-- perdue). `C_Club.SendMessage` exige un geste du joueur (HasRestrictions ; fait mesuré, skill public
+-- wow-forever-api) : pas de minuteur, la ligne part au premier clic ou à la première touche du joueur
+-- une fois la minute écoulée (le motif de CraftLink_TextQueue, pattern Deathlog). La file vit SUR LES
+-- COMMANDES (`o.discordQueued`, `o.discordQueueClub`, SavedVariables) : un /reload la garde.
+-- ------------------------------------------------------------------
+local pending   -- mes commandes dont la ligne attend, première arrivée en tête ; nil = pas encore relue
+
+local function queue()
+    if pending then return pending end
+    local db, who = COC.db, myName()
+    if not (db and db.orders and who) then return nil end
+    pending = {}
+    for _, o in pairs(db.orders) do
+        if o.discordQueued and not o.discordAt and o.status == "open" and o.buyer == who then pending[#pending + 1] = o end
+    end
+    table.sort(pending, function(a, b) return a.discordQueued < b.discordQueued end)
+    return pending
+end
+
+-- Les crochets d'input, posés au premier besoin seulement (un joueur sans Discord n'en a aucun). Hors
+-- combat : `SetPropagateKeyboardInput` y est restreint. `EnableKeyboard` est requis pour recevoir
+-- OnKeyDown, et la propagation pour ne pas avaler les touches (relevés de CraftLink_TextQueue).
+local function installDrain()
+    if D._drainInstalled or not CreateFrame then return end
+    if _G.InCombatLockdown and _G.InCombatLockdown() then
+        local f = CreateFrame("Frame")
+        f:RegisterEvent("PLAYER_REGEN_ENABLED")
+        f:SetScript("OnEvent", function(self) self:UnregisterAllEvents(); installDrain() end)
+        return
+    end
+    D._drainInstalled = true
+    local function drain() D:Drain() end
+    if WorldFrame and WorldFrame.HookScript then WorldFrame:HookScript("OnMouseDown", drain) end
+    local kf = CreateFrame("Frame", nil, UIParent)
+    if kf.EnableKeyboard then kf:EnableKeyboard(true) end
+    if kf.SetPropagateKeyboardInput then kf:SetPropagateKeyboardInput(true) end
+    kf:SetScript("OnKeyDown", drain)
+end
+
+-- À chaque clic dans le monde et à chaque touche (CHEMIN CHAUD : la file vide sort à la 1re ligne).
+-- Une ligne par minute, jamais en combat. La ligne ne part que pour la MÊME guilde et le MÊME
+-- personnage qu'au clic « Poster » ; une commande annulée entre-temps sort de la file sans rien écrire.
+function D:Drain()
+    local q = pending or queue()
+    if not (q and q[1]) then return end
+    if sinceLast() < D.COOLDOWN or (_G.InCombatLockdown and _G.InCombatLockdown()) then return end
+    local o = table.remove(q, 1)
+    local club = o.discordQueueClub
+    o.discordQueued, o.discordQueueClub = nil, nil
+    local who = myName()
+    if not (o.status == "open" and who and o.buyer == who) then trace("file : " .. tostring(o.id) .. " n'est plus à poster"); return end
+    local clubId, streamId = D.DiscordStream()
+    if not clubId or clubId ~= club then trace("file : " .. tostring(o.id) .. " hors de sa guilde, abandonnée"); return end
+    sendLine(o, who, clubId, streamId)
+end
+
+-- À appeler depuis le clic « Poster » (UI:DoPostOrder), après que la commande est partie. Rend true si
+-- la ligne est partie, "queued" si elle attend son tour, false sinon. Une ligne perdue ne casse jamais
+-- la commande : refus du jeu, flux mêlé ou guilde pas reliée = rien, sans message (le joueur n'a rien
+-- demandé de particulier) ; l'attente et l'objet pas encore connu lui sont dits.
+function D:Post(o)
+    if not (o and o.recipient == "Guilde" and o.status == "open") then return false end
+    local who = myName()
+    if not (who and o.buyer == who) then return false end
+    local clubId, streamId = D.DiscordStream()
+    if not clubId then trace("pas de fil Discord (flux mêlé ou guilde pas reliée), rien pour " .. tostring(o.id)); return false end
+    local q = queue() or {}
+    local left = D.COOLDOWN - sinceLast()
+    if left <= 0 and not q[1] then return sendLine(o, who, clubId, streamId) end
+    o.discordQueued, o.discordQueueClub = now(), clubId
+    q[#q + 1] = o
+    pending = q
+    installDrain()
+    p(string.format(L["ligne Discord en attente : elle partira dans %d s environ (une par minute)."],
+        math.max(left, 0) + D.COOLDOWN * (#q - 1)))
+    trace("file : " .. tostring(o.id) .. " en attente (" .. #q .. ")")
+    return "queued"
+end
+
+-- Après un /reload, une file gardée dans les commandes reprend : les crochets se reposent.
+if CreateFrame then
+    local f = CreateFrame("Frame")
+    f:RegisterEvent("PLAYER_ENTERING_WORLD")
+    f:SetScript("OnEvent", function(self)
+        self:UnregisterAllEvents()
+        local q = queue()
+        if q and q[1] then installDrain() end
+    end)
 end
 
 -- Appelée par Orders:Cancel (clic « Annuler » du Carnet, `/co cancel` tapée : un geste du joueur).
