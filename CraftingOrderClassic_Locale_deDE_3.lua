@@ -206,6 +206,7 @@ local de3 = {
     ["mode solo : désactivé (/co solo on pour l'activer)"] = "Solomodus: aus (/co solo on zum Einschalten)",
     ["messages verbeux : activés (/co debug off pour les couper)"] = "Ausführliche Meldungen: an (/co debug off zum Ausschalten)",
     ["messages verbeux : désactivés (/co debug on pour les activer)"] = "Ausführliche Meldungen: aus (/co debug on zum Einschalten)",
+    ["|cFFFFFFFF%s|r est en ligne avec l'addon — artisan lié."] = "|cFFFFFFFF%s|r ist mit dem Addon online — Handwerker verknüpft.",
 }
 
 for k, v in pairs(de3) do L[k] = v end

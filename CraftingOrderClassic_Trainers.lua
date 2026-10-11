@@ -257,11 +257,14 @@ function T:Harvest()
     -- Une fois par fenêtre (le drapeau tombe au TRAINER_SHOW) : TRAINER_UPDATE se déclenche à chaque
     -- clic et à chaque changement de filtre, on ne va pas le répéter à chacun.
     self._hidden = hiddenFilters()
+    -- Un toast depuis le 2026-10-11 (règle `chat-output`) : ouvrir le formateur n'est pas un geste
+    -- vers l'addon.
     if self._hidden and not self._warned then
         self._warned = true
-        print("|cFF33DD88Crafting Order|r "
-            .. string.format(COC.L["Formateur : %d recette(s) notée(s), mais ton filtre en cache (%s)."],
-                             n, self._hidden))
+        if COC.UI and COC.UI.Toast then
+            COC.UI:Toast(string.format(COC.L["Formateur : %d recette(s) notée(s), mais ton filtre en cache (%s)."],
+                                       n, self._hidden))
+        end
     end
     return prof, n, seen
 end

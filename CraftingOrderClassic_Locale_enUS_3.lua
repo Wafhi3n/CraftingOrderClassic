@@ -207,6 +207,7 @@ local en3 = {
     ["mode solo : désactivé (/co solo on pour l'activer)"] = "solo mode: off (/co solo on to turn it on)",
     ["messages verbeux : activés (/co debug off pour les couper)"] = "verbose messages: on (/co debug off to turn them off)",
     ["messages verbeux : désactivés (/co debug on pour les activer)"] = "verbose messages: off (/co debug on to turn them on)",
+    ["|cFFFFFFFF%s|r est en ligne avec l'addon — artisan lié."] = "|cFFFFFFFF%s|r is online with the addon — crafter linked.",
 }
 
 for k, v in pairs(en3) do L[k] = v end

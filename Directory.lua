@@ -22,8 +22,9 @@ local function now() return (GetTime and GetTime()) or 0 end
 function Dir:_ToastIfAdded(who)
     local r = self.roster and self.roster[who]
     if not (r and r.source == "added") then return end
+    -- Un toast seul : la ligne de chat qui le doublait est partie le 2026-10-11 (règle `chat-output`,
+    -- une présence lue sur le réseau n'est pas un geste du joueur).
     local msg = string.format(L["ton artisan |cFFFFFFFF%s|r est en ligne."], who)
-    print("|cFF33DD88Crafting Order|r " .. msg)
     if COC.UI and COC.UI.Toast then COC.UI:Toast(msg) end
 end
 
@@ -49,8 +50,11 @@ end
 function Dir:_NoteLinked(name, r)
     if r and r.manual and not r.linked then
         r.linked = true
-        print("|cFF33DD88Crafting Order|r |cFFFFFFFF" .. name ..
-            "|r est en ligne avec l'addon — artisan lié.")
+        -- Un toast (2026-10-11, règle `chat-output`), et traduit : la ligne de chat d'avant était en
+        -- français pour tous.
+        if COC.UI and COC.UI.Toast then
+            COC.UI:Toast(string.format(L["|cFFFFFFFF%s|r est en ligne avec l'addon — artisan lié."], name))
+        end
     end
 end
 

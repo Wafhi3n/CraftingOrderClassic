@@ -207,6 +207,7 @@ local es3 = {
     ["mode solo : désactivé (/co solo on pour l'activer)"] = "modo solo: desactivado (/co solo on para activarlo)",
     ["messages verbeux : activés (/co debug off pour les couper)"] = "mensajes detallados: activados (/co debug off para desactivarlos)",
     ["messages verbeux : désactivés (/co debug on pour les activer)"] = "mensajes detallados: desactivados (/co debug on para activarlos)",
+    ["|cFFFFFFFF%s|r est en ligne avec l'addon — artisan lié."] = "|cFFFFFFFF%s|r está en línea con el addon — artesano vinculado.",
 }
 
 for k, v in pairs(es3) do L[k] = v end

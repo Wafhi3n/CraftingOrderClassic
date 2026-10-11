@@ -131,7 +131,12 @@ function Ch.IsWatched(key)
     local id = clubId(key)
     if id then return (db and db.circles and db.circles[id]) == true end
     local v = db and db.watch and db.watch[key]
-    if v == nil then return DEFAULTS[key] == true end
+    if v == nil then
+        -- Qui avait décoché le bandeau sans toucher à la ligne de chat n'avait qu'elle pour alerte à
+        -- l'écran : le défaut changé le 2026-10-11 ne la lui retire pas.
+        if key == "notif_way_chat" and db and db.watch and db.watch.notif_way_toast == false then return true end
+        return DEFAULTS[key] == true
+    end
     return v == true
 end
 
