@@ -46,6 +46,20 @@ client.
 
 ## Relevés
 
+- 2026-10-11 14:19 — jusqu'a 723b36c — build `main-dev@0da5d08 2026-10-10 21:11` (geste
+  « carte-immediate ») puis `main-dev@a5941ca 2026-10-11 14:15` (« carnet-annuler » et
+  « annuler-tout-de-suite »), lus par l'appli du banc (fiche
+  `CraftingOrderClassic--feat-annulation-discord`, 3 gestes sur 5 cochés OK, sur la parole du user,
+  sans capture) ; build client non relevé — **GO partiel** sur D8 (annuler en jeu barre la carte
+  Discord) : après une minute sans commande, la carte arrive dans #commandes en quelques secondes et
+  commence par **#CO<n>** ; « Annuler » au Carnet écrit « CANCEL [objet] @Rédemption Wafhien #CO<n> »
+  dans le fil Discord, la carte de #commandes est barrée et la ligne quitte le salon relié ; une
+  commande annulée dans les 10 secondes envoie quand même sa ligne CANCEL. Le bot déployé comprend
+  donc `CANCEL`, le prérequis de la release. ⚠️ Le témoin du 3e geste (« une 2e commande dans la
+  minute part sans sa ligne ») ne vaut plus sur `a5941ca`, qui embarque `feat/discord-file` : la ligne
+  y attend son tour. **Pas vus** : `/co cancel <id>` (même résultat attendu qu'au Carnet) et la 2e
+  annulation qui ne doit pas écrire de 2e ligne.
+
 - 2026-10-10 18:03 — jusqu'a 26c9f25 — Forever build client 70338 ; build `main-dev@2dda253 2026-10-10
   17:59`, `## Version: 1.49.0` (lu dans le `.toc` déployé et par l'appli du banc, fiche
   `CraftingOrderClassic--release-v1.49.0`, version cochée OK, onglet Nouveautés confirmé vu par le user
