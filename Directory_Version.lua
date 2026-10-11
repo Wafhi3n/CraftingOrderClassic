@@ -105,10 +105,14 @@ function Dir:_EvalUpdate()
     self._updateVer = best
     if COC.db then COC.db.updateAlertedAt = time() end   -- re-corroborée aujourd'hui → le TTL repart
     if COC.UI and COC.UI.SetUpdateBadge then COC.UI:SetUpdateBadge(true, best) end
+    -- Un toast, plus une ligne de chat (2026-10-11, règle `chat-output`) : l'alerte naît de messages
+    -- d'autres joueurs, pas d'un geste du joueur. /co version la redit dans le chat, sur demande.
     if (COC.db and COC.db.updateAlerted) ~= best then
         if COC.db then COC.db.updateAlerted = best end
-        p(string.format(COC.L["Une nouvelle version est disponible : |cFFFFD100%s|r (vous avez la %s). Pensez à mettre à jour."],
-            best, self._myVerStr or "?"))
+        if COC.UI and COC.UI.Toast then
+            COC.UI:Toast(string.format(COC.L["Une nouvelle version est disponible : |cFFFFD100%s|r (vous avez la %s). Pensez à mettre à jour."],
+                best, self._myVerStr or "?"))
+        end
     end
 end
 

@@ -74,9 +74,13 @@ end
 -- Les réglages qui existaient AVANT la liste restent la vérité de leur case, sous leur nom (pas de
 -- migration, donc rien à perdre) : `room` lit roomOff, `nearby` lit crafterScan, `club:<id>` lit
 -- circles. Le reste vit dans COC.db.watch : absent = le défaut, false = décoché par le joueur.
+-- La ligne de chat des alertes et celle de chaque connexion sont DÉCOCHÉES par défaut depuis le
+-- 2026-10-11 (règle du user, skill publique `chat-output` : le chat ne répond qu'à un geste du
+-- joueur ; une commande reçue n'en est pas un). Le toast et le son restent. Qui les a cochées à la
+-- main (`true` écrit) les garde : une case n'est écrite que sur un clic (UI_Setup, onglet Artisans).
 local DEFAULTS = { trade_services = true, trade = true, trade_local = true, guild = true, sayyell = true, general = false,
-                   notif_follow = true, notif_login = true,
-                   notif_way_chat = true, notif_way_toast = true, notif_way_sound = true }
+                   notif_follow = true, notif_login = false,
+                   notif_way_chat = false, notif_way_toast = true, notif_way_sound = true }
 -- Deux cases ne disent pas OÙ lire mais s'il faut PRÉVENIR (ligne de chat, bandeau, son) : ce réglage
 -- n'existait que par /co notify, qu'aucun joueur ne trouvait (demande du user, 2026-09-30).
 --   notif_orders = les commandes reçues par l'addon : lit notifyScope, la vérité de /co notify.

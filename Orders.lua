@@ -173,7 +173,10 @@ function Orders:Confirm(id, auto)
     if not actsFor(o.buyer) then if not auto then pmsg(L["ce n'est pas ta commande."]) end; return end
     if o.status == "done" then return end
     o.status = "done"; self:Broadcast("DONE", o)
-    pmsg(string.format(L["réception confirmée : %s"], self:OrderName(o)))
+    -- Le bouton « J'ai reçu » répond dans le chat ; la confirmation AUTO (butin, courrier) arrive sans
+    -- geste du joueur : un toast (règle `chat-output`, 2026-10-11).
+    local done = string.format(L["réception confirmée : %s"], self:OrderName(o))
+    if not auto then pmsg(done) elseif COC.UI and COC.UI.Toast then COC.UI:Toast(done) end
     if COC.UI and COC.UI.Refresh then COC.UI:Refresh() end
 end
 

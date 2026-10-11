@@ -1,32 +1,32 @@
 # CraftingOrderClassic — carte du code
 
-> **GÉNÉRÉ** le 2026-10-10 (v1.48.0) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
+> **GÉNÉRÉ** le 2026-10-11 (v1.49.0) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
-162 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
+164 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
 
 ## Modules (ordre de chargement)
 
 | Fichier | Rôle | Lignes |
 |---|---|---|
-| `CraftingOrderClassic.lua` | Crafting Order - Classic — réseau GLOBAL et SOCIAL de commandes de craft. | 499 |
+| `CraftingOrderClassic.lua` | Crafting Order - Classic — réseau GLOBAL et SOCIAL de commandes de craft. | 496 |
 | `CraftingOrderClassic_Compat.lua` | couche d'adaptation d'API entre les SAVEURS de client. | 358 |
 | `CraftingOrderClassic_Trace.lua` | trace réseau PERSISTÉE, lisible hors-jeu. | 79 |
 | `CraftingOrderClassic_Migrations.lua` | versionnage du schéma SavedVariables. | 60 |
 | `CraftingOrderClassic_Locale.lua` | socle de localisation du CHROME de l'UI. | 12 |
 | `CraftingOrderClassic_Locale_enUS.lua` | overlay ANGLAIS (enUS/enGB). | 278 |
 | `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 498 |
-| `CraftingOrderClassic_Locale_enUS_3.lua` | overlay enUS, 3/3. | 207 |
+| `CraftingOrderClassic_Locale_enUS_3.lua` | overlay enUS, 3/3. | 212 |
 | `CraftingOrderClassic_Locale_deDE.lua` | overlay ALLEMAND (deDE). | 279 |
 | `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 479 |
-| `CraftingOrderClassic_Locale_deDE_3.lua` | overlay deDE, 3/3. | 206 |
+| `CraftingOrderClassic_Locale_deDE_3.lua` | overlay deDE, 3/3. | 211 |
 | `CraftingOrderClassic_Locale_esES.lua` | overlay ESPAGNOL (esES/esMX). | 280 |
 | `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 480 |
-| `CraftingOrderClassic_Locale_esES_3.lua` | overlay esES, 3/3. | 207 |
-| `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 426 |
-| `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 423 |
-| `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 423 |
+| `CraftingOrderClassic_Locale_esES_3.lua` | overlay esES, 3/3. | 212 |
+| `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 428 |
+| `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 425 |
+| `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 425 |
 | `CraftingOrderClassic_Elemental.lua` | pseudo-« métier » de récolte « Élémentaire ». | 61 |
 | `CraftingOrderClassic_UI_Skin.lua` | tokens + helpers SÉMANTIQUES du skin (métiers, statuts, rareté, quantités, icônes natives) et petits widgets d'affichage. | 473 |
 | `CraftingOrderClassic_UI_Skin_Native.lua` | kit de chrome Blizzard NATIF (le « framework » UI de COC). | 485 |
@@ -39,7 +39,8 @@
 | `CraftingOrderClassic_UI_Skin_Backgrounds.lua` | les FONDS façon fenêtre des métiers de Forever (palier 6 de la revue d'interface ; le user : « ça doit être le même que les métiers »). | 68 |
 | `CraftingOrderClassic_UI_Skin_HelpPlate.lua` | kit d'AIDE CONTEXTUELLE (le « bouton i » de retail). | 321 |
 | `CraftingOrderClassic_ShareReagents.lua` | « liste de courses » : diffuser en un clic les réactifs d'une recette (vue métier) ou d'une commande (carte) dans un canal de discussion, avec le LIEN objet de chaque réactif. | 157 |
-| `CraftingOrderClassic_UI.lua` | fenêtre principale (chrome Blizzard natif, kit UI_Skin_Native). | 439 |
+| `CraftingOrderClassic_UI.lua` | fenêtre principale (chrome Blizzard natif, kit UI_Skin_Native). | 415 |
+| `CraftingOrderClassic_Toast.lua` | UI:Toast, dans la pile de toasts du JEU. | 53 |
 | `CraftingOrderClassic_UI_Ledger.lua` | onglet CARNET : MES commandes, en table (Commande · Qté · Prix · Métier · Artisan · Statut), filtres En cours / Archivées / Confiées, colonnes TRIABLES au clic sur l'en-tête (palier 5 de la revue d'interface, calqué sur « Mes commandes » des Commandes d'artisanat ; en-tête : Skin.MakeSortHeader). | 223 |
 | `CraftingOrderClassic_UI_HelpPlate.lua` | AIDE CONTEXTUELLE de la FENÊTRE PRINCIPALE (« bouton i »). | 184 |
 | `CraftingOrderClassic_UI_Post_Layout.lua` | GÉOMÉTRIE de l'onglet « Commande » : colonnes, zones, séparateurs. | 144 |
@@ -67,7 +68,7 @@
 | `CraftingOrderClassic_UI_MyArtisans_Profit.lua` | onglet « Mes artisans » : couche Auctionator. | 135 |
 | `CraftingOrderClassic_UI_MyArtisans_Reroll.lua` | accès à la vue REROLL (métiers d'un AUTRE perso du compte) depuis l'onglet « Mes artisans ». | 86 |
 | `CraftingOrderClassic_UI_Help.lua` | onglet Aide : page unique défilante qui explique les autres onglets (Carnet/Commande/Récolte/Artisans), la Vue Métier et le réseau. | 213 |
-| `CraftingOrderClassic_UI_News.lua` | onglet « Nouveautés » : notes de version (changelog) affichées EN JEU, version par version, la plus récente en tête. | 484 |
+| `CraftingOrderClassic_UI_News.lua` | onglet « Nouveautés » : notes de version (changelog) affichées EN JEU, version par version, la plus récente en tête. | 485 |
 | `CraftingOrderClassic_Report.lua` | « Signaler » : un bug ou une idée, en ticket sur le dépôt GitHub. | 166 |
 | `CraftingOrderClassic_Social.lua` | couche sociale passive (socle). | 427 |
 | `CraftingOrderClassic_Social_Menu.lua` | entrées « Crafting Order » du menu contextuel joueur. | 116 |
@@ -127,11 +128,11 @@
 | `Directory_Recipes.lua` | COUTURE de lecture du registre « qui sait crafter quoi » d'un artisan. | 210 |
 | `Directory_Confed.lua` | source « confédération » (GreenWall) de l'annuaire, DISPLAY-ONLY. | 63 |
 | `Directory_Club.lua` | source « cercle » (communautés WoW) de l'annuaire, DISPLAY-ONLY. | 382 |
-| `Directory_Community.lua` | le réseau SANS canal : la communauté remplace CraftLinkNet (Forever). | 272 |
+| `Directory_Community.lua` | le réseau SANS canal : la communauté remplace CraftLinkNet (Forever). | 277 |
 | `Directory_Note.lua` | la note de membre de la communauté : lue dans l'annuaire, préparée pour le joueur. | 105 |
 | `Directory_Skills.lua` | niveaux de compétence + réputation (couche « profil » de l'annuaire). | 205 |
 | `Directory_Room.lua` | la salle de découverte : CraftLinkNet rejoint pour SE PRÉSENTER, pas pour transporter. | 88 |
-| `Directory_Version.lua` | détection « nouvelle version disponible » (100 % P2P, aucun serveur). | 162 |
+| `Directory_Version.lua` | détection « nouvelle version disponible » (100 % P2P, aucun serveur). | 166 |
 | `Directory_Cooldowns.lua` | cooldowns de recettes (couche « profil » de l'annuaire). | 105 |
 | `Directory_RelayCodec.lua` | codec du fil RLY : relais de la fiche d'un artisan HORS LIGNE par un de ses partenaires. | 70 |
 | `Directory_Relay.lua` | « contacts de confiance » : les données d'un joueur DÉCONNECTÉ restent servies par ses partenaires (r.isPartner). | 196 |
@@ -140,8 +141,9 @@
 | `Directory_AltCodec.lua` | codec du fil ALT (liste des persos d'un même joueur) + vérification par réciprocité. | 119 |
 | `Directory_Alts.lua` | regroupement des rerolls : identité « joueur » multi-persos (verbe ALT). | 316 |
 | `Directory_LFW.lua` | statut « recherche de travail » (Looking For Work) + OFFRE par métier. | 368 |
-| `CraftingOrderClassic_Channels.lua` | RECONNAÎTRE un canal du jeu (spec docs/specs/canaux-surveilles.md). | 261 |
+| `CraftingOrderClassic_Channels.lua` | RECONNAÎTRE un canal du jeu (spec docs/specs/canaux-surveilles.md). | 265 |
 | `CraftingOrderClassic_Notify.lua` | la SORTIE d'une alerte : ligne de chat, bandeau, son. | 39 |
+| `CraftingOrderClassic_Login.lua` | la seule ligne de chat de la connexion. | 33 |
 | `CraftingOrderClassic_LFWChat.lua` | détection « recherche de travail » dans le CHAT VISIBLE. | 91 |
 | `Directory_MyArtisans.lua` | agrégation des métiers du COMPTE (onglet « Mes artisans »). | 168 |
 | `Directory_LootScan.lua` | découverte PASSIVE des artisans NON-porteurs de l'addon qui craftent à proximité, par CHAT_MSG_TRADESKILLS « X creates Y. | 161 |
@@ -150,16 +152,16 @@
 | `Orders_AnnounceSend.lua` | l'ENVOI d'une annonce sur Trade (Services) (spec annonce-commerce, palier 2). | 226 |
 | `Orders_AnnounceRecv.lua` | la LECTURE d'une annonce de Commerce (spec annonce-commerce, palier 3). | 107 |
 | `Orders_AnnounceDiscord.lua` | la ligne d'une commande de guilde dans le fil Discord de la guilde (spec docs/specs/annonce-discord.md). | 105 |
-| `Orders.lua` | Crafting Order - Classic — Orders : carnet d'ordres GLOBAL (modèle + cycle + protocole). | 495 |
-| `Orders_Net.lua` | couche « fil réseau » du carnet d'ordres (protocole ORD\|). | 428 |
+| `Orders.lua` | Crafting Order - Classic — Orders : carnet d'ordres GLOBAL (modèle + cycle + protocole). | 498 |
+| `Orders_Net.lua` | couche « fil réseau » du carnet d'ordres (protocole ORD\|). | 432 |
 | `Orders_Narrative.lua` | TITRE et DESCRIPTION libres d'une commande : « donne un nom et une histoire à ce que tu demandes ». | 254 |
 | `CraftingOrderClassic_QuestSheet.lua` | FICHE DE QUÊTE réutilisable : affiche (ou fait écrire) une commande sous la forme d'une vraie quête du jeu. | 363 |
 | `CraftingOrderClassic_JournalQuests.lua` | lecture EN SEULE LECTURE du journal de quêtes du JEU, pour que le journal COC affiche les vraies quêtes à côté des commandes. | 103 |
 | `CraftingOrderClassic_JournalWin.lua` | LE JOURNAL : une fenêtre parchemin où les commandes et les vraies quêtes du joueur cohabitent par sections. | 304 |
 | `CraftingOrderClassic_Inbound.lua` | couche réseau « passive » : capte les demandes de craft postées dans /commerce (Trade) et /guilde par des joueurs SANS l'addon, alerte le joueur, et les range dans une file « Entrantes » (acceptable / ignorable). | 330 |
 | `CraftingOrderClassic_Handoff.lua` | « garder une commande pour un ami capable ». | 285 |
-| `CraftingOrderClassic_Moderation.lua` | modération / anti-spam. | 372 |
-| `CraftingOrderClassic_LootAlert.lua` | alerte quand TU loots un objet-PLAN (recette/formule/ schéma/patron) catalogué par CraftLink, MAIS seulement s'il te CONCERNE : soit tu as le métier (candidat à l'apprendre), soit un AMI/PARTENAIRE de ton annuaire ne le connaît pas encore (candidat à un don — cf. | 165 |
+| `CraftingOrderClassic_Moderation.lua` | modération / anti-spam. | 371 |
+| `CraftingOrderClassic_LootAlert.lua` | alerte quand TU loots un objet-PLAN (recette/formule/ schéma/patron) catalogué par CraftLink, MAIS seulement s'il te CONCERNE : soit tu as le métier (candidat à l'apprendre), soit un AMI/PARTENAIRE de ton annuaire ne le connaît pas encore (candidat à un don — cf. | 166 |
 | `CraftingOrderClassic_Companion.lua` | socle des GREFFONS : panneaux compagnons accrochés aux fenêtres natives (échange, courrier) pour livrer une commande sans quitter le geste en cours. | 233 |
 | `CraftingOrderClassic_Companion_Mail.lua` | greffon COURRIER (scène B de la maquette) : panneau accroché à droite du compositeur d'envoi. | 329 |
 | `CraftingOrderClassic_Companion_Trade.lua` | greffon ÉCHANGE (scène A de la maquette) : panneau accroché SOUS la fenêtre d'échange native quand une commande nous lie au partenaire (dans les DEUX sens : je crafte pour lui = « vendeur », ou il crafte pour moi = « acheteur »). | 121 |
@@ -170,7 +172,7 @@
 | `CraftingOrderClassic_Tracker.lua` | SUIVI À L'ÉCRAN des commandes, façon suivi de quête : un cadre léger, déplaçable, hors de toute fenêtre, qui liste ce sur quoi le joueur peut agir MAINTENANT. | 217 |
 | `CraftingOrderClassic_Tracker_Rows.lua` | LIGNES du suivi à l'écran : pool réutilisable + peinture d'un groupe de sections rendu par COC.Journal:Grouped. | 238 |
 | `CraftingOrderClassic_Tracker_Next.lua` | section « Progression » du suivi à l'écran : pour chaque métier encore en montée, LA recette à crafter maintenant pour gagner le prochain point, ses réactifs en objectifs, et le plan à acheter quand la route en achète un. | 160 |
-| `Debug.lua` | Crafting Order - Classic — Debug : mode solo pour "jouer" un réseau fictif. | 136 |
+| `Debug.lua` | Crafting Order - Classic — Debug : mode solo pour "jouer" un réseau fictif. | 173 |
 | `CraftingOrderClassic_SelfTest.lua` | suite de tests IN-GAME (/cotest). | 181 |
 
 ## Kit UI — référence `Skin.*` (extraite des fichiers *Skin*)
@@ -1043,7 +1045,23 @@
 > Onglets : Carnet / Commande / Récolte / Artisans / Mes artisans / Aide / Nouveautés.
 > Lit le cache (COC.db.orders + Directory), jamais le réseau directement.
 
-**API** : `UI:Build()` · `UI:BuildTabs(f)` · `UI:ShowTab(id)` · `UI:Toast(text, icon)` · `UI:RefreshSoon()` · `UI:Refresh()` · `UI:Toggle(tab)`
+**API** : `UI:Build()` · `UI:BuildTabs(f)` · `UI:ShowTab(id)` · `UI:RefreshSoon()` · `UI:Refresh()` · `UI:Toggle(tab)`
+
+### `CraftingOrderClassic_Toast.lua`
+> CraftingOrderClassic_Toast.lua — UI:Toast, dans la pile de toasts du JEU.
+> 
+> Règle du user du 2026-10-11 (skill publique `chat-output`) : le chat ne répond qu'à un geste du
+> joueur ; ce qui arrive sans lui (commande reçue, demande lue dans le chat, suivi, nouvelle version,
+> plan ramassé) passe en toast. Et « si Blizzard a sa propre API pour les toasts, on doit
+> l'utiliser » : c'est la pile des hauts faits et du butin (AlertFrame), en bas de l'écran. Jusqu'à
+> la v1.49.0, UI:Toast posait son propre cadre en haut au centre, qui se remplaçait lui-même.
+> 
+> Mesures : TaintLab le 2026-10-11 (nos toasts en combat, un toast de Blizzard après le nôtre, aucun
+> blocage), puis LeyLines le même jour (vu en combat, deux toasts empilés l'un au-dessus de l'autre).
+> L'inscription se fait UNE fois, au PLAYER_LOGIN, hors combat comme aux deux mesures. Sans
+> AlertFrame (tests, autre client), un toast ne fait rien : pas de repli dans le chat.
+
+**API** : `Toast:Init()` · `UI:Toast(text, icon)`
 
 ### `CraftingOrderClassic_UI_Ledger.lua`
 > CraftingOrderClassic_UI_Ledger.lua — onglet CARNET : MES commandes, en table (Commande · Qté · Prix ·
@@ -2582,6 +2600,20 @@
 
 **API** : `N.Ways()` · `N.Emit(a)`
 
+### `CraftingOrderClassic_Login.lua`
+> CraftingOrderClassic_Login.lua — la seule ligne de chat de la connexion.
+> 
+> Règle du user du 2026-10-11 (skill publique `chat-output`) : à la connexion, rien, sauf UNE ligne
+> à la première connexion après une installation ou une mise à jour. Jusqu'à la v1.49.0, « chargé —
+> /co help » tombait à chaque connexion (case « Message à la connexion », cochée par défaut) : elle
+> est décochée par défaut, et qui l'a cochée la garde.
+> 
+> `COC.freshVersion` dit au reste de la session que cette connexion suit une mise à jour. Le rappel
+> de la communauté (Directory_Community, 15 s plus tard) le lit : `seenVersion` est déjà réécrit
+> quand il passe, il ne pourrait plus le savoir.
+
+**API** : `COC:LoginLine()`
+
 ### `CraftingOrderClassic_LFWChat.lua`
 > CraftingOrderClassic_LFWChat.lua — détection « recherche de travail » dans le CHAT VISIBLE.
 > 
@@ -3082,9 +3114,14 @@
 > de fausses commandes, dans le MÊME cache que le réseau (Directory.roster / online, COC.db.orders),
 > pour tester visuellement les onglets Carnet / Commande / Récolte / Artisans en solo.
 > 
-> Tout est marqué `fake=true` → `/co debug` (toggle) purge proprement les faux sans toucher au réel.
+> Tout est marqué `fake=true` → `/co solo off` purge proprement les faux sans toucher au réel.
+> 
+> Depuis le 2026-10-11 (décision du user), `/co debug` est le mode VERBEUX (l'ancien `/co verbose`,
+> gardé en alias) et le mode solo s'appelle `/co solo`. Règle `chat-output` : un mode qui rend
+> l'addon bavard ne s'allume que par le joueur, et `/co` (le statut) dit qu'il est allumé. Les deux
+> commandes sont à deux états : tapées seules, elles DISENT l'état ; seuls on/off le changent.
 
-**API** : `Debug:Enable()` · `Debug:Disable()` · `Debug:Toggle()` · `Debug:Reapply()`
+**API** : `Debug:Enable()` · `Debug:Disable()` · `Debug:Toggle()` · `Debug:SoloCmd(rest)` · `Debug:VerboseCmd(rest)` · `Debug:StatusLine()` · `Debug:Reapply()`
 
 ### `CraftingOrderClassic_SelfTest.lua`
 > CraftingOrderClassic_SelfTest.lua — suite de tests IN-GAME (/cotest). QA/dev.

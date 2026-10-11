@@ -61,6 +61,9 @@ CraftingOrderClassic_UI_Skin_Backgrounds.lua
 CraftingOrderClassic_UI_Skin_HelpPlate.lua
 CraftingOrderClassic_ShareReagents.lua
 CraftingOrderClassic_UI.lua
+# UI:Toast dans la pile de toasts du jeu (AlertFrame) : le gabarit, puis le code.
+CraftingOrderClassic_Toast.xml
+CraftingOrderClassic_Toast.lua
 CraftingOrderClassic_UI_Ledger.lua
 CraftingOrderClassic_UI_HelpPlate.lua
 CraftingOrderClassic_UI_Post_Layout.lua
@@ -170,6 +173,7 @@ Directory_Alts.lua
 Directory_LFW.lua
 CraftingOrderClassic_Channels.lua
 CraftingOrderClassic_Notify.lua
+CraftingOrderClassic_Login.lua
 CraftingOrderClassic_LFWChat.lua
 Directory_MyArtisans.lua
 Directory_LootScan.lua

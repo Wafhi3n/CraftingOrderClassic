@@ -5,7 +5,12 @@
 -- de fausses commandes, dans le MÊME cache que le réseau (Directory.roster / online, COC.db.orders),
 -- pour tester visuellement les onglets Carnet / Commande / Récolte / Artisans en solo.
 --
--- Tout est marqué `fake=true` → `/co debug` (toggle) purge proprement les faux sans toucher au réel.
+-- Tout est marqué `fake=true` → `/co solo off` purge proprement les faux sans toucher au réel.
+--
+-- Depuis le 2026-10-11 (décision du user), `/co debug` est le mode VERBEUX (l'ancien `/co verbose`,
+-- gardé en alias) et le mode solo s'appelle `/co solo`. Règle `chat-output` : un mode qui rend
+-- l'addon bavard ne s'allume que par le joueur, et `/co` (le statut) dit qu'il est allumé. Les deux
+-- commandes sont à deux états : tapées seules, elles DISENT l'état ; seuls on/off le changent.
 
 local COC   = CraftingOrderClassic
 local Debug = {}
@@ -68,7 +73,7 @@ local function buildHex(prof, count)
     return (c:EncodeKnown(prof, known)) or ""
 end
 
-local function pmsg(m) print("|cFF33DD88Crafting Order|r |cFFFF8800[debug]|r " .. m) end
+local function pmsg(m) print("|cFF33DD88Crafting Order|r |cFFFF8800[solo]|r " .. m) end
 
 function Debug:Enable()
     local c, D = CL(), COC.Directory
@@ -122,6 +127,38 @@ end
 
 function Debug:Toggle()
     if COC.db and COC.db.debug then self:Disable() else self:Enable() end
+end
+
+-- /co solo [on|off]. Le drapeau garde son nom d'avant (`db.debug`) : un mode solo laissé allumé
+-- avant la mise à jour le reste, et Reapply le retrouve.
+function Debug:SoloCmd(rest)
+    local arg, on = (rest or ""):lower(), (COC.db and COC.db.debug) and true or false
+    if arg == "on" and not on then return self:Enable() end
+    if arg == "off" and on then return self:Disable() end
+    pmsg(on and L["mode solo : activé (/co solo off pour le couper)"]
+             or L["mode solo : désactivé (/co solo on pour l'activer)"])
+end
+
+local function say(m) print("|cFF33DD88Crafting Order|r " .. m) end
+
+-- /co debug [on|off] (et son ancien nom, /co verbose) : les messages de coulisse dans le chat
+-- (Handoff : « X peut faire une captée »). Tapée seule : l'état, et le mot qui le change.
+function Debug:VerboseCmd(rest)
+    if not COC.db then return end
+    local arg = (rest or ""):lower()
+    if arg == "on" then COC.db.verbose = true elseif arg == "off" then COC.db.verbose = nil end
+    local on = COC.db.verbose and true or false
+    if arg == "on" or arg == "off" then
+        say(on and L["messages verbeux : activés"] or L["messages verbeux : désactivés"])
+    else
+        say(self:StatusLine() or L["messages verbeux : désactivés (/co debug on pour les activer)"])
+    end
+end
+
+-- La ligne du statut (/co status) quand le mode verbeux est allumé ; nil sinon.
+function Debug:StatusLine()
+    if not (COC.db and COC.db.verbose) then return nil end
+    return L["messages verbeux : activés (/co debug off pour les couper)"]
 end
 
 -- Au login : la présence (Dir.online) est en mémoire seule → perdue au reload alors que le roster

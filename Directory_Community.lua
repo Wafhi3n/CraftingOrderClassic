@@ -237,7 +237,8 @@ function Dir:ShowJoinLink(force)
         joinLink(c))
     if force or not whisperSelf(msg, c.ticket) then p(msg) end   -- /co circle : demandé, une ligne suffit
     if not force then
-        p("|cFF888888" .. L["(/co circle nolink : ne plus afficher ce rappel)"] .. "|r")
+        -- Plus de ligne « /co circle nolink pour ne plus afficher ce rappel » : depuis le 2026-10-11 le
+        -- rappel ne vient plus qu'après une mise à jour (onLogin), il n'y a plus de quoi s'en lasser.
         if COC.Trace then COC.Trace:Log("net", "lien de la communauté proposé") end
         firstTimePopup(c)
     end
@@ -259,8 +260,12 @@ end
 -- membre traînaient au-delà, il verrait le lien : un clic ouvre alors… sa propre communauté.
 local LINK_DELAY = 15
 
+-- Et seulement à la connexion qui suit une installation ou une mise à jour (COC.freshVersion, posé
+-- par COC:LoginLine au PLAYER_LOGIN) : jusqu'au 2026-10-11 le lien revenait à CHAQUE connexion, tant
+-- que le joueur n'avait ni la communauté ni un cercle. Règle `chat-output` du user, qui a choisi
+-- « une fois, après une mise à jour ». /co circle le redonne à la demande.
 local function onLogin(_, _, isInitialLogin)
-    if not isInitialLogin then return end
+    if not (isInitialLogin and COC.freshVersion) then return end
     if C_Timer and C_Timer.After then C_Timer.After(LINK_DELAY, function() Dir:ShowJoinLink() end)
     else Dir:ShowJoinLink() end
 end

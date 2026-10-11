@@ -25,7 +25,6 @@ local de3 = {
         "offizielle Gemeinschaft als Handwerkerkreis markiert: %s",
     ["Rejoins la communauté des artisans : %s — c'est là que Crafting Order trouve les autres joueurs."] =
         "Tritt der Handwerker-Gemeinschaft bei: %s — dort findet Crafting Order die anderen Spieler.",
-    ["(/co circle nolink : ne plus afficher ce rappel)"] = "(/co circle nolink: diese Erinnerung nicht mehr anzeigen)",
     ["rappel de la communauté éteint — /co circle link pour le rallumer."] =
         "Gemeinschafts-Erinnerung aus — /co circle link schaltet sie wieder ein.",
     ["rappel de la communauté rallumé."] = "Gemeinschafts-Erinnerung wieder an.",
@@ -201,6 +200,12 @@ local de3 = {
     -- Ligne de destinataire du salon Discord de la guilde (2026-10-10)
     ["Toute la guilde + Discord"] = "Ganze Gilde + Discord",
     ["Discord"] = "Discord",
+    -- Chat sobre (2026-10-11) : la ligne d'après une mise à jour, /co solo et /co debug à deux états
+    ["v%s installé — |cFFFFFFFF/co help|r pour les commandes."] = "v%s installiert — |cFFFFFFFF/co help|r für Befehle.",
+    ["mode solo : activé (/co solo off pour le couper)"] = "Solomodus: an (/co solo off zum Ausschalten)",
+    ["mode solo : désactivé (/co solo on pour l'activer)"] = "Solomodus: aus (/co solo on zum Einschalten)",
+    ["messages verbeux : activés (/co debug off pour les couper)"] = "Ausführliche Meldungen: an (/co debug off zum Ausschalten)",
+    ["messages verbeux : désactivés (/co debug on pour les activer)"] = "Ausführliche Meldungen: aus (/co debug on zum Einschalten)",
 }
 
 for k, v in pairs(de3) do L[k] = v end

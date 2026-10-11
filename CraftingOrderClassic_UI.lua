@@ -311,32 +311,8 @@ local function insetPanel(panel, f)
 end
 UI.insetPanel = insetPanel
 
--- Toast : notification éphémère skinnée (haut-centre), fade ≤160 ms + son. Réutilisable (ordre ciblé
--- reçu, entrante captée, artisan favori en ligne). Remplace/complète les print de chat.
-function UI:Toast(text, icon)
-    local t = self._toast
-    if not t then
-        t = CreateFrame("Frame", "CraftingOrderToast", UIParent, "BackdropTemplate")
-        t:SetSize(330, 44); t:SetPoint("TOP", UIParent, "TOP", 0, -130)
-        t:SetFrameStrata("FULLSCREEN_DIALOG"); Skin.SkinFrameBackdrop(t)
-        t.icon = t:CreateTexture(nil, "ARTWORK"); t.icon:SetSize(28, 28); t.icon:SetPoint("LEFT", 10, 0)
-        t.icon:SetTexCoord(0.07, 0.93, 0.07, 0.93)
-        t.fs = t:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-        t.fs:SetPoint("LEFT", t.icon, "RIGHT", 8, 0); t.fs:SetPoint("RIGHT", -10, 0)
-        t.fs:SetJustifyH("LEFT"); Skin.ApplyShadow(t.fs)
-        t:Hide(); self._toast = t
-    end
-    t.icon:SetTexture(icon or Skin.tex.workorder); t.fs:SetText(text)
-    t:SetAlpha(0); t:Show()
-    if UIFrameFadeIn then UIFrameFadeIn(t, 0.16, 0, 1) else t:SetAlpha(1) end
-    if t._hideTimer then t._hideTimer:Cancel() end
-    if C_Timer then
-        t._hideTimer = C_Timer.NewTimer(4, function()
-            if UIFrameFadeOut then UIFrameFadeOut(t, 0.3, t:GetAlpha(), 0) end
-            C_Timer.After(0.3, function() t:Hide() end)
-        end)
-    end
-end
+-- Toast : UI:Toast vit dans CraftingOrderClassic_Toast.lua (la pile de toasts du jeu, AlertFrame,
+-- depuis le 2026-10-11 ; avant, un cadre à nous en haut au centre).
 
 -- ------------------------------------------------------------------
 -- Onglet Artisans (annuaire social) → CraftingOrderClassic_UI_Artisans.lua

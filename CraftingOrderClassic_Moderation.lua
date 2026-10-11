@@ -333,9 +333,8 @@ function Mod:_PromptMute(name, cnt)
         }
         StaticPopup_Show("COC_SPAM_MUTE", msg, nil, name)
     end
-    local Skin = COC.UI and COC.UI.Skin
-    pmsg((Skin and ("|T" .. Skin.tex.workorder .. ":0|t ") or "") .. msg
-        .. "  |cFFFFFFFF/co mute " .. name .. "|r")
+    -- Plus de ligne de chat à côté de la fenêtre (2026-10-11, règle `chat-output`) : elle disait la
+    -- même chose, et la détection de spam n'est pas un geste du joueur. /co mute reste dans l'aide.
 end
 
 -- /co spam [off|auto|<max> [fenêtre]] : configure la détection de spam. Sans argument → état courant.

@@ -355,7 +355,9 @@ function Orders:_OnDone(o, f, sender)
         COC.db.delivered = (COC.db.delivered or 0) + 1   -- réputation : créditée à la confirmation acheteur
         if COC.Directory then COC.Directory:AnnounceSkills() end
         if not COC.Channels or COC.Channels.IsWatched("notif_follow") then
-            if COC.Notify then COC.Notify.Emit({ chat = string.format(L["réception confirmée par %s ! crafts livrés au total : %d"], o.buyer or "?", COC.db.delivered), toast = false }) end
+            -- Un toast aussi depuis le 2026-10-11 : la ligne de chat des alertes est décochée par
+            -- défaut, et sans lui la confirmation ne disait plus rien à personne.
+            if COC.Notify then COC.Notify.Emit({ chat = string.format(L["réception confirmée par %s ! crafts livrés au total : %d"], o.buyer or "?", COC.db.delivered) }) end
         end
     end
 end
@@ -380,7 +382,9 @@ function Orders:_OnNack(message, sender)
        and (not COC.Channels or COC.Channels.IsWatched("notif_follow")) then
         local txt = string.format(L["%s a refusé ta commande : %s"], who, self:OrderName(o))
         local Skin = COC.UI and COC.UI.Skin
-        if COC.Notify then COC.Notify.Emit({ chat = txt, toast = (o.status == "declined") and txt or false, icon = Skin and Skin.tex.fail }) end
+        -- Refus ET désistement en toast (avant le 2026-10-11, le désistement n'avait que le chat,
+        -- décoché par défaut depuis).
+        if COC.Notify then COC.Notify.Emit({ chat = txt, icon = Skin and Skin.tex.fail }) end
     end
 end
 

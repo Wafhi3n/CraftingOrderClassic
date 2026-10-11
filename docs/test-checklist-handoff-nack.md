@@ -55,7 +55,7 @@ exclut EXPRÈS les commandes captées du mesh). Ce scénario vérifie que le cha
 maintenant :
 
 1. #4 reçoit une commande captée de #1 (scénario §3) mais ne peut PAS la crafter elle-même à 100 % de
-   certitude — simuler plutôt : #4 connaît un 3ᵉ artisan (compte additionnel ou `/co debug` mode solo)
+   certitude — simuler plutôt : #4 connaît un 3ᵉ artisan (compte additionnel ou mode solo, `/co solo on`)
    capable, encore hors ligne au moment de la réception.
 2. Ce 3ᵉ artisan se connecte pendant que #4 est en ligne et détient la commande captée
    (`o.captured == true`, `o.buyer ~= me()`).

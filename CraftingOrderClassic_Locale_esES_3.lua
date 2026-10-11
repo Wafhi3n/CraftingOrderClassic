@@ -26,7 +26,6 @@ local es3 = {
         "comunidad oficial marcada como círculo de artesanos: %s",
     ["Rejoins la communauté des artisans : %s — c'est là que Crafting Order trouve les autres joueurs."] =
         "Únete a la comunidad de artesanos: %s — ahí es donde Crafting Order encuentra a los demás jugadores.",
-    ["(/co circle nolink : ne plus afficher ce rappel)"] = "(/co circle nolink: no volver a mostrar este aviso)",
     ["rappel de la communauté éteint — /co circle link pour le rallumer."] =
         "aviso de la comunidad desactivado — /co circle link para reactivarlo.",
     ["rappel de la communauté rallumé."] = "aviso de la comunidad reactivado.",
@@ -202,6 +201,12 @@ local es3 = {
     -- Ligne de destinataire du salon Discord de la guilde (2026-10-10)
     ["Toute la guilde + Discord"] = "Toda la hermandad + Discord",
     ["Discord"] = "Discord",
+    -- Chat sobre (2026-10-11) : la ligne d'après une mise à jour, /co solo et /co debug à deux états
+    ["v%s installé — |cFFFFFFFF/co help|r pour les commandes."] = "v%s instalado — |cFFFFFFFF/co help|r para los comandos.",
+    ["mode solo : activé (/co solo off pour le couper)"] = "modo solo: activado (/co solo off para desactivarlo)",
+    ["mode solo : désactivé (/co solo on pour l'activer)"] = "modo solo: desactivado (/co solo on para activarlo)",
+    ["messages verbeux : activés (/co debug off pour les couper)"] = "mensajes detallados: activados (/co debug off para desactivarlos)",
+    ["messages verbeux : désactivés (/co debug on pour les activer)"] = "mensajes detallados: desactivados (/co debug on para activarlos)",
 }
 
 for k, v in pairs(es3) do L[k] = v end

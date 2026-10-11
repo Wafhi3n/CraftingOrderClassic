@@ -158,6 +158,7 @@ function COC:Status()
             p("  " .. ((d and d.RoomStatusLine and d:RoomStatusLine()) or L["canal : aucun — le réseau passe en whisper (cercles, amis, guilde)"]))
         end
     end
+    local dbg = COC.Debug and COC.Debug.StatusLine and COC.Debug:StatusLine(); if dbg then p(dbg) end   -- mode verbeux allumé
 end
 
 -- /co channel [on|off] : le canal CraftLinkNet est RETIRÉ (morcelé sur Forever, cf. docs/specs/
@@ -344,8 +345,8 @@ function COC:Help()
     print("  |cFFFFFFFF/co trust <nom>|r / |cFFFFFFFF/co untrust <nom>|r — " .. L["marquer un joueur de confiance (jamais muté automatiquement)"])
     print("  |cFFFFFFFF/co lowlevel [N|off]|r — " .. L["seuil de mute auto des persos bas niveau (défaut 5)"])
     print("  |cFFFFFFFF/co spam [off|auto|<max> [fenêtre]]|r — " .. L["réglage anti-spam : seuil, fenêtre, mute auto vs popup"])
-    print("  |cFFFFFFFF/co debug|r — |cFFFF8800" .. L["mode solo"] .. "|r : " .. L["injecte/retire un réseau fictif (artisans + commandes)"])
-    print("  |cFFFFFFFF/co verbose|r — |cFFFF8800" .. L["diag"] .. "|r : " .. L["affiche les messages d'info en coulisse (ex. « X peut faire une captée ») ; auto si COCMonitor est chargé"])
+    print("  |cFFFFFFFF/co solo [on|off]|r — |cFFFF8800" .. L["mode solo"] .. "|r : " .. L["injecte/retire un réseau fictif (artisans + commandes)"])
+    print("  |cFFFFFFFF/co debug [on|off]|r — |cFFFF8800" .. L["diag"] .. "|r : " .. L["affiche les messages d'info en coulisse (ex. « X peut faire une captée ») ; auto si COCMonitor est chargé"])
     print("  |cFFFFFFFF/co trace|r — |cFFFF8800" .. L["diag"] .. "|r : " .. L["journalise le réseau dans la SavedVariable (off | clear | dump)"])
     print("  |cFFFFFFFF/co gwroster|r — |cFFFF8800" .. L["diag"] .. "|r : " .. L["confédérés GreenWall repérés (SoD live only)"])
 end
@@ -423,12 +424,8 @@ function COC:Slash(msg)
     elseif cmd == "circle" or cmd == "cercle" then if D and D.CircleCmd then D:CircleCmd(rest) end
     elseif cmd == "note" then if D and D.ShowNoteText then D:ShowNoteText() end
     elseif cmd == "wipe"   then COC:WipeRoster()
-    elseif cmd == "debug"  then if COC.Debug then COC.Debug:Toggle() end
-    elseif cmd == "verbose" then
-        if COC.db then
-            COC.db.verbose = (not COC.db.verbose) or nil
-            p(COC.db.verbose and COC.L["messages verbeux : activés"] or COC.L["messages verbeux : désactivés"])
-        end
+    elseif cmd == "solo" then if COC.Debug then COC.Debug:SoloCmd(rest) end   -- l'ancien /co debug (Debug.lua)
+    elseif cmd == "debug" or cmd == "verbose" then if COC.Debug then COC.Debug:VerboseCmd(rest) end
     elseif diagCmd(cmd, rest) then    -- socialdiag / trace / lvldump / pricedump / trainers / geo
     elseif cmd == "version" or cmd == "ver" or cmd == "build" then if D and D.VersionCmd then D:VersionCmd(rest) end
     elseif cmd == "help"   then COC:Help()
@@ -484,7 +481,7 @@ f:SetScript("OnEvent", function(_, event, arg1)
         SLASH_CRAFTINGORDER1 = "/co"
         SLASH_CRAFTINGORDER2 = "/craftorder"
         SlashCmdList["CRAFTINGORDER"] = function(msg) COC:Slash(msg) end
-        if COC.Channels.IsWatched("notif_login") then p(COC.L["chargé — |cFFFFFFFF/co help|r pour les commandes. (Réseau global de craft — autonome.)"]) end
+        if COC.LoginLine then COC:LoginLine() end   -- une ligne après une mise à jour, sinon rien (Login.lua)
         if not CraftLink then p("|cFFFF8800" .. COC.L["la bibliothèque CraftLink n'a pas pu se charger : le réseau de l'addon est coupé (annuaire, commandes). Fais |cFFFFFFFF/reload|r ; si ça continue, réinstalle l'addon."] .. "|r") end   -- vécu le 2026-09-30 : /reload pendant une copie
     elseif event == "SKILL_LINES_CHANGED" then
         COC:OnSkillLines()

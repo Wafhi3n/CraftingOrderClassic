@@ -35,6 +35,11 @@ it and answer — **no shared guild required**. Built around a shared, embeddabl
 - **Persistence & retry** — your open orders re-broadcast periodically, are pushed to a targeted
   crafter the moment they log in, and expire after 6 h so the ledger stays clean.
 - **Minimap button** + toast notifications, all in the warm "tavern" art direction.
+- **Quiet chat** — the chat only answers what you type or click. Orders, requests read in chat,
+  follow-ups, a new version or a looted recipe come as a toast in the game's own stack (bottom of
+  the screen, where achievements and loot show) plus a sound; the chat line is a box you can tick
+  (Artisans tab, "How to alert"). At login, one line after an install or an update, nothing else.
+  Code: `CraftingOrderClassic_Toast.lua`, `_Login.lua`; rule: the public `chat-output` skill.
 
 ## Commands
 
@@ -47,7 +52,8 @@ it and answer — **no shared guild required**. Built around a shared, embeddabl
 | `/co refresh` | re-poll the directory (presence + proximity) |
 | `/co prof` | re-show the "profession orders" overlay on the native window |
 | `/co profwindow` | toggle the experimental custom profession window |
-| `/co debug` | solo mode: inject/remove a fake network (artisans + orders) for testing |
+| `/co solo [on\|off]` | solo mode: inject/remove a fake network (artisans + orders) for testing (was `/co debug` until v1.49) |
+| `/co debug [on\|off]` | verbose mode: behind-the-scenes messages in chat (was `/co verbose`, still accepted); typed alone, shows the state |
 | `/co help` | command reference |
 
 ## Install

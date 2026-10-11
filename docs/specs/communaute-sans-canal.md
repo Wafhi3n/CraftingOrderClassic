@@ -144,7 +144,7 @@ Ce que le canal portait et qui se tait sans lui :
     masquée (filtre `CHAT_MSG_WHISPER_INFORM`, lien de cette invitation, 10 s) ;
   - **une bande par cercle** dans l'onglet Artisans, au nom de la communauté, à la place de « Cercle »
     (demandé par le user) ; plafond 4 bandes ;
-  - **Confédération** visible sans GreenWall et hors `/co debug` (cause non trouvée : aucun fichier
+  - **Confédération** visible sans GreenWall et hors mode solo (`/co debug` à l'époque, `/co solo` depuis le 2026-10-11) (cause non trouvée : aucun fichier
     installé ne définit `gw.ReplicateMessage`) → exige désormais que l'addon GreenWall soit CHARGÉ ;
   - le filtre du chat passe par `ChatFrameUtil.AddMessageEventFilter` : `ChatFrame_AddMessageEventFilter`
     n'est qu'un alias de Blizzard_DeprecatedChatInfo.

@@ -137,7 +137,8 @@ local function onSelfLoot(itemLink)
         msg = msg .. " " .. string.format(L["|cFF66CCFFamis/partenaires intéressés :|r %s (|cFFFFFFFF/co gift <nom>|r)"], table.concat(missing, ", "))
     end
 
-    pmsg(msg)
+    -- Un toast seulement : un plan ramassé n'est pas un geste vers l'addon, et la ligne de chat qui
+    -- doublait le toast est partie le 2026-10-11 (règle `chat-output`). /co gift reste dans le toast.
     if COC.UI and COC.UI.Toast then
         local Skin = COC.UI.Skin
         COC.UI:Toast(msg, Skin and Skin.tex.workorder)

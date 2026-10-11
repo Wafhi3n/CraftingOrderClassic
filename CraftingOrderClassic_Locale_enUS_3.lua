@@ -26,7 +26,6 @@ local en3 = {
         "official community marked as your crafters' circle: %s",
     ["Rejoins la communauté des artisans : %s — c'est là que Crafting Order trouve les autres joueurs."] =
         "Join the crafters' community: %s — that's where Crafting Order finds other players.",
-    ["(/co circle nolink : ne plus afficher ce rappel)"] = "(/co circle nolink: stop showing this reminder)",
     ["rappel de la communauté éteint — /co circle link pour le rallumer."] =
         "community reminder off — /co circle link turns it back on.",
     ["rappel de la communauté rallumé."] = "community reminder back on.",
@@ -202,6 +201,12 @@ local en3 = {
     -- Ligne de destinataire du salon Discord de la guilde (2026-10-10)
     ["Toute la guilde + Discord"] = "Whole guild + Discord",
     ["Discord"] = "Discord",   -- rappel du destinataire : « Whole guild + Discord »
+    -- Chat sobre (2026-10-11) : la ligne d'après une mise à jour, /co solo et /co debug à deux états
+    ["v%s installé — |cFFFFFFFF/co help|r pour les commandes."] = "v%s installed — |cFFFFFFFF/co help|r for commands.",
+    ["mode solo : activé (/co solo off pour le couper)"] = "solo mode: on (/co solo off to turn it off)",
+    ["mode solo : désactivé (/co solo on pour l'activer)"] = "solo mode: off (/co solo on to turn it on)",
+    ["messages verbeux : activés (/co debug off pour les couper)"] = "verbose messages: on (/co debug off to turn them off)",
+    ["messages verbeux : désactivés (/co debug on pour les activer)"] = "verbose messages: off (/co debug on to turn them on)",
 }
 
 for k, v in pairs(en3) do L[k] = v end

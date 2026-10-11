@@ -172,6 +172,11 @@ Les commandes existantes restent, et agissent sur les mêmes cases que l'interfa
   de 108 à 88 px (« Rafraîchir l'annuaire » part dans la barre du bas de la fenêtre), « En sourdine »
   quitte la pile SOURCE et « Ajoutés » n'y figure qu'à partir d'un joueur ajouté. Le contenu de la
   liste et ses cases ne changent pas, et elle défile toujours quand elle dépasse.
+- 2026-10-11, **user** (règle `chat-output` du plugin public, née d'un commentaire CurseForge sur
+  LeyLines) : « Ligne dans le chat » et « Message à la connexion » sont DÉCOCHÉES par défaut ; le
+  bandeau et le son restent. Qui les avait cochées à la main les garde (une case n'est écrite que
+  sur un clic). Le bandeau est désormais le toast du jeu (AlertFrame, `CraftingOrderClassic_Toast.lua`),
+  et la connexion dit une ligne après une installation ou une mise à jour (`_Login.lua`).
 
 ## Critères d'acceptation
 
