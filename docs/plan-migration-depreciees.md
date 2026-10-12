@@ -129,15 +129,17 @@ appel, donc ce secours est du code mort, à retirer quand on y repasse.
    Il vérifie que chaque aide atteint la fonction moderne. Rappel de la règle de `tests\` : ce test
    n'arrive sur `master` que le jour où la branche de COC est fusionnée.
 5. **La preuve en jeu**, au banc (`.\deploy.ps1 -Banc fix/sortie-depreciees`) :
-   1. n'activer que nos addons : Questie, Auctionator et les autres peuvent dépendre des alias, et ce
-      test n'est pas le leur ;
+   1. n'activer que nos addons, plus `!BugGrabber` et `BugSack` pour lire les erreurs : Questie,
+      Auctionator et les autres peuvent dépendre des alias, et ce test n'est pas le leur ;
    2. `/console loadDeprecationFallbacks 0`, puis `/reload`. Les modules lisent le réglage à leur
       chargement. Que `/reload` suffise est **à confirmer** : `/dump SendChatMessage` doit rendre `nil` ;
    3. refaire chaque geste touché : envoi des réactifs, don de LootAlert, ASKE, chuchotement à soi du
       lien d'invitation, maj-clic d'un lien dans les deux docks et dans le suivi, les deux boutons
       « Chuchoter », la liste des recettes manquantes ; puis `!BugGrabber` doit être vide de COC et de
       CraftLink ;
-   4. remettre `/console loadDeprecationFallbacks 1`, puis `/reload` ;
+   4. remettre `/console loadDeprecationFallbacks 1`, puis `/reload`. Le réglage est gardé dans
+      `WTF\Config.wtf`, et ce dossier sert aux deux comptes du banc : vérifier qu'il n'y contient plus
+      `loadDeprecationFallbacks "0"`, sinon l'autre compte démarre sans les alias ;
    5. n'écrire dans `docs/verif-registre.md` que ce qui a été vu.
 6. **Facultatif, un garde-fou** : un test de `tests\` qui cherche les noms dépréciés nus dans COC.
    La liste peut se générer depuis `Documentation\` à chaque maj du client. Même règle de date
