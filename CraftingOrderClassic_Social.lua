@@ -323,7 +323,7 @@ end
 -- =========================================================================
 local function discover(unit)
     if not (unit and COC.Directory and UnitIsPlayer and UnitIsPlayer(unit)) then return end
-    if UnitIsUnit and UnitIsUnit(unit, "player") then return end
+    if COC.Api.IsMe(unit) ~= false then return end   -- moi, ou on ne peut pas le savoir : rien
     -- Whisper addon-message ne traverse pas la faction adverse → on ne ping que les alliés potentiels.
     if UnitCanCooperate and not UnitCanCooperate("player", unit) then return end
     local name = COC.Api.UnitNameSafe(unit)
