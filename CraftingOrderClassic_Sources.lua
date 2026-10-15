@@ -245,7 +245,7 @@ end
 
 -- Tout le catalogue du métier MOINS ce que ce personnage sait déjà faire. Deux témoins, et les
 -- deux comptent : le registre de la lib (persisté, alimenté à chaque ouverture de la fenêtre de
--- métier) et `IsSpellKnown`, qui seul voit les capacités APPRISES MAIS ABSENTES de la liste de
+-- métier) et le grimoire (`COC.Api.IsSpellInSpellBook`), qui seul voit les capacités APPRISES MAIS ABSENTES de la liste de
 -- recettes (Prospection, Broyage, Fonte, Désenchantement…). Sans le second, on annoncerait comme
 -- manquant ce que le joueur utilise tous les jours.
 --
@@ -337,7 +337,7 @@ function S:MissingRecipes(profKey)
     local known = (lib.MyKnownSet and lib:MyKnownSet(profKey)) or {}
     local out = {}
     for _, spellID in ipairs(lib:GetRecipes(profKey) or {}) do
-        if not known[spellID] and not (IsSpellKnown and IsSpellKnown(spellID))
+        if not known[spellID] and not COC.Api.IsSpellInSpellBook(spellID)
            and not self:IsOtherSideTwin(profKey, spellID) then
             local itemID = lib.RecipeProduct and lib:RecipeProduct(profKey, spellID) or nil
             out[#out + 1] = {

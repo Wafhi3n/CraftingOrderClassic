@@ -130,7 +130,7 @@ local function profitRow(i)
     row:RegisterForClicks("LeftButtonUp")
     row:SetScript("OnClick", function(r)
         if IsShiftKeyDown() then
-            if r.rlink and ChatEdit_InsertLink then ChatEdit_InsertLink(r.rlink) end
+            if r.rlink then COC.Api.InsertChatLink(r.rlink) end
         else
             openRecipe(r.sid)
         end

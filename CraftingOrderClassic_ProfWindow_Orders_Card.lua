@@ -192,7 +192,7 @@ function PW:_CardActions(card, it)
         PW:RefreshOrders(); if COC.UI then COC.UI:Refresh() end
     end)
     card.whisper:Show()
-    card.whisper:SetScript("OnClick", function() if ChatFrame_SendTell then ChatFrame_SendTell(o.buyer) end end)
+    card.whisper:SetScript("OnClick", function() COC.Api.SendTell(o.buyer) end)
     card.invite:SetScript("OnClick", function() if COC.Api.InviteUnit and o.buyer then COC.Api.InviteUnit(o.buyer) end end)
     card:SetScript("OnMouseUp", function(_, btn)
         if btn ~= "RightButton" then return end

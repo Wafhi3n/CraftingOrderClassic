@@ -98,7 +98,7 @@ function Loot:GiftCmd(arg)
         pmsg(string.format(L["|cFFFFFFFF%s|r n'est pas dans la liste des amis/partenaires en attente pour ce plan."], name))
         return
     end
-    SendChatMessage(string.format(L["Salut ! J'ai looté %s (%s) — tu ne le connais pas encore, ça t'intéresse ?"],
+    COC.Api.SendChatMessage(string.format(L["Salut ! J'ai looté %s (%s) — tu ne le connais pas encore, ça t'intéresse ?"],
         g.itemLink, g.recipeName), "WHISPER", nil, target)
     pmsg(string.format(L["don proposé à |cFFFFFFFF%s|r pour %s."], target, g.itemName))
 end

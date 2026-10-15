@@ -67,8 +67,11 @@ function Ask:Request(label, token)
     -- Le partenaire d'echange passe par le garde-fou des valeurs SECRETES comme toute autre unite :
     -- un nom secret ferait lever la comparaison juste en dessous, avant meme le whisper.
     local target = COC.Api.UnitNameSafe("NPC")
-    if not (target and SendChatMessage) then
+    if not target then
         return traceAsk("envoi annulé — aucun partenaire d'échange lisible")
+    end
+    if not Api.CanSendChat() then
+        return traceAsk("envoi annulé — aucune fonction d'envoi de chat sur ce client")
     end
     local now = GetTime and GetTime() or 0
     -- Depuis T4 le clic sert AUSSI à filtrer la liste native : on clique donc bien plus souvent, et
@@ -78,7 +81,7 @@ function Ask:Request(label, token)
         return traceAsk("envoi avalé — moins de 3 s depuis la demande précédente (" .. tostring(token) .. ")")
     end
     lastAsk = now
-    SendChatMessage(string.format(
+    Api.SendChatMessage(string.format(
         L["Mets ton objet « %s » dans l'emplacement du bas de la fenêtre d'échange (« ne sera pas échangé ») — je l'enchante, tu le gardes."],
         label), "WHISPER", nil, target)
     -- Étage 2 : le même clic porte le verbe ASKE (invite un-clic si le partenaire a COC). Toujours

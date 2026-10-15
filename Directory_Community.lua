@@ -208,10 +208,11 @@ end
 
 local function whisperSelf(msg, ticket)
     local me = COC.Api.PlayerName()
-    if not (_G.SendChatMessage and me and me ~= "?") then return false end
+    if not (COC.Api.CanSendChat() and me and me ~= "?") then return false end
     if not echoFilter then echoFilter = COC.Api.AddChatFilter("CHAT_MSG_WHISPER_INFORM", hideSelfEcho) end
     selfEcho = { ticket = ticket, at = (GetTime and GetTime()) or 0 }
-    return (pcall(_G.SendChatMessage, msg, "WHISPER", nil, me))
+    local ok, sent = pcall(COC.Api.SendChatMessage, msg, "WHISPER", nil, me)
+    return ok and sent == true
 end
 
 -- Chaque décision du rappel de connexion laisse sa raison dans /co trace : le 2026-09-28, un lien

@@ -155,7 +155,7 @@ function Tracker:_PaintObjective(r, obj, y)
     r.onClick = function()
         if not (IsShiftKeyDown and IsShiftKeyDown() and obj.itemID and COC.Api.GetItemInfo) then return end
         local link = select(2, COC.Api.GetItemInfo(obj.itemID))
-        if link and ChatEdit_InsertLink then ChatEdit_InsertLink(link) end
+        if link then COC.Api.InsertChatLink(link) end
     end
     return r.text:GetStringWidth() + IND_OBJ
 end

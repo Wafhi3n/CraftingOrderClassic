@@ -35,12 +35,13 @@ A.InviteUnit         = pick(C_PartyInfo and C_PartyInfo.InviteUnit, _G.InviteUni
 A.GetSpellLink       = pick(C_Spell and C_Spell.GetSpellLink,      _G.GetSpellLink)
 A.GetSpellTexture    = pick(C_Spell and C_Spell.GetSpellTexture,   _G.GetSpellTexture)
 
--- `GetInventorySlotInfo` (id d'emplacement, texture, checkRelic) : la globale est VIVANTE sur le
--- client (mesuré par COCProbe le 2026-09-21, build 69913), mais le FrameXML de Forever ne l'appelle
--- plus — Blizzard est passé à `C_PaperDollInfo.GetInventorySlotInfo`, de signature IDENTIQUE. On
--- prend la moderne d'abord, comme partout ici : si la globale disparaît un jour, trois
--- fonctionnalités ne tomberont pas en silence (silhouette d'enchant, résolution d'emplacement, pose
--- verrouillée de « demande-lui une pièce »).
+-- `GetInventorySlotInfo` (id d'emplacement, texture, checkRelic) : la globale répond sur le client
+-- (mesuré par COCProbe le 2026-09-21, build 69913), mais seulement comme ALIAS posé par
+-- `Deprecated_PaperDoll`, que le réglage `loadDeprecationFallbacks` peut ne pas charger et que
+-- Blizzard annonce retiré « à la prochaine extension ». Le FrameXML de Forever appelle
+-- `C_PaperDollInfo.GetInventorySlotInfo`, de signature IDENTIQUE. On prend la moderne d'abord : si
+-- l'alias disparaît, trois fonctionnalités ne tomberont pas en silence (silhouette d'enchant,
+-- résolution d'emplacement, pose verrouillée de « demande-lui une pièce »).
 A.GetInventorySlotInfo = pick(C_PaperDollInfo and C_PaperDollInfo.GetInventorySlotInfo,
                               _G.GetInventorySlotInfo)
 
@@ -268,6 +269,61 @@ function A.AddChatFilter(event, fn)
     if not add then return false end
     add(event, fn)
     return true
+end
+
+-- ---------------------------------------------------------------- chat et grimoire : hors des alias
+-- `SendChatMessage`, `ChatEdit_InsertLink`, `ChatFrame_SendTell` et `IsSpellKnown` ne sont plus, sur
+-- Forever, que des ALIAS posés par les modules `Blizzard_Deprecated*` (source 70374), chargés
+-- seulement si le réglage `loadDeprecationFallbacks` est actif, et annoncés retirés « à la prochaine
+-- extension ». Ce jour-là, un appel nu lève au clic, et un appel gardé (`if ChatEdit_InsertLink`)
+-- s'éteint en silence. Plan : docs/plan-migration-depreciees.md (branche du même nom).
+-- On cherche la fonction À L'APPEL, pas au chargement : une capture figerait l'originale et
+-- contournerait le crochet qu'un autre addon pose plus tard sur `ChatFrameUtil` ou `C_ChatInfo`.
+
+local function chatSender()
+    return (C_ChatInfo and C_ChatInfo.SendChatMessage) or _G.SendChatMessage
+end
+
+function A.CanSendChat() return chatSender() ~= nil end
+
+-- Même signature que l'historique (message, type, langue, cible ou index de canal). PROTÉGÉE comme
+-- elle : à n'appeler que sous un geste du joueur. Rend faux si aucune fonction d'envoi n'existe.
+function A.SendChatMessage(msg, chatType, languageID, target)
+    local send = chatSender()
+    if not send then return false end
+    send(msg, chatType, languageID, target)
+    return true
+end
+
+-- Maj-clic : insère un lien dans la barre de chat ouverte. Rend ce que rend Blizzard (vrai si inséré).
+function A.InsertChatLink(link)
+    if not link then return false end
+    local util = _G.ChatFrameUtil
+    local insert = (util and util.InsertLink) or _G.ChatEdit_InsertLink
+    return insert and insert(link) or false
+end
+
+-- Ouvre la barre de chat sur un chuchotement à `name`, sans rien envoyer.
+function A.SendTell(name)
+    if not name then return false end
+    local util = _G.ChatFrameUtil
+    local tell = (util and util.SendTell) or _G.ChatFrame_SendTell
+    if not tell then return false end
+    tell(name)
+    return true
+end
+
+-- Le sort est-il dans le grimoire du joueur ? Équivalent EXACT de l'alias `IsSpellKnown(id)` :
+-- `includeOverrides = false` écrit en dur, car la doc générée lui donne `true` par défaut et
+-- l'omettre changerait la réponse sans bruit. (Ouvert, à mesurer : une recette apprise compte-t-elle
+-- comme « dans le grimoire » ? On garde l'équivalent exact tant que ce n'est pas vu.)
+function A.IsSpellInSpellBook(spellID)
+    if not spellID then return false end
+    local book = C_SpellBook and C_SpellBook.IsSpellInSpellBook
+    local bank = Enum and Enum.SpellBookSpellBank and Enum.SpellBookSpellBank.Player
+    if book and bank then return book(spellID, bank, false) and true or false end
+    if _G.IsSpellKnown then return _G.IsSpellKnown(spellID) and true or false end
+    return false
 end
 
 -- ---------------------------------------------------------------- valeurs SECRÈTES

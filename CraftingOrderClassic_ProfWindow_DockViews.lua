@@ -284,7 +284,7 @@ local function missRow(i)
     row:RegisterForClicks("LeftButtonUp")
     row:SetScript("OnClick", function(r)
         if IsShiftKeyDown() then
-            if r.rlink and ChatEdit_InsertLink then ChatEdit_InsertLink(r.rlink) end
+            if r.rlink then COC.Api.InsertChatLink(r.rlink) end
         elseif r.pin and PW._SetNpcPin then
             PW:_SetNpcPin(r.pin)
         end

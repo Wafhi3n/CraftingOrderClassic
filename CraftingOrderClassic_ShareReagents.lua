@@ -139,7 +139,7 @@ function SR:_DoSend()
     local chatType, chanIdx = chatTarget(self.frame.dd and self.frame.dd.value)
     if not chatType then pmsg(L["choisis un canal valide."]); return end
     for _, line in ipairs(buildLines(title, items)) do
-        SendChatMessage(line, chatType, nil, chanIdx)
+        COC.Api.SendChatMessage(line, chatType, nil, chanIdx)
     end
     self.frame:Hide()
 end
