@@ -1,20 +1,23 @@
 # Craftsman's Writ → une commande d'artisan
 
-> État : **brouillon** du 2026-10-16 · Idée du user, mise en forme par l'agent · Rien de codé.
-> Mesures préalables à faire (critères 0 à 2) avant tout code ; D1 à D5 à valider par le user. Les Waylaid Crate, l'autre moitié du
-> système, auront leur propre spec quand on saura ce qu'une caisse demande (voir « Ce qu'on ne fait
-> pas »).
+> État : **brouillon** du 2026-10-16 · Idée du user, mise en forme par l'agent · Critères 0 et 1
+> **tenus** le 2026-10-16 (observés en jeu par le user) ; le critère 2 reste à voir et ne bloque
+> plus que l'infobulle · D2 à D5 à valider par le user · Plan en fin de fichier, T1 en cours sur
+> `feat/writs-aca`. Les Waylaid Crate, l'autre moitié du système, auront leur propre spec quand on
+> saura ce qu'une caisse demande (voir « Ce qu'on ne fait pas »).
 
 ## Le problème
 
 WoW: Forever a ajouté une réputation de métiers, l'**Azeroth Commerce Authority** (ACA). Un joueur
 reçoit un **Craftsman's Writ** : un parchemin qui lance une quête journalière. La quête demande un
 objet fabriqué par un artisan, à rapporter à un PNJ (dit par le user le 2026-10-16). L'objet est
-pris parmi 150, sur cinq métiers : Alchimie, Forge, Ingénierie, Travail du cuir, Couture. Le user
-**suppose** qu'il est tiré au hasard : c'est à confirmer (critère 0), et toute la valeur de cette
-spec en dépend.
+pris parmi 150, sur cinq métiers : Alchimie, Forge, Ingénierie, Travail du cuir, Couture. Le tirage
+**ignore les métiers du joueur** (critère 0, vu par le user : un enchanteur-forgeron a reçu un writ
+d'Alchimie).
 
-Si le tirage ignore les métiers du joueur, l'objet n'est la plupart du temps **pas de son métier**. Aujourd'hui il crie sur Commerce,
+L'objet n'est donc la plupart du temps **pas de son métier**. Il peut l'acheter à l'hôtel des ventes
+(une potion achetée là a été acceptée : critère 1) ; quand l'HdV n'en a pas ou le vend cher, il ne
+lui reste qu'à trouver un artisan. Aujourd'hui il crie sur Commerce,
 explique ce qu'il veut, cherche quelqu'un qui sait le faire, ou jette le writ. C'est exactement une
 commande d'artisan, passée par un PNJ, et COC sait déjà dire qui connaît quelle recette et porter une
 commande jusqu'à lui.
@@ -29,7 +32,7 @@ Ce qu'on sait du système, lu le 2026-10-16 dans deux pages Wowhead enregistrée
 | Writs | objets 264011 à 264160, chacun lance une quête journalière (94004 à 94360) |
 | Paliers | Journeyman : 45 writs, 75 de réputation · Expert : 60, 125 · Artisan : 45, 200 |
 | Réputation | deux factions (2586, 2587), qui montent ensemble ; leurs noms ne sont pas connus |
-| Objets demandés | 149 sur 150 retrouvés par leur nom anglais dans les données CraftLink ; reste « Potion of Demonslaying » (sans doute l'Elixir of Demonslaying, 9224, renommé) |
+| Objets demandés | les 150 retrouvés par leur nom anglais dans les pages Forever des métiers : 147 tels quels, 3 à une orthographe près (« Ogre's » / « Ogre », « Demonslaying » / « Demon Slaying », « Adjuster » / « Adjustor ») ; un nom désigne deux objets (« Golden Scale Gauntlets », 9366 et 217273) |
 | Autres | « Sealed Craftsman's Writ » (248206), sans doute le contenant qui donne un writ ; objet 284584 en récompense de certains writs, inconnu |
 
 ## Ce qu'on veut
@@ -70,8 +73,12 @@ Ce qu'on sait du système, lu le 2026-10-16 dans deux pages Wowhead enregistrée
 
 ## Cas particuliers
 
-- **Objet demandé inconnu de CraftLink** (aujourd'hui un seul, peut-être zéro) : l'infobulle nomme
-  l'objet sans ligne « qui sait le faire », et l'onglet Commande ne le propose pas. Pas d'erreur.
+- **Objet demandé inconnu de CraftLink** (aucun aujourd'hui, mais les données de recettes bougent
+  pendant la bêta) : l'infobulle nomme l'objet sans ligne « qui sait le faire », et l'onglet
+  Commande ne le propose pas. Pas d'erreur.
+- **Deux objets du même nom** (« Golden Scale Gauntlets », deux recettes de forge) : la table garde
+  les deux. Quête acceptée, son objectif dit lequel est demandé ; writ pas encore ouvert, « qui sait
+  le faire » compte les deux recettes.
 - **Un writ que la table ne connaît pas** (Blizzard en ajoute un) : ignoré, sans erreur ni ligne.
 - **Le writ disparaît du sac à l'ouverture** et la quête prend le relais : un même writ ne doit
   jamais compter deux fois (sac + journal).
@@ -88,17 +95,19 @@ Ce qu'on sait du système, lu le 2026-10-16 dans deux pages Wowhead enregistrée
 
 ## Décisions
 
-- **D1 (proposée par l'agent, à valider par le user)** : on commence par les writs, en partant de
-  « writ → commande ». Elle repose sur ce que le user a dit le 2026-10-16 : « le writ demande un
-  objet, sous forme de quête, qu'un artisan doit fabriquer (je suppose au hasard) et à rapporter à
-  un PNJ ». Deux choses restent à voir (critères 0 et 1). Si les writs ne tombent que dans les
-  métiers du joueur, ou si l'objet d'un autre joueur est refusé, cette spec tombe et on revient à
-  « aider le porteur à le fabriquer lui-même ».
+- **D1 (proposée par l'agent, conditions tenues le 2026-10-16)** : on commence par les writs, en
+  partant de « writ → commande ». Elle repose sur ce que le user a dit le 2026-10-16 : « le writ
+  demande un objet, sous forme de quête, qu'un artisan doit fabriquer et à rapporter à un PNJ », puis
+  sur ses deux observations en jeu : le tirage ignore les métiers du joueur, et un objet acheté à
+  l'HdV est accepté (critères 0 et 1).
 - **D2 (proposée par l'agent)** : writ, quête, objet demandé et palier viennent d'une **table
   générée** (150 lignes, identifiants seulement), tirée des pages Wowhead et des noms anglais de
   CraftLink, rangée dans COC. Pourquoi : les noms sont traduits, et rien ne dit encore que
-  l'infobulle du writ porte un lien vers l'objet (critère 2). Si le journal de quêtes rend l'objet
-  demandé par son identifiant, on le lit en jeu et la table ne sert plus qu'au writ pas encore ouvert.
+  l'infobulle du writ porte un lien vers l'objet (critère 2). La table sert donc quoi que dise le
+  critère 2. Si le journal de quêtes rend l'objet demandé par son identifiant, on le lit en jeu pour
+  la quête acceptée, et la table ne sert plus qu'au writ pas encore ouvert. Les identifiants viennent
+  des pages **Forever** des métiers, jamais des noms de Classic : Forever a réattribué des
+  identifiants d'objets (voir l'en-tête de `CraftingOrderClassic_Sources.lua`).
 - **D3 (proposée par l'agent)** : la table reste dans COC, pas dans CraftLink. Un seul dépôt touché,
   pas de lib embarquée à resynchroniser, et les writs sont un usage de COC, pas une donnée de métier.
 - **D4 (proposée par l'agent)** : deux surfaces seulement, l'infobulle (lecture) et l'onglet Commande
@@ -113,9 +122,14 @@ Ce qu'on sait du système, lu le 2026-10-16 dans deux pages Wowhead enregistrée
 0. [humain] Sur un personnage qui a deux métiers de fabrication, les writs reçus (ou ce que donne un
    « Sealed Craftsman's Writ ») viennent-ils des cinq métiers, ou seulement des siens ? Le guide ACA
    le dit peut-être, sans se connecter. **Seulement des siens : la spec s'arrête (D1).**
+   → **Tenu le 2026-10-16** (vu par le user) : un personnage enchanteur et forgeron a reçu un writ
+   d'Alchimie.
 1. [humain] Deux comptes. A ouvre un writ (quête acceptée, objectif à 0/1 : c'est le témoin). B
    fabrique l'objet demandé et le donne à A par l'échange. L'objectif de A passe à 1/1, et A rend la
    quête au PNJ. Noter le PNJ et l'endroit. **Si ça échoue, la spec s'arrête (D1).**
+   → **Tenu le 2026-10-16** (vu par le user), sous une autre forme : la potion du writ achetée à
+   l'hôtel des ventes a été acceptée. L'objet n'a donc pas à être fabriqué par le porteur. L'essai à
+   deux comptes reviendra avec le critère 10 ; le PNJ et l'endroit restent à noter.
 2. [humain] Sur un client en français, l'infobulle d'un writ pas encore ouvert : quelles lignes,
    l'objet est-il nommé, est-ce un lien ? Et la même chose pour la quête acceptée, dans le journal du
    jeu.
@@ -168,3 +182,16 @@ la page source et la date de sa génération, pour qu'on sache quand la refaire.
 - Skills : `wow-addon-dev:wow-forever-api` (infobulles et journal de quêtes sur Forever),
   `wow-addon-dev:chat-output`, `coc-native-ui` (onglet Commande), `craftlink-data-pipeline` (noms
   anglais canoniques).
+
+## Plan (2026-10-16)
+
+Une tâche par séance, chacune avec ses critères. Les deux branches `feat/writs-aca` (COC et
+outillage, pour `tests/test_writs.lua`) atterrissent le même jour.
+
+- **T1 — la table et sa lecture** : le générateur (`tools/gen_writs.lua`, page de recherche Wowhead
+  en argument), le fichier de données généré, le module qui le lit (writ → quête, objet, palier ;
+  quête → writ). Critère 3.
+- **T2 — « qui sait le faire »**, et un writ compté une seule fois entre le sac et le journal.
+  Critères 4 et 5.
+- **T3 — l'infobulle**, après le critère 2. Critères 9 et 11.
+- **T4 — l'onglet Commande**, après validation de D4 par le user. Critères 6, 7 et 10.
