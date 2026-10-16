@@ -3,8 +3,10 @@ ignore:
   - CLAUDE.md
   - CURSEFORGE.md
   - .gitignore
+  - .gitattributes
   - .pkgmeta
   - .github
   - docs
+  - tools
   - Libs/CraftLink-1.0/Data/Curated
   - Libs/CraftLink-1.0/tools
