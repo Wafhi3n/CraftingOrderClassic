@@ -32,7 +32,7 @@ Ce qu'on sait du système, lu le 2026-10-16 dans deux pages Wowhead enregistrée
 | Writs | objets 264011 à 264160, chacun lance une quête journalière (94004 à 94360) |
 | Paliers | Journeyman : 45 writs, 75 de réputation · Expert : 60, 125 · Artisan : 45, 200 |
 | Réputation | deux factions (2586, 2587), qui montent ensemble ; leurs noms ne sont pas connus |
-| Objets demandés | les 150 retrouvés par leur nom anglais dans les pages Forever des métiers : 147 tels quels, 3 à une orthographe près (« Ogre's » / « Ogre », « Demonslaying » / « Demon Slaying », « Adjuster » / « Adjustor ») ; un nom désigne deux objets (« Golden Scale Gauntlets », 9366 et 217273) |
+| Objets demandés | les 150 retrouvés par leur nom anglais dans les pages Forever des métiers : 147 à la casse près (« Pearl-Handled » / « Pearl-handled »), 3 à une orthographe près (« Ogre's » / « Ogre », « Demonslaying » / « Demon Slaying », « Adjuster » / « Adjustor ») ; un nom désigne deux objets (« Golden Scale Gauntlets », 9366 et 217273) |
 | Autres | « Sealed Craftsman's Writ » (248206), sans doute le contenant qui donne un writ ; objet 284584 en récompense de certains writs, inconnu |
 
 ## Ce qu'on veut
@@ -159,9 +159,15 @@ Ce qu'on sait du système, lu le 2026-10-16 dans deux pages Wowhead enregistrée
 
 ## Contrat
 
-Rien sur le réseau (voir « Ce qu'on ne fait pas »), rien de neuf dans les SavedVariables. La table
-générée est interne à COC : `itemID du writ → { quête, objet demandé, palier }`. Elle porte en tête
-la page source et la date de sa génération, pour qu'on sache quand la refaire.
+Rien sur le réseau (voir « Ce qu'on ne fait pas »), rien de neuf dans les SavedVariables.
+
+- **La table générée** (`CraftingOrderClassic_Writs_Data.lua`, par `tools/gen_writs.lua`), interne à
+  COC : `[writ] = { quête, palier, objet demandé [, autre objet du même nom] }`, palier 1 Journeyman,
+  2 Expert, 3 Artisan. Elle porte en tête la page source et la date de sa génération, pour qu'on
+  sache quand la refaire. Le métier n'y est pas : un objet peut en avoir deux (Gordok Ogre Suit), il
+  se déduit en jeu (`Orders:ProfForItem`).
+- **La lecture** (`COC.Writs`, entrées partagées, à lire seulement) : `Info(writ)` et
+  `ForQuest(quête)` rendent `{ writ, quest, tier, rep, items }` ou `nil` ; `All()` pour parcourir.
 
 ## Questions ouvertes
 
