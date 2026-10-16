@@ -157,6 +157,18 @@ function A.SelectQuestLogEntry(index)
     if _G.SelectQuestLogEntry then return _G.SelectQuestLogEntry(index) end
 end
 
+-- Une quête par son IDENTIFIANT, sans toucher à la sélection du journal (writs : _Writs.lua).
+-- Moderne seulement : sans C_QuestLog, rien n'est « en cours » ni « remplie », et l'appelant n'a pas
+-- à distinguer ce cas. Booléens stricts.
+function A.IsOnQuest(questID)
+    local f = C_QuestLog and C_QuestLog.IsOnQuest
+    return (questID and f and f(questID)) and true or false
+end
+function A.IsQuestComplete(questID)
+    local f = C_QuestLog and C_QuestLog.IsComplete
+    return (questID and f and f(questID)) and true or false
+end
+
 -- ---------------------------------------------------------------- événements
 
 -- `RegisterEvent` LÈVE une erreur sur un événement que le client ne connaît pas, au lieu de
