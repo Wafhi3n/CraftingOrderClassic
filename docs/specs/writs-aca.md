@@ -2,9 +2,10 @@
 
 > État : **brouillon** du 2026-10-16 · Idée du user, mise en forme par l'agent · Critères 0 et 1
 > **tenus** le 2026-10-16 (observés en jeu par le user) ; le critère 2 reste à voir et ne bloque
-> plus que l'infobulle · D2 à D5 à valider par le user · Plan en fin de fichier : **T1 fait** le
-> 2026-10-16 sur `feat/writs-aca` (COC et outillage), critère 3 tenu en test. Les Waylaid Crate, l'autre moitié du système, auront leur propre spec quand on
-> saura ce qu'une caisse demande (voir « Ce qu'on ne fait pas »).
+> plus que l'infobulle · D2 à D5 à valider par le user · Plan en fin de fichier : **T1 et T2
+> faits** le 2026-10-16 sur `feat/writs-aca` (COC et outillage), critères 3, 4 et 5 tenus en test,
+> rien de visible en jeu encore. Les Waylaid Crate, l'autre moitié du système, auront leur propre
+> spec quand on saura ce qu'une caisse demande (voir « Ce qu'on ne fait pas »).
 
 ## Le problème
 
@@ -168,6 +169,11 @@ Rien sur le réseau (voir « Ce qu'on ne fait pas »), rien de neuf dans les Sav
   se déduit en jeu (`Orders:ProfForItem`).
 - **La lecture** (`COC.Writs`, entrées partagées, à lire seulement) : `Info(writ)` et
   `ForQuest(quête)` rendent `{ writ, quest, tier, rep, items }` ou `nil` ; `All()` pour parcourir.
+  `WhoCanMake(entrée)` rend `{ recipes, me, alts, crafters, online }` (moi, mes rerolls par leur
+  nom, les autres artisans de l'annuaire en ligne d'abord), ou `nil` si aucun objet de l'entrée
+  n'est connu de CraftLink. `Held()` rend les writs portés, un par writ
+  (`{ entry, inBag, onQuest, done }`), et `WantedItems()` les objets encore à commander
+  (objet → entrée).
 
 ## Questions ouvertes
 
@@ -196,8 +202,10 @@ outillage, pour `tests/test_writs.lua`) atterrissent le même jour.
 
 - **T1 — la table et sa lecture** : le générateur (`tools/gen_writs.lua`, page de recherche Wowhead
   en argument), le fichier de données généré, le module qui le lit (writ → quête, objet, palier ;
-  quête → writ). Critère 3.
+  quête → writ). Critère 3. **Fait le 2026-10-16.**
 - **T2 — « qui sait le faire »**, et un writ compté une seule fois entre le sac et le journal.
-  Critères 4 et 5.
+  Critères 4 et 5. **Fait le 2026-10-16** : la quête se lit par son identifiant
+  (`C_QuestLog.IsOnQuest` / `IsComplete`, présentes dans la doc de l'interface de Forever ; jamais
+  appelées en jeu par COC jusqu'ici, à voir au premier test en jeu).
 - **T3 — l'infobulle**, après le critère 2. Critères 9 et 11.
 - **T4 — l'onglet Commande**, après validation de D4 par le user. Critères 6, 7 et 10.
