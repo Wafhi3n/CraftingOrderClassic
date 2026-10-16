@@ -1,7 +1,7 @@
 # Craftsman's Writ → une commande d'artisan
 
 > État : **brouillon** du 2026-10-16 · Idée du user, mise en forme par l'agent · Rien de codé.
-> Mesures préalables à faire (critères 1 et 2) avant tout code. Les Waylaid Crate, l'autre moitié du
+> Mesures préalables à faire (critères 0 à 2) avant tout code ; D1 à D5 à valider par le user. Les Waylaid Crate, l'autre moitié du
 > système, auront leur propre spec quand on saura ce qu'une caisse demande (voir « Ce qu'on ne fait
 > pas »).
 
@@ -10,10 +10,11 @@
 WoW: Forever a ajouté une réputation de métiers, l'**Azeroth Commerce Authority** (ACA). Un joueur
 reçoit un **Craftsman's Writ** : un parchemin qui lance une quête journalière. La quête demande un
 objet fabriqué par un artisan, à rapporter à un PNJ (dit par le user le 2026-10-16). L'objet est
-tiré **au hasard** parmi 150, sur cinq métiers : Alchimie, Forge, Ingénierie, Travail du cuir,
-Couture.
+pris parmi 150, sur cinq métiers : Alchimie, Forge, Ingénierie, Travail du cuir, Couture. Le user
+**suppose** qu'il est tiré au hasard : c'est à confirmer (critère 0), et toute la valeur de cette
+spec en dépend.
 
-La plupart du temps, l'objet n'est donc **pas de son métier**. Aujourd'hui il crie sur Commerce,
+Si le tirage ignore les métiers du joueur, l'objet n'est la plupart du temps **pas de son métier**. Aujourd'hui il crie sur Commerce,
 explique ce qu'il veut, cherche quelqu'un qui sait le faire, ou jette le writ. C'est exactement une
 commande d'artisan, passée par un PNJ, et COC sait déjà dire qui connaît quelle recette et porter une
 commande jusqu'à lui.
@@ -87,10 +88,12 @@ Ce qu'on sait du système, lu le 2026-10-16 dans deux pages Wowhead enregistrée
 
 ## Décisions
 
-- **D1 (user, 2026-10-16)** : on commence par les writs, en partant de « writ → commande ». La quête
-  demande un objet fabriqué par un artisan, à rapporter à un PNJ. Qu'un objet fabriqué par **un autre
-  joueur** soit accepté reste à voir en jeu (critère 1) : si ce n'est pas le cas, cette spec tombe et
-  on revient à « aider le porteur à le fabriquer lui-même ».
+- **D1 (proposée par l'agent, à valider par le user)** : on commence par les writs, en partant de
+  « writ → commande ». Elle repose sur ce que le user a dit le 2026-10-16 : « le writ demande un
+  objet, sous forme de quête, qu'un artisan doit fabriquer (je suppose au hasard) et à rapporter à
+  un PNJ ». Deux choses restent à voir (critères 0 et 1). Si les writs ne tombent que dans les
+  métiers du joueur, ou si l'objet d'un autre joueur est refusé, cette spec tombe et on revient à
+  « aider le porteur à le fabriquer lui-même ».
 - **D2 (proposée par l'agent)** : writ, quête, objet demandé et palier viennent d'une **table
   générée** (150 lignes, identifiants seulement), tirée des pages Wowhead et des noms anglais de
   CraftLink, rangée dans COC. Pourquoi : les noms sont traduits, et rien ne dit encore que
@@ -107,6 +110,9 @@ Ce qu'on sait du système, lu le 2026-10-16 dans deux pages Wowhead enregistrée
 
 **Mesures préalables, avant tout code :**
 
+0. [humain] Sur un personnage qui a deux métiers de fabrication, les writs reçus (ou ce que donne un
+   « Sealed Craftsman's Writ ») viennent-ils des cinq métiers, ou seulement des siens ? Le guide ACA
+   le dit peut-être, sans se connecter. **Seulement des siens : la spec s'arrête (D1).**
 1. [humain] Deux comptes. A ouvre un writ (quête acceptée, objectif à 0/1 : c'est le témoin). B
    fabrique l'objet demandé et le donne à A par l'échange. L'objectif de A passe à 1/1, et A rend la
    quête au PNJ. Noter le PNJ et l'endroit. **Si ça échoue, la spec s'arrête (D1).**
