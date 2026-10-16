@@ -2,8 +2,8 @@
 
 > État : **brouillon** du 2026-10-16 · Idée du user, mise en forme par l'agent · Critères 0 et 1
 > **tenus** le 2026-10-16 (observés en jeu par le user) ; le critère 2 reste à voir et ne bloque
-> plus que l'infobulle · D2 à D5 à valider par le user · Plan en fin de fichier, T1 en cours sur
-> `feat/writs-aca`. Les Waylaid Crate, l'autre moitié du système, auront leur propre spec quand on
+> plus que l'infobulle · D2 à D5 à valider par le user · Plan en fin de fichier : **T1 fait** le
+> 2026-10-16 sur `feat/writs-aca` (COC et outillage), critère 3 tenu en test. Les Waylaid Crate, l'autre moitié du système, auront leur propre spec quand on
 > saura ce qu'une caisse demande (voir « Ce qu'on ne fait pas »).
 
 ## Le problème
