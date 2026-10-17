@@ -301,6 +301,17 @@ function A.UnitNameSafe(unit, getter)
     return n
 end
 
+-- « Cette unité est-elle le joueur ? » true / false, ou nil quand on ne peut pas le savoir : une
+-- comparaison d'unités restreinte rend un booléen SECRET (doc du jeu : UnitIsUnit porte
+-- SecretWhenUnitComparisonRestricted), qu'on ne teste pas dans un `if`. Sans UnitIsUnit (autre
+-- client) : false, comme l'ancien `UnitIsUnit and UnitIsUnit(…)`. Relevé par scripts\check_api.ps1.
+function A.IsMe(unit)
+    if not (unit and _G.UnitIsUnit) then return false end
+    local ok, same = pcall(_G.UnitIsUnit, unit, "player")
+    if not ok or A.IsSecret(same) then return nil end
+    return same == true
+end
+
 -- ---------------------------------------------------------------- identité du joueur
 
 -- Nom RÉSEAU du joueur : celui sous lequel le serveur le présente aux AUTRES (émetteur d'un

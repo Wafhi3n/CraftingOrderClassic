@@ -72,6 +72,15 @@ client.
   minute part sans sa ligne ») ne vaut plus sur `a5941ca`, qui embarque `feat/discord-file` : la ligne
   y attend son tour. **Pas vus** : `/co cancel <id>` (même résultat attendu qu'au Carnet) et la 2e
   annulation qui ne doit pas écrire de 2e ligne.
+- 2026-10-14 11:07 — jusqu'a 4e65740 — Forever build client 70374 ; build `main-dev@62da2ac 2026-10-14
+  10:24` (gravé sur les réponses, `fix/secrets-validateur` dans X-Build-Branches) — **GO** sur
+  `fix/secrets-validateur` (relevé par le validateur d'API) : coché EN JEU dans les fiches en quêtes de
+  DevMacro (fiche `CraftingOrderClassic--fix-secrets-validateur`, 3 gestes OK de 10:56 à 10:58, sans
+  remarque, sur la parole du user), A = Rédemption : clic droit sur B, les entrées de Crafting Order
+  sont là (sur son propre portrait, aucune) ; survol de B inchangé ; fenêtre d'un formateur ouverte
+  sans erreur Lua. NON vu, pas provocable à la main : les cas secrets eux-mêmes (comparaison d'unités
+  secrète, GUID de PNJ secret) ; `Api.IsMe` sur un vrai booléen secret est tenu par
+  `tests/test_secrets.lua` (notre Elune), le GUID du formateur par `scripts\check_api.ps1`.
 
 - 2026-10-10 18:03 — jusqu'a 26c9f25 — Forever build client 70338 ; build `main-dev@2dda253 2026-10-10
   17:59`, `## Version: 1.49.0` (lu dans le `.toc` déployé et par l'appli du banc, fiche
