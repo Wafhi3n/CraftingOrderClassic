@@ -1,6 +1,6 @@
 # CraftingOrderClassic — carte du code
 
-> **GÉNÉRÉ** le 2026-10-14 (v1.49.0) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
+> **GÉNÉRÉ** le 2026-10-17 (v1.49.0) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
@@ -17,13 +17,13 @@
 | `CraftingOrderClassic_Locale.lua` | socle de localisation du CHROME de l'UI. | 12 |
 | `CraftingOrderClassic_Locale_enUS.lua` | overlay ANGLAIS (enUS/enGB). | 278 |
 | `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 498 |
-| `CraftingOrderClassic_Locale_enUS_3.lua` | overlay enUS, 3/3. | 207 |
+| `CraftingOrderClassic_Locale_enUS_3.lua` | overlay enUS, 3/3. | 208 |
 | `CraftingOrderClassic_Locale_deDE.lua` | overlay ALLEMAND (deDE). | 279 |
 | `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 479 |
-| `CraftingOrderClassic_Locale_deDE_3.lua` | overlay deDE, 3/3. | 206 |
+| `CraftingOrderClassic_Locale_deDE_3.lua` | overlay deDE, 3/3. | 207 |
 | `CraftingOrderClassic_Locale_esES.lua` | overlay ESPAGNOL (esES/esMX). | 280 |
 | `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 480 |
-| `CraftingOrderClassic_Locale_esES_3.lua` | overlay esES, 3/3. | 207 |
+| `CraftingOrderClassic_Locale_esES_3.lua` | overlay esES, 3/3. | 208 |
 | `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 428 |
 | `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 425 |
 | `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 425 |
@@ -146,11 +146,11 @@
 | `Directory_MyArtisans.lua` | agrégation des métiers du COMPTE (onglet « Mes artisans »). | 168 |
 | `Directory_LootScan.lua` | découverte PASSIVE des artisans NON-porteurs de l'addon qui craftent à proximité, par CHAT_MSG_TRADESKILLS « X creates Y. | 161 |
 | `Orders_Codec.lua` | codec du protocole filaire ORD\| (sérialisation ⇄ parsing, SOURCE DE VÉRITÉ). | 158 |
-| `Orders_Announce.lua` | le FORMAT d'une annonce en clair sur Commerce (spec docs/specs/annonce-commerce.md). | 209 |
-| `Orders_AnnounceSend.lua` | l'ENVOI d'une annonce sur Trade (Services) (spec annonce-commerce, palier 2). | 226 |
+| `Orders_Announce.lua` | le FORMAT d'une annonce en clair sur Commerce (spec docs/specs/annonce-commerce.md). | 244 |
+| `Orders_AnnounceSend.lua` | l'ENVOI d'une annonce sur Trade (Services) (spec annonce-commerce, palier 2). | 234 |
 | `Orders_AnnounceRecv.lua` | la LECTURE d'une annonce de Commerce (spec annonce-commerce, palier 3). | 107 |
-| `Orders_AnnounceDiscord.lua` | la ligne d'une commande de guilde dans le fil Discord de la guilde (spec docs/specs/annonce-discord.md). | 105 |
-| `Orders.lua` | Crafting Order - Classic — Orders : carnet d'ordres GLOBAL (modèle + cycle + protocole). | 495 |
+| `Orders_AnnounceDiscord.lua` | la ligne d'une commande de guilde dans le fil Discord de la guilde (spec docs/specs/annonce-discord.md). | 129 |
+| `Orders.lua` | Crafting Order - Classic — Orders : carnet d'ordres GLOBAL (modèle + cycle + protocole). | 496 |
 | `Orders_Net.lua` | couche « fil réseau » du carnet d'ordres (protocole ORD\|). | 428 |
 | `Orders_Narrative.lua` | TITRE et DESCRIPTION libres d'une commande : « donne un nom et une histoire à ce que tu demandes ». | 254 |
 | `CraftingOrderClassic_QuestSheet.lua` | FICHE DE QUÊTE réutilisable : affiche (ou fait écrire) une commande sous la forme d'une vraie quête du jeu. | 363 |
@@ -2660,7 +2660,8 @@
 >   WTB [objet] x1 PROVIDE [mat]x2 [mat]x1 2g50s #CO27      une commande publique (id = <auteur>-27)
 >   LFW Enchanting/Tailoring #CO                           un artisan disponible
 >   LFW Blacksmithing/[Forge] #CO                          le même, avec son lien de métier
->   WTB [objet] x1 2g50s @Prénom Nom #CO27                  une commande de guilde, fil Discord (annonce-discord)
+>   WTB [objet] x1 2g50s i1251 @Prénom Nom #CO27            une commande de guilde, fil Discord (annonce-discord)
+>   CANCEL [objet] @Prénom Nom #CO27                        son annulation, même fil (annonce-discord, D8)
 > 
 > Ce fichier ne fait QUE le format : fabriquer une ligne, relire une ligne. Aucun appel au jeu (les
 > liens d'objet sont résolus par l'appelant), donc tout se teste sans WoW (tests/test_announce.lua).
@@ -2668,7 +2669,7 @@
 > lecteur : on ajoute en fin de ligne, on ne réordonne pas ; le lien de métier de la ligne LFW entre
 > après son nom parce que l'ancien lecteur le prend pour un métier inconnu et le saute (2026-10-03).
 
-**API** : `A.PriceTokens(copper)` · `A.ParsePrice(text)` · `A.BuildWTB(o, targetLink, mats, copper)` · `A.BuildDiscordWTB(o, targetLink, mats, copper, who)` · `A.BuildLFW(profs, links)` · `A.ParseTradeLink(link)` · `A.Parse(msg, author, resolveProf)`
+**API** : `A.PriceTokens(copper)` · `A.ParsePrice(text)` · `A.BuildWTB(o, targetLink, mats, copper)` · `A.BuildDiscordWTB(o, targetLink, mats, copper, who, ref)` · `A.BuildDiscordCancel(o, targetLink, who)` · `A.BuildLFW(profs, links)` · `A.ParseTradeLink(link)` · `A.Parse(msg, author, resolveProf)`
 
 ### `Orders_AnnounceSend.lua`
 > Orders_AnnounceSend.lua — l'ENVOI d'une annonce sur Trade (Services) (spec annonce-commerce, palier 2).
@@ -2680,7 +2681,7 @@
 > commande. Mesuré le même soir (constat C15) : l'addon écrit sur ce canal depuis une action du joueur,
 > et le canal relie toutes les capitales.
 
-**API** : `S.ChannelIndex()` · `S:WhyNot(o, isRemind)` · `S:CanRemind(o)` · `S:LineFor(o)` · `S:DiscordLineFor(o, who)` · `S:Post(o, isRemind)` · `S.CaptureTradeLink()` · `S.TradeLink(profKey)` · `S:PostLFW(profKey)`
+**API** : `S.ChannelIndex()` · `S:WhyNot(o, isRemind)` · `S:CanRemind(o)` · `S:LineFor(o)` · `S:TargetLink(o)` · `S:DiscordLineFor(o, who)` · `S:Post(o, isRemind)` · `S.CaptureTradeLink()` · `S.TradeLink(profKey)` · `S:PostLFW(profKey)`
 
 ### `Orders_AnnounceRecv.lua`
 > Orders_AnnounceRecv.lua — la LECTURE d'une annonce de Commerce (spec annonce-commerce, palier 3).
@@ -2710,7 +2711,7 @@
 > Rien n'est jamais écrit dans le chat de guilde ordinaire, et COC ne relit pas cette ligne : un
 > guildien qui a COC reçoit déjà la commande par le réseau.
 
-**API** : `D.DiscordStream()` · `D.Wanted(target, wanted)` · `D.RowState(group, target, wanted, linked)` · `D:Post(o)`
+**API** : `D.DiscordStream()` · `D.Wanted(target, wanted)` · `D.RowState(group, target, wanted, linked)` · `D:Post(o)` · `D:Cancel(o)`
 
 ### `Orders.lua`
 > Crafting Order - Classic — Orders : carnet d'ordres GLOBAL (modèle + cycle + protocole).
