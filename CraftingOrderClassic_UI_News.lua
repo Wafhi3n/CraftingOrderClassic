@@ -32,8 +32,23 @@ local BODY_W = 780
 -- à 62. Même manœuvre : un bloc DEVANT, concaténé en premier par versions(). À la prochaine release,
 -- ajouter ici, en tête.
 -- Bloc créé pour v1.41.0 : versionsHead faisait 58 lignes.
--- Bloc de tête ACTUEL, créé pour v1.44.2 : versionsTop faisait 58 lignes. À la prochaine release,
--- ajouter ici, en tête.
+-- Bloc créé pour v1.44.2 : versionsTop faisait 58 lignes.
+-- Bloc de tête ACTUEL, créé pour v1.50.0 : versionsFront faisait 53 lignes, l'entrée l'aurait porté
+-- au-delà de 60. À la prochaine release, ajouter ici, en tête.
+local function versionsNow()
+    return {
+        {
+            v = "v1.50.0", title = L["Une commande annulée se voit aussi sur le Discord de ta guilde"],
+            lines = {
+                L["Si une de tes commandes est partie sur le Discord de ta guilde et que tu l'annules dans le Carnet, l'addon poste maintenant une ligne d'annulation dans le même salon : « CANCEL [objet] @Ton Nom #CO27 ». Ceux qui lisent Discord savent qu'elle ne tient plus. Elle part tout de suite, même dans la minute qui suit ta dernière ligne."],
+                L["La ligne Discord d'une commande porte aussi un court code avant ton nom, par exemple « i1251 » : le numéro de l'objet, puis ceux des matériaux que tu fournis. Un bot Discord peut s'en servir pour lier chaque objet à sa fiche Wowhead. Sans bot, ce ne sont que quelques caractères de plus."],
+                L["Forever peut cacher aux addons si un joueur est toi, ou quel PNJ te parle. L'addon le vérifie maintenant avant de s'en servir (survol et clic droit sur un joueur, fenêtre d'un formateur) : s'il ne peut pas savoir, il passe son tour au lieu de risquer une erreur Lua."],
+                L["Le téléchargement pèse environ 5,8 Mo de moins : le paquet emportait des pages Wowhead dont l'addon ne se sert jamais."],
+            },
+        },
+    }
+end
+
 local function versionsFront()
     return {
         {
@@ -409,15 +424,6 @@ local function versionsRecent()
                 L["La bourse d'artisan se met à jour en direct : fenêtre ouverte, chaque point de métier gagné par le personnage suivi (et chaque recette apprise) recalcule la liste de courses — plus besoin de la rouvrir pour voir la route changer."],
             },
         },
-        {
-            v = "v1.23.0", title = L["La bourse d'artisan : la liste de courses de tes guildeux, et deux corrections réseau"],
-            lines = {
-                L["L'onglet Artisans gagne un bouton sac après les icônes de métier de chaque fiche : un clic ouvre la liste de courses des matériaux qu'il te faut pour monter tes métiers, calculée en local à partir de ce que le jeu diffuse déjà (aucun nouveau trafic réseau). Les réactifs que ton propre métier sait fabriquer sont décomposés en composants de base, et les objets vendus par un PNJ sont mis de côté dans une note plutôt que d'encombrer la grille."],
-                L["Coche « inclure les plans à acheter » et les recettes derrière un coût rejoignent la liste : les plans-objets comme fourniture à apporter, les plans de formateur comme simple note. Le même bloc de fournitures s'affiche maintenant sous le plan de route « quoi monter ensuite », avec le PNJ où aller (nom, zone, coordonnées) et une épingle TomTom cliquable si tu l'as installé."],
-                L["Une recette sans réactif au prix connu (la poussière d'enchantement, par exemple) ne fait plus sauter tout un tronçon du plan de route : elle sert maintenant de repli marqué « ? » quand rien de mieux n'est disponible. Une table de désenchantement maison alimente aussi l'infobulle des poussières, essences et éclats affichés dans ces listes."],
-                L["Deux corrections : un compte à plusieurs personnages se voyait parfois lister lui-même comme « joignable via » son autre perso dans son propre onglet Artisans, corrigé. Et le plan de route pouvait s'arrêter avant le vrai plafond de compétence après une formation chez le maître, à cause d'une assignation Lua qui perdait silencieusement sa seconde valeur."],
-            },
-        },
     }
 end
 
@@ -427,7 +433,7 @@ end
 
 local function versionsOldest()
     return {
-        -- v1.22.0 (retirée à la v1.48.0), v1.21.0 (retirée à la v1.47.0),v1.20.0 (retirée à la v1.46.0), v1.19.1 / v1.19.0 (retirées à la v1.45.0), v1.18.0 / v1.17.1 (retirées à la v1.44.2), v1.17.0 (retirée à la v1.44.1),v1.16.0 (retirée à la v1.44.0), v1.15.1 (retirée à la v1.43.0), v1.15.0 (retirée à la v1.42.1), v1.14.0 (retirée à la v1.42.0), v1.13.0 (retirée à la v1.41.1), v1.12.0 / v1.11.0 / v1.10.2 (retirées à la v1.41.0 : la Saison de la Découverte, le canal du royaume et
+        -- v1.23.0 (retirée à la v1.50.0), v1.22.0 (retirée à la v1.48.0), v1.21.0 (retirée à la v1.47.0),v1.20.0 (retirée à la v1.46.0), v1.19.1 / v1.19.0 (retirées à la v1.45.0), v1.18.0 / v1.17.1 (retirées à la v1.44.2), v1.17.0 (retirée à la v1.44.1),v1.16.0 (retirée à la v1.44.0), v1.15.1 (retirée à la v1.43.0), v1.15.0 (retirée à la v1.42.1), v1.14.0 (retirée à la v1.42.0), v1.13.0 (retirée à la v1.41.1), v1.12.0 / v1.11.0 / v1.10.2 (retirées à la v1.41.0 : la Saison de la Découverte, le canal du royaume et
         -- le bouton « Créer » sécurisé n'existent pas sur Forever), v1.10.1 / v1.9.0 / v1.8.0 / v1.7.0 / v1.7.1 /
         -- v1.6.0 / v1.5.0 / v1.4.0 retirées de l'onglet (l'historique
         -- complet vit dans CHANGELOG.md). Cet onglet ne garde qu'une fenêtre glissante de versions :
@@ -438,7 +444,8 @@ local function versionsOldest()
 end
 
 local function versions()
-    local out = versionsFront()
+    local out = versionsNow()
+    for _, e in ipairs(versionsFront()) do out[#out + 1] = e end
     for _, e in ipairs(versionsTop()) do out[#out + 1] = e end
     for _, e in ipairs(versionsHead()) do out[#out + 1] = e end
     for _, e in ipairs(versionsNewest()) do out[#out + 1] = e end

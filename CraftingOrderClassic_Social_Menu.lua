@@ -58,7 +58,9 @@ local function addEntries(_, rootDescription, contextData)
     if not (rootDescription and rootDescription.CreateButton) then return end
     local name = targetName(contextData)
     if not (name and name ~= "") then return end
-    if contextData.unit and UnitIsUnit and UnitIsUnit(contextData.unit, "player") then return end  -- pas soi-même
+    -- Pas soi-même ; et sous une restriction qui rend la comparaison d'unités secrète, on ne sait pas :
+    -- pas d'entrée plutôt qu'une entrée vers soi.
+    if contextData.unit and COC.Api.IsMe(contextData.unit) ~= false then return end
     -- Découverte proactive MODÉRÉE (cf. Social:MaybeDiscover — ne ping que si métiers manquants,
     -- anti-rafale + throttle 60 s/nom) : rafraîchit skill/recipes pour que le PROCHAIN clic-droit ait
     -- ses métiers (SK/RK arrivent en whisper, async). Sans ça, un ami capté tard n'affichait la section

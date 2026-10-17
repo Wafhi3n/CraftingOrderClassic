@@ -98,8 +98,32 @@ function D:Post(o)
     local ok, err = pcall(_G.C_Club.SendMessage, clubId, streamId, line)
     if not ok then trace("envoi refusé pour " .. tostring(o.id) .. " : " .. tostring(err)); return false end
     if COC.db then COC.db.discordLast = now() end
-    o.discordAt = now()
+    o.discordAt, o.discordClub = now(), clubId   -- la guilde qui a reçu la ligne : seule à recevoir l'annulation
     trace("ligne de " .. tostring(o.id) .. " envoyée dans le fil Discord")
     p(L["commande annoncée sur le Discord de la guilde."])
+    return true
+end
+
+-- Appelée par Orders:Cancel (clic « Annuler » du Carnet, `/co cancel` tapée : un geste du joueur).
+-- Écrit « CANCEL [objet] @Prénom Nom #CO<n> » pour que le bot barre la carte (D8, décisions du user le
+-- 2026-10-10 : carte barrée, et l'annulation passe hors du délai d'une minute, sans le toucher). Une
+-- fois par commande, seulement si sa ligne WTB est partie, par son auteur (pas un reroll : le `@nom`
+-- doit être celui de la carte), et dans la MÊME guilde (un changement de guilde ne l'envoie nulle part).
+function D:Cancel(o)
+    if not (o and o.discordAt and o.discordClub and not o.discordCancelAt) then return false end
+    local me = COC.Api and COC.Api.PlayerName and COC.Api.PlayerName()
+    if not (me and o.buyer == me) then trace("annulation de " .. tostring(o.id) .. " par un autre perso : rien"); return false end
+    local clubId, streamId = D.DiscordStream()
+    if not clubId or clubId ~= o.discordClub then
+        trace("annulation de " .. tostring(o.id) .. " : pas le fil Discord de la guilde d'origine, rien"); return false
+    end
+    local S = COC.AnnounceSend
+    local line = COC.Announce.BuildDiscordCancel(o, S and S:TargetLink(o), me)
+    if not line then return false end
+    local ok, err = pcall(_G.C_Club.SendMessage, clubId, streamId, line)
+    if not ok then trace("annulation refusée pour " .. tostring(o.id) .. " : " .. tostring(err)); return false end
+    o.discordCancelAt = now()
+    trace("annulation de " .. tostring(o.id) .. " envoyée dans le fil Discord")
+    p(L["annulation signalée sur le Discord de la guilde."])
     return true
 end

@@ -70,6 +70,7 @@ local es3 = {
     ["dispo annoncée sur %s."] = "disponibilidad anunciada en %s.",
     -- Ligne d'une commande de guilde dans le fil Discord de la guilde (2026-10-10)
     ["commande annoncée sur le Discord de la guilde."] = "pedido anunciado en el Discord de la hermandad.",
+    ["annulation signalée sur le Discord de la guilde."] = "cancelación enviada al Discord de la hermandad.",
     ["commande postée sans sa ligne Discord : une par minute au plus (encore %d s)."] =
         "pedido publicado sin su línea de Discord: una por minuto como máximo (faltan %d s).",
     ["commande postée sans sa ligne Discord : un objet n'est pas encore connu du jeu."] =

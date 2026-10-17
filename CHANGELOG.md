@@ -1,5 +1,22 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.50.0 - A cancelled order shows up on your guild's Discord too
+
+If one of your orders went to your guild's Discord and you cancel it in the Ledger, the addon now
+posts a cancel line in the same channel: `CANCEL [Linen Bandage] @Your Name #CO27`. Guildmates
+reading Discord know it's off. It goes out right away, even within a minute of your last line.
+
+An order's Discord line also carries a short code before your name now:
+`WTB [Linen Bandage] x1 2g50s i1251 @Your Name #CO27`. That's the item's id, followed by the ids of
+the materials you provide. A Discord bot can read it to link each item to its Wowhead page. Without
+a bot, it's just a few extra characters.
+
+Forever can hide from addons whether a player is you, or which NPC you're talking to. The addon now
+checks before using that (hovering and right-clicking a player, a trainer's window), and when it
+can't tell, it skips that step instead of risking a Lua error.
+
+The download is about 5.8 MB smaller: the package carried Wowhead pages the addon never uses.
+
 ## v1.49.0 - A guild order can go to your guild's Discord
 
 If your guild master linked guild chat to a Discord channel, the order form now has a "Whole guild +

@@ -70,6 +70,7 @@ local en3 = {
     ["dispo annoncée sur %s."] = "availability announced in %s.",
     -- Ligne d'une commande de guilde dans le fil Discord de la guilde (2026-10-10)
     ["commande annoncée sur le Discord de la guilde."] = "order announced on the guild's Discord.",
+    ["annulation signalée sur le Discord de la guilde."] = "cancellation sent to the guild's Discord.",
     ["commande postée sans sa ligne Discord : une par minute au plus (encore %d s)."] =
         "order posted without its Discord line: one per minute at most (%d s left).",
     ["commande postée sans sa ligne Discord : un objet n'est pas encore connu du jeu."] =
