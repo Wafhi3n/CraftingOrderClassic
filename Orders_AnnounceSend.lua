@@ -127,6 +127,11 @@ function S:LineFor(o)
     return COC.Announce.BuildWTB(o, target, mats, copper)
 end
 
+-- Le lien de la cible seul (la ligne d'annulation Discord, D8), ou nil si elle n'est pas en cache.
+function S:TargetLink(o)
+    return (wtbParts(o))
+end
+
 -- La ligne du fil Discord de la guilde (Orders_AnnounceDiscord), signée `who`, ou nil.
 function S:DiscordLineFor(o, who)
     local target, mats, copper, ref = wtbParts(o)

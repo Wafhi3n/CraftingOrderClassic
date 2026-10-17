@@ -16,7 +16,9 @@
 > arrive avec la branche `feat/ligne-guilde-discord` (bâtie sur `feat/liste-destinataires`). Le GO de
 > 16:23 vaut pour `f904fe2` (envoi automatique) et pour le chef de guilde comme seul posteur.
 > Publié en **v1.49.0** (2026-10-10). **Évolution D7 du 2026-10-10 soir** (demande du user) : le jeton
-> d'ids, branche `feat/ids-discord` (COC + outillage), critères 13 et 14 ; pas encore au banc.
+> d'ids, branche `feat/ids-discord` (COC + outillage), critères 13 et 14 ; au banc le 2026-10-10 20:40.
+> **D8** (annulation, carte barrée) : branche `feat/annulation-discord` (bâtie sur `feat/ids-discord`),
+> critères 15 à 17.
 
 ## Le problème
 
@@ -128,6 +130,15 @@ dans le salon Discord.
   changement). Préfixe `i` (objet) ou `e` (sort, pour un enchantement), **jamais** `s`, `g`, `c` ni
   `p` : `Announce.Parse` lirait « x1 s13421 » comme un prix de 1s (le bot, lui, ôte la quantité avant
   de chercher le prix : vérifié par ses tests le 2026-10-10).
+- 2026-10-10 soir, **user** (D8, son idée : « si un joueur l'annule en jeu, un signal pour l'annuler
+  sur Discord aussi ») : quand l'auteur annule une commande dont la ligne est partie sur Discord, COC
+  écrit `CANCEL [objet] @Prénom Nom #CO<n>` dans le même fil, et le bot **barre** la carte (« annulée »)
+  au lieu de la supprimer (choix du user). L'annulation passe **hors du délai d'une minute** et sans le
+  toucher (choix du user : sinon annuler juste après avoir posté laisserait une carte morte). Gardes
+  (proposées par l'agent) : une fois par commande ; seulement par l'auteur, pas un reroll (le `@nom`
+  doit être celui de la carte) ; seulement dans la guilde qui a reçu la ligne (club noté au Post).
+  Ne part que d'un geste : `Orders:Cancel` n'est appelé que par le clic « Annuler » du Carnet et par
+  `/co cancel` tapée. Les autres fins (livrée, expirée, prise par un artisan) ne disent rien : plus tard.
 
 ## Mesures (faites le 2026-10-10, Rédemption chef de guilde, sonde COCProbe)
 
@@ -167,7 +178,8 @@ dans le salon Discord.
    Observateur : le user, compte de Gnomi.
 9. [human] Flux mêlé (case décochée), puis guilde déliée : la même commande de guilde n'écrit rien,
    ni dans le chat de guilde ni sur Discord. Témoin : la même commande en flux séparé écrit sa ligne.
-10. [agent] Pas d'appel à une fonction protégée de `C_Discord`, pas d'envoi hors du clic.
+10. [agent] Pas d'appel à une fonction protégée de `C_Discord`, pas d'envoi hors d'un geste (le clic
+    « Poster » ; depuis D8, aussi `Orders:Cancel`, appelé par le clic « Annuler » et `/co cancel`).
     → `api-gotcha-reviewer`
 11. [human] La ligne « Toute la guilde + Discord » : affichée sous « Toute la guilde » quand la guilde
     est reliée en flux séparé ; cachée en flux mêlé (case décochée pendant que la fenêtre est ouverte
@@ -187,6 +199,16 @@ dans le salon Discord.
     #commandes lie la cible et chaque matériau à Wowhead Forever (bot qui lit les ids). Témoin connu
     bon : une ligne v1.49.0 (sans ids) reste liée par le bot, par les noms. Observateur : le user,
     sur Discord.
+15. [test] (D8) `D:Cancel` écrit `CANCEL [objet] @<auteur> #CO<n>` dans le fil Discord, même dans la
+    seconde qui suit la ligne WTB, sans toucher au délai ; une seule fois ; rien pour une commande
+    jamais partie sur Discord, pour un reroll, dans une autre guilde, guilde déliée ; un envoi refusé
+    ne note rien. Seul `Orders:Cancel` l'appelle. `Announce.Parse` ne lit pas la ligne.
+    → `tests/test_announce.lua`, `tests/test_announce_discord.lua`
+16. [human] (D8) Rédemption poste « Toute la guilde + Discord », puis annule depuis le **Carnet**
+    (clic « Annuler »). La ligne `CANCEL … #CO<n>` revient en `[Guild Discord]` dans le chat du jeu ;
+    dans #commandes, la carte de cette commande est **barrée**, « annulée », sans aperçu. Témoin : une
+    autre commande, pas annulée, reste intacte. Observateur : le user, en jeu et sur Discord.
+17. [human] (D8) Même chose par `/co cancel <id>` tapée. Même observation que 16.
 
 ## Contrat
 
@@ -200,6 +222,10 @@ dans le salon Discord.
   (ex. `i1251,2589,765`). `e` quand c'est le sort qui est lié (enchantement, ou objet pas encore en
   cache). Absent d'une ligne v1.49.0 : un lecteur retombe alors sur les noms. Un lecteur n'apparie
   les ids aux matériaux que si leur nombre vaut 1 + le nombre de matériaux lus.
+- **La ligne d'annulation** (D8) : `CANCEL[ <lien de l'objet>] @<Prénom Nom> #CO<n>`, 255 octets au
+  plus (le lien tombe s'il ne tient pas). Clé = `@<nom>` + `<n>`, les mêmes que la ligne WTB. ⚠️ **Le
+  bot qui la comprend part AVANT la version de COC qui l'écrit** : le bot `11bacdf` prendrait
+  `CANCEL [objet] …` pour une demande de liens (réponse parasite dans #commandes, ligne non effacée).
 - **La ligne de Commerce ne change pas.** Le jeton `@<nom>` n'existe que sur la ligne Discord.
 - La ligne part dans le fil `Discord` de la guilde, jamais dans `CHAT_MSG_GUILD`. COC ne la relit pas.
 
