@@ -1,10 +1,10 @@
 # Craftsman's Writ → une commande d'artisan
 
 > État : **brouillon** du 2026-10-16 · Idée du user, mise en forme par l'agent · Critères 0 et 1
-> **tenus** le 2026-10-16 (observés en jeu par le user) ; le critère 2 reste à voir et ne bloque
-> plus que l'infobulle · D2 à D5 à valider par le user · Plan en fin de fichier : **T1 et T2
-> faits** le 2026-10-16 sur `feat/writs-aca` (COC et outillage), critères 3, 4 et 5 tenus en test,
-> rien de visible en jeu encore. Les Waylaid Crate, l'autre moitié du système, auront leur propre
+> **tenus** le 2026-10-16, critère 2 **tenu** le 2026-10-17 (captures du user, client anglais) : les
+> quantités varient d'un writ à l'autre, ce qui a corrigé T2 · D2 à D6 à valider par le user · Plan
+> en fin de fichier : **T1 et T2 faits** sur `feat/writs-aca` (COC et outillage), critères 3, 4 et 5
+> tenus en test, rien de visible en jeu encore. Les Waylaid Crate, l'autre moitié du système, auront leur propre
 > spec quand on saura ce qu'une caisse demande (voir « Ce qu'on ne fait pas »).
 
 ## Le problème
@@ -34,18 +34,24 @@ Ce qu'on sait du système, lu le 2026-10-16 dans deux pages Wowhead enregistrée
 | Paliers | Journeyman : 45 writs, 75 de réputation · Expert : 60, 125 · Artisan : 45, 200 |
 | Réputation | deux factions (2586, 2587), qui montent ensemble ; leurs noms ne sont pas connus |
 | Objets demandés | les 150 retrouvés par leur nom anglais dans les pages Forever des métiers : 147 à la casse près (« Pearl-Handled » / « Pearl-handled »), 3 à une orthographe près (« Ogre's » / « Ogre », « Demonslaying » / « Demon Slaying », « Adjuster » / « Adjustor ») ; un nom désigne deux objets (« Golden Scale Gauntlets », 9366 et 217273) |
-| Autres | « Sealed Craftsman's Writ » (248206), sans doute le contenant qui donne un writ ; objet 284584 en récompense de certains writs, inconnu |
+| Quantités | l'objectif demande N objets, et N **varie** : 200 « Crafted Solid Shot » pour un writ d'ingénieur (capture du 2026-10-17). Aucune page lue ne donne N ; le journal le donne une fois la quête acceptée |
+| Enveloppes | « Sealed Journeyman's Writ », « Sealed Expert's Writ » (identifiants inconnus ; un « Sealed Artisan's Writ » probable) : on déchire l'enveloppe, le writ est tiré au hasard dans ce palier (captures du 2026-10-17). Le « Sealed Craftsman's Writ » (248206) de Wowhead en est peut-être une autre |
+| Échange | writs et enveloppes se vendent à l'HdV (vu par le user le 2026-10-17) |
+| Autres | objet 284584 en récompense de certains writs, inconnu |
 
 ## Ce qu'on veut
 
 1. **Au survol d'un writ** (dans les sacs, avant de l'avoir ouvert), l'infobulle dit en une ou deux
    lignes **qui sait fabriquer l'objet demandé**, du plus proche au plus lointain : toi, un de tes
-   rerolls, des artisans connus de COC (combien, dont combien en ligne), ou personne de connu. Si le
-   jeu ne nomme pas l'objet dans l'infobulle, notre ligne le nomme.
+   rerolls, des artisans connus de COC (combien, dont combien en ligne), ou personne de connu. Le
+   jeu nomme déjà l'objet dans le nom du writ (« Craftsman's Writ: Crafted Solid Shot ») : nos lignes
+   ne le répètent pas.
 2. **Dans l'onglet Commande**, l'objet d'un writ que tu portes (en sac, ou quête acceptée et pas
    encore remplie) est **marqué** et se choisit **en un clic**. Le formulaire s'ouvre alors sur le
-   bon plan, quantité 1, avec un titre déjà écrit qui dit que c'est pour un writ. Tu choisis le
-   destinataire et la commission comme d'habitude, et rien ne part sans ton clic sur « Poster ».
+   bon plan, avec **ce qui manque** pour remplir la quête (150 si l'objectif est à 50/200), et un
+   titre déjà écrit qui dit que c'est pour un writ. Pour un writ pas encore ouvert, la quantité est
+   inconnue (D6). Tu choisis le destinataire et la commission comme d'habitude, et rien ne part sans
+   ton clic sur « Poster ».
 3. **L'artisan qui reçoit la commande** voit ce titre et sait que c'est pour un writ. Rien d'autre ne
    change pour lui : c'est une commande comme les autres, avec son cycle habituel (acceptée,
    fabriquée, échangée).
@@ -64,7 +70,11 @@ Ce qu'on sait du système, lu le 2026-10-16 dans deux pages Wowhead enregistrée
   existe déjà (fiche de quête). Un client COC plus ancien affiche donc la commande normalement.
 - **Pas de suivi de la réputation ACA** ni du nombre de journalières faites : c'est le métier du jeu,
   pas de COC.
-- **Pas de marché des writs** (donner ou vendre son writ à un artisan), même si le writ s'échangeait.
+- **Pas de marché des writs** (donner ou vendre son writ à un artisan). Writs et enveloppes se vendent
+  déjà à l'HdV : COC n'y touche pas.
+- **Pas d'aide sur les enveloppes** (« Sealed Journeyman's Writ »…) dans ce premier tour. Piste pour
+  plus tard : « tu sais faire 12 des 45 writs de ce palier » dans leur infobulle, pour décider s'il
+  vaut la peine de l'acheter. Il faudra leurs identifiants.
 - **Pas de marque sur les recettes côté artisan** (« cette recette est demandée par des writs, 125 de
   réputation ») dans ce premier tour. C'est la piste suivante si le premier tour sert.
 - **Pas de clic modifié sur l'objet dans les sacs** : toucher aux boutons du sac expose au taint, et
@@ -83,7 +93,11 @@ Ce qu'on sait du système, lu le 2026-10-16 dans deux pages Wowhead enregistrée
 - **Un writ que la table ne connaît pas** (Blizzard en ajoute un) : ignoré, sans erreur ni ligne.
 - **Le writ disparaît du sac à l'ouverture** et la quête prend le relais : un même writ ne doit
   jamais compter deux fois (sac + journal).
-- **L'objet est déjà dans tes sacs**, ou l'objectif est déjà à 1/1 : on ne propose plus de commande.
+- **Une partie des objets est déjà là** (objectif à 50/200 : le jeu compte ceux des sacs) : on ne
+  propose que ce qui manque. Objectif atteint (200/200), même avant que le jeu ne dise la quête
+  « remplie » : plus de commande.
+- **Writ pas encore ouvert, objet déjà en sac** : on ignore combien il en faut, donc on ne conclut
+  rien ; le writ reste marqué.
 - **Plusieurs writs à la fois** : chacun est marqué ; deux writs pour le même objet donnent une seule
   marque.
 - **Quête abandonnée, ou remise à zéro des journalières** : la marque disparaît avec elle.
@@ -103,10 +117,10 @@ Ce qu'on sait du système, lu le 2026-10-16 dans deux pages Wowhead enregistrée
   l'HdV est accepté (critères 0 et 1).
 - **D2 (proposée par l'agent)** : writ, quête, objet demandé et palier viennent d'une **table
   générée** (150 lignes, identifiants seulement), tirée des pages Wowhead et des noms anglais de
-  CraftLink, rangée dans COC. Pourquoi : les noms sont traduits, et rien ne dit encore que
-  l'infobulle du writ porte un lien vers l'objet (critère 2). La table sert donc quoi que dise le
-  critère 2. Si le journal de quêtes rend l'objet demandé par son identifiant, on le lit en jeu pour
-  la quête acceptée, et la table ne sert plus qu'au writ pas encore ouvert. Les identifiants viennent
+  CraftLink, rangée dans COC. Pourquoi : les noms sont traduits, l'infobulle du writ ne nomme l'objet
+  que dans le nom du writ, sans lien, et l'objectif de la quête ne le nomme qu'en texte
+  (« 0/200 Crafted Solid Shot ») : aucun identifiant à lire en jeu (critère 2, 2026-10-17). La table
+  est donc la seule source de l'objet ; le journal ne sert qu'aux quantités. Les identifiants viennent
   des pages **Forever** des métiers, jamais des noms de Classic : Forever a réattribué des
   identifiants d'objets (voir l'en-tête de `CraftingOrderClassic_Sources.lua`).
 - **D3 (proposée par l'agent)** : la table reste dans COC, pas dans CraftLink. Un seul dépôt touché,
@@ -115,6 +129,12 @@ Ce qu'on sait du système, lu le 2026-10-16 dans deux pages Wowhead enregistrée
   (le geste). Le journal COC et le suivi à l'écran pourront suivre si le user le demande.
 - **D5 (proposée par l'agent)** : un module neuf, branché sur l'onglet Commande par un point
   d'entrée, plutôt qu'un ajout dans `UI_Post` (déjà 429 lignes sur 500).
+- **D6 (proposée par l'agent, 2026-10-17)** : la quantité d'un writ pas encore ouvert est
+  **inconnue**, et COC ne la devine pas. L'onglet Commande marque quand même son objet ; la commande
+  se pré-remplit avec ce qui manque pour une quête acceptée, et sinon laisse la quantité au joueur
+  avec une ligne « ouvre le writ pour savoir combien il en faut ». Autre voie écartée pour l'instant :
+  retenir la quantité vue une fois par quête (un champ de plus dans les SavedVariables) ; à
+  reprendre si les joueurs commandent surtout avant d'ouvrir.
 
 ## Critères d'acceptation
 
@@ -125,8 +145,8 @@ Ce qu'on sait du système, lu le 2026-10-16 dans deux pages Wowhead enregistrée
    le dit peut-être, sans se connecter. **Seulement des siens : la spec s'arrête (D1).**
    → **Tenu le 2026-10-16** (vu par le user) : un personnage enchanteur et forgeron a reçu un writ
    d'Alchimie.
-1. [humain] Deux comptes. A ouvre un writ (quête acceptée, objectif à 0/1 : c'est le témoin). B
-   fabrique l'objet demandé et le donne à A par l'échange. L'objectif de A passe à 1/1, et A rend la
+1. [humain] Deux comptes. A ouvre un writ (quête acceptée, objectif à 0/N : c'est le témoin). B
+   fabrique l'objet demandé et le donne à A par l'échange. L'objectif de A passe à N/N, et A rend la
    quête au PNJ. Noter le PNJ et l'endroit. **Si ça échoue, la spec s'arrête (D1).**
    → **Tenu le 2026-10-16** (vu par le user), sous une autre forme : la potion du writ achetée à
    l'hôtel des ventes a été acceptée. L'objet n'a donc pas à être fabriqué par le porteur. L'essai à
@@ -134,6 +154,12 @@ Ce qu'on sait du système, lu le 2026-10-16 dans deux pages Wowhead enregistrée
 2. [humain] Sur un client en français, l'infobulle d'un writ pas encore ouvert : quelles lignes,
    l'objet est-il nommé, est-ce un lien ? Et la même chose pour la quête acceptée, dans le journal du
    jeu.
+   → **Tenu le 2026-10-17** (captures du user, client **anglais**) : l'infobulle du writ dit
+   « Craftsman's Writ: Crafted Solid Shot », « Journeyman », « This Item Begins a Quest »,
+   « Requires Level 10 » et un texte d'ambiance ; l'objet n'est nommé que dans le nom du writ, sans
+   lien. La quête acceptée se range sous l'en-tête « Crafting », niveau 60, objectif
+   « 0/200 Crafted Solid Shot ». Le client français n'a pas été vu : sans effet, tout passe par les
+   identifiants.
 
 **Une fois codé :**
 
@@ -142,10 +168,12 @@ Ce qu'on sait du système, lu le 2026-10-16 dans deux pages Wowhead enregistrée
 4. [test] « Qui sait le faire » pour un writ : moi, puis un reroll, puis l'annuaire (en ligne
    d'abord), avec les comptes ; aucune recette connue donne « personne de connu » ; un objet absent de
    CraftLink ne donne aucune ligne. → même fichier
-5. [test] Un writ en sac puis la même quête acceptée comptent pour un seul ; l'objectif à 1/1, ou
-   l'objet déjà en sac, retire la marque. → même fichier
-6. [test] Choisir l'objet d'un writ dans l'onglet Commande sélectionne le bon plan, quantité 1, titre
-   pré-rempli, et **ne poste rien** tant que « Poster » n'est pas cliqué. → même fichier
+5. [test] Un writ en sac puis la même quête acceptée comptent pour un seul ; une quête acceptée dit
+   ce qui manque (50/200 → 150) et ne marque plus rien à 200/200 ; un writ pas encore ouvert garde
+   une quantité inconnue, même avec l'objet en sac. → même fichier
+6. [test] Choisir l'objet d'un writ dans l'onglet Commande sélectionne le bon plan, la quantité qui
+   manque (ou rien de pré-rempli pour un writ pas ouvert, D6), le titre pré-rempli, et **ne poste
+   rien** tant que « Poster » n'est pas cliqué. → même fichier
 7. [test] Aucune ligne de chat quand un writ entre au sac, quand la quête est acceptée, quand elle
    est rendue (skill `chat-output`). → même fichier
 8. [porte] Les quatre portes ; chaque chaîne neuve est dans les trois overlays.
@@ -172,18 +200,16 @@ Rien sur le réseau (voir « Ce qu'on ne fait pas »), rien de neuf dans les Sav
   `WhoCanMake(entrée)` rend `{ recipes, me, alts, crafters, online }` (moi, mes rerolls par leur
   nom, les autres artisans de l'annuaire en ligne d'abord), ou `nil` si aucun objet de l'entrée
   n'est connu de CraftLink. `Held()` rend les writs portés, un par writ
-  (`{ entry, inBag, onQuest, done }`), et `WantedItems()` les objets encore à commander
-  (objet → entrée).
+  (`{ entry, inBag, onQuest, done, required, have, need }`, les trois quantités seulement pour une
+  quête acceptée), et `WantedItems()` les objets encore à commander (objet → son writ porté).
 
 ## Questions ouvertes
 
 - **Pour le user** : faut-il aussi la quête du writ dans le **journal COC** (bouton « Commander » sur
-  sa fiche), dès ce premier tour ? (D4)
-- **Pages Wowhead à enregistrer** (en anglais, extension `tools\wowhead-page`) : le guide
-  « Azeroth Commerce Authority Reputation Guide » (PNJ, remise, d'où viennent les writs, noms des deux
-  factions) ; la quête 94004 et le writ 264011 (ce que la quête demande exactement) ; le
-  « Sealed Craftsman's Writ » 248206 ; l'objet 284584.
-- Le writ lui-même s'échange-t-il ? Sans effet sur ce tour, utile pour la suite.
+  sa fiche), dès ce premier tour ? (D4) Et la quantité d'un writ pas ouvert (D6) ?
+- **Pages Wowhead à enregistrer** (en anglais, extension `tools\wowhead-page`), plus urgentes : le
+  guide « Azeroth Commerce Authority Reputation Guide » (PNJ, remise, d'où viennent les enveloppes,
+  noms des deux factions) ; l'objet 284584.
 
 ## Liens
 
@@ -206,6 +232,8 @@ outillage, pour `tests/test_writs.lua`) atterrissent le même jour.
 - **T2 — « qui sait le faire »**, et un writ compté une seule fois entre le sac et le journal.
   Critères 4 et 5. **Fait le 2026-10-16** : la quête se lit par son identifiant
   (`C_QuestLog.IsOnQuest` / `IsComplete`, présentes dans la doc de l'interface de Forever ; jamais
-  appelées en jeu par COC jusqu'ici, à voir au premier test en jeu).
+  appelées en jeu par COC jusqu'ici, à voir au premier test en jeu). **Corrigé le 2026-10-17** : les
+  quantités viennent de l'objectif (`C_QuestLog.GetQuestObjectives`, même statut), « l'objet en sac »
+  ne vaut plus « rempli ».
 - **T3 — l'infobulle**, après le critère 2. Critères 9 et 11.
 - **T4 — l'onglet Commande**, après validation de D4 par le user. Critères 6, 7 et 10.

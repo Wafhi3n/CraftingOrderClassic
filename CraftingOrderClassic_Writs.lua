@@ -15,8 +15,9 @@
 --   W:ForQuest(questID) → la même entrée, retrouvée par sa quête | nil
 --   W:All()             → writItemID → entrée, pour parcourir
 --   W:WhoCanMake(entry) → { recipes, me, alts, crafters, online } | nil (objet inconnu de CraftLink)
---   W:Held()            → { { entry, inBag, onQuest, done }, … } : les writs que je porte, un par writ
---   W:WantedItems()     → objet demandé → entrée, pour les writs portés et pas encore remplis
+--   W:Held()            → { { entry, inBag, onQuest, done, required, have, need }, … } : les writs
+--                         que je porte, un par writ ; les quantités seulement pour une quête acceptée
+--   W:WantedItems()     → objet demandé → son writ porté (Held), pas encore rempli
 -- `items` a deux objets pour un nom qui en désigne deux (« Golden Scale Gauntlets ») : la quête
 -- acceptée dit lequel. Le métier n'est pas stocké : un objet peut en avoir deux (Gordok Ogre Suit),
 -- il se lit dans CraftLink.
@@ -127,32 +128,52 @@ end
 -- =========================================================================
 local function inBags(itemID) return (COC.Api.GetItemCount(itemID, false) or 0) > 0 end
 
+-- L'objectif « objet » d'une quête de writ : combien il en faut, combien le jeu en compte déjà (il
+-- compte ceux des sacs). La quantité VARIE d'un writ à l'autre — 200 « Crafted Solid Shot », vu en jeu
+-- le 2026-10-17 — et aucune page Wowhead lue ne la donne : seul le journal la connaît, une fois la
+-- quête acceptée.
+local function objective(questID)
+    local objs, pick = COC.Api.GetQuestObjectives(questID), nil
+    for _, o in ipairs(objs) do
+        if o.type == "item" then pick = o; break end
+    end
+    pick = pick or objs[1]
+    if not (pick and pick.numRequired) then return nil end
+    return pick.numRequired, pick.numFulfilled or 0
+end
+
 -- Un writ en sac (pas encore ouvert) ou sa quête acceptée : UNE entrée par writ, quel que soit le
 -- chemin par lequel on le voit (cas « writ en sac + même quête en cours »). Quête abandonnée ou
 -- journalières remises à zéro : le writ disparaît de lui-même, rien n'est retenu entre deux appels.
--- `done` = la quête est remplie, ou l'objet demandé est déjà dans mes sacs : plus rien à commander.
+-- Quête acceptée : `required` / `have` / `need` (ce qui manque) viennent de son objectif, et `done`
+-- dit qu'il ne manque plus rien. Writ pas encore ouvert : quantité INCONNUE (champs nil), jamais
+-- devinée, et `done` reste faux — un objet en sac ne prouve rien tant qu'on ignore combien il en faut.
 function W:Held()
     local A, out = COC.Api, {}
     for writ, e in pairs(byWrit) do
         local bag, quest = inBags(writ), A.IsOnQuest(e.quest)
         if bag or quest then
-            local done = quest and A.IsQuestComplete(e.quest) or false
-            for _, it in ipairs(e.items) do
-                if not done and inBags(it) then done = true end
+            local h = { entry = e, inBag = bag, onQuest = quest, done = false }
+            if quest then
+                local req, have = objective(e.quest)
+                h.required, h.have = req, have
+                h.need = req and math.max(0, req - have) or nil
+                h.done = A.IsQuestComplete(e.quest) or h.need == 0
             end
-            out[#out + 1] = { entry = e, inBag = bag, onQuest = quest, done = done }
+            out[#out + 1] = h
         end
     end
     table.sort(out, function(a, b) return a.entry.writ < b.entry.writ end)
     return out
 end
 
--- Les objets à commander : une clé par objet, donc deux writs pour un même objet font UNE marque.
+-- Les objets à commander → leur writ porté (`Held`), pour lire `entry` et `need`. Une clé par
+-- objet : deux writs pour un même objet font UNE marque.
 function W:WantedItems()
     local out = {}
     for _, h in ipairs(self:Held()) do
         if not h.done then
-            for _, it in ipairs(h.entry.items) do out[it] = h.entry end
+            for _, it in ipairs(h.entry.items) do out[it] = h end
         end
     end
     return out

@@ -168,6 +168,12 @@ function A.IsQuestComplete(questID)
     local f = C_QuestLog and C_QuestLog.IsComplete
     return (questID and f and f(questID)) and true or false
 end
+-- Ses objectifs : { { text, type, finished, numFulfilled, numRequired }, … }, ou {} (sans
+-- C_QuestLog, ou quête absente du journal).
+function A.GetQuestObjectives(questID)
+    local f = C_QuestLog and C_QuestLog.GetQuestObjectives
+    return (questID and f and f(questID)) or {}
+end
 
 -- ---------------------------------------------------------------- événements
 
