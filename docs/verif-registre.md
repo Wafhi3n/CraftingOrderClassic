@@ -46,6 +46,14 @@ client.
 
 ## Relevés
 
+- 2026-10-17 19:09 — jusqu'a 9b8e166 — Forever build client 70450 ; build `main-dev@c48a705 2026-10-17
+  18:53`, `## Version: 1.50.0` (lu dans le `.toc` déployé et par l'appli du banc, fiche
+  `CraftingOrderClassic--release-v1.50.0`, trois gestes cochés OK, sans remarque, sur la parole du
+  user) — **GO** sur le candidat v1.50.0 (`release/v1.50.0` : version, CHANGELOG, onglet Nouveautés
+  avec son bloc de tête neuf ; le code des branches fusionnées vu au banc le 2026-10-11 à 13:59 et
+  14:19, et le 2026-10-14 à 11:07) : `/co version` affiche 1.50.0 et la ligne Build ; onglet
+  Nouveautés, la v1.50.0 en tête, lisible en anglais, sans clé brute, puis la v1.49.0.
+
 - 2026-10-11 13:59 — jusqu'a e18b574 — build `main-dev@61158f7 2026-10-10 20:40` (gestes « ligne-ids »
   et « carte-ancien-bot ») puis `main-dev@a5941ca 2026-10-11 13:37` (« enchant-ids » et
   « carte-par-id »), lus par l'appli du banc (fiche `CraftingOrderClassic--feat-ids-discord`, 4 gestes
