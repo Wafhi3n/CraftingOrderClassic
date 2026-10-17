@@ -7,7 +7,7 @@
 --   WTB [objet] x1 PROVIDE [mat]x2 [mat]x1 2g50s #CO27      une commande publique (id = <auteur>-27)
 --   LFW Enchanting/Tailoring #CO                           un artisan disponible
 --   LFW Blacksmithing/[Forge] #CO                          le même, avec son lien de métier
---   WTB [objet] x1 2g50s @Prénom Nom #CO27                  une commande de guilde, fil Discord (annonce-discord)
+--   WTB [objet] x1 2g50s i1251 @Prénom Nom #CO27            une commande de guilde, fil Discord (annonce-discord)
 --
 -- Ce fichier ne fait QUE le format : fabriquer une ligne, relire une ligne. Aucun appel au jeu (les
 -- liens d'objet sont résolus par l'appelant), donc tout se teste sans WoW (tests/test_announce.lua).
@@ -56,37 +56,56 @@ end
 local function isPublic(o) return o and (o.recipient == nil or o.recipient == "" or o.recipient == "Tous") end
 
 -- Les matériaux qui tiennent : chacun n'entre que s'il reste la place de « +N » pour les suivants,
--- au cas où ceux-là ne tiendraient pas. Rend le morceau de ligne (« PROVIDE … » ou vide).
-local function provideTokens(mats, room)
-    if not mats or #mats == 0 then return "" end
-    local out, kept = "", 0
+-- au cas où les suivants ne tiendraient pas. `withIds` : chacun paie aussi sa place dans le jeton d'ids
+-- (« ,<id> »). Rend le morceau de ligne (« PROVIDE … » ou vide) et les ids des matériaux écrits.
+local function provideTokens(mats, room, withIds)
+    if not mats or #mats == 0 then return "", {} end
+    local out, kept, ids, used = "", 0, {}, 0
     for i, m in ipairs(mats) do
         local piece = " " .. m.link .. (m.qty and ("x" .. m.qty) or "")
+        local idCost = withIds and #("," .. m.id) or 0
         local head = (kept == 0) and " PROVIDE" or ""
         local rest = #mats - i
         local reserve = (rest > 0) and #(" +" .. rest) or 0
-        if #out + #head + #piece + reserve > room then break end
-        out, kept = out .. head .. piece, kept + 1
+        if #out + used + #head + #piece + idCost + reserve > room then break end
+        out, kept, used = out .. head .. piece, kept + 1, used + idCost
+        ids[#ids + 1] = m.id
     end
     local dropped = #mats - kept
     if dropped > 0 then
         local more = ((kept == 0) and " PROVIDE" or "") .. " +" .. dropped
-        if #out + #more <= room then out = out .. more end
+        if #out + used + #more <= room then out = out .. more end
     end
-    return out
+    return out, ids
+end
+
+local function allIds(mats)
+    for _, m in ipairs(mats or {}) do
+        if not tonumber(m.id) then return false end
+    end
+    return true
 end
 
 -- Le corps commun des lignes « WTB ». `who` (facultatif) = le nom de l'auteur, posé en « @Prénom Nom »
 -- juste AVANT l'étiquette : Parse ancre `#CO<n>` en fin de ligne, et un nom n'est ni un lien ni un prix.
-local function buildWTB(o, targetLink, mats, copper, who)
+-- `ref` (facultatif, ligne Discord) = « i<objet> » ou « e<sort> » : le jeton d'ids « i1251,2589,765 »
+-- (la cible, puis chaque matériau écrit, dans l'ordre) entre le prix et le nom. Jamais « s », « g »,
+-- « c » ni « p » en tête : un lecteur prendrait « x1 s13421 » pour un prix (« 1s »).
+local function buildWTB(o, targetLink, mats, copper, who, ref)
     if type(targetLink) ~= "string" then return nil end
     local n = type(o.id) == "string" and o.id:match("%-(%d+)$")
     if not n then return nil end
     local head = "WTB " .. targetLink .. " x" .. (tonumber(o.qty) or 1)
     local price = A.PriceTokens(copper)
-    local tail = (price and (" " .. price) or "") .. (who and (" @" .. who) or "") .. " #CO" .. n
-    if #head + #tail > A.MAX then return nil end
-    return head .. provideTokens(mats, A.MAX - #head - #tail) .. tail
+    price = price and (" " .. price) or ""
+    local refTok = (type(ref) == "string" and ref:match("^[ie]%d+$")) and (" " .. ref) or ""
+    local tail = (who and (" @" .. who) or "") .. " #CO" .. n
+    local fixed = #head + #price + #refTok + #tail
+    if fixed > A.MAX then return nil end
+    local withIds = refTok ~= "" and allIds(mats)
+    local provide, ids = provideTokens(mats, A.MAX - fixed, withIds)
+    if withIds and #ids > 0 then refTok = refTok .. "," .. table.concat(ids, ",") end
+    return head .. provide .. price .. refTok .. tail
 end
 
 -- La ligne « WTB » d'une commande. `targetLink` = lien de l'objet (ou de l'enchantement) commandé ;
@@ -100,9 +119,11 @@ end
 -- La ligne du fil Discord de la guilde (spec docs/specs/annonce-discord.md) : la même, pour une commande
 -- en portée « Guilde », avec le nom du personnage (`who`) — Discord affiche le COMPTE Discord de
 -- l'auteur, jamais son personnage. nil hors portée « Guilde », sans nom, ou si elle ne tient pas.
-function A.BuildDiscordWTB(o, targetLink, mats, copper, who)
+-- `ref` = « i<objet> » / « e<sort> » de la cible, et `mats` portent leur `id` : le jeton d'ids laisse
+-- le bot Discord lier et nommer chaque objet dans SA langue, quelle que soit celle du client (D7).
+function A.BuildDiscordWTB(o, targetLink, mats, copper, who, ref)
     if not (o and o.recipient == "Guilde" and type(who) == "string" and who ~= "") then return nil end
-    return buildWTB(o, targetLink, mats, copper, who)
+    return buildWTB(o, targetLink, mats, copper, who, ref)
 end
 
 -- « LFW Enchanting/Tailoring #CO » : les noms anglais des métiers (clés de CraftLink). `links` =

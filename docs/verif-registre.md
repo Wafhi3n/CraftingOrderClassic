@@ -46,6 +46,20 @@ client.
 
 ## Relevés
 
+- 2026-10-11 13:59 — jusqu'a e18b574 — build `main-dev@61158f7 2026-10-10 20:40` (gestes « ligne-ids »
+  et « carte-ancien-bot ») puis `main-dev@a5941ca 2026-10-11 13:37` (« enchant-ids » et
+  « carte-par-id »), lus par l'appli du banc (fiche `CraftingOrderClassic--feat-ids-discord`, 4 gestes
+  sur 4 cochés OK, sur la parole du user, sans capture) ; build client non relevé — **GO** sur D7 (les
+  ids dans la ligne Discord) : la ligne « [Guild Discord] WTB … » porte le jeton `i<objet>,<matériau>`
+  juste avant `@Rédemption Wafhien #CO<n>`, le prix avant les ids ; l'ancien bot reprenait la carte
+  comme avant et effaçait la ligne du salon relié ; une commande d'enchantement sans commission donne
+  une carte sans prix (« #CO59 Gnomi Short cherche Enchant Cloak - Lesser Fire Resistance x1 —
+  https://www.wowhead.com/forever/fr/spell=7861 ») ; avec le nouveau bot, « #CO41 Rédemption Wafhien
+  cherche Enchant Cloak - Dodge x1 — fournit Guardian Stone x8 +2 —
+  https://www.wowhead.com/forever/fr/spell=25086 ». **Pas vus** : le lien de chaque matériau (la copie
+  de la carte ne le montre pas) et les noms en français (récolte des noms pas encore versée dans le
+  bot, comme prévu par la fiche).
+
 - 2026-10-10 18:03 — jusqu'a 26c9f25 — Forever build client 70338 ; build `main-dev@2dda253 2026-10-10
   17:59`, `## Version: 1.49.0` (lu dans le `.toc` déployé et par l'appli du banc, fiche
   `CraftingOrderClassic--release-v1.49.0`, version cochée OK, onglet Nouveautés confirmé vu par le user
