@@ -46,6 +46,14 @@ client.
 
 ## Relevés
 
+- 2026-11-06 09:24 — jusqu'a 7f3080c — Forever build client 70790 ; build `main-dev@a93a999 2026-11-06
+  09:21` (lu dans le `.toc` déployé, branches en test dont `fix/icone-sans-entrantes`) — **GO** sur
+  `fix/icone-sans-entrantes` : après `/reload`, l'icône Secourisme de la minicarte (« Pour tous : 1 »,
+  une demande de Tolm Rouageargent captée dans le chat, ordre `CAP-…`) a disparu, et la demande reste
+  sous le filtre « Entrantes » de la colonne Commandes. Sur la parole du user (« c'est good » aux
+  trois gestes demandés : icône éteinte, demande sous « Entrantes », `/co version`), sans capture
+  après correctif ; la capture d'avant montrait l'icône allumée et la colonne vide sous « Tous ».
+
 - 2026-10-17 19:09 — jusqu'a 9b8e166 — Forever build client 70450 ; build `main-dev@c48a705 2026-10-17
   18:53`, `## Version: 1.50.0` (lu dans le `.toc` déployé et par l'appli du banc, fiche
   `CraftingOrderClassic--release-v1.50.0`, trois gestes cochés OK, sans remarque, sur la parole du

@@ -72,13 +72,16 @@ end
 -- Les commandes NON nommées (guilde, amis, tous) qu'un de mes persos sait faire (3e tour, décision du
 -- user du 2026-09-30). Mêmes règles que l'alerte d'une non nommée (Orders:_ShouldAlert) pour la portée,
 -- sourdines et seuil anti-bot ; mais « sait faire » vaut pour TOUT le compte, pas le seul perso connecté.
+-- Jamais une demande lue dans le chat (`captured`, l'ordre « CAP-… » qu'un pair me pousse) : la spec
+-- exclut les Entrantes, et la vue métier ne la range que sous « Entrantes ». L'oublier allumait une
+-- icône dont le clic ouvrait une colonne vide sous « Tous » (vécu le 2026-11-06, Secourisme).
 function UI:OrdersICanDo()
     local out, db = {}, COC.db
     local m = db and db.notifyScope or "all"
     if not (db and db.orders) or m == "off" or m == "named" then return out end
     local O, Mod, masked, now, life = COC.Orders, COC.Moderation, db.muted or {}, time(), ttl()
     for id, o in pairs(db.orders) do
-        local kind = o.status == "open" and self:_OrderKind(o)
+        local kind = o.status == "open" and not o.captured and self:_OrderKind(o)
         if kind and kind ~= "named" and not forMe(o.buyer) and (kind == "group" or m == "all")
            and (now - (o.ts or now)) <= life and not masked[id]
            and not (Mod and Mod.IsMuted and Mod:IsMuted(o.buyer))
