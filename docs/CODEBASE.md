@@ -1,6 +1,6 @@
 # CraftingOrderClassic — carte du code
 
-> **GÉNÉRÉ** le 2026-10-17 (v1.50.0) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
+> **GÉNÉRÉ** le 2026-11-06 (v1.50.0) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
@@ -75,7 +75,7 @@
 | `CraftingOrderClassic_Minimap.lua` | bouton minimap (toggle du carnet). | 185 |
 | `CraftingOrderClassic_MinimapIndicator.lua` | icônes d'état dans la barre de la minicarte (Forever). | 127 |
 | `CraftingOrderClassic_MinimapIndicator_Who.lua` | QUI, sur mon compte, sait faire une commande, et d'où elle vient. | 131 |
-| `CraftingOrderClassic_MinimapIndicator_Orders.lua` | icônes « une commande t'attend » dans la barre de la minicarte. | 267 |
+| `CraftingOrderClassic_MinimapIndicator_Orders.lua` | icônes « une commande t'attend » dans la barre de la minicarte. | 270 |
 | `CraftingOrderClassic_Nameplate.lua` | icône « recherche de travail » (LFW) sur les plaques. | 123 |
 | `CraftingOrderClassic_ProfOrders.lua` | COORDINATEUR d'événements de la fenêtre métier. | 83 |
 | `CraftingOrderClassic_RecipeCats.lua` | SOUS-CATÉGORIES de recettes (moteur + registre). | 122 |
