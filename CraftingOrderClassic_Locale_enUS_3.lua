@@ -203,6 +203,15 @@ local en3 = {
     -- Ligne de destinataire du salon Discord de la guilde (2026-10-10)
     ["Toute la guilde + Discord"] = "Whole guild + Discord",
     ["Discord"] = "Discord",   -- rappel du destinataire : « Whole guild + Discord »
+    -- Le X du suivi à l'écran et la case qui le ramène, onglet Route (2026-11-06)
+    ["Suivi à l'écran"] = "On-screen tracker",
+    ["Masquer le suivi"] = "Hide the tracker",
+    ["Pour le réafficher : case « %s » de l'onglet %s, ou /co track on."] =
+        "To bring it back: tick “%s” in the %s tab, or type /co track on.",
+    ["Tes commandes et ta progression à l'écran, comme le suivi de quêtes. Il n'apparaît que s'il y a quelque chose à suivre."] =
+        "Your orders and your progress on screen, like the quest tracker. It only shows up when there's something to track.",
+    ["Le X au bout du suivi le masque entièrement ; la case « Suivi à l'écran » de l'onglet Route le ramène."] =
+        "The X at the end of the tracker hides it completely; the “On-screen tracker” box in the Route tab brings it back.",
 }
 
 for k, v in pairs(en3) do L[k] = v end

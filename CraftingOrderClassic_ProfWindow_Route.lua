@@ -154,16 +154,19 @@ end
 -- (cf. setRouteSub). Déclaré ici parce que le BUILD s'en sert déjà : en Lua un local
 -- n'existe pas avant sa déclaration, et le poser plus bas le rendait nil au build.
 local HEAD_ONE, HEAD_TWO = 30, 44
+local ROUTE_FOOT = 66   -- pied sous la zone scrollée : note d'estimation + deux cases (cf. le build)
 
-function PW:_BuildRouteBody(f, inset, bottomInset)
+function PW:_BuildRouteBody(f, inset)
     local inset = f.Inset or f
     local head = inset:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     head:SetPoint("TOPLEFT", 10, -9); f.head = head
     local sub = inset:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     sub:SetPoint("TOPRIGHT", -30, -10); sub:SetJustifyH("RIGHT"); f.sub = sub
     local scroll = Skin.MakeScrollFrameIn(inset)
-    -- Bas relevé (46) : place pour la case « inclure les plans » sous la zone scrollée.
-    scroll:SetPoint("TOPLEFT", 6, -HEAD_ONE); scroll:SetPoint("BOTTOMRIGHT", -26, bottomInset or 46)
+    -- Le pied, de bas en haut : la note d'estimation (7), la case « Suivi à l'écran » (24), la case
+    -- « inclure les plans » (44), puis la zone scrollée. Le même pied dans les deux contenants : la
+    -- languette passait 20 et sa case des plans débordait sur la liste.
+    scroll:SetPoint("TOPLEFT", 6, -HEAD_ONE); scroll:SetPoint("BOTTOMRIGHT", -26, ROUTE_FOOT)
     local content = CreateFrame("Frame", nil, scroll)
     content:SetSize(370, 1); scroll:SetScrollChild(content)
     f.scroll, f.content, f.rows = scroll, content, {}
@@ -188,12 +191,18 @@ function PW:_BuildRouteBody(f, inset, bottomInset)
     msg:SetPoint("CENTER", 0, 10); msg:SetWidth(340); msg:Hide(); f.msg = msg
     -- Case « inclure les plans à acheter » (parité avec la bourse) — recalcule la route au clic.
     local chk = Skin.MakeCheckButton(inset, L["Inclure les plans à acheter"], 18)
-    chk:SetPoint("BOTTOMLEFT", 8, 24)
+    chk:SetPoint("BOTTOMLEFT", 8, 44)
     chk:SetScript("OnClick", function(cb)
         if COC.db then COC.db.routePlans = cb:GetChecked() and true or false end
         PW:_FillRoute()
     end)
     f.chk = chk
+    -- Case « Suivi à l'écran » (demande du user, 2026-11-06) : le chemin du retour après le X du
+    -- suivi. Le suivi la fabrique et la tient à jour ; la route ne fait que la poser.
+    local T = COC.Tracker
+    if T and T.MakeToggleCheck then
+        f.trackChk = T:MakeToggleCheck(inset); f.trackChk:SetPoint("BOTTOMLEFT", 8, 24)
+    end
     local cav = inset:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
     cav:SetPoint("BOTTOMLEFT", 10, 7); cav:SetPoint("BOTTOMRIGHT", -10, 7); cav:SetJustifyH("LEFT")
     cav:SetText(string.format(L["Estimation : chance de point par couleur, prix du dernier scan HV (%s)."],
@@ -210,7 +219,7 @@ function PW:_BuildRouteWin()
         pos = COC.db and COC.db.routeWinPos,
         onMoved = function(p, rp, x, y) if COC.db then COC.db.routeWinPos = { p, rp, x, y } end end,
     })
-    self:_BuildRouteBody(f, f.Inset or f, 46)
+    self:_BuildRouteBody(f, f.Inset or f)
     -- Aide contextuelle « bouton i » (même mécanisme que la fenêtre principale ; soft-dep HelpPlate).
     if HelpPlate then
         f.helpBtn = Skin.MakeHelpButton(f, function() PW:_ToggleRouteHelp() end, {

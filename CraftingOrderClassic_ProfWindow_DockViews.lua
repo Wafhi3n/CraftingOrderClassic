@@ -127,9 +127,9 @@ function PW:_BuildDockViews()
     rp:SetPoint("BOTTOMRIGHT", host, "BOTTOMRIGHT", 0, 0)
     rp:Hide()
     self.routePanel = rp
-    -- Bas à 20 (au lieu de 46) : la colonne n'a pas la note d'estimation en pied de la fenêtre,
-    -- seulement la case « inclure les plans ».
-    self:_BuildRouteBody(rp, rp, 20)
+    -- Même pied que la fenêtre (note d'estimation + deux cases) : il passait 20, croyant la note
+    -- absente de la colonne, et la case des plans débordait sur la liste.
+    self:_BuildRouteBody(rp, rp)
 
     -- Panneau MANQUANTES : liste simple, tout le détail en infobulle.
     local mp = CreateFrame("Frame", nil, host)
