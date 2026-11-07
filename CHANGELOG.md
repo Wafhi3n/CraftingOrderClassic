@@ -1,5 +1,19 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.51.0 - Hide the on-screen tracker with one click
+
+The on-screen tracker (your orders and the next recipe to level a profession) has a small red X at
+the end of its first line now. Click it and the whole tracker goes away, with one chat line telling
+you how to get it back: tick "On-screen tracker" in the Route tab of the profession window, or type
+`/co track on`. It stays hidden after a `/reload` until you turn it back on.
+
+In that Route tab, the "Include recipes to buy" box could cover the last lines of a long list. It
+has its own space now.
+
+The minimap icon no longer lights up for a request someone typed in chat without the addon (a
+"LF Minor Healing Potion" in Trade, say). The profession window only lists those under "Incoming",
+so clicking the icon opened an empty "All" list. They're still there, under "Incoming".
+
 ## v1.50.0 - A cancelled order shows up on your guild's Discord too
 
 If one of your orders went to your guild's Discord and you cancel it in the Ledger, the addon now

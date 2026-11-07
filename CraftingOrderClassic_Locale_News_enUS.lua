@@ -11,6 +11,14 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "What's New",
+    -- v1.51.0
+    ["Le suivi à l'écran se masque d'un clic"] = "Hide the on-screen tracker with one click",
+    ["Le suivi à l'écran (tes commandes, et la prochaine recette pour monter un métier) a maintenant un petit X rouge au bout de sa première ligne. Un clic le masque entièrement, et une ligne dans le chat dit comment le ramener : coche « Suivi à l'écran » dans l'onglet Route de la fenêtre de métier, ou tape /co track on. Il reste masqué après un /reload, jusqu'à ce que tu le rallumes."] =
+        "The on-screen tracker (your orders, and the next recipe to level a profession) has a small red X at the end of its first line now. One click hides it completely, and a chat line tells you how to get it back: tick “On-screen tracker” in the Route tab of the profession window, or type /co track on. It stays hidden after a /reload until you turn it back on.",
+    ["Dans cet onglet Route, la case « Inclure les plans à acheter » pouvait couvrir les dernières lignes d'une longue liste. Elle a maintenant sa propre place."] =
+        "In that Route tab, the “Include recipes to buy” box could cover the last lines of a long list. It has its own space now.",
+    ["L'icône de la minicarte ne s'allume plus pour une demande tapée dans le chat par un joueur sans l'addon (un « LF Minor Healing Potion » sur Commerce, par exemple). La fenêtre de métier ne range ces demandes que sous « Entrantes », et le clic sur l'icône ouvrait une liste « Tous » vide. Elles sont toujours là, sous « Entrantes »."] =
+        "The minimap icon no longer lights up for a request someone typed in chat without the addon (an “LF Minor Healing Potion” in Trade, say). The profession window only lists those under “Incoming”, so clicking the icon opened an empty “All” list. They're still there, under “Incoming”.",
     -- v1.50.0
     ["Une commande annulée se voit aussi sur le Discord de ta guilde"] = "A cancelled order shows up on your guild's Discord too",
     ["Si une de tes commandes est partie sur le Discord de ta guilde et que tu l'annules dans le Carnet, l'addon poste maintenant une ligne d'annulation dans le même salon : « CANCEL [objet] @Ton Nom #CO27 ». Ceux qui lisent Discord savent qu'elle ne tient plus. Elle part tout de suite, même dans la minute qui suit ta dernière ligne."] =
@@ -192,11 +200,6 @@ local news = {
         "Enchant stat names finally speak your language",
     ["Les sous-catégories de la vue enchant (Force, Esprit, Croisé…) venaient d'un libellé interne jamais traduit : tout le monde les voyait en anglais, client français compris. Elles sont maintenant lues directement sur ton jeu, comme les noms de sorts, donc dans ta langue sans rien à traduire à la main à chaque nouvelle recette."] =
         "The subcategory names in the enchant view (Strength, Spirit, Crusader, and so on) were stuck in English for everyone, French clients included, because they came from an internal label the addon never translated. They're now read straight from your game client, the same way spell names already are, so they show up in your own language with no manual translation as new enchants get added.",
-    -- v1.24.1
-    ["Deux minerais de plus dans les commandes de récolte"] =
-        "Two more ores in gathering orders",
-    ["Le khorium et l'éternium n'apparaissaient pas comme commandables dans l'onglet Récolte. La liste des minerais était dérivée de ceux qu'on peut prospecter en gemmes, et ni l'un ni l'autre ne l'est — le même trou qui cachait déjà l'argent, l'or, le vrai-argent et le sombrefer. Les deux rejoignent la liste."] =
-        "Khorium and Eternium ore weren't showing up as orderable in the Gather tab. The mining list was built from what's prospectable into gems, and neither one is, the same gap that used to hide Silver, Gold, Truesilver and Dark Iron. Both join that list now.",
     -- v1.24.0
     ["La pièce à enchanter se pose d'un clic, et une bourse qui suit la progression"] =
         "The piece to enchant places itself in one click, and a pouch that keeps up",
