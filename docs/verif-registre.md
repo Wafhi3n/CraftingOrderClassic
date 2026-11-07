@@ -46,6 +46,16 @@ client.
 
 ## Relevés
 
+- 2026-11-07 08:17 — jusqu'a 2d0e28f — build `main-dev@a22d5d4 2026-11-06 18:38` (lu dans le `.toc`
+  déployé, `feat/suivi-masquer` dans les branches en test ; build client non relevé) — **GO** sur
+  `feat/suivi-masquer` : le X rouge au bout de la 1re ligne du suivi, sans recouvrir le texte, masque
+  tout le suivi avec une seule ligne de chat ; la case « On-screen tracker » de la languette Route le
+  ramène ; les cases et la note du pied de la route ne recouvrent plus la liste, rien ne déborde ;
+  après le X et un `/reload`, le suivi reste masqué et la case décochée, et `/co track on|off` fait
+  suivre la case. Sur la parole du user (« le bouton on-screen tracker fonctionne », puis les quatre
+  autres points cochés en réponse à une question), sans capture ; la fiche de l'appli du banc n'a pas
+  été remplie. Non vu : la fenêtre flottante « Leveling route » (même code que la languette).
+
 - 2026-11-06 09:24 — jusqu'a 7f3080c — Forever build client 70790 ; build `main-dev@a93a999 2026-11-06
   09:21` (lu dans le `.toc` déployé, branches en test dont `fix/icone-sans-entrantes`) — **GO** sur
   `fix/icone-sans-entrantes` : après `/reload`, l'icône Secourisme de la minicarte (« Pour tous : 1 »,

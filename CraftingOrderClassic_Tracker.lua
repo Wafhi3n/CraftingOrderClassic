@@ -18,8 +18,15 @@ local TICK       = 30    -- filet de sécurité : expiration TTL, dérive d'horl
                          -- jour arrivent par événement (sacs) et par post-hook (cycle des commandes).
 local MAX_ENTRIES = 8    -- entrées affichées au maximum ; au-delà, une ligne « +N de plus »
 local DEFAULT_POS = { "TOPRIGHT", "TOPRIGHT", -220, -330 }   -- sous la minimap, déplaçable
+Tracker.CLOSE_W   = 14   -- le X du suivi ; _Tracker_Rows réserve sa place au bout du 1er en-tête
 
 local function pmsg(m) print("|cFF33DD88Crafting Order|r " .. m) end
+
+-- Où le joueur rallume un suivi masqué : les mots qu'il VOIT à l'écran (la case, la languette).
+local function reviveHint()
+    return string.format(L["Pour le réafficher : case « %s » de l'onglet %s, ou /co track on."],
+        L["Suivi à l'écran"], L["Route"])
+end
 
 -- Config persistée, défauts posés paresseusement (comme le reste de la DB).
 function Tracker:Cfg()
@@ -50,7 +57,56 @@ function Tracker:Frame()
     f:SetFrameStrata("LOW")   -- un HUD passe DERRIÈRE les fenêtres, il ne leur dispute pas le dessus
     f:Hide()
     self.frame = f
+    self.closeBtn = self:_BuildClose(f)
     return f
+end
+
+-- Le X : masque TOUT le suivi (demande du user, 2026-11-06), une ligne de chat dit comment le
+-- rallumer. Button NU aux atlas du bouton de fermeture standard (UIPanelCloseButtonNoScripts,
+-- SharedUIPanelTemplates Mainline) : un template nommé lève s'il manque, et le suivi reste sans
+-- bouton SÉCURISÉ. Au-dessus des lignes : la 1re couvre toute la largeur et mangerait le clic.
+function Tracker:_BuildClose(f)
+    local b = CreateFrame("Button", nil, f)
+    b:SetSize(Tracker.CLOSE_W, Tracker.CLOSE_W)
+    b:SetPoint("TOPRIGHT", f, "TOPRIGHT", 0, 1)
+    b:SetFrameLevel(f:GetFrameLevel() + 10)
+    b:SetNormalAtlas("RedButton-Exit")
+    b:SetPushedAtlas("RedButton-exit-pressed")
+    b:SetHighlightAtlas("RedButton-Highlight", "ADD")
+    b:SetScript("OnClick", function()
+        Tracker:SetOn(false, L["suivi des commandes masqué."] .. " " .. reviveHint())
+    end)
+    b:SetScript("OnEnter", function(btn)
+        GameTooltip:SetOwner(btn, "ANCHOR_LEFT")
+        GameTooltip:SetText(L["Masquer le suivi"], 1, 1, 1)
+        GameTooltip:AddLine(reviveHint(), 0.8, 0.8, 0.8, true)
+        GameTooltip:Show()
+    end)
+    b:SetScript("OnLeave", GameTooltip_Hide)
+    return b
+end
+
+-- La case « Suivi à l'écran », posée par le Plan de route (les DEUX contenants : fenêtre flottante et
+-- languette Route). Le suivi la fabrique et la tient à jour : SetOn repeint toutes les cases, OnShow
+-- relit l'état — une case cochée sur un suivi masqué mentirait. Aucune ligne de chat : l'effet se voit.
+function Tracker:MakeToggleCheck(parent)
+    local Skin = COC.UI and COC.UI.Skin
+    local chk = Skin.MakeCheckButton(parent, L["Suivi à l'écran"], 18)
+    self._checks = self._checks or {}
+    self._checks[#self._checks + 1] = chk
+    local function sync(b) local c = Tracker:Cfg(); b:SetChecked(c and c.on or false) end
+    chk:SetScript("OnShow", sync)
+    chk:SetScript("OnClick", function(b) Tracker:SetOn(b:GetChecked() and true or false) end)
+    chk:SetScript("OnEnter", function(b)
+        GameTooltip:SetOwner(b, "ANCHOR_RIGHT")
+        GameTooltip:SetText(L["Suivi à l'écran"], 1, 1, 1)
+        GameTooltip:AddLine(L["Tes commandes et ta progression à l'écran, comme le suivi de quêtes. Il n'apparaît que s'il y a quelque chose à suivre."],
+            0.8, 0.8, 0.8, true)
+        GameTooltip:Show()
+    end)
+    chk:SetScript("OnLeave", GameTooltip_Hide)
+    sync(chk)
+    return chk
 end
 
 function Tracker:BeginDrag()
@@ -128,12 +184,23 @@ end
 -- ------------------------------------------------------------------
 -- Commandes
 -- ------------------------------------------------------------------
+-- Le SEUL interrupteur : le X, la case du Plan de route et /co track passent tous ici. `msg` = la
+-- ligne de chat du geste, s'il en mérite une.
+function Tracker:SetOn(on, msg)
+    local c = self:Cfg()
+    if not c then return end
+    c.on = on and true or false
+    if msg then pmsg(msg) end
+    for _, chk in ipairs(self._checks or {}) do chk:SetChecked(c.on) end
+    self:Refresh()
+end
+
+local function onOffMsg(on) return on and L["suivi des commandes affiché."] or L["suivi des commandes masqué."] end
+
 function Tracker:Toggle()
     local c = self:Cfg()
     if not c then return end
-    c.on = not c.on
-    pmsg(c.on and L["suivi des commandes affiché."] or L["suivi des commandes masqué."])
-    self:Refresh()
+    self:SetOn(not c.on, onOffMsg(not c.on))
 end
 
 -- `/co track` — bascule ; `on`/`off` explicites ; `reset` remet la position par défaut. Un cadre
@@ -147,8 +214,7 @@ function Tracker:Cmd(rest)
         c.maxEntries = math.max(1, math.min(20, tonumber(num) or MAX_ENTRIES))
         pmsg(string.format(L["suivi : %d entrées au maximum."], c.maxEntries))
     elseif arg == "on" or arg == "off" then
-        c.on = (arg == "on")
-        pmsg(c.on and L["suivi des commandes affiché."] or L["suivi des commandes masqué."])
+        return self:SetOn(arg == "on", onOffMsg(arg == "on"))
     elseif arg == "reset" then
         c.pos = { DEFAULT_POS[1], DEFAULT_POS[2], DEFAULT_POS[3], DEFAULT_POS[4] }
         c.collapsed = {}

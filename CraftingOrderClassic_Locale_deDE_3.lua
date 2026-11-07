@@ -202,6 +202,15 @@ local de3 = {
     -- Ligne de destinataire du salon Discord de la guilde (2026-10-10)
     ["Toute la guilde + Discord"] = "Ganze Gilde + Discord",
     ["Discord"] = "Discord",
+    -- Le X du suivi à l'écran et la case qui le ramène, onglet Route (2026-11-06)
+    ["Suivi à l'écran"] = "Bildschirm-Verfolgung",
+    ["Masquer le suivi"] = "Verfolgung ausblenden",
+    ["Pour le réafficher : case « %s » de l'onglet %s, ou /co track on."] =
+        "Zum Wiedereinblenden: „%s“ im Reiter %s ankreuzen, oder /co track on.",
+    ["Tes commandes et ta progression à l'écran, comme le suivi de quêtes. Il n'apparaît que s'il y a quelque chose à suivre."] =
+        "Deine Aufträge und dein Fortschritt auf dem Bildschirm, wie die Questverfolgung. Sie erscheint nur, wenn es etwas zu verfolgen gibt.",
+    ["Le X au bout du suivi le masque entièrement ; la case « Suivi à l'écran » de l'onglet Route le ramène."] =
+        "Das X am Ende der Verfolgung blendet sie ganz aus; das Kästchen „Bildschirm-Verfolgung“ im Reiter Route holt sie zurück.",
 }
 
 for k, v in pairs(de3) do L[k] = v end

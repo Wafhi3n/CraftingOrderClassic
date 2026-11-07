@@ -215,6 +215,9 @@ function Tracker:Paint(groups, overflow)
             skipped = skipped + #g.entries
         else
             local w = self:_PaintHeader(self:_Row(n), g, y, collapsed[g.section])
+            -- Le X du suivi (_Tracker.lua) se pose au bout de la 1re ligne : sans sa place, il
+            -- recouvrirait l'en-tête quand celui-ci est la ligne la plus large.
+            if n == 1 then w = w + (Tracker.CLOSE_W or 0) + 4 end
             if w > maxW then maxW = w end
             n, y = n + 1, y - LINE_H
             if not collapsed[g.section] then
