@@ -46,6 +46,14 @@ client.
 
 ## Relevés
 
+- 2026-11-08 00:10 — jusqu'a 916b8bf — build `main-dev@02016c5 2026-11-07 23:14`, `## Version: 1.51.0`
+  (lu dans le `.toc` déployé et par l'appli du banc, fiche `CraftingOrderClassic--release-v1.51.0-donnees`,
+  gestes « nouveautes » et « fin » cochés OK, sans remarque, sur la parole du user ; le geste
+  « version » (`/co version`) n'a pas été coché ; build client non relevé) — **GO** sur le candidat
+  v1.51.0 (`release/v1.51.0-donnees` : la `release/v1.51.0` préparée le 2026-11-07 à 09:22 et
+  `feat/donnees-db2`, leur code vu au banc le 2026-11-06 à 09:24 et le 2026-11-07 à 08:17 et 22:51) :
+  onglet Nouveautés, la v1.51.0 en tête avec ses paragraphes lisibles, sans clé brute, puis la v1.50.0.
+
 - 2026-11-07 22:51 — jusqu'a 97a5570 — build `main-dev@6c8cce1 2026-11-07 22:29` (lu dans le `.toc`
   déployé par l'appli du banc, fiche `CraftingOrderClassic--feat-donnees-db2`, trois gestes cochés
   OK, sans remarque, sur la parole du user ; build client non relevé) — **GO** sur

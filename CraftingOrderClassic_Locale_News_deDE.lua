@@ -8,6 +8,19 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "Neues",
+    -- v1.51.0
+    ["Les couleurs des recettes suivent le jeu, et le suivi se masque d'un clic"] =
+        "Rezeptfarben wie im Spiel, und eine Bildschirm-Verfolgung, die sich mit einem Klick ausblenden lässt",
+    ["Sur Forever, beaucoup de recettes s'apprennent plus tôt que ne le disaient les données de l'addon, souvent 25 points plus tôt, et leurs couleurs étaient calculées sur l'ancien niveau. Le plan de route pouvait compter des points sur une pierre à aiguiser que le jeu affichait déjà en gris, et « À apprendre maintenant » cachait des recettes que ton formateur vendait déjà. Les couleurs viennent maintenant des tables du client du jeu, calées sur le niveau que demande le formateur : 97 recettes changent, surtout en Forge et en Travail du cuir."] =
+        "Auf Forever werden viele Rezepte früher erlernt, als die Daten des Addons angaben, oft 25 Punkte früher, und ihre Farben wurden aus der alten Stufe berechnet. Die Levelroute konnte Punkte von einem Wetzstein einplanen, den das Spiel schon grau anzeigte, und „Jetzt erlernbar“ versteckte Rezepte, die dein Lehrer bereits verkaufte. Die Farben kommen jetzt aus den Tabellen des Spielclients, ausgerichtet auf die Stufe, die der Lehrer verlangt: 97 Rezepte ändern sich, vor allem in Schmiedekunst und Lederverarbeitung.",
+    ["L'addon connaît aussi l'objet que fabriquent 253 recettes de plus, pris dans les mêmes tables : leur prix se calcule maintenant comme celui des autres. Celles qui restent sans objet sont des services, comme les enchantements."] =
+        "Das Addon weiß jetzt auch, was 253 weitere Rezepte herstellen, aus denselben Tabellen: Ihr Preis wird jetzt wie bei allen anderen berechnet. Die wenigen ohne Gegenstand sind Dienste, etwa Verzauberungen.",
+    ["Le suivi à l'écran (tes commandes, et la prochaine recette pour monter un métier) a maintenant un petit X rouge au bout de sa première ligne. Un clic le masque entièrement, et une ligne dans le chat dit comment le ramener : coche « Suivi à l'écran » dans l'onglet Route de la fenêtre de métier, ou tape /co track on. Il reste masqué après un /reload, jusqu'à ce que tu le rallumes."] =
+        "Die Bildschirm-Verfolgung (deine Aufträge und das nächste Rezept zum Leveln eines Berufs) hat jetzt ein kleines rotes X am Ende ihrer ersten Zeile. Ein Klick blendet sie ganz aus, und eine Chatzeile sagt dir, wie du sie zurückholst: „Bildschirm-Verfolgung“ im Reiter Route des Berufsfensters ankreuzen, oder /co track on eingeben. Nach einem /reload bleibt sie ausgeblendet, bis du sie wieder einschaltest.",
+    ["Dans cet onglet Route, la case « Inclure les plans à acheter » pouvait couvrir les dernières lignes d'une longue liste. Elle a maintenant sa propre place."] =
+        "Im Reiter Route konnte das Kästchen „Kaufbare Rezepte einbeziehen“ die letzten Zeilen einer langen Liste verdecken. Es hat jetzt seinen eigenen Platz.",
+    ["L'icône de la minicarte ne s'allume plus pour une demande tapée dans le chat par un joueur sans l'addon (un « LF Minor Healing Potion » sur Commerce, par exemple). La fenêtre de métier ne range ces demandes que sous « Entrantes », et le clic sur l'icône ouvrait une liste « Tous » vide. Elles sont toujours là, sous « Entrantes »."] =
+        "Das Minikarten-Symbol leuchtet nicht mehr für eine Anfrage, die ein Spieler ohne das Addon in den Chat getippt hat (etwa ein „LF Minor Healing Potion“ im Handel). Das Berufsfenster führt solche Anfragen nur unter „Eingehend“, also öffnete der Klick auf das Symbol eine leere Liste „Alle“. Sie sind weiterhin da, unter „Eingehend“.",
     -- v1.50.0
     ["Une commande annulée se voit aussi sur le Discord de ta guilde"] = "Eine stornierte Bestellung erscheint auch im Discord deiner Gilde",
     ["Si une de tes commandes est partie sur le Discord de ta guilde et que tu l'annules dans le Carnet, l'addon poste maintenant une ligne d'annulation dans le même salon : « CANCEL [objet] @Ton Nom #CO27 ». Ceux qui lisent Discord savent qu'elle ne tient plus. Elle part tout de suite, même dans la minute qui suit ta dernière ligne."] =
@@ -189,11 +202,6 @@ local news = {
         "Verzauberungs-Werte sprechen endlich deine Sprache",
     ["Les sous-catégories de la vue enchant (Force, Esprit, Croisé…) venaient d'un libellé interne jamais traduit : tout le monde les voyait en anglais, client français compris. Elles sont maintenant lues directement sur ton jeu, comme les noms de sorts, donc dans ta langue sans rien à traduire à la main à chaque nouvelle recette."] =
         "Die Unterkategorien der Verzauberungsansicht (Stärke, Willenskraft, Kreuzritter …) stammten aus einer internen Bezeichnung, die nie übersetzt wurde: alle sahen sie auf Englisch, auch auf dem französischen Client. Sie werden jetzt direkt von deinem Client gelesen, genau wie Zaubernamen, also in deiner eigenen Sprache, ohne dass bei jedem neuen Verzauberungsrezept von Hand übersetzt werden muss.",
-    -- v1.24.1
-    ["Deux minerais de plus dans les commandes de récolte"] =
-        "Zwei weitere Erze bei Sammelaufträgen",
-    ["Le khorium et l'éternium n'apparaissaient pas comme commandables dans l'onglet Récolte. La liste des minerais était dérivée de ceux qu'on peut prospecter en gemmes, et ni l'un ni l'autre ne l'est — le même trou qui cachait déjà l'argent, l'or, le vrai-argent et le sombrefer. Les deux rejoignent la liste."] =
-        "Khorium- und Eterniumerz erschienen im Sammeln-Tab nicht als bestellbar. Die Erzliste wurde aus dem abgeleitet, was sich zu Edelsteinen aufbereiten lässt, und keins von beiden lässt sich das — dieselbe Lücke, die schon Silber, Gold, Echtsilber und Dunkeleisen versteckt hatte. Beide sind jetzt Teil der Liste.",
     -- v1.24.0
     ["La pièce à enchanter se pose d'un clic, et une bourse qui suit la progression"] =
         "Das zu verzaubernde Teil legt sich mit einem Klick ein, und ein Beutel, der Schritt hält",

@@ -38,6 +38,16 @@ local BODY_W = 780
 local function versionsNow()
     return {
         {
+            v = "v1.51.0", title = L["Les couleurs des recettes suivent le jeu, et le suivi se masque d'un clic"],
+            lines = {
+                L["Sur Forever, beaucoup de recettes s'apprennent plus tôt que ne le disaient les données de l'addon, souvent 25 points plus tôt, et leurs couleurs étaient calculées sur l'ancien niveau. Le plan de route pouvait compter des points sur une pierre à aiguiser que le jeu affichait déjà en gris, et « À apprendre maintenant » cachait des recettes que ton formateur vendait déjà. Les couleurs viennent maintenant des tables du client du jeu, calées sur le niveau que demande le formateur : 97 recettes changent, surtout en Forge et en Travail du cuir."],
+                L["L'addon connaît aussi l'objet que fabriquent 253 recettes de plus, pris dans les mêmes tables : leur prix se calcule maintenant comme celui des autres. Celles qui restent sans objet sont des services, comme les enchantements."],
+                L["Le suivi à l'écran (tes commandes, et la prochaine recette pour monter un métier) a maintenant un petit X rouge au bout de sa première ligne. Un clic le masque entièrement, et une ligne dans le chat dit comment le ramener : coche « Suivi à l'écran » dans l'onglet Route de la fenêtre de métier, ou tape /co track on. Il reste masqué après un /reload, jusqu'à ce que tu le rallumes."],
+                L["Dans cet onglet Route, la case « Inclure les plans à acheter » pouvait couvrir les dernières lignes d'une longue liste. Elle a maintenant sa propre place."],
+                L["L'icône de la minicarte ne s'allume plus pour une demande tapée dans le chat par un joueur sans l'addon (un « LF Minor Healing Potion » sur Commerce, par exemple). La fenêtre de métier ne range ces demandes que sous « Entrantes », et le clic sur l'icône ouvrait une liste « Tous » vide. Elles sont toujours là, sous « Entrantes »."],
+            },
+        },
+        {
             v = "v1.50.0", title = L["Une commande annulée se voit aussi sur le Discord de ta guilde"],
             lines = {
                 L["Si une de tes commandes est partie sur le Discord de ta guilde et que tu l'annules dans le Carnet, l'addon poste maintenant une ligne d'annulation dans le même salon : « CANCEL [objet] @Ton Nom #CO27 ». Ceux qui lisent Discord savent qu'elle ne tient plus. Elle part tout de suite, même dans la minute qui suit ta dernière ligne."],
@@ -412,12 +422,6 @@ end
 local function versionsRecent()
     return {
         {
-            v = "v1.24.1", title = L["Deux minerais de plus dans les commandes de récolte"],
-            lines = {
-                L["Le khorium et l'éternium n'apparaissaient pas comme commandables dans l'onglet Récolte. La liste des minerais était dérivée de ceux qu'on peut prospecter en gemmes, et ni l'un ni l'autre ne l'est — le même trou qui cachait déjà l'argent, l'or, le vrai-argent et le sombrefer. Les deux rejoignent la liste."],
-            },
-        },
-        {
             v = "v1.24.0", title = L["La pièce à enchanter se pose d'un clic, et une bourse qui suit la progression"],
             lines = {
                 L["Depuis la v1.21.0, un enchanteur peut cliquer un emplacement de la silhouette d'échange pour te demander la pièce à enchanter. Si tu as l'addon toi aussi, ce clic affiche maintenant une invite chez toi : accepte, et ta pièce équipée se pose toute seule dans l'emplacement « ne sera pas échangé ». Rien n'est donné (cet emplacement ne peut pas changer de mains), la pose est verrouillée sur lui, et rien ne bouge sans ton clic. Sans l'addon en face, le chuchotement explicatif part comme avant."],
@@ -433,7 +437,7 @@ end
 
 local function versionsOldest()
     return {
-        -- v1.23.0 (retirée à la v1.50.0), v1.22.0 (retirée à la v1.48.0), v1.21.0 (retirée à la v1.47.0),v1.20.0 (retirée à la v1.46.0), v1.19.1 / v1.19.0 (retirées à la v1.45.0), v1.18.0 / v1.17.1 (retirées à la v1.44.2), v1.17.0 (retirée à la v1.44.1),v1.16.0 (retirée à la v1.44.0), v1.15.1 (retirée à la v1.43.0), v1.15.0 (retirée à la v1.42.1), v1.14.0 (retirée à la v1.42.0), v1.13.0 (retirée à la v1.41.1), v1.12.0 / v1.11.0 / v1.10.2 (retirées à la v1.41.0 : la Saison de la Découverte, le canal du royaume et
+        -- v1.24.1 (retirée à la v1.51.0), v1.23.0 (retirée à la v1.50.0), v1.22.0 (retirée à la v1.48.0), v1.21.0 (retirée à la v1.47.0),v1.20.0 (retirée à la v1.46.0), v1.19.1 / v1.19.0 (retirées à la v1.45.0), v1.18.0 / v1.17.1 (retirées à la v1.44.2), v1.17.0 (retirée à la v1.44.1),v1.16.0 (retirée à la v1.44.0), v1.15.1 (retirée à la v1.43.0), v1.15.0 (retirée à la v1.42.1), v1.14.0 (retirée à la v1.42.0), v1.13.0 (retirée à la v1.41.1), v1.12.0 / v1.11.0 / v1.10.2 (retirées à la v1.41.0 : la Saison de la Découverte, le canal du royaume et
         -- le bouton « Créer » sécurisé n'existent pas sur Forever), v1.10.1 / v1.9.0 / v1.8.0 / v1.7.0 / v1.7.1 /
         -- v1.6.0 / v1.5.0 / v1.4.0 retirées de l'onglet (l'historique
         -- complet vit dans CHANGELOG.md). Cet onglet ne garde qu'une fenêtre glissante de versions :

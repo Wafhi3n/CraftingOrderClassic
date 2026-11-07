@@ -8,6 +8,19 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "Novedades",
+    -- v1.51.0
+    ["Les couleurs des recettes suivent le jeu, et le suivi se masque d'un clic"] =
+        "Colores de recetas como en el juego, y un seguimiento en pantalla que se oculta con un clic",
+    ["Sur Forever, beaucoup de recettes s'apprennent plus tôt que ne le disaient les données de l'addon, souvent 25 points plus tôt, et leurs couleurs étaient calculées sur l'ancien niveau. Le plan de route pouvait compter des points sur une pierre à aiguiser que le jeu affichait déjà en gris, et « À apprendre maintenant » cachait des recettes que ton formateur vendait déjà. Les couleurs viennent maintenant des tables du client du jeu, calées sur le niveau que demande le formateur : 97 recettes changent, surtout en Forge et en Travail du cuir."] =
+        "En Forever, muchas recetas se aprenden antes de lo que decían los datos del addon, a menudo 25 puntos antes, y sus colores se calculaban con el nivel antiguo. La ruta de subida podía contar puntos con una piedra de afilar que el juego ya mostraba en gris, y «Aprender ahora» ocultaba recetas que tu instructor ya vendía. Los colores vienen ahora de las tablas del cliente del juego, ajustados al nivel que pide el instructor: 97 recetas cambian, sobre todo en Herrería y Peletería.",
+    ["L'addon connaît aussi l'objet que fabriquent 253 recettes de plus, pris dans les mêmes tables : leur prix se calcule maintenant comme celui des autres. Celles qui restent sans objet sont des services, comme les enchantements."] =
+        "El addon también sabe ahora qué fabrican 253 recetas más, de las mismas tablas: su precio se calcula como el de las demás. Las pocas que siguen sin objeto son servicios, como los encantamientos.",
+    ["Le suivi à l'écran (tes commandes, et la prochaine recette pour monter un métier) a maintenant un petit X rouge au bout de sa première ligne. Un clic le masque entièrement, et une ligne dans le chat dit comment le ramener : coche « Suivi à l'écran » dans l'onglet Route de la fenêtre de métier, ou tape /co track on. Il reste masqué après un /reload, jusqu'à ce que tu le rallumes."] =
+        "El seguimiento en pantalla (tus pedidos y la próxima receta para subir una profesión) tiene ahora una pequeña X roja al final de su primera línea. Un clic lo oculta por completo, y una línea en el chat te dice cómo recuperarlo: marca «Seguimiento en pantalla» en la pestaña Ruta de la ventana de profesión, o escribe /co track on. Sigue oculto tras un /reload hasta que lo vuelvas a activar.",
+    ["Dans cet onglet Route, la case « Inclure les plans à acheter » pouvait couvrir les dernières lignes d'une longue liste. Elle a maintenant sa propre place."] =
+        "En esa pestaña Ruta, la casilla «Incluir las recetas por comprar» podía tapar las últimas líneas de una lista larga. Ahora tiene su propio sitio.",
+    ["L'icône de la minicarte ne s'allume plus pour une demande tapée dans le chat par un joueur sans l'addon (un « LF Minor Healing Potion » sur Commerce, par exemple). La fenêtre de métier ne range ces demandes que sous « Entrantes », et le clic sur l'icône ouvrait une liste « Tous » vide. Elles sont toujours là, sous « Entrantes »."] =
+        "El icono del minimapa ya no se enciende por una petición escrita en el chat por un jugador sin el addon (un «LF Minor Healing Potion» en Comercio, por ejemplo). La ventana de profesión solo muestra esas peticiones en «Entrantes», así que el clic en el icono abría una lista «Todos» vacía. Siguen ahí, en «Entrantes».",
     -- v1.50.0
     ["Une commande annulée se voit aussi sur le Discord de ta guilde"] = "Un pedido cancelado también se ve en el Discord de tu hermandad",
     ["Si une de tes commandes est partie sur le Discord de ta guilde et que tu l'annules dans le Carnet, l'addon poste maintenant une ligne d'annulation dans le même salon : « CANCEL [objet] @Ton Nom #CO27 ». Ceux qui lisent Discord savent qu'elle ne tient plus. Elle part tout de suite, même dans la minute qui suit ta dernière ligne."] =
@@ -189,11 +202,6 @@ local news = {
         "Las estadísticas de encantamiento por fin hablan tu idioma",
     ["Les sous-catégories de la vue enchant (Force, Esprit, Croisé…) venaient d'un libellé interne jamais traduit : tout le monde les voyait en anglais, client français compris. Elles sont maintenant lues directement sur ton jeu, comme les noms de sorts, donc dans ta langue sans rien à traduire à la main à chaque nouvelle recette."] =
         "Las subcategorías de la vista de encantamiento (Fuerza, Espíritu, Cruzado…) venían de una etiqueta interna nunca traducida: todo el mundo las veía en inglés, cliente francés incluido. Ahora se leen directamente de tu juego, igual que los nombres de hechizos, así que aparecen en tu idioma sin nada que traducir a mano con cada receta nueva.",
-    -- v1.24.1
-    ["Deux minerais de plus dans les commandes de récolte"] =
-        "Dos minerales más en los encargos de recolección",
-    ["Le khorium et l'éternium n'apparaissaient pas comme commandables dans l'onglet Récolte. La liste des minerais était dérivée de ceux qu'on peut prospecter en gemmes, et ni l'un ni l'autre ne l'est — le même trou qui cachait déjà l'argent, l'or, le vrai-argent et le sombrefer. Les deux rejoignent la liste."] =
-        "El korio y el eternio no aparecían como encargables en la pestaña Recolección. La lista de minerales se derivaba de los que se pueden prospectar en gemas, y ninguno de los dos lo es — el mismo hueco que ya escondía la plata, el oro, la veraplata y el hierro negro. Ambos se unen ahora a la lista.",
     -- v1.24.0
     ["La pièce à enchanter se pose d'un clic, et une bourse qui suit la progression"] =
         "La pieza a encantar se coloca con un clic, y una bolsa que sigue el ritmo",
