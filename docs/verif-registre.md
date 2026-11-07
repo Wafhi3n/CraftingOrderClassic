@@ -46,6 +46,19 @@ client.
 
 ## Relevés
 
+- 2026-11-07 22:51 — jusqu'a 97a5570 — build `main-dev@6c8cce1 2026-11-07 22:29` (lu dans le `.toc`
+  déployé par l'appli du banc, fiche `CraftingOrderClassic--feat-donnees-db2`, trois gestes cochés
+  OK, sans remarque, sur la parole du user ; build client non relevé) — **GO** sur
+  `feat/donnees-db2` (données Camelot de CraftLink : couleurs corrigées par les tables du client
+  1.60.1.70862, objets produits comblés) : sur Wafhien, Forge à 94, la sonde `RecipeColors` rend
+  `90 120 135 150` pour Bronze Axe (2741) et `75 80 82 85` pour Silver Rod (7818) ; la section
+  « À apprendre maintenant » du plan de route montre les recettes de bronze que Wowhead croyait
+  apprenables entre 95 et 115 ; chez un formateur de Forge, Bronze Axe demande 90 (Wowhead dit 115).
+  Avant ce build, le même soir, sur la parole du user : Silver Rod gris à 94 dans la fenêtre du jeu,
+  la mesure qui a décidé la correction. Non vu : les 253 objets produits comblés (ex. Critter Cookie
+  commandable comme objet), les 24 seuils changés en Cuisine, Enchantement et Ingénierie, le plan de
+  route aux rangs à venir.
+
 - 2026-11-07 08:17 — jusqu'a 2d0e28f — build `main-dev@a22d5d4 2026-11-06 18:38` (lu dans le `.toc`
   déployé, `feat/suivi-masquer` dans les branches en test ; build client non relevé) — **GO** sur
   `feat/suivi-masquer` : le X rouge au bout de la 1re ligne du suivi, sans recouvrir le texte, masque
