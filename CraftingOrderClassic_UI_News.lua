@@ -38,8 +38,10 @@ local BODY_W = 780
 local function versionsNow()
     return {
         {
-            v = "v1.51.0", title = L["Le suivi à l'écran se masque d'un clic"],
+            v = "v1.51.0", title = L["Les couleurs des recettes suivent le jeu, et le suivi se masque d'un clic"],
             lines = {
+                L["Sur Forever, beaucoup de recettes s'apprennent plus tôt que ne le disaient les données de l'addon, souvent 25 points plus tôt, et leurs couleurs étaient calculées sur l'ancien niveau. Le plan de route pouvait compter des points sur une pierre à aiguiser que le jeu affichait déjà en gris, et « À apprendre maintenant » cachait des recettes que ton formateur vendait déjà. Les couleurs viennent maintenant des tables du client du jeu, calées sur le niveau que demande le formateur : 97 recettes changent, surtout en Forge et en Travail du cuir."],
+                L["L'addon connaît aussi l'objet que fabriquent 253 recettes de plus, pris dans les mêmes tables : leur prix se calcule maintenant comme celui des autres. Celles qui restent sans objet sont des services, comme les enchantements."],
                 L["Le suivi à l'écran (tes commandes, et la prochaine recette pour monter un métier) a maintenant un petit X rouge au bout de sa première ligne. Un clic le masque entièrement, et une ligne dans le chat dit comment le ramener : coche « Suivi à l'écran » dans l'onglet Route de la fenêtre de métier, ou tape /co track on. Il reste masqué après un /reload, jusqu'à ce que tu le rallumes."],
                 L["Dans cet onglet Route, la case « Inclure les plans à acheter » pouvait couvrir les dernières lignes d'une longue liste. Elle a maintenant sa propre place."],
                 L["L'icône de la minicarte ne s'allume plus pour une demande tapée dans le chat par un joueur sans l'addon (un « LF Minor Healing Potion » sur Commerce, par exemple). La fenêtre de métier ne range ces demandes que sous « Entrantes », et le clic sur l'icône ouvrait une liste « Tous » vide. Elles sont toujours là, sous « Entrantes »."],

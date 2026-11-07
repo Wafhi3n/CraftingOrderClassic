@@ -1,6 +1,16 @@
 # Changelog — Crafting & Gathering Order — Classic
 
-## v1.51.0 - Hide the on-screen tracker with one click
+## v1.51.0 - Recipe colors that match the game, and a tracker you can hide
+
+On Forever, many recipes are taught earlier than the addon's data said, often 25 points earlier,
+and their colors were worked out from the old level. So the leveling route could plan skill points
+from a Silver Rod or a Coarse Sharpening Stone after the game had turned it grey, and "Learn now"
+hid recipes your trainer already sold (Bronze Axe at 90, for one). The colors now come from the game
+client's own tables, set on the level the trainer actually asks for. 97 recipes change, mostly in
+Blacksmithing and Leatherworking.
+
+The addon also knows what 253 more recipes make, from the same tables, so their price is worked out
+like any other recipe's. The few still without an item are services, like enchants.
 
 The on-screen tracker (your orders and the next recipe to level a profession) has a small red X at
 the end of its first line now. Click it and the whole tracker goes away, with one chat line telling

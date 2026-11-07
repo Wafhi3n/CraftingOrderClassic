@@ -12,7 +12,12 @@ local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "What's New",
     -- v1.51.0
-    ["Le suivi à l'écran se masque d'un clic"] = "Hide the on-screen tracker with one click",
+    ["Les couleurs des recettes suivent le jeu, et le suivi se masque d'un clic"] =
+        "Recipe colors that match the game, and a tracker you can hide",
+    ["Sur Forever, beaucoup de recettes s'apprennent plus tôt que ne le disaient les données de l'addon, souvent 25 points plus tôt, et leurs couleurs étaient calculées sur l'ancien niveau. Le plan de route pouvait compter des points sur une pierre à aiguiser que le jeu affichait déjà en gris, et « À apprendre maintenant » cachait des recettes que ton formateur vendait déjà. Les couleurs viennent maintenant des tables du client du jeu, calées sur le niveau que demande le formateur : 97 recettes changent, surtout en Forge et en Travail du cuir."] =
+        "On Forever, many recipes are taught earlier than the addon's data said, often 25 points earlier, and their colors were worked out from the old level. The leveling route could plan skill points from a sharpening stone the game had already turned grey, and “Learn now” hid recipes your trainer already sold. Colors now come from the game client's own tables, set on the level the trainer asks for: 97 recipes change, mostly in Blacksmithing and Leatherworking.",
+    ["L'addon connaît aussi l'objet que fabriquent 253 recettes de plus, pris dans les mêmes tables : leur prix se calcule maintenant comme celui des autres. Celles qui restent sans objet sont des services, comme les enchantements."] =
+        "The addon also knows what 253 more recipes make, from the same tables, so their price is worked out like any other recipe's. The few still without an item are services, like enchants.",
     ["Le suivi à l'écran (tes commandes, et la prochaine recette pour monter un métier) a maintenant un petit X rouge au bout de sa première ligne. Un clic le masque entièrement, et une ligne dans le chat dit comment le ramener : coche « Suivi à l'écran » dans l'onglet Route de la fenêtre de métier, ou tape /co track on. Il reste masqué après un /reload, jusqu'à ce que tu le rallumes."] =
         "The on-screen tracker (your orders, and the next recipe to level a profession) has a small red X at the end of its first line now. One click hides it completely, and a chat line tells you how to get it back: tick “On-screen tracker” in the Route tab of the profession window, or type /co track on. It stays hidden after a /reload until you turn it back on.",
     ["Dans cet onglet Route, la case « Inclure les plans à acheter » pouvait couvrir les dernières lignes d'une longue liste. Elle a maintenant sa propre place."] =
