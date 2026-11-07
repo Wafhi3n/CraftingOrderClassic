@@ -1,6 +1,6 @@
 # CraftingOrderClassic — carte du code
 
-> **GÉNÉRÉ** le 2026-11-06 (v1.50.0) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
+> **GÉNÉRÉ** le 2026-11-07 (v1.50.0) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
@@ -17,13 +17,13 @@
 | `CraftingOrderClassic_Locale.lua` | socle de localisation du CHROME de l'UI. | 12 |
 | `CraftingOrderClassic_Locale_enUS.lua` | overlay ANGLAIS (enUS/enGB). | 278 |
 | `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 498 |
-| `CraftingOrderClassic_Locale_enUS_3.lua` | overlay enUS, 3/3. | 208 |
+| `CraftingOrderClassic_Locale_enUS_3.lua` | overlay enUS, 3/3. | 217 |
 | `CraftingOrderClassic_Locale_deDE.lua` | overlay ALLEMAND (deDE). | 279 |
 | `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 479 |
-| `CraftingOrderClassic_Locale_deDE_3.lua` | overlay deDE, 3/3. | 207 |
+| `CraftingOrderClassic_Locale_deDE_3.lua` | overlay deDE, 3/3. | 216 |
 | `CraftingOrderClassic_Locale_esES.lua` | overlay ESPAGNOL (esES/esMX). | 280 |
 | `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 480 |
-| `CraftingOrderClassic_Locale_esES_3.lua` | overlay esES, 3/3. | 208 |
+| `CraftingOrderClassic_Locale_esES_3.lua` | overlay esES, 3/3. | 217 |
 | `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 428 |
 | `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 425 |
 | `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 425 |
@@ -66,7 +66,7 @@
 | `CraftingOrderClassic_UI_MyArtisans.lua` | onglet « Mes artisans » : vue agrégée des métiers du COMPTE (tous mes rerolls du royaume), en mode « connu ». | 475 |
 | `CraftingOrderClassic_UI_MyArtisans_Profit.lua` | onglet « Mes artisans » : couche Auctionator. | 135 |
 | `CraftingOrderClassic_UI_MyArtisans_Reroll.lua` | accès à la vue REROLL (métiers d'un AUTRE perso du compte) depuis l'onglet « Mes artisans ». | 86 |
-| `CraftingOrderClassic_UI_Help.lua` | onglet Aide : page unique défilante qui explique les autres onglets (Carnet/Commande/Récolte/Artisans), la Vue Métier et le réseau. | 213 |
+| `CraftingOrderClassic_UI_Help.lua` | onglet Aide : page unique défilante qui explique les autres onglets (Carnet/Commande/Récolte/Artisans), la Vue Métier et le réseau. | 214 |
 | `CraftingOrderClassic_UI_News.lua` | onglet « Nouveautés » : notes de version (changelog) affichées EN JEU, version par version, la plus récente en tête. | 492 |
 | `CraftingOrderClassic_Report.lua` | « Signaler » : un bug ou une idée, en ticket sur le dépôt GitHub. | 166 |
 | `CraftingOrderClassic_Social.lua` | couche sociale passive (socle). | 427 |
@@ -106,7 +106,7 @@
 | `CraftingOrderClassic_ProfWindow_Recipes.lua` | colonne GAUCHE : liste de recettes virtualisée (scroll), recherche, couleur par difficulté, sélection, badge « demandé » (nb de commandes ouvertes pour l'objet). | 485 |
 | `CraftingOrderClassic_ProfWindow_Leveling.lua` | aide à la MONTÉE DE MÉTIER dans la liste de recettes : coût de progression (réactifs au prix Auctionator ÷ chance de point selon la couleur), badge « meilleur coût/point » sur la recette recommandée, icônes de SOURCE sur les manquantes (formateur / vendeur PNJ / coté à l'HV / à farmer) et tri « progression » affiné par coût. | 219 |
 | `CraftingOrderClassic_Route.lua` | cœur de CALCUL du plan de route de montée de métier, PARAMÉTRABLE : marche gloutonne rang par rang (recette au meilleur coût/point ESPÉRÉ), seuils réels CraftLink `skillColors` aux rangs futurs, amortissement du prix des plans à acheter, exclusion des recettes à cooldown et des coûts partiels, STOCK (sacs + produits de la route) déduit avant de payer quoi que ce soit au prix HV. | 463 |
-| `CraftingOrderClassic_ProfWindow_Route.lua` | fenêtre « PLAN DE ROUTE » de montée de métier (étage ③ de l'aide à la progression) : « du rang actuel au plafond, quoi crafter, combien de fois, pour combien ». | 449 |
+| `CraftingOrderClassic_ProfWindow_Route.lua` | fenêtre « PLAN DE ROUTE » de montée de métier (étage ③ de l'aide à la progression) : « du rang actuel au plafond, quoi crafter, combien de fois, pour combien ». | 458 |
 | `CraftingOrderClassic_ProfWindow_Route_Supply.lua` | ce qui se peint SOUS les segments du plan de route : le bloc « FOURNITURES » (composants agrégés de toute la route, plans à acheter) et, quand le rang est AU PLAFOND, le bloc « débloquer le palier suivant » (livre de rang curaté, ou renvoi vers le formateur de métier). | 118 |
 | `CraftingOrderClassic_ProfWindow_Learn.lua` | section « À apprendre maintenant » du Plan de route : les recettes NON APPRISES que ton rang permet déjà d'apprendre ET qui rapportent encore un point, classées par coût espéré par point, avec l'icône de leur source. | 113 |
 | `CraftingOrderClassic_ProfWindow_DockViews.lua` | la colonne Commandes CHANGE DE CONTENU au lieu d'ouvrir des fenêtres par-dessus. | 460 |
@@ -167,8 +167,8 @@
 | `CraftingOrderClassic_Enchant_Trade_Ask.lua` | « demande-lui la pièce » : la SILHOUETTE et le verbe ASKE. | 280 |
 | `CraftingOrderClassic_Enchant_Trade_Open.lua` | le bouton « Enchantement » sur la fenêtre d'échange (T6). | 184 |
 | `CraftingOrderClassic_Journal.lua` | MODÈLE « journal » : la liste unique, triée par PRIORITÉ, de ce sur quoi le joueur peut agir maintenant. | 269 |
-| `CraftingOrderClassic_Tracker.lua` | SUIVI À L'ÉCRAN des commandes, façon suivi de quête : un cadre léger, déplaçable, hors de toute fenêtre, qui liste ce sur quoi le joueur peut agir MAINTENANT. | 217 |
-| `CraftingOrderClassic_Tracker_Rows.lua` | LIGNES du suivi à l'écran : pool réutilisable + peinture d'un groupe de sections rendu par COC.Journal:Grouped. | 238 |
+| `CraftingOrderClassic_Tracker.lua` | SUIVI À L'ÉCRAN des commandes, façon suivi de quête : un cadre léger, déplaçable, hors de toute fenêtre, qui liste ce sur quoi le joueur peut agir MAINTENANT. | 283 |
+| `CraftingOrderClassic_Tracker_Rows.lua` | LIGNES du suivi à l'écran : pool réutilisable + peinture d'un groupe de sections rendu par COC.Journal:Grouped. | 241 |
 | `CraftingOrderClassic_Tracker_Next.lua` | section « Progression » du suivi à l'écran : pour chaque métier encore en montée, LA recette à crafter maintenant pour gagner le prochain point, ses réactifs en objectifs, et le plan à acheter quand la route en achète un. | 160 |
 | `Debug.lua` | Crafting Order - Classic — Debug : mode solo pour "jouer" un réseau fictif. | 136 |
 | `CraftingOrderClassic_SelfTest.lua` | suite de tests IN-GAME (/cotest). | 181 |
@@ -3042,7 +3042,7 @@
 >   · Le rafraîchissement n'est PAS gaté sur la fenêtre principale. UI:RefreshSoon l'est, et c'est
 >     exactement ce qui empêchait la bourse d'artisan de se repeindre : on post-hooke APRÈS la garde.
 
-**API** : `Tracker:Cfg()` · `Tracker:Frame()` · `Tracker:BeginDrag()` · `Tracker:EndDrag()` · `Tracker:ToggleSection(section)` · `Tracker:OnEntryClick(e, button)` · `Tracker:Refresh()` · `Tracker:RefreshSoon()` · `Tracker:Toggle()` · `Tracker:Cmd(rest)` · `Tracker:Start()`
+**API** : `Tracker:Cfg()` · `Tracker:Frame()` · `Tracker:MakeToggleCheck(parent)` · `Tracker:BeginDrag()` · `Tracker:EndDrag()` · `Tracker:ToggleSection(section)` · `Tracker:OnEntryClick(e, button)` · `Tracker:Refresh()` · `Tracker:RefreshSoon()` · `Tracker:SetOn(on, msg)` · `Tracker:Toggle()` · `Tracker:Cmd(rest)` · `Tracker:Start()`
 
 ### `CraftingOrderClassic_Tracker_Rows.lua`
 > CraftingOrderClassic_Tracker_Rows.lua — LIGNES du suivi à l'écran : pool réutilisable + peinture
