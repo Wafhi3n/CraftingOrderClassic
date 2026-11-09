@@ -174,6 +174,15 @@ function A.GetQuestObjectives(questID)
     local f = C_QuestLog and C_QuestLog.GetQuestObjectives
     return (questID and f and f(questID)) or {}
 end
+-- L'or que rend une quête du journal, en cuivre, ou nil. `GetQuestLogRewardMoney(questID)` : le code
+-- d'UI de Forever l'appelle ainsi (AlertFrames, AM_QuestDialog). Sous pcall : jamais appelée en jeu
+-- par COC avant les writs (2026-11-09).
+function A.GetQuestRewardMoney(questID)
+    local f = _G.GetQuestLogRewardMoney
+    if not (questID and f) then return nil end
+    local ok, m = pcall(f, questID)
+    return (ok and type(m) == "number") and m or nil
+end
 
 -- ---------------------------------------------------------------- événements
 

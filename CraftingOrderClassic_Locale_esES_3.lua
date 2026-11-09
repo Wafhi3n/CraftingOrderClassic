@@ -226,6 +226,16 @@ local es3 = {
     ["Ce que coûte un lancer, pas un gain : ta commission vient en plus."] =
         "Lo que te cuesta un lanzamiento, no una ganancia: tu comisión va aparte.",
     ["Aucun coût connu (prix : %s)."] = "Ningún coste conocido (precios: %s).",
+    -- Vue Profit : la marque des Craftsman's Writ (writs-aca.md, D7 et D8, 2026-11-09)
+    ["Demandé par un writ d'artisan (+%d de réputation)."] = "Lo pide un encargo de artesano (+%d de reputación).",
+    ["Tu portes ce writ : il t'en manque %d."] = "Llevas este encargo: te faltan %d.",
+    ["Tu portes ce writ : ouvre-le pour savoir combien il en faut."] =
+        "Llevas este encargo: ábrelo para saber cuántos pide.",
+    ["Les porteurs de ce writ cherchent cet objet."] = "Quienes llevan este encargo buscan este objeto.",
+    ["Le writ à l'HdV"] = "Encargo en la casa de subastas",
+    ["%d à %d"] = "%d a %d",
+    ["Demandés (vu en jeu)"] = "Pedidos (visto en el juego)",
+    ["Or rendu (vu au niveau %s)"] = "Oro de recompensa (visto a nivel %s)",
 }
 
 for k, v in pairs(es3) do L[k] = v end

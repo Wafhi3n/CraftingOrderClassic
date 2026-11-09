@@ -259,7 +259,7 @@ end
 -- Rentabilité d'une recette, en cuivre, ou nil si le prix de VENTE du produit est inconnu (sans lui,
 -- aucun calcul n'a de sens) :
 --   sell (unitaire) · sellSrc ("vendor" | "ah") · gross (= sell × lot) · cut (coupe HV sur gross)
---   cost · missing (au moins un réactif sans prix : coût sous-estimé) · profit · numMade
+--   cost · missing (au moins un réactif sans prix : coût sous-estimé) · profit · numMade · productID
 -- Formule, inchangée depuis l'origine : vente × quantité × (1 − coupe HV) − coût des réactifs.
 function PR:CraftProfit(profKey, spellID, numMade)
     if not (self:IsAvailable() and profKey and spellID) then return nil end
@@ -274,8 +274,10 @@ function PR:CraftProfit(profKey, spellID, numMade)
     n = (n and n > 0) and n or 1
     local gross = sell * n
     local profit = gross * (1 - AH_CUT) - cost
+    -- `productID` voyage avec le calcul : qui marque la ligne (writs, D7 de writs-aca.md) parle ainsi
+    -- du MÊME objet que celui dont on vient de lire le prix.
     return { sell = sell, sellSrc = sellSrc, gross = gross, cut = gross * AH_CUT,
-             cost = cost, profit = profit, missing = missing, numMade = n }
+             cost = cost, profit = profit, missing = missing, numMade = n, productID = sch.productID }
 end
 
 -- Coût de LANCER une recette, lu comme CraftProfit (le client d'abord, le catalogue ensuite) :

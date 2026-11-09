@@ -18,11 +18,16 @@
 --   W:Held()            → { { entry, inBag, onQuest, done, required, have, need }, … } : les writs
 --                         que je porte, un par writ ; les quantités seulement pour une quête acceptée
 --   W:WantedItems()     → objet demandé → son writ porté (Held), pas encore rempli
+--   W:ForItem(itemID)   → { entrée, … } dont la quête demande cet objet | nil
+--   W:ProfitMark(itemID, wanted) → { entry, held, need, seen } | nil : la marque de la vue Profit
+--   W:Seen(questID)     → ce que COC a VU de cette quête en jeu (db.writsSeen) | nil
+--   W:Learn(questID)    → relève quantité et or d'une quête de writ au journal ; LearnHeld() : toutes
 -- `items` a deux objets pour un nom qui en désigne deux (« Golden Scale Gauntlets ») : la quête
 -- acceptée dit lequel. Le métier n'est pas stocké : un objet peut en avoir deux (Gordok Ogre Suit),
 -- il se lit dans CraftLink.
 --
 -- Aucune UI ici, aucun événement, aucune ligne de chat : ce module rend des données, à la demande.
+-- Seul `Learn` écrit (dans db.writsSeen) ; le QUAND est dans _Writs_Seen.lua.
 
 local COC = CraftingOrderClassic
 local W = {}
@@ -34,7 +39,7 @@ local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
 -- 150 quêtes la respectent, le générateur échoue si l'une s'en écarte.
 W.REP = { 75, 125, 200 }
 
-local byWrit, byQuest = {}, {}
+local byWrit, byQuest, byItem = {}, {}, {}
 
 function W:Load(data)
     for writ, row in pairs(data) do
@@ -42,12 +47,21 @@ function W:Load(data)
         for i = 3, #row do items[#items + 1] = row[i] end
         local e = { writ = writ, quest = row[1], tier = row[2], rep = self.REP[row[2]], items = items }
         byWrit[writ], byQuest[row[1]] = e, e
+        for _, it in ipairs(items) do
+            byItem[it] = byItem[it] or {}
+            table.insert(byItem[it], e)
+        end
+    end
+    -- Ordre STABLE (par writ) : `pairs` n'en a pas, et la marque prend le premier writ d'un objet.
+    for _, list in pairs(byItem) do
+        table.sort(list, function(a, b) return a.writ < b.writ end)
     end
 end
 
 function W:Info(writItemID) return byWrit[tonumber(writItemID) or -1] end
 function W:ForQuest(questID) return byQuest[tonumber(questID) or -1] end
 function W:All() return byWrit end
+function W:ForItem(itemID) return byItem[tonumber(itemID) or -1] end
 
 -- =========================================================================
 -- Qui sait le faire
@@ -131,8 +145,8 @@ local function inBags(itemID) return (COC.Api.GetItemCount(itemID, false) or 0) 
 -- L'objectif « objet » d'une quête de writ : combien il en faut, combien le jeu en compte déjà (il
 -- compte ceux des sacs). La quantité VARIE d'un writ à l'autre — 200 « Crafted Solid Shot », vu en jeu
 -- le 2026-10-17 — et aucune page Wowhead lue ne la donne : seul le journal la connaît, une fois la
--- quête acceptée.
-local function objective(questID)
+-- quête acceptée. Rend (demandé, déjà compté), ou nil si le journal ne dit rien.
+function W:Objective(questID)
     local objs, pick = COC.Api.GetQuestObjectives(questID), nil
     for _, o in ipairs(objs) do
         if o.type == "item" then pick = o; break end
@@ -155,7 +169,7 @@ function W:Held()
         if bag or quest then
             local h = { entry = e, inBag = bag, onQuest = quest, done = false }
             if quest then
-                local req, have = objective(e.quest)
+                local req, have = self:Objective(e.quest)
                 h.required, h.have = req, have
                 h.need = req and math.max(0, req - have) or nil
                 h.done = A.IsQuestComplete(e.quest) or h.need == 0
@@ -177,4 +191,59 @@ function W:WantedItems()
         end
     end
     return out
+end
+
+-- =========================================================================
+-- La marque de la vue Profit (D7)
+-- =========================================================================
+-- L'objet que fabrique une recette est-il demandé par un writ ? `wanted` = le résultat de
+-- `WantedItems()`, que l'appelant lit UNE fois par remplissage (le relire par ligne refait 150
+-- lectures de sac et de journal à chaque ligne). Un writ que je PORTE passe avant les autres : c'est
+-- celui qui me concerne. `need` = ce qui me manque, nil pour un writ pas ouvert (inconnu, D6).
+function W:ProfitMark(itemID, wanted)
+    local list = self:ForItem(itemID)
+    if not list then return nil end
+    local h = wanted and wanted[tonumber(itemID)]
+    local e = h and h.entry or list[1]
+    return { entry = e, held = h ~= nil, need = h and h.need or nil, seen = self:Seen(e.quest) }
+end
+
+-- =========================================================================
+-- Ce que COC a VU de chaque writ en jeu (D8)
+-- =========================================================================
+-- Ni la quantité ni l'or ne s'écrivent dans une page lue : seul le journal les donne, quête
+-- acceptée. On les retient par quête, PAR COMPTE (db.writsSeen, créé à l'usage). Ce sont des
+-- RELEVÉS : rien ne prouve qu'une quête demande toujours la même quantité, d'où le plus petit et le
+-- plus grand gardés à côté du dernier ; et l'or d'une quête vanilla change souvent avec le niveau
+-- (au niveau maximum, de l'or remplace l'expérience), d'où le niveau du personnage avec lui.
+function W:Seen(questID)
+    local t = COC.db and COC.db.writsSeen
+    return t and t[tonumber(questID) or -1] or nil
+end
+
+function W:Learn(questID)
+    local e = self:ForQuest(questID)
+    local db = COC.db
+    if not (e and db) then return nil end
+    local req = self:Objective(e.quest)
+    -- Journal pas encore prêt (objectif vide juste après l'acceptation) : rien, on relira.
+    if not (req and req > 0) then return nil end
+    db.writsSeen = db.writsSeen or {}
+    local r = db.writsSeen[e.quest] or {}
+    r.n = req
+    r.nMin = math.min(r.nMin or req, req)
+    r.nMax = math.max(r.nMax or req, req)
+    local A = COC.Api
+    local money = A.GetQuestRewardMoney and A.GetQuestRewardMoney(e.quest)
+    if money then r.money, r.level = money, UnitLevel and UnitLevel("player") or nil end
+    r.at = time and time() or r.at
+    db.writsSeen[e.quest] = r
+    return r
+end
+
+-- Toutes les quêtes de writ au journal (connexion) : celles acceptées avant que COC ne les relève.
+function W:LearnHeld()
+    for _, h in ipairs(self:Held()) do
+        if h.onQuest then self:Learn(h.entry.quest) end
+    end
 end
