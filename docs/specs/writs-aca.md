@@ -6,6 +6,10 @@
 > en fin de fichier : **T1 et T2 faits** sur `feat/writs-aca` (COC et outillage), critères 3, 4 et 5
 > tenus en test, rien de visible en jeu encore. Les Waylaid Crate, l'autre moitié du système, auront leur propre
 > spec quand on saura ce qu'une caisse demande (voir « Ce qu'on ne fait pas »).
+> **2026-11-09** : le user veut les writs dans la **vue Profit** (D7 à D9) : une marque tout de suite
+> (T5), un relevé en jeu de la quantité et de l'or de chaque writ (T6), puis le coût de la réputation
+> quand COC aura appris ces chiffres (T7). La branche porte désormais `feat/profit-arbitrages` : elle
+> ne part dans `main` qu'après elle.
 
 ## Le problème
 
@@ -36,8 +40,9 @@ Ce qu'on sait du système, lu le 2026-10-16 dans deux pages Wowhead enregistrée
 | Objets demandés | les 150 retrouvés par leur nom anglais dans les pages Forever des métiers : 147 à la casse près (« Pearl-Handled » / « Pearl-handled »), 3 à une orthographe près (« Ogre's » / « Ogre », « Demonslaying » / « Demon Slaying », « Adjuster » / « Adjustor ») ; un nom désigne deux objets (« Golden Scale Gauntlets », 9366 et 217273) |
 | Quantités | l'objectif demande N objets, et N **varie** : 200 « Crafted Solid Shot » pour un writ d'ingénieur (capture du 2026-10-17). Aucune page lue ne donne N ; le journal le donne une fois la quête acceptée |
 | Enveloppes | « Sealed Journeyman's Writ », « Sealed Expert's Writ » (identifiants inconnus ; un « Sealed Artisan's Writ » probable) : on déchire l'enveloppe, le writ est tiré au hasard dans ce palier (captures du 2026-10-17). Le « Sealed Craftsman's Writ » (248206) de Wowhead en est peut-être une autre |
-| Échange | writs et enveloppes se vendent à l'HdV (vu par le user le 2026-10-17) |
-| Autres | objet 284584 en récompense de certains writs, inconnu |
+| Échange | writs et enveloppes se vendent à l'HdV (vu par le user le 2026-10-17) ; le 2026-11-09, des dizaines de writs Journeyman à 6-20 pa (capture du user) |
+| Récompense | la réputation du palier (Wowhead) ; **un peu d'or** aussi (dit par le user le 2026-11-09, montant inconnu, aucune liste Wowhead ne l'affiche) ; l'objet 284584 pour 12 quêtes, inconnu |
+| Par jour | pas de plafond apparent (impression du user le 2026-11-09, à confirmer en jeu) : chaque writ est sa propre journalière |
 
 ## Ce qu'on veut
 
@@ -57,6 +62,17 @@ Ce qu'on sait du système, lu le 2026-10-16 dans deux pages Wowhead enregistrée
    fabriquée, échangée).
 4. Si **tu sais déjà le faire**, la ligne de l'infobulle le dit, et la commande n'est pas proposée en
    premier.
+5. **Dans la vue Profit** (colonne accolée à la fenêtre de métier), une recette dont l'objet est
+   demandé par un writ porte une **petite icône de writ**. Son infobulle dit le palier et la
+   réputation (« +75 de réputation »), le prix du writ à l'HdV quand Auctionator le connaît, et ce que
+   COC a vu en jeu de ce writ (quantité, or). Si **tu portes** ce writ, l'icône est pleine et
+   l'infobulle dit ce qu'il te manque ; sinon elle est éteinte : ce sont les autres porteurs qui
+   cherchent l'objet. (D7)
+6. **COC apprend chaque writ en jeu** : quand une quête de writ est dans ton journal, il retient la
+   quantité demandée et l'or de la récompense, avec le niveau du personnage. Rien dans le chat. (D8)
+7. **Plus tard, le coût de la réputation** : pour chaque writ dont tu sais faire l'objet, prix du writ
+   à l'HdV + coût de fabrication × quantité − or rendu, ramené par point de réputation, le moins cher
+   en tête. Seulement pour les writs dont COC a vu la quantité. (D9)
 
 ## Ce qu'on ne fait PAS
 
@@ -75,8 +91,10 @@ Ce qu'on sait du système, lu le 2026-10-16 dans deux pages Wowhead enregistrée
 - **Pas d'aide sur les enveloppes** (« Sealed Journeyman's Writ »…) dans ce premier tour. Piste pour
   plus tard : « tu sais faire 12 des 45 writs de ce palier » dans leur infobulle, pour décider s'il
   vaut la peine de l'acheter. Il faudra leurs identifiants.
-- **Pas de marque sur les recettes côté artisan** (« cette recette est demandée par des writs, 125 de
-  réputation ») dans ce premier tour. C'est la piste suivante si le premier tour sert.
+- **La marque côté artisan ne vit que dans la vue Profit** (D7, 2026-11-09) : rien dans la liste de
+  recettes de Blizzard (y écrire la teinte), ni dans l'onglet Commande pour l'instant.
+- **Pas de partage réseau de ce que COC a vu des writs** (quantité, or) : chacun apprend sur son
+  compte. À reprendre si le relevé reste trop maigre pour le coût de la réputation.
 - **Pas de clic modifié sur l'objet dans les sacs** : toucher aux boutons du sac expose au taint, et
   l'onglet Commande suffit.
 - **Les 27 writs d'Era** (Aube d'argent, niveau 55, quêtes 9142-9206) : un autre système, absent de
@@ -107,6 +125,15 @@ Ce qu'on sait du système, lu le 2026-10-16 dans deux pages Wowhead enregistrée
 - **Un reroll sait le faire** : on le dit, mais on propose quand même la commande (le reroll n'est
   pas connecté).
 - **En combat** : seule l'infobulle bouge, aucun cadre protégé n'est touché.
+- **Vue Profit, recette de writ à perte** : pas de ligne, comme toute recette à perte (règle de la
+  vue). La marque dit « on te l'achète », pas « fabrique-le à perte » ; le coût de la réputation (T7)
+  saura lister ces recettes-là.
+- **Deux relevés qui ne s'accordent pas** (une même quête qui demande 20 puis 40) : on garde le
+  dernier vu, le plus petit et le plus grand, et l'infobulle dit l'écart au lieu d'une moyenne.
+- **L'or dépend du niveau** : sur un contenu vanilla, un personnage au niveau maximum reçoit souvent de
+  l'or à la place de l'expérience. Chaque relevé d'or garde le niveau du personnage qui l'a vu.
+- **Une quête dont l'objectif n'est pas encore rempli par le jeu** (journal pas prêt à l'acceptation) :
+  rien n'est retenu, on relira au prochain passage.
 
 ## Décisions
 
@@ -132,9 +159,20 @@ Ce qu'on sait du système, lu le 2026-10-16 dans deux pages Wowhead enregistrée
 - **D6 (proposée par l'agent, 2026-10-17)** : la quantité d'un writ pas encore ouvert est
   **inconnue**, et COC ne la devine pas. L'onglet Commande marque quand même son objet ; la commande
   se pré-remplit avec ce qui manque pour une quête acceptée, et sinon laisse la quantité au joueur
-  avec une ligne « ouvre le writ pour savoir combien il en faut ». Autre voie écartée pour l'instant :
-  retenir la quantité vue une fois par quête (un champ de plus dans les SavedVariables) ; à
-  reprendre si les joueurs commandent surtout avant d'ouvrir.
+  avec une ligne « ouvre le writ pour savoir combien il en faut ». ~~Autre voie écartée pour
+  l'instant : retenir la quantité vue une fois par quête.~~ **Reprise le 2026-11-09 par D8** : COC
+  retient ce qu'il a vu, et l'affiche comme un relevé (« vu en jeu : 200 »), jamais comme une
+  certitude : rien ne prouve que la quantité d'une quête soit fixe.
+- **D7 (choix du user, 2026-11-09)** : les writs entrent dans la **vue Profit** par une **marque** sur
+  les recettes dont ils demandent l'objet. La vue reste triée par l'or ; la marque n'ajoute ni ne
+  retire de ligne. L'objet d'une ligne se lit à la même source que son prix (le schéma de la recette
+  du client, puis CraftLink), pour que marque et prix parlent du même objet.
+- **D8 (choix du user, 2026-11-09)** : COC **relève en jeu** la quantité et l'or de chaque writ dont
+  la quête passe dans le journal (`db.writsSeen`, par compte, créé à l'usage). Le user dit que la
+  quête donne « un peu d'or » ; personne n'en connaît le montant.
+- **D9 (choix du user, 2026-11-09)** : le **coût de la réputation** vient ensuite (T7), une fois que
+  le relevé a des chiffres. Pas de plafond par jour apparent (impression du user, à confirmer) : en
+  enchaîner plusieurs a donc du sens, et la liste les classe tous.
 
 ## Critères d'acceptation
 
@@ -186,9 +224,29 @@ Ce qu'on sait du système, lu le 2026-10-16 dans deux pages Wowhead enregistrée
     jeu, `/console taintLog 1`, une infobulle de writ survolée pendant un combat : rien de COC dans
     `Logs\taint.log`.
 
+**La vue Profit (2026-11-09) :**
+
+12. [test] La marque d'un objet : aucun writ → rien ; un writ que je ne porte pas → son entrée, `held`
+    faux ; un writ porté → `held` vrai et ce qui manque ; les deux objets d'un homonyme portent la
+    même marque ; un identifiant inconnu → rien, sans erreur. → `tests/test_writs.lua`
+13. [test] Le relevé : une quête de writ acceptée retient quantité, or et niveau ; un deuxième relevé
+    différent garde le dernier, le plus petit et le plus grand ; un objectif vide ou une
+    quête qui n'est pas un writ ne retient rien ; aucune ligne de chat. → même fichier
+14. [humain] Fenêtre d'Ingénierie (ou un des cinq métiers), vue Profit : une recette demandée par un
+    writ porte l'icône ; son infobulle dit le palier, la réputation et, Auctionator ayant scanné les
+    writs, le prix du writ. Témoin : une recette de la même vue que personne ne demande, sans icône.
+15. [humain] Ouvrir un writ (quête acceptée), puis revoir la même recette : l'icône est pleine,
+    l'infobulle dit ce qu'il manque et « vu en jeu : N ». Après `/reload`, le relevé est toujours là.
+16. [agent] `api-gotcha-reviewer` sur l'enregistreur (`QUEST_ACCEPTED`, `GetQuestLogRewardMoney`) ;
+    `/console taintLog 1` et une infobulle de la vue Profit survolée : rien de COC dans `taint.log`.
+
 ## Contrat
 
-Rien sur le réseau (voir « Ce qu'on ne fait pas »), rien de neuf dans les SavedVariables.
+Rien sur le réseau (voir « Ce qu'on ne fait pas »). Une table neuve dans les SavedVariables :
+`db.writsSeen` (par compte, créée à l'usage, sans palier de migration) :
+`[quête] = { n = dernière quantité, nMin, nMax, money = or (cuivre), level = niveau du perso qui
+l'a vu, at = time() }`. Pas de compteur de relevés : la même quête est relue à chaque connexion
+tant qu'elle reste au journal, il compterait des lectures, pas des writs.
 
 - **La table générée** (`CraftingOrderClassic_Writs_Data.lua`, par `tools/gen_writs.lua`), interne à
   COC : `[writ] = { quête, palier, objet demandé [, autre objet du même nom] }`, palier 1 Journeyman,
@@ -202,11 +260,19 @@ Rien sur le réseau (voir « Ce qu'on ne fait pas »), rien de neuf dans les Sav
   n'est connu de CraftLink. `Held()` rend les writs portés, un par writ
   (`{ entry, inBag, onQuest, done, required, have, need }`, les trois quantités seulement pour une
   quête acceptée), et `WantedItems()` les objets encore à commander (objet → son writ porté).
+  `ForItem(objet)` rend les entrées dont la quête demande cet objet (liste, souvent une seule) ;
+  `ProfitMark(objet, wanted)` rend `{ entry, held, need, seen }` ou `nil` (`wanted` = le résultat de
+  `WantedItems()`, lu une fois par remplissage de la vue) ; `Seen(quête)` rend le relevé ou `nil`.
+- **Le relevé** (`CraftingOrderClassic_Writs_Seen.lua`) : `Learn(quête)` lit l'objectif et l'or dans
+  le journal et écrit `db.writsSeen` ; il ne touche ni à `Held()` ni à `WantedItems()`, qui restent
+  sans effet de bord.
 
 ## Questions ouvertes
 
 - **Pour le user** : faut-il aussi la quête du writ dans le **journal COC** (bouton « Commander » sur
-  sa fiche), dès ce premier tour ? (D4) Et la quantité d'un writ pas ouvert (D6) ?
+  sa fiche), dès ce premier tour ? (D4)
+- **À voir en jeu** : le montant de l'or, s'il change avec le niveau ; une même quête demande-t-elle
+  toujours la même quantité ; y a-t-il un plafond de writs par jour.
 - **Pages Wowhead à enregistrer** (en anglais, extension `tools\wowhead-page`), plus urgentes : le
   guide « Azeroth Commerce Authority Reputation Guide » (PNJ, remise, d'où viennent les enveloppes,
   noms des deux factions) ; l'objet 284584.
@@ -237,3 +303,6 @@ outillage, pour `tests/test_writs.lua`) atterrissent le même jour.
   ne vaut plus « rempli ».
 - **T3 — l'infobulle**, après le critère 2. Critères 9 et 11.
 - **T4 — l'onglet Commande**, après validation de D4 par le user. Critères 6, 7 et 10.
+- **T5 — la marque dans la vue Profit** (2026-11-09). Critères 12, 14 et 16.
+- **T6 — le relevé en jeu** de la quantité et de l'or (2026-11-09). Critères 13, 15 et 16.
+- **T7 — le coût de la réputation**, quand le relevé aura des chiffres. Critères à écrire alors.
