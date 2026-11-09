@@ -66,7 +66,7 @@ local function providedMats(o)
     local out = {}
     for _, id in ipairs(o.provided or {}) do
         local link = itemLink(id)
-        if link then out[#out + 1] = { link = link, qty = per[id] and per[id] * (tonumber(o.qty) or 1) or nil } end
+        if link then out[#out + 1] = { link = link, id = id, qty = per[id] and per[id] * (tonumber(o.qty) or 1) or nil } end
     end
     return out
 end
@@ -108,13 +108,16 @@ function S:CanRemind(o)
     return not o.announcedAt or (now() - o.announcedAt) >= S.REMIND
 end
 
--- Ce qu'une ligne WTB dit de la commande : lien de la cible, matériaux fournis, commission en cuivre.
--- nil si la cible n'est pas encore en cache.
+-- Ce qu'une ligne WTB dit de la commande : lien de la cible, matériaux fournis, commission en cuivre,
+-- et la référence de la cible pour le jeton d'ids (« i<objet> », ou « e<sort> » quand c'est le sort
+-- qui est lié). nil si la cible n'est pas encore en cache.
 local function wtbParts(o)
-    local target = (o.itemID and itemLink(o.itemID)) or (o.spellID and spellLink(o.spellID))
+    local item = o.itemID and itemLink(o.itemID)
+    local target = item or (o.spellID and spellLink(o.spellID))
     if not target then return nil end
     local Skin = COC.UI and COC.UI.Skin
-    return target, providedMats(o), Skin and Skin.PriceCopper and Skin.PriceCopper(o.price) or nil
+    local ref = item and ("i" .. o.itemID) or ("e" .. o.spellID)
+    return target, providedMats(o), Skin and Skin.PriceCopper and Skin.PriceCopper(o.price) or nil, ref
 end
 
 -- La ligne de la commande, ou nil (objet pas encore en cache, commande privée…).
@@ -124,11 +127,16 @@ function S:LineFor(o)
     return COC.Announce.BuildWTB(o, target, mats, copper)
 end
 
+-- Le lien de la cible seul (la ligne d'annulation Discord, D8), ou nil si elle n'est pas en cache.
+function S:TargetLink(o)
+    return (wtbParts(o))
+end
+
 -- La ligne du fil Discord de la guilde (Orders_AnnounceDiscord), signée `who`, ou nil.
 function S:DiscordLineFor(o, who)
-    local target, mats, copper = wtbParts(o)
+    local target, mats, copper, ref = wtbParts(o)
     if not target then return nil end
-    return COC.Announce.BuildDiscordWTB(o, target, mats, copper, who)
+    return COC.Announce.BuildDiscordWTB(o, target, mats, copper, who, ref)
 end
 
 -- Écrit la ligne sur Trade (Services). À appeler depuis un CLIC du joueur. Rend true si elle est partie.

@@ -1,5 +1,46 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.51.0 - Recipe colors that match the game, and a tracker you can hide
+
+On Forever, many recipes are taught earlier than the addon's data said, often 25 points earlier,
+and their colors were worked out from the old level. So the leveling route could plan skill points
+from a Silver Rod or a Coarse Sharpening Stone after the game had turned it grey, and "Learn now"
+hid recipes your trainer already sold (Bronze Axe at 90, for one). The colors now come from the game
+client's own tables, set on the level the trainer actually asks for. 97 recipes change, mostly in
+Blacksmithing and Leatherworking.
+
+The addon also knows what 253 more recipes make, from the same tables, so their price is worked out
+like any other recipe's. The few still without an item are services, like enchants.
+
+The on-screen tracker (your orders and the next recipe to level a profession) has a small red X at
+the end of its first line now. Click it and the whole tracker goes away, with one chat line telling
+you how to get it back: tick "On-screen tracker" in the Route tab of the profession window, or type
+`/co track on`. It stays hidden after a `/reload` until you turn it back on.
+
+In that Route tab, the "Include recipes to buy" box could cover the last lines of a long list. It
+has its own space now.
+
+The minimap icon no longer lights up for a request someone typed in chat without the addon (a
+"LF Minor Healing Potion" in Trade, say). The profession window only lists those under "Incoming",
+so clicking the icon opened an empty "All" list. They're still there, under "Incoming".
+
+## v1.50.0 - A cancelled order shows up on your guild's Discord too
+
+If one of your orders went to your guild's Discord and you cancel it in the Ledger, the addon now
+posts a cancel line in the same channel: `CANCEL [Linen Bandage] @Your Name #CO27`. Guildmates
+reading Discord know it's off. It goes out right away, even within a minute of your last line.
+
+An order's Discord line also carries a short code before your name now:
+`WTB [Linen Bandage] x1 2g50s i1251 @Your Name #CO27`. That's the item's id, followed by the ids of
+the materials you provide. A Discord bot can read it to link each item to its Wowhead page. Without
+a bot, it's just a few extra characters.
+
+Forever can hide from addons whether a player is you, or which NPC you're talking to. The addon now
+checks before using that (hovering and right-clicking a player, a trainer's window), and when it
+can't tell, it skips that step instead of risking a Lua error.
+
+The download is about 5.8 MB smaller: the package carried Wowhead pages the addon never uses.
+
 ## v1.49.0 - A guild order can go to your guild's Discord
 
 If your guild master linked guild chat to a Discord channel, the order form now has a "Whole guild +

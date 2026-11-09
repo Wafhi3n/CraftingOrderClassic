@@ -148,6 +148,7 @@ local function contentTracker()
                 L["Sections, par ordre de priorité : |cFFE8B84BPrêt à livrer|r (tu as tous les réactifs), |cFFE8B84BEn cours|r, |cFFE8B84BProgression|r (la recette du prochain point de métier), |cFFE8B84BMes commandes|r."],
                 L["Clic gauche sur une ligne : ouvre le métier concerné. Clic droit : ouvre le Carnet. Maj-clic un réactif : le lie dans le chat."],
                 L["Glisse n'importe quelle ligne pour déplacer le suivi ; clique l'en-tête d'une section pour la replier."],
+                L["Le X au bout du suivi le masque entièrement ; la case « Suivi à l'écran » de l'onglet Route le ramène."],
                 L["|cFFFFFFFF/co track|r affiche/masque · |cFFFFFFFF/co track reset|r remet en place · |cFFFFFFFF/co track combat|r masque en combat · |cFFFFFFFF/co track lines 5|r borne le nombre d'entrées."],
                 L["Onglet |cFFE8B84BCommande|r » |cFFE8B84BPoster en quête|r : donne un titre et un récit à ta demande, sur un vrai parchemin de quête. Elle apparaît ensuite sous ce nom chez les artisans."],
             },

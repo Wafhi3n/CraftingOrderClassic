@@ -209,6 +209,8 @@ local function npcIdentity()
     -- base empoisonnée, que plus rien ne pourrait relire (cf. Api.UnitNameSafe).
     local name = COC.Api.UnitNameSafe("npc")
     local guid = UnitGUID and UnitGUID("npc")
+    -- Même règle pour le GUID (UnitGUID porte SecretWhenUnitIdentityRestricted) : secret = pas d'id.
+    if COC.Api.IsSecret(guid) then guid = nil end
     local id   = guid and tonumber(guid:match("Creature%-0%-%d+%-%d+%-%d+%-(%d+)")) or nil
     return id, name
 end

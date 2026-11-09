@@ -132,6 +132,7 @@ function Orders:Cancel(id)
     -- whisperable. Son annulation doit suivre le même chemin, sinon ils la voient « open » jusqu'au TTL.
     o.status = "cancelled"; self:Broadcast("CANCEL", o, { channel = true })
     pmsg(L["commande annulée : "] .. id)
+    if COC.AnnounceDiscord then pcall(COC.AnnounceDiscord.Cancel, COC.AnnounceDiscord, o) end   -- carte barrée (D8)
 end
 
 function Orders:Accept(id)

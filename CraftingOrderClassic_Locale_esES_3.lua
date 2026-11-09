@@ -70,6 +70,7 @@ local es3 = {
     ["dispo annoncée sur %s."] = "disponibilidad anunciada en %s.",
     -- Ligne d'une commande de guilde dans le fil Discord de la guilde (2026-10-10)
     ["commande annoncée sur le Discord de la guilde."] = "pedido anunciado en el Discord de la hermandad.",
+    ["annulation signalée sur le Discord de la guilde."] = "cancelación enviada al Discord de la hermandad.",
     ["commande postée sans sa ligne Discord : une par minute au plus (encore %d s)."] =
         "pedido publicado sin su línea de Discord: una por minuto como máximo (faltan %d s).",
     ["commande postée sans sa ligne Discord : un objet n'est pas encore connu du jeu."] =
@@ -202,6 +203,15 @@ local es3 = {
     -- Ligne de destinataire du salon Discord de la guilde (2026-10-10)
     ["Toute la guilde + Discord"] = "Toda la hermandad + Discord",
     ["Discord"] = "Discord",
+    -- Le X du suivi à l'écran et la case qui le ramène, onglet Route (2026-11-06)
+    ["Suivi à l'écran"] = "Seguimiento en pantalla",
+    ["Masquer le suivi"] = "Ocultar el seguimiento",
+    ["Pour le réafficher : case « %s » de l'onglet %s, ou /co track on."] =
+        "Para volver a mostrarlo: marca «%s» en la pestaña %s, o /co track on.",
+    ["Tes commandes et ta progression à l'écran, comme le suivi de quêtes. Il n'apparaît que s'il y a quelque chose à suivre."] =
+        "Tus pedidos y tu progreso en pantalla, como el seguimiento de misiones. Solo aparece cuando hay algo que seguir.",
+    ["Le X au bout du suivi le masque entièrement ; la case « Suivi à l'écran » de l'onglet Route le ramène."] =
+        "La X al final del seguimiento lo oculta por completo; la casilla «Seguimiento en pantalla» de la pestaña Ruta lo devuelve.",
 }
 
 for k, v in pairs(es3) do L[k] = v end

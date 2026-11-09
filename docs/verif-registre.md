@@ -46,6 +46,89 @@ client.
 
 ## Relevés
 
+- 2026-11-08 00:10 — jusqu'a 916b8bf — build `main-dev@02016c5 2026-11-07 23:14`, `## Version: 1.51.0`
+  (lu dans le `.toc` déployé et par l'appli du banc, fiche `CraftingOrderClassic--release-v1.51.0-donnees`,
+  gestes « nouveautes » et « fin » cochés OK, sans remarque, sur la parole du user ; le geste
+  « version » (`/co version`) n'a pas été coché ; build client non relevé) — **GO** sur le candidat
+  v1.51.0 (`release/v1.51.0-donnees` : la `release/v1.51.0` préparée le 2026-11-07 à 09:22 et
+  `feat/donnees-db2`, leur code vu au banc le 2026-11-06 à 09:24 et le 2026-11-07 à 08:17 et 22:51) :
+  onglet Nouveautés, la v1.51.0 en tête avec ses paragraphes lisibles, sans clé brute, puis la v1.50.0.
+
+- 2026-11-07 22:51 — jusqu'a 97a5570 — build `main-dev@6c8cce1 2026-11-07 22:29` (lu dans le `.toc`
+  déployé par l'appli du banc, fiche `CraftingOrderClassic--feat-donnees-db2`, trois gestes cochés
+  OK, sans remarque, sur la parole du user ; build client non relevé) — **GO** sur
+  `feat/donnees-db2` (données Camelot de CraftLink : couleurs corrigées par les tables du client
+  1.60.1.70862, objets produits comblés) : sur Wafhien, Forge à 94, la sonde `RecipeColors` rend
+  `90 120 135 150` pour Bronze Axe (2741) et `75 80 82 85` pour Silver Rod (7818) ; la section
+  « À apprendre maintenant » du plan de route montre les recettes de bronze que Wowhead croyait
+  apprenables entre 95 et 115 ; chez un formateur de Forge, Bronze Axe demande 90 (Wowhead dit 115).
+  Avant ce build, le même soir, sur la parole du user : Silver Rod gris à 94 dans la fenêtre du jeu,
+  la mesure qui a décidé la correction. Non vu : les 253 objets produits comblés (ex. Critter Cookie
+  commandable comme objet), les 24 seuils changés en Cuisine, Enchantement et Ingénierie, le plan de
+  route aux rangs à venir.
+
+- 2026-11-07 08:17 — jusqu'a 2d0e28f — build `main-dev@a22d5d4 2026-11-06 18:38` (lu dans le `.toc`
+  déployé, `feat/suivi-masquer` dans les branches en test ; build client non relevé) — **GO** sur
+  `feat/suivi-masquer` : le X rouge au bout de la 1re ligne du suivi, sans recouvrir le texte, masque
+  tout le suivi avec une seule ligne de chat ; la case « On-screen tracker » de la languette Route le
+  ramène ; les cases et la note du pied de la route ne recouvrent plus la liste, rien ne déborde ;
+  après le X et un `/reload`, le suivi reste masqué et la case décochée, et `/co track on|off` fait
+  suivre la case. Sur la parole du user (« le bouton on-screen tracker fonctionne », puis les quatre
+  autres points cochés en réponse à une question), sans capture ; la fiche de l'appli du banc n'a pas
+  été remplie. Non vu : la fenêtre flottante « Leveling route » (même code que la languette).
+
+- 2026-11-06 09:24 — jusqu'a 7f3080c — Forever build client 70790 ; build `main-dev@a93a999 2026-11-06
+  09:21` (lu dans le `.toc` déployé, branches en test dont `fix/icone-sans-entrantes`) — **GO** sur
+  `fix/icone-sans-entrantes` : après `/reload`, l'icône Secourisme de la minicarte (« Pour tous : 1 »,
+  une demande de Tolm Rouageargent captée dans le chat, ordre `CAP-…`) a disparu, et la demande reste
+  sous le filtre « Entrantes » de la colonne Commandes. Sur la parole du user (« c'est good » aux
+  trois gestes demandés : icône éteinte, demande sous « Entrantes », `/co version`), sans capture
+  après correctif ; la capture d'avant montrait l'icône allumée et la colonne vide sous « Tous ».
+
+- 2026-10-17 19:09 — jusqu'a 9b8e166 — Forever build client 70450 ; build `main-dev@c48a705 2026-10-17
+  18:53`, `## Version: 1.50.0` (lu dans le `.toc` déployé et par l'appli du banc, fiche
+  `CraftingOrderClassic--release-v1.50.0`, trois gestes cochés OK, sans remarque, sur la parole du
+  user) — **GO** sur le candidat v1.50.0 (`release/v1.50.0` : version, CHANGELOG, onglet Nouveautés
+  avec son bloc de tête neuf ; le code des branches fusionnées vu au banc le 2026-10-11 à 13:59 et
+  14:19, et le 2026-10-14 à 11:07) : `/co version` affiche 1.50.0 et la ligne Build ; onglet
+  Nouveautés, la v1.50.0 en tête, lisible en anglais, sans clé brute, puis la v1.49.0.
+
+- 2026-10-11 13:59 — jusqu'a e18b574 — build `main-dev@61158f7 2026-10-10 20:40` (gestes « ligne-ids »
+  et « carte-ancien-bot ») puis `main-dev@a5941ca 2026-10-11 13:37` (« enchant-ids » et
+  « carte-par-id »), lus par l'appli du banc (fiche `CraftingOrderClassic--feat-ids-discord`, 4 gestes
+  sur 4 cochés OK, sur la parole du user, sans capture) ; build client non relevé — **GO** sur D7 (les
+  ids dans la ligne Discord) : la ligne « [Guild Discord] WTB … » porte le jeton `i<objet>,<matériau>`
+  juste avant `@Rédemption Wafhien #CO<n>`, le prix avant les ids ; l'ancien bot reprenait la carte
+  comme avant et effaçait la ligne du salon relié ; une commande d'enchantement sans commission donne
+  une carte sans prix (« #CO59 Gnomi Short cherche Enchant Cloak - Lesser Fire Resistance x1 —
+  https://www.wowhead.com/forever/fr/spell=7861 ») ; avec le nouveau bot, « #CO41 Rédemption Wafhien
+  cherche Enchant Cloak - Dodge x1 — fournit Guardian Stone x8 +2 —
+  https://www.wowhead.com/forever/fr/spell=25086 ». **Pas vus** : le lien de chaque matériau (la copie
+  de la carte ne le montre pas) et les noms en français (récolte des noms pas encore versée dans le
+  bot, comme prévu par la fiche).
+- 2026-10-11 14:19 — jusqu'a 723b36c — build `main-dev@0da5d08 2026-10-10 21:11` (geste
+  « carte-immediate ») puis `main-dev@a5941ca 2026-10-11 14:15` (« carnet-annuler » et
+  « annuler-tout-de-suite »), lus par l'appli du banc (fiche
+  `CraftingOrderClassic--feat-annulation-discord`, 3 gestes sur 5 cochés OK, sur la parole du user,
+  sans capture) ; build client non relevé — **GO partiel** sur D8 (annuler en jeu barre la carte
+  Discord) : après une minute sans commande, la carte arrive dans #commandes en quelques secondes et
+  commence par **#CO<n>** ; « Annuler » au Carnet écrit « CANCEL [objet] @Rédemption Wafhien #CO<n> »
+  dans le fil Discord, la carte de #commandes est barrée et la ligne quitte le salon relié ; une
+  commande annulée dans les 10 secondes envoie quand même sa ligne CANCEL. Le bot déployé comprend
+  donc `CANCEL`, le prérequis de la release. ⚠️ Le témoin du 3e geste (« une 2e commande dans la
+  minute part sans sa ligne ») ne vaut plus sur `a5941ca`, qui embarque `feat/discord-file` : la ligne
+  y attend son tour. **Pas vus** : `/co cancel <id>` (même résultat attendu qu'au Carnet) et la 2e
+  annulation qui ne doit pas écrire de 2e ligne.
+- 2026-10-14 11:07 — jusqu'a 4e65740 — Forever build client 70374 ; build `main-dev@62da2ac 2026-10-14
+  10:24` (gravé sur les réponses, `fix/secrets-validateur` dans X-Build-Branches) — **GO** sur
+  `fix/secrets-validateur` (relevé par le validateur d'API) : coché EN JEU dans les fiches en quêtes de
+  DevMacro (fiche `CraftingOrderClassic--fix-secrets-validateur`, 3 gestes OK de 10:56 à 10:58, sans
+  remarque, sur la parole du user), A = Rédemption : clic droit sur B, les entrées de Crafting Order
+  sont là (sur son propre portrait, aucune) ; survol de B inchangé ; fenêtre d'un formateur ouverte
+  sans erreur Lua. NON vu, pas provocable à la main : les cas secrets eux-mêmes (comparaison d'unités
+  secrète, GUID de PNJ secret) ; `Api.IsMe` sur un vrai booléen secret est tenu par
+  `tests/test_secrets.lua` (notre Elune), le GUID du formateur par `scripts\check_api.ps1`.
+
 - 2026-10-10 18:03 — jusqu'a 26c9f25 — Forever build client 70338 ; build `main-dev@2dda253 2026-10-10
   17:59`, `## Version: 1.49.0` (lu dans le `.toc` déployé et par l'appli du banc, fiche
   `CraftingOrderClassic--release-v1.49.0`, version cochée OK, onglet Nouveautés confirmé vu par le user
