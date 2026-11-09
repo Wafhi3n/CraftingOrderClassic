@@ -17,13 +17,13 @@
 | `CraftingOrderClassic_Locale.lua` | socle de localisation du CHROME de l'UI. | 12 |
 | `CraftingOrderClassic_Locale_enUS.lua` | overlay ANGLAIS (enUS/enGB). | 278 |
 | `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 498 |
-| `CraftingOrderClassic_Locale_enUS_3.lua` | overlay enUS, 3/3. | 241 |
+| `CraftingOrderClassic_Locale_enUS_3.lua` | overlay enUS, 3/3. | 242 |
 | `CraftingOrderClassic_Locale_deDE.lua` | overlay ALLEMAND (deDE). | 279 |
 | `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 479 |
-| `CraftingOrderClassic_Locale_deDE_3.lua` | overlay deDE, 3/3. | 240 |
+| `CraftingOrderClassic_Locale_deDE_3.lua` | overlay deDE, 3/3. | 241 |
 | `CraftingOrderClassic_Locale_esES.lua` | overlay ESPAGNOL (esES/esMX). | 280 |
 | `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 480 |
-| `CraftingOrderClassic_Locale_esES_3.lua` | overlay esES, 3/3. | 241 |
+| `CraftingOrderClassic_Locale_esES_3.lua` | overlay esES, 3/3. | 242 |
 | `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 436 |
 | `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 433 |
 | `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 433 |
@@ -95,9 +95,9 @@
 | `CraftingOrderClassic_Gem_Stats.lua` | correspondance TAILLE DE GEMME → STAT (données, éditées à la main). | 41 |
 | `CraftingOrderClassic_Sources.lua` | « où j'obtiens ce plan, et lesquels me manquent ». | 429 |
 | `CraftingOrderClassic_Trainers.lua` | « le formateur, vu de nos propres yeux ». | 346 |
-| `CraftingOrderClassic_Writs.lua` | les Craftsman's Writ de WoW: Forever (réputation Azeroth Commerce Authority) : quel writ lance quelle quête, quel objet elle demande, qui sait le faire, et quels writs je porte. | 249 |
+| `CraftingOrderClassic_Writs.lua` | les Craftsman's Writ de WoW: Forever (réputation Azeroth Commerce Authority) : quel writ lance quelle quête, quel objet elle demande, qui sait le faire, et quels writs je porte. | 267 |
 | `CraftingOrderClassic_Writs_Data.lua` | les Craftsman's Writ de WoW: Forever. | 163 |
-| `CraftingOrderClassic_Writs_Seen.lua` | QUAND COC relève ce qu'il voit des writs en jeu : une quête de writ qu'on accepte, et celles déjà au journal à la connexion. | 35 |
+| `CraftingOrderClassic_Writs_Seen.lua` | QUAND COC relève ce qu'il voit des writs en jeu : une quête de writ qu'on accepte, celles déjà au journal à la connexion, et l'or versé quand on la rend. | 40 |
 | `CraftingOrderClassic_ProfWindow.lua` | fenêtre métier custom 3 colonnes (migration depuis Guild Economy) : Recettes \| Détail+Craft \| Commandes du métier. | 490 |
 | `CraftingOrderClassic_ProfWindow_Layout.lua` | GÉOMÉTRIE de la vue métier (fenêtre 3 colonnes). | 184 |
 | `CraftingOrderClassic_ProfWindow_HelpPlate.lua` | AIDE CONTEXTUELLE de la Vue Métier (« bouton i »). | 113 |
@@ -113,7 +113,7 @@
 | `CraftingOrderClassic_ProfWindow_Route_Supply.lua` | ce qui se peint SOUS les segments du plan de route : le bloc « FOURNITURES » (composants agrégés de toute la route, plans à acheter) et, quand le rang est AU PLAFOND, le bloc « débloquer le palier suivant » (livre de rang curaté, ou renvoi vers le formateur de métier). | 118 |
 | `CraftingOrderClassic_ProfWindow_Learn.lua` | section « À apprendre maintenant » du Plan de route : les recettes NON APPRISES que ton rang permet déjà d'apprendre ET qui rapportent encore un point, classées par coût espéré par point, avec l'icône de leur source. | 113 |
 | `CraftingOrderClassic_ProfWindow_DockViews.lua` | la colonne Commandes CHANGE DE CONTENU au lieu d'ouvrir des fenêtres par-dessus. | 460 |
-| `CraftingOrderClassic_ProfWindow_DockProfit.lua` | la 4ᵉ vue de la colonne : « Profit ». | 371 |
+| `CraftingOrderClassic_ProfWindow_DockProfit.lua` | la 4ᵉ vue de la colonne : « Profit ». | 375 |
 | `CraftingOrderClassic_ProfWindow_Trade.lua` | le mode ÉCHANGE de la colonne de métier (T3). | 277 |
 | `CraftingOrderClassic_ProfWindow_Geo.lua` | `/co geo` : le RELEVÉ de la colonne, en pixels écran, écrit dans la SavedVariable pour être relu HORS DU JEU. | 262 |
 | `CraftingOrderClassic_ProfWindow_Detail.lua` | colonne CENTRE : détail de la recette sélectionnée (icône, réactifs have/need) + boutons Créer / Créer tout. | 279 |
@@ -1919,6 +1919,7 @@
 >   W:ProfitMark(itemID, wanted) → { entry, held, need, seen } | nil : la marque de la vue Profit
 >   W:Seen(questID)     → ce que COC a VU de cette quête en jeu (db.writsSeen) | nil
 >   W:Learn(questID)    → relève quantité et or d'une quête de writ au journal ; LearnHeld() : toutes
+>   W:Paid(questID, money) → relève l'or VERSÉ au rendu de la quête
 > `items` a deux objets pour un nom qui en désigne deux (« Golden Scale Gauntlets ») : la quête
 > acceptée dit lequel. Le métier n'est pas stocké : un objet peut en avoir deux (Gordok Ogre Suit),
 > il se lit dans CraftLink.
@@ -1926,7 +1927,7 @@
 > Aucune UI ici, aucun événement, aucune ligne de chat : ce module rend des données, à la demande.
 > Seul `Learn` écrit (dans db.writsSeen) ; le QUAND est dans _Writs_Seen.lua.
 
-**API** : `W:Load(data)` · `W:Info(writItemID)` · `W:ForQuest(questID)` · `W:All()` · `W:ForItem(itemID)` · `W:WhoCanMake(entry)` · `W:Objective(questID)` · `W:Held()` · `W:WantedItems()` · `W:ProfitMark(itemID, wanted)` · `W:Seen(questID)` · `W:Learn(questID)` · `W:LearnHeld()`
+**API** : `W:Load(data)` · `W:Info(writItemID)` · `W:ForQuest(questID)` · `W:All()` · `W:ForItem(itemID)` · `W:WhoCanMake(entry)` · `W:Objective(questID)` · `W:Held()` · `W:WantedItems()` · `W:ProfitMark(itemID, wanted)` · `W:Seen(questID)` · `W:Learn(questID)` · `W:Paid(questID, money)` · `W:LearnHeld()`
 
 ### `CraftingOrderClassic_Writs_Data.lua`
 > CraftingOrderClassic_Writs_Data.lua — les Craftsman's Writ de WoW: Forever.
@@ -1939,7 +1940,8 @@
 
 ### `CraftingOrderClassic_Writs_Seen.lua`
 > CraftingOrderClassic_Writs_Seen.lua — QUAND COC relève ce qu'il voit des writs en jeu : une quête
-> de writ qu'on accepte, et celles déjà au journal à la connexion. Spec : docs/specs/writs-aca.md, D8.
+> de writ qu'on accepte, celles déjà au journal à la connexion, et l'or versé quand on la rend.
+> Spec : docs/specs/writs-aca.md, D8.
 > 
 > La logique (quoi lire, quoi retenir) est dans CraftingOrderClassic_Writs.lua, `W:Learn`, testée
 > sans client. Ici, seulement les deux moments. Aucun cadre visible, aucune ligne de chat.

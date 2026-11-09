@@ -22,6 +22,7 @@
 --   W:ProfitMark(itemID, wanted) → { entry, held, need, seen } | nil : la marque de la vue Profit
 --   W:Seen(questID)     → ce que COC a VU de cette quête en jeu (db.writsSeen) | nil
 --   W:Learn(questID)    → relève quantité et or d'une quête de writ au journal ; LearnHeld() : toutes
+--   W:Paid(questID, money) → relève l'or VERSÉ au rendu de la quête
 -- `items` a deux objets pour un nom qui en désigne deux (« Golden Scale Gauntlets ») : la quête
 -- acceptée dit lequel. Le métier n'est pas stocké : un objet peut en avoir deux (Gordok Ogre Suit),
 -- il se lit dans CraftLink.
@@ -235,7 +236,24 @@ function W:Learn(questID)
     r.nMax = math.max(r.nMax or req, req)
     local A = COC.Api
     local money = A.GetQuestRewardMoney and A.GetQuestRewardMoney(e.quest)
-    if money then r.money, r.level = money, UnitLevel and UnitLevel("player") or nil end
+    -- Un 0 relu plus tard (récompense pas encore chargée) n'efface pas un montant déjà vu.
+    if money and (money > 0 or r.money == nil) then
+        r.money, r.level = money, UnitLevel and UnitLevel("player") or nil
+    end
+    r.at = time and time() or r.at
+    db.writsSeen[e.quest] = r
+    return r
+end
+
+-- L'or VERSÉ au rendu (`QUEST_TURNED_IN`, son `moneyReward`) : le seul chiffre qui fasse foi. Celui du
+-- journal est une annonce, et au niveau maximum l'expérience d'une quête vanilla peut se payer en or
+-- en plus. Le coût de la réputation (T7) lira celui-ci d'abord.
+function W:Paid(questID, money)
+    local e, db = self:ForQuest(questID), COC.db
+    if not (e and db and type(money) == "number") then return nil end
+    db.writsSeen = db.writsSeen or {}
+    local r = db.writsSeen[e.quest] or {}
+    r.paid, r.paidLevel = money, UnitLevel and UnitLevel("player") or nil
     r.at = time and time() or r.at
     db.writsSeen[e.quest] = r
     return r

@@ -169,7 +169,9 @@ Ce qu'on sait du système, lu le 2026-10-16 dans deux pages Wowhead enregistrée
   du client, puis CraftLink), pour que marque et prix parlent du même objet.
 - **D8 (choix du user, 2026-11-09)** : COC **relève en jeu** la quantité et l'or de chaque writ dont
   la quête passe dans le journal (`db.writsSeen`, par compte, créé à l'usage). Le user dit que la
-  quête donne « un peu d'or » ; personne n'en connaît le montant.
+  quête donne « un peu d'or » ; personne n'en connaît le montant. L'or du journal n'est qu'une
+  **annonce** : COC relève aussi l'or **versé** au rendu (`QUEST_TURNED_IN`, champ `moneyReward` dans
+  la doc de l'interface de Forever), qui fait foi pour T7 ; l'infobulle montre celui-là d'abord.
 - **D9 (choix du user, 2026-11-09)** : le **coût de la réputation** vient ensuite (T7), une fois que
   le relevé a des chiffres. Pas de plafond par jour apparent (impression du user, à confirmer) : en
   enchaîner plusieurs a donc du sens, et la liste les classe tous.
@@ -231,22 +233,27 @@ Ce qu'on sait du système, lu le 2026-10-16 dans deux pages Wowhead enregistrée
     même marque ; un identifiant inconnu → rien, sans erreur. → `tests/test_writs.lua`
 13. [test] Le relevé : une quête de writ acceptée retient quantité, or et niveau ; un deuxième relevé
     différent garde le dernier, le plus petit et le plus grand ; un objectif vide ou une
-    quête qui n'est pas un writ ne retient rien ; aucune ligne de chat. → même fichier
+    quête qui n'est pas un writ ne retient rien ; l'or versé au rendu est gardé à part, avec son
+    niveau, sans inventer de quantité ; un 0 relu n'efface pas l'or vu ; aucune ligne de chat.
+    → même fichier
 14. [humain] Fenêtre d'Ingénierie (ou un des cinq métiers), vue Profit : une recette demandée par un
     writ porte l'icône ; son infobulle dit le palier, la réputation et, Auctionator ayant scanné les
     writs, le prix du writ. Témoin : une recette de la même vue que personne ne demande, sans icône.
 15. [humain] Ouvrir un writ (quête acceptée), puis revoir la même recette : l'icône est pleine,
     l'infobulle dit ce qu'il manque et « vu en jeu : N ». Après `/reload`, le relevé est toujours là.
-16. [agent] `api-gotcha-reviewer` sur l'enregistreur (`QUEST_ACCEPTED`, `GetQuestLogRewardMoney`) ;
+    Rendre la quête, or du personnage noté avant et après : l'écart = « Or reçu au rendu ».
+16. [agent] `api-gotcha-reviewer` sur l'enregistreur (`QUEST_ACCEPTED`, `QUEST_TURNED_IN`,
+    `GetQuestLogRewardMoney`) ;
     `/console taintLog 1` et une infobulle de la vue Profit survolée : rien de COC dans `taint.log`.
 
 ## Contrat
 
 Rien sur le réseau (voir « Ce qu'on ne fait pas »). Une table neuve dans les SavedVariables :
 `db.writsSeen` (par compte, créée à l'usage, sans palier de migration) :
-`[quête] = { n = dernière quantité, nMin, nMax, money = or (cuivre), level = niveau du perso qui
-l'a vu, at = time() }`. Pas de compteur de relevés : la même quête est relue à chaque connexion
-tant qu'elle reste au journal, il compterait des lectures, pas des writs.
+`[quête] = { n = dernière quantité, nMin, nMax, money = or annoncé par le journal (cuivre), level =
+niveau du perso qui l'a vu, paid = or versé au rendu, paidLevel, at = time() }`. Pas de compteur de
+relevés : la même quête est relue à chaque connexion tant qu'elle reste au journal, il compterait
+des lectures, pas des writs. Un `money` à 0 relu plus tard n'efface pas un montant déjà vu.
 
 - **La table générée** (`CraftingOrderClassic_Writs_Data.lua`, par `tools/gen_writs.lua`), interne à
   COC : `[writ] = { quête, palier, objet demandé [, autre objet du même nom] }`, palier 1 Journeyman,

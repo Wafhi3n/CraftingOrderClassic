@@ -234,7 +234,8 @@ local de3 = {
     ["Le writ à l'HdV"] = "Auftrag im AH",
     ["%d à %d"] = "%d bis %d",
     ["Demandés (vu en jeu)"] = "Verlangt (im Spiel gesehen)",
-    ["Or rendu (vu au niveau %s)"] = "Goldbelohnung (gesehen auf Stufe %s)",
+    ["Or annoncé (vu au niveau %s)"] = "Angezeigte Goldbelohnung (gesehen auf Stufe %s)",
+    ["Or reçu au rendu (niveau %s)"] = "Bei Abgabe erhaltenes Gold (Stufe %s)",
 }
 
 for k, v in pairs(de3) do L[k] = v end

@@ -166,8 +166,12 @@ local function addWritLines(m)
             or tostring(s.n)
         GameTooltip:AddDoubleLine(L["Demandés (vu en jeu)"], q, LBL_R, LBL_G, LBL_B, 1, 1, 1)
     end
-    if s and s.money then
-        GameTooltip:AddDoubleLine(string.format(L["Or rendu (vu au niveau %s)"], tostring(s.level or "?")),
+    -- L'or VERSÉ au rendu fait foi ; à défaut, celui que le journal annonce.
+    if s and s.paid then
+        GameTooltip:AddDoubleLine(string.format(L["Or reçu au rendu (niveau %s)"], tostring(s.paidLevel or "?")),
+            A.Coin(s.paid), LBL_R, LBL_G, LBL_B, 1, 1, 1)
+    elseif s and s.money then
+        GameTooltip:AddDoubleLine(string.format(L["Or annoncé (vu au niveau %s)"], tostring(s.level or "?")),
             A.Coin(s.money), LBL_R, LBL_G, LBL_B, 1, 1, 1)
     end
 end

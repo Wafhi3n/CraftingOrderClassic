@@ -235,7 +235,8 @@ local en3 = {
     ["Le writ à l'HdV"] = "Writ at the AH",
     ["%d à %d"] = "%d to %d",
     ["Demandés (vu en jeu)"] = "Wanted (seen in game)",
-    ["Or rendu (vu au niveau %s)"] = "Gold reward (seen at level %s)",
+    ["Or annoncé (vu au niveau %s)"] = "Gold reward shown (seen at level %s)",
+    ["Or reçu au rendu (niveau %s)"] = "Gold received on turn-in (level %s)",
 }
 
 for k, v in pairs(en3) do L[k] = v end

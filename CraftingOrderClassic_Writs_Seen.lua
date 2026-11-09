@@ -1,5 +1,6 @@
 -- CraftingOrderClassic_Writs_Seen.lua — QUAND COC relève ce qu'il voit des writs en jeu : une quête
--- de writ qu'on accepte, et celles déjà au journal à la connexion. Spec : docs/specs/writs-aca.md, D8.
+-- de writ qu'on accepte, celles déjà au journal à la connexion, et l'or versé quand on la rend.
+-- Spec : docs/specs/writs-aca.md, D8.
 --
 -- La logique (quoi lire, quoi retenir) est dans CraftingOrderClassic_Writs.lua, `W:Learn`, testée
 -- sans client. Ici, seulement les deux moments. Aucun cadre visible, aucune ligne de chat.
@@ -21,12 +22,16 @@ end
 
 local f = CreateFrame("Frame")
 A.RegisterEventSafe(f, "QUEST_ACCEPTED")
+A.RegisterEventSafe(f, "QUEST_TURNED_IN")
 A.RegisterEventSafe(f, "PLAYER_ENTERING_WORLD")
-f:SetScript("OnEvent", function(self, event, a1, a2)
+f:SetScript("OnEvent", function(self, event, a1, a2, a3)
     if event == "QUEST_ACCEPTED" then
         -- Forever (Mainline) passe (questID) ; Classic passait (index, questID).
         local q = a2 or a1
         if W:ForQuest(q) then later(AFTER_ACCEPT, function() W:Learn(q) end) end
+    elseif event == "QUEST_TURNED_IN" then
+        -- (questID, xpReward, moneyReward), doc de l'interface de Forever : l'or réellement versé.
+        W:Paid(a1, a3)
     elseif event == "PLAYER_ENTERING_WORLD" then
         -- Une fois par session : les écrans de chargement suivants ne changent pas le journal.
         self:UnregisterEvent("PLAYER_ENTERING_WORLD")

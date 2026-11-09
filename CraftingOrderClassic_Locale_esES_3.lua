@@ -235,7 +235,8 @@ local es3 = {
     ["Le writ à l'HdV"] = "Encargo en la casa de subastas",
     ["%d à %d"] = "%d a %d",
     ["Demandés (vu en jeu)"] = "Pedidos (visto en el juego)",
-    ["Or rendu (vu au niveau %s)"] = "Oro de recompensa (visto a nivel %s)",
+    ["Or annoncé (vu au niveau %s)"] = "Oro anunciado (visto a nivel %s)",
+    ["Or reçu au rendu (niveau %s)"] = "Oro recibido al entregar (nivel %s)",
 }
 
 for k, v in pairs(es3) do L[k] = v end
