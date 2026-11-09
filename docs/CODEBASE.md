@@ -1,32 +1,32 @@
 # CraftingOrderClassic — carte du code
 
-> **GÉNÉRÉ** le 2026-11-07 (v1.50.0) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
+> **GÉNÉRÉ** le 2026-11-09 (v1.51.0) par `scripts\gen_docs.ps1` — ne pas éditer à la main :
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
-162 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
+165 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
 
 ## Modules (ordre de chargement)
 
 | Fichier | Rôle | Lignes |
 |---|---|---|
 | `CraftingOrderClassic.lua` | Crafting Order - Classic — réseau GLOBAL et SOCIAL de commandes de craft. | 499 |
-| `CraftingOrderClassic_Compat.lua` | couche d'adaptation d'API entre les SAVEURS de client. | 369 |
+| `CraftingOrderClassic_Compat.lua` | couche d'adaptation d'API entre les SAVEURS de client. | 387 |
 | `CraftingOrderClassic_Trace.lua` | trace réseau PERSISTÉE, lisible hors-jeu. | 79 |
 | `CraftingOrderClassic_Migrations.lua` | versionnage du schéma SavedVariables. | 60 |
 | `CraftingOrderClassic_Locale.lua` | socle de localisation du CHROME de l'UI. | 12 |
 | `CraftingOrderClassic_Locale_enUS.lua` | overlay ANGLAIS (enUS/enGB). | 278 |
 | `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 498 |
-| `CraftingOrderClassic_Locale_enUS_3.lua` | overlay enUS, 3/3. | 217 |
+| `CraftingOrderClassic_Locale_enUS_3.lua` | overlay enUS, 3/3. | 231 |
 | `CraftingOrderClassic_Locale_deDE.lua` | overlay ALLEMAND (deDE). | 279 |
 | `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 479 |
-| `CraftingOrderClassic_Locale_deDE_3.lua` | overlay deDE, 3/3. | 216 |
+| `CraftingOrderClassic_Locale_deDE_3.lua` | overlay deDE, 3/3. | 230 |
 | `CraftingOrderClassic_Locale_esES.lua` | overlay ESPAGNOL (esES/esMX). | 280 |
 | `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 480 |
-| `CraftingOrderClassic_Locale_esES_3.lua` | overlay esES, 3/3. | 217 |
-| `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 428 |
-| `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 425 |
-| `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 425 |
+| `CraftingOrderClassic_Locale_esES_3.lua` | overlay esES, 3/3. | 231 |
+| `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 436 |
+| `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 433 |
+| `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 433 |
 | `CraftingOrderClassic_Elemental.lua` | pseudo-« métier » de récolte « Élémentaire ». | 61 |
 | `CraftingOrderClassic_UI_Skin.lua` | tokens + helpers SÉMANTIQUES du skin (métiers, statuts, rareté, quantités, icônes natives) et petits widgets d'affichage. | 473 |
 | `CraftingOrderClassic_UI_Skin_Native.lua` | kit de chrome Blizzard NATIF (le « framework » UI de COC). | 485 |
@@ -67,7 +67,7 @@
 | `CraftingOrderClassic_UI_MyArtisans_Profit.lua` | onglet « Mes artisans » : couche Auctionator. | 135 |
 | `CraftingOrderClassic_UI_MyArtisans_Reroll.lua` | accès à la vue REROLL (métiers d'un AUTRE perso du compte) depuis l'onglet « Mes artisans ». | 86 |
 | `CraftingOrderClassic_UI_Help.lua` | onglet Aide : page unique défilante qui explique les autres onglets (Carnet/Commande/Récolte/Artisans), la Vue Métier et le réseau. | 214 |
-| `CraftingOrderClassic_UI_News.lua` | onglet « Nouveautés » : notes de version (changelog) affichées EN JEU, version par version, la plus récente en tête. | 492 |
+| `CraftingOrderClassic_UI_News.lua` | onglet « Nouveautés » : notes de version (changelog) affichées EN JEU, version par version, la plus récente en tête. | 496 |
 | `CraftingOrderClassic_Report.lua` | « Signaler » : un bug ou une idée, en ticket sur le dépôt GitHub. | 166 |
 | `CraftingOrderClassic_Social.lua` | couche sociale passive (socle). | 427 |
 | `CraftingOrderClassic_Social_Menu.lua` | entrées « Crafting Order » du menu contextuel joueur. | 118 |
@@ -95,6 +95,8 @@
 | `CraftingOrderClassic_Gem_Stats.lua` | correspondance TAILLE DE GEMME → STAT (données, éditées à la main). | 41 |
 | `CraftingOrderClassic_Sources.lua` | « où j'obtiens ce plan, et lesquels me manquent ». | 429 |
 | `CraftingOrderClassic_Trainers.lua` | « le formateur, vu de nos propres yeux ». | 346 |
+| `CraftingOrderClassic_Writs.lua` | les Craftsman's Writ de WoW: Forever (réputation Azeroth Commerce Authority) : quel writ lance quelle quête, quel objet elle demande, qui sait le faire, et quels writs je porte. | 180 |
+| `CraftingOrderClassic_Writs_Data.lua` | les Craftsman's Writ de WoW: Forever. | 163 |
 | `CraftingOrderClassic_ProfWindow.lua` | fenêtre métier custom 3 colonnes (migration depuis Guild Economy) : Recettes \| Détail+Craft \| Commandes du métier. | 490 |
 | `CraftingOrderClassic_ProfWindow_Layout.lua` | GÉOMÉTRIE de la vue métier (fenêtre 3 colonnes). | 184 |
 | `CraftingOrderClassic_ProfWindow_HelpPlate.lua` | AIDE CONTEXTUELLE de la Vue Métier (« bouton i »). | 113 |
@@ -110,12 +112,13 @@
 | `CraftingOrderClassic_ProfWindow_Route_Supply.lua` | ce qui se peint SOUS les segments du plan de route : le bloc « FOURNITURES » (composants agrégés de toute la route, plans à acheter) et, quand le rang est AU PLAFOND, le bloc « débloquer le palier suivant » (livre de rang curaté, ou renvoi vers le formateur de métier). | 118 |
 | `CraftingOrderClassic_ProfWindow_Learn.lua` | section « À apprendre maintenant » du Plan de route : les recettes NON APPRISES que ton rang permet déjà d'apprendre ET qui rapportent encore un point, classées par coût espéré par point, avec l'icône de leur source. | 113 |
 | `CraftingOrderClassic_ProfWindow_DockViews.lua` | la colonne Commandes CHANGE DE CONTENU au lieu d'ouvrir des fenêtres par-dessus. | 460 |
-| `CraftingOrderClassic_ProfWindow_DockProfit.lua` | la 4ᵉ vue de la colonne : « Profit ». | 211 |
+| `CraftingOrderClassic_ProfWindow_DockProfit.lua` | la 4ᵉ vue de la colonne : « Profit ». | 309 |
 | `CraftingOrderClassic_ProfWindow_Trade.lua` | le mode ÉCHANGE de la colonne de métier (T3). | 277 |
 | `CraftingOrderClassic_ProfWindow_Geo.lua` | `/co geo` : le RELEVÉ de la colonne, en pixels écran, écrit dans la SavedVariable pour être relu HORS DU JEU. | 262 |
 | `CraftingOrderClassic_ProfWindow_Detail.lua` | colonne CENTRE : détail de la recette sélectionnée (icône, réactifs have/need) + boutons Créer / Créer tout. | 279 |
 | `CraftingOrderClassic_ProfWindow_Info.lua` | PANNEAU D'INFO en SECTIONS pour la colonne centrale de la vue métier. | 217 |
-| `CraftingOrderClassic_Profit.lua` | pont LECTURE SEULE vers l'oracle de prix, AUCTIONATOR. | 477 |
+| `CraftingOrderClassic_Profit.lua` | pont LECTURE SEULE vers l'oracle de prix, AUCTIONATOR. | 399 |
+| `CraftingOrderClassic_Profit_Best.lua` | le meilleur plan d'un métier (sorti de _Profit.lua, 2026-09-29). | 126 |
 | `CraftingOrderClassic_ProfWindow_Orders.lua` | colonne « Commandes » de la vue métier (cabine de l'artisan) : construction (onglets de relation, en-tête, scroll), vue LISTE (une ligne par commande : demandeur + prix + âge ; une ligne sourdine cliquée se réaffiche), collecte/tri et rafraîchissement. | 498 |
 | `CraftingOrderClassic_ProfWindow_Orders_Card.lua` | vue SÉLECTIONNÉE de la colonne « Commandes » : la carte complète d'une commande (composants fournis, repères Auctionator, ACCEPTER / REFUSER / CHUCHOTER ; croix en haut à droite = retour liste). | 316 |
 | `CraftingOrderClassic_ProfWindow_LFW.lua` | config de l'OFFRE « recherche de travail » par métier. | 496 |
@@ -743,7 +746,7 @@
 > NB : la lib CraftLink charge AVANT COC et ne peut donc pas s'appuyer là-dessus — elle résout
 > ses propres appels chez elle.
 
-**API** : `A.GetSpellName(spellID)` · `A.GetBNetFriend(index)` · `A.Coin(copper, fontHeight)` · `A.GetNumQuestLogEntries()` · `A.GetQuestLogTitle(index)` · `A.GetQuestSelection()` · `A.RestoreQuestSelection(token)` · `A.SelectQuestLogEntry(index)` · `A.RegisterEventSafe(frame, event)` · `A.HookScriptSafe(frame, script, handler)` · `A.RegisterEventsSafe(frame, events)` · `A.TitleFontString(frame)` · `A.PortraitTexture(frame)` · `A.ChatMessagingBlocked()` · `A.AddChatFilter(event, fn)` · `A.IsSecret(v)` · `A.UnitNameSafe(unit, getter)` · `A.IsMe(unit)` · `A.PlayerName()` · `A.IsFullPlayerName(name)` · `A.SameFirstName(a, b)` · `A.CloseProfession()`
+**API** : `A.GetSpellName(spellID)` · `A.GetBNetFriend(index)` · `A.Coin(copper, fontHeight)` · `A.GetNumQuestLogEntries()` · `A.GetQuestLogTitle(index)` · `A.GetQuestSelection()` · `A.RestoreQuestSelection(token)` · `A.SelectQuestLogEntry(index)` · `A.IsOnQuest(questID)` · `A.IsQuestComplete(questID)` · `A.GetQuestObjectives(questID)` · `A.RegisterEventSafe(frame, event)` · `A.HookScriptSafe(frame, script, handler)` · `A.RegisterEventsSafe(frame, events)` · `A.TitleFontString(frame)` · `A.PortraitTexture(frame)` · `A.ChatMessagingBlocked()` · `A.AddChatFilter(event, fn)` · `A.IsSecret(v)` · `A.UnitNameSafe(unit, getter)` · `A.IsMe(unit)` · `A.PlayerName()` · `A.IsFullPlayerName(name)` · `A.SameFirstName(a, b)` · `A.CloseProfession()`
 
 ### `CraftingOrderClassic_Trace.lua`
 > CraftingOrderClassic_Trace.lua — trace réseau PERSISTÉE, lisible hors-jeu.
@@ -1890,6 +1893,44 @@
 
 **API** : `T:Harvest()` · `T:Teaches(profKey, spellID)` · `T:Npc(profKey)` · `T:Line(profKey)` · `T:Dump(rest)`
 
+### `CraftingOrderClassic_Writs.lua`
+> CraftingOrderClassic_Writs.lua — les Craftsman's Writ de WoW: Forever (réputation Azeroth
+> Commerce Authority) : quel writ lance quelle quête, quel objet elle demande, qui sait le faire, et
+> quels writs je porte.
+> 
+> Un writ est une commande d'artisan passée par un PNJ : la quête demande un objet fabriqué, tiré
+> parmi 150 sur cinq métiers SANS tenir compte des métiers du joueur, et un objet acheté ou fabriqué
+> par un autre est accepté (vu en jeu le 2026-10-16). D'où l'idée de COC : faire de ce writ une vraie
+> commande. Spec : docs/specs/writs-aca.md.
+> 
+> Tout passe par les IDENTIFIANTS (writ, quête, objet, recette), jamais par les noms : ils sont
+> traduits. La table vit dans CraftingOrderClassic_Writs_Data.lua, générée par tools/gen_writs.lua.
+> 
+> CONTRAT : les entrées rendues sont PARTAGÉES — à lire, jamais à modifier.
+>   W:Info(writItemID)  → { writ, quest, tier, rep, items = { objet [, homonyme] } } | nil
+>   W:ForQuest(questID) → la même entrée, retrouvée par sa quête | nil
+>   W:All()             → writItemID → entrée, pour parcourir
+>   W:WhoCanMake(entry) → { recipes, me, alts, crafters, online } | nil (objet inconnu de CraftLink)
+>   W:Held()            → { { entry, inBag, onQuest, done, required, have, need }, … } : les writs
+>                         que je porte, un par writ ; les quantités seulement pour une quête acceptée
+>   W:WantedItems()     → objet demandé → son writ porté (Held), pas encore rempli
+> `items` a deux objets pour un nom qui en désigne deux (« Golden Scale Gauntlets ») : la quête
+> acceptée dit lequel. Le métier n'est pas stocké : un objet peut en avoir deux (Gordok Ogre Suit),
+> il se lit dans CraftLink.
+> 
+> Aucune UI ici, aucun événement, aucune ligne de chat : ce module rend des données, à la demande.
+
+**API** : `W:Load(data)` · `W:Info(writItemID)` · `W:ForQuest(questID)` · `W:All()` · `W:WhoCanMake(entry)` · `W:Held()` · `W:WantedItems()`
+
+### `CraftingOrderClassic_Writs_Data.lua`
+> CraftingOrderClassic_Writs_Data.lua — les Craftsman's Writ de WoW: Forever.
+> GÉNÉRÉ par tools/gen_writs.lua le 2026-10-16 — NE PAS ÉDITER À LA MAIN.
+> Sources : www.wowhead.com_20261016-210922.html (recherche « Craftsman's writ », wowhead.com/forever, anglais)
+> et les pages forever_<Métier>.html du cache de CraftLink (objets fabriqués).
+> 
+> Une ligne : [writ] = { quête, palier, objet demandé [, autre objet du même nom] }.
+> Palier : 1 Journeyman, 2 Expert, 3 Artisan. Les noms en commentaire ne servent qu'à la relecture.
+
 ### `CraftingOrderClassic_ProfWindow.lua`
 > CraftingOrderClassic_ProfWindow.lua — fenêtre métier custom 3 colonnes (migration depuis
 > Guild Economy) : Recettes | Détail+Craft | Commandes du métier. Remplace la fenêtre Blizzard
@@ -2087,6 +2128,7 @@
 
 ### `CraftingOrderClassic_ProfWindow_DockProfit.lua`
 > CraftingOrderClassic_ProfWindow_DockProfit.lua — la 4ᵉ vue de la colonne : « Profit ».
+> Spec : docs/specs/rentabilite-forever.md.
 > 
 > CE QU'ELLE RÉPARE. Sur Classic Era, la vue métier custom affichait le profit net de chaque
 > recette et savait TRIER la liste par rentabilité : c'est comme ça qu'on décidait quoi fabriquer
@@ -2100,11 +2142,14 @@
 > déjà payé ~800 actions de barres d'action refusées pour cette leçon). Elle liste à CÔTÉ, dans
 > notre colonne, et le clic repasse la main au jeu par sa propre voie (cf. openRecipe).
 > 
-> Elle ne liste que les recettes APPRISES du métier ouvert, et seulement celles qui RAPPORTENT :
-> « est-ce que ça vaudrait le coup d'aller l'apprendre » est une question voisine mais différente,
-> et elle vit déjà dans la vue « Manquantes ». Une recette à perte n'affiche rien — c'était déjà la
-> règle de l'ancienne liste (PR:ProfitText rend une chaîne vide sous zéro), et une ligne avec un nom
-> et une colonne vide ne dit pas « à perte », elle dit « prix inconnu ».
+> Elle s'ouvre sur les recettes APPRISES du métier ouvert, et seulement celles qui RAPPORTENT. La
+> case « Tout le métier » y ajoute, en gris, celles qu'on n'a pas apprises (arbitrage 9) : « que
+> rapporterait-elle » ; « où l'apprendre » reste la vue « Manquantes ». Une recette à perte n'affiche
+> rien — une ligne avec un nom et une colonne vide ne dit pas « à perte », elle dit « prix inconnu ».
+> 
+> L'ENCHANTEMENT se lit par le COÛT (arbitrage 12) : ses recettes sont des services sans objet
+> produit, donc sans prix de vente, et la liste des profits serait VIDE — indiscernable d'une vue
+> cassée. Elle y liste ce que coûte chaque enchantement à lancer, et le DIT dans son titre.
 > 
 > ⚠️ Elle n'existe PAS sans oracle de prix : la languette n'est même pas construite (cf. VIEWS dans
 > _DockViews). Un onglet qui ne sait ouvrir qu'un message d'absence est un onglet vide.
@@ -2203,7 +2248,15 @@
 > Le COÛT des réactifs et l'objet produit viennent de NOS données CraftLink (RecipeReagents/RecipeProduct),
 > pas des tables de PR : on reste maître de la recette, PR ne sert QUE d'oracle de prix.
 
-**API** : `PR:IsAvailable()` · `PR:PriceSource()` · `PR:NoPriceMessage()` · `PR:ItemValue(itemID)` · `PR:IsVendorItem(itemID)` · `PR:PriceDump(arg)` · `PR:CoinTier(copper)` · `PR:ProfitTier(copper)` · `PR:ExactMode()` · `PR:SetExactMode(on)` · `PR:ProfitText(copper)` · `PR:Money(copper, colored)` · `PR:CraftProfit(profKey, spellID, numMade)` · `PR:EntryProfit(profKey, entry)` · `PR:CraftCost(profKey, spellID)` · `PR:EntryCost(profKey, entry)` · `PR:BestPlanFor(profKey, rank)` · `PR:BestProfitFor(profKey, rank)` · `PR:PlanName(profKey, plan)` · `PR:BestPlanName(profKey, rank)` · `PR:BestKnownPlanFor(profKey, r)` · `PR:MinProfit()` · `PR:HighlightTier(profit)`
+**API** : `PR:IsAvailable()` · `PR:PriceSource()` · `PR:NoPriceMessage()` · `PR:ItemValue(itemID)` · `PR:IsVendorItem(itemID)` · `PR:PriceDump(arg)` · `PR:CoinTier(copper)` · `PR:ProfitTier(copper)` · `PR:ExactMode()` · `PR:SetExactMode(on)` · `PR:ProfitText(copper)` · `PR:Money(copper, colored)` · `PR:CraftProfit(profKey, spellID, numMade)` · `PR:RecipeCost(profKey, spellID)` · `PR:EntryProfit(profKey, entry)` · `PR:CraftCost(profKey, spellID)` · `PR:EntryCost(profKey, entry)` · `PR:MinProfit()` · `PR:HighlightTier(profit)` · `PR:ProfitLines(p)`
+
+### `CraftingOrderClassic_Profit_Best.lua`
+> CraftingOrderClassic_Profit_Best.lua — le meilleur plan d'un métier (sorti de _Profit.lua, 2026-09-29).
+> 
+> Pur déplacement : ces fonctions ne lisent le calcul que par l'API publique de COC.Profit
+> (CraftProfit, IsAvailable). Elles ont quitté _Profit.lua pour qu'il tienne sous les 500 lignes.
+
+**API** : `PR:BestPlanFor(profKey, rank)` · `PR:BestProfitFor(profKey, rank)` · `PR:PlanName(profKey, plan)` · `PR:BestPlanName(profKey, rank)` · `PR:BestKnownPlanFor(profKey, r)`
 
 ### `CraftingOrderClassic_ProfWindow_Orders.lua`
 > CraftingOrderClassic_ProfWindow_Orders.lua — colonne « Commandes » de la vue métier (cabine de

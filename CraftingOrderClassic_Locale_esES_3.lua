@@ -212,6 +212,20 @@ local es3 = {
         "Tus pedidos y tu progreso en pantalla, como el seguimiento de misiones. Solo aparece cuando hay algo que seguir.",
     ["Le X au bout du suivi le masque entièrement ; la case « Suivi à l'écran » de l'onglet Route le ramène."] =
         "La X al final del seguimiento lo oculta por completo; la casilla «Seguimiento en pantalla» de la pestaña Ruta lo devuelve.",
+    -- Vue Profit : bascule « tout le métier », source du prix, coupe HV, Enchantement par le coût (2026-09-29)
+    ["Tout le métier"] = "Toda la profesión",
+    ["Ajoute, en gris, les recettes que tu n'as pas encore apprises."] =
+        "Añade, en gris, las recetas que aún no has aprendido.",
+    ["Pas encore apprise : la vue « Manquantes » dit où l'apprendre."] =
+        "Aún no aprendida: la vista «Faltantes» dice dónde aprenderla.",
+    ["Vente (prix marchand)"] = "Venta (precio de vendedor)",
+    ["Coupe HV (%d %%)"] = "Comisión CS (%d %%)",
+    ["Un marchand vend cet objet : l'HV ne le paiera pas plus cher."] =
+        "Un vendedor vende este objeto: en la CS nadie pagará más por él.",
+    ["Coût à lancer (%d)"] = "Coste por lanzamiento (%d)",
+    ["Ce que coûte un lancer, pas un gain : ta commission vient en plus."] =
+        "Lo que te cuesta un lanzamiento, no una ganancia: tu comisión va aparte.",
+    ["Aucun coût connu (prix : %s)."] = "Ningún coste conocido (precios: %s).",
 }
 
 for k, v in pairs(es3) do L[k] = v end

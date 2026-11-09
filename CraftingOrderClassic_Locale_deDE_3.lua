@@ -211,6 +211,20 @@ local de3 = {
         "Deine Aufträge und dein Fortschritt auf dem Bildschirm, wie die Questverfolgung. Sie erscheint nur, wenn es etwas zu verfolgen gibt.",
     ["Le X au bout du suivi le masque entièrement ; la case « Suivi à l'écran » de l'onglet Route le ramène."] =
         "Das X am Ende der Verfolgung blendet sie ganz aus; das Kästchen „Bildschirm-Verfolgung“ im Reiter Route holt sie zurück.",
+    -- Vue Profit : bascule « tout le métier », source du prix, coupe HV, Enchantement par le coût (2026-09-29)
+    ["Tout le métier"] = "Ganzer Beruf",
+    ["Ajoute, en gris, les recettes que tu n'as pas encore apprises."] =
+        "Fügt die Rezepte, die du noch nicht gelernt hast, in Grau hinzu.",
+    ["Pas encore apprise : la vue « Manquantes » dit où l'apprendre."] =
+        "Noch nicht gelernt: Die Ansicht „Fehlend“ zeigt, wo du es lernst.",
+    ["Vente (prix marchand)"] = "Verkauf (Händlerpreis)",
+    ["Coupe HV (%d %%)"] = "AH-Gebühr (%d %%)",
+    ["Un marchand vend cet objet : l'HV ne le paiera pas plus cher."] =
+        "Ein Händler verkauft diesen Gegenstand: Im AH zahlt niemand mehr dafür.",
+    ["Coût à lancer (%d)"] = "Kosten pro Wirken (%d)",
+    ["Ce que coûte un lancer, pas un gain : ta commission vient en plus."] =
+        "Was dich ein Wirken kostet, kein Gewinn: Deine Provision kommt obendrauf.",
+    ["Aucun coût connu (prix : %s)."] = "Keine Kosten bekannt (Preise: %s).",
 }
 
 for k, v in pairs(de3) do L[k] = v end

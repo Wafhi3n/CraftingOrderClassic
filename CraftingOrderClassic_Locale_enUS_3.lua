@@ -212,6 +212,20 @@ local en3 = {
         "Your orders and your progress on screen, like the quest tracker. It only shows up when there's something to track.",
     ["Le X au bout du suivi le masque entièrement ; la case « Suivi à l'écran » de l'onglet Route le ramène."] =
         "The X at the end of the tracker hides it completely; the “On-screen tracker” box in the Route tab brings it back.",
+    -- Vue Profit : bascule « tout le métier », source du prix, coupe HV, Enchantement par le coût (2026-09-29)
+    ["Tout le métier"] = "Whole profession",
+    ["Ajoute, en gris, les recettes que tu n'as pas encore apprises."] =
+        "Adds, in grey, the recipes you haven't learned yet.",
+    ["Pas encore apprise : la vue « Manquantes » dit où l'apprendre."] =
+        "Not learned yet: the \"Missing\" view tells you where to learn it.",
+    ["Vente (prix marchand)"] = "Sale (vendor price)",
+    ["Coupe HV (%d %%)"] = "AH cut (%d%%)",
+    ["Un marchand vend cet objet : l'HV ne le paiera pas plus cher."] =
+        "A vendor sells this item: the AH won't pay more for it.",
+    ["Coût à lancer (%d)"] = "Cost to cast (%d)",
+    ["Ce que coûte un lancer, pas un gain : ta commission vient en plus."] =
+        "What one cast costs you, not a gain: your fee comes on top.",
+    ["Aucun coût connu (prix : %s)."] = "No known cost (prices: %s).",
 }
 
 for k, v in pairs(en3) do L[k] = v end

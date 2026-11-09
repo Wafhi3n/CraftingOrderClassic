@@ -28,7 +28,12 @@ local COC = CraftingOrderClassic
 local PR  = {}
 COC.Profit = PR
 
-local AH_CUT = 0.05   -- coupe de l'hôtel des ventes (5 %)
+-- Coupe de l'hôtel des ventes (5 %). EN DUR, et c'est un choix (arbitrage 11 de la spec
+-- rentabilite-forever) : c'est une constante du jeu, pas une préférence — un réglage de plus ne
+-- paierait pas sa place. On l'EXPOSE en revanche, pour que le détail du calcul l'affiche : sans elle,
+-- vente − réactifs ne retombe pas sur le net, et le joueur cherche d'où vient l'écart.
+local AH_CUT = 0.05
+PR.AH_CUT = AH_CUT
 
 -- Nom d'appelant exigé par l'API d'Auctionator (elle lève sur une chaîne vide).
 local CALLER = "CraftingOrderClassic"
@@ -60,18 +65,27 @@ function PR:NoPriceMessage()
     return L["Rien à calculer — scanne l'HV (Auctionator) puis rouvre ce panneau."]
 end
 
--- Prix d'un objet en cuivre (vendeur ou HV), ou nil si aucun oracle ne le connaît.
--- Ordre VENDEUR puis HV dans les deux chemins : un réactif vendu à prix fixe en ville ne doit
--- jamais être valorisé au cours de l'HV, sinon toute la route se trompe de recette.
-function PR:ItemValue(itemID)
+-- Prix d'un objet ET sa provenance ("vendor" | "ah"), ou nil. Ordre VENDEUR puis HV dans les deux
+-- chemins : un réactif vendu à prix fixe en ville ne doit jamais être valorisé au cours de l'HV,
+-- sinon toute la route se trompe de recette. Côté VENTE, le même ordre fait du prix marchand un
+-- PLAFOND honnête : si un PNJ vend l'objet, personne ne le paiera plus cher à l'HV (arbitrage 10).
+-- Locale et à deux retours : seul CraftProfit a besoin de la provenance, et un second retour qui
+-- fuirait d'ItemValue dans la liste d'arguments d'un appelant (`Coin(PR:ItemValue(id))`) y
+-- deviendrait un paramètre de trop.
+local function priceOf(itemID)
     if not itemID then return nil end
     local v1 = auctionator()
     if not v1 then return nil end
     local ok, price = pcall(v1.GetVendorPriceByItemID, CALLER, itemID)
-    if ok and type(price) == "number" and price > 0 then return price end
+    if ok and type(price) == "number" and price > 0 then return price, "vendor" end
     ok, price = pcall(v1.GetAuctionPriceByItemID, CALLER, itemID)
-    if ok and type(price) == "number" and price > 0 then return price end
+    if ok and type(price) == "number" and price > 0 then return price, "ah" end
     return nil
+end
+
+-- Prix d'un objet en cuivre (vendeur ou HV), ou nil si aucun oracle ne le connaît. UN seul retour.
+function PR:ItemValue(itemID)
+    return (priceOf(itemID))
 end
 
 -- Objet vendu par un PNJ (prix fixe) ? Sert à la bourse d'artisan : un composant vendeur ne vaut pas
@@ -230,29 +244,51 @@ local function recipeSchema(profKey, spellID)
     }
 end
 
--- Rentabilité d'une recette : { sell, cost, profit, missing } en cuivre, ou nil si le prix de VENTE
--- du produit est inconnu (sans lui, aucun calcul n'a de sens). `missing` = au moins un réactif sans
--- prix (coût sous-estimé). numMade = nb d'objets produits par craft (défaut 1).
+-- Coût d'une liste de réactifs { {itemID, qté}, … } : coût, `missing` (au moins un sans prix, donc
+-- coût SOUS-estimé) et `priced` (au moins un avec prix). Un seul compteur pour les trois lectures
+-- (profit, coût catalogue, coût client) : elles ne peuvent pas diverger sur la façon de compter.
+local function reagentsCost(reagents)
+    local cost, missing, priced = 0, false, false
+    for _, reag in ipairs(reagents) do
+        local p = PR:ItemValue(reag[1])
+        if p then cost = cost + p * (reag[2] or 1); priced = true else missing = true end
+    end
+    return cost, missing, priced
+end
+
+-- Rentabilité d'une recette, en cuivre, ou nil si le prix de VENTE du produit est inconnu (sans lui,
+-- aucun calcul n'a de sens) :
+--   sell (unitaire) · sellSrc ("vendor" | "ah") · gross (= sell × lot) · cut (coupe HV sur gross)
+--   cost · missing (au moins un réactif sans prix : coût sous-estimé) · profit · numMade
 -- Formule, inchangée depuis l'origine : vente × quantité × (1 − coupe HV) − coût des réactifs.
 function PR:CraftProfit(profKey, spellID, numMade)
     if not (self:IsAvailable() and profKey and spellID) then return nil end
     local sch = recipeSchema(profKey, spellID)
-    local sell = sch.productID and self:ItemValue(sch.productID)
+    local sell, sellSrc = priceOf(sch.productID)
     if not sell then return nil end
-
-    local cost, missing = 0, false
-    for _, reag in ipairs(sch.reagents) do
-        local id, qty = reag[1], reag[2] or 1
-        local p = self:ItemValue(id)
-        if p then cost = cost + p * qty else missing = true end
-    end
+    local cost, missing = reagentsCost(sch.reagents)
 
     -- Quantité produite : ce que l'APPELANT sait prime (une ligne de liste la porte déjà, lue sur
     -- la même session de métier), puis ce que le client dit du lot, puis 1.
     local n = numMade or sch.numMade
     n = (n and n > 0) and n or 1
-    local profit = sell * n * (1 - AH_CUT) - cost
-    return { sell = sell, cost = cost, profit = profit, missing = missing, numMade = n }
+    local gross = sell * n
+    local profit = gross * (1 - AH_CUT) - cost
+    return { sell = sell, sellSrc = sellSrc, gross = gross, cut = gross * AH_CUT,
+             cost = cost, profit = profit, missing = missing, numMade = n }
+end
+
+-- Coût de LANCER une recette, lu comme CraftProfit (le client d'abord, le catalogue ensuite) :
+-- { cost, missing }, ou nil si aucun réactif n'a de prix. Pas besoin d'un prix de vente : c'est la
+-- lecture de l'Enchantement, dont les recettes sont des services sans objet produit (arbitrage 12).
+-- Distincte de CraftCost, qui lit le catalogue SEUL pour la montée de métier et la bourse d'artisan,
+-- deux chantiers clos et validés en jeu : leur changer de source n'est pas une retouche en passant
+-- (décision 8 de la spec).
+function PR:RecipeCost(profKey, spellID)
+    if not (self:IsAvailable() and profKey and spellID) then return nil end
+    local cost, missing, priced = reagentsCost(recipeSchema(profKey, spellID).reagents)
+    if not priced then return nil end
+    return { cost = cost, missing = missing }
 end
 
 -- Résout le spellID d'une entrée de recette : direct (recettes manquantes) ou via l'objet produit
@@ -283,12 +319,7 @@ function PR:CraftCost(profKey, spellID)
     if not (self:IsAvailable() and profKey and spellID) then return nil end
     local lib = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
     local reags = lib and (lib.RecipeReagents and lib:RecipeReagents(profKey, spellID)) or {}
-    if #reags == 0 then return nil end
-    local cost, missing, priced = 0, false, false
-    for _, reag in ipairs(reags) do
-        local p = self:ItemValue(reag[1])
-        if p then cost = cost + p * (reag[2] or 1); priced = true else missing = true end
-    end
+    local cost, missing, priced = reagentsCost(reags)
     if not priced then return nil end
     return { cost = cost, missing = missing }
 end
@@ -298,125 +329,6 @@ function PR:EntryCost(profKey, entry)
     local spellID = entrySpell(profKey, entry)
     if not spellID then return nil end
     return self:CraftCost(profKey, spellID)
-end
-
--- ---------------------------------------------------------------------------
--- Meilleur profit ATTEIGNABLE dans un métier, par niveau de compétence
--- ---------------------------------------------------------------------------
--- Sert à mettre en avant l'artisan dont le métier a un plan rentable. Calculer ça naïvement voudrait
--- dire, à chaque rendu et pour chaque artisan, évaluer les centaines de recettes du métier (donc des
--- milliers de lookups de prix). On construit donc UNE FOIS par métier une table indexée par niveau :
---   best[r] = meilleur profit parmi les recettes apprenables à un niveau <= r.
--- Lookup ensuite en O(1). Cache avec TTL : les prix Auctionator bougent, mais pas à la seconde.
-local MAX_RANK, CACHE_TTL = 450, 120
-local bestCache = {}   -- [profKey] = { at = <horodatage>, best = { [rank] = profit } }
-
--- best[r] = { profit, sid } du MEILLEUR plan atteignable à un niveau ≤ r (on garde le spellID, pas
--- seulement le montant : le tooltip d'artisan NOMME le plan — « le meilleur plan » sans son nom ne
--- dit pas quoi commander).
-local function buildBest(profKey)
-    local lib = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
-    local best = {}
-    -- Meilleur plan par niveau d'apprentissage EXACT, puis propagation en max cumulé.
-    local atRank = {}
-    for _, spellID in ipairs((lib and lib.GetRecipes and lib:GetRecipes(profKey)) or {}) do
-        local p = PR:CraftProfit(profKey, spellID, nil)
-        if p and p.profit and p.profit > 0 then
-            local at = (lib.RecipeLearnedAt and lib:RecipeLearnedAt(profKey, spellID)) or 1
-            if at < 0 then at = 0 elseif at > MAX_RANK then at = MAX_RANK end
-            local cur = atRank[at]
-            if not cur or p.profit > cur.profit then atRank[at] = { profit = p.profit, sid = spellID } end
-        end
-    end
-    local running = nil
-    for r = 0, MAX_RANK do
-        local v = atRank[r]
-        if v and (not running or v.profit > running.profit) then running = v end
-        best[r] = running
-    end
-    return best
-end
-
--- Entrée { profit, sid } du meilleur plan d'un métier pour un artisan de niveau `rank`, ou nil.
--- rank nil → on suppose le niveau max (on ne sait pas, autant ne pas sous-estimer).
-function PR:BestPlanFor(profKey, rank)
-    if not (self:IsAvailable() and profKey) then return nil end
-    local now = GetTime and GetTime() or 0
-    local c = bestCache[profKey]
-    if not c or (now - c.at) > CACHE_TTL then
-        c = { at = now, best = buildBest(profKey) }
-        bestCache[profKey] = c
-    end
-    local r = tonumber(rank) or MAX_RANK
-    if r < 0 then r = 0 elseif r > MAX_RANK then r = MAX_RANK end
-    return c.best[r]
-end
-
--- Montant seul (nil si aucun plan rentable / pas de prix).
-function PR:BestProfitFor(profKey, rank)
-    local e = self:BestPlanFor(profKey, rank)
-    return e and e.profit or nil
-end
-
--- Nom de l'objet produit par un plan { profit, sid } (« Iron Buckle »), ou nil.
-function PR:PlanName(profKey, plan)
-    local lib = plan and LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
-    if not lib then return nil end
-    local itemID = lib.RecipeProduct and lib:RecipeProduct(profKey, plan.sid)
-    local nm = itemID and lib:ItemName(itemID) or lib:RecipeName(plan.sid)
-    if not nm or nm:match("^item:") or nm:match("^spell:") then return nil end
-    return nm
-end
-
--- Nom du meilleur plan ATTEIGNABLE à un rang (approximation, cf. BestPlanFor). Conservé pour les
--- appelants qui n'ont pas de fiche artisan (rang seul) — préférer BestKnownPlanFor + PlanName quand
--- une fiche `r` est disponible : plus honnête (ne nomme que ce que l'artisan a RÉELLEMENT appris).
-function PR:BestPlanName(profKey, rank)
-    return self:PlanName(profKey, self:BestPlanFor(profKey, rank))
-end
-
--- ---------------------------------------------------------------------------
--- Meilleur plan RÉELLEMENT connu d'un artisan (pas seulement « atteignable à son niveau »). En
--- Classic, une recette dépasse un palier de compétence ne veut pas dire qu'on l'a apprise : elle
--- peut nécessiter un PNJ, un butin ou une quête à part. BestPlanFor (rang seul) peut donc nommer un
--- plan que l'artisan ne sait PAS fabriquer. Ici on décode le bitmask EXACT de ses recettes connues
--- (mêmes données que le filtre « connus » de l'onglet Commande, cf. _TargetArtisanFilter) et on ne
--- regarde que celles-là. Cache par (métier, bitmask) — pas par rang — car deux artisans de même
--- niveau peuvent avoir appris des recettes différentes.
-local knownBestCache = {}   -- [profKey.."|"..hex] = { at, best = {profit, sid} | nil }
-
--- `known` = set { [spellID] = true } fourni par la couture (Directory_Recipes) : ce module n'a
--- pas a savoir si le registre est arrive en bitfield ou en identifiants.
-local function buildBestKnown(profKey, known)
-    if not known then return nil end
-    local best
-    for sid in pairs(known) do
-        local p = PR:CraftProfit(profKey, sid, nil)
-        if p and p.profit and p.profit > 0 and (not best or p.profit > best.profit) then
-            best = { profit = p.profit, sid = sid }
-        end
-    end
-    return best
-end
-
--- `r` = fiche roster de l'artisan. Renvoie nil si son registre n'est pas EXPLOITABLE pour ce
--- métier (jamais croisé en direct, ou bitfield d'une autre version du catalogue) — dans ce cas
--- l'appelant retombe sur BestPlanFor(profKey, rank), une approximation moins fiable mais
--- toujours disponible. La forme du registre est l'affaire de la couture, pas la nôtre.
-function PR:BestKnownPlanFor(profKey, r)
-    if not (self:IsAvailable() and profKey and r) then return nil end
-    local D = COC.Directory
-    -- La clé de cache vient de la couture : elle intègre la FORME du registre, donc deux
-    -- registres de formes différentes ne peuvent pas se répondre l'un pour l'autre.
-    local k = D and D.RecipeFingerprint and D:RecipeFingerprint(r, profKey)
-    if not k then return nil end
-    local now = GetTime and GetTime() or 0
-    local c = knownBestCache[k]
-    if not c or (now - c.at) > CACHE_TTL then
-        c = { at = now, best = buildBestKnown(profKey, D:RecipeKnownSet(r, profKey)) }
-        knownBestCache[k] = c
-    end
-    return c.best
 end
 
 -- Seuil de mise en avant (configurable) : par défaut 10 po. Les paliers en découlent (×10, ×100).
@@ -452,6 +364,27 @@ PR.TIER_COLOR   = {                                            -- teinte du cont
     [3] = { 1.00, 0.82, 0.25 },   -- or + halo
 }
 
+-- Le DÉTAIL d'un résultat de CraftProfit, ligne par ligne { label, value }, de sorte qu'il se
+-- RECOMPTE à l'œil : vente − coupe − réactifs = net. Deux choses qu'il doit dire (arbitrages 10 et
+-- 11 de la spec rentabilite-forever) : d'où vient le prix de vente — un prix MARCHAND affiché sous
+-- « Vente HV » passerait pour faux auprès de qui voit l'HV afficher autre chose — et la coupe de
+-- l'HV, sans laquelle le compte ne tombe pas juste. La vente est le BRUT du lot : un prix unitaire
+-- suivi de « ×2 » se lirait comme un total, et le compte ne tomberait plus juste non plus.
+function PR:ProfitLines(p)
+    local L = COC.L
+    local sellLbl = (p.sellSrc == "vendor") and L["Vente (prix marchand)"] or L["Vente HV"]
+    if (p.numMade or 1) > 1 then sellLbl = sellLbl .. " ×" .. p.numMade end
+    local costVal = self:Money(-p.cost, true)
+    if p.missing then costVal = costVal .. " |cFF888888(?)|r" end   -- un réactif sans prix : coût partiel
+    local pct = math.floor(AH_CUT * 100 + 0.5)
+    return {
+        { label = sellLbl, value = COC.Api.Coin(math.floor((p.gross or p.sell) + 0.5)) },
+        { label = string.format(L["Coupe HV (%d %%)"], pct), value = self:Money(-(p.cut or 0), true) },
+        { label = L["Réactifs"],   value = costVal },
+        { label = L["Profit net"], value = self:Money(p.profit, true) },
+    }
+end
+
 -- Section « Rentabilité » du panneau d'info (cf. _ProfWindow_Info.lua). S'affiche pour toute recette
 -- — apprise ou manquante — dont on connaît le prix de vente. Nil sinon (oracle absent, prix inconnu…).
 if COC.ProfWindow and COC.ProfWindow.RegisterInfoSection then
@@ -461,17 +394,6 @@ if COC.ProfWindow and COC.ProfWindow.RegisterInfoSection then
         local numMade = ctx.entry and ctx.entry.numMade
         local p = spellID and PR:CraftProfit(ctx.profKey, spellID, numMade)
         if not p then return nil end
-        local L = COC.L
-        local sellLbl = L["Vente HV"] .. (p.numMade > 1 and (" ×" .. p.numMade) or "")
-        local costVal = PR:Money(-p.cost, true)
-        if p.missing then costVal = costVal .. " |cFF888888(?)|r" end   -- un réactif sans prix : coût partiel
-        return {
-            title = L["Rentabilité"],
-            lines = {
-                { label = sellLbl,        value = COC.Api.Coin(p.sell) },
-                { label = L["Réactifs"],  value = costVal },
-                { label = L["Profit net"], value = PR:Money(p.profit, true) },
-            },
-        }
+        return { title = COC.L["Rentabilité"], lines = PR:ProfitLines(p) }
     end)
 end
