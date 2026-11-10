@@ -91,6 +91,7 @@ s'applique telle quelle.
 ## Décisions
 
 1. **La route choisit sur le coût NET**, et affiche aussi « À débourser ». — user, 2026-10-02.
+   Nuancée par la décision 12 quand le gain net est faible.
 2. **Le stock en sac vaut son prix de revente** : prix HV moins la coupe de 5 %, ce que le joueur en
    tirerait. — user, 2026-10-02.
 3. **La revente du produit est comptée par défaut**, avec une case pour la couper ; l'infobulle dit
@@ -126,6 +127,16 @@ s'applique telle quelle.
    s'additionnent au « Coût net » de l'en-tête. Un gain s'écrit « +X » en vert ; une étape dont les
    matières valent plus que ce qu'elle produit s'écrit en orange, l'infobulle dit de combien. Le
    suivi à l'écran, lui, affiche toujours ce qui sort de la bourse pour le prochain point.
+12. **Quand le gain net est faible, on garde la recette qui fait sortir le moins d'argent** ;
+   au-delà, le coût net décide. — user, 2026-11-10, sur une capture (Alchimie 16/75, case revente
+   décochée) : la route faisait apprendre Elixir of Minor Strength (50c) et acheter 66 Earthroot,
+   27 pa 20 à débourser, pour épargner ~4c le point de Peacebloom déjà en sac. Elixir of Minor
+   Defense, connue et dont tout était en sac, ne sortait que 1 pa 75 de fioles. **Choix
+   d'implémentation** : « faible » = au plus **10 %** de plus au point que la meilleure, au net
+   (`NET_TOL` dans `Route.lua`, valeur proposée, le user ne l'a pas chiffrée). Le seuil se mesure
+   depuis la MEILLEURE recette, pas de proche en proche (sinon la route glisserait de 10 % en
+   10 %). Ce qui sort de la bourse compte le plan amorti, comme le coût net. Une recette douteuse ne
+   passe jamais devant une sûre. La bourse d'artisan, qui n'a pas `opts.value`, n'est pas touchée.
 
 ## Critères d'acceptation
 
@@ -149,6 +160,11 @@ fabriqué retiré, choix en caisse, sac gratuit) les font tomber :
 7. `[test]` `Route:NextStep` choisit la même recette que le premier segment de `Route:Compute`, case
    cochée et décochée.
 8. `[porte]` Libellés traduits dans les trois overlays (`check_locale.ps1`).
+13. `[test]` *(décision 12, verts le 2026-11-10 ; rouges sur le code d'avant)* La capture du
+   2026-11-10 rejouée : Minor Defense de 16 à 75, seules les fioles sortent de la bourse, et le
+   suivi à l'écran fait le même choix. Peacebloom à 80c (Minor Defense ~62 % plus chère au net) :
+   le net reprend la main et la route apprend Minor Strength. Seuil ancré sur la meilleure : entre
+   A (net 100), B (net 107, sort 50c) et C (net 114, ne sort rien), la route prend B.
 
 En jeu (le user, Forge sur le banc) :
 
@@ -164,6 +180,11 @@ En jeu (le user, Forge sur le banc) :
 12. `[humain]` Le prix de rachat marchand se lit sur Forever : `/dump select(11,
     C_Item.GetItemInfo(2840))` (Copper Bar) rend un nombre > 0. Témoin : le prix de vente au
     marchand affiché dans l'infobulle de l'objet. La doc générée ne prouve pas qu'un champ répond.
+14. `[humain]` *(décision 12)* Un métier où une recette CONNUE a tous ses réactifs en sac, et où une
+    autre gagne un peu au net en faisant acheter un réactif. **Témoin** : la capture du 2026-11-10
+    (« 16 ▸ 75 Elixir of Minor Strength », 27 pa 20 à débourser alors que les herbes de Minor
+    Defense dormaient en sac). Attendu : la route prend la recette du sac, « À débourser » ne compte
+    que ce qui manque vraiment, et le survol de l'étape dit « déjà dans tes sacs ».
 
 ## Contrat
 
@@ -227,3 +248,6 @@ Base : `fix/route-formateur` (COC + outillage), dont la route est le socle ; pas
    « Compter la revente », valeur du sac consommé ; locale.~~ Fait. Pour la place :
    `_Route_Gateway.lua` sorti de `Route.lua`, l'infobulle sortie de `_ProfWindow_Route.lua`.
 4. Banc : critères 9 à 12.
+   Vu en jeu le 2026-11-10 : la capture Alchimie 16/75 a fait naître la décision 12.
+5. ~~Décision 12 (seuil du gain net faible) ; test 13.~~ Fait le 2026-11-10. Pour la place :
+   `_Route_Materials.lua` (la liste de courses) sorti de `Route.lua`. Banc : critère 14.
