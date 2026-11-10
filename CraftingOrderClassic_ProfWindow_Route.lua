@@ -21,6 +21,8 @@ PW.ROUTE_ROW_H = ROW_H
 local ARROW = "|TInterface\\ChatFrame\\ChatFrameExpandArrow:12:12|t"
 -- Sac : un segment qui puise dans le stock (sacs, ou ce que la route a fabriqué avant lui).
 local BAG = "|TInterface\\Icons\\INV_Misc_Bag_08:12:12|t"
+-- Parchemin : le segment commence par APPRENDRE la recette (plan à acheter, compté dans son coût).
+local PLAN_ICON = "|TInterface\\Icons\\INV_Scroll_03:12:12|t "
 
 -- La route de MON perso : rang/plafond de la session ouverte + couleur LIVE du client au rang
 -- courant (les seuils Wowhead basculent à ±1 rang des couleurs réelles — dump user 2026-07-18,
@@ -93,6 +95,27 @@ local function segName(sid, prod)
     if not nm and lib and lib.RecipeName then nm = lib:RecipeName(sid) end
     return nm or ("spell:" .. sid)
 end
+
+-- Nom d'étape trop long pour sa ligne (la colonne greffée de Forever) : c'est la FIN du nom qui
+-- distingue les recettes. Capture user 2026-11-10 : « Elixir of Minor Strength » coupé en « Elixir
+-- of Mi... », lu comme « Elixir of Minor Force », une recette déjà grise. On retire d'abord « ×~N »
+-- (l'infobulle le donne), puis les PREMIERS mots : « ...Minor Strength ». Mesuré, comme setRouteSub :
+-- là où le nom tient (la fenêtre flottante), rien ne change. À appeler une fois le coût posé, il
+-- borne la place du nom. « ... » en ASCII : l'ellipse typographique risque le tofu (cf. ARROW).
+local function fitSegName(row, s)
+    local fs = row.name
+    local room = fs:GetWidth() or 0
+    if room <= 0 or (fs:GetStringWidth() or 0) <= room then return end
+    local plan = (s.plan or 0) > 0 and PLAN_ICON or ""
+    local words = {}
+    for w in segName(s.sid, s.prod):gmatch("%S+") do words[#words + 1] = w end
+    fs:SetText(plan .. table.concat(words, " "))
+    for k = 2, #words do
+        if (fs:GetStringWidth() or 0) <= room then return end
+        fs:SetText(plan .. "..." .. table.concat(words, " ", k))
+    end
+end
+PW._FitSegName = fitSegName   -- exposé pour tests/test_route_noms.lua
 
 -- En-tête riche façon bourse : icône du métier + libellé + rang ARROW cible (une ligne). Le total
 -- reste dans le coin droit (f.sub).
@@ -283,7 +306,7 @@ local function fillSegRow(row, s)
         row.icon:SetTexture((s.prod and COC.Api.GetItemIcon and COC.Api.GetItemIcon(s.prod))
             or "Interface\\Icons\\INV_Misc_QuestionMark")
         row.icon:SetDesaturated(false)
-        local plan = (s.plan or 0) > 0 and "|TInterface\\Icons\\INV_Scroll_03:12:12|t " or ""
+        local plan = (s.plan or 0) > 0 and PLAN_ICON or ""
         row.name:SetText(plan .. segName(s.sid, s.prod)
             .. string.format(" |cFFAAAAAA×~%d|r", math.ceil(s.crafts - 0.001)))
         -- Sac = le segment puise dans le stock (le détail est dans l'infobulle). Tout en sac → le
@@ -294,6 +317,7 @@ local function fillSegRow(row, s)
         row.cost:SetText((stocked and (BAG .. (coin ~= "" and " " or "")) or "") .. coin
             .. (s.partial and " |cFF888888(?)|r" or ""))   -- coût partiel : réactif sans prix HV
     end
+    if not s.gap then fitSegName(row, s) end
     row:Show()
 end
 
@@ -347,6 +371,15 @@ local function setRouteSub(f, txt)
     if f.scroll then f.scroll:SetPoint("TOPLEFT", 6, -(stacked and HEAD_TWO or HEAD_ONE)) end
 end
 
+-- Le contenu prend la largeur du VIEWPORT AVANT qu'on y peigne. _FillRouteSupply la posait à la
+-- FIN : au premier passage dans la colonne greffée, étapes et notes se mesuraient sur les 370 du
+-- build, et le viewport, deux fois plus étroit, les coupait net (capture 2026-11-10 : « From an NPC
+-- vendor (no need to supply): Empty ' », et le montant de la ligne des sacs disparu).
+local function fitContentToViewport(f)
+    local sw = (f.scroll and f.scroll:GetWidth()) or 0
+    if sw > 0 then f.content:SetWidth(sw) end
+end
+
 function PW:_RouteTarget()
     if self.dockView == "route" and self.routePanel then return self.routePanel end
     return self.routeWin
@@ -363,6 +396,7 @@ function PW:_FillRoute()
     if f.SetTitle then f:SetTitle(L["Plan de route"] .. " — " .. Skin.ProfLabel(self.profKey)) end
     if f.chk then f.chk:SetChecked(not (COC.db and COC.db.routePlans == false)) end
     local segs = route and route.segments or {}
+    fitContentToViewport(f)
     -- Bandeau repliable en tête ; segments décalés dessous (ou masqués si replié).
     local collapsed = (COC.db and COC.db.routeSegCollapsed) and true or false
     local baseY = self:_SyncSegToggle(f, #segs, collapsed)
