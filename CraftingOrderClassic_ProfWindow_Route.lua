@@ -96,12 +96,10 @@ local function segName(sid, prod)
     return nm or ("spell:" .. sid)
 end
 
--- Nom d'étape trop long pour sa ligne (la colonne greffée de Forever) : c'est la FIN du nom qui
--- distingue les recettes. Capture user 2026-11-10 : « Elixir of Minor Strength » coupé en « Elixir
--- of Mi... », lu comme « Elixir of Minor Force », une recette déjà grise. On retire d'abord « ×~N »
--- (l'infobulle le donne), puis les PREMIERS mots : « ...Minor Strength ». Mesuré, comme setRouteSub :
--- là où le nom tient (la fenêtre flottante), rien ne change. À appeler une fois le coût posé, il
--- borne la place du nom. « ... » en ASCII : l'ellipse typographique risque le tofu (cf. ARROW).
+-- Nom d'étape trop long (colonne greffée) : la FIN du nom distingue les recettes. Capture user
+-- 2026-11-10 : « Elixir of Mi... » lu « Elixir of Minor Force » (grise) au lieu de « ...Minor
+-- Strength ». Retire « ×~N » (dans l'infobulle), puis les PREMIERS mots. Mesuré, comme setRouteSub ;
+-- à appeler une fois le coût posé (il borne la place). « ... » en ASCII : l'ellipse risque le tofu.
 local function fitSegName(row, s)
     local fs = row.name
     local room = fs:GetWidth() or 0
@@ -371,15 +369,6 @@ local function setRouteSub(f, txt)
     if f.scroll then f.scroll:SetPoint("TOPLEFT", 6, -(stacked and HEAD_TWO or HEAD_ONE)) end
 end
 
--- Le contenu prend la largeur du VIEWPORT AVANT qu'on y peigne. _FillRouteSupply la posait à la
--- FIN : au premier passage dans la colonne greffée, étapes et notes se mesuraient sur les 370 du
--- build, et le viewport, deux fois plus étroit, les coupait net (capture 2026-11-10 : « From an NPC
--- vendor (no need to supply): Empty ' », et le montant de la ligne des sacs disparu).
-local function fitContentToViewport(f)
-    local sw = (f.scroll and f.scroll:GetWidth()) or 0
-    if sw > 0 then f.content:SetWidth(sw) end
-end
-
 function PW:_RouteTarget()
     if self.dockView == "route" and self.routePanel then return self.routePanel end
     return self.routeWin
@@ -396,7 +385,7 @@ function PW:_FillRoute()
     if f.SetTitle then f:SetTitle(L["Plan de route"] .. " — " .. Skin.ProfLabel(self.profKey)) end
     if f.chk then f.chk:SetChecked(not (COC.db and COC.db.routePlans == false)) end
     local segs = route and route.segments or {}
-    fitContentToViewport(f)
+    self:_FitRouteContent(f)   -- AVANT de peindre : étapes et notes se mesurent sur cette largeur
     -- Bandeau repliable en tête ; segments décalés dessous (ou masqués si replié).
     local collapsed = (COC.db and COC.db.routeSegCollapsed) and true or false
     local baseY = self:_SyncSegToggle(f, #segs, collapsed)
