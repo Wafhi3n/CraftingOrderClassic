@@ -18,9 +18,9 @@
 -- rapporterait-elle » ; « où l'apprendre » reste la vue « Manquantes ». Une recette à perte n'affiche
 -- rien — une ligne avec un nom et une colonne vide ne dit pas « à perte », elle dit « prix inconnu ».
 --
--- L'ENCHANTEMENT se lit par le COÛT (arbitrage 12) : ses recettes sont des services sans objet
--- produit, donc sans prix de vente, et la liste des profits serait VIDE — indiscernable d'une vue
--- cassée. Elle y liste ce que coûte chaque enchantement à lancer, et le DIT dans son titre.
+-- L'ENCHANTEMENT se lit comme les autres métiers, par le PROFIT (décision 18 du user, 2026-11-10,
+-- qui renverse les arbitrages 12 et 13) : un enchantement n'est pas un objet, il ne se vend pas à
+-- l'HV, il n'a donc pas de ligne ; les baguettes, huiles et bâtonnets en ont une s'ils rapportent.
 --
 -- ⚠️ Elle n'existe PAS sans oracle de prix : la languette n'est même pas construite (cf. VIEWS dans
 -- _DockViews). Un onglet qui ne sait ouvrir qu'un message d'absence est un onglet vide.
@@ -33,10 +33,12 @@ local L    = COC.L
 local ROW_H  = 16
 local NO_ICON = "Interface\\Icons\\INV_Misc_QuestionMark"
 
--- Métiers dont les recettes sont des SERVICES : pas d'objet produit, donc pas de prix de vente. La
--- vue y bascule en coût (arbitrage 12). Une table, pas un test de nom semé dans le code : le jour où
--- un autre métier s'y ajoute, c'est ici.
-local COST_ONLY = { Enchanting = true }
+-- Métiers lus par le COÛT de chaque recette plutôt que par son profit (arbitrage 12). VIDE depuis la
+-- décision 18 (2026-11-10) : l'Enchantement en est sorti, ses enchantements n'ont plus de ligne.
+-- ⚠️ Le mode coût dort ici, il n'est PAS retiré : feat/writs-aca le traverse (fillRow, markWrit), et
+-- l'arracher avant qu'elle soit fusionnée garantissait des conflits au banc. Son retrait est noté
+-- dans la spec, sous la décision 18.
+local COST_ONLY = {}
 
 -- Le mode de lecture d'un métier : vrai = le COÛT de chaque recette, faux = son PROFIT.
 function PW:_ProfitCostMode(profKey)

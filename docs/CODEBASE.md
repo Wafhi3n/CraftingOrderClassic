@@ -1953,9 +1953,9 @@
 > rapporterait-elle » ; « où l'apprendre » reste la vue « Manquantes ». Une recette à perte n'affiche
 > rien — une ligne avec un nom et une colonne vide ne dit pas « à perte », elle dit « prix inconnu ».
 > 
-> L'ENCHANTEMENT se lit par le COÛT (arbitrage 12) : ses recettes sont des services sans objet
-> produit, donc sans prix de vente, et la liste des profits serait VIDE — indiscernable d'une vue
-> cassée. Elle y liste ce que coûte chaque enchantement à lancer, et le DIT dans son titre.
+> L'ENCHANTEMENT se lit comme les autres métiers, par le PROFIT (décision 18 du user, 2026-11-10,
+> qui renverse les arbitrages 12 et 13) : un enchantement n'est pas un objet, il ne se vend pas à
+> l'HV, il n'a donc pas de ligne ; les baguettes, huiles et bâtonnets en ont une s'ils rapportent.
 > 
 > ⚠️ Elle n'existe PAS sans oracle de prix : la languette n'est même pas construite (cf. VIEWS dans
 > _DockViews). Un onglet qui ne sait ouvrir qu'un message d'absence est un onglet vide.

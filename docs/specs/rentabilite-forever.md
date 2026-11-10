@@ -10,6 +10,9 @@
 > défaut vu ce jour-là (noms longs sur deux lignes) est corrigé et pas revu. Vue livrée :
 > `CraftingOrderClassic_ProfWindow_DockProfit.lua`, languette **« Profit »**.
 >
+> **2026-11-10 (user, décision 18)** : l'Enchantement repasse au PROFIT, ses enchantements n'ont
+> plus de ligne. Ça renverse les arbitrages 12 et 13 ; le mode coût dort dans le code (cf. 18).
+>
 > ⚠️ **Le clic sur une ligne est probablement inerte** (critère 2). Il passe par
 > `C_TradeSkillUI.OpenRecipe`, qui ne sélectionne RIEN quand la fenêtre est déjà ouverte : elle
 > attend une réponse serveur qui ne vient pas sur Forever (skill `coc-native-ui`, piège 22). Et
@@ -62,7 +65,8 @@ Rien ne change dans la fenêtre de Blizzard : on l'accompagne, on ne la touche p
 - ~~**On ne traite pas les enchantements** : pas d'objet produit, donc pas de prix de vente, donc
   pas de profit.~~ **RENVERSÉ le 2026-09-23 (décision 12)** : ils sont traités, par le **coût**
   (`PR:CraftCost`, qui n'a pas besoin d'un prix de vente) et non par la marge. Sans ça, la page est
-  vide pour un enchanteur — indiscernable d'une page cassée.
+  vide pour un enchanteur — indiscernable d'une page cassée. **REVENU le 2026-11-10 (décision
+  18)** : un enchantement n'a plus de ligne ; les objets que fabrique un enchanteur en ont une.
 - **On ne décompose pas** les intermédiaires, la prospection ni la mouture. Le profit d'une recette
   se calcule sur SES réactifs, au prix du marché, point.
 
@@ -129,7 +133,8 @@ Rien ne change dans la fenêtre de Blizzard : on l'accompagne, on ne la touche p
 11. **La coupe de 5 % reste en dur**, et s'affiche dans le détail du calcul plutôt que d'être
     réglable. Un réglage de plus pour une constante du jeu ne paie pas sa place ; l'afficher suffit
     à ce que personne ne cherche d'où vient l'écart.
-12. ⚠️ **L'Enchantement EST traité — par le COÛT, pas par la marge.** *Ça RENVERSE la décision
+12. ⛔ **Renversé le 2026-11-10 par la décision 18.**
+    ⚠️ **L'Enchantement EST traité — par le COÛT, pas par la marge.** *Ça RENVERSE la décision
     « on ne traite pas les enchantements » prise le 2026-09-21.* Motif : `CraftProfit` exige un prix
     de vente et rend `nil` sans objet produit, donc pour un enchanteur la page serait **vide** — et
     une page vide ne se distingue pas de « cette page ne sait pas parler de mon métier ».
@@ -143,7 +148,8 @@ Rien ne change dans la fenêtre de Blizzard : on l'accompagne, on ne la touche p
 Les arbitrages 9 à 12 laissaient ces points ouverts. Le 13 est confirmé ; les 14 à 17 restent à
 confirmer par le user, chacun est un réglage d'une ligne s'il ne convient pas.
 
-13. ✅ **CONFIRMÉ par le user le 2026-09-29, capture à l'appui.** **Le mode COÛT se décide par
+13. ⛔ **Renversé le 2026-11-10 par la décision 18** (la table `COST_ONLY` est vide).
+    ✅ **CONFIRMÉ par le user le 2026-09-29, capture à l'appui.** **Le mode COÛT se décide par
     MÉTIER, pas par recette** (`COST_ONLY = { Enchanting = true }`, `_ProfWindow_DockProfit.lua`).
     Une liste qui mêlerait les profits de ce qui a un objet produit (baguettes, huiles) et les coûts
     du reste alignerait des montants de sens opposés sous le même titre, et c'est justement ce que la
@@ -162,6 +168,35 @@ confirmer par le user, chacun est un réglage d'une ligne s'il ne convient pas.
     montée de métier et la bourse d'artisan (décision 8). Les deux comptent les réactifs avec le
     même code (`reagentsCost`) : elles ne diffèrent que par la source, et ne peuvent pas diverger
     sur la façon de compter.
+
+### Décision du 2026-11-10 (user) — elle l'emporte sur 12 et 13
+
+18. **L'Enchantement se lit par le PROFIT, comme les autres métiers : un enchantement n'a pas de
+    ligne.** Dit par le user, capture à l'appui (Enchantement 152/225, « Cost to cast (34) ») :
+    « on a les enchantements alors qu'on ne peut pas les vendre à l'HV, ils devraient être cachés
+    car ce ne sont pas vraiment des objets ». La vue Profit répond à « que fabriquer pour le vendre » ;
+    un enchantement ne se vend pas, il se pose. Les objets que fabrique un enchanteur (bâtonnets,
+    huiles, baguettes, Arcane Salvager) gardent leur ligne s'ils rapportent.
+    - **Mécanisme** : `COST_ONLY` est vide. Aucune règle neuve : un enchantement n'a pas d'objet
+      produit, donc pas de prix de vente, et la règle « prix de vente inconnu → pas de ligne » le
+      retire. ✅ Côté données : aucun sort nommé « Enchant … » n'a d'entrée dans `produces`
+      (verrouillé par `tests/test_camelot_data.lua`). Les objets d'enchanteur rangés dans la même
+      table de noms (Speedstone, librams, totems, Blackfathom Mana Oil : 21 au 2026-11-10) ont un
+      produit et gardent leur ligne. ❓ Côté client : `recipeSchema` lit d'abord
+      `outputItemID` du schéma du jeu, et personne n'a vu ce qu'il rend pour un enchantement sur
+      Forever. S'il nommait un objet (un parchemin), l'enchantement reviendrait dès que cet objet a
+      un prix. Critère 14.
+    - **Ce qu'on perd** : la liste « Coût à lancer », du plus cher au moins cher, qui servait à fixer
+      sa commission. Le coût d'un enchantement reste lisible au panneau central de la fenêtre de
+      métier (« To Craft », écrit par Auctionator), et `CraftCost` sert toujours la montée de métier.
+    - **Le mode coût DORT, il n'est pas retiré** : `feat/writs-aca` le traverse (`fillRow`,
+      `markWrit`), et l'arracher avant sa fusion garantissait des conflits au banc. **Reste à faire,
+      une fois les deux branches fusionnées** : retirer `COST_ONLY`, `_ProfitCostMode`, le paramètre
+      `costMode` de la vue, `PR:RecipeCost` (seul lecteur : cette vue), les trois chaînes « Coût à
+      lancer (%d) », « Ce que coûte un lancer… », « Aucun coût connu… », et leurs tests
+      (`test_profit_view.lua` §3, `test_profit.lua` §12).
+    - **Effet de bord** : les marques de writ (D7 de `writs-aca`) deviennent possibles en
+      Enchantement, puisqu'elles n'étaient sautées qu'en mode coût.
 
 ## Critères d'acceptation
 
@@ -222,21 +257,22 @@ Arbitrages 9 à 12 (codés le 2026-09-29) :
     → **Vu le 2026-09-29** pour l'HV : « Mystic Heavy Armor Kit », vente 2g 95s, coupe −14s 75c,
     réactifs −1g 25s 88c, net +1g 54s 37c — 29500 − 1475 − 12588 = 15437, le compte tombe juste.
     **Pas vu** : la ligne « prix marchand ».
-14. **Enchantement par le coût** (arbitrage 12).
-    `[test]` ✅ En mode coût, la liste lit `RecipeCost` (client d'abord) et jamais `CraftProfit` ;
-    `CraftCost` reste au catalogue. → `tests/test_profit.lua` §12, `tests/test_profit_view.lua` §3.
-    `[humain]` ◐ Fenêtre d'Enchantement ouverte : la languette Profit s'intitule **« Coût à lancer
-    (N) »**, liste des enchantements, le plus cher en tête, et l'infobulle dit que c'est un coût et
-    pas un gain. Revenir sur un autre métier rend « Rentables (N) ». Un nom long tient sur UNE ligne,
-    tronqué par « … ». *Témoin :* le coût d'un enchant recalculé à la main depuis les prix de ses
-    composants.
-    → **Vu le 2026-09-29** : « Cost to cast (176) », trié de 81g 24s à 10g 70s. **Défaut vu** : les
-    noms longs (« Enchant Necklace - Deflection ») passaient à la ligne et mordaient sur la suivante
-    — corrigé par `SetWordWrap(false)`, pas revu. Les montants s'affichent en blanc dans les DEUX
-    modes : la couleur par mode prévue d'abord n'a aucun effet et a été retirée, le titre porte
-    seul le « c'est un coût ». **Pas vu** : l'infobulle d'un enchant, le témoin. Constat : la liste
-    comprend aussi les recettes d'Enchantement qui produisent un OBJET (Twisting Essence Jar, bâtons,
-    Truesilver Conduit), lues par le coût comme le reste — c'est le choix 13, confirmé par le user.
+14. **Enchantement par le PROFIT, sans ses enchantements** (décision 18, qui remplace l'arbitrage 12 ;
+    le mode coût vu le 2026-09-29, « Cost to cast (176) », est au registre).
+    `[test]` ✅ L'Enchantement lit le PROFIT, jamais le coût ; ses objets y ont une ligne, un sort
+    sans prix de vente n'en a pas. → `tests/test_profit_view.lua` §1 et §3 bis. Le mode coût, en
+    sommeil, reste verrouillé tant qu'il existe (§3, `tests/test_profit.lua` §12).
+    `[test]` ✅ Aucun sort « Enchant … » n'a d'objet produit dans nos données Camelot, et les objets
+    d'enchanteur en ont un (témoin). → `tests/test_camelot_data.lua`.
+    `[humain]` ⏳ Fenêtre d'Enchantement ouverte, Auctionator présent : la languette Profit
+    s'intitule **« Rentables (N) »** (client anglais : « Profitable (N) »), **aucune ligne ne commence
+    par « Enchant »**, et les seules lignes sont des objets (bâtonnets, huiles, baguettes, Arcane
+    Salvager) au profit positif. S'il n'y en a aucun : « Aucune recette rentable (prix :
+    Auctionator). ». *Témoin :* la Forge, inchangée.
+    `[outil]` ⏳ Le client ne nomme aucun objet pour un enchantement :
+    `/dump C_TradeSkillUI.GetRecipeSchematic(13626, false).outputItemID` (Enchant Chest - Minor
+    Stats, appris) rend **nil**. Un identifiant d'objet à la place = la décision 18 tient sur nos
+    données seules, et un enchantement réapparaîtra dès que cet objet aura un prix.
 
 ## Ce qui restait à vérifier — état au 2026-09-21
 
