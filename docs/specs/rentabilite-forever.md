@@ -189,6 +189,11 @@ confirmer par le user, chacun est un réglage d'une ligne s'il ne convient pas.
     - **Ce qu'on perd** : la liste « Coût à lancer », du plus cher au moins cher, qui servait à fixer
       sa commission. Le coût d'un enchantement reste lisible au panneau central de la fenêtre de
       métier (« To Craft », écrit par Auctionator), et `CraftCost` sert toujours la montée de métier.
+    - ✅ **Confirmé par le user le 2026-11-10, en connaissant cette perte** : les deux vues lui ont
+      été comparées (« laquelle des deux est mieux ? »), il a gardé celle-ci (« ok go »). Ne pas
+      rouvrir le mode coût dans cette vue. Si la liste des coûts revient un jour, ce sera là où
+      l'enchanteur fixe son prix (une demande d'enchantement à l'échange) : piste donnée, rien de
+      décidé.
     - **Le mode coût DORT, il n'est pas retiré** : `feat/writs-aca` le traverse (`fillRow`,
       `markWrit`), et l'arracher avant sa fusion garantissait des conflits au banc. **Reste à faire,
       une fois les deux branches fusionnées** : retirer `COST_ONLY`, `_ProfitCostMode`, le paramètre
