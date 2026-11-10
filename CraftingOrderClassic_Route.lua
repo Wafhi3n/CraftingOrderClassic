@@ -277,14 +277,18 @@ end
 -- passe devant. Capture du jour, Alchimie 16 : la route faisait apprendre Elixir of Minor Strength
 -- (50c) et acheter 66 Earthroot, 27 pa à débourser, pour épargner ~4c le point de Peacebloom DÉJÀ
 -- en sac (Elixir of Minor Defense, connue, ~1 pa 75 de fioles). Au-delà du seuil, le net décide.
--- Seuil ancré sur la MEILLEURE (pas de proche en proche : la dérive passerait 10 % par 10 %).
+-- Seuil ancré sur la MEILLEURE (pas de proche en proche : la dérive passerait 10 % par 10 %), et
+-- mesuré sur ce que coûte son point AVANT revente (net + crédit de revente) : case « revente »
+-- cochée, le net de deux recettes qui se revendent tombe à quelques cuivres, et 10 % de presque
+-- rien redonnait la main au moindre écart -- la capture revenait telle quelle.
 local NET_TOL = 0.10
 -- Valeurs du rang en cours, par indice de candidate. Réutilisées d'un appel à l'autre : la fenêtre
 -- recalcule la route chaque seconde, une table par candidate et par rang serait des Mo de déchets.
-local PER, CASH, DOUBT = {}, {}, {}
+local PER, CASH, DOUBT, CREDIT = {}, {}, {}, {}
 
 local function cheaperCash(n, bi)
-    local limit, pick = PER[bi] + math.max(math.abs(PER[bi]) * NET_TOL, EPS), bi
+    local base = math.abs(PER[bi] + (CREDIT[bi] or 0))
+    local limit, pick = PER[bi] + math.max(base * NET_TOL, EPS), bi
     for i = 1, n do
         local c, p = CASH[i], CASH[pick]
         if PER[i] and DOUBT[i] == DOUBT[bi] and PER[i] <= limit
@@ -296,8 +300,8 @@ end
 local function pickBest(cands, r, cur, target, bought, st, val)
     local bi
     for i, c in ipairs(cands) do
-        local chance, per, cash, doubt = evaluate(c, r, cur, target, bought, st, val)
-        PER[i], CASH[i], DOUBT[i] = chance and per or false, cash, doubt
+        local chance, per, cash, doubt, _, _, _, _, credit = evaluate(c, r, cur, target, bought, st, val)
+        PER[i], CASH[i], DOUBT[i], CREDIT[i] = chance and per or false, cash, doubt, credit
         if chance and (not bi or better(doubt, per, c, DOUBT[bi], PER[bi], cands[bi])) then bi = i end
     end
     if bi and val then bi = cheaperCash(#cands, bi) end

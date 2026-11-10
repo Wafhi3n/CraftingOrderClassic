@@ -135,7 +135,9 @@ s'applique telle quelle.
    d'implémentation** : « faible » = au plus **10 %** de plus au point que la meilleure, au net
    (`NET_TOL` dans `Route.lua`, valeur proposée, le user ne l'a pas chiffrée). Le seuil se mesure
    depuis la MEILLEURE recette, pas de proche en proche (sinon la route glisserait de 10 % en
-   10 %). Ce qui sort de la bourse compte le plan amorti, comme le coût net. Une recette douteuse ne
+   10 %), et en pourcentage de ce que coûte son point AVANT revente (net + crédit de revente) :
+   case « revente » cochée, le net de deux recettes qui se revendent tombe à quelques cuivres, et
+   10 % de ce net ne laissait passer aucun écart. Ce qui sort de la bourse compte le plan amorti, comme le coût net. Une recette douteuse ne
    passe jamais devant une sûre. La bourse d'artisan, qui n'a pas `opts.value`, n'est pas touchée.
 
 ## Critères d'acceptation
@@ -162,7 +164,8 @@ fabriqué retiré, choix en caisse, sac gratuit) les font tomber :
 8. `[porte]` Libellés traduits dans les trois overlays (`check_locale.ps1`).
 13. `[test]` *(décision 12, verts le 2026-11-10 ; rouges sur le code d'avant)* La capture du
    2026-11-10 rejouée : Minor Defense de 16 à 75, seules les fioles sortent de la bourse, et le
-   suivi à l'écran fait le même choix. Peacebloom à 80c (Minor Defense ~62 % plus chère au net) :
+   suivi à l'écran fait le même choix. Case revente cochée, les deux élixirs cotés 50c : toujours
+   Minor Defense. Peacebloom à 80c (Minor Defense ~62 % plus chère au net) :
    le net reprend la main et la route apprend Minor Strength. Seuil ancré sur la meilleure : entre
    A (net 100), B (net 107, sort 50c) et C (net 114, ne sort rien), la route prend B.
 
@@ -183,8 +186,9 @@ En jeu (le user, Forge sur le banc) :
 14. `[humain]` *(décision 12)* Un métier où une recette CONNUE a tous ses réactifs en sac, et où une
     autre gagne un peu au net en faisant acheter un réactif. **Témoin** : la capture du 2026-11-10
     (« 16 ▸ 75 Elixir of Minor Strength », 27 pa 20 à débourser alors que les herbes de Minor
-    Defense dormaient en sac). Attendu : la route prend la recette du sac, « À débourser » ne compte
-    que ce qui manque vraiment, et le survol de l'étape dit « déjà dans tes sacs ».
+    Defense dormaient en sac). Attendu, case revente cochée ET décochée : la route prend la recette
+    du sac, « À débourser » ne compte que ce qui manque vraiment, et le survol de l'étape dit « déjà
+    dans tes sacs ».
 
 ## Contrat
 
