@@ -241,6 +241,17 @@ local en3 = {
     ["Ce que coûte un lancer, pas un gain : ta commission vient en plus."] =
         "What one cast costs you, not a gain: your fee comes on top.",
     ["Aucun coût connu (prix : %s)."] = "No known cost (prices: %s).",
+    -- Vue Profit : la marque des Craftsman's Writ (writs-aca.md, D7 et D8, 2026-11-09)
+    ["Demandé par un writ d'artisan (+%d de réputation)."] = "Wanted by a Craftsman's Writ (+%d reputation).",
+    ["Tu portes ce writ : il t'en manque %d."] = "You carry this writ: you still need %d.",
+    ["Tu portes ce writ : ouvre-le pour savoir combien il en faut."] =
+        "You carry this writ: open it to see how many it wants.",
+    ["Les porteurs de ce writ cherchent cet objet."] = "Players carrying this writ are looking for this item.",
+    ["Le writ à l'HdV"] = "Writ at the AH",
+    ["%d à %d"] = "%d to %d",
+    ["Demandés (vu en jeu)"] = "Wanted (seen in game)",
+    ["Or annoncé (vu au niveau %s)"] = "Gold reward shown (seen at level %s)",
+    ["Or reçu au rendu (niveau %s)"] = "Gold received on turn-in (level %s)",
 }
 
 for k, v in pairs(en3) do L[k] = v end

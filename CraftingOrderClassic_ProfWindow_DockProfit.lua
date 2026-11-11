@@ -22,6 +22,11 @@
 -- qui renverse les arbitrages 12 et 13) : un enchantement n'est pas un objet, il ne se vend pas à
 -- l'HV, il n'a donc pas de ligne ; les baguettes, huiles et bâtonnets en ont une s'ils rapportent.
 --
+-- LES WRITS (D7 de docs/specs/writs-aca.md, 2026-11-09) : une recette dont l'objet est demandé par un
+-- Craftsman's Writ porte une petite icône de writ, pleine si JE porte ce writ, éteinte sinon (ce sont
+-- les autres porteurs qui cherchent l'objet). La marque n'ajoute ni ne retire de ligne : la vue reste
+-- triée par l'or. Le détail (réputation, prix du writ, ce que COC en a vu en jeu) est dans l'infobulle.
+--
 -- ⚠️ Elle n'existe PAS sans oracle de prix : la languette n'est même pas construite (cf. VIEWS dans
 -- _DockViews). Un onglet qui ne sait ouvrir qu'un message d'absence est un onglet vide.
 
@@ -32,6 +37,8 @@ local L    = COC.L
 
 local ROW_H  = 16
 local NO_ICON = "Interface\\Icons\\INV_Misc_QuestionMark"
+-- Repli si le client ne rend pas l'icône du writ lui-même (lue par son identifiant d'abord).
+local WRIT_ICON = "Interface\\Icons\\INV_Scroll_03"
 
 -- Métiers lus par le COÛT de chaque recette plutôt que par son profit (arbitrage 12). VIDE depuis la
 -- décision 18 (2026-11-10) : l'Enchantement en est sorti, ses enchantements n'ont plus de ligne.
@@ -138,6 +145,39 @@ local function addDetail(p, costMode)
     end
 end
 
+-- Ce que la marque d'un writ veut dire, à la suite du calcul. Les quantités et l'or sont des RELEVÉS
+-- (ce que COC a vu en jeu), et le disent : rien ne prouve qu'une quête demande toujours autant.
+local function addWritLines(m)
+    local e, PR, A = m.entry, COC.Profit, COC.Api
+    GameTooltip:AddLine(" ")
+    GameTooltip:AddLine(string.format(L["Demandé par un writ d'artisan (+%d de réputation)."], e.rep or 0),
+        1, 0.82, 0, true)
+    if m.held then
+        GameTooltip:AddLine(m.need and string.format(L["Tu portes ce writ : il t'en manque %d."], m.need)
+            or L["Tu portes ce writ : ouvre-le pour savoir combien il en faut."], 1, 1, 1, true)
+    else
+        GameTooltip:AddLine(L["Les porteurs de ce writ cherchent cet objet."], 0.7, 0.7, 0.7, true)
+    end
+    local price = PR and PR:ItemValue(e.writ)
+    if price then
+        GameTooltip:AddDoubleLine(L["Le writ à l'HdV"], A.Coin(math.floor(price + 0.5)), LBL_R, LBL_G, LBL_B, 1, 1, 1)
+    end
+    local s = m.seen
+    if s and s.n then
+        local q = (s.nMin and s.nMax and s.nMin ~= s.nMax) and string.format(L["%d à %d"], s.nMin, s.nMax)
+            or tostring(s.n)
+        GameTooltip:AddDoubleLine(L["Demandés (vu en jeu)"], q, LBL_R, LBL_G, LBL_B, 1, 1, 1)
+    end
+    -- L'or VERSÉ au rendu fait foi ; à défaut, celui que le journal annonce.
+    if s and s.paid then
+        GameTooltip:AddDoubleLine(string.format(L["Or reçu au rendu (niveau %s)"], tostring(s.paidLevel or "?")),
+            A.Coin(s.paid), LBL_R, LBL_G, LBL_B, 1, 1, 1)
+    elseif s and s.money then
+        GameTooltip:AddDoubleLine(string.format(L["Or annoncé (vu au niveau %s)"], tostring(s.level or "?")),
+            A.Coin(s.money), LBL_R, LBL_G, LBL_B, 1, 1, 1)
+    end
+end
+
 local function profitTooltip(row)
     local p = row.p
     if not (p and COC.Profit) then return end
@@ -156,6 +196,7 @@ local function profitTooltip(row)
     if p.missing then
         GameTooltip:AddLine(L["Un réactif sans prix : coût sous-estimé."], 0.91, 0.72, 0.29, true)
     end
+    if row.writ then addWritLines(row.writ) end
     if row.unlearned then
         GameTooltip:AddLine(L["Pas encore apprise : la vue « Manquantes » dit où l'apprendre."], 0.7, 0.7, 0.7, true)
     end
@@ -191,6 +232,9 @@ local function profitRow(i)
     nm:SetPoint("LEFT", ic, "RIGHT", 4, 0); nm:SetJustifyH("LEFT"); nm:SetWordWrap(false); row.nm = nm
     local val = row:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     val:SetPoint("RIGHT", -4, 0); val:SetJustifyH("RIGHT"); row.val = val
+    -- La marque d'un writ, entre le nom et le montant ; cachée tant qu'aucun writ ne demande l'objet.
+    local wr = row:CreateTexture(nil, "ARTWORK"); wr:SetSize(12, 12)
+    wr:SetPoint("RIGHT", val, "LEFT", -3, 0); wr:Hide(); row.wr = wr
     nm:SetPoint("RIGHT", val, "LEFT", -4, 0)
     row:SetHighlightTexture("Interface\\Buttons\\UI-Listbox-Highlight", "ADD")
     row:SetScript("OnEnter", profitTooltip)
@@ -270,8 +314,27 @@ local function emptyText(PR, costMode)
     return string.format(L["Aucune recette rentable (prix : %s)."], src)
 end
 
-local function fillRow(row, e, costMode)
+-- La marque d'un writ (D7) sur une ligne. L'objet est celui que le calcul a lu (`p.productID`) : la
+-- marque et le prix parlent du même. Une ligne est RECYCLÉE : sans writ, tout est remis à zéro, sinon
+-- elle garderait l'icône et l'infobulle de la recette d'avant.
+local function markWrit(row, e, costMode, wanted)
+    local W, pid = COC.Writs, e.p and e.p.productID
+    local m = (W and pid and not costMode) and W:ProfitMark(pid, wanted) or nil
+    row.writ = m
+    if m then
+        local gi = COC.Api.GetItemIcon
+        row.wr:SetTexture((gi and gi(m.entry.writ)) or WRIT_ICON)
+        row.wr:SetDesaturated(not m.held)
+        row.wr:Show()
+    else
+        row.wr:Hide()
+    end
+    row.nm:SetPoint("RIGHT", m and row.wr or row.val, "LEFT", -4, 0)
+end
+
+local function fillRow(row, e, costMode, wanted)
     row.sid, row.rname, row.rlink, row.p = e.sid, e.name, e.link, e.p
+    markWrit(row, e, costMode, wanted)
     row.costMode, row.unlearned = costMode, e.unlearned
     row.ic:SetTexture(e.icon or NO_ICON)
     row.ic:SetDesaturated(e.unlearned)
@@ -303,9 +366,12 @@ function PW:_FillDockProfit()
     if #list == 0 then pp.msg:SetText(emptyText(PR, costMode)) end
     local w = pp.scroll:GetWidth() or 0
     if w > 0 then pp.content:SetWidth(w) end
-    for i, e in ipairs(list) do fillRow(profitRow(i), e, costMode) end
+    -- Les writs que je porte, lus UNE fois pour toute la liste (D7) : chaque ligne y cherche son objet.
+    local W = COC.Writs
+    local wanted = (W and not costMode and #list > 0) and W:WantedItems() or nil
+    for i, e in ipairs(list) do fillRow(profitRow(i), e, costMode, wanted) end
     for i = #list + 1, #pp.rows do
-        pp.rows[i]:Hide(); pp.rows[i].sid, pp.rows[i].p = nil, nil
+        pp.rows[i]:Hide(); pp.rows[i].sid, pp.rows[i].p, pp.rows[i].writ = nil, nil, nil
     end
     pp.content:SetHeight(math.max(#list * ROW_H, 1))
 end

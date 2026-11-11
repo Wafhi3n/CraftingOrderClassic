@@ -240,6 +240,17 @@ local de3 = {
     ["Ce que coûte un lancer, pas un gain : ta commission vient en plus."] =
         "Was dich ein Wirken kostet, kein Gewinn: Deine Provision kommt obendrauf.",
     ["Aucun coût connu (prix : %s)."] = "Keine Kosten bekannt (Preise: %s).",
+    -- Vue Profit : la marque des Craftsman's Writ (writs-aca.md, D7 et D8, 2026-11-09)
+    ["Demandé par un writ d'artisan (+%d de réputation)."] = "Von einem Handwerkerauftrag gesucht (+%d Ruf).",
+    ["Tu portes ce writ : il t'en manque %d."] = "Du trägst diesen Auftrag: Dir fehlen noch %d.",
+    ["Tu portes ce writ : ouvre-le pour savoir combien il en faut."] =
+        "Du trägst diesen Auftrag: Öffne ihn, um zu sehen, wie viele er verlangt.",
+    ["Les porteurs de ce writ cherchent cet objet."] = "Wer diesen Auftrag trägt, sucht diesen Gegenstand.",
+    ["Le writ à l'HdV"] = "Auftrag im AH",
+    ["%d à %d"] = "%d bis %d",
+    ["Demandés (vu en jeu)"] = "Verlangt (im Spiel gesehen)",
+    ["Or annoncé (vu au niveau %s)"] = "Angezeigte Goldbelohnung (gesehen auf Stufe %s)",
+    ["Or reçu au rendu (niveau %s)"] = "Bei Abgabe erhaltenes Gold (Stufe %s)",
 }
 
 for k, v in pairs(de3) do L[k] = v end

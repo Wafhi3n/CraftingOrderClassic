@@ -157,6 +157,33 @@ function A.SelectQuestLogEntry(index)
     if _G.SelectQuestLogEntry then return _G.SelectQuestLogEntry(index) end
 end
 
+-- Une quête par son IDENTIFIANT, sans toucher à la sélection du journal (writs : _Writs.lua).
+-- Moderne seulement : sans C_QuestLog, rien n'est « en cours » ni « remplie », et l'appelant n'a pas
+-- à distinguer ce cas. Booléens stricts.
+function A.IsOnQuest(questID)
+    local f = C_QuestLog and C_QuestLog.IsOnQuest
+    return (questID and f and f(questID)) and true or false
+end
+function A.IsQuestComplete(questID)
+    local f = C_QuestLog and C_QuestLog.IsComplete
+    return (questID and f and f(questID)) and true or false
+end
+-- Ses objectifs : { { text, type, finished, numFulfilled, numRequired }, … }, ou {} (sans
+-- C_QuestLog, ou quête absente du journal).
+function A.GetQuestObjectives(questID)
+    local f = C_QuestLog and C_QuestLog.GetQuestObjectives
+    return (questID and f and f(questID)) or {}
+end
+-- L'or que rend une quête du journal, en cuivre, ou nil. `GetQuestLogRewardMoney(questID)` : le code
+-- d'UI de Forever l'appelle ainsi (AlertFrames, AM_QuestDialog). Sous pcall : jamais appelée en jeu
+-- par COC avant les writs (2026-11-09).
+function A.GetQuestRewardMoney(questID)
+    local f = _G.GetQuestLogRewardMoney
+    if not (questID and f) then return nil end
+    local ok, m = pcall(f, questID)
+    return (ok and type(m) == "number") and m or nil
+end
+
 -- ---------------------------------------------------------------- événements
 
 -- `RegisterEvent` LÈVE une erreur sur un événement que le client ne connaît pas, au lieu de

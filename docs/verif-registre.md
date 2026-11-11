@@ -52,6 +52,17 @@ client.
   dans la colonne Route de la fenêtre du jeu, un nom d'étape tient en entier ou garde sa FIN
   (« ...Minor Strength ») ; sous « Supplies », la ligne du marchand et celle des sacs passent à la
   ligne sans être coupées au bord. Sonde `GetWidth`/`GetStringWidth` pas tapée (rien de coupé).
+- 2026-11-11 10:45 — jusqu'a 7485121 — Forever 1.60.1.70888, client ANGLAIS, solo, Sheadra (niveau 31) et
+  le writ de l'Iridescent Hammer (264022, Journeyman, quête 94222) ; builds lus par l'appli du banc dans
+  la copie déployée — **GO partiel sur `feat/writs-aca`** (taint NON vérifié) :
+  - `main-dev@c6266b2` (09:57-09:59) : icône de writ dans la vue Profit, son infobulle, writ porté (icône
+    pleine, quantité relevée) — 3 gestes cochés OK ;
+  - `main-dev@8362b42` (10:44-10:45, avec le correctif Coin Pouch de `feat/writs-infobulle`) : rendu au
+    PNJ — pas d'or direct (`paid = 0` au niveau 31), la récompense est l'objet **284584 = Coin Pouch**
+    (`db.writsSeen[94222].rewardItem`, relevé par COC) ; relevé intact après `/reload` — 2 gestes OK.
+  - Mesure du user (geste « bourse ») : la Coin Pouch d'un writ Journeyman contenait **30 pa 16 pc**
+    (Sheadra niveau 31). COC ne relève pas encore ce montant (T7).
+  Taint : geste coché, mais aucun `Logs\taint.log` n'existe (journal du taint pas allumé) : rien de lu.
 - 2026-11-08 00:10 — jusqu'a 916b8bf — build `main-dev@02016c5 2026-11-07 23:14`, `## Version: 1.51.0`
   (lu dans le `.toc` déployé et par l'appli du banc, fiche `CraftingOrderClassic--release-v1.51.0-donnees`,
   gestes « nouveautes » et « fin » cochés OK, sans remarque, sur la parole du user ; le geste
