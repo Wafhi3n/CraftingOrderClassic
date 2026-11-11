@@ -46,6 +46,14 @@ client.
 
 ## Relevés
 
+- 2026-11-11 11:22 — jusqu'a 6c511e4 — Forever 1.60.1.70888, client ANGLAIS, solo ; build
+  `main-dev@9968689 2026-11-11 11:15`, `## Version: 1.52.0` (lu par l'appli du banc dans la copie
+  déployée, fiche `CraftingOrderClassic--release-v1.52.0`) — **GO sur le candidat v1.52.0** (4 gestes
+  cochés OK, sans remarque) : `/co version` = 1.52.0 et le build qui cite `release/v1.52.0` ; onglet
+  What's New, la v1.52.0 en tête en anglais, v1.24.x sorties ; bas de l'onglet Route, trois cases sans
+  chevauchement (« Include recipes to buy » + « Count resale », « On-screen tracker » dessous : la
+  résolution du conflit de fusion) ; infobulle d'un objet de writ en une ligne, vue Profit qui se
+  remplit. Les sept branches avaient été vues une par une le même jour (relevés sur chacune).
 - 2026-11-11 09:50 — jusqu'a 2aa9d5a — Forever 1.60.1.70888, client ANGLAIS, solo (Oxygène,
   Alchimie) ; build `main-dev@c6266b2 2026-11-11 09:40` lu par l'appli du banc dans la copie
   déployée — **GO sur `fix/route-noms-coupes`** (fiche de l'appli, 2 gestes cochés OK, sans remarque) :
