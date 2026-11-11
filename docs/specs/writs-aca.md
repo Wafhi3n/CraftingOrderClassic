@@ -10,6 +10,9 @@
 > (T5), un relevé en jeu de la quantité et de l'or de chaque writ (T6), puis le coût de la réputation
 > quand COC aura appris ces chiffres (T7). La branche porte désormais `feat/profit-arbitrages` : elle
 > ne part dans `main` qu'après elle.
+> **2026-11-11** : le user veut aussi voir, **dans l'infobulle de l'objet** demandé (sac, HdV, lien
+> du chat), qu'un writ le demande (D10, T8). Branche `feat/writs-infobulle`, empilée sur
+> `feat/writs-aca` dans les deux dépôts.
 
 ## Le problème
 
@@ -73,6 +76,11 @@ Ce qu'on sait du système, lu le 2026-10-16 dans deux pages Wowhead enregistrée
 7. **Plus tard, le coût de la réputation** : pour chaque writ dont tu sais faire l'objet, prix du writ
    à l'HdV + coût de fabrication × quantité − or rendu, ramené par point de réputation, le moins cher
    en tête. Seulement pour les writs dont COC a vu la quantité. (D9)
+8. **Au survol d'un objet qu'un writ demande**, où que le jeu montre son infobulle (sac, hôtel des
+   ventes, lien du chat), deux lignes sous celles du jeu : « Demandé par un writ d'artisan (+75 de
+   réputation). », puis, si **tu portes** ce writ, ce qu'il te manque (ou « ouvre-le pour savoir
+   combien il en faut »), et sinon « Les porteurs de ce writ cherchent cet objet. ». Ce sont les
+   lignes de la vue Profit, sans le prix du writ ni le relevé. (D10)
 
 ## Ce qu'on ne fait PAS
 
@@ -91,8 +99,9 @@ Ce qu'on sait du système, lu le 2026-10-16 dans deux pages Wowhead enregistrée
 - **Pas d'aide sur les enveloppes** (« Sealed Journeyman's Writ »…) dans ce premier tour. Piste pour
   plus tard : « tu sais faire 12 des 45 writs de ce palier » dans leur infobulle, pour décider s'il
   vaut la peine de l'acheter. Il faudra leurs identifiants.
-- **La marque côté artisan ne vit que dans la vue Profit** (D7, 2026-11-09) : rien dans la liste de
-  recettes de Blizzard (y écrire la teinte), ni dans l'onglet Commande pour l'instant.
+- **La marque côté artisan vit dans la vue Profit** (D7, 2026-11-09) **et dans l'infobulle de
+  l'objet** (D10, 2026-11-11) : rien dans la liste de recettes de Blizzard (y écrire la teinte), ni
+  dans l'onglet Commande pour l'instant, ni dans les infobulles de comparaison.
 - **Pas de partage réseau de ce que COC a vu des writs** (quantité, or) : chacun apprend sur son
   compte. À reprendre si le relevé reste trop maigre pour le coût de la réputation.
 - **Pas de clic modifié sur l'objet dans les sacs** : toucher aux boutons du sac expose au taint, et
@@ -175,6 +184,15 @@ Ce qu'on sait du système, lu le 2026-10-16 dans deux pages Wowhead enregistrée
 - **D9 (choix du user, 2026-11-09)** : le **coût de la réputation** vient ensuite (T7), une fois que
   le relevé a des chiffres. Pas de plafond par jour apparent (impression du user, à confirmer) : en
   enchaîner plusieurs a donc du sens, et la liste les classe tous.
+- **D10 (choix du user, 2026-11-11)** : la marque passe aussi dans **l'infobulle de l'objet**
+  demandé, partout où le jeu la montre (« c'est possible de rajouter sur le tooltip si l'item est
+  demandé par un writ », capture de l'Iridescent Hammer). Accroche du jeu
+  (`TooltipDataProcessor.AddTooltipPostCall`, type Item), filtrée comme le fait Blizzard :
+  `GameTooltip` et `ItemRefTooltip` seulement. Comme l'infobulle se refait à chaque survol, on ne lit
+  que les writs de CET objet (`ItemMark`), jamais les 150. La vue Profit garde ses propres lignes (prix
+  du writ, relevé) : ses lignes portent un drapeau, et l'accroche se tait sur elles. Mêmes clés de
+  locale que la vue Profit : rien de neuf à traduire. Ce n'est pas T3, qui reste l'infobulle du
+  **writ** lui-même.
 
 ## Critères d'acceptation
 
@@ -246,6 +264,24 @@ Ce qu'on sait du système, lu le 2026-10-16 dans deux pages Wowhead enregistrée
     `GetQuestLogRewardMoney`) ;
     `/console taintLog 1` et une infobulle de la vue Profit survolée : rien de COC dans `taint.log`.
 
+**L'infobulle de l'objet (2026-11-11, D10) :**
+
+17. [test] L'accroche : un objet qu'aucun writ ne demande → aucune ligne, et aucune lecture du sac ;
+    un writ porté → la réputation, puis ce qui manque ; une quête remplie, ou un writ que je ne porte
+    pas → « Les porteurs de ce writ cherchent cet objet. » ; les deux objets d'un homonyme ; le lien du
+    chat reçoit les lignes, une infobulle de comparaison reste nue ; une ligne de la vue Profit ne
+    reçoit pas de doublon ; un identifiant secret (vraie secrète d'Elune) → rien, sans lever ; un
+    survol ne lit que le writ de l'objet ; `ItemMark` dit la même chose que la marque de la vue Profit,
+    pour chacun des objets. → `tests/test_writs.lua`
+18. [humain] Survol de l'Iridescent Hammer (writ 264022, Journeyman) dans un sac : sous les lignes du
+    jeu, « Demandé par un writ d'artisan (+75 de réputation). » puis « Les porteurs de ce writ
+    cherchent cet objet. » ; le même objet en lien dans le chat, cliqué : les mêmes lignes. Témoin :
+    un objet ordinaire du même sac, sans ligne COC. Puis, writ d'un objet ouvert (quête acceptée) :
+    survol de cet objet → « Tu portes ce writ : il t'en manque N. ». Vue Profit d'un métier qui fait
+    un objet de writ : ses lignes de writ n'y sont qu'**une** fois.
+19. [agent] `api-gotcha-reviewer` sur l'accroche ; en jeu, `/console taintLog 1` et un objet de writ
+    survolé en combat : rien de COC dans `Logs\taint.log`.
+
 ## Contrat
 
 Rien sur le réseau (voir « Ce qu'on ne fait pas »). Une table neuve dans les SavedVariables :
@@ -269,7 +305,9 @@ des lectures, pas des writs. Un `money` à 0 relu plus tard n'efface pas un mont
   quête acceptée), et `WantedItems()` les objets encore à commander (objet → son writ porté).
   `ForItem(objet)` rend les entrées dont la quête demande cet objet (liste, souvent une seule) ;
   `ProfitMark(objet, wanted)` rend `{ entry, held, need, seen }` ou `nil` (`wanted` = le résultat de
-  `WantedItems()`, lu une fois par remplissage de la vue) ; `Seen(quête)` rend le relevé ou `nil`.
+  `WantedItems()`, lu une fois par remplissage de la vue) ; `ItemMark(objet)` rend la même marque
+  sans `wanted`, en ne lisant que les writs de cet objet (l'infobulle, D10) ; `Seen(quête)` rend le
+  relevé ou `nil`.
 - **Le relevé** (`CraftingOrderClassic_Writs_Seen.lua`) : `Learn(quête)` lit l'objectif et l'or dans
   le journal et écrit `db.writsSeen` ; il ne touche ni à `Held()` ni à `WantedItems()`, qui restent
   sans effet de bord.
@@ -313,3 +351,6 @@ outillage, pour `tests/test_writs.lua`) atterrissent le même jour.
 - **T5 — la marque dans la vue Profit** (2026-11-09). Critères 12, 14 et 16.
 - **T6 — le relevé en jeu** de la quantité et de l'or (2026-11-09). Critères 13, 15 et 16.
 - **T7 — le coût de la réputation**, quand le relevé aura des chiffres. Critères à écrire alors.
+- **T8 — la marque dans l'infobulle de l'objet** (2026-11-11, D10). Critères 17, 18 et 19. **Codé
+  le 2026-11-11** sur `feat/writs-infobulle` (`CraftingOrderClassic_Writs_Tooltip.lua`,
+  `W:ItemMark`) : critère 17 tenu en test, jamais vu en jeu.

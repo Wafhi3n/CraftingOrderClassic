@@ -237,6 +237,9 @@ local function profitRow(i)
     row:SetHighlightTexture("Interface\\Buttons\\UI-Listbox-Highlight", "ADD")
     row:SetScript("OnEnter", profitTooltip)
     row:SetScript("OnLeave", GameTooltip_Hide)
+    -- Cette ligne écrit ses propres lignes de writ : l'accroche d'infobulle d'objet (_Writs_Tooltip)
+    -- se tait sur elle, sinon elles sortiraient deux fois.
+    row.cocWritTip = true
     -- Deux gestes, les mêmes que sur toute ligne de recette du jeu : Maj pour lier l'objet en chat,
     -- clic simple pour aller le voir dans la fenêtre native.
     row:RegisterForClicks("LeftButtonUp")
