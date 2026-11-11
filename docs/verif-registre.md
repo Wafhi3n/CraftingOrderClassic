@@ -46,6 +46,14 @@ client.
 
 ## Relevés
 
+- 2026-11-11 09:45 — jusqu'a cd1c97e — Forever 1.60.1.70888, client ANGLAIS, solo (l'enchanteur,
+  Enchantement 152/225, Auctionator actif) ; build `main-dev@c6266b2 2026-11-11 09:40` lu par l'appli
+  du banc dans la copie déployée (fiche préparée pour `main-dev@adaf780`, même commit de la branche)
+  — **GO sur la décision 18 de `feat/profit-arbitrages`** (l'Enchantement repasse au profit ; fiche de
+  l'appli, 3 gestes cochés OK, sans remarque) : en Enchantement, la languette Profit titre
+  « Profitable (N) », plus « Cost to cast », et aucune ligne « Enchant … » ; « Whole profession »
+  coché : toujours aucune ligne « Enchant … » ; la sonde du schéma d'« Enchant Chest - Minor Stats »
+  ne nomme aucun objet. `b362ff8` (docs seules) n'était pas au banc.
 - 2026-09-29 17:06 — jusqu'a 339ec5a — Forever, un client, client en ANGLAIS ; build déployé
   `main-dev@c7c3b62 2026-09-29 16:56` (sortie de `deploy.ps1 -Banc feat/profit-arbitrages` ;
   `/co version` pas relevé) — **GO partiel sur les arbitrages 9 à 12 de la vue Profit** — deux
