@@ -61,13 +61,20 @@ function PW:_FillRouteSupply(f, route, startY)
     if self._FillRouteLearn then y = self:_FillRouteLearn(f, used, y) end
     for i = used.slot + 1, #(f.slots or {}) do f.slots[i]:Hide() end
     for i = used.line + 1, #(f.lines or {}) do f.lines[i]:Hide() end
-    -- Le contenu suit la largeur du VIEWPORT. Il était figé à 370 au build : juste pour la fenêtre
-    -- flottante, deux fois trop large pour la colonne greffée — les lignes débordaient et se
-    -- faisaient couper à droite. L'ascenseur se masque quand il n'y a rien à faire défiler (constat
-    -- 2026-09-20) : la barre fine le fait seule depuis le palier 7c.
+    self:_FitRouteContent(f)
+    f.content:SetHeight(math.max(y, 1))
+end
+
+-- Le contenu suit la largeur du VIEWPORT. Il était figé à 370 au build : juste pour la fenêtre
+-- flottante, deux fois trop large pour la colonne greffée — les lignes débordaient et se
+-- faisaient couper à droite. L'ascenseur se masque quand il n'y a rien à faire défiler (constat
+-- 2026-09-20) : la barre fine le fait seule depuis le palier 7c.
+-- _FillRoute l'appelle AVANT de peindre : posée seulement ici, à la FIN, la largeur arrivait après
+-- que étapes et notes s'étaient mesurées sur les 370 (capture 2026-11-10 : « From an NPC vendor (no
+-- need to supply): Empty ' », et le montant de la ligne des sacs coupé).
+function PW:_FitRouteContent(f)
     local sw = (f.scroll and f.scroll:GetWidth()) or 0
     if sw > 0 then f.content:SetWidth(sw) end
-    f.content:SetHeight(math.max(y, 1))
 end
 
 -- PNJ formateur du PALIER SUIVANT : première recette apprise plus haut que `rank` ET enseignée au

@@ -21,6 +21,8 @@ PW.ROUTE_ROW_H = ROW_H
 local ARROW = "|TInterface\\ChatFrame\\ChatFrameExpandArrow:12:12|t"
 -- Sac : un segment qui puise dans le stock (sacs, ou ce que la route a fabriqué avant lui).
 local BAG = "|TInterface\\Icons\\INV_Misc_Bag_08:12:12|t"
+-- Parchemin : le segment commence par APPRENDRE la recette (plan à acheter, compté dans son coût).
+local PLAN_ICON = "|TInterface\\Icons\\INV_Scroll_03:12:12|t "
 
 -- La route de MON perso : rang/plafond de la session ouverte + couleur LIVE du client au rang
 -- courant (les seuils Wowhead basculent à ±1 rang des couleurs réelles — dump user 2026-07-18,
@@ -96,6 +98,25 @@ local function segName(sid, prod)
     if not nm and lib and lib.RecipeName then nm = lib:RecipeName(sid) end
     return nm or ("spell:" .. sid)
 end
+
+-- Nom d'étape trop long (colonne greffée) : la FIN du nom distingue les recettes. Capture user
+-- 2026-11-10 : « Elixir of Mi... » lu « Elixir of Minor Force » (grise) au lieu de « ...Minor
+-- Strength ». Retire « ×~N » (dans l'infobulle), puis les PREMIERS mots. Mesuré, comme setRouteSub ;
+-- à appeler une fois le coût posé (il borne la place). « ... » en ASCII : l'ellipse risque le tofu.
+local function fitSegName(row, s)
+    local fs = row.name
+    local room = fs:GetWidth() or 0
+    if room <= 0 or (fs:GetStringWidth() or 0) <= room then return end
+    local plan = (s.plan or 0) > 0 and PLAN_ICON or ""
+    local words = {}
+    for w in segName(s.sid, s.prod):gmatch("%S+") do words[#words + 1] = w end
+    fs:SetText(plan .. table.concat(words, " "))
+    for k = 2, #words do
+        if (fs:GetStringWidth() or 0) <= room then return end
+        fs:SetText(plan .. "..." .. table.concat(words, " ", k))
+    end
+end
+PW._FitSegName = fitSegName   -- exposé pour tests/test_route_noms.lua
 
 -- En-tête riche façon bourse : icône du métier + libellé + rang ARROW cible (une ligne). Le total
 -- reste dans le coin droit (f.sub).
@@ -283,7 +304,7 @@ local function fillSegRow(row, s, route)
         row.icon:SetTexture((s.prod and COC.Api.GetItemIcon and COC.Api.GetItemIcon(s.prod))
             or "Interface\\Icons\\INV_Misc_QuestionMark")
         row.icon:SetDesaturated(false)
-        local plan = (s.plan or 0) > 0 and "|TInterface\\Icons\\INV_Scroll_03:12:12|t " or ""
+        local plan = (s.plan or 0) > 0 and PLAN_ICON or ""
         row.name:SetText(plan .. segName(s.sid, s.prod)
             .. string.format(" |cFFAAAAAA×~%d|r", math.ceil(s.crafts - 0.001)))
         -- Sac = le segment puise dans le stock (le détail est dans l'infobulle). Tout en sac → le
@@ -294,6 +315,7 @@ local function fillSegRow(row, s, route)
         row.cost:SetText((stocked and (BAG .. (coin ~= "" and " " or "")) or "") .. coin
             .. (s.partial and " |cFF888888(?)|r" or ""))   -- coût partiel : réactif ou plan sans prix
     end
+    if not s.gap then fitSegName(row, s) end
     row:Show()
 end
 
@@ -373,6 +395,7 @@ function PW:_FillRoute()
     if f.chk then f.chk:SetChecked(not (COC.db and COC.db.routePlans == false)) end
     if f.chkResale then f.chkResale:SetChecked(not (COC.db and COC.db.routeResale == false)) end
     local segs = route and route.segments or {}
+    self:_FitRouteContent(f)   -- AVANT de peindre : étapes et notes se mesurent sur cette largeur
     -- Bandeau repliable en tête ; segments décalés dessous (ou masqués si replié).
     local collapsed = (COC.db and COC.db.routeSegCollapsed) and true or false
     local baseY = self:_SyncSegToggle(f, #segs, collapsed)

@@ -46,6 +46,12 @@ client.
 
 ## Relevés
 
+- 2026-11-11 09:50 — jusqu'a 2aa9d5a — Forever 1.60.1.70888, client ANGLAIS, solo (Oxygène,
+  Alchimie) ; build `main-dev@c6266b2 2026-11-11 09:40` lu par l'appli du banc dans la copie
+  déployée — **GO sur `fix/route-noms-coupes`** (fiche de l'appli, 2 gestes cochés OK, sans remarque) :
+  dans la colonne Route de la fenêtre du jeu, un nom d'étape tient en entier ou garde sa FIN
+  (« ...Minor Strength ») ; sous « Supplies », la ligne du marchand et celle des sacs passent à la
+  ligne sans être coupées au bord. Sonde `GetWidth`/`GetStringWidth` pas tapée (rien de coupé).
 - 2026-11-08 00:10 — jusqu'a 916b8bf — build `main-dev@02016c5 2026-11-07 23:14`, `## Version: 1.51.0`
   (lu dans le `.toc` déployé et par l'appli du banc, fiche `CraftingOrderClassic--release-v1.51.0-donnees`,
   gestes « nouveautes » et « fin » cochés OK, sans remarque, sur la parole du user ; le geste
