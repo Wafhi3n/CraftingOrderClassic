@@ -262,6 +262,10 @@ function W:Learn(questID)
     if money and (money > 0 or r.money == nil) then
         r.money, r.level = money, UnitLevel and UnitLevel("player") or nil
     end
+    -- Un writ rend une Coin Pouch, pas d'or (relevé du 2026-11-11 : 0 annoncé). L'objet se retient ;
+    -- une relecture sans lui (récompense pas encore chargée) ne l'efface pas.
+    local item = A.GetQuestRewardItem and A.GetQuestRewardItem(e.quest)
+    if item then r.rewardItem, r.rewardCount = item.id, item.n end
     r.at = time and time() or r.at
     db.writsSeen[e.quest] = r
     return r

@@ -166,13 +166,20 @@ local function addWritLines(m)
             or tostring(s.n)
         GameTooltip:AddDoubleLine(L["Demandés (vu en jeu)"], q, LBL_R, LBL_G, LBL_B, 1, 1, 1)
     end
-    -- L'or VERSÉ au rendu fait foi ; à défaut, celui que le journal annonce.
-    if s and s.paid then
+    -- L'or VERSÉ au rendu fait foi ; à défaut, celui que le journal annonce. Un ZÉRO ne s'affiche pas :
+    -- un writ paie en Coin Pouch, pas en or (relevé du 2026-11-11, quête 94222 : 0 annoncé), et
+    -- « 0c » se lirait « ce writ ne rapporte rien ». C'est l'objet qui le dit, ligne suivante.
+    if s and (s.paid or 0) > 0 then
         GameTooltip:AddDoubleLine(string.format(L["Or reçu au rendu (niveau %s)"], tostring(s.paidLevel or "?")),
             A.Coin(s.paid), LBL_R, LBL_G, LBL_B, 1, 1, 1)
-    elseif s and s.money then
+    elseif s and (s.money or 0) > 0 then
         GameTooltip:AddDoubleLine(string.format(L["Or annoncé (vu au niveau %s)"], tostring(s.level or "?")),
             A.Coin(s.money), LBL_R, LBL_G, LBL_B, 1, 1, 1)
+    end
+    if s and s.rewardItem then
+        local nm = (A.GetItemInfo and A.GetItemInfo(s.rewardItem)) or ("item:" .. s.rewardItem)
+        if (s.rewardCount or 1) > 1 then nm = nm .. " ×" .. s.rewardCount end
+        GameTooltip:AddDoubleLine(L["Récompense :"], nm, LBL_R, LBL_G, LBL_B, 1, 1, 1)
     end
 end
 

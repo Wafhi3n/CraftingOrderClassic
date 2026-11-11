@@ -44,7 +44,7 @@ Ce qu'on sait du système, lu le 2026-10-16 dans deux pages Wowhead enregistrée
 | Quantités | l'objectif demande N objets, et N **varie** : 200 « Crafted Solid Shot » pour un writ d'ingénieur (capture du 2026-10-17). Aucune page lue ne donne N ; le journal le donne une fois la quête acceptée |
 | Enveloppes | « Sealed Journeyman's Writ », « Sealed Expert's Writ » (identifiants inconnus ; un « Sealed Artisan's Writ » probable) : on déchire l'enveloppe, le writ est tiré au hasard dans ce palier (captures du 2026-10-17). Le « Sealed Craftsman's Writ » (248206) de Wowhead en est peut-être une autre |
 | Échange | writs et enveloppes se vendent à l'HdV (vu par le user le 2026-10-17) ; le 2026-11-09, des dizaines de writs Journeyman à 6-20 pa (capture du user) |
-| Récompense | la réputation du palier (Wowhead) ; **un peu d'or** aussi (dit par le user le 2026-11-09, montant inconnu, aucune liste Wowhead ne l'affiche) ; l'objet 284584 pour 12 quêtes, inconnu |
+| Récompense | la réputation du palier (Wowhead) ; **pas d'or direct mais une Coin Pouch** (capture du user + relevé en jeu le 2026-11-11 : writ de l'Iridescent Hammer, quête 94222, 0 d'or annoncé par le journal, « You will receive: Coin Pouch ») ; l'or « un peu » dont parlait le user le 2026-11-09 sort de la bourse, montant inconnu ; l'objet 284584 pour 12 quêtes, inconnu |
 | Par jour | pas de plafond apparent (impression du user le 2026-11-09, à confirmer en jeu) : chaque writ est sa propre journalière |
 
 ## Ce qu'on veut
@@ -288,9 +288,13 @@ Ce qu'on sait du système, lu le 2026-10-16 dans deux pages Wowhead enregistrée
 Rien sur le réseau (voir « Ce qu'on ne fait pas »). Une table neuve dans les SavedVariables :
 `db.writsSeen` (par compte, créée à l'usage, sans palier de migration) :
 `[quête] = { n = dernière quantité, nMin, nMax, money = or annoncé par le journal (cuivre), level =
-niveau du perso qui l'a vu, paid = or versé au rendu, paidLevel, at = time() }`. Pas de compteur de
+niveau du perso qui l'a vu, paid = or versé au rendu, paidLevel, rewardItem = premier objet de
+récompense (la Coin Pouch), rewardCount, at = time() }`. Pas de compteur de
 relevés : la même quête est relue à chaque connexion tant qu'elle reste au journal, il compterait
-des lectures, pas des writs. Un `money` à 0 relu plus tard n'efface pas un montant déjà vu.
+des lectures, pas des writs. Un `money` à 0 relu plus tard n'efface pas un montant déjà vu, ni une
+relecture sans objet l'objet déjà vu. **L'infobulle de la vue Profit n'affiche pas un or à 0** (un writ
+paie en Coin Pouch : « 0c » se lirait « ne rapporte rien ») ; elle affiche « Reward: Coin Pouch ».
+T7 (coût de la réputation) aura besoin de l'or qui SORT de la bourse à l'ouverture : pas encore relevé.
 
 - **La table générée** (`CraftingOrderClassic_Writs_Data.lua`, par `tools/gen_writs.lua`), interne à
   COC : `[writ] = { quête, palier, objet demandé [, autre objet du même nom] }`, palier 1 Journeyman,
