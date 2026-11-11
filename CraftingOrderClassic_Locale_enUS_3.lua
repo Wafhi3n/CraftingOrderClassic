@@ -232,6 +232,7 @@ local en3 = {
     ["Tu portes ce writ : ouvre-le pour savoir combien il en faut."] =
         "You carry this writ: open it to see how many it wants.",
     ["Les porteurs de ce writ cherchent cet objet."] = "Players carrying this writ are looking for this item.",
+    ["Writ d'artisan : +%d"] = "Craftsman's Writ: +%d",
     ["Le writ à l'HdV"] = "Writ at the AH",
     ["%d à %d"] = "%d to %d",
     ["Demandés (vu en jeu)"] = "Wanted (seen in game)",

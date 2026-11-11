@@ -77,10 +77,9 @@ Ce qu'on sait du système, lu le 2026-10-16 dans deux pages Wowhead enregistrée
    à l'HdV + coût de fabrication × quantité − or rendu, ramené par point de réputation, le moins cher
    en tête. Seulement pour les writs dont COC a vu la quantité. (D9)
 8. **Au survol d'un objet qu'un writ demande**, où que le jeu montre son infobulle (sac, hôtel des
-   ventes, lien du chat), deux lignes sous celles du jeu : « Demandé par un writ d'artisan (+75 de
-   réputation). », puis, si **tu portes** ce writ, ce qu'il te manque (ou « ouvre-le pour savoir
-   combien il en faut »), et sinon « Les porteurs de ce writ cherchent cet objet. ». Ce sont les
-   lignes de la vue Profit, sans le prix du writ ni le relevé. (D10)
+   ventes, lien du chat), UNE ligne sous celles du jeu : « Craftsman's Writ: +75 » (la réputation du
+   writ ; celle du writ que tu portes si deux writs demandent l'objet). Le détail reste dans la vue
+   Profit. (D10, D11)
 
 ## Ce qu'on ne fait PAS
 
@@ -190,9 +189,13 @@ Ce qu'on sait du système, lu le 2026-10-16 dans deux pages Wowhead enregistrée
   (`TooltipDataProcessor.AddTooltipPostCall`, type Item), filtrée comme le fait Blizzard :
   `GameTooltip` et `ItemRefTooltip` seulement. Comme l'infobulle se refait à chaque survol, on ne lit
   que les writs de CET objet (`ItemMark`), jamais les 150. La vue Profit garde ses propres lignes (prix
-  du writ, relevé) : ses lignes portent un drapeau, et l'accroche se tait sur elles. Mêmes clés de
-  locale que la vue Profit : rien de neuf à traduire. Ce n'est pas T3, qui reste l'infobulle du
-  **writ** lui-même.
+  du writ, relevé) : ses lignes portent un drapeau, et l'accroche se tait sur elles. Ce n'est pas T3,
+  qui reste l'infobulle du **writ** lui-même.
+- **D11 (choix du user, 2026-11-11, après l'avoir vue au banc)** : dans l'infobulle de l'objet, **une
+  seule ligne**, « Craftsman's Writ: +75 » (la réputation du writ), « pas plus, on flood pas le
+  tooltip ». Les phrases de D10 (« Demandé par un writ d'artisan… », ce qui manque, « les porteurs
+  cherchent… ») restent dans l'infobulle de la vue Profit, dans la fenêtre de COC. Clé neuve
+  `Writ d'artisan : +%d` (en/de/es).
 
 ## Critères d'acceptation
 
@@ -267,18 +270,16 @@ Ce qu'on sait du système, lu le 2026-10-16 dans deux pages Wowhead enregistrée
 **L'infobulle de l'objet (2026-11-11, D10) :**
 
 17. [test] L'accroche : un objet qu'aucun writ ne demande → aucune ligne, et aucune lecture du sac ;
-    un writ porté → la réputation, puis ce qui manque ; une quête remplie, ou un writ que je ne porte
-    pas → « Les porteurs de ce writ cherchent cet objet. » ; les deux objets d'un homonyme ; le lien du
-    chat reçoit les lignes, une infobulle de comparaison reste nue ; une ligne de la vue Profit ne
+    tout objet de writ (porté ou non, quête remplie, homonyme) → UNE ligne, « Writ d'artisan : +75 »
+    (+125 pour un Expert), rien de plus (D11) ; le lien du chat reçoit la ligne, une infobulle de
+    comparaison reste nue ; une ligne de la vue Profit ne
     reçoit pas de doublon ; un identifiant secret (vraie secrète d'Elune) → rien, sans lever ; un
     survol ne lit que le writ de l'objet ; `ItemMark` dit la même chose que la marque de la vue Profit,
     pour chacun des objets. → `tests/test_writs.lua`
 18. [humain] Survol de l'Iridescent Hammer (writ 264022, Journeyman) dans un sac : sous les lignes du
-    jeu, « Demandé par un writ d'artisan (+75 de réputation). » puis « Les porteurs de ce writ
-    cherchent cet objet. » ; le même objet en lien dans le chat, cliqué : les mêmes lignes. Témoin :
-    un objet ordinaire du même sac, sans ligne COC. Puis, writ d'un objet ouvert (quête acceptée) :
-    survol de cet objet → « Tu portes ce writ : il t'en manque N. ». Vue Profit d'un métier qui fait
-    un objet de writ : ses lignes de writ n'y sont qu'**une** fois.
+    jeu, une seule ligne, « Craftsman's Writ: +75 » ; le même objet en lien dans le chat, cliqué : la
+    même ligne. Témoin : un objet ordinaire du même sac, sans ligne COC. Vue Profit d'un métier qui
+    fait un objet de writ : ses lignes de writ (avec ce qui manque) n'y sont qu'**une** fois.
 19. [agent] `api-gotcha-reviewer` sur l'accroche ; en jeu, `/console taintLog 1` et un objet de writ
     survolé en combat : rien de COC dans `Logs\taint.log`.
 

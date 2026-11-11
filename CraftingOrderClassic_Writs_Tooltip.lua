@@ -1,10 +1,10 @@
 -- CraftingOrderClassic_Writs_Tooltip.lua — l'infobulle d'un OBJET qu'un Craftsman's Writ demande,
--- partout où le jeu la montre (sac, hôtel des ventes, lien du chat…) : deux lignes sous les siennes.
--- Spec : docs/specs/writs-aca.md, D10 (choix du user, 2026-11-11).
+-- partout où le jeu la montre (sac, hôtel des ventes, lien du chat…) : UNE ligne sous les siennes.
+-- Spec : docs/specs/writs-aca.md, D10 (choix du user, 2026-11-11), D11 (une ligne, même jour).
 --
 -- C'est l'autre bout du writ : l'objet demandé, pas le parchemin (l'infobulle du writ lui-même, T3,
--- reste à faire et pourra se brancher ici). Les lignes sont celles de la vue Profit, avec les mêmes
--- clés de locale. Aucun cadre créé, aucune ligne de chat, rien d'écrit chez Blizzard.
+-- reste à faire et pourra se brancher ici). Aucun cadre créé, aucune ligne de chat, rien d'écrit
+-- chez Blizzard.
 
 local COC = CraftingOrderClassic
 local W = COC.Writs
@@ -12,15 +12,12 @@ if not W then return end
 local L = COC.L
 local A = COC.Api
 
+-- « Craftsman's Writ: +75 », rien de plus (D11) : l'infobulle d'objet est partagée avec le jeu et
+-- les autres addons, on n'y empile pas des phrases. Le détail (writ porté, combien il en manque, ce
+-- que vaut le writ) reste dans la vue Profit, dans la fenêtre de COC. La réputation est celle du writ
+-- que tu portes quand deux writs demandent l'objet (ItemMark, comme la vue Profit).
 local function addLines(tooltip, m)
-    tooltip:AddLine(string.format(L["Demandé par un writ d'artisan (+%d de réputation)."], m.entry.rep or 0),
-        1, 0.82, 0, true)
-    if m.held then
-        tooltip:AddLine(m.need and string.format(L["Tu portes ce writ : il t'en manque %d."], m.need)
-            or L["Tu portes ce writ : ouvre-le pour savoir combien il en faut."], 1, 1, 1, true)
-    else
-        tooltip:AddLine(L["Les porteurs de ce writ cherchent cet objet."], 0.7, 0.7, 0.7, true)
-    end
+    tooltip:AddLine(string.format(L["Writ d'artisan : +%d"], m.entry.rep or 0), 1, 0.82, 0)
 end
 
 -- Appelée par le jeu pour CHAQUE infobulle d'objet, comparaisons comprises : elle doit sortir vite.

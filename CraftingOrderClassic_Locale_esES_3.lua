@@ -232,6 +232,7 @@ local es3 = {
     ["Tu portes ce writ : ouvre-le pour savoir combien il en faut."] =
         "Llevas este encargo: ábrelo para saber cuántos pide.",
     ["Les porteurs de ce writ cherchent cet objet."] = "Quienes llevan este encargo buscan este objeto.",
+    ["Writ d'artisan : +%d"] = "Encargo de artesano: +%d",
     ["Le writ à l'HdV"] = "Encargo en la casa de subastas",
     ["%d à %d"] = "%d a %d",
     ["Demandés (vu en jeu)"] = "Pedidos (visto en el juego)",
