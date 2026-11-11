@@ -456,6 +456,15 @@ client.
   (« ça fonctionne comme décrit », capture des deux icônes) et relu par l'agent dans `DevMacroDB.log`
   (10:35:37 : `T-a clic=native`, `T-b clic=reroll Anatarion`). **Pas observé** : le refus
   d'acceptation depuis Rédemption d'une commande nommée pour Anatarion (règle inchangée).
+- 2026-11-11 09:47 — jusqu'a 33e8d5c — Forever 1.60.1.70888, client ANGLAIS, solo (Oxygène,
+  Alchimie) ; build `main-dev@c6266b2 2026-11-11 09:40` lu par l'appli du banc dans la copie
+  déployée — **GO sur `feat/route-cout-net`** (fiche de l'appli, 5 gestes cochés OK, sans remarque ni
+  capture), critères 9 à 12 et 14 de la spec : la route prend la recette dont les réactifs sont en
+  sac, case « Count resale » cochée ET décochée (décision 12, seuil 10 %) ; « To spend » et « Net
+  cost » sous le titre ; la case « Count resale » recalcule sur-le-champ ; l'infobulle d'une étape
+  détaille achat, sac, revente et net ; `/dump select(11, C_Item.GetItemInfo(2840))` rend un nombre
+  > 0. Avant la décision 12 (capture du 2026-11-10, `main-dev@adaf780`) : deux totaux déjà vus, et un
+  plan de formateur (Elixir of Minor Strength, 50c) pris par la route — c'est `fix/route-formateur`.
 - 2026-10-02 10:20 — jusqu'a 8e7c062 — Forever, client de Rédemption, en ANGLAIS, Forgefer ; build
   `main-dev@ce68ef3 2026-10-02 10:16` avec icone-commande-recue, liste-destinataires,
   profit-arbitrages, release/v1.43.0 (copie déployée du `.toc`) — **GO sur `fix/manquantes-nom-long`**

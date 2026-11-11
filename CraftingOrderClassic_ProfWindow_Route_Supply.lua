@@ -49,6 +49,12 @@ function PW:_FillRouteSupply(f, route, startY)
             y = U:_NeedsTextLine(f, used, y, "|cFF888888" .. (all and L["Tout ce qu'il faut est déjà dans tes sacs."]
                 or L["Ce que tu as déjà en sac est déduit."]) .. "|r")
         end
+        -- Coût NET : déduit de la liste ne veut pas dire gratuit. La pile qu'on brûle avait un prix,
+        -- et le joueur doit le lire avant (spec route-cout-net, capture du 2026-10-02).
+        if (route.bagValue or 0) > 0.5 then
+            y = U:_NeedsTextLine(f, used, y, "|cFF888888" .. string.format(L["Ce que la route prend dans tes sacs vaudrait ~%s à l'HV."],
+                COC.Api.Coin(math.floor(route.bagValue + 0.5))) .. "|r")
+        end
     end
     -- « À apprendre maintenant » (soft-dep _ProfWindow_Learn) : ce que la route ne montre pas, parce
     -- qu'elle ne retient qu'UNE recette par rang -- le champ des possibles au rang courant.

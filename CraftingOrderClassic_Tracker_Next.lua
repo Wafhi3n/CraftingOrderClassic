@@ -133,10 +133,11 @@ local function progressProvider(entries, ctx)
     local withPlans = not (COC.db and COC.db.routePlans == false)
     for _, p in ipairs(levelingProfs()) do
         local known = knownSet(p.key)
-        -- Mes sacs, comme la fenêtre Plan de route : sans eux, le suivi et la route conseilleraient
-        -- deux recettes différentes dès qu'une pile de réactifs dort dans les sacs.
-        local step = known and Route:NextStep(p.key, p.rank, p.max,
-            { known = known, plans = withPlans, bag = ctx.bagCount })
+        -- Mes sacs ET la même valorisation que la fenêtre Plan de route (coût net, case « revente ») :
+        -- sans eux, le suivi et la route conseilleraient deux recettes différentes. Le sous-titre, lui,
+        -- garde ce qui sort de la bourse pour ce point (perPoint) : c'est ce que le joueur paie.
+        local step = known and Route:NextStep(p.key, p.rank, p.max, { known = known, plans = withPlans,
+            bag = ctx.bagCount, value = Route.MyValuation and Route:MyValuation() or nil })
         if step then
             local objs, done = stepObjectives(p.key, step.sid, ctx)
             local icon = Skin and Skin.ProfIcon and Skin.ProfIcon(p.key)

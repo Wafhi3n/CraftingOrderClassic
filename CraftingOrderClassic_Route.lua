@@ -12,6 +12,10 @@
 -- coût/point, la route et la bourse doivent raconter la même histoire. Aucune UI ici.
 -- ⚠️ Le badge, lui, ignore les sacs : il chiffre UNE recette au prix HV, pas un chemin. Il ne vit
 -- que dans notre liste pleine vue — la colonne greffée de Forever montre la liste de Blizzard.
+-- DEUX MODES (spec docs/specs/route-cout-net.md) : par défaut la route choisit sur ce qui SORT de la
+-- bourse (le sac est gratuit, le produit ne vaut rien) -- c'est la bourse d'artisan, et tous les
+-- appels sans `opts.value`. Avec `opts.value` (Route:MyValuation, fenêtre + suivi), elle choisit sur
+-- le coût NET : le sac vaut sa revente, le produit est crédité de la sienne (Route_Value.lua).
 
 local COC   = CraftingOrderClassic
 local Route = {}
@@ -21,20 +25,7 @@ COC.Route   = Route
 local CHANCE = { optimal = 1.0, medium = 0.75, easy = 0.25 }
 -- Plafonds d'entraînement, repli quand l'appelant ne connaît pas de maxRank.
 local CAPS = { 75, 150, 225, 300, 375, 450 }
-
--- « Passerelles » de palier : comment débloquer le rang MAX suivant une fois AU plafond entraîné.
--- La plupart des métiers entraînent le rang suivant au FORMATEUR (message générique) ; Premiers soins
--- fait exception — un LIVRE de rang acheté chez un PNJ, ABSENT de la liste de recettes (il ne produit
--- aucun objet) donc JAMAIS dans la route. Clé = profKey canonique CraftLink ("First Aid", avec
--- l'espace) → rang-plafond. item = livre à apprendre, name = repli si l'objet n'est pas en cache
--- client, vendors = PNJ des DEUX factions (MTSL filtre l'autre camp), price = repli prix vendeur,
--- nextCap = plafond entraînable après apprentissage. Étendre = ajouter une entrée (aucune autre modif).
-local GATEWAY = {
-    ["First Aid"] = {
-        [300] = { item = 22012, name = "Master First Aid - Doctor in the House",
-                  vendors = { 18991, 18990 }, price = 50000, nextCap = 375 },
-    },
-}
+Route.CAPS = CAPS   -- lu par _Route_Gateway (palier suivant)
 
 -- Couleur d'une recette à un rang FUTUR, d'après ses seuils réels {orange, jaune, vert, gris}.
 local function colorAt(c, r)
@@ -109,6 +100,19 @@ local function learnAtOf(lib, M, profKey, sid, colors)
     return at or colors[1]
 end
 
+-- Valeur de revente mémoïsée le temps d'UN balayage de candidates : un même réactif sert des dizaines
+-- de recettes. Sans Route_Value (tests, ancien .toc) : aucune valeur, la route en caisse n'en lit pas.
+local function resaleMemo(route)
+    if not route.ResaleValue then return function() return nil end end
+    local memo = {}
+    return function(id)
+        if not id then return nil end
+        local v = memo[id]
+        if v == nil then v = route:ResaleValue(id) or false; memo[id] = v end
+        return v or nil
+    end
+end
+
 -- Candidates de la route. opts = { known = set clé "s<spellID>"/"i<itemID>", live = map même clé →
 -- difficulté client (nil pour un tiers), plans = inclure les manquantes ACHETABLES (prix
 -- formateur/vendeur, sinon objet-plan coté à l'HV) }. Sans opts.plans : recettes CONNUES
@@ -121,6 +125,7 @@ function Route:Candidates(profKey, opts)
     if not (lib and lib.RecipeColors and PR and PR:IsAvailable() and profKey) then return nil end
     local known, live = opts.known or {}, opts.live or {}
     local isReagent = reagentSet(lib, profKey)
+    local resaleOf = resaleMemo(self)
     local out = {}
     for _, sid in ipairs((lib.GetRecipes and lib:GetRecipes(profKey)) or {}) do
         local colors = lib:RecipeColors(profKey, sid)
@@ -128,6 +133,7 @@ function Route:Candidates(profKey, opts)
         local reags = (colors and not cd) and lib.RecipeReagents and lib:RecipeReagents(profKey, sid) or nil
         if reags and #reags > 0 then
             local priced, cost = pricedReagents(PR, reags)
+            for _, rg in ipairs(priced) do rg[4] = resaleOf(rg[1]) end   -- valeur au stock (mode net)
             local prod = lib.RecipeProduct and lib:RecipeProduct(profKey, sid)
             local isKnown = (known["s" .. sid] or (prod and known["i" .. prod])) and true or false
             local planPrice, planUnknown, planDoubt
@@ -140,6 +146,7 @@ function Route:Candidates(profKey, opts)
             if isKnown or planPrice then
                 out[#out + 1] = {
                     sid = sid, colors = colors, cost = cost, reags = priced, prod = prod,
+                    resale = resaleOf(prod),   -- revente d'UN produit (numMade inconnu : 1, prudent)
                     conv = (prod and isReagent[prod]) or nil,
                     known = isKnown, planPrice = planPrice,
                     -- missing n'est PAS figé ici : un réactif sans prix mais en sac ne manque pas.
@@ -176,24 +183,34 @@ local function newStock(bag)
     end })
     return { bag = lazy, made = {} }
 end
-
--- Quantité de `id` à la disposition de la candidate `c`.
-local function avail(st, c, id)
-    return st.bag[id] + ((not c.conv) and (st.made[id] or 0) or 0)
-end
+Route.NewStock = newStock   -- lu par _Route_Materials (le reste du sac à réunir)
 
 -- Coût ESPÉRÉ du prochain point avec `c` (crafts = 1/chance), stock déduit : chaque réactif est
--- d'abord pris au stock, le reste payé au prix HV. missing = un reste qu'aucun prix ne couvre.
--- Stock vide → c.cost / chance, exactement le calcul d'avant.
-local function pointCost(c, crafts, st)
-    local cost, missing = 0, false
+-- d'abord pris au stock (sacs, puis ce que la route a fabriqué), le reste payé au prix HV. Rend :
+--   cash    -- ce qui sort de la bourse (stock vide → c.cost / chance, le calcul d'origine) ;
+--   missing -- un reste qu'aucun prix ne couvre ;
+--   net     -- en mode NET (`val`) : cash + valeur de ce qu'on prend au stock − revente du produit ;
+--              sans `val`, net = cash (la route d'avant, à l'identique) ;
+--   fromBag, credit -- la part des sacs et le crédit de revente, que l'infobulle détaille.
+-- ⚠️ SYMÉTRIE : ce que la route fabrique est crédité à la production et débité au même prix quand
+-- une étape suivante le consomme. Case « revente » décochée → ni crédit, ni débit : sinon une
+-- conversion paierait sa sortie sans jamais en être créditée.
+local function pointCost(c, crafts, st, val)
+    local cash, missing, fromBag, fromMade = 0, false, 0, 0
     for _, rg in ipairs(c.reags) do
-        local left = rg[2] * crafts - avail(st, c, rg[1])
+        local need = rg[2] * crafts
+        local b = math.min(need, st.bag[rg[1]])
+        local m = c.conv and 0 or math.min(need - b, st.made[rg[1]] or 0)
+        local left = need - b - m
         if left > EPS then
-            if rg[3] then cost = cost + left * rg[3] else missing = true end
+            if rg[3] then cash = cash + left * rg[3] else missing = true end
         end
+        fromBag, fromMade = fromBag + b * (rg[4] or 0), fromMade + m * (rg[4] or 0)
     end
-    return cost, missing
+    if not val then return cash, missing, cash, 0, 0 end
+    if not val.resale then return cash, missing, cash + fromBag, fromBag, 0 end
+    local credit = crafts * (c.resale or 0)
+    return cash, missing, cash + fromBag + fromMade - credit, fromBag, credit
 end
 
 -- Engage le point : puise au stock (sacs d'abord), range le produit dans `made`, et note dans le
@@ -232,37 +249,69 @@ end
 -- >= cur). Sans ça, la couleur live l'écartait au rang courant mais les seuils Wowhead la
 -- RESSUSCITAIENT en « vert » aux rangs suivants (données ≠ jeu à la frontière vert→gris) → la route
 -- comptait, et recommandait, une recette DÉJÀ grise dans la liste du joueur.
--- Rend best, chance, partiel, le coût des réactifs de CE point (stock déduit, plan exclu), et
--- « un réactif manque de prix ».
+-- Rend best, chance, partiel, le coût des réactifs de CE point (stock déduit, plan exclu),
+-- « un réactif manque de prix », et le détail du point { cash, net, bag, credit } (cf. pointCost).
+-- `val` = mode NET (cf. en-tête) : le choix se fait sur `net` au lieu de `cash`.
 -- DEUX drapeaux, à ne pas confondre : le DOUTE classe (better), le PARTIEL s'affiche (« (?) » sur le
 -- segment, « > » devant le total). Un plan de formateur attesté au prix inconnu est partiel sans
 -- être douteux : il concourt, et le joueur voit quand même que le total est sous-évalué.
-local function pickBest(cands, r, cur, target, bought, st)
-    local best, bestPer, bestChance, bestDoubt, bestCost, bestMissing
-    for _, c in ipairs(cands) do
-        if c.learnAt <= r and c.live ~= "trivial" then
-            local col
-            if r == cur and c.live then col = c.live
-            else col = colorAt(c.colors, r) end
-            local chance = col and CHANCE[col]
-            if chance then
-                local cost, missing = pointCost(c, 1 / chance, st)
-                local per = cost
-                if not c.known and not bought[c.sid] then
-                    per = per + (c.planPrice or 0) / math.max(1, math.min(c.colors[4], target) - r)
-                end
-                local doubt = (missing or c.planDoubt) and true or false
-                if not best or better(doubt, per, c, bestDoubt, bestPer, best) then
-                    best, bestPer, bestChance, bestDoubt, bestCost = c, per, chance, doubt, cost
-                    bestMissing = missing and true or false
-                end
-            end
-        end
+-- Une candidate au rang r : nil si elle n'y concourt pas, sinon chance, coût/point au NET (`per`,
+-- plan amorti compris), ce qui SORT de la bourse (`cash`, même amortissement), doute, puis le
+-- détail de pointCost. Le plan pas encore « acheté » s'amortit sur les points qu'il servira encore.
+local function evaluate(c, r, cur, target, bought, st, val)
+    if c.learnAt > r or c.live == "trivial" then return nil end
+    local col = (r == cur and c.live) or colorAt(c.colors, r)
+    local chance = col and CHANCE[col]
+    if not chance then return nil end
+    local cost, missing, net, fromBag, credit = pointCost(c, 1 / chance, st, val)
+    local amort = 0
+    if not c.known and not bought[c.sid] then
+        amort = (c.planPrice or 0) / math.max(1, math.min(c.colors[4], target) - r)
     end
+    return chance, net + amort, cost + amort, (missing or c.planDoubt) and true or false,
+        cost, missing and true or false, net, fromBag, credit
+end
+
+-- Gain net « faible » (décision 12 de la spec, user 2026-11-10) : en mode NET, une candidate qui
+-- coûte au plus NET_TOL de plus au point que la meilleure, mais fait sortir MOINS de la bourse,
+-- passe devant. Capture du jour, Alchimie 16 : la route faisait apprendre Elixir of Minor Strength
+-- (50c) et acheter 66 Earthroot, 27 pa à débourser, pour épargner ~4c le point de Peacebloom DÉJÀ
+-- en sac (Elixir of Minor Defense, connue, ~1 pa 75 de fioles). Au-delà du seuil, le net décide.
+-- Seuil ancré sur la MEILLEURE (pas de proche en proche : la dérive passerait 10 % par 10 %), et
+-- mesuré sur ce que coûte son point AVANT revente (net + crédit de revente) : case « revente »
+-- cochée, le net de deux recettes qui se revendent tombe à quelques cuivres, et 10 % de presque
+-- rien redonnait la main au moindre écart -- la capture revenait telle quelle.
+local NET_TOL = 0.10
+-- Valeurs du rang en cours, par indice de candidate. Réutilisées d'un appel à l'autre : la fenêtre
+-- recalcule la route chaque seconde, une table par candidate et par rang serait des Mo de déchets.
+local PER, CASH, DOUBT, CREDIT = {}, {}, {}, {}
+
+local function cheaperCash(n, bi)
+    local base = math.abs(PER[bi] + (CREDIT[bi] or 0))
+    local limit, pick = PER[bi] + math.max(base * NET_TOL, EPS), bi
+    for i = 1, n do
+        local c, p = CASH[i], CASH[pick]
+        if PER[i] and DOUBT[i] == DOUBT[bi] and PER[i] <= limit
+            and (c < p - EPS or (c <= p + EPS and PER[i] < PER[pick] - EPS)) then pick = i end
+    end
+    return pick
+end
+
+local function pickBest(cands, r, cur, target, bought, st, val)
+    local bi
+    for i, c in ipairs(cands) do
+        local chance, per, cash, doubt, _, _, _, _, credit = evaluate(c, r, cur, target, bought, st, val)
+        PER[i], CASH[i], DOUBT[i], CREDIT[i] = chance and per or false, cash, doubt, credit
+        if chance and (not bi or better(doubt, per, c, DOUBT[bi], PER[bi], cands[bi])) then bi = i end
+    end
+    if bi and val then bi = cheaperCash(#cands, bi) end
+    local best = bi and cands[bi]
+    if not best then return nil end
+    local chance, _, _, _, cost, missing, net, fromBag, credit = evaluate(best, r, cur, target, bought, st, val)
     -- Partiel : un réactif sans prix, ou un plan au prix inconnu PAS ENCORE payé (une fois que la
     -- route l'a « acheté », les points suivants sont chiffrés juste).
-    local partial = best and (bestMissing or (best.planUnknown and not bought[best.sid])) and true or false
-    return best, bestChance, partial, bestCost, bestMissing
+    local partial = (missing or (best.planUnknown and not bought[best.sid])) and true or false
+    return best, chance, partial, cost, missing, { cash = cost, net = net, bag = fromBag, credit = credit }
 end
 
 -- Plafond visé : maxRank s'il est connu, sinon le prochain palier CAPS au-dessus de `rank`.
@@ -273,21 +322,26 @@ local function targetFor(rank, maxRank)
 end
 
 -- Le point `r` est gagné avec `best` : étend le segment courant ou en ouvre un.
-local function addPoint(segs, r, best, chance, cost, planCost, boughtNow, isPartial)
+-- `pt` = détail du point (pickBest). net/bagValue/resale/resaleQty ne servent qu'en mode NET ;
+-- en caisse ils valent cost/0/0/0 et personne ne les affiche.
+local function addPoint(segs, r, best, chance, pt, planCost, boughtNow, isPartial)
     local seg = segs[#segs]
     if not (seg and seg.sid == best.sid) then
         seg = { sid = best.sid, from = r, to = r, crafts = 0, cost = 0, plan = 0, prod = best.prod,
-            bought = boughtNow, bag = {}, made = {} }
+            bought = boughtNow, bag = {}, made = {}, net = 0, bagValue = 0, resale = 0, resaleQty = 0 }
         segs[#segs + 1] = seg
     end
     seg.to = r + 1; seg.crafts = seg.crafts + 1 / chance
-    seg.cost = seg.cost + cost; seg.plan = seg.plan + planCost
+    seg.cost = seg.cost + pt.cash; seg.plan = seg.plan + planCost
+    seg.net, seg.bagValue = seg.net + pt.net, seg.bagValue + pt.bag
+    if pt.credit > 0 then seg.resale, seg.resaleQty = seg.resale + pt.credit, seg.resaleQty + 1 / chance end
     if isPartial then seg.partial = true end
     return seg
 end
 
 -- La route : segments consécutifs { sid, from, to, crafts, cost, plan, prod, bought, partial,
--- missing, planUnknown, bag, made } (ou { gap = true }), + totaux mats/plans. `done` = déjà au plafond. maxRank nil →
+-- missing, planUnknown, bag, made, net, bagValue, resale, resaleQty } (ou { gap = true }), + totaux
+-- mats/plans (ce qui sort de la bourse) et, en mode NET (opts.value), net/bagValue/resale. `done` = déjà au plafond. maxRank nil →
 -- prochain palier CAPS. nil si briques absentes (cf. Candidates). opts : voir Candidates, plus
 -- opts.bag(itemID) → quantité en sac (MON perso seulement). `bag` est gardé sur la route : Materials
 -- en a besoin pour dire ce qu'il reste à réunir.
@@ -298,10 +352,11 @@ function Route:Compute(profKey, rank, maxRank, opts)
     if not target or rank >= target then return { rank = rank, target = target or rank, segments = {}, mats = 0, plans = 0, done = true } end
     local cands = self:Candidates(profKey, opts)
     if not cands then return nil end
-    local st = newStock(opts.bag)
+    local st, val = newStock(opts.bag), opts.value
     local segs, mats, plans, bought, anyPartial = {}, 0, 0, {}, false
+    local tot = { net = 0, bag = 0, resale = 0 }
     for r = rank, target - 1 do
-        local best, chance, isPartial, cost, missing = pickBest(cands, r, rank, target, bought, st)
+        local best, chance, isPartial, cost, missing, pt = pickBest(cands, r, rank, target, bought, st, val)
         local seg = segs[#segs]
         if not best then
             if seg and seg.gap then seg.to = r + 1
@@ -314,7 +369,8 @@ function Route:Compute(profKey, rank, maxRank, opts)
             end
             if isPartial then anyPartial = true end
             mats = mats + cost   -- coût espéré des réactifs pour CE point, stock déduit
-            seg = addPoint(segs, r, best, chance, cost, planCost, boughtNow, isPartial)
+            tot.net, tot.bag, tot.resale = tot.net + pt.net, tot.bag + pt.bag, tot.resale + pt.credit
+            seg = addPoint(segs, r, best, chance, pt, planCost, boughtNow, isPartial)
             -- La RAISON du partiel, pour l'infobulle : le joueur n'y peut pas la même chose.
             if missing then seg.missing = true end
             if boughtNow and best.planUnknown then seg.planUnknown = true end
@@ -322,7 +378,9 @@ function Route:Compute(profKey, rank, maxRank, opts)
         end
     end
     return { rank = rank, target = target, segments = segs, mats = mats, plans = plans,
-        partial = anyPartial, bag = opts.bag }
+        partial = anyPartial, bag = opts.bag,
+        net = val and (tot.net + plans) or nil, bagValue = val and tot.bag or nil,
+        resale = val and tot.resale or nil }
 end
 
 -- ------------------------------------------------------------------
@@ -377,125 +435,13 @@ function Route:NextStep(profKey, rank, maxRank, opts)
     if not target or rank >= target then return nil end
     local cands = self:CachedCandidates(profKey, opts)
     if not cands then return nil end
-    local best, chance, partial, cost = pickBest(cands, rank, rank, target, {}, newStock(opts.bag))
+    local best, chance, partial, cost, _, pt = pickBest(cands, rank, rank, target, {}, newStock(opts.bag), opts.value)
     if not (best and chance) then return nil end
     return {
         sid = best.sid, prod = best.prod, rank = rank, target = target,
-        cost = best.cost, chance = chance, perPoint = cost,
+        cost = best.cost, chance = chance, perPoint = cost, perPointNet = pt and pt.net or nil,
         -- `plan` non nil = la route ACHÈTE ce plan pour ce point (le joueur ne le connaît pas encore).
         plan = (not best.known) and { price = best.planPrice or 0 } or nil,
         partial = partial or nil,
     }
-end
-
--- Ajoute `n` unités du réactif `id` au sac `acc`, avec trois raffinements terrain (retours user
--- 2026-07-19, capture Couture, et 2026-09-26, capture Travail du cuir) :
---  · CRÉDIT de production : ce que la route CRAFTE déjà (acc.produced, ex. rouleaux montés pour
---    les points) sert d'abord aux recettes suivantes — pas de double compte ;
---  · SACS : ce que le joueur a déjà (acc.bag, vide pour un tiers) passe ensuite — la liste dit ce
---    qu'il RESTE à réunir, pas ce que la route consomme ;
---  · DÉCOMPOSITION : un intermédiaire que le MÊME métier fabrique (acc.i2s : objet → recette,
---    ex. rouleau ← étoffe) est remplacé par ses composants de base, récursivement. Garde de
---    profondeur : les transmutations d'essences bouclent (A→B et B→A). numMade inconnu de la lib
---    → 1 craft = 1 objet supposé (vrai pour les rouleaux/barres ; estimation sinon).
-local function addReagent(lib, profKey, acc, id, n, depth)
-    local credit = acc.produced[id]
-    if credit and credit > 0 then
-        local used = (credit < n) and credit or n
-        acc.produced[id] = credit - used
-        n = n - used
-        if n <= 0 then return end
-    end
-    local inBag = acc.bag[id]
-    if inBag > EPS then
-        local used = (inBag < n) and inBag or n
-        acc.bag[id] = inBag - used
-        acc.fromBags = true
-        n = n - used
-        if n <= EPS then return end
-    end
-    local sid = (depth < 4) and acc.i2s[id]
-    local sub = sid and lib.RecipeReagents and lib:RecipeReagents(profKey, sid)
-    if sub and #sub > 0 then
-        for _, rg in ipairs(sub) do addReagent(lib, profKey, acc, rg[1], n * (rg[2] or 1), depth + 1) end
-    else
-        if not acc.qty[id] then acc.qty[id] = 0; acc.order[#acc.order + 1] = id end
-        acc.qty[id] = acc.qty[id] + n
-    end
-end
-
--- « Liste de courses » d'une route : réactifs AGRÉGÉS sur tous les segments (crafts espérés ×
--- quantité, crédit/décomposition cf. addReagent, arrondis au plafond par objet) + plans achetés
--- par la route (objet-plan à fournir, ou plan de FORMATEUR — pas d'objet, il devra l'apprendre au
--- PNJ). Sert à la bourse d'artisan. mats triés par coût total décroissant ; cost = prix unitaire
--- Auctionator (nil si inconnu) ; vendor = vendu par un PNJ (inutile de fournir, l'UI le sort de la
--- grille). gaps = des rangs sans candidate (liste incomplète). fromBags = les sacs (route.bag, MON
--- perso seulement) ont couvert une partie des besoins : la liste est un RESTE, l'UI le dit.
-function Route:Materials(profKey, route)
-    local lib = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
-    if not (lib and route) then return nil end
-    local PR, M = COC.Profit, COC.Sources
-    local acc = { qty = {}, order = {}, produced = {}, bag = newStock(route.bag).bag,
-        i2s = (lib.ItemToSpell and lib:ItemToSpell(profKey)) or {} }
-    for _, s in ipairs(route.segments or {}) do
-        if not s.gap and s.prod then acc.produced[s.prod] = (acc.produced[s.prod] or 0) + s.crafts end
-    end
-    local plans, gapPts, partial = {}, 0, false
-    for _, s in ipairs(route.segments or {}) do
-        if s.gap then gapPts = gapPts + (s.to - s.from)
-        else
-            if s.partial then partial = true end
-            for _, reag in ipairs((lib.RecipeReagents and lib:RecipeReagents(profKey, s.sid)) or {}) do
-                addReagent(lib, profKey, acc, reag[1], (reag[2] or 1) * s.crafts, 0)
-            end
-            if s.bought then
-                local kind = (M and M:IsAvailable()) and M:SourceKind(profKey, s.sid) or "unknown"
-                local ri = M and M:RecipeItem(profKey, s.sid)
-                plans[#plans + 1] = { sid = s.sid, itemID = (kind ~= "trainer") and ri or nil,
-                    price = s.plan or 0, trainer = (kind == "trainer") }
-            end
-        end
-    end
-    local mats = {}
-    for _, id in ipairs(acc.order) do
-        local n = math.ceil(acc.qty[id] - 0.001)
-        if n > 0 then mats[#mats + 1] = { itemID = id, qty = n, cost = PR and PR:ItemValue(id) or nil,
-            vendor = (PR and PR.IsVendorItem) and PR:IsVendorItem(id) or false } end
-    end
-    table.sort(mats, function(a, b) return ((a.cost or 0) * a.qty) > ((b.cost or 0) * b.qty) end)
-    return { mats = mats, plans = plans, gaps = gapPts > 0, gapPts = gapPts, partial = partial,
-        fromBags = acc.fromBags or nil }
-end
-
--- Vrai s'il existe, dans les données CHARGÉES (couche du client), au moins une recette apprise à un
--- rang STRICTEMENT supérieur à `rank` : le palier suivant existe donc RÉELLEMENT ici. Sur Era/Vanilla
--- (First Aid plafonne à 300, aucune recette au-dessus) → faux → on n'incite jamais à un palier fantôme.
-function Route:HasHigherTier(profKey, rank)
-    if not (profKey and rank) then return false end
-    local lib = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
-    if not (lib and lib.GetRecipes and lib.RecipeLearnedAt) then return false end
-    for _, sid in ipairs(lib:GetRecipes(profKey) or {}) do
-        local at = lib:RecipeLearnedAt(profKey, sid)
-        if at and at > rank then return true end
-    end
-    return false
-end
-
--- Passerelle CURATÉE pour (métier, rang-plafond) — { item, name, vendors, price, nextCap } — ou nil
--- si aucune, ou si le palier supérieur n'existe pas dans la saveur chargée (cohérence via HasHigherTier :
--- jamais promettre un livre pour un palier absent du client). Consommée par la fenêtre Plan de route.
-function Route:Gateway(profKey, rank)
-    local g = profKey and rank and GATEWAY[profKey] and GATEWAY[profKey][rank]
-    if not g then return nil end
-    if not self:HasHigherTier(profKey, rank) then return nil end
-    return g
-end
-
--- Prochain plafond de palier STANDARD strictement au-dessus de `rank` — repli pour l'en-tête d'un
--- palier entraîné au FORMATEUR (pas de nextCap curaté). Le +5 racial draeneï pousse le plafond
--- effectif à 230 : le palier VISÉ reste le suivant (300). nil si déjà au sommet des paliers connus.
-function Route:NextTierCap(rank)
-    if not rank then return nil end
-    for _, cap in ipairs(CAPS) do if rank < cap then return cap end end
-    return nil
 end
