@@ -46,6 +46,16 @@ client.
 
 ## Relevés
 
+- 2026-11-11 10:06 — jusqu'a 9de2499 — Forever 1.60.1.70888, client ANGLAIS, solo ; builds lus par l'appli
+  du banc dans la copie déployée — **GO partiel sur `feat/writs-infobulle`** (taint NON vérifié) :
+  - `main-dev@f0e975e` (09:35, jusqu'à 67aa195, version D10 à deux lignes) : 7 gestes cochés OK —
+    infobulle de l'objet au sac, en lien du chat, à l'HdV, writ porté, vue Profit sans doublon, en combat ;
+  - `main-dev@c6266b2` (09:40, jusqu'à 29c86b2, D11 : UNE ligne « Craftsman's Writ: +75 ») : vu OK **sur
+    la parole du user** (« c'est tout bon »), gestes de la fiche recrite pas recochés ;
+  - `main-dev@8362b42` (10:06, jusqu'à 9de2499) : geste « recompense » coché OK — la vue Profit ne montre
+    plus d'or à 0 et dit « Reward: Coin Pouch » (le journal du writ 94222 annonce 0 d'or, relevé
+    `db.writsSeen[94222].money = 0` au niveau 22 ; la récompense est une Coin Pouch, capture du user).
+  Taint : geste coché, mais aucun `Logs\taint.log` n'existe (journal du taint pas allumé) : rien de lu.
 - 2026-11-08 00:10 — jusqu'a 916b8bf — build `main-dev@02016c5 2026-11-07 23:14`, `## Version: 1.51.0`
   (lu dans le `.toc` déployé et par l'appli du banc, fiche `CraftingOrderClassic--release-v1.51.0-donnees`,
   gestes « nouveautes » et « fin » cochés OK, sans remarque, sur la parole du user ; le geste
