@@ -183,6 +183,20 @@ function A.GetQuestRewardMoney(questID)
     local ok, m = pcall(f, questID)
     return (ok and type(m) == "number") and m or nil
 end
+-- Le premier OBJET que rend une quête du journal : { id = itemID, n = nombre }, ou nil. Un writ
+-- d'artisan ne rend pas d'or mais une Coin Pouch (relevé du 2026-11-11 : 0 d'or annoncé, quête 94222).
+-- `GetNumQuestLogRewards(questID)` + `GetQuestLogRewardInfo(i, questID)`, 6e retour = itemID : le code
+-- d'UI de Forever les appelle ainsi (QuestUtils.lua, Blizzard_Journeys.lua). Une TABLE, pas deux
+-- valeurs : derrière `X and X(q)`, la seconde se perdrait. Sous pcall.
+function A.GetQuestRewardItem(questID)
+    local num, info = _G.GetNumQuestLogRewards, _G.GetQuestLogRewardInfo
+    if not (questID and num and info) then return nil end
+    local ok, n = pcall(num, questID)
+    if not (ok and type(n) == "number" and n > 0) then return nil end
+    local ok2, _, _, count, _, _, itemID = pcall(info, 1, questID)
+    if not (ok2 and type(itemID) == "number" and itemID > 0) then return nil end
+    return { id = itemID, n = (type(count) == "number" and count > 0) and count or 1 }
+end
 
 -- ---------------------------------------------------------------- événements
 

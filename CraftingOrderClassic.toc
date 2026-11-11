@@ -122,6 +122,7 @@ CraftingOrderClassic_Trainers.lua
 CraftingOrderClassic_Writs.lua
 CraftingOrderClassic_Writs_Data.lua
 CraftingOrderClassic_Writs_Seen.lua
+CraftingOrderClassic_Writs_Tooltip.lua
 CraftingOrderClassic_ProfWindow.lua
 CraftingOrderClassic_ProfWindow_Layout.lua
 CraftingOrderClassic_ProfWindow_HelpPlate.lua

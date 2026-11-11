@@ -246,6 +246,7 @@ local de3 = {
     ["Tu portes ce writ : ouvre-le pour savoir combien il en faut."] =
         "Du trägst diesen Auftrag: Öffne ihn, um zu sehen, wie viele er verlangt.",
     ["Les porteurs de ce writ cherchent cet objet."] = "Wer diesen Auftrag trägt, sucht diesen Gegenstand.",
+    ["Writ d'artisan : +%d"] = "Handwerkerauftrag: +%d",
     ["Le writ à l'HdV"] = "Auftrag im AH",
     ["%d à %d"] = "%d bis %d",
     ["Demandés (vu en jeu)"] = "Verlangt (im Spiel gesehen)",

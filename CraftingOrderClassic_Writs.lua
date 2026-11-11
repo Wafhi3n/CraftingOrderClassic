@@ -20,6 +20,7 @@
 --   W:WantedItems()     → objet demandé → son writ porté (Held), pas encore rempli
 --   W:ForItem(itemID)   → { entrée, … } dont la quête demande cet objet | nil
 --   W:ProfitMark(itemID, wanted) → { entry, held, need, seen } | nil : la marque de la vue Profit
+--   W:ItemMark(itemID)  → la même marque, sans `wanted` : ne lit que les writs de cet objet
 --   W:Seen(questID)     → ce que COC a VU de cette quête en jeu (db.writsSeen) | nil
 --   W:Learn(questID)    → relève quantité et or d'une quête de writ au journal ; LearnHeld() : toutes
 --   W:Paid(questID, money) → relève l'or VERSÉ au rendu de la quête
@@ -163,20 +164,25 @@ end
 -- Quête acceptée : `required` / `have` / `need` (ce qui manque) viennent de son objectif, et `done`
 -- dit qu'il ne manque plus rien. Writ pas encore ouvert : quantité INCONNUE (champs nil), jamais
 -- devinée, et `done` reste faux — un objet en sac ne prouve rien tant qu'on ignore combien il en faut.
+local function heldOf(self, e)
+    local A = COC.Api
+    local bag, quest = inBags(e.writ), A.IsOnQuest(e.quest)
+    if not (bag or quest) then return nil end
+    local h = { entry = e, inBag = bag, onQuest = quest, done = false }
+    if quest then
+        local req, have = self:Objective(e.quest)
+        h.required, h.have = req, have
+        h.need = req and math.max(0, req - have) or nil
+        h.done = A.IsQuestComplete(e.quest) or h.need == 0
+    end
+    return h
+end
+
 function W:Held()
-    local A, out = COC.Api, {}
-    for writ, e in pairs(byWrit) do
-        local bag, quest = inBags(writ), A.IsOnQuest(e.quest)
-        if bag or quest then
-            local h = { entry = e, inBag = bag, onQuest = quest, done = false }
-            if quest then
-                local req, have = self:Objective(e.quest)
-                h.required, h.have = req, have
-                h.need = req and math.max(0, req - have) or nil
-                h.done = A.IsQuestComplete(e.quest) or h.need == 0
-            end
-            out[#out + 1] = h
-        end
+    local out = {}
+    for _, e in pairs(byWrit) do
+        local h = heldOf(self, e)
+        if h then out[#out + 1] = h end
     end
     table.sort(out, function(a, b) return a.entry.writ < b.entry.writ end)
     return out
@@ -207,6 +213,22 @@ function W:ProfitMark(itemID, wanted)
     local h = wanted and wanted[tonumber(itemID)]
     local e = h and h.entry or list[1]
     return { entry = e, held = h ~= nil, need = h and h.need or nil, seen = self:Seen(e.quest) }
+end
+
+-- La même marque, pour l'infobulle d'un objet (D10) : elle se refait à CHAQUE survol, d'où une
+-- lecture des seuls writs de cet objet (un, deux pour un homonyme), jamais des 150 de `WantedItems()`.
+-- Même règle : un writ dont la quête est remplie ne compte plus comme porté.
+function W:ItemMark(itemID)
+    local list = self:ForItem(itemID)
+    if not list then return nil end
+    local wanted = {}
+    for _, e in ipairs(list) do
+        local h = heldOf(self, e)
+        if h and not h.done then
+            for _, it in ipairs(e.items) do wanted[it] = h end
+        end
+    end
+    return self:ProfitMark(itemID, wanted)
 end
 
 -- =========================================================================
@@ -240,6 +262,10 @@ function W:Learn(questID)
     if money and (money > 0 or r.money == nil) then
         r.money, r.level = money, UnitLevel and UnitLevel("player") or nil
     end
+    -- Un writ rend une Coin Pouch, pas d'or (relevé du 2026-11-11 : 0 annoncé). L'objet se retient ;
+    -- une relecture sans lui (récompense pas encore chargée) ne l'efface pas.
+    local item = A.GetQuestRewardItem and A.GetQuestRewardItem(e.quest)
+    if item then r.rewardItem, r.rewardCount = item.id, item.n end
     r.at = time and time() or r.at
     db.writsSeen[e.quest] = r
     return r
