@@ -861,6 +861,30 @@ client.
   Général, l'absence du lien de communauté à une connexion complète, le message de `/co refresh`.
   Vu en passant : une balise texte `CLNK1` part sur la salle au `/co refresh` (le canal a de nouveau un
   index) — utile aux clients d'avant la v1.37, masquée du chat de ceux qui ont l'addon ; laissée.
+- 2026-11-11 09:45 — jusqu'a cd1c97e — Forever 1.60.1.70888, client ANGLAIS, solo (l'enchanteur,
+  Enchantement 152/225, Auctionator actif) ; build `main-dev@c6266b2 2026-11-11 09:40` lu par l'appli
+  du banc dans la copie déployée (fiche préparée pour `main-dev@adaf780`, même commit de la branche)
+  — **GO sur la décision 18 de `feat/profit-arbitrages`** (l'Enchantement repasse au profit ; fiche de
+  l'appli, 3 gestes cochés OK, sans remarque) : en Enchantement, la languette Profit titre
+  « Profitable (N) », plus « Cost to cast », et aucune ligne « Enchant … » ; « Whole profession »
+  coché : toujours aucune ligne « Enchant … » ; la sonde du schéma d'« Enchant Chest - Minor Stats »
+  ne nomme aucun objet. `b362ff8` (docs seules) n'était pas au banc.
+- 2026-09-29 17:06 — jusqu'a 339ec5a — Forever, un client, client en ANGLAIS ; build déployé
+  `main-dev@c7c3b62 2026-09-29 16:56` (sortie de `deploy.ps1 -Banc feat/profit-arbitrages` ;
+  `/co version` pas relevé) — **GO partiel sur les arbitrages 9 à 12 de la vue Profit** — deux
+  captures du user, lues par l'agent. Travail du cuir 45/75, case « Whole profession » cochée :
+  « Profitable (33) », titre et case sur une ligne, le « i » à gauche de la rangée (il ne mord plus
+  sur la languette Profit). Infobulle de « Mystic Heavy Armor Kit », recette non apprise : AH sale
+  2g 95s, AH cut (5%) −14s 75c, Reagents −1g 25s 88c, Net profit +1g 54s 37c — le compte tombe
+  juste (29500 − 1475 − 12588 = 15437) — et la phrase « Not learned yet… "Missing" view ».
+  Enchantement : « Cost to cast (176) », trié de 81g 24s à 10g 70s, beaucoup de « (?) ».
+  ⚠️ **DÉFAUT VU** : les noms longs (« Enchant Necklace - Deflection », « Enchant Weapon - Healing
+  Power ») passent sur deux lignes et mordent sur la ligne suivante ; corrigé sur la branche après
+  ce relevé (`SetWordWrap(false)`), pas revu. Vu aussi : les montants sont blancs dans les deux
+  modes, la couleur par mode du code était sans effet (retirée).
+  PÉRIMÈTRE, ce qui n'a PAS été observé : la case décochée à l'ouverture ; le GRIS des lignes non
+  apprises (aucune ligne apprise à l'écran pour comparer) ; la ligne « Sale (vendor price) » ;
+  l'infobulle d'un enchant ; le clic sur une ligne ; le combat.
 
 - 2026-09-29 16:10 — jusqu'a a3ba24b — Forever, deux clients, client en ANGLAIS ; build déployé
   `main-dev@f2e653a 2026-09-29 15:35` (`/co version` pas relu par l'agent ; la ligne de trace
