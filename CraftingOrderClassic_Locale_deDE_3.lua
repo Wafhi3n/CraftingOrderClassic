@@ -96,6 +96,21 @@ local de3 = {
         "Es fehlen noch %d in der Post: Trenne sie selbst von einem Stapel ab (Umschalt-Klick auf den Stapel) und lege sie hinein.",
     ["La pile de %d est prête dans ton sac : dépose-la toi-même dans le courrier."] =
         "Der Stapel mit %d liegt bereit in deiner Tasche: Lege ihn selbst in die Post.",
+    -- Plan de route : le prix d'un plan de formateur, relevé chez lui (2026-10-02)
+    ["Prix du plan inconnu : COC le relèvera à ton prochain passage chez le formateur."] = "Rezeptpreis unbekannt: COC notiert ihn bei deinem nächsten Besuch beim Lehrer.",
+    -- Plan de route au coût NET, spec route-cout-net (2026-10-02)
+    ["Compter la revente"] = "Weiterverkauf zählen",
+    ["Cochée : ce que la route fabrique est compté à son prix de revente (HV moins 5 %), et ce qu'elle prend dans tes sacs aussi. La route choisit alors au coût net."] = "Aktiviert: Was die Route herstellt, zählt zu seinem Wiederverkaufspreis (AH minus 5 %), ebenso was sie aus deinen Taschen nimmt. Die Route wählt dann nach Nettokosten.",
+    ["À débourser : %s"] = "Auszugeben: %s",
+    ["Coût net : %s"] = "Nettokosten: %s",
+    ["Gain net : %s"] = "Nettogewinn: %s",
+    ["Pris dans tes sacs : ~%s"] = "Aus deinen Taschen: ~%s",
+    ["Revente : ~%s (%d objet(s) à vendre)"] = "Wiederverkauf: ~%s (%d Gegenstand/Gegenstände zu verkaufen)",
+    ["Revente inconnue : comptée nulle."] = "Wiederverkauf unbekannt: als null gezählt.",
+    ["Coût net de l'étape : %s"] = "Nettokosten dieses Schritts: %s",
+    ["Gain net de l'étape : %s"] = "Nettogewinn dieses Schritts: %s",
+    ["Les matières valent ~%s de plus que ce que l'étape produit."] = "Die Materialien sind ~%s mehr wert als das, was dieser Schritt herstellt.",
+    ["Ce que la route prend dans tes sacs vaudrait ~%s à l'HV."] = "Was die Route aus deinen Taschen nimmt, brächte im AH ~%s.",
     -- Note de membre de la communauté, /co note (2026-09-29)
     ["le texte de tes métiers, à coller dans ta note de communauté (visible même hors ligne)"] =
         "der Text deiner Berufe, zum Einfügen in deine Gemeinschaftsnotiz (auch offline sichtbar)",
@@ -211,6 +226,32 @@ local de3 = {
         "Deine Aufträge und dein Fortschritt auf dem Bildschirm, wie die Questverfolgung. Sie erscheint nur, wenn es etwas zu verfolgen gibt.",
     ["Le X au bout du suivi le masque entièrement ; la case « Suivi à l'écran » de l'onglet Route le ramène."] =
         "Das X am Ende der Verfolgung blendet sie ganz aus; das Kästchen „Bildschirm-Verfolgung“ im Reiter Route holt sie zurück.",
+    -- Vue Profit : bascule « tout le métier », source du prix, coupe HV, Enchantement par le coût (2026-09-29)
+    ["Tout le métier"] = "Ganzer Beruf",
+    ["Ajoute, en gris, les recettes que tu n'as pas encore apprises."] =
+        "Fügt die Rezepte, die du noch nicht gelernt hast, in Grau hinzu.",
+    ["Pas encore apprise : la vue « Manquantes » dit où l'apprendre."] =
+        "Noch nicht gelernt: Die Ansicht „Fehlend“ zeigt, wo du es lernst.",
+    ["Vente (prix marchand)"] = "Verkauf (Händlerpreis)",
+    ["Coupe HV (%d %%)"] = "AH-Gebühr (%d %%)",
+    ["Un marchand vend cet objet : l'HV ne le paiera pas plus cher."] =
+        "Ein Händler verkauft diesen Gegenstand: Im AH zahlt niemand mehr dafür.",
+    ["Coût à lancer (%d)"] = "Kosten pro Wirken (%d)",
+    ["Ce que coûte un lancer, pas un gain : ta commission vient en plus."] =
+        "Was dich ein Wirken kostet, kein Gewinn: Deine Provision kommt obendrauf.",
+    ["Aucun coût connu (prix : %s)."] = "Keine Kosten bekannt (Preise: %s).",
+    -- Vue Profit : la marque des Craftsman's Writ (writs-aca.md, D7 et D8, 2026-11-09)
+    ["Demandé par un writ d'artisan (+%d de réputation)."] = "Von einem Handwerkerauftrag gesucht (+%d Ruf).",
+    ["Tu portes ce writ : il t'en manque %d."] = "Du trägst diesen Auftrag: Dir fehlen noch %d.",
+    ["Tu portes ce writ : ouvre-le pour savoir combien il en faut."] =
+        "Du trägst diesen Auftrag: Öffne ihn, um zu sehen, wie viele er verlangt.",
+    ["Les porteurs de ce writ cherchent cet objet."] = "Wer diesen Auftrag trägt, sucht diesen Gegenstand.",
+    ["Writ d'artisan : +%d"] = "Handwerkerauftrag: +%d",
+    ["Le writ à l'HdV"] = "Auftrag im AH",
+    ["%d à %d"] = "%d bis %d",
+    ["Demandés (vu en jeu)"] = "Verlangt (im Spiel gesehen)",
+    ["Or annoncé (vu au niveau %s)"] = "Angezeigte Goldbelohnung (gesehen auf Stufe %s)",
+    ["Or reçu au rendu (niveau %s)"] = "Bei Abgabe erhaltenes Gold (Stufe %s)",
 }
 
 for k, v in pairs(de3) do L[k] = v end

@@ -38,6 +38,17 @@ local BODY_W = 780
 local function versionsNow()
     return {
         {
+            v = "v1.52.0", title = L["Les writs dans la vue Profit, et une route qui compte tes sacs"],
+            lines = {
+                L["La vue Profit (la colonne à droite de la fenêtre de métier) marque les recettes dont l'objet est demandé par un Craftsman's Writ : une petite icône de writ à côté du montant, allumée si tu portes ce writ, éteinte sinon. Son infobulle donne la réputation, le prix du writ à l'hôtel des ventes quand Auctionator le connaît, combien d'objets le writ demandait quand tu l'as ouvert, et ce qu'il rapporte : une bourse (Coin Pouch), pas de l'or. Survole l'objet lui-même n'importe où dans le jeu (sac, hôtel des ventes, lien du chat) et une ligne dit qu'un writ le veut : « Writ d'artisan : +75 »."],
+                L["La vue Profit a aussi une case « Tout le métier », qui ajoute en gris les recettes que tu n'as pas encore apprises. Un objet qu'un marchand vend est compté à son prix, puisque personne ne le paiera plus cher à l'hôtel des ventes, et la coupe de cinq pour cent de l'hôtel des ventes est retirée. L'Enchantement se lit au profit comme les autres métiers : les enchantements n'ont plus de ligne, puisqu'ils ne se vendent pas à l'hôtel des ventes."],
+                L["Le plan de route (onglet Route) calcule maintenant le coût net de chaque étape. Ce qu'il prend dans tes sacs vaut ce que tu en tirerais à l'hôtel des ventes, coupe déduite, et ce que tu fabriques compte pour sa revente (décoche « Compter la revente » pour l'ignorer). Le haut de l'onglet affiche deux totaux : « À débourser », l'or qui sort vraiment de ta bourse, et « Coût net ». Quand une autre recette ne fait gagner que peu (dix pour cent au plus), la route garde celle dont tu as déjà les composants, au lieu de t'envoyer acheter de l'Earthroot pour épargner quelques pièces de Peacebloom."],
+                L["Les recettes de ton formateur entrent aussi dans la route, avec le prix et le niveau qu'il demande, relevés à ta première visite."],
+                L["Un nom d'étape trop long pour la colonne perd maintenant ses premiers mots, plus les derniers : « ...Minor Strength » au lieu de « Elixir of Mi... », qui ressemblait trop à Elixir of Minor Force. Les notes sous « Fournitures » passent à la ligne dans la colonne au lieu d'être coupées au bord."],
+                L["La Coarse Grinding Stone devient grise à 90, plus à 75 : Blizzard l'a changé sur le serveur le 11 novembre, et l'addon suit. Il connaît aussi le niveau d'apprentissage de 92 recettes de plus, relevé chez le formateur, surtout en Couture, où les couleurs étaient décalées d'environ 25 points."],
+            },
+        },
+        {
             v = "v1.51.0", title = L["Les couleurs des recettes suivent le jeu, et le suivi se masque d'un clic"],
             lines = {
                 L["Sur Forever, beaucoup de recettes s'apprennent plus tôt que ne le disaient les données de l'addon, souvent 25 points plus tôt, et leurs couleurs étaient calculées sur l'ancien niveau. Le plan de route pouvait compter des points sur une pierre à aiguiser que le jeu affichait déjà en gris, et « À apprendre maintenant » cachait des recettes que ton formateur vendait déjà. Les couleurs viennent maintenant des tables du client du jeu, calées sur le niveau que demande le formateur : 97 recettes changent, surtout en Forge et en Travail du cuir."],
@@ -410,25 +421,11 @@ local function versionsLatest()
                 L["Corrigé aussi : quand un enchanteur te demandait une pièce, l'invite ne s'affichait parfois jamais. Une première demande arrivée trop tôt, avant que tu aies équipé la pièce, armait quand même le délai de cinq secondes — et la vraie demande qui suivait passait à la trappe. Le délai ne démarre plus que sur une demande réellement affichée."],
             },
         },
-        {
-            v = "v1.24.2", title = L["Les stats d'enchant parlent enfin ta langue"],
-            lines = {
-                L["Les sous-catégories de la vue enchant (Force, Esprit, Croisé…) venaient d'un libellé interne jamais traduit : tout le monde les voyait en anglais, client français compris. Elles sont maintenant lues directement sur ton jeu, comme les noms de sorts, donc dans ta langue sans rien à traduire à la main à chaque nouvelle recette."],
-            },
-        },
     }
 end
 
 local function versionsRecent()
-    return {
-        {
-            v = "v1.24.0", title = L["La pièce à enchanter se pose d'un clic, et une bourse qui suit la progression"],
-            lines = {
-                L["Depuis la v1.21.0, un enchanteur peut cliquer un emplacement de la silhouette d'échange pour te demander la pièce à enchanter. Si tu as l'addon toi aussi, ce clic affiche maintenant une invite chez toi : accepte, et ta pièce équipée se pose toute seule dans l'emplacement « ne sera pas échangé ». Rien n'est donné (cet emplacement ne peut pas changer de mains), la pose est verrouillée sur lui, et rien ne bouge sans ton clic. Sans l'addon en face, le chuchotement explicatif part comme avant."],
-                L["La bourse d'artisan se met à jour en direct : fenêtre ouverte, chaque point de métier gagné par le personnage suivi (et chaque recette apprise) recalcule la liste de courses — plus besoin de la rouvrir pour voir la route changer."],
-            },
-        },
-    }
+    return {}   -- vide depuis la v1.52.0 (v1.24.2 et v1.24.0 sorties de la fenêtre glissante) ; gardé pour versions()
 end
 
 local function versionsOlder()

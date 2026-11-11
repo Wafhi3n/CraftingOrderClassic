@@ -157,6 +157,47 @@ function A.SelectQuestLogEntry(index)
     if _G.SelectQuestLogEntry then return _G.SelectQuestLogEntry(index) end
 end
 
+-- Une quête par son IDENTIFIANT, sans toucher à la sélection du journal (writs : _Writs.lua).
+-- Moderne seulement : sans C_QuestLog, rien n'est « en cours » ni « remplie », et l'appelant n'a pas
+-- à distinguer ce cas. Booléens stricts.
+function A.IsOnQuest(questID)
+    local f = C_QuestLog and C_QuestLog.IsOnQuest
+    return (questID and f and f(questID)) and true or false
+end
+function A.IsQuestComplete(questID)
+    local f = C_QuestLog and C_QuestLog.IsComplete
+    return (questID and f and f(questID)) and true or false
+end
+-- Ses objectifs : { { text, type, finished, numFulfilled, numRequired }, … }, ou {} (sans
+-- C_QuestLog, ou quête absente du journal).
+function A.GetQuestObjectives(questID)
+    local f = C_QuestLog and C_QuestLog.GetQuestObjectives
+    return (questID and f and f(questID)) or {}
+end
+-- L'or que rend une quête du journal, en cuivre, ou nil. `GetQuestLogRewardMoney(questID)` : le code
+-- d'UI de Forever l'appelle ainsi (AlertFrames, AM_QuestDialog). Sous pcall : jamais appelée en jeu
+-- par COC avant les writs (2026-11-09).
+function A.GetQuestRewardMoney(questID)
+    local f = _G.GetQuestLogRewardMoney
+    if not (questID and f) then return nil end
+    local ok, m = pcall(f, questID)
+    return (ok and type(m) == "number") and m or nil
+end
+-- Le premier OBJET que rend une quête du journal : { id = itemID, n = nombre }, ou nil. Un writ
+-- d'artisan ne rend pas d'or mais une Coin Pouch (relevé du 2026-11-11 : 0 d'or annoncé, quête 94222).
+-- `GetNumQuestLogRewards(questID)` + `GetQuestLogRewardInfo(i, questID)`, 6e retour = itemID : le code
+-- d'UI de Forever les appelle ainsi (QuestUtils.lua, Blizzard_Journeys.lua). Une TABLE, pas deux
+-- valeurs : derrière `X and X(q)`, la seconde se perdrait. Sous pcall.
+function A.GetQuestRewardItem(questID)
+    local num, info = _G.GetNumQuestLogRewards, _G.GetQuestLogRewardInfo
+    if not (questID and num and info) then return nil end
+    local ok, n = pcall(num, questID)
+    if not (ok and type(n) == "number" and n > 0) then return nil end
+    local ok2, _, _, count, _, _, itemID = pcall(info, 1, questID)
+    if not (ok2 and type(itemID) == "number" and itemID > 0) then return nil end
+    return { id = itemID, n = (type(count) == "number" and count > 0) and count or 1 }
+end
+
 -- ---------------------------------------------------------------- événements
 
 -- `RegisterEvent` LÈVE une erreur sur un événement que le client ne connaît pas, au lieu de

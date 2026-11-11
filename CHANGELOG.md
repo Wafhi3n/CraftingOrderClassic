@@ -1,5 +1,37 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.52.0 - Craftsman's Writs in the Profit view, and a leveling route that counts your bags
+
+The Profit view (the column to the right of the profession window) marks recipes whose item a
+Craftsman's Writ asks for: a small writ icon next to the amount, lit when you carry that writ, dimmed
+when you don't. Its tooltip gives the reputation, the writ's price at the auction house when
+Auctionator knows it, how many items the writ asked for when you opened it, and what it pays: a Coin
+Pouch, not gold. Hover the item itself anywhere in the game (your bags, the auction house, a chat
+link) and one line says a writ wants it: "Craftsman's Writ: +75".
+
+The Profit view also has a "Whole profession" box, which adds the recipes you haven't learned yet, in
+grey. An item a vendor sells is priced at the vendor's price, since nobody will pay more at the
+auction house, and the 5% auction house cut comes off. Enchanting reads by profit like the other
+professions: enchants have no line any more, since they don't sell at the auction house.
+
+The leveling route (Route tab) now works out the net cost of each step. What it takes from your bags
+is worth what you'd get for it at the auction house, minus the cut, and what you craft counts for its
+resale value (untick "Count resale" to leave that out). The top of the tab shows two totals: "To
+spend", the gold that actually leaves your pocket, and "Net cost". When another recipe only saves a
+little (10% at most), the route keeps the one you already have the materials for, instead of sending
+you to buy Earthroot to spare a few coppers of Peacebloom.
+
+Recipes your trainer teaches join the route too, with the price and level the trainer asks for,
+noted on your first visit.
+
+A step name too long for the column now loses its first words, not its last: "...Minor Strength"
+instead of "Elixir of Mi...", which looked just like Elixir of Minor Force. The notes under
+"Supplies" wrap inside the column instead of being cut at the edge.
+
+Coarse Grinding Stone turns grey at 90, not 75: Blizzard changed it on the server on November 11, and
+the addon follows. It also knows the level 92 more recipes are taught at, read at the trainer, mostly
+in Tailoring, where the colors were off by about 25 points.
+
 ## v1.51.0 - Recipe colors that match the game, and a tracker you can hide
 
 On Forever, many recipes are taught earlier than the addon's data said, often 25 points earlier,

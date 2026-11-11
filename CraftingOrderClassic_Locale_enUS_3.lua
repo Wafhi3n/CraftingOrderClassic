@@ -97,6 +97,21 @@ local en3 = {
         "%d still missing from the mail: split them off a stack yourself (Shift-click the stack), then drop them in.",
     ["La pile de %d est prête dans ton sac : dépose-la toi-même dans le courrier."] =
         "The stack of %d is ready in your bag: drop it into the mail yourself.",
+    -- Plan de route : le prix d'un plan de formateur, relevé chez lui (2026-10-02)
+    ["Prix du plan inconnu : COC le relèvera à ton prochain passage chez le formateur."] = "Recipe price unknown: COC will note it next time you visit the trainer.",
+    -- Plan de route au coût NET, spec route-cout-net (2026-10-02)
+    ["Compter la revente"] = "Count resale",
+    ["Cochée : ce que la route fabrique est compté à son prix de revente (HV moins 5 %), et ce qu'elle prend dans tes sacs aussi. La route choisit alors au coût net."] = "Checked: what the route crafts counts at its resale price (AH minus 5%), and so does what it takes from your bags. The route then picks by net cost.",
+    ["À débourser : %s"] = "To spend: %s",
+    ["Coût net : %s"] = "Net cost: %s",
+    ["Gain net : %s"] = "Net gain: %s",
+    ["Pris dans tes sacs : ~%s"] = "Taken from your bags: ~%s",
+    ["Revente : ~%s (%d objet(s) à vendre)"] = "Resale: ~%s (%d item(s) to sell)",
+    ["Revente inconnue : comptée nulle."] = "Resale unknown: counted as zero.",
+    ["Coût net de l'étape : %s"] = "Net cost of this step: %s",
+    ["Gain net de l'étape : %s"] = "Net gain of this step: %s",
+    ["Les matières valent ~%s de plus que ce que l'étape produit."] = "The materials are worth ~%s more than what this step makes.",
+    ["Ce que la route prend dans tes sacs vaudrait ~%s à l'HV."] = "What the route takes from your bags would fetch ~%s at the AH.",
     -- Note de membre de la communauté, /co note (2026-09-29)
     ["le texte de tes métiers, à coller dans ta note de communauté (visible même hors ligne)"] =
         "the text of your professions, to paste into your community note (visible even offline)",
@@ -212,6 +227,32 @@ local en3 = {
         "Your orders and your progress on screen, like the quest tracker. It only shows up when there's something to track.",
     ["Le X au bout du suivi le masque entièrement ; la case « Suivi à l'écran » de l'onglet Route le ramène."] =
         "The X at the end of the tracker hides it completely; the “On-screen tracker” box in the Route tab brings it back.",
+    -- Vue Profit : bascule « tout le métier », source du prix, coupe HV, Enchantement par le coût (2026-09-29)
+    ["Tout le métier"] = "Whole profession",
+    ["Ajoute, en gris, les recettes que tu n'as pas encore apprises."] =
+        "Adds, in grey, the recipes you haven't learned yet.",
+    ["Pas encore apprise : la vue « Manquantes » dit où l'apprendre."] =
+        "Not learned yet: the \"Missing\" view tells you where to learn it.",
+    ["Vente (prix marchand)"] = "Sale (vendor price)",
+    ["Coupe HV (%d %%)"] = "AH cut (%d%%)",
+    ["Un marchand vend cet objet : l'HV ne le paiera pas plus cher."] =
+        "A vendor sells this item: the AH won't pay more for it.",
+    ["Coût à lancer (%d)"] = "Cost to cast (%d)",
+    ["Ce que coûte un lancer, pas un gain : ta commission vient en plus."] =
+        "What one cast costs you, not a gain: your fee comes on top.",
+    ["Aucun coût connu (prix : %s)."] = "No known cost (prices: %s).",
+    -- Vue Profit : la marque des Craftsman's Writ (writs-aca.md, D7 et D8, 2026-11-09)
+    ["Demandé par un writ d'artisan (+%d de réputation)."] = "Wanted by a Craftsman's Writ (+%d reputation).",
+    ["Tu portes ce writ : il t'en manque %d."] = "You carry this writ: you still need %d.",
+    ["Tu portes ce writ : ouvre-le pour savoir combien il en faut."] =
+        "You carry this writ: open it to see how many it wants.",
+    ["Les porteurs de ce writ cherchent cet objet."] = "Players carrying this writ are looking for this item.",
+    ["Writ d'artisan : +%d"] = "Craftsman's Writ: +%d",
+    ["Le writ à l'HdV"] = "Writ at the AH",
+    ["%d à %d"] = "%d to %d",
+    ["Demandés (vu en jeu)"] = "Wanted (seen in game)",
+    ["Or annoncé (vu au niveau %s)"] = "Gold reward shown (seen at level %s)",
+    ["Or reçu au rendu (niveau %s)"] = "Gold received on turn-in (level %s)",
 }
 
 for k, v in pairs(en3) do L[k] = v end

@@ -97,6 +97,21 @@ local es3 = {
         "Faltan %d en el correo: sepáralos tú mismo de una pila (Mayús-clic en la pila) y luego colócalos.",
     ["La pile de %d est prête dans ton sac : dépose-la toi-même dans le courrier."] =
         "La pila de %d está lista en tu bolsa: colócala tú mismo en el correo.",
+    -- Plan de route : le prix d'un plan de formateur, relevé chez lui (2026-10-02)
+    ["Prix du plan inconnu : COC le relèvera à ton prochain passage chez le formateur."] = "Precio de la receta desconocido: COC lo anotará en tu próxima visita al maestro.",
+    -- Plan de route au coût NET, spec route-cout-net (2026-10-02)
+    ["Compter la revente"] = "Contar la reventa",
+    ["Cochée : ce que la route fabrique est compté à son prix de revente (HV moins 5 %), et ce qu'elle prend dans tes sacs aussi. La route choisit alors au coût net."] = "Marcada: lo que fabrica la ruta cuenta a su precio de reventa (subasta menos 5 %), y también lo que toma de tus bolsas. La ruta elige entonces por coste neto.",
+    ["À débourser : %s"] = "A desembolsar: %s",
+    ["Coût net : %s"] = "Coste neto: %s",
+    ["Gain net : %s"] = "Ganancia neta: %s",
+    ["Pris dans tes sacs : ~%s"] = "Tomado de tus bolsas: ~%s",
+    ["Revente : ~%s (%d objet(s) à vendre)"] = "Reventa: ~%s (%d objeto(s) por vender)",
+    ["Revente inconnue : comptée nulle."] = "Reventa desconocida: se cuenta como cero.",
+    ["Coût net de l'étape : %s"] = "Coste neto de este paso: %s",
+    ["Gain net de l'étape : %s"] = "Ganancia neta de este paso: %s",
+    ["Les matières valent ~%s de plus que ce que l'étape produit."] = "Los materiales valen ~%s más que lo que produce este paso.",
+    ["Ce que la route prend dans tes sacs vaudrait ~%s à l'HV."] = "Lo que la ruta toma de tus bolsas valdría ~%s en la subasta.",
     -- Note de membre de la communauté, /co note (2026-09-29)
     ["le texte de tes métiers, à coller dans ta note de communauté (visible même hors ligne)"] =
         "el texto de tus profesiones, para pegarlo en tu nota de comunidad (visible incluso desconectado)",
@@ -212,6 +227,32 @@ local es3 = {
         "Tus pedidos y tu progreso en pantalla, como el seguimiento de misiones. Solo aparece cuando hay algo que seguir.",
     ["Le X au bout du suivi le masque entièrement ; la case « Suivi à l'écran » de l'onglet Route le ramène."] =
         "La X al final del seguimiento lo oculta por completo; la casilla «Seguimiento en pantalla» de la pestaña Ruta lo devuelve.",
+    -- Vue Profit : bascule « tout le métier », source du prix, coupe HV, Enchantement par le coût (2026-09-29)
+    ["Tout le métier"] = "Toda la profesión",
+    ["Ajoute, en gris, les recettes que tu n'as pas encore apprises."] =
+        "Añade, en gris, las recetas que aún no has aprendido.",
+    ["Pas encore apprise : la vue « Manquantes » dit où l'apprendre."] =
+        "Aún no aprendida: la vista «Faltantes» dice dónde aprenderla.",
+    ["Vente (prix marchand)"] = "Venta (precio de vendedor)",
+    ["Coupe HV (%d %%)"] = "Comisión CS (%d %%)",
+    ["Un marchand vend cet objet : l'HV ne le paiera pas plus cher."] =
+        "Un vendedor vende este objeto: en la CS nadie pagará más por él.",
+    ["Coût à lancer (%d)"] = "Coste por lanzamiento (%d)",
+    ["Ce que coûte un lancer, pas un gain : ta commission vient en plus."] =
+        "Lo que te cuesta un lanzamiento, no una ganancia: tu comisión va aparte.",
+    ["Aucun coût connu (prix : %s)."] = "Ningún coste conocido (precios: %s).",
+    -- Vue Profit : la marque des Craftsman's Writ (writs-aca.md, D7 et D8, 2026-11-09)
+    ["Demandé par un writ d'artisan (+%d de réputation)."] = "Lo pide un encargo de artesano (+%d de reputación).",
+    ["Tu portes ce writ : il t'en manque %d."] = "Llevas este encargo: te faltan %d.",
+    ["Tu portes ce writ : ouvre-le pour savoir combien il en faut."] =
+        "Llevas este encargo: ábrelo para saber cuántos pide.",
+    ["Les porteurs de ce writ cherchent cet objet."] = "Quienes llevan este encargo buscan este objeto.",
+    ["Writ d'artisan : +%d"] = "Encargo de artesano: +%d",
+    ["Le writ à l'HdV"] = "Encargo en la casa de subastas",
+    ["%d à %d"] = "%d a %d",
+    ["Demandés (vu en jeu)"] = "Pedidos (visto en el juego)",
+    ["Or annoncé (vu au niveau %s)"] = "Oro anunciado (visto a nivel %s)",
+    ["Or reçu au rendu (niveau %s)"] = "Oro recibido al entregar (nivel %s)",
 }
 
 for k, v in pairs(es3) do L[k] = v end

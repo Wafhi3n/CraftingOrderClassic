@@ -49,19 +49,32 @@ function PW:_FillRouteSupply(f, route, startY)
             y = U:_NeedsTextLine(f, used, y, "|cFF888888" .. (all and L["Tout ce qu'il faut est déjà dans tes sacs."]
                 or L["Ce que tu as déjà en sac est déduit."]) .. "|r")
         end
+        -- Coût NET : déduit de la liste ne veut pas dire gratuit. La pile qu'on brûle avait un prix,
+        -- et le joueur doit le lire avant (spec route-cout-net, capture du 2026-10-02).
+        if (route.bagValue or 0) > 0.5 then
+            y = U:_NeedsTextLine(f, used, y, "|cFF888888" .. string.format(L["Ce que la route prend dans tes sacs vaudrait ~%s à l'HV."],
+                COC.Api.Coin(math.floor(route.bagValue + 0.5))) .. "|r")
+        end
     end
     -- « À apprendre maintenant » (soft-dep _ProfWindow_Learn) : ce que la route ne montre pas, parce
     -- qu'elle ne retient qu'UNE recette par rang -- le champ des possibles au rang courant.
     if self._FillRouteLearn then y = self:_FillRouteLearn(f, used, y) end
     for i = used.slot + 1, #(f.slots or {}) do f.slots[i]:Hide() end
     for i = used.line + 1, #(f.lines or {}) do f.lines[i]:Hide() end
-    -- Le contenu suit la largeur du VIEWPORT. Il était figé à 370 au build : juste pour la fenêtre
-    -- flottante, deux fois trop large pour la colonne greffée — les lignes débordaient et se
-    -- faisaient couper à droite. L'ascenseur se masque quand il n'y a rien à faire défiler (constat
-    -- 2026-09-20) : la barre fine le fait seule depuis le palier 7c.
+    self:_FitRouteContent(f)
+    f.content:SetHeight(math.max(y, 1))
+end
+
+-- Le contenu suit la largeur du VIEWPORT. Il était figé à 370 au build : juste pour la fenêtre
+-- flottante, deux fois trop large pour la colonne greffée — les lignes débordaient et se
+-- faisaient couper à droite. L'ascenseur se masque quand il n'y a rien à faire défiler (constat
+-- 2026-09-20) : la barre fine le fait seule depuis le palier 7c.
+-- _FillRoute l'appelle AVANT de peindre : posée seulement ici, à la FIN, la largeur arrivait après
+-- que étapes et notes s'étaient mesurées sur les 370 (capture 2026-11-10 : « From an NPC vendor (no
+-- need to supply): Empty ' », et le montant de la ligne des sacs coupé).
+function PW:_FitRouteContent(f)
     local sw = (f.scroll and f.scroll:GetWidth()) or 0
     if sw > 0 then f.content:SetWidth(sw) end
-    f.content:SetHeight(math.max(y, 1))
 end
 
 -- PNJ formateur du PALIER SUIVANT : première recette apprise plus haut que `rank` ET enseignée au

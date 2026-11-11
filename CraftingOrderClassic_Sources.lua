@@ -13,10 +13,12 @@
 --      sur chaque saveur, et rafraîchie par le même geste que le reste des données.
 --
 -- CE QU'ON PERD EN ABANDONNANT MTSL, et qu'il faut assumer plutôt que masquer :
---   · le prix d'un plan de FORMATEUR : aucune source ne le donne, SourcePrice rend nil, et nil veut
---     dire INCONNU, jamais zéro -- un appelant qui confondrait les deux conseillerait d'acheter un
---     plan « gratuit » qui ne l'est pas. (Le prix chez un MARCHAND, lui, est revenu : les pages
---     d'objet de Wowhead le portent, cf. tools/gen_origins.lua) ;
+--   · le prix d'un plan de FORMATEUR : aucune source de données ne le donne. Il revient par la
+--     moisson du formateur (COC.Trainers, depuis le 2026-10-02) -- mais seulement une fois qu'on y
+--     est passé : avant, SourcePrice rend nil, et nil veut dire INCONNU, jamais zéro -- un appelant
+--     qui confondrait les deux conseillerait d'acheter un plan « gratuit » qui ne l'est pas. (Le
+--     prix chez un MARCHAND, lui, est revenu : les pages d'objet de Wowhead le portent, cf.
+--     tools/gen_origins.lua) ;
 --   · les COORDONNÉES d'un PNJ du catalogue : on donne son nom et sa zone, pas ses coordonnées.
 --     Seul un formateur qu'on a VU en jeu en a (cf. COC.Trainers -- on y était) ;
 --   · le nom du PNJ dans la langue du client : il arrive en anglais. La ZONE, elle, reste
@@ -109,18 +111,42 @@ function S:IsInferred(profKey, spellID)
     return not (lib and lib.RecipeSource and lib:RecipeSource(profKey, spellID))
 end
 
--- Rang de compétence requis, ou nil.
+-- Le formateur est-il ATTESTÉ, et pas seulement déduit d'une absence ? Deux témoins : on l'a VU
+-- l'enseigner (COC.Trainers), ou la donnée NOMME les PNJ qui l'enseignent (`recipeOrigin` de nature
+-- « trainer », lue sur la page Wowhead du sort). La déduction nue -- ni objet-recette, ni origine --
+-- ne suffit pas : compté le 2026-10-02, 94 recettes de Forge du set Camelot sont dans ce cas, et
+-- beaucoup ne s'apprennent PAS au formateur (recettes de Naxxramas, runes de SoD…). La route s'en
+-- sert pour décider si un plan au prix inconnu mérite d'être conseillé (cf. Route:Candidates).
+function S:TrainerConfirmed(profKey, spellID)
+    if observed(profKey, spellID) then return true end
+    local lib = CL()
+    return (lib and lib.RecipeOriginKind and lib:RecipeOriginKind(profKey, spellID)) == "trainer"
+end
+
+-- Rang de compétence requis, ou nil. Le rang LU CHEZ LE FORMATEUR passe devant celui des données,
+-- même quand les données en ont un : c'est le serveur où l'on joue qui l'exige. Vécu le
+-- 2026-10-02 : Copper Chain Pants au rang 1 chez Wowhead, au rang 15 chez le formateur de Forever
+-- -- « À apprendre maintenant » la proposait à un forgeron de rang 6.
 function S:MinSkill(profKey, spellID)
+    local T = COC.Trainers
+    local seen = T and T.Rank and T:Rank(profKey, spellID)
+    if seen then return seen end
     local lib = CL()
     return lib and lib.RecipeLearnedAt and lib:RecipeLearnedAt(profKey, spellID) or nil
 end
 
 -- PRIX du plan chez son vendeur. `nil` = INCONNU, et les appelants doivent le traiter comme tel :
--- on ne connaît ni les prix de formateur, ni les prix fixes des marchands. Seul Auctionator, s'il
--- a vu le marchand, sait répondre — et c'est déjà son rôle via COC.Profit, interrogé ici pour
--- que les appelants n'aient qu'UN endroit à demander.
+-- un prix de formateur n'existe qu'une fois relevé chez lui, un prix fixe de marchand que si la
+-- donnée le porte. Au-delà, seul Auctionator, s'il a vu le marchand, sait répondre — et c'est déjà
+-- son rôle via COC.Profit, interrogé ici pour que les appelants n'aient qu'UN endroit à demander.
 function S:SourcePrice(profKey, spellID)
-    -- Le prix RELEVÉ chez le marchand d'abord : c'est un fait, il ne dépend d'aucun addon tiers, et
+    -- Le prix LU CHEZ LE FORMATEUR d'abord, pour la même raison que `SourceKind` le fait passer
+    -- devant : c'est la source que le joueur a sous les yeux, et la seule qui ne coûte ni farm ni
+    -- marchand. Il n'existe que si le joueur est passé chez lui depuis le 2026-10-02.
+    local T = COC.Trainers
+    local seen = T and T.Price and T:Price(profKey, spellID)
+    if seen then return seen end
+    -- Puis le prix RELEVÉ chez le marchand : c'est un fait, il ne dépend d'aucun addon tiers, et
     -- il vaut pour tout le monde. Ce qu'on avait perdu en abandonnant MTSL est revenu par les pages
     -- d'objet de Wowhead (`buyprice`), pour les plans vendus.
     local lib = CL()
@@ -252,9 +278,10 @@ end
 -- Format IDENTIQUE à COC.Craft:ReadRecipes() + isMissing/level, pour que la vue métier et le
 -- regroupement par catégories les traitent sans cas particulier.
 -- Niveau d'apprentissage, ou nil quand on ne le sait pas. 0 n'est pas un niveau : les données ne
--- s'en servent jamais (le plus bas est 1), il ne peut donc venir que d'une absence.
-local function levelOf(lib, profKey, spellID)
-    local at = lib.RecipeLearnedAt and lib:RecipeLearnedAt(profKey, spellID)
+-- s'en servent jamais (le plus bas est 1), il ne peut donc venir que d'une absence. Le rang lu chez
+-- le formateur passe devant (cf. MinSkill).
+local function levelOf(profKey, spellID)
+    local at = S:MinSkill(profKey, spellID)
     return (at and at > 0) and at or nil
 end
 
@@ -348,7 +375,7 @@ function S:MissingRecipes(profKey)
                 -- génération, 8 rien qu'en Couture). Rendu 0, l'inconnu devenait un niveau REQUIS
                 -- de 0 : la vue les classait en tête et les déclarait à portée (0 <= ton rang),
                 -- c'est-à-dire qu'elle affirmait ce qu'elle ignore. Un repli doit se taire.
-                level = levelOf(lib, profKey, spellID),
+                level = levelOf(profKey, spellID),
                 icon = (itemID and COC.Api.GetItemIcon and COC.Api.GetItemIcon(itemID))
                        or "Interface\\Icons\\INV_Scroll_03",
                 difficulty = "trivial",   -- neutre : une recette non apprise n'a pas de couleur

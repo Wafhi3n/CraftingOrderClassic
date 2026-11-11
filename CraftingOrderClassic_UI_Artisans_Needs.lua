@@ -179,9 +179,13 @@ function UI:_NeedsTextLine(f, used, y, text)
     local fs = f.lines[used.line]
     if not fs then
         fs = f.content:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-        fs:SetWidth(contentW(f) - 10); fs:SetJustifyH("LEFT"); fs:SetWordWrap(true)
+        fs:SetJustifyH("LEFT"); fs:SetWordWrap(true)
         f.lines[used.line] = fs
     end
+    -- Largeur reprise à CHAQUE ligne : une ligne du pool née quand le contenu avait une autre
+    -- largeur (le Plan de route posait la sienne après coup) la gardait pour toujours, et le
+    -- viewport coupait ce qui dépassait.
+    fs:SetWidth(contentW(f) - 10)
     fs:ClearAllPoints(); fs:SetPoint("TOPLEFT", 4, -y)
     fs:SetText(text); fs:Show()
     return y + math.max(fs:GetStringHeight() or 12, 12) + 4

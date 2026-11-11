@@ -46,6 +46,40 @@ client.
 
 ## Relevés
 
+- 2026-11-11 11:22 — jusqu'a 6c511e4 — Forever 1.60.1.70888, client ANGLAIS, solo ; build
+  `main-dev@9968689 2026-11-11 11:15`, `## Version: 1.52.0` (lu par l'appli du banc dans la copie
+  déployée, fiche `CraftingOrderClassic--release-v1.52.0`) — **GO sur le candidat v1.52.0** (4 gestes
+  cochés OK, sans remarque) : `/co version` = 1.52.0 et le build qui cite `release/v1.52.0` ; onglet
+  What's New, la v1.52.0 en tête en anglais, v1.24.x sorties ; bas de l'onglet Route, trois cases sans
+  chevauchement (« Include recipes to buy » + « Count resale », « On-screen tracker » dessous : la
+  résolution du conflit de fusion) ; infobulle d'un objet de writ en une ligne, vue Profit qui se
+  remplit. Les sept branches avaient été vues une par une le même jour (relevés sur chacune).
+- 2026-11-11 09:50 — jusqu'a 2aa9d5a — Forever 1.60.1.70888, client ANGLAIS, solo (Oxygène,
+  Alchimie) ; build `main-dev@c6266b2 2026-11-11 09:40` lu par l'appli du banc dans la copie
+  déployée — **GO sur `fix/route-noms-coupes`** (fiche de l'appli, 2 gestes cochés OK, sans remarque) :
+  dans la colonne Route de la fenêtre du jeu, un nom d'étape tient en entier ou garde sa FIN
+  (« ...Minor Strength ») ; sous « Supplies », la ligne du marchand et celle des sacs passent à la
+  ligne sans être coupées au bord. Sonde `GetWidth`/`GetStringWidth` pas tapée (rien de coupé).
+- 2026-11-11 10:45 — jusqu'a 7485121 — Forever 1.60.1.70888, client ANGLAIS, solo, Sheadra (niveau 31) et
+  le writ de l'Iridescent Hammer (264022, Journeyman, quête 94222) ; builds lus par l'appli du banc dans
+  la copie déployée — **GO partiel sur `feat/writs-aca`** (taint NON vérifié) :
+  - `main-dev@c6266b2` (09:57-09:59) : icône de writ dans la vue Profit, son infobulle, writ porté (icône
+    pleine, quantité relevée) — 3 gestes cochés OK ;
+  - `main-dev@8362b42` (10:44-10:45, avec le correctif Coin Pouch de `feat/writs-infobulle`) : rendu au
+    PNJ — pas d'or direct (`paid = 0` au niveau 31), la récompense est l'objet **284584 = Coin Pouch**
+    (`db.writsSeen[94222].rewardItem`, relevé par COC) ; relevé intact après `/reload` — 2 gestes OK.
+  - Mesure du user (geste « bourse ») : la Coin Pouch d'un writ Journeyman contenait **30 pa 16 pc**
+    (Sheadra niveau 31). COC ne relève pas encore ce montant (T7).
+- 2026-11-11 10:06 — jusqu'a 9de2499 — Forever 1.60.1.70888, client ANGLAIS, solo ; builds lus par l'appli
+  du banc dans la copie déployée — **GO partiel sur `feat/writs-infobulle`** (taint NON vérifié) :
+  - `main-dev@f0e975e` (09:35, jusqu'à 67aa195, version D10 à deux lignes) : 7 gestes cochés OK —
+    infobulle de l'objet au sac, en lien du chat, à l'HdV, writ porté, vue Profit sans doublon, en combat ;
+  - `main-dev@c6266b2` (09:40, jusqu'à 29c86b2, D11 : UNE ligne « Craftsman's Writ: +75 ») : vu OK **sur
+    la parole du user** (« c'est tout bon »), gestes de la fiche recrite pas recochés ;
+  - `main-dev@8362b42` (10:06, jusqu'à 9de2499) : geste « recompense » coché OK — la vue Profit ne montre
+    plus d'or à 0 et dit « Reward: Coin Pouch » (le journal du writ 94222 annonce 0 d'or, relevé
+    `db.writsSeen[94222].money = 0` au niveau 22 ; la récompense est une Coin Pouch, capture du user).
+  Taint : geste coché, mais aucun `Logs\taint.log` n'existe (journal du taint pas allumé) : rien de lu.
 - 2026-11-08 00:10 — jusqu'a 916b8bf — build `main-dev@02016c5 2026-11-07 23:14`, `## Version: 1.51.0`
   (lu dans le `.toc` déployé et par l'appli du banc, fiche `CraftingOrderClassic--release-v1.51.0-donnees`,
   gestes « nouveautes » et « fin » cochés OK, sans remarque, sur la parole du user ; le geste
@@ -456,6 +490,15 @@ client.
   (« ça fonctionne comme décrit », capture des deux icônes) et relu par l'agent dans `DevMacroDB.log`
   (10:35:37 : `T-a clic=native`, `T-b clic=reroll Anatarion`). **Pas observé** : le refus
   d'acceptation depuis Rédemption d'une commande nommée pour Anatarion (règle inchangée).
+- 2026-11-11 09:47 — jusqu'a 33e8d5c — Forever 1.60.1.70888, client ANGLAIS, solo (Oxygène,
+  Alchimie) ; build `main-dev@c6266b2 2026-11-11 09:40` lu par l'appli du banc dans la copie
+  déployée — **GO sur `feat/route-cout-net`** (fiche de l'appli, 5 gestes cochés OK, sans remarque ni
+  capture), critères 9 à 12 et 14 de la spec : la route prend la recette dont les réactifs sont en
+  sac, case « Count resale » cochée ET décochée (décision 12, seuil 10 %) ; « To spend » et « Net
+  cost » sous le titre ; la case « Count resale » recalcule sur-le-champ ; l'infobulle d'une étape
+  détaille achat, sac, revente et net ; `/dump select(11, C_Item.GetItemInfo(2840))` rend un nombre
+  > 0. Avant la décision 12 (capture du 2026-11-10, `main-dev@adaf780`) : deux totaux déjà vus, et un
+  plan de formateur (Elixir of Minor Strength, 50c) pris par la route — c'est `fix/route-formateur`.
 - 2026-10-02 10:20 — jusqu'a 8e7c062 — Forever, client de Rédemption, en ANGLAIS, Forgefer ; build
   `main-dev@ce68ef3 2026-10-02 10:16` avec icone-commande-recue, liste-destinataires,
   profit-arbitrages, release/v1.43.0 (copie déployée du `.toc`) — **GO sur `fix/manquantes-nom-long`**
@@ -846,6 +889,30 @@ client.
   Général, l'absence du lien de communauté à une connexion complète, le message de `/co refresh`.
   Vu en passant : une balise texte `CLNK1` part sur la salle au `/co refresh` (le canal a de nouveau un
   index) — utile aux clients d'avant la v1.37, masquée du chat de ceux qui ont l'addon ; laissée.
+- 2026-11-11 09:45 — jusqu'a cd1c97e — Forever 1.60.1.70888, client ANGLAIS, solo (l'enchanteur,
+  Enchantement 152/225, Auctionator actif) ; build `main-dev@c6266b2 2026-11-11 09:40` lu par l'appli
+  du banc dans la copie déployée (fiche préparée pour `main-dev@adaf780`, même commit de la branche)
+  — **GO sur la décision 18 de `feat/profit-arbitrages`** (l'Enchantement repasse au profit ; fiche de
+  l'appli, 3 gestes cochés OK, sans remarque) : en Enchantement, la languette Profit titre
+  « Profitable (N) », plus « Cost to cast », et aucune ligne « Enchant … » ; « Whole profession »
+  coché : toujours aucune ligne « Enchant … » ; la sonde du schéma d'« Enchant Chest - Minor Stats »
+  ne nomme aucun objet. `b362ff8` (docs seules) n'était pas au banc.
+- 2026-09-29 17:06 — jusqu'a 339ec5a — Forever, un client, client en ANGLAIS ; build déployé
+  `main-dev@c7c3b62 2026-09-29 16:56` (sortie de `deploy.ps1 -Banc feat/profit-arbitrages` ;
+  `/co version` pas relevé) — **GO partiel sur les arbitrages 9 à 12 de la vue Profit** — deux
+  captures du user, lues par l'agent. Travail du cuir 45/75, case « Whole profession » cochée :
+  « Profitable (33) », titre et case sur une ligne, le « i » à gauche de la rangée (il ne mord plus
+  sur la languette Profit). Infobulle de « Mystic Heavy Armor Kit », recette non apprise : AH sale
+  2g 95s, AH cut (5%) −14s 75c, Reagents −1g 25s 88c, Net profit +1g 54s 37c — le compte tombe
+  juste (29500 − 1475 − 12588 = 15437) — et la phrase « Not learned yet… "Missing" view ».
+  Enchantement : « Cost to cast (176) », trié de 81g 24s à 10g 70s, beaucoup de « (?) ».
+  ⚠️ **DÉFAUT VU** : les noms longs (« Enchant Necklace - Deflection », « Enchant Weapon - Healing
+  Power ») passent sur deux lignes et mordent sur la ligne suivante ; corrigé sur la branche après
+  ce relevé (`SetWordWrap(false)`), pas revu. Vu aussi : les montants sont blancs dans les deux
+  modes, la couleur par mode du code était sans effet (retirée).
+  PÉRIMÈTRE, ce qui n'a PAS été observé : la case décochée à l'ouverture ; le GRIS des lignes non
+  apprises (aucune ligne apprise à l'écran pour comparer) ; la ligne « Sale (vendor price) » ;
+  l'infobulle d'un enchant ; le clic sur une ligne ; le combat.
 
 - 2026-09-29 16:10 — jusqu'a a3ba24b — Forever, deux clients, client en ANGLAIS ; build déployé
   `main-dev@f2e653a 2026-09-29 15:35` (`/co version` pas relu par l'agent ; la ligne de trace

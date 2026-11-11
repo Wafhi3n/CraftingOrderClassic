@@ -21,6 +21,8 @@ PW.ROUTE_ROW_H = ROW_H
 local ARROW = "|TInterface\\ChatFrame\\ChatFrameExpandArrow:12:12|t"
 -- Sac : un segment qui puise dans le stock (sacs, ou ce que la route a fabriqué avant lui).
 local BAG = "|TInterface\\Icons\\INV_Misc_Bag_08:12:12|t"
+-- Parchemin : le segment commence par APPRENDRE la recette (plan à acheter, compté dans son coût).
+local PLAN_ICON = "|TInterface\\Icons\\INV_Scroll_03:12:12|t "
 
 -- La route de MON perso : rang/plafond de la session ouverte + couleur LIVE du client au rang
 -- courant (les seuils Wowhead basculent à ±1 rang des couleurs réelles — dump user 2026-07-18,
@@ -79,8 +81,11 @@ function PW:_ComputeRoute()
         if v == nil then v = (COC.Api.GetItemCount and COC.Api.GetItemCount(id, false)) or 0; counts[id] = v end
         return v
     end
-    return COC.Route:Compute(self.profKey, rank, maxRank,
-        { known = self:_KnownRecipeSet(), live = live, plans = withPlans, bag = bag })
+    -- Coût NET (spec route-cout-net) : le sac vaut sa revente, le produit est crédité de la sienne ;
+    -- même réglage que le suivi à l'écran (Route:MyValuation), pour qu'ils choisissent pareil.
+    local R = COC.Route
+    return R:Compute(self.profKey, rank, maxRank, { known = self:_KnownRecipeSet(), live = live,
+        plans = withPlans, bag = bag, value = R.MyValuation and R:MyValuation() or nil })
 end
 
 -- Nom affichable d'un segment : objet produit (localisé si en cache client), repli nom canonique
@@ -94,6 +99,25 @@ local function segName(sid, prod)
     return nm or ("spell:" .. sid)
 end
 
+-- Nom d'étape trop long (colonne greffée) : la FIN du nom distingue les recettes. Capture user
+-- 2026-11-10 : « Elixir of Mi... » lu « Elixir of Minor Force » (grise) au lieu de « ...Minor
+-- Strength ». Retire « ×~N » (dans l'infobulle), puis les PREMIERS mots. Mesuré, comme setRouteSub ;
+-- à appeler une fois le coût posé (il borne la place). « ... » en ASCII : l'ellipse risque le tofu.
+local function fitSegName(row, s)
+    local fs = row.name
+    local room = fs:GetWidth() or 0
+    if room <= 0 or (fs:GetStringWidth() or 0) <= room then return end
+    local plan = (s.plan or 0) > 0 and PLAN_ICON or ""
+    local words = {}
+    for w in segName(s.sid, s.prod):gmatch("%S+") do words[#words + 1] = w end
+    fs:SetText(plan .. table.concat(words, " "))
+    for k = 2, #words do
+        if (fs:GetStringWidth() or 0) <= room then return end
+        fs:SetText(plan .. "..." .. table.concat(words, " ", k))
+    end
+end
+PW._FitSegName = fitSegName   -- exposé pour tests/test_route_noms.lua
+
 -- En-tête riche façon bourse : icône du métier + libellé + rang ARROW cible (une ligne). Le total
 -- reste dans le coin droit (f.sub).
 local function headText(profKey, from, to)
@@ -103,47 +127,9 @@ local function headText(profKey, from, to)
         .. "|cFF9AC0E8" .. from .. "|r" .. ARROW .. "|cFF9AC0E8" .. to .. "|r"
 end
 
--- « Ruined Leather Scraps ×43, Light Leather ×19 » — ce qu'un segment prend au stock (seg.bag /
--- seg.made, posés par COC.Route). nil si rien : pas de ligne vide dans l'infobulle.
-local function stockText(map)
-    local lib = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
-    local parts = {}
-    for id, q in pairs(map or {}) do
-        local n = math.floor(q + 0.5)
-        if n > 0 then
-            local nm = COC.Api.GetItemInfo and COC.Api.GetItemInfo(id)
-            if not nm and lib and lib.ItemName then nm = lib:ItemName(id) end
-            parts[#parts + 1] = (nm or ("item:" .. id)) .. " ×" .. n
-        end
-    end
-    table.sort(parts)
-    return parts[1] and table.concat(parts, ", ") or nil
-end
-
-local function segTooltip(row)
-    local s = row.seg; if not s then return end
-    GameTooltip:SetOwner(row, "ANCHOR_RIGHT"); GameTooltip:ClearLines()
-    -- Fiche COMPLÈTE de l'objet produit en tête (repli nom : enchants sans objet, item hors cache
-    -- — retour user 2026-07-19, le survol des segments ne montrait pas l'objet).
-    if not s.gap and s.prod then Skin.TipItem(GameTooltip, s.prod, segName(s.sid, s.prod))
-    else GameTooltip:SetText(row.name:GetText() or "", 1, 1, 1) end
-    if s.gap then
-        GameTooltip:AddLine(L["Aucune recette calculable sur ce segment (prix HV manquants, ou plans introuvables)."], 0.8, 0.8, 0.8, true)
-    else
-        GameTooltip:AddLine(string.format(L["Crafts attendus : ~%d"], math.ceil(s.crafts - 0.001)), 0.60, 0.75, 0.91)
-        GameTooltip:AddLine(L["Réactifs (espéré)"] .. " : " .. COC.Api.Coin(math.floor(s.cost + 0.5)), 0.60, 0.75, 0.91)
-        local bag, made = stockText(s.bag), stockText(s.made)
-        if bag then GameTooltip:AddLine(string.format(L["Déjà dans tes sacs : %s"], bag), 0.55, 0.85, 0.55, true) end
-        if made then GameTooltip:AddLine(string.format(L["Fabriqué aux étapes d'avant : %s"], made), 0.55, 0.85, 0.55, true) end
-        if (s.plan or 0) > 0 then
-            GameTooltip:AddLine(L["Plan à acheter"] .. " : " .. COC.Api.Coin(s.plan), 0.91, 0.72, 0.29)
-        end
-        if s.partial then
-            GameTooltip:AddLine(L["Coût partiel : au moins un réactif sans prix HV."], 0.8, 0.8, 0.8, true)
-        end
-    end
-    GameTooltip:Show()
-end
+-- L'INFOBULLE d'une étape vit dans _ProfWindow_Route_Tip.lua (PW:_RouteSegTip) ; elle nomme le
+-- produit comme la ligne, d'où le nom exposé.
+PW._RouteSegName = segName
 
 -- CORPS de la route, indépendant de son contenant. Il vit dans DEUX endroits : la fenêtre
 -- flottante et le panneau de la colonne greffée (_ProfWindow_DockViews). Un seul peintre, une seule
@@ -155,6 +141,40 @@ end
 -- n'existe pas avant sa déclaration, et le poser plus bas le rendait nil au build.
 local HEAD_ONE, HEAD_TWO = 30, 44
 local ROUTE_FOOT = 66   -- pied sous la zone scrollée : note d'estimation + deux cases (cf. le build)
+
+-- Les cases sous la route : « inclure les plans à acheter » (parité avec la bourse) et « compter la
+-- revente » (coût net) sur une ligne, « Suivi à l'écran » dessous. Chacune recalcule la route au clic.
+local function buildRouteChecks(f, inset)
+    local chk = Skin.MakeCheckButton(inset, L["Inclure les plans à acheter"], 18)
+    chk:SetPoint("BOTTOMLEFT", 8, 44)
+    chk:SetScript("OnClick", function(cb)
+        if COC.db then COC.db.routePlans = cb:GetChecked() and true or false end
+        PW:_FillRoute()
+    end)
+    f.chk = chk
+    -- Case « Compter la revente » (spec route-cout-net, décision 3) : décochée, ce qu'on fabrique ne
+    -- vaut plus rien pour la route ; ce qu'elle prend dans les sacs garde sa valeur (décision 2).
+    local rs = Skin.MakeCheckButton(inset, L["Compter la revente"], 18)
+    rs:SetPoint("LEFT", chk.text, "RIGHT", 12, 0)
+    rs:SetScript("OnClick", function(cb)
+        if COC.db then COC.db.routeResale = cb:GetChecked() and true or false end
+        PW:_FillRoute()
+    end)
+    rs:SetScript("OnEnter", function(b)
+        GameTooltip:SetOwner(b, "ANCHOR_TOP")
+        GameTooltip:SetText(L["Compter la revente"], 1, 1, 1)
+        GameTooltip:AddLine(L["Cochée : ce que la route fabrique est compté à son prix de revente (HV moins 5 %), et ce qu'elle prend dans tes sacs aussi. La route choisit alors au coût net."], 0.8, 0.8, 0.8, true)
+        GameTooltip:Show()
+    end)
+    rs:SetScript("OnLeave", GameTooltip_Hide)
+    f.chkResale = rs
+    -- Case « Suivi à l'écran » (demande du user, 2026-11-06) : le chemin du retour après le X du
+    -- suivi. Le suivi la fabrique et la tient à jour ; la route ne fait que la poser.
+    local T = COC.Tracker
+    if T and T.MakeToggleCheck then
+        f.trackChk = T:MakeToggleCheck(inset); f.trackChk:SetPoint("BOTTOMLEFT", 8, 24)
+    end
+end
 
 function PW:_BuildRouteBody(f, inset)
     local inset = f.Inset or f
@@ -189,20 +209,7 @@ function PW:_BuildRouteBody(f, inset)
     seg:Hide(); f.segToggle = seg
     local msg = inset:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     msg:SetPoint("CENTER", 0, 10); msg:SetWidth(340); msg:Hide(); f.msg = msg
-    -- Case « inclure les plans à acheter » (parité avec la bourse) — recalcule la route au clic.
-    local chk = Skin.MakeCheckButton(inset, L["Inclure les plans à acheter"], 18)
-    chk:SetPoint("BOTTOMLEFT", 8, 44)
-    chk:SetScript("OnClick", function(cb)
-        if COC.db then COC.db.routePlans = cb:GetChecked() and true or false end
-        PW:_FillRoute()
-    end)
-    f.chk = chk
-    -- Case « Suivi à l'écran » (demande du user, 2026-11-06) : le chemin du retour après le X du
-    -- suivi. Le suivi la fabrique et la tient à jour ; la route ne fait que la poser.
-    local T = COC.Tracker
-    if T and T.MakeToggleCheck then
-        f.trackChk = T:MakeToggleCheck(inset); f.trackChk:SetPoint("BOTTOMLEFT", 8, 24)
-    end
+    buildRouteChecks(f, inset)
     local cav = inset:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
     cav:SetPoint("BOTTOMLEFT", 10, 7); cav:SetPoint("BOTTOMRIGHT", -10, 7); cav:SetJustifyH("LEFT")
     cav:SetText(string.format(L["Estimation : chance de point par couleur, prix du dernier scan HV (%s)."],
@@ -266,14 +273,28 @@ function PW:_RouteRow(i)
     local name = row:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     name:SetPoint("LEFT", icon, "RIGHT", 4, 0); name:SetPoint("RIGHT", cost, "LEFT", -6, 0)
     name:SetJustifyH("LEFT"); name:SetWordWrap(false); row.name = name
-    row:SetScript("OnEnter", segTooltip)
+    row:SetScript("OnEnter", function(r) if PW._RouteSegTip then PW:_RouteSegTip(r) end end)
     row:SetScript("OnLeave", GameTooltip_Hide)
     f.rows[i] = row
     return row
 end
 
-local function fillSegRow(row, s)
+-- Montant d'une étape. En coût NET (route.net présent) : le net de l'étape, plan compris -- les
+-- lignes s'additionnent alors au « Coût net » de l'en-tête ; un GAIN s'écrit « +X » en vert, et une
+-- étape dont les matières valent plus que ce qu'elle produit, en orange (l'infobulle dit de combien).
+-- Sinon : ce qui sort de la bourse, comme avant.
+local function segAmount(s, valued)
+    if not valued then return math.floor(s.cost + (s.plan or 0) + 0.5), "" end
+    local amount = math.floor(s.net + (s.plan or 0) + 0.5)
+    if amount < 0 then return -amount, "|cFF33DD33+" end
+    if (s.resale or 0) > 0 and s.net > 0.5 then return amount, "|cFFFF9933" end
+    return amount, ""
+end
+
+local function fillSegRow(row, s, route)
     row.seg = s
+    row.valued = route and route.net ~= nil or nil
+    row.resaleOn = row.valued and COC.Route:MyValuation().resale or nil
     row.rng:SetText("|cFF9AC0E8" .. s.from .. "|r" .. ARROW .. "|cFF9AC0E8" .. s.to .. "|r")
     if s.gap then
         row.icon:SetTexture("Interface\\Icons\\INV_Misc_QuestionMark"); row.icon:SetDesaturated(true)
@@ -283,17 +304,18 @@ local function fillSegRow(row, s)
         row.icon:SetTexture((s.prod and COC.Api.GetItemIcon and COC.Api.GetItemIcon(s.prod))
             or "Interface\\Icons\\INV_Misc_QuestionMark")
         row.icon:SetDesaturated(false)
-        local plan = (s.plan or 0) > 0 and "|TInterface\\Icons\\INV_Scroll_03:12:12|t " or ""
+        local plan = (s.plan or 0) > 0 and PLAN_ICON or ""
         row.name:SetText(plan .. segName(s.sid, s.prod)
             .. string.format(" |cFFAAAAAA×~%d|r", math.ceil(s.crafts - 0.001)))
         -- Sac = le segment puise dans le stock (le détail est dans l'infobulle). Tout en sac → le
         -- sac SEUL : « 0c » se lirait comme un prix manquant, pas comme « tu as déjà tout ».
-        local total = math.floor(s.cost + (s.plan or 0) + 0.5)
+        local total, color = segAmount(s, row.valued)
         local stocked = (next(s.bag or {}) or next(s.made or {})) and true or false
-        local coin = (total > 0 or not stocked) and COC.Api.Coin(total) or ""
+        local coin = (total > 0 or not stocked) and (color .. COC.Api.Coin(total) .. (color ~= "" and "|r" or "")) or ""
         row.cost:SetText((stocked and (BAG .. (coin ~= "" and " " or "")) or "") .. coin
-            .. (s.partial and " |cFF888888(?)|r" or ""))   -- coût partiel : réactif sans prix HV
+            .. (s.partial and " |cFF888888(?)|r" or ""))   -- coût partiel : réactif ou plan sans prix
     end
+    if not s.gap then fitSegName(row, s) end
     row:Show()
 end
 
@@ -325,7 +347,16 @@ local function routeSubText(route, segs)
     local cost = math.floor(route.mats + route.plans + 0.5)
     if cost <= 0 and floorOnly then return "|cFF888888" .. L["Total estimé : inconnu"] .. "|r" end
     -- « > » (ASCII, le ≥ risque le tofu) : trous OU coûts partiels → le total est un plancher.
-    return string.format(L["Total estimé : %s"], (floorOnly and "> " or "") .. COC.Api.Coin(cost))
+    if not route.net then
+        return string.format(L["Total estimé : %s"], (floorOnly and "> " or "") .. COC.Api.Coin(cost))
+    end
+    -- Coût NET : ce qui sort de la bourse, PUIS la valeur, revente déduite. Un plancher côté coût
+    -- (« > ») est un plafond côté gain (« < ») : un prix manquant sous-estime ce qu'on dépense.
+    local net = math.floor(route.net + 0.5)
+    local netTxt = (net < 0)
+        and ("|cFF33DD33" .. string.format(L["Gain net : %s"], (floorOnly and "< " or "") .. COC.Api.Coin(-net)) .. "|r")
+        or string.format(L["Coût net : %s"], (floorOnly and "> " or "") .. COC.Api.Coin(net))
+    return string.format(L["À débourser : %s"], (floorOnly and "> " or "") .. COC.Api.Coin(cost)) .. "  ·  " .. netTxt
 end
 
 -- Titre et total sur la MÊME ligne, ou l'un sous l'autre : ça dépend de la place, donc ça se
@@ -362,7 +393,9 @@ function PW:_FillRoute()
     Skin.SetWindowPortrait(f, Skin.ProfIcon(self.profKey) or "Interface\\Icons\\INV_Misc_Map_01")
     if f.SetTitle then f:SetTitle(L["Plan de route"] .. " — " .. Skin.ProfLabel(self.profKey)) end
     if f.chk then f.chk:SetChecked(not (COC.db and COC.db.routePlans == false)) end
+    if f.chkResale then f.chkResale:SetChecked(not (COC.db and COC.db.routeResale == false)) end
     local segs = route and route.segments or {}
+    self:_FitRouteContent(f)   -- AVANT de peindre : étapes et notes se mesurent sur cette largeur
     -- Bandeau repliable en tête ; segments décalés dessous (ou masqués si replié).
     local collapsed = (COC.db and COC.db.routeSegCollapsed) and true or false
     local baseY = self:_SyncSegToggle(f, #segs, collapsed)
@@ -375,7 +408,7 @@ function PW:_FillRoute()
             row:ClearAllPoints()
             row:SetPoint("TOPLEFT", 0, -(baseY + (i - 1) * ROW_H))
             row:SetPoint("RIGHT", f.content, "RIGHT", 0, 0)
-            fillSegRow(row, s)
+            fillSegRow(row, s, route)
         end
         for i = #segs + 1, #f.rows do f.rows[i]:Hide(); f.rows[i].seg = nil end
     end
