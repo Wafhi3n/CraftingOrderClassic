@@ -96,6 +96,8 @@ local de3 = {
         "Es fehlen noch %d in der Post: Trenne sie selbst von einem Stapel ab (Umschalt-Klick auf den Stapel) und lege sie hinein.",
     ["La pile de %d est prête dans ton sac : dépose-la toi-même dans le courrier."] =
         "Der Stapel mit %d liegt bereit in deiner Tasche: Lege ihn selbst in die Post.",
+    -- Plan de route : le prix d'un plan de formateur, relevé chez lui (2026-10-02)
+    ["Prix du plan inconnu : COC le relèvera à ton prochain passage chez le formateur."] = "Rezeptpreis unbekannt: COC notiert ihn bei deinem nächsten Besuch beim Lehrer.",
     -- Note de membre de la communauté, /co note (2026-09-29)
     ["le texte de tes métiers, à coller dans ta note de communauté (visible même hors ligne)"] =
         "der Text deiner Berufe, zum Einfügen in deine Gemeinschaftsnotiz (auch offline sichtbar)",
