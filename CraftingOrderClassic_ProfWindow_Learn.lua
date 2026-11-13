@@ -40,9 +40,10 @@ local MAX_ROWS = 6   -- la fenêtre est petite : au-delà, ce n'est plus un cons
 
 -- Couleur d'une recette à un rang donné, d'après ses seuils réels { orange, jaune, vert, gris }.
 -- nil = grise (aucun point) OU pas encore apprenable : dans les deux cas elle n'a rien à faire ici.
+-- Jaune ET vert à 0 = « grise dès l'apprentissage » : jamais un point (même règle que COC.Route).
 local function colorAt(colors, rank)
     if not colors then return nil end
-    if rank >= colors[4] then return nil end
+    if rank >= colors[4] or (colors[2] == 0 and colors[3] == 0) then return nil end
     if rank >= colors[3] then return "easy" end
     if rank >= colors[2] then return "medium" end
     if rank >= colors[1] then return "optimal" end

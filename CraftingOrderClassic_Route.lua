@@ -28,8 +28,10 @@ local CAPS = { 75, 150, 225, 300, 375, 450 }
 Route.CAPS = CAPS   -- lu par _Route_Gateway (palier suivant)
 
 -- Couleur d'une recette à un rang FUTUR, d'après ses seuils réels {orange, jaune, vert, gris}.
+-- Jaune ET vert à 0 = « grise dès l'apprentissage » (un 0 = couleur absente, pas un seuil à 0) : aucun
+-- point, même apprise sous le niveau des données (Solid Grinding Stone, vu en jeu le 2026-11-13).
 local function colorAt(c, r)
-    if r >= c[4] then return nil end
+    if r >= c[4] or (c[2] == 0 and c[3] == 0) then return nil end
     if r >= c[3] then return "easy" end
     if r >= c[2] then return "medium" end
     return "optimal"
