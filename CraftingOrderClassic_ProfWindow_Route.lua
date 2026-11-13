@@ -174,6 +174,7 @@ local function buildRouteChecks(f, inset)
     if T and T.MakeToggleCheck then
         f.trackChk = T:MakeToggleCheck(inset); f.trackChk:SetPoint("BOTTOMLEFT", 8, 24)
     end
+    if PW._BuildRouteWritCheck then PW:_BuildRouteWritCheck(f, inset) end   -- à sa droite (_Route_Writs)
 end
 
 function PW:_BuildRouteBody(f, inset)
@@ -315,6 +316,7 @@ local function fillSegRow(row, s, route)
         row.cost:SetText((stocked and (BAG .. (coin ~= "" and " " or "")) or "") .. coin
             .. (s.partial and " |cFF888888(?)|r" or ""))   -- coût partiel : réactif ou plan sans prix
     end
+    if PW._RouteWritMark then PW:_RouteWritMark(row, s) end   -- marque de writ, avant la mesure du nom
     if not s.gap then fitSegName(row, s) end
     row:Show()
 end
@@ -394,6 +396,7 @@ function PW:_FillRoute()
     if f.SetTitle then f:SetTitle(L["Plan de route"] .. " — " .. Skin.ProfLabel(self.profKey)) end
     if f.chk then f.chk:SetChecked(not (COC.db and COC.db.routePlans == false)) end
     if f.chkResale then f.chkResale:SetChecked(not (COC.db and COC.db.routeResale == false)) end
+    if self._SyncRouteWritCheck then self:_SyncRouteWritCheck(f) end
     local segs = route and route.segments or {}
     self:_FitRouteContent(f)   -- AVANT de peindre : étapes et notes se mesurent sur cette largeur
     -- Bandeau repliable en tête ; segments décalés dessous (ou masqués si replié).

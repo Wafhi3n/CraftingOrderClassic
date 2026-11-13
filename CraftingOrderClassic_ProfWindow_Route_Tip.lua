@@ -72,6 +72,7 @@ function PW:_RouteSegTip(row)
     if made then add(string.format(L["Fabriqué aux étapes d'avant : %s"], made), GREEN, true) end
     if (s.plan or 0) > 0 then add(L["Plan à acheter"] .. " : " .. COC.Api.Coin(s.plan), { 0.91, 0.72, 0.29 }) end
     if row.valued then netLines(s, row.resaleOn) end
+    if PW._RouteWritTip then PW:_RouteWritTip(row) end   -- writ demandé, choix de la case (_Route_Writs)
     -- Deux raisons au « (?) », et le joueur n'y peut pas la même chose : un réactif sans prix
     -- attend un scan de l'HV, un plan de formateur sans prix attend une visite chez lui.
     if s.missing or (s.partial and not s.planUnknown) then

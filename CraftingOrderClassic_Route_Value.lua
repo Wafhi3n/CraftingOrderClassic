@@ -49,7 +49,9 @@ end
 
 -- Réglage de valorisation de MON perso, le même pour la fenêtre et le suivi à l'écran (critère 7 :
 -- les deux choisissent la même recette). `resale` = case « Compter la revente » (db.routeResale,
--- nil = cochée, même convention que db.routePlans).
+-- nil = cochée, même convention que db.routePlans). `writs` = case « Privilégier les writs »
+-- (db.routeWrits, nil = DÉCOCHÉE : elle change des routes que le joueur a déjà suivies).
 function Route:MyValuation()
-    return { resale = not (COC.db and COC.db.routeResale == false) }
+    local db = COC.db
+    return { resale = not (db and db.routeResale == false), writs = (db and db.routeWrits == true) or false }
 end

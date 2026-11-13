@@ -139,6 +139,21 @@ s'applique telle quelle.
    case « revente » cochée, le net de deux recettes qui se revendent tombe à quelques cuivres, et
    10 % de ce net ne laissait passer aucun écart. Ce qui sort de la bourse compte le plan amorti, comme le coût net. Une recette douteuse ne
    passe jamais devant une sûre. La bourse d'artisan, qui n'a pas `opts.value`, n'est pas touchée.
+13. **Une case « Privilégier les writs »** : cochée, une recette dont l'objet est demandé par un
+   Craftsman's Writ passe devant, « car ça se revend vite à l'HV » — user, 2026-11-13, sur deux
+   captures (route de Forge 161/225, vue Profit où l'Iridescent Hammer porte sa marque de writ).
+   **Choix d'implémentation, à valider par le user** : la case est **décochée par défaut**
+   (`db.routeWrits`, `nil` = décochée : elle change des routes déjà suivies) ; « privilégier » =
+   passer devant la meilleure si le point coûte au plus **25 %** de plus (`WRIT_TOL` dans
+   `Route.lua`, valeur proposée), jamais à n'importe quel prix (un plan cher acheté pour un objet de
+   writ). Mêmes garde-fous que la décision 12 : seuil ancré sur la meilleure, mesuré sur le coût du
+   point avant revente, jamais d'un étage de doute à l'autre. Entre writs à portée, le moins cher.
+   **La case passe avant la décision 12** (choix explicite du joueur) ; sans writ à portée, la
+   décision 12 joue comme avant. Est « writ » tout objet qu'un des 150 writs demande, que je porte ce
+   writ ou non : l'argument est la revente, pas mon propre writ. La marque elle-même (icône de writ
+   sur l'étape, détail dans son infobulle) vit dans `writs-aca.md`, D12. Une étape choisie par la
+   case dit dans son infobulle ce qu'elle a coûté de plus que la moins chère : une route qui ne prend
+   plus la recette la moins chère passe sinon pour un bug (vécu avec la décision 12).
 
 ## Critères d'acceptation
 
@@ -168,6 +183,13 @@ fabriqué retiré, choix en caisse, sac gratuit) les font tomber :
    Minor Defense. Peacebloom à 80c (Minor Defense ~62 % plus chère au net) :
    le net reprend la main et la route apprend Minor Strength. Seuil ancré sur la meilleure : entre
    A (net 100), B (net 107, sort 50c) et C (net 114, ne sort rien), la route prend B.
+15. `[test]` *(décision 13, `tests/test_route_writs.lua`, verts le 2026-11-13)* Case décochée par
+   défaut ; décochée, la moins chère comme avant ; cochée, un objet de writ à 20 % de plus passe
+   devant et l'étape note son surcoût (9 points × 20 pc) ; à 30 %, la moins chère reste ; writ déjà
+   le moins cher : aucun surcoût noté ; writ au coût douteux : la recette sûre garde la place ; case
+   revente cochée (nets de 5 et 25 pc, coût avant revente 100) : le writ reste à portée ; la case
+   passe avant la décision 12 ; la route en caisse (bourse) l'ignore ; le suivi à l'écran fait le
+   même choix ; sans module de writs, aucune erreur.
 
 En jeu (le user, Forge sur le banc) :
 
@@ -189,6 +211,11 @@ En jeu (le user, Forge sur le banc) :
     Defense dormaient en sac). Attendu, case revente cochée ET décochée : la route prend la recette
     du sac, « À débourser » ne compte que ce qui manque vraiment, et le survol de l'étape dit « déjà
     dans tes sacs ».
+16. `[humain]` *(décision 13)* Route d'un des cinq métiers des writs (Forge 161/225 de la capture
+    du 2026-11-13). **Témoin** : la route case décochée, notée avant. Cocher « Privilégier les
+    writs » : la route se recalcule sur-le-champ ; si une recette de writ était à portée, elle
+    remplace une étape, et le survol de cette étape dit « Choisie pour le writ : ~X de plus… ».
+    Décocher : la route du témoin revient à l'identique.
 
 ## Contrat
 
@@ -198,11 +225,14 @@ En jeu (le user, Forge sur le banc) :
   un retour en cuivre ou `nil` — `PR:ItemValue` × (1 − coupe) (marchand d'abord : il plafonne) ;
   sans prix coté, le prix de rachat marchand (11e retour de `C_Item.GetItemInfo`, `sellPrice`, à
   confirmer en jeu : critère 12).
-- **Option de calcul** : `opts.value = { resale = bool }` pour `Route:Compute` et `Route:NextStep` ;
-  `Route:MyValuation()` la construit depuis `db.routeResale`.
+- **Option de calcul** : `opts.value = { resale = bool, writs = bool }` pour `Route:Compute` et
+  `Route:NextStep` ; `Route:MyValuation()` la construit depuis `db.routeResale` et `db.routeWrits`
+  (décision 13 : `nil` = décochée, `true` = cochée, par compte).
 - **Route** : gagne `net`, `bagValue`, `resale` (nil sans `opts.value`). **Segment** : gagne `net`,
-  `bagValue`, `resale`, `resaleQty`, n'en perd aucun. **NextStep** : gagne `perPointNet`. Les
-  lecteurs d'avant (bourse) les ignorent sans casser.
+  `bagValue`, `resale`, `resaleQty`, `writExtra` (décision 13 : surcoût net de l'étape dû à la case,
+  absent sinon), n'en perd aucun. **Candidate** : gagne `writ` (objet demandé par un writ, lu dans
+  la table statique `COC.Writs:ForItem`). **NextStep** : gagne `perPointNet`. Les lecteurs d'avant
+  (bourse) les ignorent sans casser.
 - Rien sur le fil réseau : la route est locale.
 
 ## Deuxième étape — l'arbitrage entre métiers (décision 5)
@@ -255,3 +285,6 @@ Base : `fix/route-formateur` (COC + outillage), dont la route est le socle ; pas
    Vu en jeu le 2026-11-10 : la capture Alchimie 16/75 a fait naître la décision 12.
 5. ~~Décision 12 (seuil du gain net faible) ; test 13.~~ Fait le 2026-11-10. Pour la place :
    `_Route_Materials.lua` (la liste de courses) sorti de `Route.lua`. Banc : critère 14.
+6. ~~Décision 13 (case « Privilégier les writs ») ; test 15.~~ Fait le 2026-11-13 sur
+   `feat/route-writs` (COC + outillage) ; la marque et la case vivent dans
+   `_ProfWindow_Route_Writs.lua`. Banc : critère 16, et 20-21 de `writs-aca.md`.

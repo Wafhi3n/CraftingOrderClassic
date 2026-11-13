@@ -99,6 +99,11 @@ local es3 = {
         "La pila de %d está lista en tu bolsa: colócala tú mismo en el correo.",
     -- Plan de route : le prix d'un plan de formateur, relevé chez lui (2026-10-02)
     ["Prix du plan inconnu : COC le relèvera à ton prochain passage chez le formateur."] = "Precio de la receta desconocido: COC lo anotará en tu próxima visita al maestro.",
+    -- Plan de route : les Craftsman's Writ, marque et case (writs-aca.md D12, route-cout-net.md décision 13, 2026-11-13)
+    ["Privilégier les writs"] = "Priorizar encargos",
+    ["Cochée : une recette dont l'objet est demandé par un writ d'artisan passe devant, si son point coûte au plus %d %% de plus. Ces objets se revendent vite à l'HV."] =
+        "Marcada: una receta cuyo objeto pide un encargo de artesano pasa primero, si su punto cuesta como mucho un %d %% más. Estos objetos se venden rápido en la casa de subastas.",
+    ["Choisie pour le writ : ~%s de plus que la recette la moins chère."] = "Elegida por el encargo: ~%s más que la receta más barata.",
     -- Plan de route au coût NET, spec route-cout-net (2026-10-02)
     ["Compter la revente"] = "Contar la reventa",
     ["Cochée : ce que la route fabrique est compté à son prix de revente (HV moins 5 %), et ce qu'elle prend dans tes sacs aussi. La route choisit alors au coût net."] = "Marcada: lo que fabrica la ruta cuenta a su precio de reventa (subasta menos 5 %), y también lo que toma de tus bolsas. La ruta elige entonces por coste neto.",

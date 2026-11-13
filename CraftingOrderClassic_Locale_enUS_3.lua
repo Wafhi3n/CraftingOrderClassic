@@ -99,6 +99,11 @@ local en3 = {
         "The stack of %d is ready in your bag: drop it into the mail yourself.",
     -- Plan de route : le prix d'un plan de formateur, relevé chez lui (2026-10-02)
     ["Prix du plan inconnu : COC le relèvera à ton prochain passage chez le formateur."] = "Recipe price unknown: COC will note it next time you visit the trainer.",
+    -- Plan de route : les Craftsman's Writ, marque et case (writs-aca.md D12, route-cout-net.md décision 13, 2026-11-13)
+    ["Privilégier les writs"] = "Prefer writs",
+    ["Cochée : une recette dont l'objet est demandé par un writ d'artisan passe devant, si son point coûte au plus %d %% de plus. Ces objets se revendent vite à l'HV."] =
+        "Checked: a recipe whose item a Craftsman's Writ wants goes first, if its point costs at most %d%% more. These items sell fast at the AH.",
+    ["Choisie pour le writ : ~%s de plus que la recette la moins chère."] = "Picked for the writ: ~%s more than the cheapest recipe.",
     -- Plan de route au coût NET, spec route-cout-net (2026-10-02)
     ["Compter la revente"] = "Count resale",
     ["Cochée : ce que la route fabrique est compté à son prix de revente (HV moins 5 %), et ce qu'elle prend dans tes sacs aussi. La route choisit alors au coût net."] = "Checked: what the route crafts counts at its resale price (AH minus 5%), and so does what it takes from your bags. The route then picks by net cost.",
