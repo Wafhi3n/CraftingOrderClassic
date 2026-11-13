@@ -13,6 +13,11 @@ sell fast at the auction house, since the players carrying the writ look for the
 off by default. A step it picked says so in its tooltip, along with how much more it costs than the
 cheapest recipe.
 
+Fixed: the route and "Learn now" no longer send you to learn a recipe that's grey the moment you
+learn it. Solid Grinding Stone and Solid Weightstone gave it away: the addon thought they were green
+from the trainer's level up to 200, while the game shows them grey as soon as you learn them. 41
+recipes were affected, mostly in Tailoring and Blacksmithing.
+
 ## v1.52.0 - Craftsman's Writs in the Profit view, and a leveling route that counts your bags
 
 The Profit view (the column to the right of the profession window) marks recipes whose item a

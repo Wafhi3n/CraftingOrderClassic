@@ -42,6 +42,7 @@ local function versionsNow()
             lines = {
                 L["Le plan de route (onglet Route) marque maintenant les étapes dont l'objet est demandé par un Craftsman's Writ, comme la vue Profit : l'icône du writ à côté du montant, allumée si tu portes ce writ, éteinte sinon. Survole l'étape pour la réputation, le prix du writ à l'hôtel des ventes et ce que l'addon a vu de ce writ en jeu."],
                 L["Une nouvelle case, « Privilégier les writs », à côté de « Suivi à l'écran » : cochée, une recette dont l'objet est demandé par un writ passe devant la moins chère, tant que son point ne coûte pas plus d'un quart de plus. Ces objets se revendent vite à l'hôtel des ventes, les porteurs du writ les y cherchent. La case est décochée par défaut. Une étape qu'elle a choisie le dit dans son infobulle, avec ce qu'elle coûte de plus que la recette la moins chère."],
+                L["Corrigé : la route et « À apprendre maintenant » ne t'envoient plus apprendre une recette grise dès l'apprentissage. Solid Grinding Stone et Solid Weightstone l'ont montré : l'addon les croyait vertes du niveau du formateur jusqu'à 200, alors que le jeu les affiche grises dès qu'on les apprend. 41 recettes étaient touchées, surtout en Couture et en Forge."],
             },
         },
         {
