@@ -174,6 +174,7 @@ local function buildRouteChecks(f, inset)
     if T and T.MakeToggleCheck then
         f.trackChk = T:MakeToggleCheck(inset); f.trackChk:SetPoint("BOTTOMLEFT", 8, 24)
     end
+    if PW._BuildRouteWritCheck then PW:_BuildRouteWritCheck(f, inset) end   -- à sa droite (_Route_Writs)
 end
 
 function PW:_BuildRouteBody(f, inset)
@@ -315,6 +316,7 @@ local function fillSegRow(row, s, route)
         row.cost:SetText((stocked and (BAG .. (coin ~= "" and " " or "")) or "") .. coin
             .. (s.partial and " |cFF888888(?)|r" or ""))   -- coût partiel : réactif ou plan sans prix
     end
+    if PW._RouteWritMark then PW:_RouteWritMark(row, s) end   -- marque de writ, avant la mesure du nom
     if not s.gap then fitSegName(row, s) end
     row:Show()
 end
@@ -394,6 +396,7 @@ function PW:_FillRoute()
     if f.SetTitle then f:SetTitle(L["Plan de route"] .. " — " .. Skin.ProfLabel(self.profKey)) end
     if f.chk then f.chk:SetChecked(not (COC.db and COC.db.routePlans == false)) end
     if f.chkResale then f.chkResale:SetChecked(not (COC.db and COC.db.routeResale == false)) end
+    if self._SyncRouteWritCheck then self:_SyncRouteWritCheck(f) end
     local segs = route and route.segments or {}
     self:_FitRouteContent(f)   -- AVANT de peindre : étapes et notes se mesurent sur cette largeur
     -- Bandeau repliable en tête ; segments décalés dessous (ou masqués si replié).
@@ -442,50 +445,5 @@ function PW:_FillRoute()
     if #segs == 0 then f.msg:SetText(COC.Profit and COC.Profit:NoPriceMessage() or "") end
 end
 
--- Ouvre/ferme le panneau (bouton carte de la barre d'outils Recettes). Sans Auctionator : popup
--- d'incitation (même pattern que les toggles de tri).
-function PW:ToggleRoute()
-    local PR = COC.Profit
-    if not (PR and PR:IsAvailable()) then COC:NeedPriceAddon(); return end
-    local f = self.routeWin or self:_BuildRouteWin()
-    if f:IsShown() then f:Hide() else self:_FillRoute(); f:Show() end
-    self:_SyncRouteBtn()
-end
-
--- Bouton « carte » dans le slot recTools (construit par _BuildRecipeTools sous garde nil).
-function PW:_BuildRouteBtn(tz)
-    local b = self:_MakeToolBtn(tz, function()
-        return L["Plan de route : quoi crafter pour monter au moins cher."]
-    end, function() PW:ToggleRoute() end)
-    b:SetPoint("LEFT", 68, 0)
-    local map = b:CreateTexture(nil, "ARTWORK")
-    map:SetTexture("Interface\\Icons\\INV_Misc_Map_01"); map:SetSize(15, 15)
-    map:SetTexCoord(0.07, 0.93, 0.07, 0.93); map:SetPoint("CENTER"); b.map = map
-    self.recRouteBtn = b
-end
-
--- État du bouton (appelé par _SyncSortHeader à chaque refresh) : masqué en reroll ; coloré si Lazy
--- Gold absent (incite au clic → popup) ou panneau ouvert, grisé sinon. Fenêtre ouverte : re-remplit
--- à chaque refresh de la liste (throttle 1 s) — même cadence que le badge « meilleur coût/point »,
--- pour que la route suive AUSSI les prix Auctionator (vécu 2026-07-18 : route figée sur d'anciens prix
--- ≠ badge recalculé → les deux guides se contredisaient) ; immédiat si métier ou rang a changé.
-function PW:_SyncRouteBtn()
-    local b = self.recRouteBtn
-    if b then
-        local show = not self.rerollKey
-        b:SetShown(show and true or false)
-        local ok = COC.Profit and COC.Profit:IsAvailable()
-        local active = (self.routeWin and self.routeWin:IsShown()) and true or false
-        if b.onBG then b.onBG:SetShown(active) end
-        if b.map then b.map:SetDesaturated((ok and not active) and true or false) end
-    end
-    -- Suivi live : la FENÊTRE si elle est ouverte, sinon le PANNEAU de colonne s'il porte la route.
-    local f = self:_RouteTarget()
-    if f and f:IsShown() then
-        local rank = COC.Craft and COC.Craft:OpenRank()
-        local fresh = ((GetTime and GetTime() or 0) - (self._routeAt or 0)) < 1
-        if self._routeProf ~= self.profKey or (rank and rank ~= self._routeRank) or not fresh then
-            self:_FillRoute()
-        end
-    end
-end
+-- Le bouton « carte » de la barre d'outils, l'ouverture de la fenêtre et le suivi live vivent dans
+-- _ProfWindow_Route_Btn.lua (sortis le 2026-11-13 : ce fichier touchait les 500 lignes).

@@ -184,6 +184,7 @@ local function addWritLines(m)
         GameTooltip:AddDoubleLine(L["Récompense :"], nm, LBL_R, LBL_G, LBL_B, 1, 1, 1)
     end
 end
+PW._AddWritLines = addWritLines   -- la même rédaction dans l'infobulle d'une étape de route (_Route_Writs)
 
 local function profitTooltip(row)
     local p = row.p

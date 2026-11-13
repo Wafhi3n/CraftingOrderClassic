@@ -16,6 +16,7 @@
 -- bourse (le sac est gratuit, le produit ne vaut rien) -- c'est la bourse d'artisan, et tous les
 -- appels sans `opts.value`. Avec `opts.value` (Route:MyValuation, fenêtre + suivi), elle choisit sur
 -- le coût NET : le sac vaut sa revente, le produit est crédité de la sienne (Route_Value.lua).
+-- `opts.value.writs` (case « Privilégier les writs ») biaise ce choix vers les objets de writ (preferWrit).
 
 local COC   = CraftingOrderClassic
 local Route = {}
@@ -126,6 +127,7 @@ function Route:Candidates(profKey, opts)
     local known, live = opts.known or {}, opts.live or {}
     local isReagent = reagentSet(lib, profKey)
     local resaleOf = resaleMemo(self)
+    local W = COC.Writs   -- table STATIQUE (objet -> writs) : la marque ne périme pas le cache
     local out = {}
     for _, sid in ipairs((lib.GetRecipes and lib:GetRecipes(profKey)) or {}) do
         local colors = lib:RecipeColors(profKey, sid)
@@ -148,6 +150,7 @@ function Route:Candidates(profKey, opts)
                     sid = sid, colors = colors, cost = cost, reags = priced, prod = prod,
                     resale = resaleOf(prod),   -- revente d'UN produit (numMade inconnu : 1, prudent)
                     conv = (prod and isReagent[prod]) or nil,
+                    writ = (W and prod and W:ForItem(prod)) and true or nil,   -- cf. preferWrit
                     known = isKnown, planPrice = planPrice,
                     -- missing n'est PAS figé ici : un réactif sans prix mais en sac ne manque pas.
                     planUnknown = planUnknown or nil, planDoubt = planDoubt or nil,
@@ -297,21 +300,56 @@ local function cheaperCash(n, bi)
     return pick
 end
 
+-- « Privilégier les writs » (case de la route, db.routeWrits, décochée par défaut ; décision 13 de
+-- route-cout-net.md, demande du user 2026-11-13) : l'objet d'un Craftsman's Writ se revend vite à
+-- l'HV, ses porteurs l'y cherchent. Case cochée, une recette dont l'objet est demandé par un writ
+-- passe devant la meilleure si son point coûte au plus WRIT_TOL de plus. Mêmes garde-fous que
+-- cheaperCash : ancré sur la MEILLEURE, mesuré sur le coût avant revente, jamais d'un étage de doute
+-- à l'autre. Au-delà, le net décide : « privilégier » n'est pas « fabriquer à n'importe quel prix ».
+-- Rend la gagnante et son surcoût au point (0 si la meilleure était déjà un writ), ou nil.
+local WRIT_TOL = 0.25   -- valeur PROPOSÉE, comme NET_TOL : le user ne l'a pas chiffrée
+Route.WRIT_TOL = WRIT_TOL   -- lu par l'infobulle de la case
+
+local function preferWrit(cands, bi)
+    if cands[bi].writ then return bi, 0 end
+    local base = math.abs(PER[bi] + (CREDIT[bi] or 0))
+    local limit, pick = PER[bi] + math.max(base * WRIT_TOL, EPS), nil
+    for i, c in ipairs(cands) do
+        if c.writ and PER[i] and DOUBT[i] == DOUBT[bi] and PER[i] <= limit
+            and (not pick or PER[i] < PER[pick] - EPS) then pick = i end
+    end
+    if pick then return pick, PER[pick] - PER[bi] end
+    return nil
+end
+
+-- Après la marche, deux préférences, dans CET ordre : la case des writs (choix explicite du joueur),
+-- puis la décision 12 (gain net faible -> ce qui sort le moins de la bourse) si aucun writ n'est à
+-- portée. Rend l'indice retenu et le surcoût du writ au point (nil sans writ retenu).
+local function refine(cands, bi, val)
+    if not (bi and val) then return bi, nil end
+    if val.writs then
+        local w, extra = preferWrit(cands, bi)
+        if w then return w, extra end
+    end
+    return cheaperCash(#cands, bi), nil
+end
+
 local function pickBest(cands, r, cur, target, bought, st, val)
-    local bi
+    local bi, writExtra
     for i, c in ipairs(cands) do
         local chance, per, cash, doubt, _, _, _, _, credit = evaluate(c, r, cur, target, bought, st, val)
         PER[i], CASH[i], DOUBT[i], CREDIT[i] = chance and per or false, cash, doubt, credit
         if chance and (not bi or better(doubt, per, c, DOUBT[bi], PER[bi], cands[bi])) then bi = i end
     end
-    if bi and val then bi = cheaperCash(#cands, bi) end
+    bi, writExtra = refine(cands, bi, val)
     local best = bi and cands[bi]
     if not best then return nil end
     local chance, _, _, _, cost, missing, net, fromBag, credit = evaluate(best, r, cur, target, bought, st, val)
     -- Partiel : un réactif sans prix, ou un plan au prix inconnu PAS ENCORE payé (une fois que la
     -- route l'a « acheté », les points suivants sont chiffrés juste).
     local partial = (missing or (best.planUnknown and not bought[best.sid])) and true or false
-    return best, chance, partial, cost, missing, { cash = cost, net = net, bag = fromBag, credit = credit }
+    return best, chance, partial, cost, missing,
+        { cash = cost, net = net, bag = fromBag, credit = credit, writExtra = writExtra }
 end
 
 -- Plafond visé : maxRank s'il est connu, sinon le prochain palier CAPS au-dessus de `rank`.
@@ -335,12 +373,14 @@ local function addPoint(segs, r, best, chance, pt, planCost, boughtNow, isPartia
     seg.cost = seg.cost + pt.cash; seg.plan = seg.plan + planCost
     seg.net, seg.bagValue = seg.net + pt.net, seg.bagValue + pt.bag
     if pt.credit > 0 then seg.resale, seg.resaleQty = seg.resale + pt.credit, seg.resaleQty + 1 / chance end
+    -- Ce que la case des writs a coûté sur l'étape (net, somme des points) : l'infobulle le dit.
+    if (pt.writExtra or 0) > EPS then seg.writExtra = (seg.writExtra or 0) + pt.writExtra end
     if isPartial then seg.partial = true end
     return seg
 end
 
 -- La route : segments consécutifs { sid, from, to, crafts, cost, plan, prod, bought, partial,
--- missing, planUnknown, bag, made, net, bagValue, resale, resaleQty } (ou { gap = true }), + totaux
+-- missing, planUnknown, bag, made, net, bagValue, resale, resaleQty, writExtra } (ou { gap = true }), + totaux
 -- mats/plans (ce qui sort de la bourse) et, en mode NET (opts.value), net/bagValue/resale. `done` = déjà au plafond. maxRank nil →
 -- prochain palier CAPS. nil si briques absentes (cf. Candidates). opts : voir Candidates, plus
 -- opts.bag(itemID) → quantité en sac (MON perso seulement). `bag` est gardé sur la route : Materials

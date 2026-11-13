@@ -46,6 +46,16 @@ client.
 
 ## Relevés
 
+- 2026-11-13 14:08 — jusqu'a 64ec334 — Forever 1.60.1.70938, solo, forgeron (Forge 161/225, celui de la
+  capture du 13/11) ; build `main-dev@79dc27b 2026-11-13 10:13` lu par l'appli du banc dans la copie
+  déployée — **GO sur `feat/route-writs`** (fiche de l'appli, 5 gestes cochés OK, sans remarque) : dans
+  l'onglet Route, les étapes d'objets de writ portent l'icône du writ (grise, writ non porté), les
+  autres non ; l'infobulle d'une étape marquée donne les lignes de writ de la vue Profit, sans la ligne
+  courte de l'accroche en double ; la case « Prefer writs » recalcule la route au clic, tient sur sa
+  ligne, et l'étape qu'elle choisit le dit ; décochée, la route d'avant revient, et la case garde son
+  état après `/reload` ; la route suit encore le rang en direct après un point gagné (découpage de
+  `_ProfWindow_Route_Btn.lua` sans perte). Écrit sur la parole du user (cases cochées), sans capture.
+
 - 2026-11-11 11:22 — jusqu'a 6c511e4 — Forever 1.60.1.70888, client ANGLAIS, solo ; build
   `main-dev@9968689 2026-11-11 11:15`, `## Version: 1.52.0` (lu par l'appli du banc dans la copie
   déployée, fiche `CraftingOrderClassic--release-v1.52.0`) — **GO sur le candidat v1.52.0** (4 gestes

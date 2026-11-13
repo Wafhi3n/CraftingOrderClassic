@@ -13,6 +13,9 @@
 > **2026-11-11** : le user veut aussi voir, **dans l'infobulle de l'objet** demandé (sac, HdV, lien
 > du chat), qu'un writ le demande (D10, T8). Branche `feat/writs-infobulle`, empilée sur
 > `feat/writs-aca` dans les deux dépôts.
+> **2026-11-13** : la même marque **dans le Plan de route** (D12, T9), et une case qui y privilégie
+> les objets de writ (décision 13 de `route-cout-net.md`). Branche `feat/route-writs` (COC et
+> outillage).
 
 ## Le problème
 
@@ -80,6 +83,10 @@ Ce qu'on sait du système, lu le 2026-10-16 dans deux pages Wowhead enregistrée
    ventes, lien du chat), UNE ligne sous celles du jeu : « Craftsman's Writ: +75 » (la réputation du
    writ ; celle du writ que tu portes si deux writs demandent l'objet). Le détail reste dans la vue
    Profit. (D10, D11)
+9. **Dans le Plan de route**, une étape dont l'objet est demandé par un writ porte la même icône que
+   dans la vue Profit (pleine si tu portes le writ, éteinte sinon), et son infobulle les mêmes lignes.
+   Une case « Privilégier les writs » fait passer ces recettes devant à coût proche : leurs objets se
+   revendent vite à l'HdV. (D12)
 
 ## Ce qu'on ne fait PAS
 
@@ -98,9 +105,10 @@ Ce qu'on sait du système, lu le 2026-10-16 dans deux pages Wowhead enregistrée
 - **Pas d'aide sur les enveloppes** (« Sealed Journeyman's Writ »…) dans ce premier tour. Piste pour
   plus tard : « tu sais faire 12 des 45 writs de ce palier » dans leur infobulle, pour décider s'il
   vaut la peine de l'acheter. Il faudra leurs identifiants.
-- **La marque côté artisan vit dans la vue Profit** (D7, 2026-11-09) **et dans l'infobulle de
-  l'objet** (D10, 2026-11-11) : rien dans la liste de recettes de Blizzard (y écrire la teinte), ni
-  dans l'onglet Commande pour l'instant, ni dans les infobulles de comparaison.
+- **La marque côté artisan vit dans la vue Profit** (D7, 2026-11-09), **dans l'infobulle de
+  l'objet** (D10, 2026-11-11) **et dans le Plan de route** (D12, 2026-11-13) : rien dans la liste
+  de recettes de Blizzard (y écrire la teinte), ni dans l'onglet Commande pour l'instant, ni dans
+  les infobulles de comparaison, ni dans le suivi à l'écran (il suit la route, sans marque).
 - **Pas de partage réseau de ce que COC a vu des writs** (quantité, or) : chacun apprend sur son
   compte. À reprendre si le relevé reste trop maigre pour le coût de la réputation.
 - **Pas de clic modifié sur l'objet dans les sacs** : toucher aux boutons du sac expose au taint, et
@@ -196,6 +204,15 @@ Ce qu'on sait du système, lu le 2026-10-16 dans deux pages Wowhead enregistrée
   tooltip ». Les phrases de D10 (« Demandé par un writ d'artisan… », ce qui manque, « les porteurs
   cherchent… ») restent dans l'infobulle de la vue Profit, dans la fenêtre de COC. Clé neuve
   `Writ d'artisan : +%d` (en/de/es).
+- **D12 (demande du user, 2026-11-13)** : « tout comme Profit, il faudrait que dans Route on voie si
+  un des plans a un writ, et faire une option pour privilégier les writs car ça se revend vite à
+  l'HdV » (captures : route de Forge 161/225, vue Profit avec la marque de l'Iridescent Hammer). La
+  marque d'une étape est celle de la vue Profit : icône du writ entre le nom et le montant, pleine si
+  porté, éteinte sinon ; l'infobulle de l'étape reprend les lignes de la vue Profit (une seule
+  rédaction, `PW._AddWritLines`) et se protège de l'accroche d'objet par `cocWritTip`. Elle se lit
+  par `ItemMark` (les writs de CET objet), jamais par `WantedItems()` : la route se repeint chaque
+  seconde. L'objet est celui de l'étape (produit CraftLink), comme son icône et son nom. La case et
+  son seuil sont la décision 13 de `route-cout-net.md`.
 
 ## Critères d'acceptation
 
@@ -283,6 +300,19 @@ Ce qu'on sait du système, lu le 2026-10-16 dans deux pages Wowhead enregistrée
 19. [agent] `api-gotcha-reviewer` sur l'accroche ; en jeu, `/console taintLog 1` et un objet de writ
     survolé en combat : rien de COC dans `Logs\taint.log`.
 
+**Le Plan de route (2026-11-13, D12) :**
+
+20. [test] La marque d'une étape : objet de writ → icône du writ, éteinte si non porté, pleine si
+    porté, texture réutilisée ; ligne recyclée sur une étape sans writ → marque cachée, nom rendu à
+    sa place ; étape « ? » → rien ; drapeau `cocWritTip` posé ; infobulle → lignes de la vue Profit,
+    plus « Choisie pour le writ » seulement quand la case a choisi l'étape. →
+    `tests/test_route_writs.lua` (avec les tests de la décision 13 de `route-cout-net.md`)
+21. [humain] Route d'un des cinq métiers (Forge de la capture du 2026-11-13) : une étape dont
+    l'objet est demandé par un writ porte l'icône, et son survol donne la fiche de l'objet, puis
+    « Demandé par un writ d'artisan (+75 de réputation) » et ce qui suit, la ligne « Craftsman's
+    Writ: +75 » de l'accroche n'y figurant pas. Témoin : une étape voisine sans writ, sans icône, nom
+    non tronqué plus tôt que d'habitude.
+
 ## Contrat
 
 Rien sur le réseau (voir « Ce qu'on ne fait pas »). Une table neuve dans les SavedVariables :
@@ -359,3 +389,7 @@ outillage, pour `tests/test_writs.lua`) atterrissent le même jour.
 - **T8 — la marque dans l'infobulle de l'objet** (2026-11-11, D10). Critères 17, 18 et 19. **Codé
   le 2026-11-11** sur `feat/writs-infobulle` (`CraftingOrderClassic_Writs_Tooltip.lua`,
   `W:ItemMark`) : critère 17 tenu en test, jamais vu en jeu.
+- **T9 — la marque et la case dans le Plan de route** (2026-11-13, D12). Critères 20 et 21, et 15-16
+  de `route-cout-net.md`. **Codé le 2026-11-13** sur `feat/route-writs`
+  (`CraftingOrderClassic_ProfWindow_Route_Writs.lua`, `preferWrit` dans `Route.lua`) : tenu en
+  test, jamais vu en jeu.
