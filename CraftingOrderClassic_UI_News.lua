@@ -38,6 +38,14 @@ local BODY_W = 780
 local function versionsNow()
     return {
         {
+            v = "v1.53.0", title = L["Les writs dans le plan de route, et une case pour les privilégier"],
+            lines = {
+                L["Le plan de route (onglet Route) marque maintenant les étapes dont l'objet est demandé par un Craftsman's Writ, comme la vue Profit : l'icône du writ à côté du montant, allumée si tu portes ce writ, éteinte sinon. Survole l'étape pour la réputation, le prix du writ à l'hôtel des ventes et ce que l'addon a vu de ce writ en jeu."],
+                L["Une nouvelle case, « Privilégier les writs », à côté de « Suivi à l'écran » : cochée, une recette dont l'objet est demandé par un writ passe devant la moins chère, tant que son point ne coûte pas plus d'un quart de plus. Ces objets se revendent vite à l'hôtel des ventes, les porteurs du writ les y cherchent. La case est décochée par défaut. Une étape qu'elle a choisie le dit dans son infobulle, avec ce qu'elle coûte de plus que la recette la moins chère."],
+                L["Corrigé : la route et « À apprendre maintenant » ne t'envoient plus apprendre une recette grise dès l'apprentissage. Solid Grinding Stone et Solid Weightstone l'ont montré : l'addon les croyait vertes du niveau du formateur jusqu'à 200, alors que le jeu les affiche grises dès qu'on les apprend. 41 recettes étaient touchées, surtout en Couture et en Forge."],
+            },
+        },
+        {
             v = "v1.52.0", title = L["Les writs dans la vue Profit, et une route qui compte tes sacs"],
             lines = {
                 L["La vue Profit (la colonne à droite de la fenêtre de métier) marque les recettes dont l'objet est demandé par un Craftsman's Writ : une petite icône de writ à côté du montant, allumée si tu portes ce writ, éteinte sinon. Son infobulle donne la réputation, le prix du writ à l'hôtel des ventes quand Auctionator le connaît, combien d'objets le writ demandait quand tu l'as ouvert, et ce qu'il rapporte : une bourse (Coin Pouch), pas de l'or. Survole l'objet lui-même n'importe où dans le jeu (sac, hôtel des ventes, lien du chat) et une ligne dit qu'un writ le veut : « Writ d'artisan : +75 »."],
@@ -413,14 +421,6 @@ local function versionsLatest()
                 L["L'alchimie se range mieux aussi : les élixirs se regroupent sous la stat qu'ils donnent, pendant que les potions de soin et de mana, les flacons et les transmutations gardent leurs propres en-têtes — « rend de la vie » n'a jamais été une stat. Sur TBC, ça sort 74 consommables du fourre-tout Divers."],
             },
         },
-        {
-            v = "v1.25.0", title = L["Les gemmes se rangent par couleur, puis par ce qu'elles donnent"],
-            lines = {
-                L["La joaillerie versait toutes les gemmes taillées sous un seul en-tête « Gemme ». Elles se rangent maintenant par couleur de châsse, et sous chaque couleur par la stat qu'elles donnent : « Force - Audacieux », « Endurance - Solide ». Cette stat n'est pas une table écrite à la main, elle est lue sur ton propre jeu — donc dans ta langue, et valable pour des gemmes que je n'ai jamais regardées."],
-                L["Les gemmes méta, elles, reviennent à une simple liste : chaque taille de méta n'existe qu'en un seul exemplaire, un en-tête au-dessus n'aurait fait que répéter la ligne. Bagues, colliers, statues et figurines gardent le classement qu'ils avaient."],
-                L["Corrigé aussi : quand un enchanteur te demandait une pièce, l'invite ne s'affichait parfois jamais. Une première demande arrivée trop tôt, avant que tu aies équipé la pièce, armait quand même le délai de cinq secondes — et la vraie demande qui suivait passait à la trappe. Le délai ne démarre plus que sur une demande réellement affichée."],
-            },
-        },
     }
 end
 
@@ -434,7 +434,7 @@ end
 
 local function versionsOldest()
     return {
-        -- v1.24.1 (retirée à la v1.51.0), v1.23.0 (retirée à la v1.50.0), v1.22.0 (retirée à la v1.48.0), v1.21.0 (retirée à la v1.47.0),v1.20.0 (retirée à la v1.46.0), v1.19.1 / v1.19.0 (retirées à la v1.45.0), v1.18.0 / v1.17.1 (retirées à la v1.44.2), v1.17.0 (retirée à la v1.44.1),v1.16.0 (retirée à la v1.44.0), v1.15.1 (retirée à la v1.43.0), v1.15.0 (retirée à la v1.42.1), v1.14.0 (retirée à la v1.42.0), v1.13.0 (retirée à la v1.41.1), v1.12.0 / v1.11.0 / v1.10.2 (retirées à la v1.41.0 : la Saison de la Découverte, le canal du royaume et
+        -- v1.25.0 (retirée à la v1.53.0), v1.24.1 (retirée à la v1.51.0), v1.23.0 (retirée à la v1.50.0), v1.22.0 (retirée à la v1.48.0), v1.21.0 (retirée à la v1.47.0),v1.20.0 (retirée à la v1.46.0), v1.19.1 / v1.19.0 (retirées à la v1.45.0), v1.18.0 / v1.17.1 (retirées à la v1.44.2), v1.17.0 (retirée à la v1.44.1),v1.16.0 (retirée à la v1.44.0), v1.15.1 (retirée à la v1.43.0), v1.15.0 (retirée à la v1.42.1), v1.14.0 (retirée à la v1.42.0), v1.13.0 (retirée à la v1.41.1), v1.12.0 / v1.11.0 / v1.10.2 (retirées à la v1.41.0 : la Saison de la Découverte, le canal du royaume et
         -- le bouton « Créer » sécurisé n'existent pas sur Forever), v1.10.1 / v1.9.0 / v1.8.0 / v1.7.0 / v1.7.1 /
         -- v1.6.0 / v1.5.0 / v1.4.0 retirées de l'onglet (l'historique
         -- complet vit dans CHANGELOG.md). Cet onglet ne garde qu'une fenêtre glissante de versions :

@@ -1,5 +1,23 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.53.0 - Craftsman's Writs in the leveling route, and a box to favor them
+
+The leveling route (Route tab) now marks the steps whose item a Craftsman's Writ asks for, the same
+way the Profit view does: the writ's icon next to the amount, lit when you carry that writ, dimmed
+when you don't. Hover the step for the reputation, the writ's price at the auction house, and what
+the addon saw of that writ in game.
+
+A new "Prefer writs" box sits next to "On-screen tracker". Tick it and a recipe whose item a writ
+wants goes ahead of the cheapest one, as long as its point costs at most a quarter more. Writ items
+sell fast at the auction house, since the players carrying the writ look for them there. The box is
+off by default. A step it picked says so in its tooltip, along with how much more it costs than the
+cheapest recipe.
+
+Fixed: the route and "Learn now" no longer send you to learn a recipe that's grey the moment you
+learn it. Solid Grinding Stone and Solid Weightstone gave it away: the addon thought they were green
+from the trainer's level up to 200, while the game shows them grey as soon as you learn them. 41
+recipes were affected, mostly in Tailoring and Blacksmithing.
+
 ## v1.52.0 - Craftsman's Writs in the Profit view, and a leveling route that counts your bags
 
 The Profit view (the column to the right of the profession window) marks recipes whose item a

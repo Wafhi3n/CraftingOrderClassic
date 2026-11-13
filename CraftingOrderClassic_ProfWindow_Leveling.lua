@@ -40,7 +40,8 @@ function PW:_MissingDifficulty(e)
     local lib = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
     local c = lib and lib.RecipeColors and lib:RecipeColors(self.profKey, e.spellID)
     if c then
-        if rank >= c[4] then return nil          -- gris : plus aucun point
+        -- gris, ou « grise dès l'apprentissage » (jaune et vert à 0 : même règle que COC.Route)
+        if rank >= c[4] or (c[2] == 0 and c[3] == 0) then return nil
         elseif rank >= c[3] then return "easy"   -- vert
         elseif rank >= c[2] then return "medium" -- jaune
         else return "optimal" end                -- orange (apprenable, donc rang >= requis)

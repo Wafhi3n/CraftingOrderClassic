@@ -98,6 +98,11 @@ local de3 = {
         "Der Stapel mit %d liegt bereit in deiner Tasche: Lege ihn selbst in die Post.",
     -- Plan de route : le prix d'un plan de formateur, relevé chez lui (2026-10-02)
     ["Prix du plan inconnu : COC le relèvera à ton prochain passage chez le formateur."] = "Rezeptpreis unbekannt: COC notiert ihn bei deinem nächsten Besuch beim Lehrer.",
+    -- Plan de route : les Craftsman's Writ, marque et case (writs-aca.md D12, route-cout-net.md décision 13, 2026-11-13)
+    ["Privilégier les writs"] = "Aufträge bevorzugen",
+    ["Cochée : une recette dont l'objet est demandé par un writ d'artisan passe devant, si son point coûte au plus %d %% de plus. Ces objets se revendent vite à l'HV."] =
+        "Aktiviert: Ein Rezept, dessen Gegenstand ein Handwerkerauftrag verlangt, kommt zuerst, wenn sein Punkt höchstens %d %% mehr kostet. Diese Gegenstände verkaufen sich im AH schnell.",
+    ["Choisie pour le writ : ~%s de plus que la recette la moins chère."] = "Für den Auftrag gewählt: ~%s mehr als das günstigste Rezept.",
     -- Plan de route au coût NET, spec route-cout-net (2026-10-02)
     ["Compter la revente"] = "Weiterverkauf zählen",
     ["Cochée : ce que la route fabrique est compté à son prix de revente (HV moins 5 %), et ce qu'elle prend dans tes sacs aussi. La route choisit alors au coût net."] = "Aktiviert: Was die Route herstellt, zählt zu seinem Wiederverkaufspreis (AH minus 5 %), ebenso was sie aus deinen Taschen nimmt. Die Route wählt dann nach Nettokosten.",
