@@ -8,6 +8,13 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "Novedades",
+    -- v1.53.0
+    ["Les writs dans le plan de route, et une case pour les privilégier"] =
+        "Los encargos de artesano en la ruta de subida, y una casilla para priorizarlos",
+    ["Le plan de route (onglet Route) marque maintenant les étapes dont l'objet est demandé par un Craftsman's Writ, comme la vue Profit : l'icône du writ à côté du montant, allumée si tu portes ce writ, éteinte sinon. Survole l'étape pour la réputation, le prix du writ à l'hôtel des ventes et ce que l'addon a vu de ce writ en jeu."] =
+        "La ruta de subida (pestaña Ruta) marca ahora los pasos cuyo objeto pide un encargo de artesano, igual que la vista Beneficio: el icono del encargo junto al importe, encendido si llevas ese encargo y apagado si no. Pasa el ratón por el paso para ver la reputación, el precio del encargo en la casa de subastas y lo que el addon ha visto de ese encargo en el juego.",
+    ["Une nouvelle case, « Privilégier les writs », à côté de « Suivi à l'écran » : cochée, une recette dont l'objet est demandé par un writ passe devant la moins chère, tant que son point ne coûte pas plus d'un quart de plus. Ces objets se revendent vite à l'hôtel des ventes, les porteurs du writ les y cherchent. La case est décochée par défaut. Une étape qu'elle a choisie le dit dans son infobulle, avec ce qu'elle coûte de plus que la recette la moins chère."] =
+        "Una casilla nueva, «Priorizar encargos», junto a «Seguimiento en pantalla»: marcada, una receta cuyo objeto pide un encargo pasa por delante de la más barata, siempre que su punto no cueste más de una cuarta parte más. Estos objetos se venden rápido en la casa de subastas, porque quienes llevan el encargo los buscan allí. La casilla viene desmarcada. Un paso que ella haya elegido lo dice en su descripción, con lo que cuesta de más que la receta más barata.",
     -- v1.52.0
     ["Les writs dans la vue Profit, et une route qui compte tes sacs"] =
         "Los encargos de artesano en la vista Beneficio, y una ruta que cuenta tus bolsas",
@@ -203,15 +210,7 @@ local news = {
         "Cada lista de recetas — la pestaña Pedido, la ventana de profesión, Mis artesanos — recibe un selector de estadística. Eliges Fuerza y solo ves lo que da Fuerza: gemas, equipo, elixires. El menú se llena con lo que la profesión abierta fabrica de verdad, así que Cocina no te ofrece Poder con hechizos. Esas estadísticas no están escritas en ningún sitio, se leen de tu propio juego, así que aparecen en tu idioma y siguen funcionando con objetos que nunca he mirado, Wrath incluido.",
     ["L'alchimie se range mieux aussi : les élixirs se regroupent sous la stat qu'ils donnent, pendant que les potions de soin et de mana, les flacons et les transmutations gardent leurs propres en-têtes — « rend de la vie » n'a jamais été une stat. Sur TBC, ça sort 74 consommables du fourre-tout Divers."] =
         "La alquimia también se ordena mejor: los elixires se agrupan según la estadística que dan, mientras que las pociones de vida y maná, los frascos y las transmutaciones conservan sus propios encabezados — «restaura vida» nunca fue una estadística. En TBC eso saca 74 consumibles del montón de Varios.",
-    -- v1.25.0
-    ["Les gemmes se rangent par couleur, puis par ce qu'elles donnent"] =
-        "Las gemas se ordenan por color y luego por lo que dan",
-    ["La joaillerie versait toutes les gemmes taillées sous un seul en-tête « Gemme ». Elles se rangent maintenant par couleur de châsse, et sous chaque couleur par la stat qu'elles donnent : « Force - Audacieux », « Endurance - Solide ». Cette stat n'est pas une table écrite à la main, elle est lue sur ton propre jeu — donc dans ta langue, et valable pour des gemmes que je n'ai jamais regardées."] =
-        "Joyería volcaba todas las gemas talladas bajo un único encabezado «Gema». Ahora se colocan bajo su color de ranura y, dentro de cada color, según la estadística que dan, como «Fuerza - Audaz» o «Aguante - Sólida». Esa estadística no es una tabla escrita a mano, se lee directamente de tu propio juego, por eso aparece en tu idioma y sigue funcionando con gemas que nunca he mirado.",
-    ["Les gemmes méta, elles, reviennent à une simple liste : chaque taille de méta n'existe qu'en un seul exemplaire, un en-tête au-dessus n'aurait fait que répéter la ligne. Bagues, colliers, statues et figurines gardent le classement qu'ils avaient."] =
-        "Las gemas meta pasan a una lista simple. De cada talla meta solo existe una gema, así que un encabezado encima no hacía más que repetir la línea de debajo. Anillos, collares, estatuas y figurillas conservan la clasificación que ya tenían.",
-    ["Corrigé aussi : quand un enchanteur te demandait une pièce, l'invite ne s'affichait parfois jamais. Une première demande arrivée trop tôt, avant que tu aies équipé la pièce, armait quand même le délai de cinq secondes — et la vraie demande qui suivait passait à la trappe. Le délai ne démarre plus que sur une demande réellement affichée."] =
-        "También corregido: cuando un encantador te pedía una pieza, el aviso a veces no aparecía nunca. Una primera petición que llegaba demasiado pronto, antes de que hubieras equipado la pieza, activaba igualmente la espera de cinco segundos, y la petición real que venía después se perdía. La espera ahora solo empieza cuando una petición ha pasado de verdad.",
+    -- (clés v1.25.0 retirées à la v1.53.0 : version sortie de la fenêtre glissante de l'onglet)
     -- (clés v1.24.2 et v1.24.0 retirées à la v1.52.0 : versions sorties de la fenêtre glissante de l'onglet)
     -- (clés v1.23.0 retirées à la v1.50.0 : version sortie de la fenêtre glissante de l'onglet)
     -- (clés v1.22.1 retirées à la v1.49.0 : version sortie de la fenêtre glissante de l'onglet)

@@ -11,6 +11,13 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "What's New",
+    -- v1.53.0
+    ["Les writs dans le plan de route, et une case pour les privilégier"] =
+        "Craftsman's Writs in the leveling route, and a box to favor them",
+    ["Le plan de route (onglet Route) marque maintenant les étapes dont l'objet est demandé par un Craftsman's Writ, comme la vue Profit : l'icône du writ à côté du montant, allumée si tu portes ce writ, éteinte sinon. Survole l'étape pour la réputation, le prix du writ à l'hôtel des ventes et ce que l'addon a vu de ce writ en jeu."] =
+        "The leveling route (Route tab) now marks the steps whose item a Craftsman's Writ asks for, the same way the Profit view does: the writ's icon next to the amount, lit when you carry that writ, dimmed when you don't. Hover the step for the reputation, the writ's price at the auction house, and what the addon saw of that writ in game.",
+    ["Une nouvelle case, « Privilégier les writs », à côté de « Suivi à l'écran » : cochée, une recette dont l'objet est demandé par un writ passe devant la moins chère, tant que son point ne coûte pas plus d'un quart de plus. Ces objets se revendent vite à l'hôtel des ventes, les porteurs du writ les y cherchent. La case est décochée par défaut. Une étape qu'elle a choisie le dit dans son infobulle, avec ce qu'elle coûte de plus que la recette la moins chère."] =
+        "A new “Prefer writs” box sits next to “On-screen tracker”. Tick it and a recipe whose item a writ wants goes ahead of the cheapest one, as long as its point costs at most a quarter more. Writ items sell fast at the auction house, since the players carrying the writ look for them there. The box is off by default. A step it picked says so in its tooltip, along with how much more it costs than the cheapest recipe.",
     -- v1.52.0
     ["Les writs dans la vue Profit, et une route qui compte tes sacs"] =
         "Craftsman's Writs in the Profit view, and a leveling route that counts your bags",
@@ -206,15 +213,7 @@ local news = {
         "Every recipe list, the Order tab, the profession window and My Artisans, gets a stat picker. Pick Strength and you see only what gives Strength, gems, gear, elixirs. The menu is built from what the open profession actually makes, so Cooking won't offer you Spell Power. None of those stats are typed out anywhere, they're read off your own client, so they show up in your language and keep working on items I've never looked at, Wrath included.",
     ["L'alchimie se range mieux aussi : les élixirs se regroupent sous la stat qu'ils donnent, pendant que les potions de soin et de mana, les flacons et les transmutations gardent leurs propres en-têtes — « rend de la vie » n'a jamais été une stat. Sur TBC, ça sort 74 consommables du fourre-tout Divers."] =
         "Alchemy sorts better too. Elixirs group under the stat they give, while healing and mana potions, flasks and transmutes keep their own headings, since \"restores health\" was never a stat. On TBC that pulled 74 loose consumables out of the Misc pile.",
-    -- v1.25.0
-    ["Les gemmes se rangent par couleur, puis par ce qu'elles donnent"] =
-        "Cut gems sort by color, then by what they give",
-    ["La joaillerie versait toutes les gemmes taillées sous un seul en-tête « Gemme ». Elles se rangent maintenant par couleur de châsse, et sous chaque couleur par la stat qu'elles donnent : « Force - Audacieux », « Endurance - Solide ». Cette stat n'est pas une table écrite à la main, elle est lue sur ton propre jeu — donc dans ta langue, et valable pour des gemmes que je n'ai jamais regardées."] =
-        "Jewelcrafting dumped every cut gem under a single \"Gem\" heading. Gems now sit under their socket color, and under that, under the stat they give, so you get \"Strength - Bold\" and \"Stamina - Solid\". That stat isn't a list I typed out, it's read off your own client, which is why it shows up in your language and why it'll keep working on gems I've never looked at.",
-    ["Les gemmes méta, elles, reviennent à une simple liste : chaque taille de méta n'existe qu'en un seul exemplaire, un en-tête au-dessus n'aurait fait que répéter la ligne. Bagues, colliers, statues et figurines gardent le classement qu'ils avaient."] =
-        "Meta gems get a plain list instead. Every meta cut is a single gem, so a heading above each one just repeated the line underneath it. Rings, necklaces, statues and figurines keep sorting the way they always did.",
-    ["Corrigé aussi : quand un enchanteur te demandait une pièce, l'invite ne s'affichait parfois jamais. Une première demande arrivée trop tôt, avant que tu aies équipé la pièce, armait quand même le délai de cinq secondes — et la vraie demande qui suivait passait à la trappe. Le délai ne démarre plus que sur une demande réellement affichée."] =
-        "Also fixed: when an enchanter asked you for a piece, the prompt sometimes never showed up. A first request that arrived a moment too early, before you'd equipped the piece, still armed the five second cooldown, so the real request that followed got swallowed. The cooldown now only starts once a request has actually gone through.",
+    -- (clés v1.25.0 retirées à la v1.53.0 : version sortie de la fenêtre glissante de l'onglet)
     -- (clés v1.24.2 et v1.24.0 retirées à la v1.52.0 : versions sorties de la fenêtre glissante de l'onglet)
     -- (clés v1.23.0 retirées à la v1.50.0 : version sortie de la fenêtre glissante de l'onglet)
     -- (clés v1.22.1 retirées à la v1.49.0 : version sortie de la fenêtre glissante de l'onglet)

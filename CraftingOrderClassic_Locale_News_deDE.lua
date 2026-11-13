@@ -8,6 +8,13 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "Neues",
+    -- v1.53.0
+    ["Les writs dans le plan de route, et une case pour les privilégier"] =
+        "Handwerkeraufträge in der Levelroute, und ein Kästchen, um sie zu bevorzugen",
+    ["Le plan de route (onglet Route) marque maintenant les étapes dont l'objet est demandé par un Craftsman's Writ, comme la vue Profit : l'icône du writ à côté du montant, allumée si tu portes ce writ, éteinte sinon. Survole l'étape pour la réputation, le prix du writ à l'hôtel des ventes et ce que l'addon a vu de ce writ en jeu."] =
+        "Die Levelroute (Reiter Route) markiert jetzt die Schritte, deren Gegenstand ein Handwerkerauftrag verlangt, genau wie die Gewinnansicht: das Auftragssymbol neben dem Betrag, hell, wenn du diesen Auftrag trägst, sonst blass. Fahr mit der Maus über den Schritt für den Ruf, den Preis des Auftrags im Auktionshaus und was das Addon von diesem Auftrag im Spiel gesehen hat.",
+    ["Une nouvelle case, « Privilégier les writs », à côté de « Suivi à l'écran » : cochée, une recette dont l'objet est demandé par un writ passe devant la moins chère, tant que son point ne coûte pas plus d'un quart de plus. Ces objets se revendent vite à l'hôtel des ventes, les porteurs du writ les y cherchent. La case est décochée par défaut. Une étape qu'elle a choisie le dit dans son infobulle, avec ce qu'elle coûte de plus que la recette la moins chère."] =
+        "Ein neues Kästchen „Aufträge bevorzugen“ neben „Bildschirm-Verfolgung“: Aktiviert, kommt ein Rezept, dessen Gegenstand ein Auftrag verlangt, vor das günstigste, solange sein Punkt höchstens ein Viertel mehr kostet. Diese Gegenstände verkaufen sich im Auktionshaus schnell, denn wer den Auftrag trägt, sucht sie dort. Das Kästchen ist standardmäßig aus. Ein Schritt, den es gewählt hat, sagt das in seinem Tooltip, mit dem, was er mehr kostet als das günstigste Rezept.",
     -- v1.52.0
     ["Les writs dans la vue Profit, et une route qui compte tes sacs"] =
         "Handwerkeraufträge in der Gewinnansicht, und eine Levelroute, die deine Taschen mitzählt",
@@ -203,15 +210,7 @@ local news = {
         "Jede Rezeptliste — der Auftrags-Reiter, das Berufsfenster, Meine Handwerker — bekommt einen Wert-Auswähler. Wähle Stärke und du siehst nur, was Stärke gibt: Edelsteine, Ausrüstung, Elixiere. Das Menü füllt sich mit dem, was der offene Beruf wirklich herstellt, Kochkunst bietet dir also keine Zaubermacht an. Diese Werte stehen nirgends geschrieben, sie werden von deinem Client gelesen, also in deiner Sprache und auch bei Gegenständen, die ich nie angesehen habe, Wrath inbegriffen.",
     ["L'alchimie se range mieux aussi : les élixirs se regroupent sous la stat qu'ils donnent, pendant que les potions de soin et de mana, les flacons et les transmutations gardent leurs propres en-têtes — « rend de la vie » n'a jamais été une stat. Sur TBC, ça sort 74 consommables du fourre-tout Divers."] =
         "Auch die Alchemie sortiert sich besser: Elixiere gruppieren sich nach dem Wert, den sie geben, während Heil- und Manatränke, Fläschchen und Transmutationen ihre eigenen Überschriften behalten — „stellt Leben wieder her“ war nie ein Wert. Auf TBC holt das 74 lose Verbrauchsgegenstände aus dem Sonstiges-Haufen.",
-    -- v1.25.0
-    ["Les gemmes se rangent par couleur, puis par ce qu'elles donnent"] =
-        "Edelsteine sortieren sich nach Farbe und danach, was sie geben",
-    ["La joaillerie versait toutes les gemmes taillées sous un seul en-tête « Gemme ». Elles se rangent maintenant par couleur de châsse, et sous chaque couleur par la stat qu'elles donnent : « Force - Audacieux », « Endurance - Solide ». Cette stat n'est pas une table écrite à la main, elle est lue sur ton propre jeu — donc dans ta langue, et valable pour des gemmes que je n'ai jamais regardées."] =
-        "Juwelenschleifen warf alle geschliffenen Steine unter eine einzige Überschrift „Edelstein“. Die Steine stehen jetzt unter ihrer Sockelfarbe und darunter nach dem Wert, den sie geben, also „Stärke - Kühn“ oder „Ausdauer - Massiv“. Dieser Wert ist keine von Hand getippte Tabelle, er wird direkt von deinem Client gelesen, deshalb erscheint er in deiner Sprache und funktioniert auch bei Steinen, die ich nie angesehen habe.",
-    ["Les gemmes méta, elles, reviennent à une simple liste : chaque taille de méta n'existe qu'en un seul exemplaire, un en-tête au-dessus n'aurait fait que répéter la ligne. Bagues, colliers, statues et figurines gardent le classement qu'ils avaient."] =
-        "Meta-Steine bekommen stattdessen eine schlichte Liste. Jeden Meta-Schliff gibt es nur ein einziges Mal, eine Überschrift darüber hätte also nur die Zeile darunter wiederholt. Ringe, Halsketten, Statuen und Figuren werden weiter wie bisher sortiert.",
-    ["Corrigé aussi : quand un enchanteur te demandait une pièce, l'invite ne s'affichait parfois jamais. Une première demande arrivée trop tôt, avant que tu aies équipé la pièce, armait quand même le délai de cinq secondes — et la vraie demande qui suivait passait à la trappe. Le délai ne démarre plus que sur une demande réellement affichée."] =
-        "Ebenfalls behoben: Wenn ein Verzauberer dich um ein Ausrüstungsteil bat, erschien die Abfrage manchmal gar nicht. Eine erste Anfrage, die zu früh eintraf, bevor du das Teil angelegt hattest, setzte trotzdem die Sperre von fünf Sekunden, und die eigentliche Anfrage danach ging verloren. Die Sperre startet jetzt erst, wenn eine Anfrage wirklich durchgekommen ist.",
+    -- (clés v1.25.0 retirées à la v1.53.0 : version sortie de la fenêtre glissante de l'onglet)
     -- (clés v1.24.2 et v1.24.0 retirées à la v1.52.0 : versions sorties de la fenêtre glissante de l'onglet)
     -- (clés v1.23.0 retirées à la v1.50.0 : version sortie de la fenêtre glissante de l'onglet)
     -- (clés v1.22.1 retirées à la v1.49.0 : version sortie de la fenêtre glissante de l'onglet)
