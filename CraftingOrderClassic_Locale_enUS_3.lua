@@ -234,10 +234,13 @@ local en3 = {
         "The X at the end of the tracker hides it completely; the “On-screen tracker” box in the Route tab brings it back.",
     -- Vue Profit : bascule « tout le métier », source du prix, coupe HV, Enchantement par le coût (2026-09-29)
     ["Tout le métier"] = "Whole profession",
-    ["Ajoute, en gris, les recettes que tu n'as pas encore apprises."] =
-        "Adds, in grey, the recipes you haven't learned yet.",
-    ["Pas encore apprise : la vue « Manquantes » dit où l'apprendre."] =
-        "Not learned yet: the \"Missing\" view tells you where to learn it.",
+    -- Vue Profit : les recettes à apprendre à son rang, le clic qui dit où (décision 19, 2026-11-16)
+    ["Ajoute aussi, en gris, les recettes que ton rang ne permet pas encore d'apprendre."] =
+        "Also adds, in grey, the recipes your skill is still too low to learn.",
+    ["Pas encore apprise."] = "Not learned yet.",
+    ["Clic : dire dans le chat où trouver cette recette."] = "Click: say in chat where to find this recipe.",
+    -- Vue Manquantes : le filtre par catégorie (2026-11-16)
+    ["Writs"] = "Writs",
     ["Vente (prix marchand)"] = "Sale (vendor price)",
     ["Coupe HV (%d %%)"] = "AH cut (%d%%)",
     ["Un marchand vend cet objet : l'HV ne le paiera pas plus cher."] =

@@ -234,10 +234,13 @@ local es3 = {
         "La X al final del seguimiento lo oculta por completo; la casilla «Seguimiento en pantalla» de la pestaña Ruta lo devuelve.",
     -- Vue Profit : bascule « tout le métier », source du prix, coupe HV, Enchantement par le coût (2026-09-29)
     ["Tout le métier"] = "Toda la profesión",
-    ["Ajoute, en gris, les recettes que tu n'as pas encore apprises."] =
-        "Añade, en gris, las recetas que aún no has aprendido.",
-    ["Pas encore apprise : la vue « Manquantes » dit où l'apprendre."] =
-        "Aún no aprendida: la vista «Faltantes» dice dónde aprenderla.",
+    -- Vue Profit : les recettes à apprendre à son rang, le clic qui dit où (décision 19, 2026-11-16)
+    ["Ajoute aussi, en gris, les recettes que ton rang ne permet pas encore d'apprendre."] =
+        "Añade también, en gris, las recetas que tu nivel aún no te permite aprender.",
+    ["Pas encore apprise."] = "Aún no aprendida.",
+    ["Clic : dire dans le chat où trouver cette recette."] = "Clic: decir en el chat dónde encontrar esta receta.",
+    -- Vue Manquantes : le filtre par catégorie (2026-11-16)
+    ["Writs"] = "Encargos",
     ["Vente (prix marchand)"] = "Venta (precio de vendedor)",
     ["Coupe HV (%d %%)"] = "Comisión CS (%d %%)",
     ["Un marchand vend cet objet : l'HV ne le paiera pas plus cher."] =

@@ -13,6 +13,10 @@
 > **2026-11-10 (user, décision 18)** : l'Enchantement repasse au PROFIT, ses enchantements n'ont
 > plus de ligne. Ça renverse les arbitrages 12 et 13 ; le mode coût dort dans le code (cf. 18).
 >
+> **2026-11-16 (user, décision 19)** : les recettes pas apprises que le rang permet d'apprendre
+> s'affichent en gris SANS cocher la case ; la case ajoute celles hors de portée ; le clic sur une
+> ligne grise dit où aller la chercher. Ça amende l'arbitrage 9 (cf. 19, critère 15).
+>
 > ⚠️ **Le clic sur une ligne est probablement inerte** (critère 2). Il passe par
 > `C_TradeSkillUI.OpenRecipe`, qui ne sélectionne RIEN quand la fenêtre est déjà ouverte : elle
 > attend une réponse serveur qui ne vient pas sur Forever (skill `coc-native-ui`, piège 22). Et
@@ -203,6 +207,38 @@ confirmer par le user, chacun est un réglage d'une ligne s'il ne convient pas.
     - **Effet de bord** : les marques de writ (D7 de `writs-aca`) deviennent possibles en
       Enchantement, puisqu'elles n'étaient sautées qu'en mode coût.
 
+### Décision du 2026-11-16 (user) — elle amende 9 et 15
+
+19. **La vue montre aussi, EN GRIS, les recettes qu'on n'a pas mais que son rang permet déjà
+    d'apprendre, sans rien cocher ; le clic sur une ligne grise dit où aller la chercher.** Demande
+    du user, captures à l'appui (Forge, « Profitable (16) », case décochée) : « prendre en compte le
+    niveau pour l'affichage, montrer en gris les plans qu'on n'a pas, et au clic dire où il faut
+    aller le chercher ». Trois points tranchés par le user le même jour, chacun sur l'option
+    recommandée :
+    - **Par défaut, sans la case** : la question de la vue devient « que fabriquer, ou apprendre puis
+      fabriquer, pour gagner de l'or à mon rang ». L'arbitrage 9 (« la liste s'ouvre sur ce que je
+      peux crafter maintenant ») est amendé : ce qu'on peut apprendre maintenant y entre aussi.
+    - **Le niveau filtre** : une recette pas apprise n'entre par défaut que si son niveau requis est
+      ≤ au rang du métier ouvert (`COC.Craft:OpenRank()`). Un niveau **inconnu** (trou de données)
+      n'entre pas : on ne promet pas qu'une recette est à portée sans le savoir.
+    - **La case « Tout le métier » reste**, et change de sens : elle ajoute les recettes hors de
+      portée et celles de niveau inconnu, **plus sombres** que les grises à portée. Toujours un état
+      de session (décision 15).
+    - **Le clic sur une ligne grise** ne passe plus par `OpenRecipe` (ouvrir une recette qu'on n'a pas
+      ne dit pas où l'apprendre). Il pose le **repère sur le PNJ** quand on a sa position (le poseur
+      écrit lui-même « repère posé : … »), sinon il écrit **UNE ligne de chat** avec la source. Une
+      réponse au clic, jamais un message spontané (skill `chat-output`). L'invite de l'infobulle dit
+      lequel des deux le clic fera, et rien quand il ne fera rien.
+    - **L'infobulle d'une ligne grise** dit « Pas encore apprise. », le niveau requis et ce qu'il
+      manque, puis la source **mot pour mot comme la vue « Manquantes »** (`PW._MissWhere`, la même
+      fonction) et le prix du plan. Elle ne renvoie plus à « Manquantes ». ⚠️ Une exception à venir :
+      `fix/plan-autre-camp` (au banc, pas fusionnée) ajoute la cote HV d'un plan que seul l'autre camp
+      vend dans l'infobulle de « Manquantes », hors de `missWhere` : la vue Profit ne la montrera pas
+      tant que ce n'est pas repris ici.
+    - **Coût** : `S:MissingRecipes` est lue à chaque remplissage (avant : case cochée seulement), et
+      l'oracle est interrogé pour les recettes à portée en plus. Quelques dizaines par métier ;
+      jamais mesuré, comme le reste de la vue.
+
 ## Critères d'acceptation
 
 1. `[humain]` ◐ Fenêtre de métier ouverte sur Forever, Auctionator présent : la languette
@@ -241,10 +277,10 @@ confirmer par le user, chacun est un réglage d'une ligne s'il ne convient pas.
 
 Arbitrages 9 à 12 (codés le 2026-09-29) :
 
-12. **Bascule « Tout le métier »** (arbitrage 9).
-    `[test]` ✅ Case décochée : seules les recettes apprises ; cochée : les manquantes du métier
-    OUVERT s'ajoutent, marquées non apprises. Tri, doublons, en-têtes, perte et zéro écartés. →
-    `tests/test_profit_view.lua`.
+12. **Bascule « Tout le métier »** (arbitrage 9 ; son sens a changé avec la décision 19, cf. 15).
+    `[test]` ✅ ~~Case décochée : seules les recettes apprises~~ (remplacé par le critère 15) ;
+    cochée : les manquantes du métier OUVERT s'ajoutent, marquées non apprises. Tri, doublons,
+    en-têtes, perte et zéro écartés. → `tests/test_profit_view.lua`.
     `[humain]` ◐ À l'ouverture de la fenêtre, la case est **décochée**. Cochée, des lignes au **nom
     gris et à l'icône éteinte** apparaissent parmi les autres, et leur infobulle renvoie à
     « Manquantes ». Le titre et la case tiennent sur une ligne, sans chevauchement avec le « i ».
@@ -278,6 +314,26 @@ Arbitrages 9 à 12 (codés le 2026-09-29) :
     `/dump C_TradeSkillUI.GetRecipeSchematic(13626, false).outputItemID` (Enchant Chest - Minor
     Stats, appris) rend **nil**. Un identifiant d'objet à la place = la décision 18 tient sur nos
     données seules, et un enchantement réapparaîtra dès que cet objet aura un prix.
+
+Décision 19 (codée le 2026-11-16, branche `feat/manquantes-filtres-profit-niveau`, dépôts COC et
+outillage) :
+
+15. **Les recettes à apprendre à son rang, en gris, et le clic qui dit où.**
+    `[test]` ✅ Case décochée : les apprises, puis les manquantes dont le niveau est ≤ au rang (égal
+    compris), pas celles au-dessus ni celles de niveau inconnu ; cochée : toutes. Rang inconnu : aucune
+    manquante. Le rang est lu sur le métier ouvert s'il n'est pas donné. Une ligne non apprise emporte
+    son niveau. → `tests/test_profit_view.lua` §2 et §4. Le « où » en une ligne (texte du jeu ramené
+    à une ligne, sinon nature + origine) → `tests/test_missing_filter.lua` §5.
+    `[humain]` ⏳ Forge ouverte, case **décochée** : des lignes **grises** se mêlent aux lignes
+    blanches, triées par l'or comme elles, et aucune ne demande plus que ton rang (survol : « Niveau
+    requis : N » sans « il t'en manque »). *Témoin :* la vue « Manquantes », où les mêmes recettes
+    sont en clair (à portée). Case cochée : des lignes **plus sombres** s'ajoutent, et leur infobulle
+    dit « il t'en manque N ».
+    `[humain]` ⏳ Survol d'une ligne grise : « Pas encore apprise. », le niveau, la source comme dans
+    « Manquantes » (même texte), le prix du plan, et l'invite « Clic : poser un repère sur ce PNJ. »
+    ou « Clic : dire dans le chat où trouver cette recette. ». Clic : le repère se pose (et le chat
+    dit « repère posé : … »), ou UNE ligne de chat donne la source. Une ligne blanche, elle, garde
+    « Clic : ouvrir cette recette. ».
 
 ## Ce qui restait à vérifier — état au 2026-09-21
 

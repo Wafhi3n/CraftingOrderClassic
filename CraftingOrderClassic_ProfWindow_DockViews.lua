@@ -40,6 +40,7 @@ local KIND_TEXT = {
     drop    = function() return L["Butin"] end,
     quest   = function() return L["Quête"] end,
 }
+PW._MissKindText = KIND_TEXT   -- le « où » en une ligne de la vue Profit dit la même nature (_DockMissing_Filter)
 
 local MAP_ICON    = "Interface\\Icons\\INV_Misc_Map_01"
 local SCROLL_ICON = "Interface\\Icons\\INV_Scroll_03"
@@ -132,12 +133,17 @@ function PW:_BuildDockViews()
     -- absente de la colonne, et la case des plans débordait sur la liste.
     self:_BuildRouteBody(rp, rp)
 
-    -- Panneau MANQUANTES : liste simple, tout le détail en infobulle.
+    -- Panneau MANQUANTES : liste simple, tout le détail en infobulle. Son en-tête porte le menu des
+    -- catégories à droite (_DockMissing_Filter) ; le titre a une gauche et une droite sur la MÊME
+    -- ligne que lui, et se tronque par « … » plutôt que de passer dessous.
     local mp = CreateFrame("Frame", nil, host)
     mp:SetAllPoints(rp)
     mp:Hide()
+    if self._BuildMissFilter then self:_BuildMissFilter(mp) end
     local hdr = mp:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    hdr:SetPoint("TOPLEFT", 8, -8); mp.hdr = hdr
+    hdr:SetPoint("LEFT", mp, "TOPLEFT", 8, -13)
+    if mp.dd then hdr:SetPoint("RIGHT", mp.dd, "LEFT", -6, 0) end
+    hdr:SetJustifyH("LEFT"); hdr:SetWordWrap(false); mp.hdr = hdr
     local scroll = Skin.MakeScrollFrameIn(mp)   -- barre fine, se cache seule (palier 7c)
     scroll:SetPoint("TOPLEFT", 6, -24); scroll:SetPoint("BOTTOMRIGHT", -26, 6)
     local content = CreateFrame("Frame", nil, scroll)
@@ -232,6 +238,9 @@ local function missWhere(prof, sid)
     GameTooltip:AddLine(origin.text, 0.8, 0.8, 0.8)
     return origin.pin
 end
+-- La même rédaction dans l'infobulle d'une recette pas apprise de la vue Profit (décision 19 de
+-- docs/specs/rentabilite-forever.md). Rend le repère SEUL, jamais plusieurs valeurs.
+PW._MissWhere = missWhere
 
 local function missTooltip(row)
     -- Le métier vient de la LIGNE, pas de `PW.profKey` : le joueur peut changer d'onglet de métier
@@ -246,6 +255,8 @@ local function missTooltip(row)
     missHead(row, facts)
     missWorth(row, facts)
     row.pin = missWhere(prof, sid)
+    -- Plan dont l'objet est demandé par un writ (D13 de writs-aca.md) : le détail de la vue Profit.
+    if row.writ and PW._AddWritLines then PW._AddWritLines(row.writ) end
     local price = S.SourcePrice and S:SourcePrice(prof, sid)
     if price then GameTooltip:AddLine(L["Prix"] .. " : " .. COC.Api.Coin(price), 1, 1, 1) end
     -- L'invite n'apparait que s'il y a vraiment un repere a poser : annoncer un clic qui ne fait
@@ -271,10 +282,16 @@ local function missRow(i)
     nm:SetPoint("LEFT", ic, "RIGHT", 4, 0); nm:SetJustifyH("LEFT"); nm:SetWordWrap(false); row.nm = nm
     local lv = row:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
     lv:SetPoint("RIGHT", -4, 0); row.lv = lv
+    -- La marque d'un writ, entre le nom et le rang ; cachée tant qu'aucun writ ne demande l'objet.
+    local wr = row:CreateTexture(nil, "ARTWORK"); wr:SetSize(12, 12)
+    wr:SetPoint("RIGHT", lv, "LEFT", -3, 0); wr:Hide(); row.wr = wr
     nm:SetPoint("RIGHT", lv, "LEFT", -4, 0)
     row:SetHighlightTexture("Interface\\Buttons\\UI-Listbox-Highlight", "ADD")
     row:SetScript("OnEnter", missTooltip)
     row:SetScript("OnLeave", GameTooltip_Hide)
+    -- Cette ligne écrit ses propres lignes de writ : l'accroche d'infobulle d'objet (_Writs_Tooltip)
+    -- se tait sur elle, sinon elles sortiraient deux fois.
+    row.cocWritTip = true
     -- Shift-clic = lier l'objet produit en chat, comme n'importe quelle ligne de recette du jeu.
     -- Le lien est posé au SURVOL (missTooltip) : on ne clique pas une ligne sans l'avoir survolée,
     -- et ça évite un `GetRecipeInfo` par ligne à chaque remplissage de la liste.
@@ -300,7 +317,9 @@ end
 function PW:_FillDockMissing()
     local mp = self.missPanel; if not mp then return end
     local S = COC.Sources
-    local list = (S and S:MissingRecipes(self.profKey)) or {}
+    local all = (S and S:MissingRecipes(self.profKey)) or {}
+    -- Le filtre de l'en-tête (_DockMissing_Filter) : la liste AFFICHÉE, celle que le titre compte.
+    local list = self._MissFilterApply and self:_MissFilterApply(mp, all) or all
     -- Niveau inconnu = EN FIN de liste, jamais en tête : trié comme un 0, il passait devant tout ce
     -- que le joueur peut réellement apprendre (vécu en Couture, 8 recettes sans niveau).
     table.sort(list, function(a, b)
@@ -314,12 +333,17 @@ function PW:_FillDockMissing()
     if #list == 0 then mp.msg:SetText(L["Rien ne manque dans ce métier."]) end
     local w = mp.scroll:GetWidth() or 0
     if w > 0 then mp.content:SetWidth(w) end
+    -- Les writs que je porte, lus UNE fois pour toute la liste (comme la vue Profit).
+    local W, mark = COC.Writs, PW._MissMarkWrit
+    local wanted = (W and mark and #list > 0) and W:WantedItems() or nil
+
     for i, e in ipairs(list) do
         local row = missRow(i)
         row.sid, row.rname, row.rlevel = e.spellID, e.name, e.level
         row.rlink, row.pin = nil, nil   -- ligne poolée : rien de la précédente ne survit
         row.prof = self.profKey   -- la ligne emporte le métier qui l'a produite (cf. missTooltip)
         row.ic:SetTexture(ICON[S:SourceKind(self.profKey, e.spellID)] or ICON.unknown)
+        if mark then mark(row, e.itemID, wanted) end
         -- Trois états, pas deux : à portée, hors de portée (grisée), et NIVEAU INCONNU — celle-là
         -- n'est pas grisée (on ne sait pas), mais son « ? » dit qu'on ne promet rien.
         local outOfReach = e.level ~= nil and e.level > rank
