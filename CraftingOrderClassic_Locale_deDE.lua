@@ -232,6 +232,7 @@ local de = {
     ["Commande : %s"] = "Auftrag: %s",
     ["Voici ta commande. Prix convenu : %s."] = "Hier ist dein Auftrag. Vereinbarter Preis: %s.",
     ["Voici ta commande."] = "Hier ist dein Auftrag.",
+    ["Contre-remboursement désactivé par le jeu : le prix convenu est dans le message, à régler par échange."] = "Nachnahme ist im Spiel deaktiviert: Der vereinbarte Preis steht in der Nachricht und wird per Handel bezahlt.",
     ["Recettes"] = "Rezepte", ["Commandes"] = "Aufträge", ["Réactifs :"] = "Materialien:",
     ["Créer"] = "Herstellen", ["Créer tout"] = "Alle herstellen", ["Vue Blizzard"] = "Blizzard-Ansicht",
     ["Sélectionne une recette."] = "Wähle ein Rezept.", ["Produit "] = "Ergibt ",

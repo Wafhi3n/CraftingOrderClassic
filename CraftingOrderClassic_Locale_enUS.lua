@@ -252,6 +252,7 @@ local en = {
     ["Commande : %s"] = "Order: %s",
     ["Voici ta commande. Prix convenu : %s."] = "Here is your order. Agreed price: %s.",
     ["Voici ta commande."] = "Here is your order.",
+    ["Contre-remboursement désactivé par le jeu : le prix convenu est dans le message, à régler par échange."] = "C.O.D. is disabled by the game: the agreed price is in the message, to be paid through a trade.",
     -- Fenêtre métier (ProfWindow)
     ["Recettes"] = "Recipes", ["Commandes"] = "Orders", ["Réactifs :"] = "Reagents:",
     ["Créer"] = "Create", ["Créer tout"] = "Create All", ["Vue Blizzard"] = "Blizzard view",

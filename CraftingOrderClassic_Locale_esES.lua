@@ -233,6 +233,7 @@ local es = {
     ["Commande : %s"] = "Pedido: %s",
     ["Voici ta commande. Prix convenu : %s."] = "Aquí está tu pedido. Precio acordado: %s.",
     ["Voici ta commande."] = "Aquí está tu pedido.",
+    ["Contre-remboursement désactivé par le jeu : le prix convenu est dans le message, à régler par échange."] = "El contra reembolso está desactivado en el juego: el precio acordado está en el mensaje, a pagar mediante comercio.",
     ["Recettes"] = "Recetas", ["Commandes"] = "Pedidos", ["Réactifs :"] = "Reactivos:",
     ["Créer"] = "Crear", ["Créer tout"] = "Crear todo", ["Vue Blizzard"] = "Vista Blizzard",
     ["Sélectionne une recette."] = "Selecciona una receta.", ["Produit "] = "Produce ",
