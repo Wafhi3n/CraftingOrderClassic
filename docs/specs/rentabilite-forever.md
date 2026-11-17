@@ -329,11 +329,11 @@ outillage) :
     requis : N » sans « il t'en manque »). *Témoin :* la vue « Manquantes », où les mêmes recettes
     sont en clair (à portée). Case cochée : des lignes **plus sombres** s'ajoutent, et leur infobulle
     dit « il t'en manque N ». → **Vu le 2026-11-18** (registre, appli du banc, parole du user).
-    `[humain]` ◐ Survol d'une ligne grise : « Pas encore apprise. », le niveau, la source comme dans
+    `[humain]` ✅ Survol d'une ligne grise : « Pas encore apprise. », le niveau, la source comme dans
     « Manquantes » (même texte), le prix du plan, et l'invite « Clic : poser un repère sur ce PNJ. »
     ou « Clic : dire dans le chat où trouver cette recette. ». Clic : le repère se pose (et le chat
     dit « repère posé : … »), ou UNE ligne de chat donne la source. Une ligne blanche, elle, garde
-    « Clic : ouvrir cette recette. ». → **Survol vu le 2026-11-18** (registre) ; **le clic, pas vu**.
+    « Clic : ouvrir cette recette. ». → **Vu le 2026-11-18** (registre, survol et clic).
 
 ## Ce qui restait à vérifier — état au 2026-09-21
 
