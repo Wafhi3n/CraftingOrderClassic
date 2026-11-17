@@ -156,8 +156,49 @@ local function attachItem(itemID, qty)
     end
 end
 
+-- C.O.D. : Blizzard ne le laisse coché que s'il y a un objet joint ET que le jeu l'autorise
+-- (SendMailFrame_Update ; `C_Mail.IsCODEnabled` arrive avec le build 70959, absente avant = autorisé).
+-- Sinon il rebascule la radio sur « Envoyer de l'argent » (SendMailRadioButton_OnClick(1)) SANS vider
+-- le montant : l'artisan PAIERAIT le prix à l'acheteur au lieu de l'encaisser (lu le 2026-11-18).
+local codCopper   -- montant posé par « Remplir » dans le C.O.D., tant que le compositeur le garde
+
+local function codEnabled()
+    local fn = C_Mail and C_Mail.IsCODEnabled
+    if not fn then return true end
+    return fn() and true or false
+end
+
+-- Prix illisible ou rien à joindre (enchant sans itemID) → C.O.D. laissé tel quel, montant à zéro.
+local function prefillCOD(o)
+    local copper = Comp.PriceToCopper(o.price)
+    if not (copper and o.itemID and _G.SendMailCODButton and MoneyInputFrame_SetCopper and _G.SendMailMoney) then
+        return
+    end
+    if not codEnabled() then
+        print("|cFF33DD88Crafting Order|r " .. L["Contre-remboursement désactivé par le jeu : le prix convenu est dans le message, à régler par échange."])
+        return
+    end
+    _G.SendMailCODButton:SetChecked(true)
+    if _G.SendMailSendMoneyButton then _G.SendMailSendMoneyButton:SetChecked(false) end
+    MoneyInputFrame_SetCopper(_G.SendMailMoney, copper)
+    codCopper = copper
+end
+
+-- Filet : si Blizzard rebascule quand même sur « Envoyer de l'argent » (objet introuvable dans les sacs,
+-- onglet quitté puis repris sans pièce jointe), le prix posé par « Remplir » est vidé. Posé par
+-- hooksecurefunc : passe APRÈS l'appel, sans contaminer SendMailFrame_Update qui l'appelle. Un montant
+-- retapé par le joueur n'est pas touché.
+local function onRadio(index)
+    if index ~= 1 or not codCopper then return end
+    local m = _G.SendMailMoney
+    if m and MoneyInputFrame_GetCopper and MoneyInputFrame_GetCopper(m) == codCopper then
+        MoneyInputFrame_SetCopper(m, 0)
+    end
+    codCopper = nil
+end
+
 -- Pré-remplit le compositeur depuis la commande sélectionnée : destinataire + objet + corps + C.O.D.
--- N'ENVOIE PAS (le joueur clique Envoyer). Prix illisible → C.O.D. laissé tel quel.
+-- N'ENVOIE PAS (le joueur clique Envoyer).
 local function fill()
     local o = panel and panel.selected
     if not (o and o.status == "accepted") then return end
@@ -171,12 +212,7 @@ local function fill()
         _G.MailEditBox:SetText(o.price and string.format(L["Voici ta commande. Prix convenu : %s."], o.price)
             or L["Voici ta commande."])
     end
-    local copper = Comp.PriceToCopper(o.price)
-    if copper and _G.SendMailCODButton and MoneyInputFrame_SetCopper and _G.SendMailMoney then
-        _G.SendMailCODButton:SetChecked(true)
-        if _G.SendMailSendMoneyButton then _G.SendMailSendMoneyButton:SetChecked(false) end
-        MoneyInputFrame_SetCopper(_G.SendMailMoney, copper)
-    end
+    prefillCOD(o)
     -- Joint l'objet crafté depuis les sacs (best-effort ; enchant sans itemID → rien à joindre).
     if o.itemID and not alreadyAttached(o.itemID) then
         local wantN = o.qty or 1
@@ -237,6 +273,7 @@ local function build()
 
     -- Hook PASSIF de l'API d'envoi : mémorise le destinataire réel (anti-mismatch si le « À: » change).
     hooksecurefunc("SendMail", function(target) lastSendTarget = Comp.shortName(target or ""):lower() end)
+    if SendMailRadioButton_OnClick then hooksecurefunc("SendMailRadioButton_OnClick", onRadio) end
 end
 
 -- ------------------------------------------------------------------
@@ -316,7 +353,7 @@ f:SetScript("OnEvent", function(_, event)
         if panel then Mail.Update() end
     elseif event == "MAIL_CLOSED" then
         atMailbox, closedAt = false, GetTime()
-        pending = nil
+        pending, codCopper = nil, nil
     elseif event == "MAIL_SEND_SUCCESS" and pending then
         local o = COC.db and COC.db.orders and COC.db.orders[pending.id]
         if o and o.status == "accepted" and o.acceptedBy == me()
