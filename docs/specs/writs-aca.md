@@ -340,6 +340,7 @@ Ce qu'on sait du système, lu le 2026-10-16 dans deux pages Wowhead enregistrée
     donne la fiche de l'objet, le niveau, la source, puis « Demandé par un writ d'artisan (+75 de
     réputation) » et ce qui suit, sans la ligne « Craftsman's Writ: +75 » de l'accroche. Le menu de
     l'en-tête, sur « Writs », ne laisse que ces plans. Témoin : un plan voisin sans writ, sans icône.
+    → **Vu le 2026-11-18** (registre de COC, appli du banc, parole du user).
 
 ## Contrat
 

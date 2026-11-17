@@ -324,16 +324,16 @@ outillage) :
     manquante. Le rang est lu sur le métier ouvert s'il n'est pas donné. Une ligne non apprise emporte
     son niveau. → `tests/test_profit_view.lua` §2 et §4. Le « où » en une ligne (texte du jeu ramené
     à une ligne, sinon nature + origine) → `tests/test_missing_filter.lua` §5.
-    `[humain]` ⏳ Forge ouverte, case **décochée** : des lignes **grises** se mêlent aux lignes
+    `[humain]` ✅ Forge ouverte, case **décochée** : des lignes **grises** se mêlent aux lignes
     blanches, triées par l'or comme elles, et aucune ne demande plus que ton rang (survol : « Niveau
     requis : N » sans « il t'en manque »). *Témoin :* la vue « Manquantes », où les mêmes recettes
     sont en clair (à portée). Case cochée : des lignes **plus sombres** s'ajoutent, et leur infobulle
-    dit « il t'en manque N ».
-    `[humain]` ⏳ Survol d'une ligne grise : « Pas encore apprise. », le niveau, la source comme dans
+    dit « il t'en manque N ». → **Vu le 2026-11-18** (registre, appli du banc, parole du user).
+    `[humain]` ◐ Survol d'une ligne grise : « Pas encore apprise. », le niveau, la source comme dans
     « Manquantes » (même texte), le prix du plan, et l'invite « Clic : poser un repère sur ce PNJ. »
     ou « Clic : dire dans le chat où trouver cette recette. ». Clic : le repère se pose (et le chat
     dit « repère posé : … »), ou UNE ligne de chat donne la source. Une ligne blanche, elle, garde
-    « Clic : ouvrir cette recette. ».
+    « Clic : ouvrir cette recette. ». → **Survol vu le 2026-11-18** (registre) ; **le clic, pas vu**.
 
 ## Ce qui restait à vérifier — état au 2026-09-21
 

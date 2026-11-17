@@ -46,6 +46,19 @@ client.
 
 ## Relevés
 
+- 2026-11-18 00:11 — jusqu'a ddd3809 — Forever 1.60.1.70938, solo, forgeron (client anglais) ; build
+  `main-dev@3ef7955 2026-11-18 00:08` lu par l'appli du banc dans la copie déployée (la branche
+  `feat/manquantes-filtres-profit-niveau` y est listée, ddd3809 est un ancêtre de 3ef7955), fiche
+  `CraftingOrderClassic--feat-manquantes-filtres-profit-niveau` — **GO partiel** (6 gestes sur 7
+  cochés OK, sans remarque, sur la parole du user) : vue Missing, menu de l'en-tête avec « All »,
+  « Writs » et les catégories de la liste des plans, chacune comptée ; filtre par catégorie qui garde
+  l'ordre par niveau, choix gardé par métier ; icône de writ sur un plan demandé par un writ, détail
+  au survol, filtre « Writs » ; vue Profit, case décochée, plans pas appris à portée du rang en gris
+  parmi les autres (infobulle « Not learned yet. », niveau, source, prix) ; case cochée, plans hors de
+  portée plus sombres, infobulle de la case ; en combat, changement de filtre refusé avec son message.
+  **Pas vu** : le clic sur une ligne grise de Profit (repère sur le PNJ ou ligne de chat avec la
+  source), geste laissé sans réponse.
+
 - 2026-11-13 14:39 — jusqu'a 2fd15f9 — Forever 1.60.1.70938, solo, forgeron (Forge 185/225) ; build
   `main-dev@c86a357 2026-11-13 14:32`, `## Version: 1.53.0` (lu par l'appli du banc dans la copie
   déployée, fiche `CraftingOrderClassic--release-v1.53.0`) — **GO sur le candidat v1.53.0**, qui
