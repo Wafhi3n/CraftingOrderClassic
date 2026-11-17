@@ -233,10 +233,13 @@ local de3 = {
         "Das X am Ende der Verfolgung blendet sie ganz aus; das Kästchen „Bildschirm-Verfolgung“ im Reiter Route holt sie zurück.",
     -- Vue Profit : bascule « tout le métier », source du prix, coupe HV, Enchantement par le coût (2026-09-29)
     ["Tout le métier"] = "Ganzer Beruf",
-    ["Ajoute, en gris, les recettes que tu n'as pas encore apprises."] =
-        "Fügt die Rezepte, die du noch nicht gelernt hast, in Grau hinzu.",
-    ["Pas encore apprise : la vue « Manquantes » dit où l'apprendre."] =
-        "Noch nicht gelernt: Die Ansicht „Fehlend“ zeigt, wo du es lernst.",
+    -- Vue Profit : les recettes à apprendre à son rang, le clic qui dit où (décision 19, 2026-11-16)
+    ["Ajoute aussi, en gris, les recettes que ton rang ne permet pas encore d'apprendre."] =
+        "Zeigt zusätzlich, in Grau, die Rezepte, für die dein Skill noch nicht reicht.",
+    ["Pas encore apprise."] = "Noch nicht gelernt.",
+    ["Clic : dire dans le chat où trouver cette recette."] = "Klick: im Chat anzeigen, wo es dieses Rezept gibt.",
+    -- Vue Manquantes : le filtre par catégorie (2026-11-16)
+    ["Writs"] = "Aufträge",
     ["Vente (prix marchand)"] = "Verkauf (Händlerpreis)",
     ["Coupe HV (%d %%)"] = "AH-Gebühr (%d %%)",
     ["Un marchand vend cet objet : l'HV ne le paiera pas plus cher."] =

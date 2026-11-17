@@ -13,10 +13,13 @@
 -- déjà payé ~800 actions de barres d'action refusées pour cette leçon). Elle liste à CÔTÉ, dans
 -- notre colonne, et le clic repasse la main au jeu par sa propre voie (cf. openRecipe).
 --
--- Elle s'ouvre sur les recettes APPRISES du métier ouvert, et seulement celles qui RAPPORTENT. La
--- case « Tout le métier » y ajoute, en gris, celles qu'on n'a pas apprises (arbitrage 9) : « que
--- rapporterait-elle » ; « où l'apprendre » reste la vue « Manquantes ». Une recette à perte n'affiche
--- rien — une ligne avec un nom et une colonne vide ne dit pas « à perte », elle dit « prix inconnu ».
+-- Elle liste les recettes du métier ouvert qui RAPPORTENT : celles qu'on a apprises, et, EN GRIS,
+-- celles qu'on n'a pas mais que son rang permet déjà d'apprendre (décision 19 du user, 2026-11-16,
+-- qui amende l'arbitrage 9). La case « Tout le métier » y ajoute les autres, hors de portée ou de
+-- niveau inconnu, plus sombres. Une ligne grise dit OÙ aller chercher la recette, au survol, et le
+-- clic pose le repère sur le PNJ (ou l'écrit dans le chat quand on n'a pas sa position). Une recette
+-- à perte n'affiche rien — une ligne avec un nom et une colonne vide ne dit pas « à perte », elle dit
+-- « prix inconnu ».
 --
 -- L'ENCHANTEMENT se lit comme les autres métiers, par le PROFIT (décision 18 du user, 2026-11-10,
 -- qui renverse les arbitrages 12 et 13) : un enchantement n'est pas un objet, il ne se vend pas à
@@ -66,8 +69,8 @@ end
 -- « Tout le métier » : la case vit sur la ligne du titre, à DROITE, libellé à GAUCHE de la boîte
 -- pour que la boîte tienne le bord. Le titre s'arrête contre le libellé et se tronque par « … »
 -- plutôt que de passer dessous : la colonne est étroite, et sa largeur change d'un mode à l'autre.
--- État de SESSION, pas de préférence enregistrée : la liste s'ouvre sur ce qu'on sait fabriquer
--- (arbitrage 9) et la spec ne touche à aucun schéma persisté (décision 4).
+-- État de SESSION, pas de préférence enregistrée : la liste s'ouvre sur ce qu'on peut fabriquer ou
+-- apprendre à son rang (décision 19) et la spec ne touche à aucun schéma persisté (décision 4).
 local function buildAllToggle(pp)
     local chk = Skin.MakeCheckButton(pp, L["Tout le métier"], 16)
     chk.text:ClearAllPoints(); chk.text:SetPoint("RIGHT", chk, "LEFT", -2, 0)
@@ -83,7 +86,8 @@ local function buildAllToggle(pp)
     end)
     chk:SetScript("OnEnter", function(b)
         GameTooltip:SetOwner(b, "ANCHOR_RIGHT")
-        GameTooltip:SetText(L["Ajoute, en gris, les recettes que tu n'as pas encore apprises."], 1, 1, 1, 1, true)
+        GameTooltip:SetText(L["Ajoute aussi, en gris, les recettes que ton rang ne permet pas encore d'apprendre."],
+            1, 1, 1, 1, true)
         GameTooltip:Show()
     end)
     chk:SetScript("OnLeave", GameTooltip_Hide)
@@ -186,9 +190,46 @@ local function addWritLines(m)
 end
 PW._AddWritLines = addWritLines   -- la même rédaction dans l'infobulle d'une étape de route (_Route_Writs)
 
+-- Une recette PAS ENCORE APPRISE : le rang qu'elle demande, et où aller la chercher (décision 19).
+-- Le « où » est celui de la vue « Manquantes », mot pour mot (PW._MissWhere) : deux vues qui disent
+-- deux choses sur la même recette en disent une de trop. Le repère éventuel est retenu pour le clic.
+local function addWhere(row)
+    GameTooltip:AddLine(" ")
+    GameTooltip:AddLine(L["Pas encore apprise."], 0.7, 0.7, 0.7)
+    local lvl = row.rlevel
+    local rank = (COC.Craft and COC.Craft.OpenRank) and COC.Craft:OpenRank() or nil
+    if lvl then
+        local miss = (rank and lvl > rank) and (lvl - rank) or nil
+        GameTooltip:AddLine(string.format(L["Niveau requis : %d"], lvl)
+            .. (miss and (" |cFFFF6666" .. string.format(L["il t'en manque %d"], miss) .. "|r") or ""),
+            LBL_R, LBL_G, LBL_B)
+    end
+    local S = COC.Sources
+    if not (S and PW._MissWhere) then return end
+    row.pin = PW._MissWhere(row.prof, row.sid)
+    local price = S.SourcePrice and S:SourcePrice(row.prof, row.sid)
+    if price then GameTooltip:AddLine(L["Prix"] .. " : " .. COC.Api.Coin(price), 1, 1, 1) end
+end
+
+-- Ce que fait le clic, dit seulement s'il fait quelque chose (même règle que « Manquantes »).
+local function clickHint(row)
+    if not row.unlearned then return L["Clic : ouvrir cette recette."] end
+    if row.pin then return L["Clic : poser un repère sur ce PNJ."] end
+    if COC.Sources and PW._MissWhereText then return L["Clic : dire dans le chat où trouver cette recette."] end
+    return nil
+end
+
 local function profitTooltip(row)
     local p = row.p
     if not (p and COC.Profit) then return end
+    -- Une recette pas apprise arrive sans lien (le lecteur des manquantes n'en a pas) : on le
+    -- demande au client au survol, comme la vue « Manquantes » (il le rend même non apprise). Il
+    -- sert aussi au Maj-clic.
+    local C = COC.Craft
+    if row.unlearned and not row.rlink and C and C.RecipeFacts then
+        local f = C:RecipeFacts(row.sid)
+        row.rlink = f and f.link or nil
+    end
     GameTooltip:SetOwner(row, "ANCHOR_LEFT")
     -- ⚠️ `SetHyperlink` SOUS pcall, comme les autres appels du dépôt : un lien que le client refuse
     -- lève, et ici l'erreur emporterait tout ce qui suit — jusqu'au `Show()` final. Le joueur
@@ -205,10 +246,9 @@ local function profitTooltip(row)
         GameTooltip:AddLine(L["Un réactif sans prix : coût sous-estimé."], 0.91, 0.72, 0.29, true)
     end
     if row.writ then addWritLines(row.writ) end
-    if row.unlearned then
-        GameTooltip:AddLine(L["Pas encore apprise : la vue « Manquantes » dit où l'apprendre."], 0.7, 0.7, 0.7, true)
-    end
-    GameTooltip:AddLine(L["Clic : ouvrir cette recette."], 0.55, 0.75, 0.55)
+    if row.unlearned then addWhere(row) end
+    local hint = clickHint(row)
+    if hint then GameTooltip:AddLine(hint, 0.55, 0.75, 0.55) end
     GameTooltip:Show()
 end
 
@@ -221,6 +261,17 @@ local function openRecipe(spellID)
     local open = C_TradeSkillUI and C_TradeSkillUI.OpenRecipe
     if not (spellID and open) then return end
     pcall(open, spellID)
+end
+
+-- Le clic sur une recette PAS ENCORE APPRISE (décision 19) : l'ouvrir dans la fenêtre native ne dit
+-- pas où l'apprendre. On pose le repère sur le PNJ quand on a sa position (le poseur écrit lui-même
+-- « repère posé : … »), sinon UNE ligne de chat dit où la chercher — une réponse au clic du joueur,
+-- jamais un message spontané. Le repère est celui que le SURVOL a résolu (cf. addWhere).
+local function tellWhere(row)
+    if row.pin and PW._SetNpcPin then PW:_SetNpcPin(row.pin); return end
+    local txt = COC.Sources and PW._MissWhereText and PW._MissWhereText(row.prof, row.sid)
+    if not txt then return end
+    print("|cFF33DD88Crafting Order|r " .. (row.rname or "?") .. " : " .. txt)
 end
 
 local function profitRow(i)
@@ -251,13 +302,14 @@ local function profitRow(i)
     -- se tait sur elle, sinon elles sortiraient deux fois.
     row.cocWritTip = true
     -- Deux gestes, les mêmes que sur toute ligne de recette du jeu : Maj pour lier l'objet en chat,
-    -- clic simple pour aller le voir dans la fenêtre native.
+    -- clic simple pour aller le voir dans la fenêtre native — ou, recette pas apprise, savoir où
+    -- aller l'apprendre.
     row:RegisterForClicks("LeftButtonUp")
     row:SetScript("OnClick", function(r)
         if IsShiftKeyDown() then
             if r.rlink and ChatEdit_InsertLink then ChatEdit_InsertLink(r.rlink) end
         else
-            openRecipe(r.sid)
+            if r.unlearned then tellWhere(r) else openRecipe(r.sid) end
         end
     end)
     pp.rows[i] = row
@@ -268,18 +320,22 @@ end
 -- La liste (pure : aucun cadre, testée par tests/test_profit_view.lua)
 -- ------------------------------------------------------------------
 
--- Les entrées à évaluer : les recettes APPRISES de la session ouverte, puis, case cochée, celles
--- qu'on n'a pas apprises (le même lecteur que la vue « Manquantes », pour qu'elles ne se contredisent
--- pas sur ce qui manque).
-function PW:_ProfitEntries(all)
+-- Les entrées à évaluer : les recettes APPRISES de la session ouverte, puis celles qu'on n'a pas
+-- apprises (le même lecteur que la vue « Manquantes », pour qu'elles ne se contredisent pas sur ce
+-- qui manque). Décision 19 : par défaut, seulement celles que le rang `rank` permet d'apprendre ; la
+-- case (`all`) ajoute les autres. Un niveau INCONNU ne passe qu'avec la case : on ne promet pas
+-- qu'une recette est à portée sans le savoir. `rank` est lu sur le métier ouvert s'il n'est pas donné.
+function PW:_ProfitEntries(all, rank)
     if self._EnsureRecipesForRoute then self:_EnsureRecipesForRoute() end
     local out = {}
     for _, e in ipairs(self.recipes or {}) do
         if not e.isMissing then out[#out + 1] = e end
     end
-    local S = all and COC.Sources
-    if S then
-        for _, m in ipairs(S:MissingRecipes(self.profKey) or {}) do out[#out + 1] = m end
+    local S = COC.Sources
+    if not S then return out end
+    if rank == nil and COC.Craft and COC.Craft.OpenRank then rank = COC.Craft:OpenRank() end
+    for _, m in ipairs(S:MissingRecipes(self.profKey) or {}) do
+        if all or (rank and m.level and m.level <= rank) then out[#out + 1] = m end
     end
     return out
 end
@@ -300,7 +356,8 @@ function PW:_ProfitList(PR, profKey, entries, costMode)
             -- trait à celui d'une recette qui ne rapporte rien (choix du user, 2026-09-21).
             if amount and amount > 0 then
                 out[#out + 1] = { sid = sid, name = e.name, link = e.link, icon = e.icon, p = p,
-                                  amount = amount, unlearned = e.isMissing and true or false }
+                                  amount = amount, unlearned = e.isMissing and true or false,
+                                  level = e.isMissing and e.level or nil }
             end
         end
     end
@@ -343,15 +400,21 @@ local function markWrit(row, e, costMode, wanted)
     row.nm:SetPoint("RIGHT", m and row.wr or row.val, "LEFT", -4, 0)
 end
 
-local function fillRow(row, e, costMode, wanted)
+-- `ctx` = ce qui vaut pour toute la liste : { costMode, wanted, rank, prof }.
+local function fillRow(row, e, ctx)
     row.sid, row.rname, row.rlink, row.p = e.sid, e.name, e.link, e.p
-    markWrit(row, e, costMode, wanted)
-    row.costMode, row.unlearned = costMode, e.unlearned
+    markWrit(row, e, ctx.costMode, ctx.wanted)
+    row.costMode, row.unlearned, row.rlevel = ctx.costMode, e.unlearned, e.level
+    row.prof, row.pin = ctx.prof, nil   -- le métier part avec la ligne ; le repère se résout au survol
     row.ic:SetTexture(e.icon or NO_ICON)
     row.ic:SetDesaturated(e.unlearned)
     row.nm:SetText(e.name or "?")
     -- Une recette NON apprise se voit au premier coup d'œil (arbitrage 9) : nom gris, icône éteinte.
-    if e.unlearned then row.nm:SetTextColor(0.6, 0.6, 0.6) else row.nm:SetTextColor(1, 1, 1) end
+    -- Plus sombre encore hors de portée de son rang (elle n'est là que par la case, décision 19).
+    local far = e.unlearned and not (e.level and ctx.rank and e.level <= ctx.rank)
+    if far then row.nm:SetTextColor(0.45, 0.45, 0.45)
+    elseif e.unlearned then row.nm:SetTextColor(0.6, 0.6, 0.6)
+    else row.nm:SetTextColor(1, 1, 1) end
     -- VALEUR EXACTE, pas le palier compact des pièces/étoiles : dans une liste dont le tri EST le
     -- montant, deux lignes qui affichent la même icône en se suivant font passer le classement pour
     -- arbitraire. ARRONDI À L'ENTIER : la coupe de l'HV (×0,95) rend un cuivre FRACTIONNAIRE, et le
@@ -367,7 +430,8 @@ function PW:_FillDockProfit()
     local pp = self.profitPanel; if not pp then return end
     local PR = oracle()
     local costMode = self:_ProfitCostMode(self.profKey)
-    local list = PR and self:_ProfitList(PR, self.profKey, self:_ProfitEntries(self._profitAll), costMode) or {}
+    local rank = (COC.Craft and COC.Craft.OpenRank) and COC.Craft:OpenRank() or nil
+    local list = PR and self:_ProfitList(PR, self.profKey, self:_ProfitEntries(self._profitAll, rank), costMode) or {}
     pp.allChk:SetChecked(self._profitAll and true or false)
     local title = costMode and L["Coût à lancer (%d)"] or L["Rentables (%d)"]
     pp.hdr:SetText("|cFFE8B84B" .. string.format(title, #list) .. "|r")
@@ -380,7 +444,8 @@ function PW:_FillDockProfit()
     -- Les writs que je porte, lus UNE fois pour toute la liste (D7) : chaque ligne y cherche son objet.
     local W = COC.Writs
     local wanted = (W and not costMode and #list > 0) and W:WantedItems() or nil
-    for i, e in ipairs(list) do fillRow(profitRow(i), e, costMode, wanted) end
+    local ctx = { costMode = costMode, wanted = wanted, rank = rank, prof = self.profKey }
+    for i, e in ipairs(list) do fillRow(profitRow(i), e, ctx) end
     for i = #list + 1, #pp.rows do
         pp.rows[i]:Hide(); pp.rows[i].sid, pp.rows[i].p, pp.rows[i].writ = nil, nil, nil
     end

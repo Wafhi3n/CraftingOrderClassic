@@ -16,6 +16,9 @@
 > **2026-11-13** : la même marque **dans le Plan de route** (D12, T9), et une case qui y privilégie
 > les objets de writ (décision 13 de `route-cout-net.md`). Branche `feat/route-writs` (COC et
 > outillage).
+> **2026-11-16** : la même marque **dans la vue « Manquantes »** (D13), et une entrée « Writs » dans
+> son nouveau filtre par catégorie. Branche `feat/manquantes-filtres-profit-niveau` (COC et
+> outillage).
 
 ## Le problème
 
@@ -87,6 +90,9 @@ Ce qu'on sait du système, lu le 2026-10-16 dans deux pages Wowhead enregistrée
    dans la vue Profit (pleine si tu portes le writ, éteinte sinon), et son infobulle les mêmes lignes.
    Une case « Privilégier les writs » fait passer ces recettes devant à coût proche : leurs objets se
    revendent vite à l'HdV. (D12)
+10. **Dans la vue « Manquantes »**, un plan qu'on n'a pas et dont l'objet est demandé par un writ
+   porte la même icône, entre le nom et le rang, et son infobulle les mêmes lignes. Le filtre de la
+   vue a une entrée « Writs » qui ne garde que ces plans. (D13)
 
 ## Ce qu'on ne fait PAS
 
@@ -213,6 +219,16 @@ Ce qu'on sait du système, lu le 2026-10-16 dans deux pages Wowhead enregistrée
   par `ItemMark` (les writs de CET objet), jamais par `WantedItems()` : la route se repeint chaque
   seconde. L'objet est celui de l'étape (produit CraftLink), comme son icône et son nom. La case et
   son seuil sont la décision 13 de `route-cout-net.md`.
+- **D13 (demande du user, 2026-11-16)** : dans la vue « Manquantes », « rajouter les filtres de la
+  liste des plans, et si ça fait partie d'un writ, avec l'icône ». La marque est celle de la vue
+  Profit (`W:ProfitMark`, `WantedItems()` lu UNE fois par remplissage : la vue ne se repeint qu'à
+  l'ouverture, au changement de métier ou de filtre), posée entre le nom et le rang ; l'infobulle
+  reprend `PW._AddWritLines` et la ligne porte `cocWritTip`. L'objet est le produit CraftLink du
+  plan (`MissingRecipes` → `itemID`). Le filtre « Writs » garde les plans dont l'objet figure dans
+  la table des writs (`W:ForItem`), porté ou non. Le reste du filtre (catégories de la liste des
+  plans, menu plutôt que sections, choix par métier) est décrit dans l'en-tête de
+  `CraftingOrderClassic_ProfWindow_DockMissing_Filter.lua`, qui porte aussi la marque ; la vue
+  elle-même reste dans `_ProfWindow_DockViews.lua`, que les branches du banc retouchent.
 
 ## Critères d'acceptation
 
@@ -312,6 +328,19 @@ Ce qu'on sait du système, lu le 2026-10-16 dans deux pages Wowhead enregistrée
     « Demandé par un writ d'artisan (+75 de réputation) » et ce qui suit, la ligne « Craftsman's
     Writ: +75 » de l'accroche n'y figurant pas. Témoin : une étape voisine sans writ, sans icône, nom
     non tronqué plus tôt que d'habitude.
+
+**La vue « Manquantes » (2026-11-16, D13) :**
+
+22. [test] Le filtre « Writs » ne garde que les plans dont l'objet est demandé par un writ, l'entrée
+    n'existe que s'il y en a, et le menu les compte ; sans module Writs, rien ne lève. →
+    `tests/test_missing_filter.lua` §2 et §3. (La marque elle-même lit `W:ProfitMark`, déjà verrouillé
+    par `tests/test_writs.lua`.)
+23. [humain] Vue « Manquantes » de la Forge (ou d'un autre des cinq métiers à writ) : un plan dont
+    l'objet est demandé par un writ porte l'icône, éteinte sauf si tu portes ce writ ; son survol
+    donne la fiche de l'objet, le niveau, la source, puis « Demandé par un writ d'artisan (+75 de
+    réputation) » et ce qui suit, sans la ligne « Craftsman's Writ: +75 » de l'accroche. Le menu de
+    l'en-tête, sur « Writs », ne laisse que ces plans. Témoin : un plan voisin sans writ, sans icône.
+    → **Vu le 2026-11-18** (registre de COC, appli du banc, parole du user).
 
 ## Contrat
 

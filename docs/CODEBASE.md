@@ -4,7 +4,7 @@
 > relancer le script (deploy.ps1 le fait) après un changement de structure. Source de chaque
 > rubrique : le `.toc` (ordre de chargement) et les commentaires d'en-tête des fichiers eux-mêmes.
 
-173 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
+175 modules + 3 entrée(s) Libs (CraftLink embarquée, documentée dans son repo).
 
 ## Modules (ordre de chargement)
 
@@ -17,13 +17,13 @@
 | `CraftingOrderClassic_Locale.lua` | socle de localisation du CHROME de l'UI. | 12 |
 | `CraftingOrderClassic_Locale_enUS.lua` | overlay ANGLAIS (enUS/enGB). | 279 |
 | `CraftingOrderClassic_Locale_enUS_2.lua` | overlay enUS, 2/2. | 498 |
-| `CraftingOrderClassic_Locale_enUS_3.lua` | overlay enUS, 3/3. | 263 |
+| `CraftingOrderClassic_Locale_enUS_3.lua` | overlay enUS, 3/3. | 266 |
 | `CraftingOrderClassic_Locale_deDE.lua` | overlay ALLEMAND (deDE). | 280 |
 | `CraftingOrderClassic_Locale_deDE_2.lua` | overlay deDE, 2/2. | 479 |
-| `CraftingOrderClassic_Locale_deDE_3.lua` | overlay deDE, 3/3. | 262 |
+| `CraftingOrderClassic_Locale_deDE_3.lua` | overlay deDE, 3/3. | 265 |
 | `CraftingOrderClassic_Locale_esES.lua` | overlay ESPAGNOL (esES/esMX). | 281 |
 | `CraftingOrderClassic_Locale_esES_2.lua` | overlay esES, 2/2. | 480 |
-| `CraftingOrderClassic_Locale_esES_3.lua` | overlay esES, 3/3. | 263 |
+| `CraftingOrderClassic_Locale_esES_3.lua` | overlay esES, 3/3. | 266 |
 | `CraftingOrderClassic_Locale_News_enUS.lua` | traductions de l'onglet « Nouveautés » (enUS/enGB). | 441 |
 | `CraftingOrderClassic_Locale_News_deDE.lua` | traductions de l'onglet « Nouveautés » (deDE). | 438 |
 | `CraftingOrderClassic_Locale_News_esES.lua` | traductions de l'onglet « Nouveautés » (esES). | 438 |
@@ -119,8 +119,10 @@
 | `CraftingOrderClassic_ProfWindow_Route_Writs.lua` | les Craftsman's Writ dans le Plan de route (demande du user, 2026-11-13 : « tout comme Profit, il faudrait que dans Route on voie si un des plans a un writ, et une option pour privilégier les writs car ça se revend vite à l'HV ») :   · la MARQUE d'une étape dont l'objet est demandé par un writ, la même que dans la vue Profit ;   · la case « Privilégier les writs », qui biaise le choix de la route (COC.Route, preferWrit). | 84 |
 | `CraftingOrderClassic_ProfWindow_Route_Supply.lua` | ce qui se peint SOUS les segments du plan de route : le bloc « FOURNITURES » (composants agrégés de toute la route, plans à acheter) et, quand le rang est AU PLAFOND, le bloc « débloquer le palier suivant » (livre de rang curaté, ou renvoi vers le formateur de métier). | 131 |
 | `CraftingOrderClassic_ProfWindow_Learn.lua` | section « À apprendre maintenant » du Plan de route : les recettes NON APPRISES que ton rang permet déjà d'apprendre ET qui rapportent encore un point, classées par coût espéré par point, avec l'icône de leur source. | 114 |
-| `CraftingOrderClassic_ProfWindow_DockViews.lua` | la colonne Commandes CHANGE DE CONTENU au lieu d'ouvrir des fenêtres par-dessus. | 460 |
-| `CraftingOrderClassic_ProfWindow_DockProfit.lua` | la 4ᵉ vue de la colonne : « Profit ». | 388 |
+| `CraftingOrderClassic_ProfWindow_DockViews.lua` | la colonne Commandes CHANGE DE CONTENU au lieu d'ouvrir des fenêtres par-dessus. | 357 |
+| `CraftingOrderClassic_ProfWindow_DockTabs.lua` | la RANGÉE DE LANGUETTES des vues de la colonne (Commandes · Route · Manquantes · Profit) : sa construction, sa place, sa largeur, et la synchro qui décide quand elle s'affiche. | 143 |
+| `CraftingOrderClassic_ProfWindow_DockMissing_Filter.lua` | le FILTRE et la marque des WRITS de la vue « Manquantes » de la colonne (la vue elle-même vit dans _DockViews.lua). | 198 |
+| `CraftingOrderClassic_ProfWindow_DockProfit.lua` | la 4ᵉ vue de la colonne : « Profit ». | 453 |
 | `CraftingOrderClassic_ProfWindow_Trade.lua` | le mode ÉCHANGE de la colonne de métier (T3). | 277 |
 | `CraftingOrderClassic_ProfWindow_Geo.lua` | `/co geo` : le RELEVÉ de la colonne, en pixels écran, écrit dans la SavedVariable pour être relu HORS DU JEU. | 262 |
 | `CraftingOrderClassic_ProfWindow_Detail.lua` | colonne CENTRE : détail de la recette sélectionnée (icône, réactifs have/need) + boutons Créer / Créer tout. | 279 |
@@ -2217,6 +2219,7 @@
 > CraftingOrderClassic_ProfWindow_DockViews.lua — la colonne Commandes CHANGE DE CONTENU au lieu
 > d'ouvrir des fenêtres par-dessus. Trois vues, deux boutons dans son en-tête :
 >   · Commandes (défaut)   · Plan de route   · Manquantes
+> (la rangée de languettes qui les choisit vit dans _DockTabs.lua, la 4ᵉ vue dans _DockProfit.lua)
 > 
 > POURQUOI. Greffée dans la fenêtre native de Forever, la colonne est haute, étroite et le plus
 > souvent presque vide — « Orders (0) » et vingt centimètres de marbre. Faire surgir une fenêtre
@@ -2232,6 +2235,37 @@
 > `Show`/`Hide` sur ses enfants sont donc refusés en combat (piège wow-protected-frame-hide-combat,
 > reconfirmé sur Forever). Changer de vue est un geste de confort, jamais urgent : on le refuse
 > franchement, avec un mot, plutôt que de laisser le jeu bloquer l'action sans explication.
+
+### `CraftingOrderClassic_ProfWindow_DockTabs.lua`
+> CraftingOrderClassic_ProfWindow_DockTabs.lua — la RANGÉE DE LANGUETTES des vues de la colonne
+> (Commandes · Route · Manquantes · Profit) : sa construction, sa place, sa largeur, et la synchro
+> qui décide quand elle s'affiche. Extraite de _DockViews.lua (anti-monolithe, 2026-11-16) : la
+> bascule de vue et les panneaux restent là-bas. Ce bloc-ci a été choisi parce qu'AUCUNE branche en
+> cours ne le touche, alors que les branches du banc retouchent la vue « Manquantes » : déplacer le
+> code qu'elles éditent aurait rouvert un conflit à chaque refusion du banc.
+> 
+> ⚠️ LE COMBAT : mêmes règles que _DockViews (colonne greffée = protégée comme son hôte).
+
+### `CraftingOrderClassic_ProfWindow_DockMissing_Filter.lua`
+> CraftingOrderClassic_ProfWindow_DockMissing_Filter.lua — le FILTRE et la marque des WRITS de la
+> vue « Manquantes » de la colonne (la vue elle-même vit dans _DockViews.lua).
+> 
+> LE FILTRE (demande du user, 2026-11-16) : un menu dans l'en-tête, avec les CATÉGORIES de la liste
+> des plans de l'onglet Commande (« Poignets · Mailles », « Hache à une main »…) et « Writs ».
+> Un menu et pas des sections repliables (choix du user, même jour) : la liste garde son ordre de
+> progression, le filtre ne fait que la resserrer. La catégorie est celle de la liste des plans,
+> calculée par le MÊME code (RecipeCats.SectionForSpell, puis COC.SectionOf) : les deux listes ne
+> peuvent pas se contredire sur ce qu'est une pièce. Le choix vit le temps de la session, par
+> métier : « Mailles » choisi en Forge ne vide pas la Couture.
+> 
+> LES WRITS (D13 de docs/specs/writs-aca.md) : la ligne d'un plan dont l'objet est demandé par un
+> Craftsman's Writ porte l'icône du writ, pleine si JE le porte, éteinte sinon — la même marque que
+> la vue Profit (D7), et le même détail au survol (PW._AddWritLines, appelé par la vue).
+> 
+> POURQUOI UN FICHIER À PART : les branches du banc retouchent le code de la vue dans _DockViews.lua ;
+> ce qui est neuf vit ici, et la vue n'y gagne que quelques appels, loin de leurs lignes.
+> Le cœur (catégories, menu, filtre, choix, « où » en une ligne) est PUR : testé sans client par
+> tests/test_missing_filter.lua.
 
 ### `CraftingOrderClassic_ProfWindow_DockProfit.lua`
 > CraftingOrderClassic_ProfWindow_DockProfit.lua — la 4ᵉ vue de la colonne : « Profit ».
@@ -2249,10 +2283,13 @@
 > déjà payé ~800 actions de barres d'action refusées pour cette leçon). Elle liste à CÔTÉ, dans
 > notre colonne, et le clic repasse la main au jeu par sa propre voie (cf. openRecipe).
 > 
-> Elle s'ouvre sur les recettes APPRISES du métier ouvert, et seulement celles qui RAPPORTENT. La
-> case « Tout le métier » y ajoute, en gris, celles qu'on n'a pas apprises (arbitrage 9) : « que
-> rapporterait-elle » ; « où l'apprendre » reste la vue « Manquantes ». Une recette à perte n'affiche
-> rien — une ligne avec un nom et une colonne vide ne dit pas « à perte », elle dit « prix inconnu ».
+> Elle liste les recettes du métier ouvert qui RAPPORTENT : celles qu'on a apprises, et, EN GRIS,
+> celles qu'on n'a pas mais que son rang permet déjà d'apprendre (décision 19 du user, 2026-11-16,
+> qui amende l'arbitrage 9). La case « Tout le métier » y ajoute les autres, hors de portée ou de
+> niveau inconnu, plus sombres. Une ligne grise dit OÙ aller chercher la recette, au survol, et le
+> clic pose le repère sur le PNJ (ou l'écrit dans le chat quand on n'a pas sa position). Une recette
+> à perte n'affiche rien — une ligne avec un nom et une colonne vide ne dit pas « à perte », elle dit
+> « prix inconnu ».
 > 
 > L'ENCHANTEMENT se lit comme les autres métiers, par le PROFIT (décision 18 du user, 2026-11-10,
 > qui renverse les arbitrages 12 et 13) : un enchantement n'est pas un objet, il ne se vend pas à

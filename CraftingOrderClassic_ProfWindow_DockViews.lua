@@ -1,6 +1,7 @@
 -- CraftingOrderClassic_ProfWindow_DockViews.lua — la colonne Commandes CHANGE DE CONTENU au lieu
 -- d'ouvrir des fenêtres par-dessus. Trois vues, deux boutons dans son en-tête :
 --   · Commandes (défaut)   · Plan de route   · Manquantes
+-- (la rangée de languettes qui les choisit vit dans _DockTabs.lua, la 4ᵉ vue dans _DockProfit.lua)
 --
 -- POURQUOI. Greffée dans la fenêtre native de Forever, la colonne est haute, étroite et le plus
 -- souvent presque vide — « Orders (0) » et vingt centimètres de marbre. Faire surgir une fenêtre
@@ -39,6 +40,7 @@ local KIND_TEXT = {
     drop    = function() return L["Butin"] end,
     quest   = function() return L["Quête"] end,
 }
+PW._MissKindText = KIND_TEXT   -- le « où » en une ligne de la vue Profit dit la même nature (_DockMissing_Filter)
 
 local MAP_ICON    = "Interface\\Icons\\INV_Misc_Map_01"
 local SCROLL_ICON = "Interface\\Icons\\INV_Scroll_03"
@@ -131,12 +133,17 @@ function PW:_BuildDockViews()
     -- absente de la colonne, et la case des plans débordait sur la liste.
     self:_BuildRouteBody(rp, rp)
 
-    -- Panneau MANQUANTES : liste simple, tout le détail en infobulle.
+    -- Panneau MANQUANTES : liste simple, tout le détail en infobulle. Son en-tête porte le menu des
+    -- catégories à droite (_DockMissing_Filter) ; le titre a une gauche et une droite sur la MÊME
+    -- ligne que lui, et se tronque par « … » plutôt que de passer dessous.
     local mp = CreateFrame("Frame", nil, host)
     mp:SetAllPoints(rp)
     mp:Hide()
+    if self._BuildMissFilter then self:_BuildMissFilter(mp) end
     local hdr = mp:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
-    hdr:SetPoint("TOPLEFT", 8, -8); mp.hdr = hdr
+    hdr:SetPoint("LEFT", mp, "TOPLEFT", 8, -13)
+    if mp.dd then hdr:SetPoint("RIGHT", mp.dd, "LEFT", -6, 0) end
+    hdr:SetJustifyH("LEFT"); hdr:SetWordWrap(false); mp.hdr = hdr
     local scroll = Skin.MakeScrollFrameIn(mp)   -- barre fine, se cache seule (palier 7c)
     scroll:SetPoint("TOPLEFT", 6, -24); scroll:SetPoint("BOTTOMRIGHT", -26, 6)
     local content = CreateFrame("Frame", nil, scroll)
@@ -231,6 +238,9 @@ local function missWhere(prof, sid)
     GameTooltip:AddLine(origin.text, 0.8, 0.8, 0.8)
     return origin.pin
 end
+-- La même rédaction dans l'infobulle d'une recette pas apprise de la vue Profit (décision 19 de
+-- docs/specs/rentabilite-forever.md). Rend le repère SEUL, jamais plusieurs valeurs.
+PW._MissWhere = missWhere
 
 local function missTooltip(row)
     -- Le métier vient de la LIGNE, pas de `PW.profKey` : le joueur peut changer d'onglet de métier
@@ -245,6 +255,8 @@ local function missTooltip(row)
     missHead(row, facts)
     missWorth(row, facts)
     row.pin = missWhere(prof, sid)
+    -- Plan dont l'objet est demandé par un writ (D13 de writs-aca.md) : le détail de la vue Profit.
+    if row.writ and PW._AddWritLines then PW._AddWritLines(row.writ) end
     local price = S.SourcePrice and S:SourcePrice(prof, sid)
     if price then GameTooltip:AddLine(L["Prix"] .. " : " .. COC.Api.Coin(price), 1, 1, 1) end
     -- L'invite n'apparait que s'il y a vraiment un repere a poser : annoncer un clic qui ne fait
@@ -270,10 +282,16 @@ local function missRow(i)
     nm:SetPoint("LEFT", ic, "RIGHT", 4, 0); nm:SetJustifyH("LEFT"); nm:SetWordWrap(false); row.nm = nm
     local lv = row:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
     lv:SetPoint("RIGHT", -4, 0); row.lv = lv
+    -- La marque d'un writ, entre le nom et le rang ; cachée tant qu'aucun writ ne demande l'objet.
+    local wr = row:CreateTexture(nil, "ARTWORK"); wr:SetSize(12, 12)
+    wr:SetPoint("RIGHT", lv, "LEFT", -3, 0); wr:Hide(); row.wr = wr
     nm:SetPoint("RIGHT", lv, "LEFT", -4, 0)
     row:SetHighlightTexture("Interface\\Buttons\\UI-Listbox-Highlight", "ADD")
     row:SetScript("OnEnter", missTooltip)
     row:SetScript("OnLeave", GameTooltip_Hide)
+    -- Cette ligne écrit ses propres lignes de writ : l'accroche d'infobulle d'objet (_Writs_Tooltip)
+    -- se tait sur elle, sinon elles sortiraient deux fois.
+    row.cocWritTip = true
     -- Shift-clic = lier l'objet produit en chat, comme n'importe quelle ligne de recette du jeu.
     -- Le lien est posé au SURVOL (missTooltip) : on ne clique pas une ligne sans l'avoir survolée,
     -- et ça évite un `GetRecipeInfo` par ligne à chaque remplissage de la liste.
@@ -299,7 +317,9 @@ end
 function PW:_FillDockMissing()
     local mp = self.missPanel; if not mp then return end
     local S = COC.Sources
-    local list = (S and S:MissingRecipes(self.profKey)) or {}
+    local all = (S and S:MissingRecipes(self.profKey)) or {}
+    -- Le filtre de l'en-tête (_DockMissing_Filter) : la liste AFFICHÉE, celle que le titre compte.
+    local list = self._MissFilterApply and self:_MissFilterApply(mp, all) or all
     -- Niveau inconnu = EN FIN de liste, jamais en tête : trié comme un 0, il passait devant tout ce
     -- que le joueur peut réellement apprendre (vécu en Couture, 8 recettes sans niveau).
     table.sort(list, function(a, b)
@@ -313,12 +333,17 @@ function PW:_FillDockMissing()
     if #list == 0 then mp.msg:SetText(L["Rien ne manque dans ce métier."]) end
     local w = mp.scroll:GetWidth() or 0
     if w > 0 then mp.content:SetWidth(w) end
+    -- Les writs que je porte, lus UNE fois pour toute la liste (comme la vue Profit).
+    local W, mark = COC.Writs, PW._MissMarkWrit
+    local wanted = (W and mark and #list > 0) and W:WantedItems() or nil
+
     for i, e in ipairs(list) do
         local row = missRow(i)
         row.sid, row.rname, row.rlevel = e.spellID, e.name, e.level
         row.rlink, row.pin = nil, nil   -- ligne poolée : rien de la précédente ne survit
         row.prof = self.profKey   -- la ligne emporte le métier qui l'a produite (cf. missTooltip)
         row.ic:SetTexture(ICON[S:SourceKind(self.profKey, e.spellID)] or ICON.unknown)
+        if mark then mark(row, e.itemID, wanted) end
         -- Trois états, pas deux : à portée, hors de portée (grisée), et NIVEAU INCONNU — celle-là
         -- n'est pas grisée (on ne sait pas), mais son « ? » dit qu'on ne promet rien.
         local outOfReach = e.level ~= nil and e.level > rank
@@ -329,132 +354,4 @@ function PW:_FillDockMissing()
     end
     for i = #list + 1, #mp.rows do mp.rows[i]:Hide(); mp.rows[i].sid = nil end
     mp.content:SetHeight(math.max(#list * ROW_H, 1))
-end
-
--- ------------------------------------------------------------------
--- Les deux boutons de l'en-tête
--- ------------------------------------------------------------------
-
--- Les vues, dans l'ordre de lecture. À languettes et pas à interrupteurs, et c'est le fond du
--- sujet : des états exclusifs dont un est TOUJOURS vrai ne se dessinent pas avec des bascules.
--- Deux icônes 16 px posées dans une bande vide se lisaient comme des boutons secondaires oubliés là,
--- et les désaturer pour dire « inactive » les faisait passer pour INDISPONIBLES (relevé sur capture
--- en jeu, 2026-09-19). Une languette sélectionnée dit la même chose sans ambiguïté, et c'est le
--- vocabulaire du jeu.
---
--- « Profit » est CONDITIONNELLE : sans oracle de prix il n'y a pas de rentabilité à trier, et une
--- languette qui n'ouvre qu'un message d'absence est un onglet vide. La règle vit déjà dans
--- PR:IsAvailable() — ici on ne fait que la consulter. Libellé court à dessein : la rangée est la
--- SEULE chose qui contraint encore la largeur de la colonne (sizeColumn prend le max), donc chaque
--- caractère de plus élargit la fenêtre native de Forever d'autant (arbitrage du user, 2026-09-21).
---
--- ⚠️ La languette « route » dit **Route**, pas « Plan de route » — et ce n'est pas une étourderie
--- à « corriger ». Un libellé de languette coûte de la LARGEUR À LA FENÊTRE, pas seulement de la
--- place dans la rangée : `sizeColumn` prend le max, et la fenêtre native s'élargit d'autant. Sur
--- le relevé du 2026-09-26 la rangée fait 213 px pour 8 px de marge, et un 5ᵉ onglet est spécifié
--- (Travail, cf. docs/specs/lfw-forever.md) — ce sont ces caractères-là qui lui font la place.
--- La VUE, elle, garde le mot entier dans son titre (`_ProfWindow_Route.lua`) : là il ne coûte rien.
-local VIEWS = {
-    { id = "orders", label = function() return L["Commandes"] end },
-    { id = "route",  label = function() return L["Route"] end },
-    { id = "learn",  label = function() return L["Manquantes"] end },
-    { id = "profit", label = function() return L["Profit"] end,
-      shown = function() return (COC.Profit and COC.Profit:IsAvailable()) and true or false end },
-}
-
--- Construite par _BuildOrders (garde nil). Occupe la rangée du HAUT : les onglets de relation, eux,
--- descendent dans la vue Commandes à laquelle ils appartiennent (cf. _PlaceOrdTabs).
--- Une vue écartée ici n'est pas MASQUÉE, elle n'est pas CONSTRUITE : _ViewTabsWidth somme les
--- boutons qui existent, et un bouton caché lui ferait réserver une largeur que rien n'occupe.
-function PW:_BuildDockViewBtns()
-    if self.viewTabs then return end
-    local defs = {}
-    for _, v in ipairs(VIEWS) do
-        if not v.shown or v.shown() then defs[#defs + 1] = { id = v.id, label = v.label() } end
-    end
-    self.viewTabs = Skin.MakeTabs(self.frame, defs, function(id)
-        PW:_SetDockView(id ~= "orders" and id or nil)
-    end, { tabX = self:_TabX(), tabY = self:_TabTop(),
-           namePrefix = (self.frame:GetName() or "COCWin") .. "View" })
-    self.viewTabs:Select("orders")
-    self:_HideViewTabs()
-end
-
--- Re-posée à chaque changement de mode (_ApplyMode, sizeColumn) : la bande d'en-tête se referme une
--- fois la colonne encastrée, et la rangée doit remonter avec elle. Seule la PREMIÈRE languette porte
--- une ancre — les suivantes s'enchaînent sur elle.
-function PW:_PlaceViewTabs()
-    local bar = self.viewTabs
-    local first = bar and bar.buttons[VIEWS[1].id]
-    if not first then return end
-    first:ClearAllPoints()
-    first:SetPoint("TOPLEFT", self.frame, "TOPLEFT", self:_TabX(), self:_TabTop())
-end
-
-function PW:_HideViewTabs()
-    for _, b in pairs((self.viewTabs and self.viewTabs.buttons) or {}) do b:Hide() end
-end
-
--- Largeur RÉELLE de la rangée de vues, pour que la greffe dimensionne la colonne sur la PLUS LARGE
--- des deux rangées (cf. _ProfWindow_Camelot) : sinon la dernière languette se fait rogner par la
--- bordure, comme « Incoming » au premier essai du POC.
--- ⚠️ La marge GAUCHE n'est pas une constante : c'est `_TabX()`, donc elle grandit de la gouttière
--- du « i » une fois la colonne encastrée. Elle était forfaitisée dans un « + 20 » qui ne bougeait
--- pas — la colonne se dimensionnait alors sans savoir où la rangée commençait vraiment, et le
--- surplus qui restait à droite n'était pas une marge voulue mais un reste. On somme donc ce qu'on
--- pose réellement : gouttière + rangée + une marge droite explicite.
-function PW:_ViewTabsWidth()
-    local bar = self.viewTabs
-    if not (bar and bar.buttons) then return 0 end
-    local total, n = 0, 0
-    for _, b in pairs(bar.buttons) do total = total + ((b.GetWidth and b:GetWidth()) or 0); n = n + 1 end
-    if n == 0 then return 0 end
-    return self:_TabX() + (total - 4 * (n - 1)) + 12
-end
-
--- La rangée de vues n'existe que là où la colonne est SEULE et qu'un métier est ouvert : sans rang
--- courant il n'y a ni route à calculer ni manquantes à lister. Appelé par RefreshOrders, qui tourne
--- dans tous les modes.
-function PW:_SyncDockViewBtns()
-    local bar = self.viewTabs
-    if not bar then return end
-    -- Le mode Échange se redécide ICI, à chaque rafraîchissement de la colonne — et pas seulement
-    -- sur les événements d'échange écoutés par _ProfWindow_Trade. Vécu en jeu le 2026-09-22 : la
-    -- silhouette n'apparaissait qu'après un aller-retour sur un autre onglet, parce qu'aucun
-    -- événement n'était retombé APRÈS que la colonne fut prête. Garde de ré-entrance : la bascule
-    -- de vue repasse par RefreshOrders, donc par ici.
-    if self._SyncTradeView and not self._inTradeSync then
-        self._inTradeSync = true
-        self:_SyncTradeView()
-        self._inTradeSync = nil
-    end
-    -- ⚠️ LE MÉTIER PEUT CHANGER SOUS LA VUE. L'onglet natif passe de la Cuisine à l'Herboristerie,
-    -- `_RefreshDock` met `profKey` à jour, et la vue affichée continue d'afficher la liste de
-    -- l'ANCIEN métier -- que les infobulles interrogent alors avec la clé du NOUVEAU. On repeint sur
-    -- le CHANGEMENT seulement : `RefreshOrders` tourne à chaque mouvement de commande, et refaire
-    -- 128 lignes à chaque fois pour rien serait payer cher une bascule qui arrive une fois par heure.
-    -- ⚠️ ET PAS EN COMBAT. Repeindre veut dire CRÉER et AFFICHER des lignes, et greffée la colonne
-    -- est protégée comme son hôte : Show/SetPoint y sont refusés (cf. l'en-tête). Le témoin de
-    -- métier reste donc EN RETARD exprès — c'est lui qui déclenchera le repaint à la première
-    -- synchro hors combat. L'avancer sans repeindre figerait la vue sur l'ancien métier pour de bon.
-    if self._dockViewProf ~= self.profKey and not lockedDown() then
-        self._dockViewProf = self.profKey
-        if self.dockView == "learn" then self:_FillDockMissing()
-        elseif self.dockView == "route" then self:_FillRoute()
-        elseif self.dockView == "profit" then self:_FillDockProfit() end
-    end
-    local craft = COC.Craft
-    local show = (self._compact or self.docked) and self.profKey and not self.rerollKey
-        and craft and craft:GetOpenProfessionInfo() ~= nil
-    -- En mode Échange, la colonne ne montre QUE l'échange : ses onglets se taisent (spec
-    -- enchant-echange-forever, décision du 2026-09-21).
-    local trade = self.dockView == "trade"
-    for _, b in pairs(bar.buttons) do b:SetShown((show and not trade) and true or false) end
-    if not show then
-        if self.dockView then self:_ResetDockView() end
-        return
-    end
-    if trade then return end
-    bar:Select(self.dockView or "orders")
-    if self.dockView == "route" then self:_SyncRouteBtn() end
 end
