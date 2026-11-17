@@ -46,6 +46,19 @@ client.
 
 ## Relevés
 
+- 2026-11-17 23:49 — jusqu'a 0d05701 — Forever 1.60.1.70938, solo ; build `main-dev@90ba897
+  2026-11-17 12:14` (lu par l'appli du banc dans la copie déployée, fiche
+  `CraftingOrderClassic--feat-donnees-70938`) — **GO partiel sur `feat/donnees-70938`** (données
+  Camelot du build 70938) : les données chargées en jeu sont bien celles de la branche (capture du
+  user, deux sondes `/run` sur `LibStub("CraftLink-1.0")`). Réactifs de Couture, le client l'emporte :
+  3758 Green Woolen Bag 2997 x5, 6688 Red Woolen Bag 2997 x5, 6693 Green Silk Pack 4305 x5, 6695
+  Black Silk Pack 4305 x6, 12079 Red Mageweave Bag 4339 x5. Seuils de couleur : 1262978 Cookie's
+  Feast 140/145/145/145, 1291341 Expert Campfire 200/205/205/205, 1230564 Mana Well 20/20/20/20,
+  1263005 Fermenter 140/140/140/140. **Pas vu** (gestes « Pas fait », aucun perso au bon métier ou
+  au bon rang) : le nombre de rouleaux demandé par la fenêtre de Couture du jeu, et la couleur
+  affichée par le jeu pour ces 4 recettes (orange puis gris sans jaune ni vert, grises dès
+  l'apprentissage pour les deux dernières).
+
 - 2026-11-13 14:39 — jusqu'a 2fd15f9 — Forever 1.60.1.70938, solo, forgeron (Forge 185/225) ; build
   `main-dev@c86a357 2026-11-13 14:32`, `## Version: 1.53.0` (lu par l'appli du banc dans la copie
   déployée, fiche `CraftingOrderClassic--release-v1.53.0`) — **GO sur le candidat v1.53.0**, qui
