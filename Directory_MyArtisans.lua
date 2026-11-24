@@ -12,7 +12,7 @@ local COC = CraftingOrderClassic
 local Dir = COC.Directory
 
 local function me() return (UnitName and UnitName("player")) or "?" end   -- PRÉNOM : clé LOCALE de perso (cf. Api.PlayerName)
-local function myRealm() return (GetRealmName and GetRealmName()) or "" end
+local function myRealm() return COC.Api.LOCAL_REALM end   -- clés « Prénom- » (spec cle-perso-sans-royaume)
 
 -- Nom court d'une clé « Nom-Royaume » SI elle est du royaume `realm`, sinon nil. Le nom de perso
 -- n'a pas de tiret (WoW l'interdit) ; le royaume PEUT contenir des espaces (« Wild Growth »).
@@ -158,7 +158,7 @@ end
 function Dir:PruneMySkills()
     local db = COC.db
     if not (db and db.mySkillsByChar) then return end
-    local cur = me() .. "-" .. myRealm()
+    local cur = COC.Api.CharKey()
     for key in pairs(db.mySkillsByChar) do
         local orphan = key ~= cur
             and not (db.myChars and db.myChars[key])

@@ -374,6 +374,16 @@ function A.PlayerName()
     return (_G.UnitName and _G.UnitName("player")) or "?"
 end
 
+-- Clé LOCALE d'un perso dans la sauvegarde (knownRecipes, myCooldowns, mySkillsByChar, myChars…) :
+-- « Prénom- ». Elle portait le royaume jusqu'au build 71037 de Forever, où GetRealmName() s'est mis à
+-- rendre "" (mesuré le 2026-11-24) ; elle ne le relit plus, pour que la sauvegarde ne se recoupe pas
+-- s'il revient. Les anciennes clés « Prénom-Royaume » restent, orphelines (palier 3 de Migrations).
+-- Spec docs/specs/cle-perso-sans-royaume.md.
+A.LOCAL_REALM = ""
+function A.CharKey(short)
+    return (short or (_G.UnitName and _G.UnitName("player")) or "?") .. "-" .. A.LOCAL_REALM
+end
+
 -- Un nom qu'on peut chuchoter ? Sur Forever, « moi » porte un nom de famille : un nom SANS est
 -- incomplet, et un chuchotement à ce nom se perd puis revient en « No player named » deux minutes
 -- plus tard. Relevé le 2026-10-07 : « whisper→Gnomi » (membre de groupe dont le jeu n'avait pas encore

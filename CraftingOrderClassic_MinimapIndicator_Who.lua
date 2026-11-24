@@ -14,8 +14,8 @@ local UI  = COC.UI
 local L   = COC.L
 
 local function CL() return LibStub and LibStub:GetLibrary("CraftLink-1.0", true) end
-local function realm() return (GetRealmName and GetRealmName()) or "" end
-local function meKey() return ((UnitName and UnitName("player")) or "?") .. "-" .. realm() end
+local function realm() return COC.Api.LOCAL_REALM end   -- clés « Prénom- » (spec cle-perso-sans-royaume)
+local function meKey() return COC.Api.CharKey() end
 
 -- Le sort de la commande : le sien, sinon celui que le catalogue associe à l'objet.
 local function spellOf(o)

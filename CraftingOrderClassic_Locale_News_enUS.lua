@@ -253,7 +253,7 @@ local news = {
     ["rerolls : désactivés — rien n'est annoncé (opt-in : /co alts on)."] =
         "alts: disabled — nothing is announced (opt-in: /co alts on).",
     ["perso principal (vitrine) : %s"] = "main character (front): %s",
-    ["persos du compte (%s) : %s"] = "account characters (%s): %s",
+    ["persos du compte : %s"] = "account characters: %s",
     ["le lien n'est vérifié chez les autres qu'après une connexion de CHAQUE perso (addon actif)."] =
         "others only verify the link after EACH character has logged in once (addon running).",
     ["rerolls activés — perso principal : %s (changer : /co alts main <nom>)"] =

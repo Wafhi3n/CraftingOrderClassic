@@ -210,9 +210,11 @@ end
 -- ------------------------------------------------------------------
 -- Rerolls / alts (même compte) : « ton reroll X sait le faire »
 -- ------------------------------------------------------------------
--- Un de MES rerolls sait-il crafter `o` ? Lit les partitions persistées COC.db.knownRecipes[nom-royaume]
+-- Un de MES rerolls sait-il crafter `o` ? Lit les partitions persistées COC.db.knownRecipes[Prénom-]
 -- (set spellID par métier, cf. COC:_MyKnownStore) SANS que l'alt soit connecté. Renvoie le nom (court)
 -- du 1er reroll capable, ou nil. Surface « ton reroll » quand le perso COURANT, lui, ne sait pas faire.
+-- Seules les clés du royaume local comptent : une ancienne clé « Prénom-Royaume » (d'avant le build
+-- 71037) peut être celle du perso connecté, qui s'annonçait alors comme son propre reroll.
 function Handoff:MyRerollCanCraft(o)
     local c = CraftLink
     if not (c and COC.db and COC.db.knownRecipes) then return nil end
@@ -221,10 +223,11 @@ function Handoff:MyRerollCanCraft(o)
     local spellID = o.spellID
     if not spellID and o.itemID then local i2s = c:ItemToSpell(prof); spellID = i2s and i2s[o.itemID] end
     if not spellID then return nil end
-    local meKey = ((UnitName and UnitName("player")) or "?") .. "-" .. ((GetRealmName and GetRealmName()) or "")
+    local meKey, here = COC.Api.CharKey(), COC.Api.LOCAL_REALM
     for who, partition in pairs(COC.db.knownRecipes) do
-        local set = who ~= meKey and partition[prof]
-        if set and set[spellID] then return who:match("^([^%-]+)") or who end
+        local short, realm = who:match("^([^%-]+)%-(.*)$")
+        local set = who ~= meKey and realm == here and type(partition) == "table" and partition[prof]
+        if set and set[spellID] then return short end
     end
     return nil
 end
