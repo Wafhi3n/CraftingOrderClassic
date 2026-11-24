@@ -6,6 +6,10 @@
 > Palier 3 codé (`Directory_Bridge.lua`, `tests/test_pont_royaume_passeur.lua`), pas vu en jeu
 > Cible : WoW: Forever / Camelot (16001) · Addon : Crafting Order - Classic (+ lib CraftLink, peu)
 >
+> **2026-11-24 : le pont est AVEUGLE depuis le build 71037.** `GetRealmID()` rend 0, plus personne n'envoie
+> `rm=`. Le GUID porte encore le royaume ; le relire et l'annoncer à la salle est une décision du user, pas
+> encore prise (voir `cle-perso-sans-royaume.md`, « Ce qu'on ne fait pas »).
+>
 > Origine : mesures du 2026-10-07 avec trois comptes. Sous le méga-serveur de Forever, les royaumes
 > existent toujours, et un canal s'arrête au royaume : notre salle `CraftLinkNet`, et aussi le canal
 > Commerce du jeu. Faits datés dans le skill public `wow-addon-dev:wow-forever-api`,

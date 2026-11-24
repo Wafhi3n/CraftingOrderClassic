@@ -48,6 +48,11 @@ lues dans le code et dans la sauvegarde du user le 2026-11-24 :
 - **Clé neuve présente mais vide** (`_MyKnownStore` la crée vide à la connexion) : traitée comme absente.
 - **Deux persos du compte au même prénom** : ils partagent désormais la clé « Prénom- ». Avant 71037 c'était
   déjà vrai sur un même royaume ; ça l'est maintenant entre royaumes. Accepté.
+- **Persos PvE et PvP d'un même compte** : le royaume suit le compte par type de règles, donc un tel compte a
+  deux royaumes. Sous « Prénom- », ils apparaissent ensemble dans « Mes artisans », « Mes métiers » et « ton
+  reroll sait le faire » (le filtre de camp reste, celui de royaume n'existe plus). Vrai depuis 71037, pas à
+  cause de ce chantier, mais le format le rend durable. Le courrier entre deux royaumes n'est pas mesuré : un
+  reroll PvP proposé pour une commande reçue sur un perso PvE pourrait ne pas recevoir l'objet par courrier.
 
 ## Décisions
 
@@ -75,9 +80,11 @@ lues dans le code et dans la sauvegarde du user le 2026-11-24 :
 6. [test] `COC.Api.CharKey()` (que `_MyKnownStore` et `_MyCooldownStore` appellent), `StampMyChar` et le miroir
    des niveaux écrivent « Prénom- » même si `GetRealmName()` rend un royaume ; CraftLink aussi
    (`test_craftlink_demarrage.lua`). → même fichier
-7. [agent] Sur la sauvegarde du user après une connexion au banc : `schemaVer = 3`, les anciennes clés présentes,
-   aucune clé neuve modifiée (les trois persos ont rouvert leurs métiers après 71037). Lecture de la SV par
-   `tools/elune`.
+7. [agent] Sur la sauvegarde du user après une connexion au banc, comparée table par table à la copie d'avant
+   (`F:\sauvegardes-wow\coc-sv-avant-palier3-2026-11-24\`) : `schemaVer` passe à 3 ; les anciennes clés sont
+   toutes là ; les clés neuves déjà remplies ne bougent pas (les trois persos ont rouvert leurs métiers après
+   71037). Seule une partition neuve vide (`{}`, par exemple dans `myCooldowns`) peut recevoir la copie de
+   l'ancienne. Lecture de la SV par `tools/elune`.
 8. [human] Au banc : « Mes artisans » montre les mêmes persos et métiers qu'avant le déploiement ; `/co alts`
    écrit « persos du compte : … » sans parenthèses. Témoin : la même vue avant le déploiement.
 
