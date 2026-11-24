@@ -33,7 +33,8 @@ lues dans le code et dans la sauvegarde du user le 2026-11-24 :
 
 - **Le pont entre royaumes** (`rm=`, spec `pont-royaumes.md`) reste aveugle dans ce chantier. Le GUID porte encore
   le royaume (`Player-6948-…`, mesuré le 2026-11-24), mais le relire pour l'annoncer à la salle redonnerait à
-  tous ce que Blizzard vient de cacher : décision du user attendue, chantier à part.
+  tous ce que Blizzard vient de cacher. Décision du user (2026-11-24) : on ne le fait pas ; Blizzard a annoncé
+  que le royaume partira aussi du GUID (dit par le user, source pas donnée), on attend cette mise à jour.
 - **On n'efface pas les anciennes clés.** Une migration ne tourne qu'une fois et l'effacement ne se rattrape pas ;
   elles restent orphelines, filtrées par tous les lecteurs.
 - **Pas de clé au nom complet** (« Prénom Nom ») : il faudrait changer chaque lecteur de clé, pour un gain qui ne
