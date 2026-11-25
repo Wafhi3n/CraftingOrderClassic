@@ -208,7 +208,7 @@ local function addWhere(row)
     if not (S and PW._MissWhere) then return end
     row.pin = PW._MissWhere(row.prof, row.sid)
     local price = S.SourcePrice and S:SourcePrice(row.prof, row.sid)
-    if price then GameTooltip:AddLine(L["Prix"] .. " : " .. COC.Api.Coin(price), 1, 1, 1) end
+    if price then GameTooltip:AddLine(string.format(L["Prix : %s"], COC.Api.Coin(price)), 1, 1, 1) end
 end
 
 -- Ce que fait le clic, dit seulement s'il fait quelque chose (même règle que « Manquantes »).
@@ -271,7 +271,7 @@ local function tellWhere(row)
     if row.pin and PW._SetNpcPin then PW:_SetNpcPin(row.pin); return end
     local txt = COC.Sources and PW._MissWhereText and PW._MissWhereText(row.prof, row.sid)
     if not txt then return end
-    print("|cFF33DD88Crafting Order|r " .. (row.rname or "?") .. " : " .. txt)
+    print("|cFF33DD88Crafting Order|r " .. string.format(L["%s : %s"], row.rname or "?", txt))
 end
 
 local function profitRow(i)

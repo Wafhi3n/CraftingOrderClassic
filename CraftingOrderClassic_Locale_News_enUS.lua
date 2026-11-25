@@ -11,6 +11,19 @@ local L = COC.L
 local news = {
     -- Onglet Nouveautés (changelog en jeu)
     ["Nouveautés"] = "What's New",
+    -- v1.54.0
+    ["Un filtre pour les Manquantes, les recettes à apprendre dans Profit, et tes persos après la mise à jour du jeu"] =
+        "A filter for Missing, recipes to learn in Profit, and your characters after the game update",
+    ["La vue Manquantes a un menu dans son en-tête : choisis une catégorie, les mêmes que dans la liste des plans, ou « Writs » pour ne garder que les objets qu'un Craftsman's Writ demande. La liste garde son ordre par niveau."] =
+        "The Missing view has a menu in its header. Pick a category, the same ones as the recipe list, or “Writs” to keep only the items a Craftsman's Writ asks for. The list keeps its order by level.",
+    ["La vue Profit montre maintenant en gris les recettes que tu n'as pas encore apprises mais que ton rang permet d'apprendre. « Tout le métier » ajoute celles pour lesquelles ton niveau est encore trop bas. Clique sur une ligne grise et l'addon dit dans le chat où trouver cette recette."] =
+        "The Profit view now shows, in grey, the recipes you haven't learned yet but could learn at your rank. “Whole profession” adds the ones your skill is still too low for. Click a grey line and the addon says in chat where to find that recipe.",
+    ["Corrigé : à la boîte aux lettres, « Remplir depuis commande » pouvait changer ton prix en argent envoyé à l'acheteur. Quand le courrier repassait sur « Envoyer de l'argent » (aucun objet joint, ou contre-remboursement coupé par le jeu), le prix restait dans le champ. Il n'est plus posé en contre-remboursement qu'avec un objet joint, et il est effacé si le courrier repasse en envoi d'argent. Si le jeu coupe le contre-remboursement, le prix convenu va dans le message, à régler par échange."] =
+        "Fixed: at the mailbox, “Fill from order” could turn your C.O.D. price into money sent to the buyer. When the mail switched back to “Send money” (no item attached, or C.O.D. turned off by the game), the price stayed in the field. It's now only set as C.O.D. with an item attached, and it's cleared if the mail switches to sending money. If the game turns C.O.D. off, the agreed price goes in the message instead, to be paid through a trade.",
+    ["Corrigé après la mise à jour du jeu du 23 novembre : le jeu ne donne plus aux addons le nom de ton royaume, alors Crafting Order rangeait tes persos sous un nouveau nom et perdait ce qu'il avait gardé pour eux. Tes recettes ne partaient plus à la connexion tant que tu n'avais pas rouvert chaque métier, et « ton reroll sait le faire » pouvait nommer le perso que tu jouais. Si tu n'as pas rouvert les métiers d'un perso depuis la mise à jour, ses recettes et ses niveaux reviennent à ta première connexion avec cette version."] =
+        "Fixed after the game update of November 23: the game no longer gives addons your realm's name, so Crafting Order filed your characters under a new name and lost track of what it had saved for them. Your recipes weren't shared at login until you reopened each profession, and “your alt can make this” could name the character you were playing. If you haven't reopened a character's professions since the update, its saved recipes and skill levels come back the first time you log in with this version.",
+    ["Les données des recettes suivent le build 70938 du jeu : cinq sacs de Couture demandent les réactifs que le jeu demande (Green Woolen Bag, Red Woolen Bag, Green Silk Pack, Black Silk Pack, Red Mageweave Bag), et Cookie's Feast, Expert Campfire, Mana Well et Fermenter changent de couleur aux niveaux du jeu."] =
+        "Recipe data follows game build 70938: five Tailoring bags ask for the reagent counts the game asks for (Green Woolen Bag, Red Woolen Bag, Green Silk Pack, Black Silk Pack, Red Mageweave Bag), and Cookie's Feast, Expert Campfire, Mana Well and Fermenter change color at the skill levels the game uses.",
     -- v1.53.0
     ["Les writs dans le plan de route, et une case pour les privilégier"] =
         "Craftsman's Writs in the leveling route, and a box to favor them",
@@ -208,14 +221,7 @@ local news = {
         "The addon now notices when you're running behind. It reads the version off other players you cross paths with on the network, and once it's seen a newer one from a few different people, it drops a single line in chat and puts a red dot on the minimap button. The dot clears itself once you update.",
     ["Ce « plusieurs personnes différentes » est voulu : un joueur isolé ne peut pas te faire croire que tu es en retard en annonçant un faux numéro, il faut que des joueurs distincts le confirment. Et ça ne te prévient qu'une fois par version, jamais à chaque connexion. Tape /co version pour voir ta version et s'il en existe une plus récente."] =
         "That \"few different people\" part is on purpose. One player can't spoof you into thinking you're behind by broadcasting a fake number, it takes separate players to corroborate it. And it only tells you once per version, never every login. Type /co version to see what you're on and whether there's something newer.",
-    -- v1.26.0
-    ["Filtre n'importe quelle liste par la stat qu'elle donne"] =
-        "Filter any craft list by the stat it gives",
-    ["Chaque liste de recettes — l'onglet Commande, la fenêtre métier, Mes artisans — reçoit un sélecteur de stat. Tu choisis Force, tu ne vois que ce qui donne de la Force : gemmes, équipements, élixirs. Le menu se remplit avec ce que le métier ouvert fabrique vraiment, donc la Cuisine ne te propose pas Puissance des sorts. Ces stats ne sont écrites nulle part, elles sont lues sur ton propre jeu — dans ta langue, et valables pour des objets que je n'ai jamais regardés, Wrath compris."] =
-        "Every recipe list, the Order tab, the profession window and My Artisans, gets a stat picker. Pick Strength and you see only what gives Strength, gems, gear, elixirs. The menu is built from what the open profession actually makes, so Cooking won't offer you Spell Power. None of those stats are typed out anywhere, they're read off your own client, so they show up in your language and keep working on items I've never looked at, Wrath included.",
-    ["L'alchimie se range mieux aussi : les élixirs se regroupent sous la stat qu'ils donnent, pendant que les potions de soin et de mana, les flacons et les transmutations gardent leurs propres en-têtes — « rend de la vie » n'a jamais été une stat. Sur TBC, ça sort 74 consommables du fourre-tout Divers."] =
-        "Alchemy sorts better too. Elixirs group under the stat they give, while healing and mana potions, flasks and transmutes keep their own headings, since \"restores health\" was never a stat. On TBC that pulled 74 loose consumables out of the Misc pile.",
-    -- (clés v1.25.0 retirées à la v1.53.0 : version sortie de la fenêtre glissante de l'onglet)
+    -- (clés v1.26.0 et v1.25.0 retirées à la v1.54.0 et à la v1.53.0 : versions sorties de la fenêtre glissante de l'onglet)
     -- (clés v1.24.2 et v1.24.0 retirées à la v1.52.0 : versions sorties de la fenêtre glissante de l'onglet)
     -- (clés v1.23.0 retirées à la v1.50.0 : version sortie de la fenêtre glissante de l'onglet)
     -- (clés v1.22.1 retirées à la v1.49.0 : version sortie de la fenêtre glissante de l'onglet)
@@ -252,7 +258,7 @@ local news = {
         "alts: ENABLED — your character list is announced to the network.",
     ["rerolls : désactivés — rien n'est annoncé (opt-in : /co alts on)."] =
         "alts: disabled — nothing is announced (opt-in: /co alts on).",
-    ["perso principal (vitrine) : %s"] = "main character (front): %s",
+    ["perso principal (vitrine) : %s"] = "main character (showcase): %s",
     ["persos du compte : %s"] = "account characters: %s",
     ["le lien n'est vérifié chez les autres qu'après une connexion de CHAQUE perso (addon actif)."] =
         "others only verify the link after EACH character has logged in once (addon running).",

@@ -237,9 +237,11 @@ local de3 = {
     ["Ajoute aussi, en gris, les recettes que ton rang ne permet pas encore d'apprendre."] =
         "Zeigt zusätzlich, in Grau, die Rezepte, für die dein Skill noch nicht reicht.",
     ["Pas encore apprise."] = "Noch nicht gelernt.",
+    ["Prix : %s"] = "Preis: %s",
+    ["%s : %s"] = "%s: %s",
     ["Clic : dire dans le chat où trouver cette recette."] = "Klick: im Chat anzeigen, wo es dieses Rezept gibt.",
     -- Vue Manquantes : le filtre par catégorie (2026-11-16)
-    ["Writs"] = "Aufträge",
+    ["Writs"] = "Handwerksaufträge",   -- « Aufträge » = Commandes : pas le même mot dans le même menu
     ["Vente (prix marchand)"] = "Verkauf (Händlerpreis)",
     ["Coupe HV (%d %%)"] = "AH-Gebühr (%d %%)",
     ["Un marchand vend cet objet : l'HV ne le paiera pas plus cher."] =

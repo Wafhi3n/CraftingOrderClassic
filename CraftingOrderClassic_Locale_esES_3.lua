@@ -238,6 +238,8 @@ local es3 = {
     ["Ajoute aussi, en gris, les recettes que ton rang ne permet pas encore d'apprendre."] =
         "Añade también, en gris, las recetas que tu nivel aún no te permite aprender.",
     ["Pas encore apprise."] = "Aún no aprendida.",
+    ["Prix : %s"] = "Precio: %s",
+    ["%s : %s"] = "%s: %s",
     ["Clic : dire dans le chat où trouver cette recette."] = "Clic: decir en el chat dónde encontrar esta receta.",
     -- Vue Manquantes : le filtre par catégorie (2026-11-16)
     ["Writs"] = "Encargos",

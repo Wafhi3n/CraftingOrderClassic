@@ -1,5 +1,32 @@
 # Changelog — Crafting & Gathering Order — Classic
 
+## v1.54.0 - A filter for Missing, recipes to learn in Profit, and your characters after the game update
+
+The Missing view has a menu in its header. Pick a category, the same ones as the recipe list, or
+Writs to keep only the items a Craftsman's Writ asks for. The list keeps its order by level.
+
+The Profit view now shows, in grey, the recipes you haven't learned yet but could learn at your
+rank. "Whole profession" adds the ones your skill is still too low for. Click a grey line and the
+addon says in chat where to find that recipe.
+
+Fixed: "Fill from order" at the mailbox could turn your C.O.D. price into money sent to the buyer.
+When the mail switched back to "Send money" (no item attached, or C.O.D. turned off by the game),
+the price stayed in the field. The price is now only set as C.O.D. with an item attached, and it's
+cleared if the mail switches to sending money. If the game turns C.O.D. off, the agreed price goes
+in the message instead, to be paid through a trade.
+
+Fixed after the game update of November 23: the game no longer gives addons your realm's name, so
+Crafting Order filed your characters under a new name and lost track of what it had saved for them.
+Your recipes weren't shared at login until you reopened each profession, and "your alt can make
+this" could name the character you were playing. If you haven't reopened a character's professions
+since the update, its saved recipes and skill levels come back the first time you log in with this
+version.
+
+Recipe data follows game build 70938. Five Tailoring bags ask for the reagent counts the game asks
+for (Green Woolen Bag, Red Woolen Bag, Green Silk Pack, Black Silk Pack, Red Mageweave Bag), and
+Cookie's Feast, Expert Campfire, Mana Well and Fermenter change color at the skill levels the game
+uses.
+
 ## v1.53.0 - Craftsman's Writs in the leveling route, and a box to favor them
 
 The leveling route (Route tab) now marks the steps whose item a Craftsman's Writ asks for, the same

@@ -38,6 +38,16 @@ local BODY_W = 780
 local function versionsNow()
     return {
         {
+            v = "v1.54.0", title = L["Un filtre pour les Manquantes, les recettes à apprendre dans Profit, et tes persos après la mise à jour du jeu"],
+            lines = {
+                L["La vue Manquantes a un menu dans son en-tête : choisis une catégorie, les mêmes que dans la liste des plans, ou « Writs » pour ne garder que les objets qu'un Craftsman's Writ demande. La liste garde son ordre par niveau."],
+                L["La vue Profit montre maintenant en gris les recettes que tu n'as pas encore apprises mais que ton rang permet d'apprendre. « Tout le métier » ajoute celles pour lesquelles ton niveau est encore trop bas. Clique sur une ligne grise et l'addon dit dans le chat où trouver cette recette."],
+                L["Corrigé : à la boîte aux lettres, « Remplir depuis commande » pouvait changer ton prix en argent envoyé à l'acheteur. Quand le courrier repassait sur « Envoyer de l'argent » (aucun objet joint, ou contre-remboursement coupé par le jeu), le prix restait dans le champ. Il n'est plus posé en contre-remboursement qu'avec un objet joint, et il est effacé si le courrier repasse en envoi d'argent. Si le jeu coupe le contre-remboursement, le prix convenu va dans le message, à régler par échange."],
+                L["Corrigé après la mise à jour du jeu du 23 novembre : le jeu ne donne plus aux addons le nom de ton royaume, alors Crafting Order rangeait tes persos sous un nouveau nom et perdait ce qu'il avait gardé pour eux. Tes recettes ne partaient plus à la connexion tant que tu n'avais pas rouvert chaque métier, et « ton reroll sait le faire » pouvait nommer le perso que tu jouais. Si tu n'as pas rouvert les métiers d'un perso depuis la mise à jour, ses recettes et ses niveaux reviennent à ta première connexion avec cette version."],
+                L["Les données des recettes suivent le build 70938 du jeu : cinq sacs de Couture demandent les réactifs que le jeu demande (Green Woolen Bag, Red Woolen Bag, Green Silk Pack, Black Silk Pack, Red Mageweave Bag), et Cookie's Feast, Expert Campfire, Mana Well et Fermenter changent de couleur aux niveaux du jeu."],
+            },
+        },
+        {
             v = "v1.53.0", title = L["Les writs dans le plan de route, et une case pour les privilégier"],
             lines = {
                 L["Le plan de route (onglet Route) marque maintenant les étapes dont l'objet est demandé par un Craftsman's Writ, comme la vue Profit : l'icône du writ à côté du montant, allumée si tu portes ce writ, éteinte sinon. Survole l'étape pour la réputation, le prix du writ à l'hôtel des ventes et ce que l'addon a vu de ce writ en jeu."],
@@ -414,13 +424,6 @@ local function versionsLatest()
                 L["Ce « plusieurs personnes différentes » est voulu : un joueur isolé ne peut pas te faire croire que tu es en retard en annonçant un faux numéro, il faut que des joueurs distincts le confirment. Et ça ne te prévient qu'une fois par version, jamais à chaque connexion. Tape /co version pour voir ta version et s'il en existe une plus récente."],
             },
         },
-        {
-            v = "v1.26.0", title = L["Filtre n'importe quelle liste par la stat qu'elle donne"],
-            lines = {
-                L["Chaque liste de recettes — l'onglet Commande, la fenêtre métier, Mes artisans — reçoit un sélecteur de stat. Tu choisis Force, tu ne vois que ce qui donne de la Force : gemmes, équipements, élixirs. Le menu se remplit avec ce que le métier ouvert fabrique vraiment, donc la Cuisine ne te propose pas Puissance des sorts. Ces stats ne sont écrites nulle part, elles sont lues sur ton propre jeu — dans ta langue, et valables pour des objets que je n'ai jamais regardés, Wrath compris."],
-                L["L'alchimie se range mieux aussi : les élixirs se regroupent sous la stat qu'ils donnent, pendant que les potions de soin et de mana, les flacons et les transmutations gardent leurs propres en-têtes — « rend de la vie » n'a jamais été une stat. Sur TBC, ça sort 74 consommables du fourre-tout Divers."],
-            },
-        },
     }
 end
 
@@ -434,7 +437,7 @@ end
 
 local function versionsOldest()
     return {
-        -- v1.25.0 (retirée à la v1.53.0), v1.24.1 (retirée à la v1.51.0), v1.23.0 (retirée à la v1.50.0), v1.22.0 (retirée à la v1.48.0), v1.21.0 (retirée à la v1.47.0),v1.20.0 (retirée à la v1.46.0), v1.19.1 / v1.19.0 (retirées à la v1.45.0), v1.18.0 / v1.17.1 (retirées à la v1.44.2), v1.17.0 (retirée à la v1.44.1),v1.16.0 (retirée à la v1.44.0), v1.15.1 (retirée à la v1.43.0), v1.15.0 (retirée à la v1.42.1), v1.14.0 (retirée à la v1.42.0), v1.13.0 (retirée à la v1.41.1), v1.12.0 / v1.11.0 / v1.10.2 (retirées à la v1.41.0 : la Saison de la Découverte, le canal du royaume et
+        -- v1.26.0 (retirée à la v1.54.0), v1.25.0 (retirée à la v1.53.0),v1.24.1 (retirée à la v1.51.0), v1.23.0 (retirée à la v1.50.0), v1.22.0 (retirée à la v1.48.0), v1.21.0 (retirée à la v1.47.0),v1.20.0 (retirée à la v1.46.0), v1.19.1 / v1.19.0 (retirées à la v1.45.0), v1.18.0 / v1.17.1 (retirées à la v1.44.2), v1.17.0 (retirée à la v1.44.1),v1.16.0 (retirée à la v1.44.0), v1.15.1 (retirée à la v1.43.0), v1.15.0 (retirée à la v1.42.1), v1.14.0 (retirée à la v1.42.0), v1.13.0 (retirée à la v1.41.1), v1.12.0 / v1.11.0 / v1.10.2 (retirées à la v1.41.0 : la Saison de la Découverte, le canal du royaume et
         -- le bouton « Créer » sécurisé n'existent pas sur Forever), v1.10.1 / v1.9.0 / v1.8.0 / v1.7.0 / v1.7.1 /
         -- v1.6.0 / v1.5.0 / v1.4.0 retirées de l'onglet (l'historique
         -- complet vit dans CHANGELOG.md). Cet onglet ne garde qu'une fenêtre glissante de versions :

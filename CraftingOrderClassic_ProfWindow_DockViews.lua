@@ -258,7 +258,7 @@ local function missTooltip(row)
     -- Plan dont l'objet est demandé par un writ (D13 de writs-aca.md) : le détail de la vue Profit.
     if row.writ and PW._AddWritLines then PW._AddWritLines(row.writ) end
     local price = S.SourcePrice and S:SourcePrice(prof, sid)
-    if price then GameTooltip:AddLine(L["Prix"] .. " : " .. COC.Api.Coin(price), 1, 1, 1) end
+    if price then GameTooltip:AddLine(string.format(L["Prix : %s"], COC.Api.Coin(price)), 1, 1, 1) end
     -- L'invite n'apparait que s'il y a vraiment un repere a poser : annoncer un clic qui ne fait
     -- rien est pire que de ne rien annoncer.
     if row.pin then GameTooltip:AddLine(L["Clic : poser un repère sur ce PNJ."], 0.55, 0.75, 0.55) end
