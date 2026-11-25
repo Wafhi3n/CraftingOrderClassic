@@ -46,6 +46,19 @@ client.
 
 ## Relevés
 
+- 2026-11-25 10:48 — jusqu'a 050e327 — Forever 1.60.1.71037, solo, un compte à trois persos ; build
+  non recopié du jeu (le déploiement du 2026-11-24 a posé `main-dev@cf26314`, fiche
+  `CraftingOrderClassic--fix-cle-perso-sans-royaume` ; la reprise, absente de `main`, prouve que c'est
+  ce code qui a tourné) — **GO sur `fix/cle-perso-sans-royaume`** (clé locale « Prénom- », palier 3) :
+  la sauvegarde écrite après la séance du user (2026-11-24 22:57) est relue par l'agent et comparée à
+  la copie d'avant (`F:\sauvegardes-wow\coc-sv-avant-palier3-2026-11-24`). `schemaVer` passe de 2 à
+  3 ; dans `myChars`, `myCharNames`, `myCharFaction`, `mySkillsByChar` et `knownRecipes`, les clés
+  « Prénom- » et « Prénom-<royaume> » des trois persos sont toutes là, contenus inchangés (seule l'heure
+  de connexion d'un perso a bougé : il a été joué). Aucune erreur Lua dans BugGrabber depuis le
+  déploiement. Le user : « c'est good » (2026-11-25), fiche non remplie dans l'appli. **Pas vu** :
+  l'écran « Mes artisans » et `/co alts` relevés geste par geste ; un perso dont la clé neuve était
+  vide, seul cas où la reprise recopie (il est couvert par `tests/test_cle_perso_sans_royaume.lua`).
+
 - 2026-11-17 23:49 — jusqu'a 0d05701 — Forever 1.60.1.70938, solo ; build `main-dev@90ba897
   2026-11-17 12:14` (lu par l'appli du banc dans la copie déployée, fiche
   `CraftingOrderClassic--feat-donnees-70938`) — **GO partiel sur `feat/donnees-70938`** (données
