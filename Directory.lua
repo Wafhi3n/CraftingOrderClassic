@@ -17,13 +17,18 @@ local function now() return (GetTime and GetTime()) or 0 end
 -- ------------------------------------------------------------------
 -- Réception
 -- ------------------------------------------------------------------
--- Un artisan AJOUTÉ à la main vient d'apparaître en ligne : on le dit. Appelé à l'entrée dans le canal
--- ET à la 1re réponse (_Touch) — sans canal, c'est le seul signal qui reste.
+-- Un artisan AJOUTÉ à la main apparaît en ligne (entrée dans le canal, 1re réponse) : une bulle, 30 min
+-- au plus par artisan. Ses arrivées se répètent (salles, départs et retours) : la bulle revenait en boucle
+-- (vue par le user le 2026-11-25). Pas de ligne au chat : aucun geste du joueur ne l'a demandée.
+local ADDED_TOAST_GAP = 1800   -- s
 function Dir:_ToastIfAdded(who)
     local r = self.roster and self.roster[who]
     if not (r and r.source == "added") then return end
+    self._addedToastAt = self._addedToastAt or {}
+    local last, t = self._addedToastAt[who], now()
+    if last and t - last < ADDED_TOAST_GAP then return end
+    self._addedToastAt[who] = t
     local msg = string.format(L["ton artisan |cFFFFFFFF%s|r est en ligne."], who)
-    print("|cFF33DD88Crafting Order|r " .. msg)
     if COC.UI and COC.UI.Toast then COC.UI:Toast(msg) end
 end
 

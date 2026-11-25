@@ -27,6 +27,9 @@ for (Green Woolen Bag, Red Woolen Bag, Green Silk Pack, Black Silk Pack, Red Mag
 Cookie's Feast, Expert Campfire, Mana Well and Fermenter change color at the skill levels the game
 uses.
 
+Fixed: the "your crafter ... is online" notice could keep coming back for a crafter you added by hand.
+It now shows at most once every 30 minutes per crafter, and no longer writes a line in chat.
+
 ## v1.53.0 - Craftsman's Writs in the leveling route, and a box to favor them
 
 The leveling route (Route tab) now marks the steps whose item a Craftsman's Writ asks for, the same
