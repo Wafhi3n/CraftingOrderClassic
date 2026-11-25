@@ -46,15 +46,27 @@ client.
 
 ## Relevés
 
+- 2026-11-25 11:49 — jusqu'a 63ef602 — Forever 1.60.1.71037, solo, client anglais ; build
+  `main-dev@c49cca6 2026-11-25 11:44` (lu par l'appli du banc, fiche
+  `CraftingOrderClassic--fix-bulle-artisan-en-ligne`) — **GO sur `fix/bulle-artisan-en-ligne`** : avant,
+  la bulle « your crafter Atlânce Saenar is online » revenait sans cesse à l'écran (capture du user,
+  11:40, artisan ajouté à la main). Après le `/reload` : `/co version` donne ce build, sans erreur Lua ;
+  la bulle ne revient plus et aucune ligne n'apparaît au chat (user, « Vu OK ») ; la sauvegarde s'écrit
+  (11:49:04). ⚠️ Observation courte : les trois gestes sont cochés à 11:49, cinq minutes après le
+  déploiement, et le retour d'une bulle au-delà de 30 min n'a pas été attendu. Cause non mesurée : la
+  trace réseau n'est pas active sur le live, on ne sait pas combien de fois l'artisan entrait dans le canal.
+
 - 2026-11-25 11:34 — jusqu'a fcfd1c8 — Forever 1.60.1.71037, solo ; build `main-dev@8868748
   2026-11-25 11:02` (lu par l'appli du banc dans la copie déployée, fiche
   `CraftingOrderClassic--release-v1.54.0`) — **GO sur `release/v1.54.0`** (version candidate) : le
   chargement se fait sans erreur Lua et `/co version` donne ce build (user, « Vu OK ») ; l'onglet
   Nouveautés ouvre sur la v1.54.0, son titre et ses cinq paragraphes, la v1.53.0 dessous (user, « Vu
   OK »). Le code de la release avait été vu morceau par morceau (`feat/manquantes-filtres-profit-niveau`
-  le 2026-11-18, `fix/cle-perso-sans-royaume` ce matin). **Pas vu** : les textes retouchés en anglais,
-  allemand et espagnol (« Prix : %s », « %s : %s », « Handwerksaufträge », client français) ; le
-  correctif du courrier (`fix/courrier-cod`), publié sans avoir été vu, sur l'accord du user.
+  le 2026-11-18, `fix/cle-perso-sans-royaume` ce matin). Client du user en anglais (capture du même
+  jour) : l'onglet a donc été lu dans sa traduction anglaise. **Pas vu** : « Price: %s » dans
+  l'infobulle de Profit, « %s: %s » au chat, les textes allemands et espagnols ; le correctif du
+  courrier (`fix/courrier-cod`), publié sans avoir été vu, sur l'accord du user. (Corrigé le 2026-11-25 :
+  la première écriture de ce relevé disait à tort « client français ».)
 
 - 2026-11-25 10:48 — jusqu'a 050e327 — Forever 1.60.1.71037, solo, un compte à trois persos ; build
   non recopié du jeu (le déploiement du 2026-11-24 a posé `main-dev@cf26314`, fiche
