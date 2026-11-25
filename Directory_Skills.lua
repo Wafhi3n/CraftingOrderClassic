@@ -10,10 +10,7 @@ local Dir = COC.Directory
 
 local CraftLink = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
 
-local function me() return (UnitName and UnitName("player")) or "?" end   -- PRÉNOM : clé LOCALE de perso (cf. Api.PlayerName)
-local function myRealm() return (GetRealmName and GetRealmName()) or "" end
-
--- Miroir de mySkills (perso COURANT) vers une partition PAR PERSO (clé « Nom-Royaume », comme
+-- Miroir de mySkills (perso COURANT) vers une partition PAR PERSO (clé « Prénom- », COC.Api.CharKey, comme
 -- knownRecipes/myChars) → l'onglet « Mes artisans » lit les niveaux de TOUS mes rerolls hors ligne.
 -- COPIE des {rank,max} : self.mySkills est réassigné {} à chaque CaptureSkills, une référence
 -- pointerait vers une table qui sera remplacée.
@@ -22,7 +19,7 @@ local function mirrorMySkills(skills)
     COC.db.mySkillsByChar = COC.db.mySkillsByChar or {}
     local part = {}
     for key, sk in pairs(skills) do part[key] = { sk[1], sk[2] } end
-    COC.db.mySkillsByChar[me() .. "-" .. myRealm()] = part
+    COC.db.mySkillsByChar[COC.Api.CharKey()] = part
 end
 
 -- L'API skill existe sous DEUX formes qui ne se recouvrent pas, et c'est un piège à double détente :

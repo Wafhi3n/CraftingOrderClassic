@@ -250,7 +250,7 @@ local news = {
     ["rerolls : désactivés — rien n'est annoncé (opt-in : /co alts on)."] =
         "Twinks: deaktiviert — nichts wird angekündigt (Opt-in: /co alts on).",
     ["perso principal (vitrine) : %s"] = "Hauptcharakter (Aushängeschild): %s",
-    ["persos du compte (%s) : %s"] = "Charaktere des Accounts (%s): %s",
+    ["persos du compte : %s"] = "Charaktere des Accounts: %s",
     ["le lien n'est vérifié chez les autres qu'après une connexion de CHAQUE perso (addon actif)."] =
         "Andere bestätigen die Verknüpfung erst, wenn sich JEDER Charakter einmal eingeloggt hat (Addon aktiv).",
     ["rerolls activés — perso principal : %s (changer : /co alts main <nom>)"] =

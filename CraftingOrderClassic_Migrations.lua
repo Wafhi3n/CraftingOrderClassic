@@ -10,8 +10,36 @@
 -- PUR : aucune dépendance à l'API WoW ni à LibStub → testable hors client (tests headless Elune).
 
 local COC = CraftingOrderClassic
-local Migrations = { VER = 2 }
+local Migrations = { VER = 3 }
 COC.Migrations = Migrations
+
+-- Palier 3 : les tables rangées par perso, sous « Prénom-Royaume » jusqu'au build 71037 de Forever, sous
+-- « Prénom- » depuis (COC.Api.CharKey ; spec docs/specs/cle-perso-sans-royaume.md).
+local PER_CHAR = { "knownRecipes", "myCooldowns", "mySkillsByChar", "myChars", "myCharNames", "myCharFaction" }
+
+local function deepCopy(v)
+    if type(v) ~= "table" then return v end
+    local t = {}
+    for k, x in pairs(v) do t[k] = deepCopy(x) end
+    return t
+end
+
+-- Prénom → son ancien royaume, ou false s'il en a plusieurs (sur l'union des tables : un même prénom sur
+-- deux royaumes, c'est deux persos, ou un transfert ; on ne devine pas lequel est « Prénom- »).
+local function oldRealms(db)
+    local seen = {}
+    for _, name in ipairs(PER_CHAR) do
+        for key in pairs(type(db[name]) == "table" and db[name] or {}) do
+            local short, realm
+            if type(key) == "string" then short, realm = key:match("^([^%-]+)%-(.+)$") end
+            if short then
+                if seen[short] == nil then seen[short] = realm
+                elseif seen[short] ~= realm then seen[short] = false end
+            end
+        end
+    end
+    return seen
+end
 
 -- LADDER[v] fait passer une DB du schéma (v-1) au schéma v. Doit être IDEMPOTENT vis-à-vis d'une DB
 -- déjà à ce format (une DB courante ou déjà migrée ne doit rien perdre).
@@ -41,6 +69,26 @@ Migrations.LADDER = {
                 if type(k) == "table" and next(k) and type(set) == "table" then
                     for sid in pairs(set) do
                         if not k[sid] then set[sid] = nil end
+                    end
+                end
+            end
+        end
+    end,
+    -- v3 : depuis le build 71037, GetRealmName() rend "" et chaque perso écrit sous « Prénom- » ; ce qu'il
+    -- avait sous « Prénom-Royaume » n'était plus lu (recettes muettes jusqu'à rouvrir chaque métier, rerolls
+    -- absents de « Mes artisans »). On le recopie sous « Prénom- » quand celle-ci manque ou est vide, et
+    -- seulement si le prénom n'a qu'un ancien royaume (règle du user, 2026-11-24). Les anciennes clés restent :
+    -- rien ne s'efface, et tous les lecteurs les écartent (royaume ≠ COC.Api.LOCAL_REALM).
+    [3] = function(db)
+        local realms = oldRealms(db)
+        for _, name in ipairs(PER_CHAR) do
+            local tab = db[name]
+            if type(tab) == "table" then
+                for short, realm in pairs(realms) do
+                    local new, old = short .. "-", (realm and tab[short .. "-" .. realm]) or nil
+                    local cur = tab[new]
+                    if old ~= nil and (cur == nil or (type(cur) == "table" and next(cur) == nil)) then
+                        tab[new] = deepCopy(old)
                     end
                 end
             end

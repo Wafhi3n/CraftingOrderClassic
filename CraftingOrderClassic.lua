@@ -35,27 +35,23 @@ COC.GATHER_ONLY = { Fishing = true, Herbalism = true, Skinning = true }
 local function p(msg) print("|cFF33DD88Crafting Order|r " .. msg) end
 
 -- Registre de recettes PAR PERSO. La SavedVariables est partagée par COMPTE, donc on partitionne
--- knownRecipes[nom-royaume] : on ne charge/diffuse (RK) QUE la partition du perso courant — sinon les
+-- knownRecipes[Prénom-] : on ne charge/diffuse (RK) QUE la partition du perso courant — sinon les
 -- métiers des alts fuiraient dans MON annonce (« Balragar forgeron » = recettes de Luletta, même compte).
 -- Les partitions des alts sont CONSERVÉES (future feature « ton reroll X peut faire cette commande »).
 function COC:_MyKnownStore()
     if not self.db then return nil end
     self.db.knownRecipes = self.db.knownRecipes or {}
-    local n  = (UnitName and UnitName("player")) or "?"
-    local rl = (GetRealmName and GetRealmName()) or ""
-    local me = n .. "-" .. rl
+    local me = self.Api.CharKey()   -- « Prénom- » (spec cle-perso-sans-royaume)
     self.db.knownRecipes[me] = self.db.knownRecipes[me] or {}
     return self.db.knownRecipes[me]
 end
 
--- myCooldowns[nom-royaume] : même partition PAR PERSO que knownRecipes — un CD de transmutation
+-- myCooldowns[Prénom-] : même partition PAR PERSO que knownRecipes — un CD de transmutation
 -- appartient au perso, pas au compte (sinon le CD d'un alt fuirait dans MON annonce).
 function COC:_MyCooldownStore()
     if not self.db then return nil end
     self.db.myCooldowns = self.db.myCooldowns or {}
-    local n  = (UnitName and UnitName("player")) or "?"
-    local rl = (GetRealmName and GetRealmName()) or ""
-    local me = n .. "-" .. rl
+    local me = self.Api.CharKey()
     self.db.myCooldowns[me] = self.db.myCooldowns[me] or {}
     return self.db.myCooldowns[me]
 end

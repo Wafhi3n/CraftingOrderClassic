@@ -19,7 +19,7 @@ local CraftLink = LibStub and LibStub:GetLibrary("CraftLink-1.0", true)
 local function p(msg) print("|cFF33DD88Crafting Order|r " .. msg) end
 local function now() return (GetTime and GetTime()) or 0 end     -- uptime : rate-cap
 local function me() return COC.Api.PlayerName() end   -- nom RÉSEAU (« Prénom Nom » sur Forever)
-local function myRealm() return (GetRealmName and GetRealmName()) or "" end
+local function myRealm() return COC.Api.LOCAL_REALM end   -- clés « Prénom- » (spec cle-perso-sans-royaume)
 
 -- Nom RÉSEAU d'un de mes persos. `altMain` peut valoir un prénom (choisi par /co alts main dans les
 -- clés locales) : on le complète par myCharNames avant de l'annoncer, sinon les pairs le compareraient
@@ -36,7 +36,7 @@ local RATE_WINDOW, RATE_MAX = 300, 10      -- réception : 10 msgs ALT max / 5 m
 -- ------------------------------------------------------------------
 -- Mes persos (100 % local — la SV est par COMPTE)
 -- ------------------------------------------------------------------
--- Trace du passage de CHAQUE perso du compte (clé « Nom-Royaume », format _MyKnownStore).
+-- Trace du passage de CHAQUE perso du compte (clé « Prénom- », COC.Api.CharKey, format _MyKnownStore).
 -- Stampé à chaque login, même sans opt-in : nourrit IsMyChar (visibilité/alertes locales).
 -- On estampille AUSSI la FACTION du perso : un reroll d'en face n'est PAS un artisan exploitable
 -- (le courrier et l'échange sont bloqués entre factions en Classic/TBC/WotLK), et le mélanger aux
@@ -47,7 +47,7 @@ local RATE_WINDOW, RATE_MAX = 300, 10      -- réception : 10 msgs ALT max / 5 m
 -- perso est noté à côté, dans myCharNames : c'est lui que les autres joueurs nous renvoient.
 function COC:StampMyChar()
     if not self.db then return end
-    local key = ((UnitName and UnitName("player")) or "?") .. "-" .. myRealm()
+    local key = COC.Api.CharKey()
     self.db.myChars = self.db.myChars or {}
     self.db.myChars[key] = time()
     self.db.myCharNames = self.db.myCharNames or {}
@@ -274,7 +274,7 @@ function Dir:_AltsStatus()
                       or L["rerolls : désactivés — rien n'est annoncé (opt-in : /co alts on)."])
     if db.altMain then p(string.format(L["perso principal (vitrine) : %s"], db.altMain)) end
     local names = self:_MyAltNames()
-    if #names > 0 then p(string.format(L["persos du compte (%s) : %s"], myRealm(), table.concat(names, ", "))) end
+    if #names > 0 then p(string.format(L["persos du compte : %s"], table.concat(names, ", "))) end
     p(L["le lien n'est vérifié chez les autres qu'après une connexion de CHAQUE perso (addon actif)."])
 end
 
