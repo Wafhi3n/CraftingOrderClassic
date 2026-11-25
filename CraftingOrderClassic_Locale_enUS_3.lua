@@ -238,6 +238,8 @@ local en3 = {
     ["Ajoute aussi, en gris, les recettes que ton rang ne permet pas encore d'apprendre."] =
         "Also adds, in grey, the recipes your skill is still too low to learn.",
     ["Pas encore apprise."] = "Not learned yet.",
+    ["Prix : %s"] = "Price: %s",
+    ["%s : %s"] = "%s: %s",   -- « recette : où la trouver », la ligne de chat d'un clic sur Profit
     ["Clic : dire dans le chat où trouver cette recette."] = "Click: say in chat where to find this recipe.",
     -- Vue Manquantes : le filtre par catégorie (2026-11-16)
     ["Writs"] = "Writs",
